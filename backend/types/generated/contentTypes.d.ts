@@ -523,6 +523,43 @@ export interface PluginContentReleasesReleaseAction
   };
 }
 
+export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
+  collectionName: 'breeders';
+  info: {
+    displayName: 'Breeder';
+    pluralName: 'breeders';
+    singularName: 'breeder';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    breedingLicenseSince: Schema.Attribute.Date;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    kennelName: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+      }>;
+    litters: Schema.Attribute.Relation<
+      'oneToMany',
+      'plugin::hzd-plugin.litter'
+    >;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'plugin::hzd-plugin.breeder'
+    > &
+      Schema.Attribute.Private;
+    member: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.member'>;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
   collectionName: 'dogs';
   info: {
@@ -531,7 +568,6 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
     singularName: 'dog';
   };
   options: {
-    comment: '';
     draftAndPublish: false;
   };
   pluginOptions: {
@@ -540,16 +576,180 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
     };
   };
   attributes: {
+    avatar: Schema.Attribute.Media<'images' | 'files'>;
+    color: Schema.Attribute.Enumeration<['S', 'SM', 'B']>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    dateOfBirth: Schema.Attribute.Date;
+    dateOfDeath: Schema.Attribute.Date;
+    father: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.dog'>;
+    fullKennelName: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 500;
+      }>;
+    givenName: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'plugin::hzd-plugin.dog'
     > &
       Schema.Attribute.Private;
-    name: Schema.Attribute.String;
+    microchipNo: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 30;
+      }>;
+    mother: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.dog'>;
+    owner: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.member'>;
+    publishedAt: Schema.Attribute.DateTime;
+    sex: Schema.Attribute.Enumeration<['M', 'F']>;
+    stuntLicenseSince: Schema.Attribute.Date;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface PluginHzdPluginLitter extends Struct.CollectionTypeSchema {
+  collectionName: 'litters';
+  info: {
+    displayName: 'Litter';
+    pluralName: 'litters';
+    singularName: 'litter';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  pluginOptions: {
+    'content-manager': {
+      visible: true;
+    };
+  };
+  attributes: {
+    breeder: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::hzd-plugin.breeder'
+    >;
+    closed: Schema.Attribute.Boolean;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    dateOfBirth: Schema.Attribute.Date;
+    dateOfManting: Schema.Attribute.Date;
+    expectedDateOfBirth: Schema.Attribute.Date;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'plugin::hzd-plugin.litter'
+    > &
+      Schema.Attribute.Private;
+    mother: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.dog'>;
+    publishedAt: Schema.Attribute.DateTime;
+    puppies: Schema.Attribute.Relation<'oneToMany', 'plugin::hzd-plugin.puppy'>;
+    stuntDog: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.dog'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface PluginHzdPluginMember extends Struct.CollectionTypeSchema {
+  collectionName: 'members';
+  info: {
+    displayName: 'Member';
+    pluralName: 'members';
+    singularName: 'member';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  pluginOptions: {
+    'content-manager': {
+      visible: true;
+    };
+  };
+  attributes: {
+    adress1: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    adress2: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
+    cancellationDueDate: Schema.Attribute.Date;
+    cancellationOn: Schema.Attribute.Date;
+    countryCode: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 2;
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    dateOfBirth: Schema.Attribute.Date;
+    dateOfDeath: Schema.Attribute.Date;
+    fullName: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'plugin::hzd-plugin.member'
+    > &
+      Schema.Attribute.Private;
+    membershipNo: Schema.Attribute.Integer;
+    memberSince: Schema.Attribute.Date;
+    phone: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 50;
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    region: Schema.Attribute.Enumeration<
+      ['Nord', 'Ost', 'Mitte', 'S\u00FCd', 'West']
+    >;
+    sex: Schema.Attribute.Enumeration<['M', 'F']>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    zip: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 10;
+      }>;
+  };
+}
+
+export interface PluginHzdPluginPuppy extends Struct.CollectionTypeSchema {
+  collectionName: 'puppies';
+  info: {
+    displayName: 'Puppy';
+    pluralName: 'puppies';
+    singularName: 'puppy';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  pluginOptions: {
+    'content-manager': {
+      visible: true;
+    };
+  };
+  attributes: {
+    available: Schema.Attribute.Boolean;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    dog: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.dog'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'plugin::hzd-plugin.puppy'
+    > &
+      Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -976,7 +1176,11 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
+      'plugin::hzd-plugin.breeder': PluginHzdPluginBreeder;
       'plugin::hzd-plugin.dog': PluginHzdPluginDog;
+      'plugin::hzd-plugin.litter': PluginHzdPluginLitter;
+      'plugin::hzd-plugin.member': PluginHzdPluginMember;
+      'plugin::hzd-plugin.puppy': PluginHzdPluginPuppy;
       'plugin::i18n.locale': PluginI18NLocale;
       'plugin::review-workflows.workflow': PluginReviewWorkflowsWorkflow;
       'plugin::review-workflows.workflow-stage': PluginReviewWorkflowsWorkflowStage;

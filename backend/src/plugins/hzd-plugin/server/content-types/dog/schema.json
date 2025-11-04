@@ -7,7 +7,7 @@
     "displayName": "Dog"
   },
   "options": {
-    "comment": ""
+    "draftAndPublish": false
   },
   "pluginOptions": {
     "content-manager": {
@@ -15,8 +15,84 @@
     }
   },
   "attributes": {
-    "name": {
-      "type": "string"
+    "givenName": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "fullKennelName": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "avatar": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
+    },
+    "microchipNo": {
+      "type": "string",
+      "maxLength": 30
+    },
+    "stuntLicenseSince": {
+      "type": "date"
+    },
+    "dateOfBirth": {
+      "type": "date"
+    },
+    "dateOfDeath": {
+      "type": "date"
+    },
+    "sex": {
+      "type": "enumeration",
+      "enum": [
+        "M",
+        "F"
+      ]
+    },
+    "color": {
+      "type": "enumeration",
+      "enum": [
+        "S",
+        "SM",
+        "B"
+      ]
+    },
+    "father": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::hzd-plugin.dog",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "sex"
+            },
+            "F"
+          ]
+        }
+      }
+    },
+    "mother": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::hzd-plugin.dog",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "sex"
+            },
+            "F"
+          ]
+        }
+      }
+    },
+    "owner": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::hzd-plugin.member"
     }
   }
 }

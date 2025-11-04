@@ -1,9 +1,31 @@
 import dog from "../../content-types/dog/schema.json"
+import member from "../../content-types/member/schema.json"
+import breeder from "../../content-types/breeder/schema.json"
+import litter from "../../content-types/litter/schema.json"
+import puppy from "../../content-types/puppy/schema.json"
 
-// https://forum.strapi.io/t/cant-get-plugin-content-type-to-show-up/42435/5
+// ContentTypeDefinition
+
+// https://docs.strapi.io/cms/backend-customization/models#lifecycle-hooks
+const dogLifecyles = {
+
+}
 
 export default {
     dog: {
-        schema: dog
+        schema: dog,
+        lifecyles: dogLifecyles
+    },
+    breeder: {
+        schema: breeder
+    },
+    member: {
+        schema: member
+    },
+    litter: {
+        schema: litter
+    },
+    puppy: {
+        schema: puppy
     }
 };

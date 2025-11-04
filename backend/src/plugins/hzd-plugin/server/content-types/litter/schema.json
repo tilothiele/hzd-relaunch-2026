@@ -1,0 +1,52 @@
+{
+  "kind": "collectionType",
+  "collectionName": "litters",
+  "info": {
+    "singularName": "litter",
+    "pluralName": "litters",
+    "displayName": "Litter"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {
+    "content-manager": {
+          "visible": true
+    }
+  },
+  "attributes": {
+    "breeder": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::hzd-plugin.breeder",
+      "inversedBy": "litters"
+    },
+    "mother": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::hzd-plugin.dog"
+    },
+    "stuntDog": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::hzd-plugin.dog"
+    },
+    "dateOfManting": {
+      "type": "date"
+    },
+    "expectedDateOfBirth": {
+      "type": "date"
+    },
+    "dateOfBirth": {
+      "type": "date"
+    },
+    "puppies": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::hzd-plugin.puppy"
+    },
+    "closed": {
+      "type": "boolean"
+    }
+  }
+}

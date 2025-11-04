@@ -1,0 +1,33 @@
+{
+  "kind": "collectionType",
+  "collectionName": "breeders",
+  "info": {
+    "singularName": "breeder",
+    "pluralName": "breeders",
+    "displayName": "Breeder"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "member": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::hzd-plugin.member"
+    },
+    "kennelName": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "breedingLicenseSince": {
+      "type": "date"
+    },
+    "litters": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::hzd-plugin.litter",
+      "mappedBy": "breeder"
+    }
+  }
+}
