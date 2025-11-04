@@ -523,6 +523,40 @@ export interface PluginContentReleasesReleaseAction
   };
 }
 
+export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
+  collectionName: 'dogs';
+  info: {
+    displayName: 'Dog';
+    pluralName: 'dogs';
+    singularName: 'dog';
+  };
+  options: {
+    comment: '';
+    draftAndPublish: false;
+  };
+  pluginOptions: {
+    'content-manager': {
+      visible: true;
+    };
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'plugin::hzd-plugin.dog'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface PluginI18NLocale extends Struct.CollectionTypeSchema {
   collectionName: 'i18n_locale';
   info: {
@@ -942,6 +976,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
+      'plugin::hzd-plugin.dog': PluginHzdPluginDog;
       'plugin::i18n.locale': PluginI18NLocale;
       'plugin::review-workflows.workflow': PluginReviewWorkflowsWorkflow;
       'plugin::review-workflows.workflow-stage': PluginReviewWorkflowsWorkflowStage;

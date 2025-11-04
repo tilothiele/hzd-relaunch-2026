@@ -1,0 +1,22 @@
+{
+  "kind": "collectionType",
+  "collectionName": "dogs",
+  "info": {
+    "singularName": "dog",
+    "pluralName": "dogs",
+    "displayName": "Dog"
+  },
+  "options": {
+    "comment": ""
+  },
+  "pluginOptions": {
+    "content-manager": {
+          "visible": true
+    }
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    }
+  }
+}
