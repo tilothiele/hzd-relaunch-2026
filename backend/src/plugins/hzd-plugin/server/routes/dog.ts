@@ -1,7 +1,26 @@
-/**
- *  router
- */
-
-import { factories } from '@strapi/strapi';
-
-export default factories.createCoreRouter('plugin::hzd-plugin.dog');
+export default [
+  {
+    method: 'GET',
+    path: '/dogs',
+    handler: 'dog.find',
+    config: {
+      auth: false, // öffentlich
+    },
+  },
+  {
+    method: 'GET',
+    path: '/dogs/:id',
+    handler: 'dog.findOne',
+    config: {
+      auth: false, // öffentlich
+    },
+  },
+  {
+    method: 'GET',
+    path: '/dog/:id',
+    handler: 'dog.findOne',
+    config: {
+      auth: false, // öffentlich - alternativer Pfad im Singular
+    },
+  },
+];

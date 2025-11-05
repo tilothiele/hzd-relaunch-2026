@@ -1,3 +1,5 @@
+import dogRoutes from '../../routes/dog';
+
 export default [
   {
     method: "GET",
@@ -7,4 +9,5 @@ export default [
       policies: [],
     },
   },
+  ...dogRoutes,
 ];
