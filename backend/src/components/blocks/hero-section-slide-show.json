@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_blocks_hero_section_slide_shows",
+  "info": {
+    "displayName": "Hero Section Slide Show"
+  },
+  "options": {},
+  "attributes": {
+    "Headline": {
+      "type": "component",
+      "component": "blocks.slide-item",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}

@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_blocks_item_lists",
+  "info": {
+    "displayName": "Item List"
+  },
+  "options": {},
+  "attributes": {
+    "ColumnItem": {
+      "type": "component",
+      "component": "columns.column-item",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}

@@ -1,0 +1,22 @@
+{
+  "kind": "collectionType",
+  "collectionName": "block_columns",
+  "info": {
+    "singularName": "block-column",
+    "pluralName": "block-columns",
+    "displayName": "BlockColumn"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Columns": {
+      "type": "dynamiczone",
+      "components": [
+        "columns.text-column",
+        "blocks.item-list"
+      ]
+    }
+  }
+}

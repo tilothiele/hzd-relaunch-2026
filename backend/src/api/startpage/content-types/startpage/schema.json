@@ -1,0 +1,33 @@
+{
+  "kind": "singleType",
+  "collectionName": "startpages",
+  "info": {
+    "singularName": "startpage",
+    "pluralName": "startpages",
+    "displayName": "Startpage"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "menu": {
+      "type": "json"
+    },
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
+    },
+    "Sections": {
+      "type": "dynamiczone",
+      "components": [
+        "blocks.hero-section-slide-show",
+        "blocks.card-section"
+      ]
+    }
+  }
+}

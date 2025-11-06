@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_columns_text_columns",
+  "info": {
+    "displayName": "Text Column"
+  },
+  "options": {},
+  "attributes": {
+    "Content": {
+      "type": "string"
+    },
+    "Blocks": {
+      "type": "blocks"
+    }
+  },
+  "config": {}
+}

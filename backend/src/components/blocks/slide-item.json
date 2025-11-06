@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_blocks_slide_items",
+  "info": {
+    "displayName": "Slide Item"
+  },
+  "options": {},
+  "attributes": {
+    "Headline": {
+      "type": "string"
+    },
+    "Subheadline": {
+      "type": "string"
+    },
+    "actionButton": {
+      "type": "component",
+      "component": "links.action-button",
+      "repeatable": false
+    }
+  },
+  "config": {}
+}

@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_columns_column_items",
+  "info": {
+    "displayName": "Column Item"
+  },
+  "options": {},
+  "attributes": {
+    "Headline": {
+      "type": "string"
+    },
+    "ItemBody": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

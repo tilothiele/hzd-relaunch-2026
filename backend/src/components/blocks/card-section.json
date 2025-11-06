@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_blocks_card_sections",
+  "info": {
+    "displayName": "Card Section"
+  },
+  "options": {},
+  "attributes": {
+    "Headline": {
+      "type": "string"
+    },
+    "SubHeadline": {
+      "type": "string"
+    },
+    "ActionButton": {
+      "type": "component",
+      "component": "links.action-button",
+      "repeatable": false
+    }
+  },
+  "config": {}
+}
