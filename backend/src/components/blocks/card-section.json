@@ -5,24 +5,11 @@
   },
   "options": {},
   "attributes": {
-    "Headline": {
-      "type": "string"
-    },
-    "SubHeadline": {
-      "type": "string"
-    },
-    "BackgroundImage": {
-      "type": "media",
-      "multiple": false,
-      "allowedTypes": [
-        "images",
-        "files"
-      ]
-    },
-    "ActionButton": {
+    "CardItem": {
       "type": "component",
-      "component": "links.action-button",
-      "repeatable": false
+      "component": "blocks.card-item",
+      "repeatable": true,
+      "min": 1
     }
   },
   "config": {}

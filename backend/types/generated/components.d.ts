@@ -1,15 +1,32 @@
 import type { Schema, Struct } from '@strapi/strapi';
 
+export interface BlocksCardItem extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_card_items';
+  info: {
+    displayName: 'Card Item';
+  };
+  attributes: {
+    ActionButton: Schema.Attribute.Component<'links.action-button', false>;
+    BackgroundImage: Schema.Attribute.Media<'images' | 'files'>;
+    FarbThema: Schema.Attribute.Enumeration<['A', 'B', 'C']>;
+    Headline: Schema.Attribute.String;
+    Subheadline: Schema.Attribute.String;
+  };
+}
+
 export interface BlocksCardSection extends Struct.ComponentSchema {
   collectionName: 'components_blocks_card_sections';
   info: {
     displayName: 'Card Section';
   };
   attributes: {
-    ActionButton: Schema.Attribute.Component<'links.action-button', false>;
-    BackgroundImage: Schema.Attribute.Media<'images' | 'files'>;
-    Headline: Schema.Attribute.String;
-    SubHeadline: Schema.Attribute.String;
+    CardItem: Schema.Attribute.Component<'blocks.card-item', true> &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      >;
   };
 }
 
@@ -92,6 +109,7 @@ export interface LinksActionButton extends Struct.ComponentSchema {
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
+      'blocks.card-item': BlocksCardItem;
       'blocks.card-section': BlocksCardSection;
       'blocks.hero-section-slide-show': BlocksHeroSectionSlideShow;
       'blocks.item-list': BlocksItemList;

@@ -1,0 +1,37 @@
+{
+  "collectionName": "components_blocks_card_items",
+  "info": {
+    "displayName": "Card Item"
+  },
+  "options": {},
+  "attributes": {
+    "Headline": {
+      "type": "string"
+    },
+    "Subheadline": {
+      "type": "string"
+    },
+    "BackgroundImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
+    },
+    "FarbThema": {
+      "type": "enumeration",
+      "enum": [
+        "A",
+        "B",
+        "C"
+      ]
+    },
+    "ActionButton": {
+      "type": "component",
+      "component": "links.action-button",
+      "repeatable": false
+    }
+  },
+  "config": {}
+}
