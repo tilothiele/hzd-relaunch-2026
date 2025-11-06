@@ -7,6 +7,7 @@ export interface BlocksCardSection extends Struct.ComponentSchema {
   };
   attributes: {
     ActionButton: Schema.Attribute.Component<'links.action-button', false>;
+    BackgroundImage: Schema.Attribute.Media<'images' | 'files'>;
     Headline: Schema.Attribute.String;
     SubHeadline: Schema.Attribute.String;
   };
@@ -19,6 +20,16 @@ export interface BlocksHeroSectionSlideShow extends Struct.ComponentSchema {
   };
   attributes: {
     Headline: Schema.Attribute.Component<'blocks.slide-item', true>;
+  };
+}
+
+export interface BlocksItemList extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_item_lists';
+  info: {
+    displayName: 'Item List';
+  };
+  attributes: {
+    ColumnItem: Schema.Attribute.Component<'columns.column-item', true>;
   };
 }
 
@@ -39,7 +50,30 @@ export interface BlocksSlideItem extends Struct.ComponentSchema {
   attributes: {
     actionButton: Schema.Attribute.Component<'links.action-button', false>;
     Headline: Schema.Attribute.String;
+    HeroImage: Schema.Attribute.Media<'images' | 'files'>;
     Subheadline: Schema.Attribute.String;
+  };
+}
+
+export interface ColumnsColumnItem extends Struct.ComponentSchema {
+  collectionName: 'components_columns_column_items';
+  info: {
+    displayName: 'Column Item';
+  };
+  attributes: {
+    Headline: Schema.Attribute.String;
+    ItemBody: Schema.Attribute.String;
+  };
+}
+
+export interface ColumnsTextColumn extends Struct.ComponentSchema {
+  collectionName: 'components_columns_text_columns';
+  info: {
+    displayName: 'Text Column';
+  };
+  attributes: {
+    Blocks: Schema.Attribute.Blocks;
+    Content: Schema.Attribute.String;
   };
 }
 
@@ -60,8 +94,11 @@ declare module '@strapi/strapi' {
     export interface ComponentSchemas {
       'blocks.card-section': BlocksCardSection;
       'blocks.hero-section-slide-show': BlocksHeroSectionSlideShow;
+      'blocks.item-list': BlocksItemList;
       'blocks.page-section': BlocksPageSection;
       'blocks.slide-item': BlocksSlideItem;
+      'columns.column-item': ColumnsColumnItem;
+      'columns.text-column': ColumnsTextColumn;
       'links.action-button': LinksActionButton;
     }
   }

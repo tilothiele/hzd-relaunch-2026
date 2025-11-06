@@ -430,6 +430,36 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiBlockColumnBlockColumn extends Struct.CollectionTypeSchema {
+  collectionName: 'block_columns';
+  info: {
+    displayName: 'BlockColumn';
+    pluralName: 'block-columns';
+    singularName: 'block-column';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    Columns: Schema.Attribute.DynamicZone<
+      ['columns.text-column', 'blocks.item-list']
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::block-column.block-column'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiContactContact extends Struct.CollectionTypeSchema {
   collectionName: 'contacts';
   info: {
@@ -1265,6 +1295,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::block-column.block-column': ApiBlockColumnBlockColumn;
       'api::contact.contact': ApiContactContact;
       'api::news-article.news-article': ApiNewsArticleNewsArticle;
       'api::startpage.startpage': ApiStartpageStartpage;

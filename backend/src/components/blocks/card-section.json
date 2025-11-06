@@ -11,6 +11,14 @@
     "SubHeadline": {
       "type": "string"
     },
+    "BackgroundImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
+    },
     "ActionButton": {
       "type": "component",
       "component": "links.action-button",

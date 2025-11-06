@@ -11,6 +11,14 @@
     "Subheadline": {
       "type": "string"
     },
+    "HeroImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
+    },
     "actionButton": {
       "type": "component",
       "component": "links.action-button",
