@@ -93,6 +93,45 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "plugin::hzd-plugin.member"
+    },
+    "jBreederId": {
+      "type": "integer"
+    },
+    "jId": {
+      "type": "integer"
+    },
+    "jBreeder": {
+      "type": "string"
+    },
+    "jRegion": {
+      "type": "string"
+    },
+    "jBonitation": {
+      "type": "text"
+    },
+    "jLitter": {
+      "type": "string"
+    },
+    "jMantings": {
+      "type": "string"
+    },
+    "jCategory": {
+      "type": "string"
+    },
+    "jSex": {
+      "type": "integer"
+    },
+    "jLitterKind": {
+      "type": "string"
+    },
+    "jWithersHeight": {
+      "type": "integer"
+    },
+    "jExhibitions": {
+      "type": "text"
+    },
+    "jImage": {
+      "type": "string"
     }
   }
 }
