@@ -62,7 +62,7 @@ function renderMenuItem(item: MenuItem) {
 				<Link href={item.url} className={baseLinkClass}>
 					{item.name}
 					{hasChildren ? (
-						<span className="text-xs" aria-hidden="true">
+						<span className="text-l" aria-hidden="true">
 							▼
 						</span>
 					) : null}
@@ -71,7 +71,7 @@ function renderMenuItem(item: MenuItem) {
 				<span className={baseLinkClass}>
 					{item.name}
 					{hasChildren ? (
-						<span className="text-xs" aria-hidden="true">
+						<span className="text-l" aria-hidden="true">
 							▼
 						</span>
 					) : null}
@@ -102,36 +102,36 @@ export function Header({ startpage }: HeaderProps) {
 	console.log(logoSrc, logoAlt, logoWidth, logoHeight)
 	return (
 		<header className="bg-[#64574E] text-white">
-			<nav className="container mx-auto px-4 py-3">
-				<ul className="flex items-center gap-6 text-sm">
-					<li>
+			<nav className="container px-4 py-3 mx-auto">
+				<div className="flex justify-between">
+					<ul className="flex items-center gap-6 text-sm">
 						<Link
-							href="/"
-							className="flex items-center transition-opacity hover:opacity-80"
-							aria-label="Zur Startseite"
-						>
-							{logoSrc ? (
-								<Image
-									src={logoSrc}
-									alt={logoAlt}
-									width="100"
-									height="100"
-									className="object-contain"
-									unoptimized
-									priority
-								/>
-							) : (
-								<span className="text-lg font-semibold tracking-wide">
-									HZD
-								</span>
-							)}
+								href="/"
+								className="transition-opacity hover:opacity-80"
+								aria-label="Zur Startseite"
+							>
+								{logoSrc ? (
+									<Image
+										src={logoSrc}
+										alt={logoAlt}
+										width="100"
+										height="100"
+										className="object-contain"
+										unoptimized
+										priority
+									/>
+								) : (
+									<span className="text-lg font-semibold tracking-wide">
+										HZD
+									</span>
+								)}
 						</Link>
-					</li>
-					{(startpage.Menu?.items ?? []).map(renderMenuItem)}
-					<li className="ml-auto flex items-center gap-4">
-						<SocialLinks socialLinkFB={startpage.SocialLinkFB} socialLinkYT={startpage.SocialLinkYT} />
-					</li>
-				</ul>
+						{(startpage.Menu?.items ?? []).map(renderMenuItem)}
+						<li className="ml-auto flex items-center gap-4">
+							<SocialLinks socialLinkFB={startpage.SocialLinkFB} socialLinkYT={startpage.SocialLinkYT} />
+						</li>
+					</ul>
+				</div>
 			</nav>
 		</header>
 	)
