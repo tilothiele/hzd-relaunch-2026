@@ -1,5 +1,6 @@
-import type { MenuItem } from '@/types'
 import { menu } from '@/lib/globals'
+import type { MenuItem, Startpage } from '@/types'
+import Image from 'next/image'
 import Link from 'next/link'
 
 const baseLinkClass =
@@ -17,6 +18,36 @@ const dropdownListClass = [
 	'shadow-lg',
 	'group-hover:block',
 ].join(' ')
+
+function resolveLogoUrl(logo?: Startpage['logo']) {
+	const logoPath = logo?.url
+
+	if (!logoPath) {
+		return null
+	}
+
+	const baseUrl = process.env.NEXT_PUBLIC_STRAPI_BASE_URL ?? ''
+
+	if (/^https?:\/\//.test(logoPath)) {
+		return logoPath
+	}
+
+	if (!baseUrl) {
+		return logoPath
+	}
+
+	try {
+		const resolvedUrl = new URL(logoPath, baseUrl)
+
+		if (resolvedUrl.searchParams.has('url')) {
+			resolvedUrl.searchParams.delete('url')
+		}
+
+		return resolvedUrl.toString()
+	} catch {
+		return logoPath
+	}
+}
 
 function renderMenuItem(item: MenuItem) {
 	const hasChildren = Boolean(item.children?.length)
@@ -55,11 +86,51 @@ function renderMenuItem(item: MenuItem) {
 	)
 }
 
-export function Header() {
+interface HeaderProps {
+	startpage: Startpage
+}
+
+export function Header({ startpage }: HeaderProps) {
+	const logoSrc = resolveLogoUrl(startpage?.logo)
+	const logoAlt =
+		startpage?.logo?.alternativeText ??
+		startpage?.logo?.url ??
+		'HZD Logo'
+	const logoWidth = startpage?.logo?.width ?? 120
+	const logoHeight = startpage?.logo?.height ?? 48
+
+	console.log(logoSrc, logoAlt, logoWidth, logoHeight)
 	return (
 		<header className="bg-[#3d2817] text-white">
 			<nav className="container mx-auto px-4 py-3">
 				<ul className="flex items-center gap-6 text-sm">
+					<li>
+						<Link
+							href="/"
+							className="flex items-center transition-opacity hover:opacity-80"
+							aria-label="Zur Startseite"
+						>
+							{logoSrc ? (
+								<Image
+									src={logoSrc}
+									alt={logoAlt}
+									width={logoWidth}
+									height={logoHeight}
+									className="object-contain"
+									style={{
+										height: '3rem',
+										width: 'auto',
+									}}
+									unoptimized
+									priority
+								/>
+							) : (
+								<span className="text-lg font-semibold tracking-wide">
+									HZD
+								</span>
+							)}
+						</Link>
+					</li>
 					{menu.items.map(renderMenuItem)}
 					<li className="ml-auto flex items-center gap-4">
 						<a

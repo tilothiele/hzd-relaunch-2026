@@ -36,7 +36,7 @@ export default async function Home() {
 
 	return (
 		<>
-			<Header />
+			<Header startpage={homepage} />
 			<main>
 
 			</main>
