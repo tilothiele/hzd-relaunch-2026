@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Startpage } from '@/types'
 import Image from 'next/image'
 import { SocialLinks } from '../header/social-links'
-import { resolveLogoUrl } from '../header/header'
+import { resolveMediaUrl } from '../header/logo-utils'
 interface FooterProps {
 	startpage: Startpage
 }
@@ -12,14 +12,14 @@ export function Footer({ startpage }: FooterProps) {
 
 	const logoImage = startpage?.Logo
 
-	const logoSrc = resolveLogoUrl(logoImage) ?? ''
+	const logoSrc = resolveMediaUrl(logoImage) ?? ''
 	const logoAlt = logoImage?.alternativeText ?? 'Hovawart logo'
 	const logoWidth = logoImage?.width ?? 200
 	const logoHeight = logoImage?.height ?? 100
 
 	const magaizinImage = startpage?.UnserHovawartImage
 
-	const magazinSrc = resolveLogoUrl(magaizinImage) ?? ''
+	const magazinSrc = resolveMediaUrl(magaizinImage) ?? ''
 	const magazinAlt = magaizinImage?.alternativeText ?? 'Hovawart Magazin'
 	const magazinWidth = magaizinImage?.width ?? 200
 	const magazinHeight = magaizinImage?.height ?? 100

@@ -23,7 +23,7 @@ export function SocialLinks({ socialLinkFB, socialLinkYT }: SocialLinksProps) {
 				className='transition-colors hover:text-yellow-400'
 				aria-label='Facebook'
 			>
-				<FontAwesomeIcon icon={faFacebookF} size="xl" />
+				<FontAwesomeIcon icon={faFacebookF} size='xl' />
 			</a>
 			<a
 				href={youtubeHref}
@@ -32,7 +32,7 @@ export function SocialLinks({ socialLinkFB, socialLinkYT }: SocialLinksProps) {
 				className='transition-colors hover:text-yellow-400'
 				aria-label='YouTube'
 			>
-				<FontAwesomeIcon icon={faYoutube} size="xl" />
+				<FontAwesomeIcon icon={faYoutube} size='xl' />
 			</a>
 		</>
 	)

@@ -1,7 +1,14 @@
-import type { MenuItem, Startpage } from '@/types'
+'use client'
+
+import type { ChangeEvent, FormEvent } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { MenuItem, Startpage, AuthUser } from '@/types'
 import Image from 'next/image'
 import Link from 'next/link'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faUser, faRightFromBracket, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { SocialLinks } from './social-links'
+import { resolveMediaUrl } from './logo-utils'
 
 const baseLinkClass =
 	'flex items-center gap-1 transition-colors hover:text-yellow-400'
@@ -19,34 +26,28 @@ const dropdownListClass = [
 	'group-hover:block',
 ].join(' ')
 
-export function resolveLogoUrl(logo?: Startpage['Logo']) {
-	const logoPath = logo?.url
+interface LoginCredentials {
+	identifier: string
+	password: string
+}
 
-	if (!logoPath) {
-		return null
-	}
+interface LoginControlsProps {
+	isAuthenticated: boolean
+	user: AuthUser | null
+	onLogin: (credentials: LoginCredentials) => Promise<void>
+	onLogout: () => void
+	isAuthenticating: boolean
+	error?: string | null
+}
 
-	const baseUrl = process.env.NEXT_PUBLIC_STRAPI_BASE_URL ?? ''
-
-	if (/^https?:\/\//.test(logoPath)) {
-		return logoPath
-	}
-
-	if (!baseUrl) {
-		return logoPath
-	}
-
-	try {
-		const resolvedUrl = new URL(logoPath, baseUrl)
-
-		if (resolvedUrl.searchParams.has('url')) {
-			resolvedUrl.searchParams.delete('url')
-		}
-
-		return resolvedUrl.toString()
-	} catch {
-		return logoPath
-	}
+interface HeaderProps {
+	startpage: Startpage
+	isAuthenticated: boolean
+	user: AuthUser | null
+	onLogin: (credentials: LoginCredentials) => Promise<void>
+	onLogout: () => void
+	isAuthenticating: boolean
+	error?: string | null
 }
 
 function renderMenuItem(item: MenuItem) {
@@ -62,7 +63,7 @@ function renderMenuItem(item: MenuItem) {
 				<Link href={item.url} className={baseLinkClass}>
 					{item.name}
 					{hasChildren ? (
-						<span className="text-l" aria-hidden="true">
+						<span className='text-xs' aria-hidden='true'>
 							▼
 						</span>
 					) : null}
@@ -71,7 +72,7 @@ function renderMenuItem(item: MenuItem) {
 				<span className={baseLinkClass}>
 					{item.name}
 					{hasChildren ? (
-						<span className="text-l" aria-hidden="true">
+						<span className='text-xs' aria-hidden='true'>
 							▼
 						</span>
 					) : null}
@@ -86,55 +87,215 @@ function renderMenuItem(item: MenuItem) {
 	)
 }
 
-interface HeaderProps {
-	startpage: Startpage
+function LoginControls({
+	isAuthenticated,
+	user,
+	onLogin,
+	onLogout,
+	isAuthenticating,
+	error,
+}: LoginControlsProps) {
+	const [isFormVisible, setIsFormVisible] = useState(false)
+	const [identifier, setIdentifier] = useState('')
+	const [password, setPassword] = useState('')
+	const [localError, setLocalError] = useState<string | null>(null)
+
+	const userLabel = useMemo(() => {
+		if (!user) {
+			return 'Login'
+		}
+
+		return user.username ?? user.email ?? 'Account'
+	}, [user])
+
+	useEffect(() => {
+		if (isAuthenticated) {
+			setIsFormVisible(false)
+			setIdentifier('')
+			setPassword('')
+		}
+	}, [isAuthenticated])
+
+	useEffect(() => {
+		setLocalError(error ?? null)
+	}, [error])
+
+	const toggleFormVisibility = useCallback(() => {
+		setIsFormVisible((previous) => !previous)
+	}, [])
+
+	const handleLogout = useCallback(() => {
+		setIsFormVisible(false)
+		onLogout()
+	}, [onLogout])
+
+	const handleSubmit = useCallback(async (event: FormEvent<HTMLFormElement>) => {
+		event.preventDefault()
+		setLocalError(null)
+
+		try {
+			await onLogin({ identifier, password })
+		} catch (submissionError) {
+			if (submissionError instanceof Error && submissionError.message) {
+				setLocalError(submissionError.message)
+			} else {
+				setLocalError('Login fehlgeschlagen. Bitte versuchen Sie es erneut.')
+			}
+		} finally {
+			setPassword('')
+		}
+	}, [identifier, onLogin, password])
+
+	if (isAuthenticated) {
+		return (
+			<div className='flex items-center gap-3'>
+				<span className='flex items-center gap-2 text-sm'>
+					<FontAwesomeIcon icon={faUser} />
+					{userLabel}
+				</span>
+				<button
+					type='button'
+					onClick={handleLogout}
+					className='flex items-center gap-2 text-sm transition-colors hover:text-yellow-400'
+				>
+					<FontAwesomeIcon icon={faRightFromBracket} />
+					Logout
+				</button>
+			</div>
+		)
+	}
+
+	return (
+		<div className='relative'>
+			<button
+				type='button'
+				onClick={toggleFormVisibility}
+				className='flex items-center gap-2 text-sm transition-colors hover:text-yellow-400'
+				aria-expanded={isFormVisible}
+				aria-controls='login-form'
+			>
+				<FontAwesomeIcon icon={faUser} />
+				{isAuthenticating ? (
+					<span className='flex items-center gap-2'>
+						<FontAwesomeIcon icon={faSpinner} spin />
+						Laden
+					</span>
+				) : (
+					<span>{userLabel}</span>
+				)}
+			</button>
+			{isFormVisible ? (
+				<form
+					id='login-form'
+					onSubmit={handleSubmit}
+					className='absolute right-0 mt-2 w-64 rounded bg-white p-4 text-gray-900 shadow-lg'
+				>
+					<label className='mb-2 block text-sm font-medium text-gray-700'>
+						E-Mail oder Benutzername
+						<input
+							type='text'
+							name='identifier'
+							value={identifier}
+							onChange={(event: ChangeEvent<HTMLInputElement>) => setIdentifier(event.target.value)}
+							className='mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none'
+							autoComplete='username'
+							required
+						/>
+					</label>
+					<label className='mb-2 block text-sm font-medium text-gray-700'>
+						Passwort
+						<input
+							type='password'
+							name='password'
+							value={password}
+							onChange={(event: ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
+							className='mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none'
+							autoComplete='current-password'
+							required
+						/>
+					</label>
+					{localError ? (
+						<p className='mb-2 text-sm text-red-600'>
+							{localError}
+						</p>
+					) : null}
+					<button
+						type='submit'
+						className='flex w-full items-center justify-center gap-2 rounded bg-[#64574E] px-3 py-2 text-sm text-white transition-colors hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-60'
+						disabled={isAuthenticating}
+					>
+						{isAuthenticating ? (
+							<>
+								<FontAwesomeIcon icon={faSpinner} spin />
+								Anmeldung läuft
+							</>
+						) : (
+							'Einloggen'
+						)}
+					</button>
+				</form>
+			) : null}
+		</div>
+	)
 }
 
-export function Header({ startpage }: HeaderProps) {
-	const logoSrc = resolveLogoUrl(startpage?.Logo)
-	const logoAlt =
-		startpage?.Logo?.alternativeText ??
-		startpage?.Logo?.url ??
-		'HZD Logo'
-	const logoWidth = startpage?.Logo?.width ?? 120
-	const logoHeight = startpage?.Logo?.height ?? 48
+export function Header({
+	startpage,
+	isAuthenticated,
+	user,
+	onLogin,
+	onLogout,
+	isAuthenticating,
+	error,
+}: HeaderProps) {
+	const logoSrc = resolveMediaUrl(startpage?.Logo)
+	const logoAlt = startpage?.Logo?.alternativeText ?? startpage?.Logo?.url ?? 'HZD Logo'
+	const menuItems = startpage.Menu?.items ?? []
 
-	console.log(logoSrc, logoAlt, logoWidth, logoHeight)
 	return (
-		<header className="bg-[#64574E] text-white">
-			<nav className="container px-4 py-3 mx-auto">
-				<div className="flex justify-between">
-					<ul className="flex items-center gap-6 text-sm">
-						<Link
-								href="/"
-								className="transition-opacity hover:opacity-80"
-								aria-label="Zur Startseite"
-							>
-								{logoSrc ? (
-									<Image
-										src={logoSrc}
-										alt={logoAlt}
-										width="100"
-										height="100"
-										className="object-contain"
-										unoptimized
-										priority
-									/>
-								) : (
-									<span className="text-lg font-semibold tracking-wide">
-										HZD
-									</span>
-								)}
-						</Link>
-						{(startpage.Menu?.items ?? []).map(renderMenuItem)}
-						<li className="ml-auto flex items-center gap-4">
-							<SocialLinks socialLinkFB={startpage.SocialLinkFB} socialLinkYT={startpage.SocialLinkYT} />
-						</li>
+		<header className='bg-[#64574E] text-white'>
+			<nav className='container mx-auto flex items-center justify-between gap-6 px-4 py-3'>
+				<div className='flex flex-1 items-center gap-6'>
+					<Link
+						href='/'
+						className='flex items-center transition-opacity hover:opacity-80'
+						aria-label='Zur Startseite'
+					>
+						{logoSrc ? (
+							<Image
+								src={logoSrc}
+								alt={logoAlt}
+								width={100}
+								height={100}
+								className='h-12 w-auto object-contain'
+								unoptimized
+								priority
+							/>
+						) : (
+							<span className='text-lg font-semibold tracking-wide'>
+								HZD
+							</span>
+						)}
+					</Link>
+					<ul className='flex flex-wrap items-center gap-6 text-sm'>
+						{menuItems.map(renderMenuItem)}
 					</ul>
+				</div>
+				<div className='flex items-center gap-4'>
+					<SocialLinks
+						socialLinkFB={startpage.SocialLinkFB}
+						socialLinkYT={startpage.SocialLinkYT}
+					/>
+					<LoginControls
+						isAuthenticated={isAuthenticated}
+						user={user}
+						onLogin={onLogin}
+						onLogout={onLogout}
+						isAuthenticating={isAuthenticating}
+						error={error}
+					/>
 				</div>
 			</nav>
 		</header>
 	)
 }
-
-

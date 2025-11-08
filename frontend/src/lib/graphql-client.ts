@@ -5,10 +5,21 @@ const graphqlEndpoint = `${strapiUrl}/graphql`
 
 export const graphqlClient = new GraphQLClient(graphqlEndpoint)
 
-export async function fetchGraphQL<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
+let persistedAuthToken: string | null = null
+
+export function setGraphQLAuthToken(token?: string | null) {
+	persistedAuthToken = token ?? null
+}
+
+export async function fetchGraphQL<T>(
+	query: string,
+	variables?: Record<string, unknown>,
+	token?: string | null,
+): Promise<T> {
 	try {
-		const data = await graphqlClient.request<T>(query, variables)
-		console.log(data)
+		const effectiveToken = token ?? persistedAuthToken
+		const headers = effectiveToken ? { Authorization: `Bearer ${effectiveToken}` } : undefined
+		const data = await graphqlClient.request<T>(query, variables, headers)
 		return data
 	} catch (error) {
 		console.error('GraphQL Error:', error)
@@ -18,5 +29,3 @@ export async function fetchGraphQL<T>(query: string, variables?: Record<string, 
 		throw error
 	}
 }
-
-

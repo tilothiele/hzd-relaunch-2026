@@ -1,7 +1,7 @@
-import { Header } from '@/components/header/header'
 import { Footer } from '@/components/footer/footer'
 import { fetchGraphQL } from '@/lib/graphql-client'
-import { GET_HOMEPAGE, GET_SECTIONS } from '@/lib/graphql/queries'
+import { GET_HOMEPAGE } from '@/lib/graphql/queries'
+import { HomePageContent } from './home-page-content'
 import type { Startpage } from '@/types'
 
 interface HomePageData {
@@ -19,27 +19,21 @@ async function getHomepageData() {
 }
 
 export default async function Home() {
-	const [homepage] = await Promise.all([
-		getHomepageData(),
-//		getSectionsData(),
-	])
-
-	console.log(homepage)
+	const homepage = await getHomepageData()
 
 	if (!homepage) {
 		return (
-			<div className="min-h-screen flex items-center justify-center">
-				<p className="text-gray-600">Keine Daten verfügbar. Bitte Strapi Backend starten und Daten anlegen.</p>
+			<div className='flex min-h-screen items-center justify-center'>
+				<p className='text-gray-600'>
+					Keine Daten verfügbar. Bitte Strapi Backend starten und Daten anlegen.
+				</p>
 			</div>
 		)
 	}
 
 	return (
 		<>
-			<Header startpage={homepage} />
-			<main>
-
-			</main>
+			<HomePageContent homepage={homepage} />
 			<Footer startpage={homepage} />
 		</>
 	)

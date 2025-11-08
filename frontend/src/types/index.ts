@@ -85,3 +85,9 @@ export interface MenuItem {
 	url?: string
 	children?: MenuItem[]
 }
+
+export interface AuthUser {
+	id: number
+	username?: string | null
+	email?: string | null
+}
