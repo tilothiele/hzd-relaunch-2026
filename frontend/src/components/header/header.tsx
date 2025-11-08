@@ -16,7 +16,8 @@ const baseLinkClass =
 const dropdownListClass = [
 	'absolute',
 	'left-0',
-	'mt-2',
+	'top-full',
+	'z-20',
 	'hidden',
 	'w-40',
 	'rounded',
@@ -24,6 +25,7 @@ const dropdownListClass = [
 	'py-2',
 	'shadow-lg',
 	'group-hover:block',
+	'group-focus-within:block',
 ].join(' ')
 
 interface LoginCredentials {
