@@ -254,8 +254,8 @@ export function Header({
 
 	return (
 		<header className='bg-[#64574E] text-white'>
-			<nav className='container mx-auto flex items-center justify-between gap-6 px-4 py-3'>
-				<div className='flex flex-1 items-center gap-6'>
+			<nav className='container mx-auto flex items-center px-4 py-3'>
+				<div className='flex flex-1 justify-start'>
 					<Link
 						href='/'
 						className='flex items-center transition-opacity hover:opacity-80'
@@ -265,9 +265,9 @@ export function Header({
 							<Image
 								src={logoSrc}
 								alt={logoAlt}
-								width={100}
-								height={100}
-								className='h-12 w-auto object-contain'
+								width={150}
+								height={150}
+								className='h-30 w-auto object-contain'
 								unoptimized
 								priority
 							/>
@@ -277,11 +277,11 @@ export function Header({
 							</span>
 						)}
 					</Link>
-					<ul className='flex flex-wrap items-center gap-6 text-sm'>
-						{menuItems.map(renderMenuItem)}
-					</ul>
 				</div>
-				<div className='flex items-center gap-4'>
+				<ul className='flex flex-1 items-center justify-center gap-6 text-base'>
+					{menuItems.map(renderMenuItem)}
+				</ul>
+				<div className='flex flex-1 items-center justify-end gap-4'>
 					<SocialLinks
 						socialLinkFB={startpage.SocialLinkFB}
 						socialLinkYT={startpage.SocialLinkYT}
