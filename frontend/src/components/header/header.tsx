@@ -114,13 +114,9 @@ export function Header({ startpage }: HeaderProps) {
 								<Image
 									src={logoSrc}
 									alt={logoAlt}
-									width={logoWidth}
-									height={logoHeight}
+									width="100"
+									height="100"
 									className="object-contain"
-									style={{
-										height: '3rem',
-										width: 'auto',
-									}}
 									unoptimized
 									priority
 								/>

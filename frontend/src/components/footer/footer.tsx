@@ -25,7 +25,7 @@ export function Footer({ startpage }: FooterProps) {
 	const magazinHeight = magaizinImage?.height ?? 100
 
 	return (
-		<footer className="bg-[#64574E] text-white py-12">
+		<footer className="bg-[#64574E] text-white pt-12 pb-4">
 			<div className="container mx-auto px-4">
 				<div className="grid md:grid-cols-4 gap-4 mb-8">
 					<div>
@@ -50,7 +50,7 @@ export function Footer({ startpage }: FooterProps) {
 					</div>
 					<div>
 						<div>
-							<div className="grid md:grid-cols-2 gap-2 space-y-4">
+							<div className="grid grid-cols-2 gap-2 space-y-4">
 								<div>
 									<h4 className="font-semibold mb-2">Präsidium</h4>
 									<p className="text-sm">Claudia von Brill</p>
@@ -62,8 +62,9 @@ export function Footer({ startpage }: FooterProps) {
 									<p className="text-sm">Adresse, Telefon</p>
 								</div>
 							</div>
-							<div className="grid md:grid-cols-2 gap-2 space-y-4 mt-4">
-								<div className="flex gap-4 mt-4">
+							<hr className="border-yellow" />
+							<div className="grid grid-cols-2 gap-2 space-y-4 mt-4">
+								<div className="flex gap-4">
 									<SocialLinks socialLinkFB={startpage.SocialLinkFB} socialLinkYT={startpage.SocialLinkYT} />
 								</div>
 								<div>
@@ -98,6 +99,9 @@ export function Footer({ startpage }: FooterProps) {
 										className="object-contain"
 										unoptimized
 										priority
+										style={{
+											margin: 'auto',
+										}}
 									/>
 					</div>
 					<div>
@@ -139,7 +143,7 @@ export function Footer({ startpage }: FooterProps) {
 						</div>
 					</div>
 				</div>
-				<div className="border-t border-[#5a3d2a] pt-4 text-center text-sm text-gray-300">
+				<div className="border-t border-yellow pt-4 text-center text-sm text-gray-300">
 					<p>© {currentYear} {startpage.Copyright}</p>
 				</div>
 			</div>
