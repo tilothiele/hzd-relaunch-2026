@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_layout_footers",
+  "info": {
+    "displayName": "Footer"
+  },
+  "options": {},
+  "attributes": {
+    "PraesidiumName": {
+      "type": "string"
+    },
+    "PraesidiumOrt": {
+      "type": "string"
+    },
+    "PraesidiumTelefon": {
+      "type": "string"
+    },
+    "ItProjektleitungName": {
+      "type": "string"
+    },
+    "ItProjektleitungOrt": {
+      "type": "string"
+    },
+    "ItProjektleitungTelefon": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

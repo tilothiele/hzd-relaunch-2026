@@ -19,7 +19,7 @@
         "files"
       ]
     },
-    "actionButton": {
+    "ActionButton": {
       "type": "component",
       "component": "links.action-button",
       "repeatable": false

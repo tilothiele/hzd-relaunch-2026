@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_permission_groups",
+  "info": {
+    "displayName": "Groups"
+  },
+  "options": {},
+  "attributes": {
+    "Any": {
+      "type": "boolean",
+      "default": true
+    },
+    "Member": {
+      "type": "boolean",
+      "default": true
+    },
+    "HeadOfEvent": {
+      "type": "boolean",
+      "default": true
+    },
+    "BreedWarden": {
+      "type": "boolean"
+    }
+  },
+  "config": {}
+}

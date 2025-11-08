@@ -65,7 +65,7 @@ export interface BlocksSlideItem extends Struct.ComponentSchema {
     displayName: 'Slide Item';
   };
   attributes: {
-    actionButton: Schema.Attribute.Component<'links.action-button', false>;
+    ActionButton: Schema.Attribute.Component<'links.action-button', false>;
     Headline: Schema.Attribute.String;
     HeroImage: Schema.Attribute.Media<'images' | 'files'>;
     Subheadline: Schema.Attribute.String;
@@ -94,6 +94,21 @@ export interface ColumnsTextColumn extends Struct.ComponentSchema {
   };
 }
 
+export interface LayoutFooter extends Struct.ComponentSchema {
+  collectionName: 'components_layout_footers';
+  info: {
+    displayName: 'Footer';
+  };
+  attributes: {
+    ItProjektleitungName: Schema.Attribute.String;
+    ItProjektleitungOrt: Schema.Attribute.String;
+    ItProjektleitungTelefon: Schema.Attribute.String;
+    PraesidiumName: Schema.Attribute.String;
+    PraesidiumOrt: Schema.Attribute.String;
+    PraesidiumTelefon: Schema.Attribute.String;
+  };
+}
+
 export interface LinksActionButton extends Struct.ComponentSchema {
   collectionName: 'components_links_action_buttons';
   info: {
@@ -103,6 +118,19 @@ export interface LinksActionButton extends Struct.ComponentSchema {
     Label: Schema.Attribute.String;
     Link: Schema.Attribute.String;
     Primary: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+  };
+}
+
+export interface PermissionGroups extends Struct.ComponentSchema {
+  collectionName: 'components_permission_groups';
+  info: {
+    displayName: 'Groups';
+  };
+  attributes: {
+    Any: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    BreedWarden: Schema.Attribute.Boolean;
+    HeadOfEvent: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    Member: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
   };
 }
 
@@ -117,7 +145,9 @@ declare module '@strapi/strapi' {
       'blocks.slide-item': BlocksSlideItem;
       'columns.column-item': ColumnsColumnItem;
       'columns.text-column': ColumnsTextColumn;
+      'layout.footer': LayoutFooter;
       'links.action-button': LinksActionButton;
+      'permission.groups': PermissionGroups;
     }
   }
 }

@@ -11,10 +11,10 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "menu": {
+    "Menu": {
       "type": "json"
     },
-    "logo": {
+    "Logo": {
       "type": "media",
       "multiple": false,
       "allowedTypes": [
@@ -27,6 +27,28 @@
       "components": [
         "blocks.hero-section-slide-show",
         "blocks.card-section"
+      ]
+    },
+    "Footer": {
+      "type": "component",
+      "component": "layout.footer",
+      "repeatable": false
+    },
+    "Copyright": {
+      "type": "string"
+    },
+    "SocialLinkFB": {
+      "type": "string"
+    },
+    "SocialLinkYT": {
+      "type": "string"
+    },
+    "UnserHovawartImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files"
       ]
     }
   }

@@ -20,7 +20,7 @@ export function ActiveSection({ sections }: ActiveSectionProps) {
 							{section.attributes.buttonText && section.attributes.buttonLink && (
 								<Link
 									href={section.attributes.buttonLink}
-									className="inline-flex items-center gap-2 bg-yellow-400 text-[#3d2817] px-6 py-3 rounded font-semibold hover:bg-yellow-500 transition-colors"
+									className="inline-flex items-center gap-2 bg-yellow-400 text-[#64574E] px-6 py-3 rounded font-semibold hover:bg-yellow-500 transition-colors"
 								>
 									<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path

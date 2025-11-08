@@ -1,0 +1,44 @@
+{
+  "kind": "collectionType",
+  "collectionName": "supplemental_documents",
+  "info": {
+    "singularName": "supplemental-document",
+    "pluralName": "supplemental-documents",
+    "displayName": "SupplementalDocument"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Name": {
+      "type": "string",
+      "required": true
+    },
+    "Description": {
+      "type": "blocks"
+    },
+    "ShortId": {
+      "type": "string"
+    },
+    "DownloadDocument": {
+      "type": "media",
+      "multiple": true,
+      "required": true,
+      "allowedTypes": [
+        "files"
+      ]
+    },
+    "VisibilityStart": {
+      "type": "datetime"
+    },
+    "VisibilityEnd": {
+      "type": "datetime"
+    },
+    "Groups": {
+      "type": "component",
+      "component": "permission.groups",
+      "repeatable": false
+    }
+  }
+}

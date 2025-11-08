@@ -21,7 +21,7 @@ export function WelcomeSection({ homepage }: WelcomeSectionProps) {
 						{welcomeButtonText && welcomeButtonLink && (
 							<Link
 								href={welcomeButtonLink}
-								className="inline-block bg-yellow-400 text-[#3d2817] px-8 py-4 rounded font-semibold hover:bg-yellow-500 transition-colors"
+								className="inline-block bg-yellow-400 text-[#64574E] px-8 py-4 rounded font-semibold hover:bg-yellow-500 transition-colors"
 							>
 								{welcomeButtonText}
 							</Link>

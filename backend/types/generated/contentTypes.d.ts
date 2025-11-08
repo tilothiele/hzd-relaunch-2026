@@ -530,24 +530,65 @@ export interface ApiStartpageStartpage extends Struct.SingleTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    Copyright: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    Footer: Schema.Attribute.Component<'layout.footer', false>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::startpage.startpage'
     > &
       Schema.Attribute.Private;
-    logo: Schema.Attribute.Media<'images' | 'files'>;
-    menu: Schema.Attribute.JSON;
+    Logo: Schema.Attribute.Media<'images' | 'files'>;
+    Menu: Schema.Attribute.JSON;
     publishedAt: Schema.Attribute.DateTime;
     Sections: Schema.Attribute.DynamicZone<
       ['blocks.hero-section-slide-show', 'blocks.card-section']
     >;
+    SocialLinkFB: Schema.Attribute.String;
+    SocialLinkYT: Schema.Attribute.String;
+    UnserHovawartImage: Schema.Attribute.Media<'images' | 'files'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+  };
+}
+
+export interface ApiSupplementalDocumentSupplementalDocument
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'supplemental_documents';
+  info: {
+    displayName: 'SupplementalDocument';
+    pluralName: 'supplemental-documents';
+    singularName: 'supplemental-document';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    Description: Schema.Attribute.Blocks;
+    DownloadDocument: Schema.Attribute.Media<'files', true> &
+      Schema.Attribute.Required;
+    Groups: Schema.Attribute.Component<'permission.groups', false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::supplemental-document.supplemental-document'
+    > &
+      Schema.Attribute.Private;
+    Name: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    ShortId: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    VisibilityEnd: Schema.Attribute.DateTime;
+    VisibilityStart: Schema.Attribute.DateTime;
   };
 }
 
@@ -1312,6 +1353,7 @@ declare module '@strapi/strapi' {
       'api::contact.contact': ApiContactContact;
       'api::news-article.news-article': ApiNewsArticleNewsArticle;
       'api::startpage.startpage': ApiStartpageStartpage;
+      'api::supplemental-document.supplemental-document': ApiSupplementalDocumentSupplementalDocument;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::hzd-plugin.breeder': PluginHzdPluginBreeder;
