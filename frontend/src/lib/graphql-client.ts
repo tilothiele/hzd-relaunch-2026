@@ -8,6 +8,7 @@ export const graphqlClient = new GraphQLClient(graphqlEndpoint)
 export async function fetchGraphQL<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
 	try {
 		const data = await graphqlClient.request<T>(query, variables)
+		console.log(data)
 		return data
 	} catch (error) {
 		console.error('GraphQL Error:', error)

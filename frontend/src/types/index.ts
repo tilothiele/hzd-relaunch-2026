@@ -5,59 +5,10 @@ export interface Image {
 	height?: number
 }
 
-export interface Homepage {
+export interface Startpage {
 	documentId: string
-	heroTitle: string
-	heroSubtitle: string
-	heroImage: {
-		data: {
-			attributes: Image
-		}
-	}
-	heroButtonText: string
-	heroButtonLink: string
-	welcomeTitle: string
-	welcomeText: string
-	welcomeButtonText: string
-	welcomeButtonLink: string
-	welcomeBulletPoints: string[]
-	membershipTitle: string
-	membershipText: string
-	membershipButtonText: string
-	membershipButtonLink: string
-	createdAt: string
-	updatedAt: string
-	publishedAt: string
-}
-
-export interface NewsArticle {
-	id: string
-	attributes: {
-		title: string
-		slug: string
-		excerpt: string
-		content: string
-		category: string
-		image: {
-			data: {
-				attributes: Image
-			}
-		}
-		publishedAt: string
-	}
-}
-
-export interface HomepageSection {
-	id: string
-	attributes: {
-		title: string
-		text: string
-		buttonText: string
-		buttonLink: string
-		backgroundColor: string
-		textColor: string
-		order: number
-	}
+	menu: any
+	logo: Image
 }
 
 export interface Contact {
@@ -72,6 +23,16 @@ export interface Contact {
 		region?: string
 		topic?: string
 	}
+}
+
+export interface Menu {
+	items: MenuItem[];
+}
+
+export interface MenuItem {
+	name: string
+	url?: string
+	children?: MenuItem[];
 }
 
 
