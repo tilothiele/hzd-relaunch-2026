@@ -1,26 +1,49 @@
 import { GraphQLClient } from 'graphql-request'
 
-const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'
-const graphqlEndpoint = `${strapiUrl}/graphql`
-
-export const graphqlClient = new GraphQLClient(graphqlEndpoint)
-
 let persistedAuthToken: string | null = null
+let persistedBaseUrl: string | null = null
 
 export function setGraphQLAuthToken(token?: string | null) {
 	persistedAuthToken = token ?? null
 }
 
+export function setGraphQLBaseUrl(baseUrl?: string | null) {
+	if (typeof baseUrl === 'string' && baseUrl.trim().length > 0) {
+		persistedBaseUrl = baseUrl.trim()
+	} else {
+		persistedBaseUrl = null
+	}
+}
+
+interface FetchGraphQLOptions {
+	variables?: Record<string, unknown>
+	token?: string | null
+	baseUrl?: string | null
+}
+
 export async function fetchGraphQL<T>(
 	query: string,
-	variables?: Record<string, unknown>,
-	token?: string | null,
+	options: FetchGraphQLOptions = {},
 ): Promise<T> {
+	const { variables, token, baseUrl } = options
+
+	const effectiveToken = token ?? persistedAuthToken
+	const resolvedBaseUrl = baseUrl ?? persistedBaseUrl
+
+	if (!resolvedBaseUrl || resolvedBaseUrl.trim().length === 0) {
+		throw new Error('Strapi Base URL ist nicht gesetzt. Bitte Konfiguration laden.')
+	}
+
+	const effectiveBaseUrl = resolvedBaseUrl.replace(/\/$/, '')
+	const endpoint = `${effectiveBaseUrl}/graphql`
+	const client = new GraphQLClient(endpoint)
+
+	if (effectiveToken) {
+		client.setHeader('Authorization', `Bearer ${effectiveToken}`)
+	}
+
 	try {
-		const effectiveToken = token ?? persistedAuthToken
-		const headers = effectiveToken ? { Authorization: `Bearer ${effectiveToken}` } : undefined
-		const data = await graphqlClient.request<T>(query, variables, headers)
-		return data
+		return await client.request<T>(query, variables)
 	} catch (error) {
 		console.error('GraphQL Error:', error)
 		if (error instanceof Error) {

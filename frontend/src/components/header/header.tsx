@@ -3,6 +3,7 @@
 import type { ChangeEvent, FormEvent } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { MenuItem, Startpage, AuthUser } from '@/types'
+import type { ThemeDefinition } from '@/themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -21,7 +22,6 @@ const dropdownListClass = [
 	'hidden',
 	'w-40',
 	'rounded',
-	'bg-[#64574E]',
 	'py-2',
 	'shadow-lg',
 	'group-hover:block',
@@ -40,10 +40,13 @@ interface LoginControlsProps {
 	onLogout: () => void
 	isAuthenticating: boolean
 	error?: string | null
+	theme: ThemeDefinition
 }
 
 interface HeaderProps {
 	startpage: Startpage
+	strapiBaseUrl: string
+	theme: ThemeDefinition
 	isAuthenticated: boolean
 	user: AuthUser | null
 	onLogin: (credentials: LoginCredentials) => Promise<void>
@@ -52,7 +55,7 @@ interface HeaderProps {
 	error?: string | null
 }
 
-function renderMenuItem(item: MenuItem) {
+function renderMenuItem(item: MenuItem, theme: ThemeDefinition) {
 	const hasChildren = Boolean(item.children?.length)
 	const key = item.url ?? item.name
 
@@ -81,8 +84,11 @@ function renderMenuItem(item: MenuItem) {
 				</span>
 			)}
 			{hasChildren ? (
-				<ul className={dropdownListClass}>
-					{item.children?.map(renderMenuItem)}
+				<ul
+					className={dropdownListClass}
+					style={{ backgroundColor: theme.headerBackground }}
+				>
+					{item.children?.map((child) => renderMenuItem(child, theme))}
 				</ul>
 			) : null}
 		</li>
@@ -96,6 +102,7 @@ function LoginControls({
 	onLogout,
 	isAuthenticating,
 	error,
+	theme,
 }: LoginControlsProps) {
 	const [isFormVisible, setIsFormVisible] = useState(false)
 	const [identifier, setIdentifier] = useState('')
@@ -123,7 +130,7 @@ function LoginControls({
 	}, [error])
 
 	const toggleFormVisibility = useCallback(() => {
-		setIsFormVisible((previous) => !previous)
+		setIsFormVisible((previousVisible: boolean) => !previousVisible)
 	}, [])
 
 	const handleLogout = useCallback(() => {
@@ -223,7 +230,8 @@ function LoginControls({
 					) : null}
 					<button
 						type='submit'
-						className='flex w-full items-center justify-center gap-2 rounded bg-[#64574E] px-3 py-2 text-sm text-white transition-colors hover:bg-yellow-500 disabled:cursor-not-allowed disabled:opacity-60'
+						className='flex w-full items-center justify-center gap-2 rounded px-3 py-2 text-sm text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60'
+						style={{ backgroundColor: theme.headerBackground }}
 						disabled={isAuthenticating}
 					>
 						{isAuthenticating ? (
@@ -243,6 +251,8 @@ function LoginControls({
 
 export function Header({
 	startpage,
+	strapiBaseUrl,
+	theme,
 	isAuthenticated,
 	user,
 	onLogin,
@@ -250,12 +260,17 @@ export function Header({
 	isAuthenticating,
 	error,
 }: HeaderProps) {
-	const logoSrc = resolveMediaUrl(startpage?.Logo)
-	const logoAlt = startpage?.Logo?.alternativeText ?? startpage?.Logo?.url ?? 'HZD Logo'
+	const logoSrc = resolveMediaUrl(startpage?.Logo, strapiBaseUrl ?? '')
+	const logoAlt = startpage?.Logo?.alternativeText ?? 'HZD Logo'
 	const menuItems = startpage.Menu?.items ?? []
 
+	console.log(strapiBaseUrl, logoSrc)
+
 	return (
-		<header className='bg-[#64574E] text-white'>
+		<header
+			className='text-white'
+			style={{ backgroundColor: theme.headerBackground }}
+		>
 			<nav className='container mx-auto flex items-center px-4 py-3'>
 				<div className='flex flex-1 justify-start'>
 					<Link
@@ -280,8 +295,8 @@ export function Header({
 						)}
 					</Link>
 				</div>
-				<ul className='flex flex-1 items-center justify-center gap-6 text-base'>
-					{menuItems.map(renderMenuItem)}
+					<ul className='flex flex-1 items-center justify-center gap-6 text-base'>
+						{menuItems.map((item) => renderMenuItem(item, theme))}
 				</ul>
 				<div className='flex flex-1 items-center justify-end gap-4'>
 					<SocialLinks
@@ -295,6 +310,7 @@ export function Header({
 						onLogout={onLogout}
 						isAuthenticating={isAuthenticating}
 						error={error}
+						theme={theme}
 					/>
 				</div>
 			</nav>

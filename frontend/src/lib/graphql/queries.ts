@@ -1,4 +1,4 @@
-export const GET_HOMEPAGE = `
+export const GET_STARTPAGE = `
 	query GetStartpage {
 		startpage {
 			Menu
