@@ -1,0 +1,97 @@
+    {
+        "items": [
+        {
+            "url": "/",
+            "name": "Startseite"
+        },
+        {
+            "url": "/hzd",
+            "name": "HZD",
+            "children": [
+            {
+                "url": "/aktuelles",
+                "name": "Aktuelles",
+                "children": [
+                    {
+                        "url": "/testseite",
+                        "name": "Testseite"
+                    }
+                ]
+            },
+            {
+                "name": "Ansprechpartner",
+                "url": "/ansprechpartner"
+            },
+            {
+                "url": "/verein",
+                "name": "Der Verein",
+                "children": [
+                    {
+                        "url": "/regionalgruppen",
+                        "name": "Regionalgruppen"
+                    },
+                    {
+                        "name": "Mitgliederservice",
+                        "url": "/mitgliederservice"
+                    }
+                ]},
+                {
+                    "url": "/onlinemagazin",
+                    "name": "Onlinemagazin"
+                },
+                {
+                    "url": "/mitgliedsantrag",
+                    "name": "Mitglied werden"
+                },
+                {
+                    "url": "/terminkalender",
+                    "name": "Terminkalender"
+                }
+            ]
+        },
+        {
+            "url": "/hovawart",
+            "name": "Hovawart",
+            "children": [
+                {
+                    "url": "/rasse-infos",
+                    "name": "Die Rasse"
+                },
+                {
+                    "url": "/historie",
+                    "name": "Historie"
+                },
+                {
+                    "url": "/gesundheit",
+                    "name": "Gesundheit"
+                }
+            ]
+        },
+        {
+            "url": "/zucht",
+            "name": "Zucht",
+            "children": [
+            {
+                "url": "/hunde",
+                "name": "Unsere Hunde"
+            },
+            {
+            "url": "/zuechter",
+            "name": "Unsere Züchter"
+            },
+            {
+            "url": "/vermittlungsportal",
+            "name": "Vermittlungsportal"
+            },
+            {
+            "url": "/zuechter-werden",
+            "name": "Züchter werden"
+            },
+            {
+            "url": "/verhalten",
+            "name": "Verhaltensbeurteilungen"
+            }
+            ]
+        }
+        ]
+    }

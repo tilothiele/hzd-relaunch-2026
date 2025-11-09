@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import type { Startpage, AuthUser } from '@/types'
 import { Header } from '@/components/header/header'
+import { CookieBanner } from '@/components/cookie-banner/cookie-banner'
 import { setGraphQLAuthToken } from '@/lib/graphql-client'
 
 interface HomePageContentProps {
@@ -95,6 +96,7 @@ export function HomePageContent({ homepage }: HomePageContentProps) {
 			<main>
 
 			</main>
+			<CookieBanner />
 		</>
 	)
 }
