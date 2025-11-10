@@ -20,8 +20,8 @@ export function Footer({ startpage, strapiBaseUrl, theme }: FooterProps) {
 
 	const logoSrc = resolveMediaUrl(logoImage, strapiBaseUrl) ?? ''
 	const logoAlt = logoImage?.alternativeText ?? 'Hovawart logo'
-	const logoWidth = 200
-	const logoHeight = 100
+	const logoWidth = 150
+	const logoHeight = 150
 
 	const magaizinImage = startpage?.UnserHovawartImage
 
@@ -64,13 +64,13 @@ export function Footer({ startpage, strapiBaseUrl, theme }: FooterProps) {
 						<div>
 							<div className='grid grid-cols-2 gap-2'>
 								<div>
-									<h3 className='mb-2 font-semibold'>Präsidium</h3>
+									<h3 className='mb-2 font-bold'>Präsidium</h3>
 									<p className='text-sm'>{startpage.Footer?.PraesidiumName}</p>
 									<p className='text-sm'>{startpage.Footer?.PraesidiumOrt}</p>
 									<p className='text-sm'>{startpage.Footer?.PraesidiumTelefon}</p>
 								</div>
 								<div>
-									<h3 className='mb-2 font-semibold'>IT-Projektleitung</h3>
+									<h3 className='mb-2 font-bold'>IT-Projektleitung</h3>
 									<p className='text-sm'>{startpage.Footer?.ItProjektleitungName}</p>
 									<p className='text-sm'>{startpage.Footer?.ItProjektleitungOrt}</p>
 									<p className='text-sm'>{startpage.Footer?.ItProjektleitungTelefon}</p>
@@ -88,7 +88,6 @@ export function Footer({ startpage, strapiBaseUrl, theme }: FooterProps) {
 									<SocialLinks socialLinkFB={startpage.SocialLinkFB} socialLinkYT={startpage.SocialLinkYT} />
 								</div>
 								<div>
-									<h3 className='mb-4 font-semibold'>Rechtliches</h3>
 									<ul className='space-y-2'>
 										<li>
 											<Link href='/impressum' className='text-sm transition-colors hover:text-yellow-400'>

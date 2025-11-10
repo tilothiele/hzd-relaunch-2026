@@ -310,6 +310,8 @@ export function Header({
 	const logoSrc = resolveMediaUrl(startpage?.Logo, strapiBaseUrl ?? '')
 	const logoAlt = startpage?.Logo?.alternativeText ?? 'HZD Logo'
 	const menuItems = startpage.Menu?.items ?? []
+	const logoWidth = 150
+	const logoHeight = 150
 
 	console.log(strapiBaseUrl, logoSrc)
 
@@ -321,30 +323,31 @@ export function Header({
 			}}
 		>
 			<nav className='container mx-auto flex items-center px-4 py-3'>
-				<div className='flex flex-1 justify-start'>
+				<div className='flex flex-1 justify-center'>
 					<Link
 						href='/'
-						className='flex items-center transition-opacity hover:opacity-80'
+						className='flex items-center justify-center transition-opacity hover:opacity-80'
 						aria-label='Zur Startseite'
 					>
 						{logoSrc ? (
 							<Image
 								src={logoSrc}
 								alt={logoAlt}
-								width={150}
-								height={150}
+								width={logoWidth}
+								height={logoHeight}
 								className='object-contain'
 								unoptimized
 								priority
+								style={{ margin: 'auto' }}
 							/>
 						) : (
-							<span className='text-lg font-semibold tracking-wide'>
+							<span className='text-lg font-semibold tracking-wide text-center'>
 								HZD
 							</span>
 						)}
 					</Link>
 				</div>
-					<ul className='flex flex-1 items-center justify-center gap-6 text-base'>
+					<ul className='flex flex-1 items-center justify-center gap-6 text-xl'>
 						{menuItems.map((item) => (
 							<MenuItemComponent
 								key={item.url ?? item.name}
