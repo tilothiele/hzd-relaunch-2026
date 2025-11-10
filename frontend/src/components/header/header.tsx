@@ -14,20 +14,6 @@ import { resolveMediaUrl } from './logo-utils'
 const baseLinkClass =
 	'flex items-center gap-1 transition-colors hover:text-yellow-400'
 
-const dropdownListClass = [
-	'absolute',
-	'left-0',
-	'top-full',
-	'z-20',
-	'hidden',
-	'w-40',
-	'rounded',
-	'py-2',
-	'shadow-lg',
-	'group-hover:block',
-	'group-focus-within:block',
-].join(' ')
-
 interface LoginCredentials {
 	identifier: string
 	password: string
@@ -55,40 +41,98 @@ interface HeaderProps {
 	error?: string | null
 }
 
-function renderMenuItem(item: MenuItem, theme: ThemeDefinition) {
+interface MenuItemComponentProps {
+	item: MenuItem
+	theme: ThemeDefinition
+}
+
+function MenuItemComponent({ item, theme }: MenuItemComponentProps) {
 	const hasChildren = Boolean(item.children?.length)
 	const key = item.url ?? item.name
+	const [isOpen, setIsOpen] = useState(false)
+
+	const openMenu = useCallback(() => {
+		setIsOpen(true)
+	}, [])
+
+	const closeMenu = useCallback(() => {
+		setIsOpen(false)
+	}, [])
+
+	const toggleMenu = useCallback(() => {
+		setIsOpen((previousOpen: boolean) => !previousOpen)
+	}, [])
+
+	const handleLinkClick = useCallback(() => {
+		closeMenu()
+	}, [closeMenu])
+
+	const dropdownClass = [
+		'absolute',
+		'left-0',
+		'top-full',
+		'z-20',
+		'w-48',
+		'rounded',
+		'py-2',
+		'shadow-lg',
+		isOpen ? 'block' : 'hidden',
+	].join(' ')
 
 	return (
 		<li
 			key={key}
-			className={hasChildren ? 'relative group' : undefined}
+			className={hasChildren ? 'relative' : undefined}
+			onMouseEnter={hasChildren ? openMenu : undefined}
+			onMouseLeave={hasChildren ? closeMenu : undefined}
+			onFocus={hasChildren ? openMenu : undefined}
+			onBlur={hasChildren ? closeMenu : undefined}
 		>
-			{item.url ? (
-				<Link href={item.url} className={baseLinkClass}>
-					{item.name}
-					{hasChildren ? (
-						<span className='text-xs' aria-hidden='true'>
-							▼
+			<div className='flex items-center gap-2'>
+				{item.url ? (
+					<Link
+						href={item.url}
+						className={baseLinkClass}
+						onClick={handleLinkClick}
+					>
+						{item.name}
+					</Link>
+				) : (
+					<span className={baseLinkClass}>
+						{item.name}
+					</span>
+				)}
+				{hasChildren ? (
+					<button
+						type='button'
+						onClick={toggleMenu}
+						className='text-xs transition-colors hover:text-yellow-400 focus:outline-none'
+						aria-expanded={isOpen}
+						aria-label={`${item.name} Untermenü ${
+							isOpen ? 'schließen' : 'öffnen'
+						}`}
+					>
+						<span aria-hidden='true'>
+							{isOpen ? '▲' : '▼'}
 						</span>
-					) : null}
-				</Link>
-			) : (
-				<span className={baseLinkClass}>
-					{item.name}
-					{hasChildren ? (
-						<span className='text-xs' aria-hidden='true'>
-							▼
-						</span>
-					) : null}
-				</span>
-			)}
+					</button>
+				) : null}
+			</div>
 			{hasChildren ? (
 				<ul
-					className={dropdownListClass}
-					style={{ backgroundColor: theme.headerBackground }}
+					className={dropdownClass}
+					style={{
+						backgroundColor: theme.headerBackground,
+						color: theme.headerFooterTextColor,
+					}}
 				>
-					{item.children?.map((child) => renderMenuItem(child, theme))}
+					{item.children?.map((child) => (
+						<MenuItemComponent
+							key={child.url ?? child.name}
+							item={child}
+							theme={theme}
+						/>
+					))}
 				</ul>
 			) : null}
 		</li>
@@ -230,8 +274,11 @@ function LoginControls({
 					) : null}
 					<button
 						type='submit'
-						className='flex w-full items-center justify-center gap-2 rounded px-3 py-2 text-sm text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60'
-						style={{ backgroundColor: theme.headerBackground }}
+						className='flex w-full items-center justify-center gap-2 rounded px-3 py-2 text-sm transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60'
+						style={{
+							backgroundColor: theme.headerBackground,
+							color: theme.headerFooterTextColor,
+						}}
 						disabled={isAuthenticating}
 					>
 						{isAuthenticating ? (
@@ -268,8 +315,10 @@ export function Header({
 
 	return (
 		<header
-			className='text-white'
-			style={{ backgroundColor: theme.headerBackground }}
+			style={{
+				backgroundColor: theme.headerBackground,
+				color: theme.headerFooterTextColor,
+			}}
 		>
 			<nav className='container mx-auto flex items-center px-4 py-3'>
 				<div className='flex flex-1 justify-start'>
@@ -284,7 +333,7 @@ export function Header({
 								alt={logoAlt}
 								width={150}
 								height={150}
-								className='h-30 w-auto object-contain'
+								className='object-contain'
 								unoptimized
 								priority
 							/>
@@ -296,7 +345,13 @@ export function Header({
 					</Link>
 				</div>
 					<ul className='flex flex-1 items-center justify-center gap-6 text-base'>
-						{menuItems.map((item) => renderMenuItem(item, theme))}
+						{menuItems.map((item) => (
+							<MenuItemComponent
+								key={item.url ?? item.name}
+								item={item}
+								theme={theme}
+							/>
+						))}
 				</ul>
 				<div className='flex flex-1 items-center justify-end gap-4'>
 					<SocialLinks

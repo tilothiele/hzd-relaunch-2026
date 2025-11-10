@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
 import './globals.css'
+import { Providers } from './providers'
 
 config.autoAddCss = false
 
@@ -18,7 +19,9 @@ export default function RootLayout({
 	return (
 		<html lang='de'>
 			<body className='antialiased'>
-				{children}
+				<Providers>
+					{children}
+				</Providers>
 			</body>
 		</html>
 	)

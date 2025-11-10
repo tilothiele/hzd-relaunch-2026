@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Skeleton } from '@chakra-ui/react'
 import { fetchGraphQL } from '@/lib/graphql-client'
 import { GET_STARTPAGE } from '@/lib/graphql/queries'
 import { HomePageContent } from './home-page-content'
@@ -9,6 +10,50 @@ import type { Startpage } from '@/types'
 
 interface StartpageData {
 	startpage: Startpage
+}
+
+type StatusType = 'loading' | 'error' | 'empty' | null
+
+const textSkeletonKeys = [
+	'text-primary',
+	'text-secondary',
+	'text-tertiary',
+	'text-quaternary',
+] as const
+
+interface StatusState {
+	type: StatusType
+	message: string | null
+}
+
+function HomePageSkeleton() {
+	return (
+		<div
+			className='flex min-h-screen flex-col gap-8 px-4 py-12'
+			aria-busy='true'
+			aria-live='polite'
+		>
+			<Skeleton height='5rem' borderRadius='md' />
+			<div className='grid gap-6 lg:grid-cols-[2fr_1fr]'>
+				<Skeleton height='20rem' borderRadius='md' />
+				<div className='flex flex-col gap-4'>
+					<Skeleton height='3.5rem' borderRadius='md' />
+					<Skeleton height='3.5rem' borderRadius='md' />
+					<Skeleton height='3.5rem' borderRadius='md' />
+				</div>
+			</div>
+			<Skeleton height='12rem' borderRadius='md' />
+			<div className='flex flex-col gap-4'>
+				{textSkeletonKeys.map((key) => (
+					<Skeleton
+						key={key}
+						height='1.25rem'
+						borderRadius='md'
+					/>
+				))}
+			</div>
+		</div>
+	)
 }
 
 export default function Home() {
@@ -49,42 +94,64 @@ export default function Home() {
 
 	const isBusy = isConfigLoading || isLoading
 
-	const statusMessage = useMemo(() => {
+	const status = useMemo<StatusState>(() => {
 		if (!baseUrl) {
 			if (configError) {
-				return 'Konfiguration konnte nicht geladen werden.'
+				return {
+					type: 'error',
+					message: 'Konfiguration konnte nicht geladen werden.',
+				}
 			}
 
-			return 'Konfiguration wird geladen...'
+			return {
+				type: 'loading',
+				message: null,
+			}
 		}
 
 		if (isBusy) {
-			return 'Lade Inhalte...'
+			return {
+				type: 'loading',
+				message: null,
+			}
 		}
 
 		if (configError) {
-			return 'Konfiguration konnte nicht geladen werden.'
+			return {
+				type: 'error',
+				message: 'Konfiguration konnte nicht geladen werden.',
+			}
 		}
 
 		if (error) {
-			return error.message ?? 'Startpage konnte nicht geladen werden.'
+			return {
+				type: 'error',
+				message: error.message ?? 'Startpage konnte nicht geladen werden.',
+			}
 		}
 
 		if (!startpage) {
-			return 'Keine Daten verfügbar. Bitte Strapi Backend starten und Daten anlegen.'
+			return {
+				type: 'empty',
+				message:
+					'Keine Daten verfügbar. Bitte Strapi Backend starten und Daten anlegen.',
+			}
 		}
 
-		return null
-	}, [configError, error, isBusy, startpage])
-
-	if (statusMessage) {
-		if (startpage && baseUrl && !isBusy && !error && !configError) {
-			return <HomePageContent homepage={startpage!} strapiBaseUrl={baseUrl} />
+		return {
+			type: null,
+			message: null,
 		}
+	}, [baseUrl, configError, error, isBusy, startpage])
 
+	if (status.type === 'loading') {
+		return <HomePageSkeleton />
+	}
+
+	if (status.type) {
 		return (
 			<div className='flex min-h-screen items-center justify-center px-4 text-center text-sm text-gray-600'>
-				<p>{statusMessage}</p>
+				<p>{status.message}</p>
 			</div>
 		)
 	}

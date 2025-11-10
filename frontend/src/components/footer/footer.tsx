@@ -20,23 +20,26 @@ export function Footer({ startpage, strapiBaseUrl, theme }: FooterProps) {
 
 	const logoSrc = resolveMediaUrl(logoImage, strapiBaseUrl) ?? ''
 	const logoAlt = logoImage?.alternativeText ?? 'Hovawart logo'
-	const logoWidth = logoImage?.width ?? 200
-	const logoHeight = logoImage?.height ?? 100
+	const logoWidth = 200
+	const logoHeight = 100
 
 	const magaizinImage = startpage?.UnserHovawartImage
 
 	const magazinSrc = resolveMediaUrl(magaizinImage, strapiBaseUrl) ?? ''
 	const magazinAlt = magaizinImage?.alternativeText ?? 'Hovawart Magazin'
-	const magazinWidth = magaizinImage?.width ?? 200
-	const magazinHeight = magaizinImage?.height ?? 100
+	const magazinWidth = 200
+	const magazinHeight = 100
 
 	return (
 		<footer
 			className='pt-12 pb-4'
-			style={{ backgroundColor: theme.footerBackground, color: theme.textColor }}
+			style={{
+				backgroundColor: theme.footerBackground,
+				color: theme.headerFooterTextColor,
+			}}
 		>
 			<div className='container mx-auto px-4'>
-				<div className='mb-8 grid gap-4 md:grid-cols-4'>
+				<div className='mb-8 grid gap-4 md:grid-cols-[1.5fr_2fr_1fr_0.5fr]'>
 					<div>
 						{logoSrc ? (
 							<Image
@@ -59,25 +62,33 @@ export function Footer({ startpage, strapiBaseUrl, theme }: FooterProps) {
 					</div>
 					<div>
 						<div>
-							<div className='grid grid-cols-2 gap-2 space-y-4'>
+							<div className='grid grid-cols-2 gap-2'>
 								<div>
-									<h4 className='mb-2 font-semibold'>Präsidium</h4>
-									<p className='text-sm'>Claudia von Brill</p>
-									<p className='text-sm'>Adresse, Telefon</p>
+									<h3 className='mb-2 font-semibold'>Präsidium</h3>
+									<p className='text-sm'>{startpage.Footer?.PraesidiumName}</p>
+									<p className='text-sm'>{startpage.Footer?.PraesidiumOrt}</p>
+									<p className='text-sm'>{startpage.Footer?.PraesidiumTelefon}</p>
 								</div>
 								<div>
-									<h4 className='mb-2 font-semibold'>IT-Projektleitung</h4>
-									<p className='text-sm'>Judith Reinicke</p>
-									<p className='text-sm'>Adresse, Telefon</p>
+									<h3 className='mb-2 font-semibold'>IT-Projektleitung</h3>
+									<p className='text-sm'>{startpage.Footer?.ItProjektleitungName}</p>
+									<p className='text-sm'>{startpage.Footer?.ItProjektleitungOrt}</p>
+									<p className='text-sm'>{startpage.Footer?.ItProjektleitungTelefon}</p>
 								</div>
 							</div>
-							<hr className='border-yellow' />
-							<div className='mt-4 grid grid-cols-2 gap-2 space-y-4'>
-								<div className='flex gap-4'>
+							<hr
+								style={{
+									borderColor: '#FAD857',
+									marginTop: '1rem',
+									marginBottom: '1rem',
+								}}
+							/>
+							<div className='mt-4 grid grid-cols-2 gap-2'>
+								<div className='flex justify-center gap-4'>
 									<SocialLinks socialLinkFB={startpage.SocialLinkFB} socialLinkYT={startpage.SocialLinkYT} />
 								</div>
 								<div>
-									<h4 className='mb-4 font-semibold'>Rechtliches</h4>
+									<h3 className='mb-4 font-semibold'>Rechtliches</h3>
 									<ul className='space-y-2'>
 										<li>
 											<Link href='/impressum' className='text-sm transition-colors hover:text-yellow-400'>
@@ -116,9 +127,14 @@ export function Footer({ startpage, strapiBaseUrl, theme }: FooterProps) {
 						) : null}
 					</div>
 					<div>
-						<h4 className='mb-4 font-semibold'>Unsere Partner</h4>
-						<div className='space-y-4'>
-							<div>
+						<h3
+							className='text-center font-semibold'
+							style={{ marginBottom: '0.5rem' }}
+						>
+							Unsere Partner
+						</h3>
+						<div className='flex flex-col items-center' style={{ gap: '1rem' }}>
+							<div className='flex justify-center' style={{ marginTop: '0.5rem' }}>
 								<Image
 									src='/logos/HZD_Shop-hovawart-zuchgemeinschaft.png'
 									alt='VDH Logo'
@@ -129,7 +145,7 @@ export function Footer({ startpage, strapiBaseUrl, theme }: FooterProps) {
 									priority
 								/>
 							</div>
-							<div>
+							<div className='flex justify-center'>
 								<Image
 									src='/logos/FCI-federal-cynologique-internationale-hzd-hovawart.png'
 									alt='FCI Logo'
@@ -140,7 +156,7 @@ export function Footer({ startpage, strapiBaseUrl, theme }: FooterProps) {
 									priority
 								/>
 							</div>
-							<div>
+							<div className='flex justify-center' style={{ marginBottom: '0.5rem' }}>
 								<Image
 									src='/logos/verband-deutsches-hundewesen-hzd-hovawart.png'
 									alt='VDH Logo'
@@ -154,7 +170,7 @@ export function Footer({ startpage, strapiBaseUrl, theme }: FooterProps) {
 						</div>
 					</div>
 				</div>
-				<div className='border-t border-yellow pt-4 text-center text-sm text-gray-300'>
+				<div className='border-t border-yellow pt-4 text-center text-sm'>
 					<p>© {currentYear} {startpage.Copyright}</p>
 				</div>
 			</div>
