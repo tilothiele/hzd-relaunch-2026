@@ -519,6 +519,39 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiPagePage extends Struct.CollectionTypeSchema {
+  collectionName: 'pages';
+  info: {
+    displayName: 'Page';
+    pluralName: 'pages';
+    singularName: 'page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::page.page'> &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    Sections: Schema.Attribute.DynamicZone<
+      [
+        'blocks.page-section',
+        'blocks.hero-section-slide-show',
+        'blocks.card-section',
+        'blocks.rich-text-section',
+      ]
+    >;
+    slug: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiStartpageStartpage extends Struct.SingleTypeSchema {
   collectionName: 'startpages';
   info: {
@@ -1352,6 +1385,7 @@ declare module '@strapi/strapi' {
       'api::block-column.block-column': ApiBlockColumnBlockColumn;
       'api::contact.contact': ApiContactContact;
       'api::news-article.news-article': ApiNewsArticleNewsArticle;
+      'api::page.page': ApiPagePage;
       'api::startpage.startpage': ApiStartpageStartpage;
       'api::supplemental-document.supplemental-document': ApiSupplementalDocumentSupplementalDocument;
       'plugin::content-releases.release': PluginContentReleasesRelease;

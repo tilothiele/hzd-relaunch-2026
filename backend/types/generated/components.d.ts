@@ -59,6 +59,17 @@ export interface BlocksPageSection extends Struct.ComponentSchema {
   attributes: {};
 }
 
+export interface BlocksRichTextSection extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_rich_text_sections';
+  info: {
+    displayName: 'RichTextSection';
+  };
+  attributes: {
+    RichTextContent: Schema.Attribute.RichText &
+      Schema.Attribute.CustomField<'plugin::tinymce.tinymce'>;
+  };
+}
+
 export interface BlocksSlideItem extends Struct.ComponentSchema {
   collectionName: 'components_blocks_slide_items';
   info: {
@@ -142,6 +153,7 @@ declare module '@strapi/strapi' {
       'blocks.hero-section-slide-show': BlocksHeroSectionSlideShow;
       'blocks.item-list': BlocksItemList;
       'blocks.page-section': BlocksPageSection;
+      'blocks.rich-text-section': BlocksRichTextSection;
       'blocks.slide-item': BlocksSlideItem;
       'columns.column-item': ColumnsColumnItem;
       'columns.text-column': ColumnsTextColumn;

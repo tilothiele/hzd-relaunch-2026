@@ -22,7 +22,7 @@ export interface SlideItem {
 }
 
 export interface HeroSectionSlideShow {
-	__typename: 'BlocksHeroSectionSlideShow'
+	__typename: 'ComponentBlocksHeroSectionSlideShow'
 	Headline?: SlideItem[] | null
 }
 
@@ -36,11 +36,18 @@ export interface CardItem {
 }
 
 export interface CardSection {
-	__typename: 'BlocksCardSection'
+	__typename: 'ComponentBlocksCardSection'
 	CardItem?: CardItem[] | null
 }
 
 export type StartpageSection = HeroSectionSlideShow | CardSection
+
+export type PageSection = StartpageSection
+
+export interface Page {
+	slug?: string | null
+	Sections?: PageSection[] | null
+}
 
 export interface Footer {
 	ItProjektleitungName?: string | null

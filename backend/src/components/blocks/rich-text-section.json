@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_blocks_rich_text_sections",
+  "info": {
+    "displayName": "RichTextSection"
+  },
+  "options": {},
+  "attributes": {
+    "RichTextContent": {
+      "type": "customField",
+      "customField": "plugin::tinymce.tinymce"
+    }
+  },
+  "config": {}
+}

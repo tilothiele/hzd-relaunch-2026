@@ -8,11 +8,16 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser, faRightFromBracket, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import {
+	NavigationMenu,
+	NavigationMenuList,
+	NavigationMenuItem,
+	NavigationMenuTrigger,
+	NavigationMenuContent,
+	NavigationMenuLink,
+} from '@/components/ui/navigation-menu'
 import { SocialLinks } from './social-links'
 import { resolveMediaUrl } from './logo-utils'
-
-const baseLinkClass =
-	'flex items-center gap-1 transition-colors hover:text-yellow-400'
 
 interface LoginCredentials {
 	identifier: string
@@ -41,101 +46,68 @@ interface HeaderProps {
 	error?: string | null
 }
 
-interface MenuItemComponentProps {
-	item: MenuItem
+const FALLBACK_MENU_URL = '#'
+
+function MenuContentList({
+	items,
+	theme,
+}: {
+	items: MenuItem[]
 	theme: ThemeDefinition
-}
-
-function MenuItemComponent({ item, theme }: MenuItemComponentProps) {
-	const hasChildren = Boolean(item.children?.length)
-	const key = item.url ?? item.name
-	const [isOpen, setIsOpen] = useState(false)
-
-	const openMenu = useCallback(() => {
-		setIsOpen(true)
-	}, [])
-
-	const closeMenu = useCallback(() => {
-		setIsOpen(false)
-	}, [])
-
-	const toggleMenu = useCallback(() => {
-		setIsOpen((previousOpen: boolean) => !previousOpen)
-	}, [])
-
-	const handleLinkClick = useCallback(() => {
-		closeMenu()
-	}, [closeMenu])
-
-	const dropdownClass = [
-		'absolute',
-		'left-0',
-		'top-full',
-		'z-20',
-		'w-48',
-		'rounded',
-		'py-2',
-		'shadow-lg',
-		isOpen ? 'block' : 'hidden',
-	].join(' ')
-
+}) {
 	return (
-		<li
-			key={key}
-			className={hasChildren ? 'relative' : undefined}
-			onMouseEnter={hasChildren ? openMenu : undefined}
-			onMouseLeave={hasChildren ? closeMenu : undefined}
-			onFocus={hasChildren ? openMenu : undefined}
-			onBlur={hasChildren ? closeMenu : undefined}
+		<div
+			className='flex flex-col gap-4'
+			style={{
+				color: theme.textColor,
+			}}
 		>
-			<div className='flex items-center gap-2'>
-				{item.url ? (
-					<Link
-						href={item.url}
-						className={baseLinkClass}
-						onClick={handleLinkClick}
+			{items.map((child) => {
+				const key = child.url ?? child.name
+				const hasNestedChildren = Boolean(child.children?.length)
+
+				if (hasNestedChildren) {
+					return (
+						<div
+							key={key}
+							className='flex flex-col gap-2'
+						>
+							<p className='text-lg font-semibold'>
+								{child.name}
+							</p>
+							<ul className='space-y-1'>
+								{child.children?.map((grandchild) => (
+									<li key={grandchild.url ?? grandchild.name}>
+										<NavigationMenuLink asChild>
+											<Link
+												href={grandchild.url ?? FALLBACK_MENU_URL}
+												className='block rounded px-2 py-1 text-base transition-colors hover:text-yellow-400'
+											>
+												{grandchild.name}
+											</Link>
+										</NavigationMenuLink>
+									</li>
+								))}
+							</ul>
+						</div>
+					)
+				}
+
+				return (
+					<NavigationMenuLink
+						key={key}
+						asChild
 					>
-						{item.name}
-					</Link>
-				) : (
-					<span className={baseLinkClass}>
-						{item.name}
-					</span>
-				)}
-				{hasChildren ? (
-					<button
-						type='button'
-						onClick={toggleMenu}
-						className='text-xs transition-colors hover:text-yellow-400 focus:outline-none'
-						aria-expanded={isOpen}
-						aria-label={`${item.name} Untermenü ${
-							isOpen ? 'schließen' : 'öffnen'
-						}`}
-					>
-						<span aria-hidden='true'>
-							{isOpen ? '▲' : '▼'}
-						</span>
-					</button>
-				) : null}
-			</div>
-			{hasChildren ? (
-				<ul
-					className={dropdownClass}
-					style={{
-						backgroundColor: theme.headerBackground,
-						color: theme.headerFooterTextColor,
-					}}
-				>
-					{item.children?.map((child) => (
-						<MenuItemComponent
-							key={child.url ?? child.name}
-							item={child}
-							theme={theme}
-						/>
-					))}
-				</ul>
-			) : null}
-		</li>
+						<Link
+							href={child.url ?? FALLBACK_MENU_URL}
+							className='block rounded px-2 py-1 text-base transition-colors hover:text-yellow-400'
+						>
+							{child.name}
+						</Link>
+					</NavigationMenuLink>
+				)
+			})}
+		</div>
 	)
 }
 
@@ -313,8 +285,6 @@ export function Header({
 	const logoWidth = 150
 	const logoHeight = 150
 
-	console.log(strapiBaseUrl, logoSrc)
-
 	return (
 		<header
 			style={{
@@ -347,15 +317,54 @@ export function Header({
 						)}
 					</Link>
 				</div>
-					<ul className='flex flex-1 items-center justify-center gap-6 text-xl'>
-						{menuItems.map((item) => (
-							<MenuItemComponent
-								key={item.url ?? item.name}
-								item={item}
-								theme={theme}
-							/>
-						))}
-				</ul>
+				<NavigationMenu className='flex flex-1 justify-center text-xl'>
+					<NavigationMenuList>
+						{menuItems.map((item) => {
+							const hasChildren = Boolean(item.children?.length)
+							const itemKey = item.url ?? item.name
+
+							return (
+								<NavigationMenuItem key={itemKey}>
+									{hasChildren ? (
+										<>
+											<NavigationMenuTrigger className='bg-transparent text-inherit'>
+												{item.name}
+											</NavigationMenuTrigger>
+											<NavigationMenuContent
+												style={{
+													backgroundColor: '#F2F5F7',
+													color: theme.textColor,
+													marginTop: '0.5rem',
+													padding: '1.5rem',
+													borderRadius: '0.5rem',
+													border: '1px solid rgba(0, 0, 0, 0.08)',
+												}}
+											>
+												<MenuContentList
+													items={item.children!}
+													theme={theme}
+												/>
+											</NavigationMenuContent>
+										</>
+									) : item.url ? (
+										<NavigationMenuLink asChild>
+											<Link
+												href={item.url}
+												className='inline-flex items-center px-3 py-2 text-xl font-medium transition-colors hover:text-yellow-400'
+											>
+												{item.name}
+											</Link>
+										</NavigationMenuLink>
+									) : (
+										<span className='inline-flex items-center px-3 py-2 text-xl font-medium'>
+											{item.name}
+										</span>
+									)}
+								</NavigationMenuItem>
+							)
+						})}
+					</NavigationMenuList>
+				</NavigationMenu>
 				<div className='flex flex-1 items-center justify-end gap-4'>
 					<SocialLinks
 						socialLinkFB={startpage.SocialLinkFB}

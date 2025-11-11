@@ -10,6 +10,50 @@ export const GET_STARTPAGE = `
 				caption
 				previewUrl
 			}
+			Sections {
+				__typename
+				... on ComponentBlocksHeroSectionSlideShow {
+					Headline {
+						id
+						Headline
+						Subheadline
+						HeroImage {
+							url
+							alternativeText
+							width
+							height
+							caption
+							previewUrl
+						}
+						ActionButton {
+							Label
+							Link
+							Primary
+						}
+					}
+				}
+				... on ComponentBlocksCardSection {
+					CardItem {
+						id
+						Headline
+						Subheadline
+						FarbThema
+						BackgroundImage {
+							url
+							alternativeText
+							width
+							height
+							caption
+							previewUrl
+						}
+						ActionButton {
+							Label
+							Link
+							Primary
+						}
+					}
+				}
+			}
 			Footer {
 				ItProjektleitungName
 				ItProjektleitungOrt
@@ -34,50 +78,6 @@ export const GET_STARTPAGE = `
 `
 
 /*
-			Sections {
-				__typename
-				... on BlocksHeroSectionSlideShow {
-					Headline {
-						id
-						Headline
-						Subheadline
-						HeroImage {
-							url
-							alternativeText
-							width
-							height
-							caption
-							previewUrl
-						}
-						ActionButton {
-							Label
-							Link
-							Primary
-						}
-					}
-				}
-				... on BlocksCardSection {
-					CardItem {
-						id
-						Headline
-						Subheadline
-						FarbThema
-						BackgroundImage {
-							url
-							alternativeText
-							width
-							height
-							caption
-							previewUrl
-						}
-						ActionButton {
-							Label
-							Link
-							Primary
-						}
-					}
-				}
-			}
 */
 
 export const GET_SECTIONS = `
@@ -116,6 +116,58 @@ export const GET_CONTACTS = `
 				}
 			}
 		}
+	}
+`
+
+export const GET_PAGE_BY_SLUG = `
+	query GetPageBySlug($slug: String!) {
+		pages(filters: { slug: { eq: $slug } }, pagination: { pageSize: 1 }) {
+					slug
+					Sections {
+						__typename
+						... on ComponentBlocksHeroSectionSlideShow {
+							Headline {
+								id
+								Headline
+								Subheadline
+								HeroImage {
+									url
+									alternativeText
+									width
+									height
+									caption
+									previewUrl
+								}
+								ActionButton {
+									Label
+									Link
+									Primary
+								}
+							}
+						}
+						... on ComponentBlocksCardSection {
+							CardItem {
+								id
+								Headline
+								Subheadline
+								FarbThema
+								BackgroundImage {
+									url
+									alternativeText
+									width
+									height
+									caption
+									previewUrl
+								}
+								ActionButton {
+									Label
+									Link
+									Primary
+								}
+							}
+						}
+					}
+				}
 	}
 `
 

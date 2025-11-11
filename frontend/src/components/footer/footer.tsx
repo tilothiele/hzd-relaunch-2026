@@ -32,10 +32,10 @@ export function Footer({ startpage, strapiBaseUrl, theme }: FooterProps) {
 
 	return (
 		<footer
-			className='pt-12 pb-4'
-			style={{
+style={{
 				backgroundColor: theme.footerBackground,
 				color: theme.headerFooterTextColor,
+				paddingTop: "1em"
 			}}
 		>
 			<div className='container mx-auto px-4'>
@@ -169,7 +169,7 @@ export function Footer({ startpage, strapiBaseUrl, theme }: FooterProps) {
 						</div>
 					</div>
 				</div>
-				<div className='border-t border-yellow pt-4 text-center text-sm'>
+				<div style={{ backgroundColor: '#FAD857', color: '#0A0A0A', borderTop: '1px solid ', paddingTop: '.5em', paddingBottom: '.5em', textAlign: 'center', fontSize: '0.875em' }}>
 					<p>© {currentYear} {startpage.Copyright}</p>
 				</div>
 			</div>
