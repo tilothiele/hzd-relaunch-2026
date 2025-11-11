@@ -66,3 +66,42 @@ h6 {
 h1 {
 	color: var(--theme-heading-color, var(--theme-text-color, var(--foreground)));
 }
+
+.hero-section-slider {
+	--swiper-pagination-color: #f4d03f;
+	--swiper-pagination-bullet-inactive-color: rgba(255, 255, 255, 0.6);
+	--swiper-pagination-bullet-size: 12px;
+	--swiper-pagination-bullet-inactive-opacity: 0.5;
+	--swiper-pagination-bottom: 24px;
+	background-color: transparent;
+}
+
+.hero-section-slider .swiper-pagination-bullet {
+	transition: transform 0.3s ease;
+}
+
+.hero-section-slider .swiper-pagination-bullet-active {
+	transform: scale(1.2);
+}
+
+.hero-section-slider .swiper-slide {
+	height: auto;
+}
+
+.hero-section-slide-content {
+	text-align: center;
+}
+
+.hero-section-slide-headline {
+	font-size: clamp(2rem, 4vw + 1rem, 4rem);
+	line-height: 1.1;
+	margin: 0 auto;
+	max-width: 45ch;
+}
+
+.hero-section-slide-subheadline {
+	font-size: clamp(1.1rem, 1.5vw + 0.5rem, 1.75rem);
+	line-height: 1.35;
+	margin: 0 auto;
+	max-width: 60ch;
+}

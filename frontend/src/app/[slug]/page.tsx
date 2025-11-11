@@ -10,9 +10,18 @@ interface PageProps {
 	}>
 }
 
-interface PageQueryResult {
-	pages?: Page[]
+interface PageEntity {
+	id: string
+	attributes?: Page | null
 }
+
+interface PageQueryResult {
+	pages?: {
+		data?: PageEntity[] | null
+	} | null
+}
+
+const FALLBACK_STRAPI_BASE_URL = 'http://localhost:1337'
 
 function resolveStrapiBaseUrl() {
 	const envUrl = process.env.STRAPI_BASE_URL
@@ -21,7 +30,7 @@ function resolveStrapiBaseUrl() {
 		return envUrl.trim()
 	}
 
-	return null
+	return FALLBACK_STRAPI_BASE_URL
 }
 
 async function loadPageBySlug(slug: string, baseUrl: string) {
@@ -33,9 +42,14 @@ async function loadPageBySlug(slug: string, baseUrl: string) {
 		},
 	)
 
-	const page = data.pages && data.pages.length > 0 ? data.pages[0] : null
+	const entities = data.pages?.data ?? []
 
-    return page
+	const matchingPage = entities.find((entity) => {
+		const entitySlug = entity.attributes?.slug
+		return entitySlug?.toLowerCase() === slug.toLowerCase()
+	})
+
+	return matchingPage?.attributes ?? null
 }
 
 export default async function Page({ params }: PageProps) {
@@ -46,18 +60,11 @@ export default async function Page({ params }: PageProps) {
 	}
 
 	const baseUrl = resolveStrapiBaseUrl()
-
-	if (!baseUrl) {
-		console.error('STRAPI_BASE_URL ist nicht gesetzt')
-		notFound()
-	}
-
 	const normalizedSlug = rawSlug.trim()
 
 	try {
 		const page = await loadPageBySlug(normalizedSlug, baseUrl)
 
-        console.log(page)
 		if (!page) {
 			notFound()
 		}

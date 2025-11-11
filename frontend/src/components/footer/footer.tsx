@@ -32,13 +32,14 @@ export function Footer({ startpage, strapiBaseUrl, theme }: FooterProps) {
 
 	return (
 		<footer
-style={{
+			style={{
 				backgroundColor: theme.footerBackground,
 				color: theme.headerFooterTextColor,
-				paddingTop: "1em"
+				paddingTop: '1em',
 			}}
+			className='w-full'
 		>
-			<div className='container mx-auto px-4'>
+			<div className='mx-auto w-full max-w-screen-xl px-4 pb-8'>
 				<div className='mb-8 grid gap-4 md:grid-cols-[1.5fr_2fr_1fr_0.5fr]'>
 					<div>
 						{logoSrc ? (
@@ -169,9 +170,25 @@ style={{
 						</div>
 					</div>
 				</div>
-				<div style={{ backgroundColor: '#FAD857', color: '#0A0A0A', borderTop: '1px solid ', paddingTop: '.5em', paddingBottom: '.5em', textAlign: 'center', fontSize: '0.875em' }}>
-					<p>© {currentYear} {startpage.Copyright}</p>
-				</div>
+			</div>
+			<div
+				className='w-full text-center'
+				style={{
+					backgroundColor: '#FAD857',
+					color: '#0A0A0A',
+					borderTop: '1px solid',
+					paddingTop: '.5em',
+					paddingBottom: '.5em',
+					fontSize: '0.875em',
+				}}
+			>
+				<p>
+					©
+					{' '}
+					{currentYear}
+					{' '}
+					{startpage.Copyright}
+				</p>
 			</div>
 		</footer>
 	)

@@ -7,6 +7,7 @@ import { Footer } from '@/components/footer/footer'
 import { CookieBanner } from '@/components/cookie-banner/cookie-banner'
 import { setGraphQLAuthToken } from '@/lib/graphql-client'
 import { useTheme } from '@/hooks/use-theme'
+import { renderStartpageSections } from '@/components/sections/section-factory'
 
 interface HomePageContentProps {
 	homepage: Startpage
@@ -33,6 +34,7 @@ export function HomePageContent({ homepage, strapiBaseUrl }: HomePageContentProp
 	const [authError, setAuthError] = useState<string | null>(null)
 	const [isAuthenticating, setIsAuthenticating] = useState(false)
 	const { theme } = useTheme()
+	const sections = homepage.Sections ?? []
 
 	const isAuthenticated = useMemo(() => Boolean(authState.token), [authState.token])
 	const themeStyles = useMemo(() => ({
@@ -102,8 +104,8 @@ export function HomePageContent({ homepage, strapiBaseUrl }: HomePageContentProp
 				isAuthenticating={isAuthenticating}
 				error={authError}
 			/>
-			<main>
-
+			<main className='flex flex-col gap-12'>
+				{renderStartpageSections({ sections, strapiBaseUrl })}
 			</main>
 			<Footer
 				startpage={homepage}

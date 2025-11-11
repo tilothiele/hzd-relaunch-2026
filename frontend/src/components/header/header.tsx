@@ -291,8 +291,9 @@ export function Header({
 				backgroundColor: theme.headerBackground,
 				color: theme.headerFooterTextColor,
 			}}
+			className='w-full'
 		>
-			<nav className='container mx-auto flex items-center px-4 py-3'>
+			<nav className='flex w-full items-center px-6 py-3'>
 				<div className='flex flex-1 justify-center'>
 					<Link
 						href='/'
@@ -365,7 +366,7 @@ export function Header({
 						})}
 					</NavigationMenuList>
 				</NavigationMenu>
-				<div className='flex flex-1 items-center justify-end gap-4'>
+				<div className='flex flex-1 items-center justify-center gap-4'>
 					<SocialLinks
 						socialLinkFB={startpage.SocialLinkFB}
 						socialLinkYT={startpage.SocialLinkYT}
