@@ -48,7 +48,8 @@ export default async function Page({ params }: PageProps) {
 	const baseUrl = resolveStrapiBaseUrl()
 
 	if (!baseUrl) {
-		<div></div>
+		console.error('STRAPI_BASE_URL ist nicht gesetzt')
+		notFound()
 	}
 
 	const normalizedSlug = rawSlug.trim()
