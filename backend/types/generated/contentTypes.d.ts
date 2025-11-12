@@ -728,6 +728,11 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
   options: {
     draftAndPublish: false;
   };
+  pluginOptions: {
+    'content-manager': {
+      visible: true;
+    };
+  };
   attributes: {
     breedingLicenseSince: Schema.Attribute.Date;
     createdAt: Schema.Attribute.DateTime;

@@ -119,3 +119,22 @@ export interface Dog {
 export interface DogSearchResult {
 	hzdPluginDogs: Dog[]
 }
+
+export interface Breeder {
+	documentId: string
+	kennelName?: string | null
+	breedingLicenseSince?: string | null
+	member?: {
+		fullName?: string | null
+		region?: string | null
+		phone?: string | null
+		adress1?: string | null
+		adress2?: string | null
+		zip?: string | null
+		countryCode?: string | null
+	} | null
+}
+
+export interface BreederSearchResult {
+	hzdPluginBreeders: Breeder[]
+}

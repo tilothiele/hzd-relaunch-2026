@@ -1,4 +1,5 @@
 import dogRoutes from '../../routes/dog';
+import breederRoutes from '../../routes/breeder';
 
 export default [
   {
@@ -10,4 +11,5 @@ export default [
     },
   },
   ...dogRoutes,
+  ...breederRoutes,
 ];

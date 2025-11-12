@@ -196,3 +196,26 @@ export const SEARCH_DOGS = `
 	}
 `
 
+export const SEARCH_BREEDERS = `
+	query SearchBreeders($filters: HzdPluginBreederFiltersInput, $pagination: PaginationArg, $sort: [String]) {
+		hzdPluginBreeders(
+			filters: $filters
+			pagination: $pagination
+			sort: $sort
+		) {
+			documentId
+			kennelName
+			breedingLicenseSince
+			member {
+				fullName
+				region
+				phone
+				adress1
+				adress2
+				zip
+				countryCode
+			}
+		}
+	}
+`
+
