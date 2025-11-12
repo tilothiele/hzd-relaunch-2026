@@ -171,3 +171,28 @@ export const GET_PAGE_BY_SLUG = `
 	}
 `
 
+export const SEARCH_DOGS = `
+	query SearchDogs($filters: HzdPluginDogFiltersInput, $pagination: PaginationArg, $sort: [String]) {
+		hzdPluginDogs(
+			filters: $filters
+			pagination: $pagination
+			sort: $sort
+		) {
+			documentId
+				givenName
+				fullKennelName
+				sex
+				color
+				dateOfBirth
+				dateOfDeath
+				microchipNo
+				avatar {
+					url
+					alternativeText
+					width
+					height
+				}
+		}
+	}
+`
+

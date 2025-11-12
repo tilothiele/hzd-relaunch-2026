@@ -98,3 +98,24 @@ export interface AuthUser {
 	username?: string | null
 	email?: string | null
 }
+
+export interface Dog {
+	documentId: string
+	givenName?: string | null
+	fullKennelName?: string | null
+	sex?: 'M' | 'F' | null
+	color?: 'S' | 'SM' | 'B' | null
+	dateOfBirth?: string | null
+	dateOfDeath?: string | null
+	microchipNo?: string | null
+	avatar?: {
+		url?: string | null
+		alternativeText?: string | null
+		width?: number | null
+		height?: number | null
+	} | null
+}
+
+export interface DogSearchResult {
+	hzdPluginDogs: Dog[]
+}
