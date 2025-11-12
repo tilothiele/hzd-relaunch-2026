@@ -5,13 +5,13 @@ import { Skeleton } from '@chakra-ui/react'
 import { fetchGraphQL } from '@/lib/graphql-client'
 import { GET_STARTPAGE } from '@/lib/graphql/queries'
 import { useConfig } from '@/hooks/use-config'
-import type { Startpage, AuthUser } from '@/types'
+import type { Startpage } from '@/types'
 import { Header } from '@/components/header/header'
 import { Footer } from '@/components/footer/footer'
 import { CookieBanner } from '@/components/cookie-banner/cookie-banner'
 import { BreederSearch } from '@/components/breeder-search/breeder-search'
-import { setGraphQLAuthToken } from '@/lib/graphql-client'
 import { useTheme } from '@/hooks/use-theme'
+import { useAuth } from '@/hooks/use-auth'
 import type { CSSProperties } from 'react'
 
 interface StartpageData {
@@ -23,21 +23,6 @@ type StatusType = 'loading' | 'error' | 'empty' | null
 interface StatusState {
 	type: StatusType
 	message: string | null
-}
-
-interface AuthState {
-	token: string | null
-	user: AuthUser | null
-}
-
-interface LoginCredentials {
-	identifier: string
-	password: string
-}
-
-interface StrapiAuthResponse {
-	jwt: string
-	user: AuthUser
 }
 
 function BreedersPageSkeleton() {
@@ -59,12 +44,16 @@ export default function BreedersPage() {
 	const [startpage, setStartpage] = useState<Startpage | null>(null)
 	const [isLoading, setIsLoading] = useState(false)
 	const [error, setError] = useState<Error | null>(null)
-	const [authState, setAuthState] = useState<AuthState>({ token: null, user: null })
-	const [authError, setAuthError] = useState<string | null>(null)
-	const [isAuthenticating, setIsAuthenticating] = useState(false)
 	const { theme } = useTheme()
-
 	const baseUrl = config.strapiBaseUrl
+	const {
+		isAuthenticated,
+		user,
+		authError,
+		isAuthenticating,
+		handleLogin,
+		handleLogout,
+	} = useAuth(baseUrl || '')
 
 	const loadStartpage = useCallback(async (resolvedBaseUrl?: string | null) => {
 		try {
@@ -94,60 +83,11 @@ export default function BreedersPage() {
 		void loadStartpage(baseUrl)
 	}, [baseUrl, loadStartpage])
 
-	const isAuthenticated = useMemo(() => Boolean(authState.token), [authState.token])
 	const themeStyles = useMemo(() => ({
 		'--theme-text-color': theme.textColor,
 		'--theme-heading-color': theme.headerBackground,
 		color: theme.textColor,
 	}) as CSSProperties, [theme])
-
-	const handleLogin = useCallback(async ({ identifier, password }: LoginCredentials) => {
-		setIsAuthenticating(true)
-		setAuthError(null)
-
-		try {
-			const response = await fetch(`${baseUrl}/api/auth/local`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ identifier, password }),
-			})
-
-			if (!response.ok) {
-				const errorPayload = await response.json().catch(() => null)
-				const message =
-					errorPayload?.error?.message ??
-					'Anmeldung fehlgeschlagen. Bitte Zugangsdaten prüfen.'
-				throw new Error(message)
-			}
-
-			const result = (await response.json()) as StrapiAuthResponse
-
-			setAuthState({
-				token: result.jwt,
-				user: result.user,
-			})
-			setGraphQLAuthToken(result.jwt)
-		} catch (error) {
-			if (error instanceof Error) {
-				setAuthError(error.message)
-				throw error
-			}
-
-			const fallbackError = new Error('Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.')
-			setAuthError(fallbackError.message)
-			throw fallbackError
-		} finally {
-			setIsAuthenticating(false)
-		}
-	}, [baseUrl])
-
-	const handleLogout = useCallback(() => {
-		setAuthState({ token: null, user: null })
-		setAuthError(null)
-		setGraphQLAuthToken(null)
-	}, [])
 
 	const isBusy = isConfigLoading || isLoading
 
@@ -220,7 +160,7 @@ export default function BreedersPage() {
 				strapiBaseUrl={baseUrl!}
 				theme={theme}
 				isAuthenticated={isAuthenticated}
-				user={authState.user}
+				user={user}
 				onLogin={handleLogin}
 				onLogout={handleLogout}
 				isAuthenticating={isAuthenticating}
