@@ -1,0 +1,365 @@
+'use client'
+
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { fetchGraphQL } from '@/lib/graphql-client'
+import { SEARCH_LITTERS } from '@/lib/graphql/queries'
+import type { Litter, LitterSearchResult } from '@/types'
+
+interface LitterSearchProps {
+	strapiBaseUrl: string
+}
+
+type PageSize = 5 | 10 | 20
+
+export function LitterSearch({ strapiBaseUrl }: LitterSearchProps) {
+	const [breederFilter, setBreederFilter] = useState('')
+	const [motherFilter, setMotherFilter] = useState('')
+	const [closedFilter, setClosedFilter] = useState<'' | 'true' | 'false'>('')
+	const [page, setPage] = useState(1)
+	const [pageSize, setPageSize] = useState<PageSize>(10)
+	const [litters, setLitters] = useState<Litter[]>([])
+	const [isLoading, setIsLoading] = useState(false)
+	const [error, setError] = useState<Error | null>(null)
+	const [totalLitters, setTotalLitters] = useState(0)
+	const [pageCount, setPageCount] = useState(0)
+
+	const searchLitters = useCallback(async () => {
+		if (!strapiBaseUrl) {
+			return
+		}
+
+		setIsLoading(true)
+		setError(null)
+
+		try {
+			const filterConditions: Array<Record<string, unknown>> = []
+
+			if (breederFilter.trim()) {
+				filterConditions.push({
+					breeder: {
+						kennelName: { containsi: breederFilter.trim() },
+					},
+				})
+			}
+
+			if (motherFilter.trim()) {
+				filterConditions.push({
+					or: [
+						{ mother: { fullKennelName: { containsi: motherFilter.trim() } } },
+						{ mother: { givenName: { containsi: motherFilter.trim() } } },
+					],
+				})
+			}
+
+			if (closedFilter) {
+				filterConditions.push({
+					closed: { eq: closedFilter === 'true' },
+				})
+			}
+
+			const variables: Record<string, unknown> = {
+				pagination: {
+					page,
+					pageSize,
+				},
+				sort: ['dateOfBirth:desc', 'expectedDateOfBirth:desc'],
+			}
+
+			if (filterConditions.length > 0) {
+				variables.filters = {
+					and: filterConditions,
+				}
+			}
+
+			const data = await fetchGraphQL<LitterSearchResult>(
+				SEARCH_LITTERS,
+				{
+					baseUrl: strapiBaseUrl,
+					variables,
+				},
+			)
+
+			const littersArray = Array.isArray(data.hzdPluginLitters) ? data.hzdPluginLitters : []
+			setLitters(littersArray)
+
+			// Berechne Paginierung basierend auf den übergebenen Parametern
+			// Da die Meta-Informationen nicht in der Antwort enthalten sind,
+			// schätzen wir die Gesamtzahl basierend auf der Anzahl der zurückgegebenen Ergebnisse
+			// Wenn wir genau pageSize Ergebnisse haben, gibt es wahrscheinlich mehr
+			const estimatedTotal = littersArray.length === pageSize && page > 1
+				? page * pageSize + 1
+				: littersArray.length === pageSize
+					? page * pageSize
+					: (page - 1) * pageSize + littersArray.length
+
+			const calculatedPageCount = Math.ceil(estimatedTotal / pageSize)
+
+			setTotalLitters(estimatedTotal)
+			setPageCount(calculatedPageCount)
+		} catch (err) {
+			const fetchError = err instanceof Error
+				? err
+				: new Error('Würfe konnten nicht geladen werden.')
+			setError(fetchError)
+			setLitters([])
+			setTotalLitters(0)
+			setPageCount(0)
+		} finally {
+			setIsLoading(false)
+		}
+	}, [strapiBaseUrl, breederFilter, motherFilter, closedFilter, page, pageSize])
+
+	useEffect(() => {
+		void searchLitters()
+	}, [searchLitters])
+
+	const handleSearch = useCallback(() => {
+		setPage(1)
+		void searchLitters()
+	}, [searchLitters])
+
+	const handlePageSizeChange = useCallback((newPageSize: PageSize) => {
+		setPageSize(newPageSize)
+		setPage(1)
+	}, [])
+
+	const handlePageChange = useCallback((newPage: number) => {
+		setPage(newPage)
+	}, [])
+
+	const totalPages = pageCount
+	const currentPage = page
+
+	const formatDate = useCallback((dateString: string | null | undefined) => {
+		if (!dateString) {
+			return '-'
+		}
+
+		try {
+			const date = new Date(dateString)
+			return date.toLocaleDateString('de-DE', {
+				year: 'numeric',
+				month: '2-digit',
+				day: '2-digit',
+			})
+		} catch {
+			return dateString
+		}
+	}, [])
+
+	return (
+		<div className='container mx-auto px-4 py-8'>
+			<div className='mb-8 rounded-lg bg-white p-6 shadow-md'>
+				<h2 className='mb-6 text-2xl font-bold text-gray-900'>
+					Würfe suchen
+				</h2>
+				<div className='grid gap-4 md:grid-cols-3'>
+					<div>
+						<label
+							htmlFor='breeder-filter'
+							className='mb-2 block text-sm font-medium text-gray-700'
+						>
+							Züchter
+						</label>
+						<input
+							id='breeder-filter'
+							type='text'
+							value={breederFilter}
+							onChange={(e) => setBreederFilter(e.target.value)}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter') {
+									handleSearch()
+								}
+							}}
+							placeholder='Zwingername'
+							className='w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none'
+						/>
+					</div>
+					<div>
+						<label
+							htmlFor='mother-filter'
+							className='mb-2 block text-sm font-medium text-gray-700'
+						>
+							Mutter
+						</label>
+						<input
+							id='mother-filter'
+							type='text'
+							value={motherFilter}
+							onChange={(e) => setMotherFilter(e.target.value)}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter') {
+									handleSearch()
+								}
+							}}
+							placeholder='Name der Mutter'
+							className='w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none'
+						/>
+					</div>
+					<div>
+						<label
+							htmlFor='closed-filter'
+							className='mb-2 block text-sm font-medium text-gray-700'
+						>
+							Status
+						</label>
+						<select
+							id='closed-filter'
+							value={closedFilter}
+							onChange={(e) => setClosedFilter(e.target.value as '' | 'true' | 'false')}
+							className='w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none'
+						>
+							<option value=''>Alle</option>
+							<option value='false'>Offen</option>
+							<option value='true'>Geschlossen</option>
+						</select>
+					</div>
+				</div>
+				<div className='mt-4 flex justify-end'>
+					<button
+						type='button'
+						onClick={handleSearch}
+						disabled={isLoading}
+						className='rounded bg-yellow-400 px-6 py-2 text-sm font-semibold text-gray-900 transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60'
+					>
+						{isLoading ? 'Suche...' : 'Suchen'}
+					</button>
+				</div>
+			</div>
+
+			{error ? (
+				<div className='mb-4 rounded bg-red-50 p-4 text-sm text-red-800'>
+					{error.message}
+				</div>
+			) : null}
+
+			<div className='mb-4 flex items-center justify-between'>
+				<div className='text-sm text-gray-600'>
+					{totalLitters > 0 ? (
+						<>
+							Zeige {((currentPage - 1) * pageSize) + 1} bis{' '}
+							{Math.min(currentPage * pageSize, totalLitters)} von {totalLitters} Würfen
+						</>
+					) : (
+						'Keine Würfe gefunden'
+					)}
+				</div>
+				<div className='flex items-center gap-2'>
+					<label
+						htmlFor='page-size'
+						className='text-sm text-gray-600'
+					>
+						Pro Seite:
+					</label>
+					<select
+						id='page-size'
+						value={pageSize}
+						onChange={(e) => handlePageSizeChange(Number(e.target.value) as PageSize)}
+						className='rounded border border-gray-300 px-2 py-1 text-sm focus:border-yellow-400 focus:outline-none'
+					>
+						<option value={5}>5</option>
+						<option value={10}>10</option>
+						<option value={20}>20</option>
+					</select>
+				</div>
+			</div>
+
+			{isLoading ? (
+				<div className='text-center py-8 text-gray-600'>
+					Lade Würfe...
+				</div>
+			) : litters.length > 0 ? (
+				<>
+					<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+						{litters.map((litter) => {
+							const breederName = litter.breeder?.kennelName ?? 'Unbekannt'
+							const breederMember = litter.breeder?.member?.fullName
+							const motherName = litter.mother?.fullKennelName ?? litter.mother?.givenName ?? 'Unbekannt'
+							const stuntDogName = litter.stuntDog?.fullKennelName ?? litter.stuntDog?.givenName
+
+							return (
+								<div
+									key={litter.documentId}
+									className='rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md'
+								>
+									<div className='mb-3 flex items-center justify-between'>
+										<h3 className='text-lg font-semibold text-gray-900'>
+											Wurf
+										</h3>
+										{litter.closed ? (
+											<span className='rounded bg-gray-200 px-2 py-1 text-xs font-medium text-gray-700'>
+												Geschlossen
+											</span>
+										) : (
+											<span className='rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-800'>
+												Offen
+											</span>
+										)}
+									</div>
+									<div className='space-y-2 text-sm text-gray-600'>
+										<p>
+											<strong>Züchter:</strong> {breederName}
+											{breederMember ? ` (${breederMember})` : ''}
+										</p>
+										<p>
+											<strong>Mutter:</strong> {motherName}
+										</p>
+										{stuntDogName ? (
+											<p>
+												<strong>Deckrüde:</strong> {stuntDogName}
+											</p>
+										) : null}
+										{litter.dateOfManting ? (
+											<p>
+												<strong>Deckdatum:</strong> {formatDate(litter.dateOfManting)}
+											</p>
+										) : null}
+										{litter.expectedDateOfBirth ? (
+											<p>
+												<strong>Erwartetes Geburtsdatum:</strong> {formatDate(litter.expectedDateOfBirth)}
+											</p>
+										) : null}
+										{litter.dateOfBirth ? (
+											<p>
+												<strong>Geburtsdatum:</strong> {formatDate(litter.dateOfBirth)}
+											</p>
+										) : null}
+									</div>
+								</div>
+							)
+						})}
+					</div>
+
+					{totalPages > 1 ? (
+						<div className='mt-6 flex items-center justify-center gap-2'>
+							<button
+								type='button'
+								onClick={() => handlePageChange(currentPage - 1)}
+								disabled={currentPage === 1 || isLoading}
+								className='rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50'
+							>
+								Zurück
+							</button>
+							<span className='text-sm text-gray-600'>
+								Seite {currentPage} von {totalPages}
+							</span>
+							<button
+								type='button'
+								onClick={() => handlePageChange(currentPage + 1)}
+								disabled={currentPage === totalPages || isLoading}
+								className='rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50'
+							>
+								Weiter
+							</button>
+						</div>
+					) : null}
+				</>
+			) : !isLoading ? (
+				<div className='rounded-lg border border-gray-200 bg-gray-50 p-8 text-center text-gray-600'>
+					Keine Würfe gefunden. Bitte passen Sie Ihre Suchkriterien an.
+				</div>
+			) : null}
+		</div>
+	)
+}
+

@@ -138,3 +138,29 @@ export interface Breeder {
 export interface BreederSearchResult {
 	hzdPluginBreeders: Breeder[]
 }
+
+export interface Litter {
+	documentId: string
+	dateOfManting?: string | null
+	expectedDateOfBirth?: string | null
+	dateOfBirth?: string | null
+	closed?: boolean | null
+	breeder?: {
+		kennelName?: string | null
+		member?: {
+			fullName?: string | null
+		} | null
+	} | null
+	mother?: {
+		fullKennelName?: string | null
+		givenName?: string | null
+	} | null
+	stuntDog?: {
+		fullKennelName?: string | null
+		givenName?: string | null
+	} | null
+}
+
+export interface LitterSearchResult {
+	hzdPluginLitters: Litter[]
+}

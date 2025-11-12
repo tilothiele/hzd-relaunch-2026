@@ -219,3 +219,33 @@ export const SEARCH_BREEDERS = `
 	}
 `
 
+export const SEARCH_LITTERS = `
+	query SearchLitters($filters: HzdPluginLitterFiltersInput, $pagination: PaginationArg, $sort: [String]) {
+		hzdPluginLitters(
+			filters: $filters
+			pagination: $pagination
+			sort: $sort
+		) {
+			documentId
+			dateOfManting
+			expectedDateOfBirth
+			dateOfBirth
+			closed
+			breeder {
+				kennelName
+				member {
+					fullName
+				}
+			}
+			mother {
+				fullKennelName
+				givenName
+			}
+			stuntDog {
+				fullKennelName
+				givenName
+			}
+		}
+	}
+`
+
