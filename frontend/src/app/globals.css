@@ -46,6 +46,23 @@
 	--color-green-light: var(--green-light);
 	--font-sans: var(--font-body);
 	--font-heading: var(--font-heading);
+	/* Standard Tailwind grau Farben */
+	--color-gray-50: #f9fafb;
+	--color-gray-100: #f3f4f6;
+	--color-gray-200: #e5e7eb;
+	--color-gray-300: #d1d5db;
+	--color-gray-400: #9ca3af;
+	--color-gray-500: #6b7280;
+	--color-gray-600: #4b5563;
+	--color-gray-700: #374151;
+	--color-gray-800: #1f2937;
+	--color-gray-900: #111827;
+	/* Standard Tailwind gelb Farben */
+	--color-yellow-400: #facc15;
+	--color-yellow-500: #eab308;
+	/* Standard Tailwind rot Farben */
+	--color-red-50: #fef2f2;
+	--color-red-800: #991b1b;
 }
 
 body {

@@ -126,32 +126,54 @@ export function LoginControls({
 				<form
 					id='login-form'
 					onSubmit={handleSubmit}
-					className='absolute right-0 z-50 mt-3 w-72 rounded-lg bg-gray-50 p-6 text-gray-900 shadow-xl ring-1 ring-gray-200'
+					className='absolute right-0 z-50 mt-3 w-96 rounded-lg p-6 text-gray-900 shadow-xl border border-gray-200'
+					style={{
+						backgroundColor: '#ffffff',
+					}}
 				>
-					<h3 className='mb-4 text-lg font-semibold text-gray-900'>
+					<h3
+						className='text-lg font-semibold text-gray-900 my-4'
+						style={{ marginTop: '1rem', marginLeft: '1.5rem', marginRight: '1.5rem' }}
+					>
 						Anmeldung
 					</h3>
-					<div className='space-y-4'>
+					<div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', padding: '1.5rem'}}>
 						<label className='block text-sm font-medium text-gray-700'>
-							E-Mail oder Benutzername
+							<span
+								className='block'
+								style={{ margin: '0.5rem' }}
+							>
+								E-Mail oder Benutzername
+							</span>
 							<input
 								type='text'
 								name='identifier'
 								value={identifier}
 								onChange={(event: ChangeEvent<HTMLInputElement>) => setIdentifier(event.target.value)}
-								className='mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm transition-colors focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1'
+								className='w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-colors focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1'
+								style={{
+									backgroundColor: '#e5e7eb',
+								}}
 								autoComplete='username'
 								required
 							/>
 						</label>
 						<label className='block text-sm font-medium text-gray-700'>
-							Passwort
+							<span
+								className='block'
+								style={{ marginBottom: '0.5rem' }}
+							>
+								Passwort
+							</span>
 							<input
 								type='password'
 								name='password'
 								value={password}
 								onChange={(event: ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
-								className='mt-2 w-full rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm transition-colors focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1'
+								className='w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-colors focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1'
+								style={{
+									backgroundColor: '#e5e7eb',
+								}}
 								autoComplete='current-password'
 								required
 							/>
@@ -166,6 +188,11 @@ export function LoginControls({
 						<button
 							type='submit'
 							className='flex w-full items-center justify-center gap-2 rounded-md bg-yellow-400 px-4 py-2.5 text-sm font-semibold text-gray-900 transition-all hover:bg-yellow-500 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-yellow-400 disabled:hover:shadow-none'
+							style={{
+								backgroundColor: '#facc15',
+								color: '#111827',
+								marginTop: '0.5rem',
+							}}
 							disabled={isAuthenticating}
 						>
 							{isAuthenticating ? (
