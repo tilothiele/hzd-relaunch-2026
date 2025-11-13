@@ -7,10 +7,14 @@ ENV NODE_ENV=${NODE_ENV}
 WORKDIR /opt/
 COPY package.json package-lock.json ./
 RUN npm install -g node-gyp
-RUN npm config set fetch-retry-maxtimeout 600000 -g && npm install --only=production
+RUN npm config set fetch-retry-maxtimeout 600000 -g && npm install
 ENV PATH=/opt/node_modules/.bin:$PATH
 WORKDIR /opt/app
 COPY . .
+# Build plugin first before building Strapi
+WORKDIR /opt/app/src/plugins/hzd-plugin
+RUN if [ -f "package.json" ]; then npm install && npm run build; fi
+WORKDIR /opt/app
 RUN npm run build
 
 # Creating final production image
@@ -19,10 +23,11 @@ RUN apk add --no-cache vips-dev
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 WORKDIR /opt/
-COPY --from=build /opt/node_modules ./node_modules
+COPY --from=build /opt/package.json /opt/package-lock.json ./
+RUN npm config set fetch-retry-maxtimeout 600000 -g && npm install --only=production
+ENV PATH=/opt/node_modules/.bin:$PATH
 WORKDIR /opt/app
 COPY --from=build /opt/app ./
-ENV PATH=/opt/node_modules/.bin:$PATH
 
 RUN chown -R node:node /opt/app
 USER node
