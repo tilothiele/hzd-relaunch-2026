@@ -50,15 +50,6 @@ export interface BlocksItemList extends Struct.ComponentSchema {
   };
 }
 
-export interface BlocksPageSection extends Struct.ComponentSchema {
-  collectionName: 'components_blocks_page_sections';
-  info: {
-    displayName: 'Page Section';
-    icon: 'picture';
-  };
-  attributes: {};
-}
-
 export interface BlocksRichTextSection extends Struct.ComponentSchema {
   collectionName: 'components_blocks_rich_text_sections';
   info: {
@@ -85,6 +76,26 @@ export interface BlocksSlideItem extends Struct.ComponentSchema {
     Headline: Schema.Attribute.String;
     HeroImage: Schema.Attribute.Media<'images' | 'files'>;
     Subheadline: Schema.Attribute.String;
+  };
+}
+
+export interface BlocksTeaserTextWithImage extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_teaser_text_with_images';
+  info: {
+    displayName: 'TeaserTextWithImageSection';
+  };
+  attributes: {
+    ActionButton: Schema.Attribute.Component<'links.action-button', false>;
+    Headline: Schema.Attribute.String;
+    Image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    ImagePosition: Schema.Attribute.Enumeration<['Left', 'Right']>;
+    TeaserText: Schema.Attribute.RichText &
+      Schema.Attribute.CustomField<
+        'plugin::ckeditor5.CKEditor',
+        {
+          preset: 'defaultHtml';
+        }
+      >;
   };
 }
 
@@ -157,9 +168,9 @@ declare module '@strapi/strapi' {
       'blocks.card-section': BlocksCardSection;
       'blocks.hero-section-slide-show': BlocksHeroSectionSlideShow;
       'blocks.item-list': BlocksItemList;
-      'blocks.page-section': BlocksPageSection;
       'blocks.rich-text-section': BlocksRichTextSection;
       'blocks.slide-item': BlocksSlideItem;
+      'blocks.teaser-text-with-image': BlocksTeaserTextWithImage;
       'columns.column-item': ColumnsColumnItem;
       'columns.text-column': ColumnsTextColumn;
       'layout.footer': LayoutFooter;

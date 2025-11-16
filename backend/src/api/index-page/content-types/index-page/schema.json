@@ -1,28 +1,22 @@
 {
-  "kind": "collectionType",
-  "collectionName": "pages",
+  "kind": "singleType",
+  "collectionName": "index_pages",
   "info": {
-    "singularName": "page",
-    "pluralName": "pages",
-    "displayName": "Page"
+    "singularName": "index-page",
+    "pluralName": "index-pages",
+    "displayName": "IndexPage"
   },
   "options": {
     "draftAndPublish": true
   },
   "pluginOptions": {},
   "attributes": {
-    "slug": {
-      "type": "string"
-    },
-    "title": {
-      "type": "string"
-    },
     "Sections": {
       "type": "dynamiczone",
       "components": [
+        "blocks.rich-text-section",
         "blocks.hero-section-slide-show",
         "blocks.card-section",
-        "blocks.rich-text-section",
         "blocks.teaser-text-with-image"
       ]
     }

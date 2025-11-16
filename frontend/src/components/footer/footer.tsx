@@ -1,29 +1,29 @@
 'use client'
 
 import Link from 'next/link'
-import { Startpage } from '@/types'
+import type { GlobalLayout } from '@/types'
 import Image from 'next/image'
 import type { ThemeDefinition } from '@/themes'
 import { SocialLinks } from '../header/social-links'
 import { resolveMediaUrl } from '../header/logo-utils'
 
 interface FooterProps {
-	startpage: Startpage
+	globalLayout: GlobalLayout | null | undefined
 	strapiBaseUrl: string
 	theme: ThemeDefinition
 }
 
-export function Footer({ startpage, strapiBaseUrl, theme }: FooterProps) {
+export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 	const currentYear = new Date().getFullYear()
 
-	const logoImage = startpage?.Logo
+	const logoImage = globalLayout?.Logo
 
 	const logoSrc = resolveMediaUrl(logoImage, strapiBaseUrl) ?? ''
 	const logoAlt = logoImage?.alternativeText ?? 'Hovawart logo'
 	const logoWidth = 150
 	const logoHeight = 150
 
-	const magaizinImage = startpage?.UnserHovawartImage
+	const magaizinImage = globalLayout?.UnserHovawartImage
 
 	const magazinSrc = resolveMediaUrl(magaizinImage, strapiBaseUrl) ?? ''
 	const magazinAlt = magaizinImage?.alternativeText ?? 'Hovawart Magazin'
@@ -66,15 +66,15 @@ export function Footer({ startpage, strapiBaseUrl, theme }: FooterProps) {
 							<div className='grid grid-cols-2 gap-2'>
 								<div>
 									<h3 className='mb-2 font-bold'>Präsidium</h3>
-									<p className='text-sm'>{startpage.Footer?.PraesidiumName}</p>
-									<p className='text-sm'>{startpage.Footer?.PraesidiumOrt}</p>
-									<p className='text-sm'>{startpage.Footer?.PraesidiumTelefon}</p>
+									<p className='text-sm'>{globalLayout?.Footer?.PraesidiumName}</p>
+									<p className='text-sm'>{globalLayout?.Footer?.PraesidiumOrt}</p>
+									<p className='text-sm'>{globalLayout?.Footer?.PraesidiumTelefon}</p>
 								</div>
 								<div>
 									<h3 className='mb-2 font-bold'>IT-Projektleitung</h3>
-									<p className='text-sm'>{startpage.Footer?.ItProjektleitungName}</p>
-									<p className='text-sm'>{startpage.Footer?.ItProjektleitungOrt}</p>
-									<p className='text-sm'>{startpage.Footer?.ItProjektleitungTelefon}</p>
+									<p className='text-sm'>{globalLayout?.Footer?.ItProjektleitungName}</p>
+									<p className='text-sm'>{globalLayout?.Footer?.ItProjektleitungOrt}</p>
+									<p className='text-sm'>{globalLayout?.Footer?.ItProjektleitungTelefon}</p>
 								</div>
 							</div>
 							<hr
@@ -86,7 +86,7 @@ export function Footer({ startpage, strapiBaseUrl, theme }: FooterProps) {
 							/>
 							<div className='mt-4 grid grid-cols-2 gap-2'>
 								<div className='flex justify-center gap-4'>
-									<SocialLinks socialLinkFB={startpage.SocialLinkFB} socialLinkYT={startpage.SocialLinkYT} />
+									<SocialLinks socialLinkFB={globalLayout?.SocialLinkFB} socialLinkYT={globalLayout?.SocialLinkYT} />
 								</div>
 								<div>
 									<ul className='space-y-2'>
@@ -187,7 +187,7 @@ export function Footer({ startpage, strapiBaseUrl, theme }: FooterProps) {
 					{' '}
 					{currentYear}
 					{' '}
-					{startpage.Copyright}
+					{globalLayout?.Copyright}
 				</p>
 			</div>
 		</footer>

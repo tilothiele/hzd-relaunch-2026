@@ -1,10 +1,10 @@
 {
   "kind": "singleType",
-  "collectionName": "startpages",
+  "collectionName": "global_layouts",
   "info": {
-    "singularName": "startpage",
-    "pluralName": "startpages",
-    "displayName": "Startpage"
+    "singularName": "global-layout",
+    "pluralName": "global-layouts",
+    "displayName": "GlobalLayout"
   },
   "options": {
     "draftAndPublish": true
@@ -18,15 +18,7 @@
       "type": "media",
       "multiple": false,
       "allowedTypes": [
-        "images",
-        "files"
-      ]
-    },
-    "Sections": {
-      "type": "dynamiczone",
-      "components": [
-        "blocks.hero-section-slide-show",
-        "blocks.card-section"
+        "images"
       ]
     },
     "Footer": {
@@ -47,8 +39,7 @@
       "type": "media",
       "multiple": false,
       "allowedTypes": [
-        "images",
-        "files"
+        "images"
       ]
     }
   }

@@ -490,6 +490,75 @@ export interface ApiContactContact extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
+  collectionName: 'global_layouts';
+  info: {
+    displayName: 'GlobalLayout';
+    pluralName: 'global-layouts';
+    singularName: 'global-layout';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    Copyright: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    Footer: Schema.Attribute.Component<'layout.footer', false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::global-layout.global-layout'
+    > &
+      Schema.Attribute.Private;
+    Logo: Schema.Attribute.Media<'images'>;
+    Menu: Schema.Attribute.JSON;
+    publishedAt: Schema.Attribute.DateTime;
+    SocialLinkFB: Schema.Attribute.String;
+    SocialLinkYT: Schema.Attribute.String;
+    UnserHovawartImage: Schema.Attribute.Media<'images'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiIndexPageIndexPage extends Struct.SingleTypeSchema {
+  collectionName: 'index_pages';
+  info: {
+    displayName: 'IndexPage';
+    pluralName: 'index-pages';
+    singularName: 'index-page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::index-page.index-page'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    Sections: Schema.Attribute.DynamicZone<
+      [
+        'blocks.rich-text-section',
+        'blocks.hero-section-slide-show',
+        'blocks.card-section',
+        'blocks.teaser-text-with-image',
+      ]
+    >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
   collectionName: 'news_articles';
   info: {
@@ -539,51 +608,14 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     publishedAt: Schema.Attribute.DateTime;
     Sections: Schema.Attribute.DynamicZone<
       [
-        'blocks.page-section',
         'blocks.hero-section-slide-show',
         'blocks.card-section',
         'blocks.rich-text-section',
+        'blocks.teaser-text-with-image',
       ]
     >;
     slug: Schema.Attribute.String;
     title: Schema.Attribute.String;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
-export interface ApiStartpageStartpage extends Struct.SingleTypeSchema {
-  collectionName: 'startpages';
-  info: {
-    displayName: 'Startpage';
-    pluralName: 'startpages';
-    singularName: 'startpage';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    Copyright: Schema.Attribute.String;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    Footer: Schema.Attribute.Component<'layout.footer', false>;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::startpage.startpage'
-    > &
-      Schema.Attribute.Private;
-    Logo: Schema.Attribute.Media<'images' | 'files'>;
-    Menu: Schema.Attribute.JSON;
-    publishedAt: Schema.Attribute.DateTime;
-    Sections: Schema.Attribute.DynamicZone<
-      ['blocks.hero-section-slide-show', 'blocks.card-section']
-    >;
-    SocialLinkFB: Schema.Attribute.String;
-    SocialLinkYT: Schema.Attribute.String;
-    UnserHovawartImage: Schema.Attribute.Media<'images' | 'files'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1390,9 +1422,10 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::block-column.block-column': ApiBlockColumnBlockColumn;
       'api::contact.contact': ApiContactContact;
+      'api::global-layout.global-layout': ApiGlobalLayoutGlobalLayout;
+      'api::index-page.index-page': ApiIndexPageIndexPage;
       'api::news-article.news-article': ApiNewsArticleNewsArticle;
       'api::page.page': ApiPagePage;
-      'api::startpage.startpage': ApiStartpageStartpage;
       'api::supplemental-document.supplemental-document': ApiSupplementalDocumentSupplementalDocument;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

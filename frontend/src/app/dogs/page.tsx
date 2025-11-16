@@ -1,29 +1,14 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo, type CSSProperties } from 'react'
 import { Skeleton } from '@chakra-ui/react'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { GET_STARTPAGE } from '@/lib/graphql/queries'
-import { useConfig } from '@/hooks/use-config'
-import type { Startpage } from '@/types'
+import { useGlobalLayout } from '@/hooks/use-global-layout'
 import { Header } from '@/components/header/header'
 import { Footer } from '@/components/footer/footer'
 import { CookieBanner } from '@/components/cookie-banner/cookie-banner'
 import { DogSearch } from '@/components/dog-search/dog-search'
 import { useTheme } from '@/hooks/use-theme'
 import { useAuth } from '@/hooks/use-auth'
-import type { CSSProperties } from 'react'
-
-interface StartpageData {
-	startpage: Startpage
-}
-
-type StatusType = 'loading' | 'error' | 'empty' | null
-
-interface StatusState {
-	type: StatusType
-	message: string | null
-}
 
 function DogsPageSkeleton() {
 	return (
@@ -40,12 +25,8 @@ function DogsPageSkeleton() {
 }
 
 export default function DogsPage() {
-	const { config, isLoading: isConfigLoading, error: configError } = useConfig()
-	const [startpage, setStartpage] = useState<Startpage | null>(null)
-	const [isLoading, setIsLoading] = useState(false)
-	const [error, setError] = useState<Error | null>(null)
+	const { globalLayout, isLoading, error, baseUrl } = useGlobalLayout()
 	const { theme } = useTheme()
-	const baseUrl = config.strapiBaseUrl
 	const {
 		isAuthenticated,
 		user,
@@ -55,100 +36,28 @@ export default function DogsPage() {
 		handleLogout,
 	} = useAuth(baseUrl || '')
 
-	const loadStartpage = useCallback(async (resolvedBaseUrl?: string | null) => {
-		try {
-			setIsLoading(true)
-			const data = await fetchGraphQL<StartpageData>(
-				GET_STARTPAGE,
-				{ baseUrl: resolvedBaseUrl ?? baseUrl },
-			)
-			setStartpage(data.startpage)
-			setError(null)
-		} catch (err) {
-			const fetchError = err instanceof Error
-				? err
-				: new Error('Startpage konnte nicht geladen werden.')
-			setError(fetchError)
-			setStartpage(null)
-		} finally {
-			setIsLoading(false)
-		}
-	}, [baseUrl])
-
-	useEffect(() => {
-		if (!baseUrl || baseUrl.trim().length === 0) {
-			return
-		}
-
-		void loadStartpage(baseUrl)
-	}, [baseUrl, loadStartpage])
-
 	const themeStyles = useMemo(() => ({
 		'--theme-text-color': theme.textColor,
 		'--theme-heading-color': theme.headerBackground,
 		color: theme.textColor,
 	}) as CSSProperties, [theme])
 
-	const isBusy = isConfigLoading || isLoading
-
-	const status = useMemo<StatusState>(() => {
-		if (!baseUrl) {
-			if (configError) {
-				return {
-					type: 'error',
-					message: 'Konfiguration konnte nicht geladen werden.',
-				}
-			}
-
-			return {
-				type: 'loading',
-				message: null,
-			}
-		}
-
-		if (isBusy) {
-			return {
-				type: 'loading',
-				message: null,
-			}
-		}
-
-		if (configError) {
-			return {
-				type: 'error',
-				message: 'Konfiguration konnte nicht geladen werden.',
-			}
-		}
-
-		if (error) {
-			return {
-				type: 'error',
-				message: error.message ?? 'Startpage konnte nicht geladen werden.',
-			}
-		}
-
-		if (!startpage) {
-			return {
-				type: 'empty',
-				message:
-					'Keine Daten verfügbar. Bitte Strapi Backend starten und Daten anlegen.',
-			}
-		}
-
-		return {
-			type: null,
-			message: null,
-		}
-	}, [baseUrl, configError, error, isBusy, startpage])
-
-	if (status.type === 'loading') {
+	if (isLoading || !globalLayout) {
 		return <DogsPageSkeleton />
 	}
 
-	if (status.type) {
+	if (error) {
 		return (
 			<div className='flex min-h-screen items-center justify-center px-4 text-center text-sm text-gray-600'>
-				<p>{status.message}</p>
+				<p>{error.message ?? 'GlobalLayout konnte nicht geladen werden.'}</p>
+			</div>
+		)
+	}
+
+	if (!baseUrl) {
+		return (
+			<div className='flex min-h-screen items-center justify-center px-4 text-center text-sm text-gray-600'>
+				<p>Konfiguration konnte nicht geladen werden.</p>
 			</div>
 		)
 	}
@@ -156,8 +65,8 @@ export default function DogsPage() {
 	return (
 		<div style={themeStyles}>
 			<Header
-				startpage={startpage!}
-				strapiBaseUrl={baseUrl!}
+				globalLayout={globalLayout}
+				strapiBaseUrl={baseUrl}
 				theme={theme}
 				isAuthenticated={isAuthenticated}
 				user={user}
@@ -167,11 +76,11 @@ export default function DogsPage() {
 				error={authError}
 			/>
 			<main>
-				<DogSearch strapiBaseUrl={baseUrl!} />
+				<DogSearch strapiBaseUrl={baseUrl} />
 			</main>
 			<Footer
-				startpage={startpage!}
-				strapiBaseUrl={baseUrl!}
+				globalLayout={globalLayout}
+				strapiBaseUrl={baseUrl}
 				theme={theme}
 			/>
 			<CookieBanner />

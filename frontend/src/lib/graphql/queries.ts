@@ -1,6 +1,6 @@
-export const GET_STARTPAGE = `
-	query GetStartpage {
-		startpage {
+export const GET_LAYOUT = `
+	query GetLayout {
+		globalLayout {
 			Menu
 			Logo {
 				url
@@ -10,6 +10,32 @@ export const GET_STARTPAGE = `
 				caption
 				previewUrl
 			}
+			UnserHovawartImage {
+				url
+				alternativeText
+				width
+				height
+				caption
+				previewUrl
+			}
+			Footer {
+				ItProjektleitungName
+				ItProjektleitungOrt
+				ItProjektleitungTelefon
+				PraesidiumName
+				PraesidiumOrt
+				PraesidiumTelefon
+			}
+			Copyright
+			SocialLinkFB
+			SocialLinkYT
+		}
+	}
+`
+
+export const GET_INDEX_PAGE = `
+	query GetIndexPage {
+		indexPage {
 			Sections {
 				__typename
 			    ... on ComponentBlocksRichTextSection {
@@ -57,25 +83,6 @@ export const GET_STARTPAGE = `
 					}
 				}
 			}
-			Footer {
-				ItProjektleitungName
-				ItProjektleitungOrt
-				ItProjektleitungTelefon
-				PraesidiumName
-				PraesidiumOrt
-				PraesidiumTelefon
-			}
-			Copyright
-			SocialLinkFB
-			SocialLinkYT
-			UnserHovawartImage {
-				url
-				alternativeText
-				width
-				height
-				caption
-				previewUrl
-			}
 		}
 	}
 `
@@ -87,8 +94,6 @@ export const GET_SECTIONS = `
 	query GetSections {
 		hzdPluginHomepageSections(sort: ["order:asc"]) {
 			data {
-				id
-				attributes {
 					title
 					text
 					buttonText
@@ -96,7 +101,6 @@ export const GET_SECTIONS = `
 					backgroundColor
 					textColor
 					order
-				}
 			}
 		}
 	}
@@ -106,8 +110,6 @@ export const GET_CONTACTS = `
 	query GetContacts {
 		hzdPluginContacts {
 			data {
-				id
-				attributes {
 					title
 					name
 					email
@@ -116,7 +118,6 @@ export const GET_CONTACTS = `
 					role
 					region
 					topic
-				}
 			}
 		}
 	}
@@ -133,7 +134,6 @@ export const GET_PAGE_BY_SLUG = `
 						}
 						... on ComponentBlocksHeroSectionSlideShow {
 							Headline {
-								id
 								Headline
 								Subheadline
 								HeroImage {
@@ -153,7 +153,6 @@ export const GET_PAGE_BY_SLUG = `
 						}
 						... on ComponentBlocksCardSection {
 							CardItem {
-								id
 								Headline
 								Subheadline
 								FarbThema

@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, type CSSProperties } from 'react'
-import type { Startpage } from '@/types'
+import type { GlobalLayout } from '@/types'
 import { Header } from '@/components/header/header'
 import { Footer } from '@/components/footer/footer'
 import { CookieBanner } from '@/components/cookie-banner/cookie-banner'
@@ -10,7 +10,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { renderStartpageSections } from '@/components/sections/section-factory'
 
 interface HomePageContentProps {
-	homepage: Startpage
+	homepage: GlobalLayout
 	strapiBaseUrl: string
 }
 
@@ -35,7 +35,7 @@ export function HomePageContent({ homepage, strapiBaseUrl }: HomePageContentProp
 	return (
 		<div style={themeStyles}>
 			<Header
-				startpage={homepage}
+				globalLayout={homepage}
 				strapiBaseUrl={strapiBaseUrl}
 				theme={theme}
 				isAuthenticated={isAuthenticated}
@@ -49,7 +49,7 @@ export function HomePageContent({ homepage, strapiBaseUrl }: HomePageContentProp
 				{renderStartpageSections({ sections, strapiBaseUrl })}
 			</main>
 			<Footer
-				startpage={homepage}
+				globalLayout={homepage}
 				strapiBaseUrl={strapiBaseUrl}
 				theme={theme}
 			/>

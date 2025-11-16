@@ -54,6 +54,10 @@ export interface Page {
 	Sections?: PageSection[] | null
 }
 
+export interface PagesQueryResult {
+	pages?: Page[] | null
+}
+
 export interface Footer {
 	ItProjektleitungName?: string | null
 	ItProjektleitungOrt?: string | null
@@ -63,7 +67,7 @@ export interface Footer {
 	PraesidiumTelefon?: string | null
 }
 
-export interface Startpage {
+export interface GlobalLayout {
 	Menu?: Menu | null
 	Logo?: Image | null
 	UnserHovawartImage?: Image | null
@@ -74,18 +78,43 @@ export interface Startpage {
 	Sections?: StartpageSection[] | null
 }
 
+export interface ContactAttributes {
+	title: string
+	name: string
+	email: string
+	phone?: string | null
+	address?: string | null
+	role?: string | null
+	region?: string | null
+	topic?: string | null
+}
+
 export interface Contact {
 	id: string
-	attributes: {
-		title: string
-		name: string
-		email: string
-		phone?: string
-		address?: string
-		role?: string
-		region?: string
-		topic?: string
-	}
+	attributes: ContactAttributes
+}
+
+export interface ContactData {
+	data: Contact[]
+}
+
+export interface HomepageSectionAttributes {
+	title: string
+	text: string
+	buttonText?: string | null
+	buttonLink?: string | null
+	backgroundColor?: string | null
+	textColor?: string | null
+	order?: number | null
+}
+
+export interface HomepageSection {
+	id: string
+	attributes: HomepageSectionAttributes
+}
+
+export interface HomepageSectionData {
+	data: HomepageSection[]
 }
 
 export interface Menu {
@@ -168,4 +197,16 @@ export interface Litter {
 
 export interface LitterSearchResult {
 	hzdPluginLitters: Litter[]
+}
+
+export interface PagesQueryResult {
+	pages?: Page[] | null
+}
+
+export interface ContactsQueryResult {
+	hzdPluginContacts: ContactData
+}
+
+export interface HomepageSectionsQueryResult {
+	hzdPluginHomepageSections: HomepageSectionData
 }

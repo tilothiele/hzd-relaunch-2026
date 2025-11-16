@@ -1,6 +1,6 @@
 'use client'
 
-import type { MenuItem, Startpage, AuthUser } from '@/types'
+import type { MenuItem, AuthUser, GlobalLayout } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -22,7 +22,7 @@ interface LoginCredentials {
 }
 
 interface HeaderProps {
-	startpage: Startpage
+	globalLayout: GlobalLayout | null | undefined
 	strapiBaseUrl: string
 	theme: ThemeDefinition
 	isAuthenticated: boolean
@@ -100,7 +100,7 @@ function MenuContentList({
 
 
 export function Header({
-	startpage,
+	globalLayout,
 	strapiBaseUrl,
 	theme,
 	isAuthenticated,
@@ -110,9 +110,12 @@ export function Header({
 	isAuthenticating,
 	error,
 }: HeaderProps) {
-	const logoSrc = resolveMediaUrl(startpage?.Logo, strapiBaseUrl ?? '')
-	const logoAlt = startpage?.Logo?.alternativeText ?? 'HZD Logo'
-	const menuItems = startpage.Menu?.items ?? []
+
+	console.log(globalLayout)
+
+	const logoSrc = resolveMediaUrl(globalLayout?.Logo, strapiBaseUrl ?? '')
+	const logoAlt = globalLayout?.Logo?.alternativeText ?? 'HZD Logo'
+	const menuItems = globalLayout?.Menu?.items ?? []
 	const logoWidth = 150
 	const logoHeight = 150
 
@@ -199,8 +202,8 @@ export function Header({
 				</NavigationMenu>
 				<div className='flex flex-1 items-center justify-center gap-4'>
 					<SocialLinks
-						socialLinkFB={startpage.SocialLinkFB}
-						socialLinkYT={startpage.SocialLinkYT}
+						socialLinkFB={globalLayout?.SocialLinkFB}
+						socialLinkYT={globalLayout?.SocialLinkYT}
 					/>
 					<LoginControls
 						isAuthenticated={isAuthenticated}
