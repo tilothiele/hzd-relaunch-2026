@@ -3,7 +3,6 @@
 import { Skeleton } from '@chakra-ui/react'
 import { PageContent } from '@/components/pages/page-content'
 import { usePage } from '@/hooks/use-page'
-import { useGlobalLayout } from '@/hooks/use-global-layout'
 
 interface PageProps {
 	params: Promise<{
@@ -49,11 +48,10 @@ function HomePageSkeleton() {
 }
 
 export default function Page({ params }: PageProps) {
-	const { globalLayout, isLoading: isGlobalLayoutLoading } = useGlobalLayout()
 	const pageData = usePage(params)
-	const { page, baseUrl, status } = pageData
+	const { page, globalLayout, baseUrl, status } = pageData
 
-	if (status.type === 'loading' || !baseUrl || isGlobalLayoutLoading || !globalLayout) {
+	if (status.type === 'loading' || !baseUrl || !globalLayout) {
 		return <HomePageSkeleton />
 	}
 

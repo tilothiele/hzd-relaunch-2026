@@ -3,12 +3,16 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { notFound } from 'next/navigation'
 import { fetchGraphQL } from '@/lib/graphql-client'
-import { GET_PAGE_BY_SLUG } from '@/lib/graphql/queries'
+import { GET_PAGE_BY_SLUG, GET_LAYOUT } from '@/lib/graphql/queries'
 import { useConfig } from '@/hooks/use-config'
-import type { Page } from '@/types'
+import type { GlobalLayout, Page } from '@/types'
 
 interface PageQueryResult {
 	pages?: Page[] | null
+}
+
+interface LayoutData {
+	globalLayout: GlobalLayout
 }
 
 type StatusType = 'loading' | 'error' | 'empty' | null
@@ -39,6 +43,7 @@ async function loadPageBySlug(slug: string, baseUrl: string) {
 
 export interface PageData {
 	page: Page | null
+	globalLayout: GlobalLayout | null
 	baseUrl: string | null
 	isLoading: boolean
 	error: Error | null
@@ -48,6 +53,7 @@ export interface PageData {
 export function usePage(params: Promise<{ slug: string }>): PageData {
 	const { config, isLoading: isConfigLoading, error: configError } = useConfig()
 	const [page, setPage] = useState<Page | null>(null)
+	const [globalLayout, setGlobalLayout] = useState<GlobalLayout | null>(null)
 	const [isLoading, setIsLoading] = useState(false)
 	const [error, setError] = useState<Error | null>(null)
 	const [slug, setSlug] = useState<string | null>(null)
@@ -74,9 +80,16 @@ export function usePage(params: Promise<{ slug: string }>): PageData {
 
 		try {
 			setIsLoading(true)
-			const pageData = await loadPageBySlug(normalizedSlug, resolvedBaseUrl ?? baseUrl ?? '')
+			const [pageData, layoutData] = await Promise.all([
+				loadPageBySlug(normalizedSlug, resolvedBaseUrl ?? baseUrl ?? ''),
+				fetchGraphQL<LayoutData>(
+					GET_LAYOUT,
+					{ baseUrl: resolvedBaseUrl ?? baseUrl ?? '' },
+				),
+			])
 
 			setPage(pageData)
+			setGlobalLayout(layoutData.globalLayout)
 			setError(null)
 		} catch (err) {
 			const fetchError = err instanceof Error
@@ -84,6 +97,7 @@ export function usePage(params: Promise<{ slug: string }>): PageData {
 				: new Error('Seite konnte nicht geladen werden.')
 			setError(fetchError)
 			setPage(null)
+			setGlobalLayout(null)
 		} finally {
 			setIsLoading(false)
 		}
@@ -151,10 +165,11 @@ export function usePage(params: Promise<{ slug: string }>): PageData {
 
 	return useMemo(() => ({
 		page,
+		globalLayout,
 		baseUrl: baseUrl ?? null,
 		isLoading: isBusy,
 		error: configError ?? error,
 		status,
-	}), [page, baseUrl, isBusy, configError, error, status])
+	}), [page, globalLayout, baseUrl, isBusy, configError, error, status])
 }
 
