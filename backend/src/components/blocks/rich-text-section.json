@@ -7,7 +7,10 @@
   "attributes": {
     "RichTextContent": {
       "type": "customField",
-      "customField": "plugin::tinymce.tinymce"
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultHtml"
+      }
     }
   },
   "config": {}

@@ -42,8 +42,11 @@ export async function fetchGraphQL<T>(
 		client.setHeader('Authorization', `Bearer ${effectiveToken}`)
 	}
 
+	console.log(query, variables)
+
 	try {
-		return await client.request<T>(query, variables)
+		const data = await client.request<T>(query, variables)
+		return data
 	} catch (error) {
 		console.error('GraphQL Error:', error)
 		if (error instanceof Error) {

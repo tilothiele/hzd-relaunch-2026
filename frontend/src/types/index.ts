@@ -40,7 +40,12 @@ export interface CardSection {
 	CardItem?: CardItem[] | null
 }
 
-export type StartpageSection = HeroSectionSlideShow | CardSection
+export interface RichTextSection {
+	__typename: 'ComponentBlocksRichTextSection'
+	RichTextContent?: string | null
+}
+
+export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection
 
 export type PageSection = StartpageSection
 

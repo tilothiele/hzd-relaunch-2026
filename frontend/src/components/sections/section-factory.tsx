@@ -3,6 +3,7 @@
 import type { StartpageSection } from '@/types'
 import { HeroSectionSlideShowComponent } from './hero-section-slide-show/hero-section-slide-show'
 import { CardSectionComponent } from './card-section/card-section'
+import { RichTextSectionComponent } from './rich-text-section/rich-text-section'
 
 interface RenderStartpageSectionsParams {
 	sections: StartpageSection[] | null | undefined
@@ -15,7 +16,7 @@ interface RenderSectionParams {
 	key: string
 }
 
-function renderSection({
+function renderStartpageSection({
 	section,
 	strapiBaseUrl,
 	key,
@@ -37,6 +38,14 @@ function renderSection({
 				strapiBaseUrl={strapiBaseUrl}
 			/>
 		)
+	case 'ComponentBlocksRichTextSection':
+		return (
+			<RichTextSectionComponent
+				key={key}
+				section={section}
+				strapiBaseUrl={strapiBaseUrl}
+			/>
+		)
 	default:
 		return null
 	}
@@ -46,6 +55,7 @@ export function renderStartpageSections({
 	sections,
 	strapiBaseUrl,
 }: RenderStartpageSectionsParams) {
+
 	if (!sections?.length) {
 		return null
 	}
@@ -53,7 +63,7 @@ export function renderStartpageSections({
 	return sections
 		.map((section, index) => {
 			const key = `${section.__typename}-${index}`
-			return renderSection({ section, strapiBaseUrl, key })
+			return renderStartpageSection({ section, strapiBaseUrl, key })
 		})
 		.filter((node) => node !== null)
 }

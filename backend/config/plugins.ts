@@ -24,7 +24,9 @@ export default () => ({
                 extended_valid_elements: "span, img, small",
                 forced_root_block: "",
                 convert_urls: true,
-                relative_urls: true,
+                relative_urls: false,
+                //base_url: "http://localhost:1337",
+
                 // urlconverter_callback: (url) => {
                 //     console.log(url)
 				// 	if (!url) {

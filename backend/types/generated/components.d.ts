@@ -66,7 +66,12 @@ export interface BlocksRichTextSection extends Struct.ComponentSchema {
   };
   attributes: {
     RichTextContent: Schema.Attribute.RichText &
-      Schema.Attribute.CustomField<'plugin::tinymce.tinymce'>;
+      Schema.Attribute.CustomField<
+        'plugin::ckeditor5.CKEditor',
+        {
+          preset: 'defaultHtml';
+        }
+      >;
   };
 }
 

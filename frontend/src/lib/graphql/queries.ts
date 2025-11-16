@@ -12,6 +12,9 @@ export const GET_STARTPAGE = `
 			}
 			Sections {
 				__typename
+			    ... on ComponentBlocksRichTextSection {
+					RichTextContent
+				}
 				... on ComponentBlocksHeroSectionSlideShow {
 					Headline {
 						id
@@ -125,6 +128,9 @@ export const GET_PAGE_BY_SLUG = `
 					slug
 					Sections {
 						__typename
+						... on ComponentBlocksRichTextSection {
+							RichTextContent
+						}
 						... on ComponentBlocksHeroSectionSlideShow {
 							Headline {
 								id
