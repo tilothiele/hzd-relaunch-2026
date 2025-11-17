@@ -35,10 +35,14 @@
     "VisibilityEnd": {
       "type": "datetime"
     },
-    "Groups": {
-      "type": "component",
-      "component": "permission.groups",
-      "repeatable": false
+    "Gruppe": {
+      "type": "enumeration",
+      "enum": [
+        "Allgemein",
+        "HZD-Intern",
+        "Mitglieder",
+        "Zucht"
+      ]
     }
   }
 }

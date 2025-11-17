@@ -921,7 +921,9 @@ export interface ApiSupplementalDocumentSupplementalDocument
     Description: Schema.Attribute.Blocks;
     DownloadDocument: Schema.Attribute.Media<'files', true> &
       Schema.Attribute.Required;
-    Groups: Schema.Attribute.Component<'permission.groups', false>;
+    Gruppe: Schema.Attribute.Enumeration<
+      ['Allgemein', 'HZD-Intern', 'Mitglieder', 'Zucht']
+    >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
