@@ -607,7 +607,7 @@ export interface ApiLocalCummunityLocalCummunity
   extends Struct.CollectionTypeSchema {
   collectionName: 'local_cummunities';
   info: {
-    displayName: 'LocalCummunity';
+    displayName: 'LocalCommunity';
     pluralName: 'local-cummunities';
     singularName: 'local-cummunity';
   };

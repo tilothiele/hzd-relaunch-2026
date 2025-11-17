@@ -55,10 +55,6 @@ export interface Page {
 	Sections?: PageSection[] | null
 }
 
-export interface PagesQueryResult {
-	pages?: Page[] | null
-}
-
 export interface Footer {
 	ItProjektleitungName?: string | null
 	ItProjektleitungOrt?: string | null
@@ -79,7 +75,7 @@ export interface GlobalLayout {
 	Sections?: StartpageSection[] | null
 }
 
-export interface ContactAttributes {
+export interface Contact {
 	title: string
 	name: string
 	email: string
@@ -90,16 +86,11 @@ export interface ContactAttributes {
 	topic?: string | null
 }
 
-export interface Contact {
-	id: string
-	attributes: ContactAttributes
-}
-
 export interface ContactData {
 	data: Contact[]
 }
 
-export interface HomepageSectionAttributes {
+export interface HomepageSection {
 	title: string
 	text: string
 	buttonText?: string | null
@@ -107,11 +98,6 @@ export interface HomepageSectionAttributes {
 	backgroundColor?: string | null
 	textColor?: string | null
 	order?: number | null
-}
-
-export interface HomepageSection {
-	id: string
-	attributes: HomepageSectionAttributes
 }
 
 export interface HomepageSectionData {
@@ -200,8 +186,20 @@ export interface LitterSearchResult {
 	hzdPluginLitters: Litter[]
 }
 
+export interface IndexPage {
+	Sections?: StartpageSection[] | null
+}
+
 export interface PagesQueryResult {
 	pages?: Page[] | null
+}
+
+export interface IndexPageQueryResult {
+	indexPage: IndexPage
+}
+
+export interface GlobalLayoutQueryResult {
+	globalLayout: GlobalLayout
 }
 
 export interface ContactsQueryResult {
