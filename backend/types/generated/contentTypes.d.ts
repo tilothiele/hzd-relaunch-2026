@@ -633,6 +633,48 @@ export interface ApiIndexPageIndexPage extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiLocalCummunityLocalCummunity
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'local_cummunities';
+  info: {
+    displayName: 'LocalCummunity';
+    pluralName: 'local-cummunities';
+    singularName: 'local-cummunity';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    CEO: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.member'>;
+    CFO: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.member'>;
+    City: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::local-cummunity.local-cummunity'
+    > &
+      Schema.Attribute.Private;
+    Name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    regional_unit: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::regional-unit.regional-unit'
+    >;
+    Secretary: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::hzd-plugin.member'
+    >;
+    Street: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    ZipCode: Schema.Attribute.String;
+  };
+}
+
 export interface ApiMerchandisingProductMerchandisingProduct
   extends Struct.CollectionTypeSchema {
   collectionName: 'merchandising_products';
@@ -699,6 +741,37 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiOfficerRoleOfficerRole extends Struct.CollectionTypeSchema {
+  collectionName: 'officer_roles';
+  info: {
+    displayName: 'OfficerRole';
+    pluralName: 'officer-roles';
+    singularName: 'officer-role';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::officer-role.officer-role'
+    > &
+      Schema.Attribute.Private;
+    Name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    RegionalUnit: Schema.Attribute.Enumeration<
+      ['NORD', 'OST', 'S\u00DCD', 'WEST', 'MITTE']
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -810,6 +883,45 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     >;
     slug: Schema.Attribute.String;
     title: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiRegionalUnitRegionalUnit
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'regional_units';
+  info: {
+    displayName: 'RegionalUnit';
+    pluralName: 'regional-units';
+    singularName: 'regional-unit';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    CEO: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.member'>;
+    CFO: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.member'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    local_cummunities: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::local-cummunity.local-cummunity'
+    >;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::regional-unit.regional-unit'
+    > &
+      Schema.Attribute.Private;
+    Name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    Secretary: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::hzd-plugin.member'
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1615,11 +1727,14 @@ declare module '@strapi/strapi' {
       'api::contact.contact': ApiContactContact;
       'api::global-layout.global-layout': ApiGlobalLayoutGlobalLayout;
       'api::index-page.index-page': ApiIndexPageIndexPage;
+      'api::local-cummunity.local-cummunity': ApiLocalCummunityLocalCummunity;
       'api::merchandising-product.merchandising-product': ApiMerchandisingProductMerchandisingProduct;
       'api::news-article.news-article': ApiNewsArticleNewsArticle;
+      'api::officer-role.officer-role': ApiOfficerRoleOfficerRole;
       'api::order-item.order-item': ApiOrderItemOrderItem;
       'api::order.order': ApiOrderOrder;
       'api::page.page': ApiPagePage;
+      'api::regional-unit.regional-unit': ApiRegionalUnitRegionalUnit;
       'api::supplemental-document.supplemental-document': ApiSupplementalDocumentSupplementalDocument;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

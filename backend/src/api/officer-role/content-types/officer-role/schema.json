@@ -1,0 +1,28 @@
+{
+  "kind": "collectionType",
+  "collectionName": "officer_roles",
+  "info": {
+    "singularName": "officer-role",
+    "pluralName": "officer-roles",
+    "displayName": "OfficerRole"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Name": {
+      "type": "string"
+    },
+    "RegionalUnit": {
+      "type": "enumeration",
+      "enum": [
+        "NORD",
+        "OST",
+        "SÜD",
+        "WEST",
+        "MITTE"
+      ]
+    }
+  }
+}

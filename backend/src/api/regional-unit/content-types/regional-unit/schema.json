@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "regional_units",
+  "info": {
+    "singularName": "regional-unit",
+    "pluralName": "regional-units",
+    "displayName": "RegionalUnit"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Name": {
+      "type": "string"
+    },
+    "local_cummunities": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::local-cummunity.local-cummunity",
+      "mappedBy": "regional_unit"
+    },
+    "CFO": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::hzd-plugin.member"
+    },
+    "CEO": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::hzd-plugin.member"
+    },
+    "Secretary": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::hzd-plugin.member"
+    }
+  }
+}

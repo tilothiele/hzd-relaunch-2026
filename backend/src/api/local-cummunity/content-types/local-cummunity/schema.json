@@ -1,0 +1,48 @@
+{
+  "kind": "collectionType",
+  "collectionName": "local_cummunities",
+  "info": {
+    "singularName": "local-cummunity",
+    "pluralName": "local-cummunities",
+    "displayName": "LocalCummunity"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Name": {
+      "type": "string"
+    },
+    "Street": {
+      "type": "string"
+    },
+    "ZipCode": {
+      "type": "string"
+    },
+    "City": {
+      "type": "string"
+    },
+    "regional_unit": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::regional-unit.regional-unit",
+      "inversedBy": "local_cummunities"
+    },
+    "CEO": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::hzd-plugin.member"
+    },
+    "CFO": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::hzd-plugin.member"
+    },
+    "Secretary": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::hzd-plugin.member"
+    }
+  }
+}
