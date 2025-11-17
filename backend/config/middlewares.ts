@@ -7,7 +7,7 @@ export default [
       contentSecurityPolicy: {
         useDefaults: true,
         directives: {
-          'script-src': ['https://cdn.ckeditor.com'],
+          'script-src': ['https://cdn.ckeditor.com', 'https://hzd-backend.app.tilothiele.de'],
            'connect-src': ['https://proxy-event.ckeditor.com']
           },
         },
