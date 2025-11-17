@@ -31,6 +31,7 @@ interface HeaderProps {
 	onLogout: () => void
 	isAuthenticating: boolean
 	error?: string | null
+	pageTitle?: string | null
 }
 
 const FALLBACK_MENU_URL = '#'
@@ -109,9 +110,10 @@ export function Header({
 	onLogout,
 	isAuthenticating,
 	error,
+	pageTitle,
 }: HeaderProps) {
 
-	console.log(globalLayout)
+//	console.log(globalLayout)
 
 	const logoSrc = resolveMediaUrl(globalLayout?.Logo, strapiBaseUrl ?? '')
 	const logoAlt = globalLayout?.Logo?.alternativeText ?? 'HZD Logo'
@@ -216,6 +218,10 @@ export function Header({
 					/>
 				</div>
 			</nav>
+			{pageTitle ? (
+			<div className='flex w-full justify-end'>
+				<span style={{ marginRight: '20vw', fontSize: '2em' }}>{pageTitle}</span>
+			</div>) : null}
 		</header>
 	)
 }

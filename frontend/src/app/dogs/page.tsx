@@ -42,7 +42,7 @@ export default function DogsPage() {
 		color: theme.textColor,
 	}) as CSSProperties, [theme])
 
-	if (isLoading || !globalLayout) {
+	if (isLoading || !globalLayout || !baseUrl) {
 		return <DogsPageSkeleton />
 	}
 
@@ -50,14 +50,6 @@ export default function DogsPage() {
 		return (
 			<div className='flex min-h-screen items-center justify-center px-4 text-center text-sm text-gray-600'>
 				<p>{error.message ?? 'GlobalLayout konnte nicht geladen werden.'}</p>
-			</div>
-		)
-	}
-
-	if (!baseUrl) {
-		return (
-			<div className='flex min-h-screen items-center justify-center px-4 text-center text-sm text-gray-600'>
-				<p>Konfiguration konnte nicht geladen werden.</p>
 			</div>
 		)
 	}
@@ -74,9 +66,12 @@ export default function DogsPage() {
 				onLogout={handleLogout}
 				isAuthenticating={isAuthenticating}
 				error={authError}
+				pageTitle='Hunde'
 			/>
-			<main>
-				<DogSearch strapiBaseUrl={baseUrl} />
+			<main className='flex w-full justify-center'>
+				<div className='w-full max-w-[1200px]'>
+					<DogSearch strapiBaseUrl={baseUrl} />
+				</div>
 			</main>
 			<Footer
 				globalLayout={globalLayout}

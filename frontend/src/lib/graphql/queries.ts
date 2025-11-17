@@ -127,6 +127,7 @@ export const GET_PAGE_BY_SLUG = `
 	query GetPageBySlug($slug: String!) {
 		pages(filters: { slug: { eq: $slug } }, pagination: { pageSize: 1 }) {
 					slug
+					title
 					Sections {
 						__typename
 						... on ComponentBlocksRichTextSection {

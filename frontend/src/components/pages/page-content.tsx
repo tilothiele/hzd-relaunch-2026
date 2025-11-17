@@ -79,6 +79,7 @@ export function PageContent({ page, globalLayout, strapiBaseUrl }: PageContentPr
 					onLogout={handleLogout}
 					isAuthenticating={isAuthenticating}
 					error={authError}
+					pageTitle={page.title}
 				/>
 				<main className={emptyStateClasses}>
 					<h1 className='text-3xl font-semibold text-neutral-900'>
@@ -112,7 +113,8 @@ export function PageContent({ page, globalLayout, strapiBaseUrl }: PageContentPr
 				onLogout={handleLogout}
 				isAuthenticating={isAuthenticating}
 				error={authError}
-			/>
+				pageTitle={page.title}
+				/>
 			<main className='flex flex-col gap-12'>
 				{renderStartpageSections({ sections, strapiBaseUrl })}
 			</main>

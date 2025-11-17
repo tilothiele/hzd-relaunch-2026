@@ -42,7 +42,7 @@ export async function fetchGraphQL<T>(
 		client.setHeader('Authorization', `Bearer ${effectiveToken}`)
 	}
 
-	console.log(query, variables)
+//	console.log(query, variables)
 
 	try {
 		const data = await client.request<T>(query, variables)

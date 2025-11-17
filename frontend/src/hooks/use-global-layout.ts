@@ -6,6 +6,9 @@ import { GET_LAYOUT } from '@/lib/graphql/queries'
 import { useConfig } from '@/hooks/use-config'
 import type { GlobalLayout } from '@/types'
 
+interface LayoutData {
+	globalLayout: GlobalLayout
+}
 
 export function useGlobalLayout() {
 	const { config, isLoading: isConfigLoading, error: configError } = useConfig()
@@ -18,11 +21,11 @@ export function useGlobalLayout() {
 	const loadGlobalLayout = useCallback(async (resolvedBaseUrl?: string | null) => {
 		try {
 			setIsLoading(true)
-			const data = await fetchGraphQL<GlobalLayout>(
+			const data = await fetchGraphQL<LayoutData>(
 				GET_LAYOUT,
 				{ baseUrl: resolvedBaseUrl ?? baseUrl },
 			)
-			setGlobalLayout(data)
+			setGlobalLayout(data.globalLayout)
 			setError(null)
 		} catch (err) {
 			const fetchError = err instanceof Error

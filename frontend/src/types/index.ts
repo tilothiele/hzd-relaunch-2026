@@ -51,6 +51,7 @@ export type PageSection = StartpageSection
 
 export interface Page {
 	slug?: string | null
+	title?: string | null
 	Sections?: PageSection[] | null
 }
 

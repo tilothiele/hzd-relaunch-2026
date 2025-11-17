@@ -1,18 +1,12 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { SEARCH_DOGS } from '@/lib/graphql/queries'
-import type { Dog, DogSearchResult } from '@/types'
+import { useCallback, useState } from 'react'
 import Image from 'next/image'
+import { useDogs, type ColorFilter, type PageSize, type SexFilter } from '@/hooks/use-dogs'
 
 interface DogSearchProps {
 	strapiBaseUrl: string
 }
-
-type SexFilter = 'M' | 'F' | ''
-type ColorFilter = 'S' | 'SM' | 'B' | ''
-type PageSize = 5 | 10 | 20
 
 export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 	const [nameFilter, setNameFilter] = useState('')
@@ -20,99 +14,28 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 	const [colorFilter, setColorFilter] = useState<ColorFilter>('')
 	const [page, setPage] = useState(1)
 	const [pageSize, setPageSize] = useState<PageSize>(10)
-	const [dogs, setDogs] = useState<Dog[]>([])
-	const [isLoading, setIsLoading] = useState(false)
-	const [error, setError] = useState<Error | null>(null)
-	const [totalDogs, setTotalDogs] = useState(0)
-	const [pageCount, setPageCount] = useState(0)
 
-	const searchDogs = useCallback(async () => {
-		if (!strapiBaseUrl) {
-			return
-		}
+	const {
+		dogs,
+		totalDogs,
+		pageCount,
+		isLoading,
+		error,
+		searchDogs,
+	} = useDogs({
+		filters: {
+			nameFilter,
+			sexFilter,
+			colorFilter,
+		},
+		pagination: {
+			page,
+			pageSize,
+		},
+		autoLoad: true,
+	})
 
-		setIsLoading(true)
-		setError(null)
-
-		try {
-			const filterConditions: Array<Record<string, unknown>> = []
-
-			if (nameFilter.trim()) {
-				filterConditions.push({
-					or: [
-						{ givenName: { containsi: nameFilter.trim() } },
-						{ fullKennelName: { containsi: nameFilter.trim() } },
-					],
-				})
-			}
-
-			if (sexFilter) {
-				filterConditions.push({
-					sex: { eq: sexFilter },
-				})
-			}
-
-			if (colorFilter) {
-				filterConditions.push({
-					color: { eq: colorFilter },
-				})
-			}
-
-			const variables: Record<string, unknown> = {
-				pagination: {
-					page,
-					pageSize,
-				},
-				sort: ['fullKennelName:asc'],
-			}
-
-			if (filterConditions.length > 0) {
-				variables.filters = {
-					and: filterConditions,
-				}
-			}
-
-			const data = await fetchGraphQL<DogSearchResult>(
-				SEARCH_DOGS,
-				{
-					baseUrl: strapiBaseUrl,
-					variables,
-				},
-			)
-
-			const dogsArray = Array.isArray(data.hzdPluginDogs) ? data.hzdPluginDogs : []
-			setDogs(dogsArray)
-
-			// Berechne Paginierung basierend auf den übergebenen Parametern
-			// Da die Meta-Informationen nicht in der Antwort enthalten sind,
-			// schätzen wir die Gesamtzahl basierend auf der Anzahl der zurückgegebenen Ergebnisse
-			// Wenn wir genau pageSize Ergebnisse haben, gibt es wahrscheinlich mehr
-			const estimatedTotal = dogsArray.length === pageSize && page > 1
-				? page * pageSize + 1
-				: dogsArray.length === pageSize
-					? page * pageSize
-					: (page - 1) * pageSize + dogsArray.length
-
-			const calculatedPageCount = Math.ceil(estimatedTotal / pageSize)
-
-			setTotalDogs(estimatedTotal)
-			setPageCount(calculatedPageCount)
-		} catch (err) {
-			const fetchError = err instanceof Error
-				? err
-				: new Error('Hunde konnten nicht geladen werden.')
-			setError(fetchError)
-			setDogs([])
-			setTotalDogs(0)
-			setPageCount(0)
-		} finally {
-			setIsLoading(false)
-		}
-	}, [strapiBaseUrl, nameFilter, sexFilter, colorFilter, page, pageSize])
-
-	useEffect(() => {
-		void searchDogs()
-	}, [searchDogs])
+	console.log(dogs)
 
 	const handleSearch = useCallback(() => {
 		setPage(1)
@@ -173,12 +96,9 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 	}, [])
 
 	return (
-		<div className='container mx-auto px-4 py-8'>
-			<div className='mb-8 rounded-lg bg-white p-6 shadow-md'>
-				<h2 className='mb-6 text-2xl font-bold text-gray-900'>
-					Hunde suchen
-				</h2>
-				<div className='grid gap-4 md:grid-cols-3'>
+		<div id='dog-suchmaske' className='grid gap-6 mt-6'>
+			<div className='rounded-lg bg-white shadow-md grid gap-3'>
+				<div className='grid gap-6 md:grid-cols-3'>
 					<div>
 						<label
 							htmlFor='name-filter'
@@ -200,7 +120,7 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 							className='w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none'
 						/>
 					</div>
-					<div>
+					<div className='space-y-2'>
 						<label
 							htmlFor='sex-filter'
 							className='mb-2 block text-sm font-medium text-gray-700'
@@ -218,7 +138,7 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 							<option value='F'>Hündin</option>
 						</select>
 					</div>
-					<div>
+					<div className='my-2'>
 						<label
 							htmlFor='color-filter'
 							className='mb-2 block text-sm font-medium text-gray-700'
@@ -238,7 +158,7 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 						</select>
 					</div>
 				</div>
-				<div className='mt-4 flex justify-end'>
+				<div className='mt-6 flex justify-end'>
 					<button
 						type='button'
 						onClick={handleSearch}
@@ -251,12 +171,12 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 			</div>
 
 			{error ? (
-				<div className='mb-4 rounded bg-red-50 p-4 text-sm text-red-800'>
+				<div className='rounded bg-red-50 p-4 text-sm text-red-800'>
 					{error.message}
 				</div>
 			) : null}
 
-			<div className='mb-4 flex items-center justify-between'>
+			<div className='flex items-center justify-between'>
 				<div className='text-sm text-gray-600'>
 					{totalDogs > 0 ? (
 						<>
