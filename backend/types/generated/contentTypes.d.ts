@@ -737,6 +737,10 @@ export interface ApiOfficerRoleOfficerRole extends Struct.CollectionTypeSchema {
       'api::officer-role.officer-role'
     > &
       Schema.Attribute.Private;
+    members: Schema.Attribute.Relation<
+      'manyToMany',
+      'plugin::hzd-plugin.member'
+    >;
     Name: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     RegionalUnit: Schema.Attribute.Enumeration<
@@ -1226,6 +1230,10 @@ export interface PluginHzdPluginMember extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     membershipNo: Schema.Attribute.Integer;
     memberSince: Schema.Attribute.Date;
+    officer_roles: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::officer-role.officer-role'
+    >;
     phone: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 50;

@@ -23,6 +23,12 @@
         "WEST",
         "MITTE"
       ]
+    },
+    "members": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::hzd-plugin.member",
+      "mappedBy": "officer_roles"
     }
   }
 }
