@@ -460,6 +460,80 @@ export interface ApiBlockColumnBlockColumn extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiCalendarEntryCalendarEntry
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'calendar_entries';
+  info: {
+    displayName: 'CalendarEntry';
+    pluralName: 'calendar-entries';
+    singularName: 'calendar-entry';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    calendar: Schema.Attribute.Relation<'oneToOne', 'api::calendar.calendar'>;
+    CalendarDocument: Schema.Attribute.Component<
+      'calendar.calendar-document',
+      true
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    Date: Schema.Attribute.Date & Schema.Attribute.Required;
+    Description: Schema.Attribute.Text;
+    Headline: Schema.Attribute.String & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::calendar-entry.calendar-entry'
+    > &
+      Schema.Attribute.Private;
+    LongDescription: Schema.Attribute.RichText &
+      Schema.Attribute.CustomField<
+        'plugin::ckeditor.CKEditor',
+        {
+          licenseKey: 'GPL';
+          output: 'HTML';
+          preset: 'standard';
+        }
+      >;
+    publishedAt: Schema.Attribute.DateTime;
+    Time: Schema.Attribute.Time;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiCalendarCalendar extends Struct.CollectionTypeSchema {
+  collectionName: 'calendars';
+  info: {
+    displayName: 'Calendar';
+    pluralName: 'calendars';
+    singularName: 'calendar';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::calendar.calendar'
+    > &
+      Schema.Attribute.Private;
+    Name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiContactContact extends Struct.CollectionTypeSchema {
   collectionName: 'contacts';
   info: {
@@ -559,6 +633,49 @@ export interface ApiIndexPageIndexPage extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiMerchandisingProductMerchandisingProduct
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'merchandising_products';
+  info: {
+    displayName: 'MerchandisingProduct';
+    pluralName: 'merchandising-products';
+    singularName: 'merchandising-product';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    Description: Schema.Attribute.Text;
+    Images: Schema.Attribute.Media<'images', true>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::merchandising-product.merchandising-product'
+    > &
+      Schema.Attribute.Private;
+    LongDescription: Schema.Attribute.RichText &
+      Schema.Attribute.CustomField<
+        'plugin::ckeditor.CKEditor',
+        {
+          licenseKey: 'GPL';
+          output: 'HTML';
+          preset: 'standard';
+        }
+      >;
+    MaxOrderVolume: Schema.Attribute.Integer;
+    Name: Schema.Attribute.String;
+    Price: Schema.Attribute.Decimal;
+    publishedAt: Schema.Attribute.DateTime;
+    TaxPercent: Schema.Attribute.Decimal;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
   collectionName: 'news_articles';
   info: {
@@ -582,6 +699,83 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiOrderItemOrderItem extends Struct.CollectionTypeSchema {
+  collectionName: 'order_items';
+  info: {
+    displayName: 'OrderItem';
+    pluralName: 'order-items';
+    singularName: 'order-item';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    Amount: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<1>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::order-item.order-item'
+    > &
+      Schema.Attribute.Private;
+    merchandising_product: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::merchandising-product.merchandising-product'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
+  collectionName: 'orders';
+  info: {
+    displayName: 'Order';
+    pluralName: 'orders';
+    singularName: 'order';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    AdminNotes: Schema.Attribute.Text;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    CustomerNotes: Schema.Attribute.Text;
+    hzd_plugin_member: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::hzd-plugin.member'
+    >;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::order.order'> &
+      Schema.Attribute.Private;
+    OrderStatus: Schema.Attribute.Enumeration<
+      ['ORDERED', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELED']
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    ShippingAddress: Schema.Attribute.Component<
+      'personal.shipping-address',
+      false
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -760,11 +954,6 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
   };
   options: {
     draftAndPublish: false;
-  };
-  pluginOptions: {
-    'content-manager': {
-      visible: true;
-    };
   };
   attributes: {
     breedingLicenseSince: Schema.Attribute.Date;
@@ -1421,10 +1610,15 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::block-column.block-column': ApiBlockColumnBlockColumn;
+      'api::calendar-entry.calendar-entry': ApiCalendarEntryCalendarEntry;
+      'api::calendar.calendar': ApiCalendarCalendar;
       'api::contact.contact': ApiContactContact;
       'api::global-layout.global-layout': ApiGlobalLayoutGlobalLayout;
       'api::index-page.index-page': ApiIndexPageIndexPage;
+      'api::merchandising-product.merchandising-product': ApiMerchandisingProductMerchandisingProduct;
       'api::news-article.news-article': ApiNewsArticleNewsArticle;
+      'api::order-item.order-item': ApiOrderItemOrderItem;
+      'api::order.order': ApiOrderOrder;
       'api::page.page': ApiPagePage;
       'api::supplemental-document.supplemental-document': ApiSupplementalDocumentSupplementalDocument;
       'plugin::content-releases.release': PluginContentReleasesRelease;

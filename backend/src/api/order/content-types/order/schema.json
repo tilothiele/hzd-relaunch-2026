@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "orders",
+  "info": {
+    "singularName": "order",
+    "pluralName": "orders",
+    "displayName": "Order"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "hzd_plugin_member": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::hzd-plugin.member"
+    },
+    "OrderStatus": {
+      "type": "enumeration",
+      "enum": [
+        "ORDERED",
+        "CONFIRMED",
+        "SHIPPED",
+        "DELIVERED",
+        "CANCELED"
+      ]
+    },
+    "CustomerNotes": {
+      "type": "text"
+    },
+    "ShippingAddress": {
+      "type": "component",
+      "component": "personal.shipping-address",
+      "repeatable": false
+    },
+    "AdminNotes": {
+      "type": "text"
+    }
+  }
+}

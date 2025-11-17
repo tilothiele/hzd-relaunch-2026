@@ -99,6 +99,17 @@ export interface BlocksTeaserTextWithImage extends Struct.ComponentSchema {
   };
 }
 
+export interface CalendarCalendarDocument extends Struct.ComponentSchema {
+  collectionName: 'components_calendar_calendar_documents';
+  info: {
+    displayName: 'CalendarDocument';
+  };
+  attributes: {
+    Description: Schema.Attribute.String;
+    MediaFile: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+  };
+}
+
 export interface ColumnsColumnItem extends Struct.ComponentSchema {
   collectionName: 'components_columns_column_items';
   info: {
@@ -161,6 +172,21 @@ export interface PermissionGroups extends Struct.ComponentSchema {
   };
 }
 
+export interface PersonalShippingAddress extends Struct.ComponentSchema {
+  collectionName: 'components_personal_shipping_addresses';
+  info: {
+    displayName: 'Address';
+  };
+  attributes: {
+    AdditionalName: Schema.Attribute.String;
+    City: Schema.Attribute.String;
+    CountryCode: Schema.Attribute.String;
+    Name: Schema.Attribute.String;
+    Street: Schema.Attribute.String;
+    ZipCode: Schema.Attribute.String;
+  };
+}
+
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
@@ -171,11 +197,13 @@ declare module '@strapi/strapi' {
       'blocks.rich-text-section': BlocksRichTextSection;
       'blocks.slide-item': BlocksSlideItem;
       'blocks.teaser-text-with-image': BlocksTeaserTextWithImage;
+      'calendar.calendar-document': CalendarCalendarDocument;
       'columns.column-item': ColumnsColumnItem;
       'columns.text-column': ColumnsTextColumn;
       'layout.footer': LayoutFooter;
       'links.action-button': LinksActionButton;
       'permission.groups': PermissionGroups;
+      'personal.shipping-address': PersonalShippingAddress;
     }
   }
 }

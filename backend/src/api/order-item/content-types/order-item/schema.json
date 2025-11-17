@@ -1,0 +1,26 @@
+{
+  "kind": "collectionType",
+  "collectionName": "order_items",
+  "info": {
+    "singularName": "order-item",
+    "pluralName": "order-items",
+    "displayName": "OrderItem"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "merchandising_product": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::merchandising-product.merchandising-product"
+    },
+    "Amount": {
+      "type": "integer",
+      "required": true,
+      "default": 1,
+      "min": 0
+    }
+  }
+}

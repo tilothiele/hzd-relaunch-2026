@@ -1,0 +1,46 @@
+{
+  "kind": "collectionType",
+  "collectionName": "merchandising_products",
+  "info": {
+    "singularName": "merchandising-product",
+    "pluralName": "merchandising-products",
+    "displayName": "MerchandisingProduct"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Name": {
+      "type": "string"
+    },
+    "Description": {
+      "type": "text"
+    },
+    "LongDescription": {
+      "type": "customField",
+      "customField": "plugin::ckeditor.CKEditor",
+      "options": {
+        "output": "HTML",
+        "licenseKey": "GPL",
+        "preset": "standard"
+      }
+    },
+    "Images": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "Price": {
+      "type": "decimal"
+    },
+    "TaxPercent": {
+      "type": "decimal"
+    },
+    "MaxOrderVolume": {
+      "type": "integer"
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "kind": "collectionType",
+  "collectionName": "calendar_entries",
+  "info": {
+    "singularName": "calendar-entry",
+    "pluralName": "calendar-entries",
+    "displayName": "CalendarEntry"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Headline": {
+      "type": "string",
+      "required": true
+    },
+    "Description": {
+      "type": "text"
+    },
+    "LongDescription": {
+      "type": "customField",
+      "customField": "plugin::ckeditor.CKEditor",
+      "options": {
+        "output": "HTML",
+        "preset": "standard",
+        "licenseKey": "GPL"
+      }
+    },
+    "Date": {
+      "type": "date",
+      "required": true
+    },
+    "Time": {
+      "type": "time"
+    },
+    "CalendarDocument": {
+      "type": "component",
+      "component": "calendar.calendar-document",
+      "repeatable": true
+    },
+    "calendar": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::calendar.calendar"
+    }
+  }
+}
