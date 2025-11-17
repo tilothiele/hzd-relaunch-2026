@@ -8,9 +8,10 @@ export interface BlocksCardItem extends Struct.ComponentSchema {
   attributes: {
     ActionButton: Schema.Attribute.Component<'links.action-button', false>;
     BackgroundImage: Schema.Attribute.Media<'images' | 'files'>;
-    FarbThema: Schema.Attribute.Enumeration<['A', 'B', 'C']>;
+    FarbThema: Schema.Attribute.Enumeration<['A', 'B', 'C', 'D']>;
     Headline: Schema.Attribute.String;
     Subheadline: Schema.Attribute.String;
+    TeaserText: Schema.Attribute.Text;
   };
 }
 
@@ -27,6 +28,7 @@ export interface BlocksCardSection extends Struct.ComponentSchema {
         },
         number
       >;
+    Headline: Schema.Attribute.String;
   };
 }
 
@@ -63,6 +65,8 @@ export interface BlocksRichTextSection extends Struct.ComponentSchema {
           preset: 'defaultHtml';
         }
       >;
+    Subtitle: Schema.Attribute.String;
+    Title: Schema.Attribute.String;
   };
 }
 

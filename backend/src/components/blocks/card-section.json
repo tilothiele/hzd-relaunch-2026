@@ -5,6 +5,9 @@
   },
   "options": {},
   "attributes": {
+    "Headline": {
+      "type": "string"
+    },
     "CardItem": {
       "type": "component",
       "component": "blocks.card-item",

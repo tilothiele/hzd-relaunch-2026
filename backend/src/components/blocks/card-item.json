@@ -11,6 +11,9 @@
     "Subheadline": {
       "type": "string"
     },
+    "TeaserText": {
+      "type": "text"
+    },
     "BackgroundImage": {
       "type": "media",
       "multiple": false,
@@ -24,7 +27,8 @@
       "enum": [
         "A",
         "B",
-        "C"
+        "C",
+        "D"
       ]
     },
     "ActionButton": {

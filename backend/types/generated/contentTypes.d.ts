@@ -430,36 +430,6 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiBlockColumnBlockColumn extends Struct.CollectionTypeSchema {
-  collectionName: 'block_columns';
-  info: {
-    displayName: 'BlockColumn';
-    pluralName: 'block-columns';
-    singularName: 'block-column';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    Columns: Schema.Attribute.DynamicZone<
-      ['columns.text-column', 'blocks.item-list']
-    >;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::block-column.block-column'
-    > &
-      Schema.Attribute.Private;
-    publishedAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
 export interface ApiCalendarEntryCalendarEntry
   extends Struct.CollectionTypeSchema {
   collectionName: 'calendar_entries';
@@ -869,6 +839,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    FarbThema: Schema.Attribute.Enumeration<['A', 'B', 'C', 'D']>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::page.page'> &
       Schema.Attribute.Private;
@@ -1721,7 +1692,6 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
-      'api::block-column.block-column': ApiBlockColumnBlockColumn;
       'api::calendar-entry.calendar-entry': ApiCalendarEntryCalendarEntry;
       'api::calendar.calendar': ApiCalendarCalendar;
       'api::contact.contact': ApiContactContact;

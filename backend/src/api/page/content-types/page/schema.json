@@ -17,6 +17,15 @@
     "title": {
       "type": "string"
     },
+    "FarbThema": {
+      "type": "enumeration",
+      "enum": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
     "Sections": {
       "type": "dynamiczone",
       "components": [

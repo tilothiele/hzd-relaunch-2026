@@ -5,6 +5,12 @@
   },
   "options": {},
   "attributes": {
+    "Title": {
+      "type": "string"
+    },
+    "Subtitle": {
+      "type": "string"
+    },
     "RichTextContent": {
       "type": "customField",
       "customField": "plugin::ckeditor5.CKEditor",
