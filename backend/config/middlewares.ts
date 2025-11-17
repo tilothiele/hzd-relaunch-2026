@@ -19,7 +19,7 @@ export default [
       origin: process.env.CORS_ORIGIN
         ? process.env.CORS_ORIGIN.split(',')
         : process.env.NODE_ENV === 'development'
-          ? ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000']
+          ? ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000', 'https://hzd-backend.app.tilothiele.de']
           : [],
       credentials: true,
       headers: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
