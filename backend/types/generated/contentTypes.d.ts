@@ -725,7 +725,7 @@ export interface ApiOfficerRoleOfficerRole extends Struct.CollectionTypeSchema {
     singularName: 'officer-role';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
@@ -1198,6 +1198,7 @@ export interface PluginHzdPluginMember extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 100;
       }>;
+    Avatar: Schema.Attribute.Media<'images'>;
     cancellationDueDate: Schema.Attribute.Date;
     cancellationOn: Schema.Attribute.Date;
     countryCode: Schema.Attribute.String &
@@ -1210,6 +1211,13 @@ export interface PluginHzdPluginMember extends Struct.CollectionTypeSchema {
     dateOfBirth: Schema.Attribute.Date;
     dateOfDeath: Schema.Attribute.Date;
     fullName: Schema.Attribute.String;
+    Intro: Schema.Attribute.RichText &
+      Schema.Attribute.CustomField<
+        'plugin::ckeditor5.CKEditor',
+        {
+          preset: 'defaultHtml';
+        }
+      >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -1657,6 +1665,7 @@ export interface PluginUsersPermissionsUser
       'plugin::users-permissions.user'
     > &
       Schema.Attribute.Private;
+    member: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.member'>;
     password: Schema.Attribute.Password &
       Schema.Attribute.Private &
       Schema.Attribute.SetMinMaxLength<{
