@@ -903,6 +903,40 @@ export interface ApiRegionalUnitRegionalUnit
   };
 }
 
+export interface ApiSupplementalDocumentGroupSupplementalDocumentGroup
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'supplemental_document_groups';
+  info: {
+    displayName: 'SupplementalDocumentGroup';
+    pluralName: 'supplemental-document-groups';
+    singularName: 'supplemental-document-group';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::supplemental-document-group.supplemental-document-group'
+    > &
+      Schema.Attribute.Private;
+    Name: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    SortOrd: Schema.Attribute.Integer;
+    supplemental_documents: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::supplemental-document.supplemental-document'
+    >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiSupplementalDocumentSupplementalDocument
   extends Struct.CollectionTypeSchema {
   collectionName: 'supplemental_documents';
@@ -921,9 +955,6 @@ export interface ApiSupplementalDocumentSupplementalDocument
     Description: Schema.Attribute.Blocks;
     DownloadDocument: Schema.Attribute.Media<'files', true> &
       Schema.Attribute.Required;
-    Gruppe: Schema.Attribute.Enumeration<
-      ['Allgemein', 'HZD-Intern', 'Mitglieder', 'Zucht']
-    >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -933,6 +964,10 @@ export interface ApiSupplementalDocumentSupplementalDocument
     Name: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     ShortId: Schema.Attribute.String;
+    supplemental_document_group: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::supplemental-document-group.supplemental-document-group'
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1725,6 +1760,7 @@ declare module '@strapi/strapi' {
       'api::order.order': ApiOrderOrder;
       'api::page.page': ApiPagePage;
       'api::regional-unit.regional-unit': ApiRegionalUnitRegionalUnit;
+      'api::supplemental-document-group.supplemental-document-group': ApiSupplementalDocumentGroupSupplementalDocumentGroup;
       'api::supplemental-document.supplemental-document': ApiSupplementalDocumentSupplementalDocument;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

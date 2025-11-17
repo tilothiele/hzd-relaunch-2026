@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "supplemental_document_groups",
+  "info": {
+    "singularName": "supplemental-document-group",
+    "pluralName": "supplemental-document-groups",
+    "displayName": "SupplementalDocumentGroup"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Name": {
+      "type": "string"
+    },
+    "SortOrd": {
+      "type": "integer"
+    },
+    "supplemental_documents": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::supplemental-document.supplemental-document",
+      "mappedBy": "supplemental_document_group"
+    }
+  }
+}

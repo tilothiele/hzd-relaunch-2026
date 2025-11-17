@@ -35,14 +35,11 @@
     "VisibilityEnd": {
       "type": "datetime"
     },
-    "Gruppe": {
-      "type": "enumeration",
-      "enum": [
-        "Allgemein",
-        "HZD-Intern",
-        "Mitglieder",
-        "Zucht"
-      ]
+    "supplemental_document_group": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::supplemental-document-group.supplemental-document-group",
+      "inversedBy": "supplemental_documents"
     }
   }
 }
