@@ -1205,6 +1205,7 @@ export interface PluginHzdPluginMember extends Struct.CollectionTypeSchema {
     Avatar: Schema.Attribute.Media<'images'>;
     cancellationDueDate: Schema.Attribute.Date;
     cancellationOn: Schema.Attribute.Date;
+    city: Schema.Attribute.String;
     countryCode: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 2;
