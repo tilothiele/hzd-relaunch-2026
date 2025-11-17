@@ -51,6 +51,8 @@ export default function Page({ params }: PageProps) {
 	const pageData = usePage(params)
 	const { page, globalLayout, baseUrl, status } = pageData
 
+	console.log('pageData', pageData)
+	
 	if (status.type === 'loading' || !baseUrl || !globalLayout) {
 		return <HomePageSkeleton />
 	}

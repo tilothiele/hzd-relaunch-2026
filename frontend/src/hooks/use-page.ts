@@ -22,7 +22,9 @@ interface StatusState {
 	message: string | null
 }
 
-async function loadPageBySlug(slug: string, baseUrl: string) {
+async function loadPageBySlug(rawSlug: string, baseUrl: string) {
+	const slug = `/${rawSlug}`
+	console.log('loadPageBySlug', slug, baseUrl)
 	const { pages } = await fetchGraphQL<PageQueryResult>(
 		GET_PAGE_BY_SLUG,
 		{
@@ -31,11 +33,14 @@ async function loadPageBySlug(slug: string, baseUrl: string) {
 		},
 	)
 
+	console.log('pages', pages)
 	const matchingPage = pages?.find((entity) => {
 		const entitySlug = entity?.slug
 		return entitySlug?.toLowerCase() === slug.toLowerCase()
 	})
 
+	console.log('matchingPage', matchingPage)
+	
 	return matchingPage ?? null
 }
 
