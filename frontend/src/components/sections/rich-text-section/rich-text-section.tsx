@@ -15,10 +15,10 @@ export function RichTextSectionComponent({
 	}
 
 	return (
-		<section className='mb-16 px-4'>
-			<div className='mx-auto w-full max-w-4xl'>
+		<section className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em' }}>
+			<div className='w-full max-w-4xl'>
 				<div
-					className='prose prose-lg max-w-none dark:prose-invert'
+					className='prose prose-xl max-w-none dark:prose-invert'
 					dangerouslySetInnerHTML={{ __html: section.RichTextContent }}
 				/>
 			</div>

@@ -113,8 +113,6 @@ export function Header({
 	pageTitle,
 }: HeaderProps) {
 
-//	console.log(globalLayout)
-
 	const logoSrc = resolveMediaUrl(globalLayout?.Logo, strapiBaseUrl ?? '')
 	const logoAlt = globalLayout?.Logo?.alternativeText ?? 'HZD Logo'
 	const menuItems = globalLayout?.Menu?.items ?? []

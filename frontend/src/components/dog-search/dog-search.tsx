@@ -37,8 +37,6 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 		autoLoad: true,
 	})
 
-	console.log(dogs)
-
 	const handleSearch = useCallback(() => {
 		setPage(1)
 		void searchDogs()

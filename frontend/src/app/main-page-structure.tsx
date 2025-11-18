@@ -79,7 +79,6 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 		return <MainPageSkeleton />
 	}
 
-	console.log('pageTitle', pageTitle)
 	return (
 		<div style={themeStyles}>
 			<Header
