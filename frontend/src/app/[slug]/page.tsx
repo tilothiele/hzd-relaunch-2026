@@ -1,8 +1,9 @@
 'use client'
 
-import { Skeleton } from '@chakra-ui/react'
-import { PageContent } from '@/components/pages/page-content'
+import Image from 'next/image'
 import { usePage } from '@/hooks/use-page'
+import { renderStartpageSections } from '@/components/sections/section-factory'
+import { MainPageStructure } from '../main-page-structure'
 
 interface PageProps {
 	params: Promise<{
@@ -10,39 +11,30 @@ interface PageProps {
 	}>
 }
 
-const textSkeletonKeys = [
-	'text-primary',
-	'text-secondary',
-	'text-tertiary',
-	'text-quaternary',
-] as const
-
-function HomePageSkeleton() {
+function NotFoundSection() {
 	return (
-		<div
-			className='flex min-h-screen flex-col gap-8 px-4 py-12'
-			aria-busy='true'
-			aria-live='polite'
-		>
-			<Skeleton height='5rem' borderRadius='md' />
-			<div className='grid gap-6 lg:grid-cols-[2fr_1fr]'>
-				<Skeleton height='20rem' borderRadius='md' />
-				<div className='flex flex-col gap-4'>
-					<Skeleton height='3.5rem' borderRadius='md' />
-					<Skeleton height='3.5rem' borderRadius='md' />
-					<Skeleton height='3.5rem' borderRadius='md' />
-				</div>
-			</div>
-			<Skeleton height='12rem' borderRadius='md' />
-			<div className='flex flex-col gap-4'>
-				{textSkeletonKeys.map((key) => (
-					<Skeleton
-						key={key}
-						height='1.25rem'
-						borderRadius='md'
+		<div className='flex w-full justify-center px-6 py-24'>
+			<section className='grid min-h-[50vh] w-full max-w-6xl grid-cols-1 gap-8 md:grid-cols-2'>
+				<div className='flex items-center justify-center px-6' style={{ paddingTop: '1em', paddingBottom: '1em' }}>
+					<Image
+						src='/static-images/404-not-found-wuff.jpg'
+						alt='404 - Seite nicht gefunden'
+						width={300}
+						height={300}
+						className='rounded-lg object-cover'
+						unoptimized
 					/>
-				))}
-			</div>
+				</div>
+				<div className='flex flex-col items-center justify-center gap-6 px-6 text-center md:text-left'>
+					<h1 className='text-4xl font-semibold tracking-tight text-neutral-900'>
+						Seite nicht gefunden
+					</h1>
+					<p className='max-w-lg text-base text-neutral-600'>
+						Die angeforderte Seite konnte nicht gefunden werden. Bitte prüfen Sie die
+						URL oder kehren Sie zur Startseite zurück.
+					</p>
+				</div>
+			</section>
 		</div>
 	)
 }
@@ -51,27 +43,33 @@ export default function Page({ params }: PageProps) {
 	const pageData = usePage(params)
 	const { page, globalLayout, baseUrl, status } = pageData
 
-	console.log('pageData', pageData)
-	
-	if (status.type === 'loading' || !baseUrl || !globalLayout) {
-		return <HomePageSkeleton />
+	if (status.type === 'loading' || !globalLayout || !baseUrl) {
+		return <MainPageStructure homepage={globalLayout} strapiBaseUrl={baseUrl} loading={true}>{null}</MainPageStructure>
 	}
 
-	if (status.type) {
+	if (status.type === 'error') {
 		return (
-			<div className='flex min-h-screen items-center justify-center px-4 text-center text-sm text-gray-600'>
-				<p>{status.message}</p>
-			</div>
+			<MainPageStructure homepage={globalLayout} strapiBaseUrl={baseUrl}>
+				<div className='flex min-h-[50vh] items-center justify-center px-4 text-center text-sm text-gray-600'>
+					<p>{status.message}</p>
+				</div>
+			</MainPageStructure>
 		)
 	}
 
-	if (!page) {
+	if (!page || status.type === 'empty') {
 		return (
-			<div className='flex min-h-screen items-center justify-center px-4 text-center text-sm text-gray-600'>
-				<p>Seite nicht gefunden</p>
-			</div>
+			<MainPageStructure homepage={globalLayout} strapiBaseUrl={baseUrl} pageTitle='404 - Seite nicht gefunden'>
+				<NotFoundSection />
+			</MainPageStructure>
 		)
 	}
 
-	return <PageContent page={page} globalLayout={globalLayout} strapiBaseUrl={baseUrl} />
+	const sections = page.Sections || []
+
+	return (
+		<MainPageStructure homepage={globalLayout} strapiBaseUrl={baseUrl} pageTitle={page.title}>
+			{renderStartpageSections({ sections, strapiBaseUrl: baseUrl })}
+		</MainPageStructure>
+	)
 }

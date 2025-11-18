@@ -1,17 +1,18 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import Image from 'next/image'
 import { useDogs, type ColorFilter, type PageSize, type SexFilter } from '@/hooks/use-dogs'
+import { DogCard } from './dog-card'
 
 interface DogSearchProps {
-	strapiBaseUrl: string
+	strapiBaseUrl?: string | null
 }
 
 export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 	const [nameFilter, setNameFilter] = useState('')
 	const [sexFilter, setSexFilter] = useState<SexFilter>('')
 	const [colorFilter, setColorFilter] = useState<ColorFilter>('')
+	const [chipNoFilter, setChipNoFilter] = useState('')
 	const [page, setPage] = useState(1)
 	const [pageSize, setPageSize] = useState<PageSize>(10)
 
@@ -27,6 +28,7 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 			nameFilter,
 			sexFilter,
 			colorFilter,
+			chipNoFilter,
 		},
 		pagination: {
 			page,
@@ -54,51 +56,11 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 	const totalPages = pageCount
 	const currentPage = page
 
-	const getColorLabel = useCallback((color: string | null | undefined) => {
-		switch (color) {
-		case 'S':
-			return 'Schwarz'
-		case 'SM':
-			return 'Schwarz-Marken'
-		case 'B':
-			return 'Braun'
-		default:
-			return '-'
-		}
-	}, [])
-
-	const getSexLabel = useCallback((sex: string | null | undefined) => {
-		switch (sex) {
-		case 'M':
-			return 'Rüde'
-		case 'F':
-			return 'Hündin'
-		default:
-			return '-'
-		}
-	}, [])
-
-	const formatDate = useCallback((dateString: string | null | undefined) => {
-		if (!dateString) {
-			return '-'
-		}
-
-		try {
-			const date = new Date(dateString)
-			return date.toLocaleDateString('de-DE', {
-				year: 'numeric',
-				month: '2-digit',
-				day: '2-digit',
-			})
-		} catch {
-			return dateString
-		}
-	}, [])
-
 	return (
-		<div id='dog-suchmaske' className='grid gap-6 mt-6'>
+		<div className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em' }}>
+			<div id='dog-suchmaske' className='grid w-full max-w-6xl gap-6'>
 			<div className='rounded-lg bg-white shadow-md grid gap-3'>
-				<div className='grid gap-6 md:grid-cols-3'>
+				<div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
 					<div>
 						<label
 							htmlFor='name-filter'
@@ -157,6 +119,27 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 							<option value='B'>Braun</option>
 						</select>
 					</div>
+					<div>
+						<label
+							htmlFor='chipno-filter'
+							className='mb-2 block text-sm font-medium text-gray-700'
+						>
+							Chipnummer
+						</label>
+						<input
+							id='chipno-filter'
+							type='text'
+							value={chipNoFilter}
+							onChange={(e) => setChipNoFilter(e.target.value)}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter') {
+									handleSearch()
+								}
+							}}
+							placeholder='Chipnummer'
+							className='w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none'
+						/>
+					</div>
 				</div>
 				<div className='mt-6 flex justify-end'>
 					<button
@@ -214,61 +197,13 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 			) : dogs.length > 0 ? (
 				<>
 					<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-						{dogs.map((dog) => {
-							const avatarUrl = dog.avatar?.url
-							const avatarAlt = dog.avatar?.alternativeText ?? 'Hund'
-							const fullName = dog.fullKennelName ?? dog.givenName ?? 'Unbekannt'
-
-							return (
-								<div
-									key={dog.documentId}
-									className='rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md'
-								>
-									{avatarUrl ? (
-										<div className='mb-3 flex justify-center'>
-											<Image
-												src={`${strapiBaseUrl}${avatarUrl}`}
-												alt={avatarAlt}
-												width={200}
-												height={200}
-												className='h-48 w-48 rounded object-cover'
-												unoptimized
-											/>
-										</div>
-									) : (
-										<div className='mb-3 flex h-48 items-center justify-center rounded bg-gray-100 text-gray-400'>
-											Kein Bild
-										</div>
-									)}
-									<h3 className='mb-2 text-lg font-semibold text-gray-900'>
-										{fullName}
-									</h3>
-									{dog.givenName && dog.fullKennelName ? (
-										<p className='mb-2 text-sm text-gray-600'>
-											Rufname: {dog.givenName}
-										</p>
-									) : null}
-									<div className='space-y-1 text-sm text-gray-600'>
-										<p>
-											<strong>Geschlecht:</strong> {getSexLabel(dog.sex)}
-										</p>
-										<p>
-											<strong>Farbe:</strong> {getColorLabel(dog.color)}
-										</p>
-										{dog.dateOfBirth ? (
-											<p>
-												<strong>Geburtsdatum:</strong> {formatDate(dog.dateOfBirth)}
-											</p>
-										) : null}
-										{dog.microchipNo ? (
-											<p>
-												<strong>Chip-Nr.:</strong> {dog.microchipNo}
-											</p>
-										) : null}
-									</div>
-								</div>
-							)
-						})}
+						{dogs.map((dog) => (
+							<DogCard
+								key={dog.documentId}
+								dog={dog}
+								strapiBaseUrl={strapiBaseUrl}
+							/>
+						))}
 					</div>
 
 					{totalPages > 1 ? (
@@ -300,6 +235,7 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 					Keine Hunde gefunden. Bitte passen Sie Ihre Suchkriterien an.
 				</div>
 			) : null}
+			</div>
 		</div>
 	)
 }

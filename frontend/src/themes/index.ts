@@ -9,7 +9,7 @@ export interface ThemeDefinition {
 	name: string
 }
 
-const themes: Record<ThemeId, ThemeDefinition> = {
+export const themes: Record<ThemeId, ThemeDefinition> = {
 	A: {
 		id: 'A',
 		headerBackground: '#64574E',

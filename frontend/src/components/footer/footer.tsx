@@ -8,8 +8,8 @@ import { SocialLinks } from '../header/social-links'
 import { resolveMediaUrl } from '../header/logo-utils'
 
 interface FooterProps {
-	globalLayout: GlobalLayout | null | undefined
-	strapiBaseUrl: string
+	globalLayout?: GlobalLayout | null
+	strapiBaseUrl?: string | null
 	theme: ThemeDefinition
 }
 

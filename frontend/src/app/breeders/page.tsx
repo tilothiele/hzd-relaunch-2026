@@ -1,90 +1,19 @@
 'use client'
 
-import { useMemo, type CSSProperties } from 'react'
-import { Skeleton } from '@chakra-ui/react'
 import { useGlobalLayout } from '@/hooks/use-global-layout'
-import { Header } from '@/components/header/header'
-import { Footer } from '@/components/footer/footer'
-import { CookieBanner } from '@/components/cookie-banner/cookie-banner'
+import { MainPageStructure } from '../main-page-structure'
 import { BreederSearch } from '@/components/breeder-search/breeder-search'
-import { useTheme } from '@/hooks/use-theme'
-import { useAuth } from '@/hooks/use-auth'
+import { themes } from '@/themes'
 
-function BreedersPageSkeleton() {
-	return (
-		<div
-			className='flex min-h-screen flex-col gap-8 px-4 py-12'
-			aria-busy='true'
-			aria-live='polite'
-		>
-			<Skeleton height='5rem' borderRadius='md' />
-			<Skeleton height='20rem' borderRadius='md' />
-			<Skeleton height='12rem' borderRadius='md' />
-		</div>
-	)
-}
-
-export default function BreedersPage() {
+export default function DogsPage() {
 	const { globalLayout, isLoading, error, baseUrl } = useGlobalLayout()
-	const { theme } = useTheme()
-	const {
-		isAuthenticated,
-		user,
-		authError,
-		isAuthenticating,
-		handleLogin,
-		handleLogout,
-	} = useAuth(baseUrl || '')
-
-	const themeStyles = useMemo(() => ({
-		'--theme-text-color': theme.textColor,
-		'--theme-heading-color': theme.headerBackground,
-		color: theme.textColor,
-	}) as CSSProperties, [theme])
-
-	if (isLoading || !globalLayout) {
-		return <BreedersPageSkeleton />
-	}
-
-	if (error) {
-		return (
-			<div className='flex min-h-screen items-center justify-center px-4 text-center text-sm text-gray-600'>
-				<p>{error.message ?? 'GlobalLayout konnte nicht geladen werden.'}</p>
-			</div>
-		)
-	}
-
-	if (!baseUrl) {
-		return (
-			<div className='flex min-h-screen items-center justify-center px-4 text-center text-sm text-gray-600'>
-				<p>Konfiguration konnte nicht geladen werden.</p>
-			</div>
-		)
-	}
+	const pageTitle = 'Züchter'
+	const theme = themes.B
 
 	return (
-		<div style={themeStyles}>
-			<Header
-				globalLayout={globalLayout}
-				strapiBaseUrl={baseUrl}
-				theme={theme}
-				isAuthenticated={isAuthenticated}
-				user={user}
-				onLogin={handleLogin}
-				onLogout={handleLogout}
-				isAuthenticating={isAuthenticating}
-				error={authError}
-			/>
-			<main>
-				<BreederSearch strapiBaseUrl={baseUrl} />
-			</main>
-			<Footer
-				globalLayout={globalLayout}
-				strapiBaseUrl={baseUrl}
-				theme={theme}
-			/>
-			<CookieBanner />
-		</div>
+		<MainPageStructure homepage={globalLayout} pageTitle={pageTitle} theme={theme} strapiBaseUrl={baseUrl} loading={isLoading}>
+			<BreederSearch strapiBaseUrl={baseUrl} />
+		</MainPageStructure>
 	)
 }
 

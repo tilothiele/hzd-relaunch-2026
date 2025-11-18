@@ -6,7 +6,7 @@ import { SEARCH_BREEDERS } from '@/lib/graphql/queries'
 import type { Breeder, BreederSearchResult } from '@/types'
 
 interface BreederSearchProps {
-	strapiBaseUrl: string
+	strapiBaseUrl?: string | null
 }
 
 type PageSize = 5 | 10 | 20
@@ -137,7 +137,8 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 	}, [])
 
 	return (
-		<div className='container mx-auto px-4 py-8'>
+		<div className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em' }}>
+			<div className='w-full max-w-6xl'>
 			<div className='mb-8 rounded-lg bg-white p-6 shadow-md'>
 				<h2 className='mb-6 text-2xl font-bold text-gray-900'>
 					Züchter suchen
@@ -301,6 +302,7 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 					Keine Züchter gefunden. Bitte passen Sie Ihre Suchkriterien an.
 				</div>
 			) : null}
+			</div>
 		</div>
 	)
 }

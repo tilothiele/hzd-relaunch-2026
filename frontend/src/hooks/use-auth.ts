@@ -58,7 +58,7 @@ function saveAuthState(state: AuthState) {
 	}
 }
 
-export function useAuth(strapiBaseUrl: string) {
+export function useAuth(strapiBaseUrl?: string | null) {
 	const [authState, setAuthState] = useState<AuthState>(loadAuthState)
 	const [authError, setAuthError] = useState<string | null>(null)
 	const [isAuthenticating, setIsAuthenticating] = useState(false)

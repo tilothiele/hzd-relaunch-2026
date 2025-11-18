@@ -22,8 +22,8 @@ interface LoginCredentials {
 }
 
 interface HeaderProps {
-	globalLayout: GlobalLayout | null | undefined
-	strapiBaseUrl: string
+	globalLayout?: GlobalLayout | null
+	strapiBaseUrl?: string | null
 	theme: ThemeDefinition
 	isAuthenticated: boolean
 	user: AuthUser | null

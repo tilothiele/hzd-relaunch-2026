@@ -1,6 +1,6 @@
 import type { Image } from '@/types'
 
-export function resolveMediaUrl(media?: Image | null, baseUrl = '') {
+export function resolveMediaUrl(media?: Image | null, baseUrl?: string | null) {
 	const mediaPath = media?.url
 
 	if (!mediaPath) {

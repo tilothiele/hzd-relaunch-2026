@@ -14,6 +14,7 @@ interface DogsFilters {
 	nameFilter?: string
 	sexFilter?: SexFilter
 	colorFilter?: ColorFilter
+	chipNoFilter?: string
 }
 
 interface DogsPagination {
@@ -53,6 +54,7 @@ export function useDogs(options: UseDogsOptions = {}) {
 	const nameFilter = filters.nameFilter ?? ''
 	const sexFilter = filters.sexFilter ?? ''
 	const colorFilter = filters.colorFilter ?? ''
+	const chipNoFilter = filters.chipNoFilter ?? ''
 	const page = pagination.page ?? 1
 	const pageSize = pagination.pageSize ?? 10
 
@@ -85,6 +87,12 @@ export function useDogs(options: UseDogsOptions = {}) {
 			if (colorFilter) {
 				filterConditions.push({
 					color: { eq: colorFilter },
+				})
+			}
+
+			if (chipNoFilter.trim()) {
+				filterConditions.push({
+					microchipNo: { containsi: chipNoFilter.trim() },
 				})
 			}
 
@@ -138,7 +146,7 @@ export function useDogs(options: UseDogsOptions = {}) {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [baseUrl, nameFilter, sexFilter, colorFilter, page, pageSize])
+	}, [baseUrl, nameFilter, sexFilter, colorFilter, chipNoFilter, page, pageSize])
 
 	useEffect(() => {
 		if (autoLoad && baseUrl && baseUrl.trim().length > 0) {

@@ -40,7 +40,7 @@ async function loadPageBySlug(rawSlug: string, baseUrl: string) {
 	})
 
 	console.log('matchingPage', matchingPage)
-	
+
 	return matchingPage ?? null
 }
 
