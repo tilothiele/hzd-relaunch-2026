@@ -5,10 +5,10 @@ import type { GlobalLayout } from '@/types'
 import { Header } from '@/components/header/header'
 import { Footer } from '@/components/footer/footer'
 import { CookieBanner } from '@/components/cookie-banner/cookie-banner'
-import { useTheme } from '@/hooks/use-theme'
+import { themes } from '@/themes'
 import { useAuth } from '@/hooks/use-auth'
 import { Skeleton } from '@chakra-ui/react'
-import { ThemeDefinition } from '@/themes'
+import { DEFAULT_THEME_ID, ThemeDefinition } from '@/themes'
 
 const textSkeletonKeys = [
 	'text-primary',
@@ -67,10 +67,12 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 		handleLogout,
 	} = useAuth(strapiBaseUrl)
 
+	const themex = theme || themes[DEFAULT_THEME_ID]
+
 	const themeStyles = useMemo(() => ({
-		'--theme-text-color': theme.textColor,
-		'--theme-heading-color': theme.headerBackground,
-		color: theme.textColor,
+		'--theme-text-color': themex.textColor,
+		'--theme-heading-color': themex.headerBackground,
+		color: themex.textColor,
 	}) as CSSProperties, [theme])
 
 	if (!!loading|| !homepage) {
@@ -84,7 +86,7 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 				globalLayout={homepage}
 				pageTitle={pageTitle}
 				strapiBaseUrl={strapiBaseUrl}
-				theme={theme}
+				theme={themex}
 				isAuthenticated={isAuthenticated}
 				user={user}
 				onLogin={handleLogin}
@@ -98,7 +100,7 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 			<Footer
 				globalLayout={homepage}
 				strapiBaseUrl={strapiBaseUrl}
-				theme={theme}
+				theme={themex}
 			/>
 			<CookieBanner />
 		</div>
