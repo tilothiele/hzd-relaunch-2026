@@ -142,7 +142,13 @@ export function DogCard({ dog, strapiBaseUrl }: DogCardProps) {
 					{dog.microchipNo ? (
 						<tr>
 							<td className='w-8 py-2' style={{ paddingLeft: '1em', paddingRight: '1em' }}>
-								<span className='text-xs'>Chip</span>
+								<img
+									src='/icons/zucht-icon-microchip-hzd-hovawart-zuchtgemeinschaft.png'
+									alt='Microchipnummer'
+									width={20}
+									height={20}
+									className='object-contain'
+								/>
 							</td>
 							<td className='py-2'>{dog.microchipNo}</td>
 						</tr>
