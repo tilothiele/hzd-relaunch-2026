@@ -82,6 +82,24 @@ export const GET_INDEX_PAGE = `
 						}
 					}
 				}
+				... on ComponentBlocksTeaserTextWithImageSection {
+					Headline
+					TeaserText
+					ImagePosition
+					Image {
+						url
+						alternativeText
+						width
+						height
+						caption
+						previewUrl
+					}
+					ActionButton {
+						Label
+						Link
+						Primary
+					}
+				}
 			}
 		}
 	}
@@ -128,6 +146,7 @@ export const GET_PAGE_BY_SLUG = `
 		pages(filters: { slug: { eq: $slug } }, pagination: { pageSize: 1 }) {
 					slug
 					title
+					FarbThema
 					Sections {
 						__typename
 						... on ComponentBlocksRichTextSection {
@@ -193,6 +212,24 @@ export const GET_PAGE_BY_SLUG = `
 									VisibilityStart
 									VisibilityEnd
 								}
+							}
+						}
+						... on ComponentBlocksTeaserTextWithImage {
+							TeaserHeadline
+							TeaserText
+							ImagePosition
+							Image {
+								url
+								alternativeText
+								width
+								height
+								caption
+								previewUrl
+							}
+							ActionButton {
+								Label
+								Link
+								Primary
 							}
 						}
 					}

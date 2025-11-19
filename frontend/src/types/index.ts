@@ -76,13 +76,23 @@ export interface SupplementalDocumentGroupSection {
 	supplemental_document_group?: SupplementalDocumentGroup | null
 }
 
-export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection
+export interface TeaserTextWithImageSection {
+	__typename: 'ComponentBlocksTeaserTextWithImage'
+	TeaserHeadline?: string | null
+	TeaserText?: string | null
+	Image?: Image | null
+	ImagePosition?: 'left' | 'right' | null
+	ActionButton?: ActionButton | null
+}
+
+export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection
 
 export type PageSection = StartpageSection
 
 export interface Page {
 	slug?: string | null
 	title?: string | null
+	FarbThema?: 'A' | 'B' | 'C' | 'D' | null
 	Sections?: PageSection[] | null
 }
 

@@ -88,67 +88,87 @@ export function DogCard({ dog, strapiBaseUrl }: DogCardProps) {
 			<table className='w-full text-sm text-gray-600'>
 				<tbody>
                     <tr>
-						<td className='w-8 py-2' style={{ paddingLeft: '1em', paddingRight: '1em' }}>
-							<img
-								src='/icons/zucht-icon-zwinger-hzd-hovawart-zuchtgemeinschaft.png'
-                                alt='Zwingername'
-								width={20}
-								height={20}
-								className='object-contain'
-							/>
+						<td className='w-8 py-2' style={{ paddingLeft: '1em', paddingRight: '1em', verticalAlign: 'middle' }}>
+							<div style={{ width: '20px', height: '20px', position: 'relative' }}>
+								<Image
+									src='/icons/zucht-icon-zwinger-hzd-hovawart-zuchtgemeinschaft.png'
+									alt='Zwingername'
+									width={20}
+									height={20}
+									className='object-contain'
+									unoptimized
+									style={{ width: '100%', height: '100%' }}
+								/>
+							</div>
 						</td>
 						<td className='py-2'>{fullName}</td>
 					</tr>
 					{dog.givenName && dog.fullKennelName ? (
 						<tr>
-							<td className='w-8 py-2' style={{ paddingLeft: '1em', paddingRight: '1em' }}>
-								<img
-									src={getGivenNameIcon(dog.sex)}
-									alt='Rufname'
-									width={20}
-									height={20}
-									className='object-contain'
-								/>
+							<td className='w-8 py-2' style={{ paddingLeft: '1em', paddingRight: '1em', verticalAlign: 'middle' }}>
+								<div style={{ width: '20px', height: '20px', position: 'relative' }}>
+									<Image
+										src={getGivenNameIcon(dog.sex)}
+										alt='Rufname'
+										width={20}
+										height={20}
+										className='object-contain'
+										unoptimized
+										style={{ width: '100%', height: '100%' }}
+									/>
+								</div>
 							</td>
 							<td className='py-2'>{dog.givenName}</td>
 						</tr>
 					) : null}
 					<tr>
-						<td className='w-8 py-2' style={{ paddingLeft: '1em', paddingRight: '1em' }}>
-							<img
-								src='/icons/zucht-icon-farbe-hzd-hovawart-zuchtgemeinschaft.png'
-								alt='Farbe'
-								width={20}
-								height={20}
-								className='object-contain'
-							/>
+						<td className='w-8 py-2' style={{ paddingLeft: '1em', paddingRight: '1em', verticalAlign: 'middle' }}>
+							<div style={{ width: '20px', height: '20px', position: 'relative' }}>
+								<Image
+									src='/icons/zucht-icon-farbe-hzd-hovawart-zuchtgemeinschaft.png'
+									alt='Farbe'
+									width={20}
+									height={20}
+									className='object-contain'
+									unoptimized
+									style={{ width: '100%', height: '100%' }}
+								/>
+							</div>
 						</td>
 						<td className='py-2'>{getColorLabel(dog.color)}</td>
 					</tr>
 					{dog.dateOfBirth ? (
 						<tr>
-							<td className='w-8 py-2' style={{ paddingLeft: '1em', paddingRight: '1em' }}>
-								<img
-									src='/icons/zucht-icon-geburt-hzd-hovawart-zuchtgemeinschaft.png'
-									alt='Geburtsdatum'
-									width={20}
-									height={20}
-									className='object-contain'
-								/>
+							<td className='w-8 py-2' style={{ paddingLeft: '1em', paddingRight: '1em', verticalAlign: 'middle' }}>
+								<div style={{ width: '20px', height: '20px', position: 'relative' }}>
+									<Image
+										src='/icons/zucht-icon-geburt-hzd-hovawart-zuchtgemeinschaft.png'
+										alt='Geburtsdatum'
+										width={20}
+										height={20}
+										className='object-contain'
+										unoptimized
+										style={{ width: '100%', height: '100%' }}
+									/>
+								</div>
 							</td>
 							<td className='py-2'>{formatDate(dog.dateOfBirth)}</td>
 						</tr>
 					) : null}
 					{dog.microchipNo ? (
 						<tr>
-							<td className='w-8 py-2' style={{ paddingLeft: '1em', paddingRight: '1em' }}>
-								<img
-									src='/icons/zucht-icon-microchip-hzd-hovawart-zuchtgemeinschaft.png'
-									alt='Microchipnummer'
-									width={20}
-									height={20}
-									className='object-contain'
-								/>
+							<td className='w-8 py-2' style={{ paddingLeft: '1em', paddingRight: '1em', verticalAlign: 'middle' }}>
+								<div style={{ width: '20px', height: '20px', position: 'relative' }}>
+									<Image
+										src='/icons/zucht-icon-microchip-hzd-hovawart-zuchtgemeinschaft.png'
+										alt='Microchipnummer'
+										width={20}
+										height={20}
+										className='object-contain'
+										unoptimized
+										style={{ width: '100%', height: '100%' }}
+									/>
+								</div>
 							</td>
 							<td className='py-2'>{dog.microchipNo}</td>
 						</tr>

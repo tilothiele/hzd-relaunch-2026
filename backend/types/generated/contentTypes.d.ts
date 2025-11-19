@@ -853,8 +853,8 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.hero-section-slide-show',
         'blocks.card-section',
         'blocks.rich-text-section',
-        'blocks.teaser-text-with-image',
         'blocks.supplemental-document-group-section',
+        'blocks.teaser-text-with-image',
       ]
     >;
     slug: Schema.Attribute.String;

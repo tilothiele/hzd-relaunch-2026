@@ -105,9 +105,9 @@ export interface BlocksTeaserTextWithImage extends Struct.ComponentSchema {
   };
   attributes: {
     ActionButton: Schema.Attribute.Component<'links.action-button', false>;
-    Headline: Schema.Attribute.String;
     Image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     ImagePosition: Schema.Attribute.Enumeration<['Left', 'Right']>;
+    TeaserHeadline: Schema.Attribute.String;
     TeaserText: Schema.Attribute.RichText &
       Schema.Attribute.CustomField<
         'plugin::ckeditor5.CKEditor',

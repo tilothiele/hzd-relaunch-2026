@@ -5,7 +5,7 @@
   },
   "options": {},
   "attributes": {
-    "Headline": {
+    "TeaserHeadline": {
       "type": "string"
     },
     "TeaserText": {

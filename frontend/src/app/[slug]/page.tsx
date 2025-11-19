@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { usePage } from '@/hooks/use-page'
 import { renderStartpageSections } from '@/components/sections/section-factory'
 import { MainPageStructure } from '../main-page-structure'
+import { themes } from '@/themes'
 
 interface PageProps {
 	params: Promise<{
@@ -42,6 +43,7 @@ function NotFoundSection() {
 export default function Page({ params }: PageProps) {
 	const pageData = usePage(params)
 	const { page, globalLayout, baseUrl, status } = pageData
+	const theme = themes[page?.FarbThema ?? 'A']
 
 	if (status.type === 'loading' || !globalLayout || !baseUrl) {
 		return <MainPageStructure homepage={globalLayout} strapiBaseUrl={baseUrl} loading={true}>{null}</MainPageStructure>
@@ -68,7 +70,7 @@ export default function Page({ params }: PageProps) {
 	const sections = page.Sections || []
 
 	return (
-		<MainPageStructure homepage={globalLayout} strapiBaseUrl={baseUrl} pageTitle={page.title}>
+		<MainPageStructure homepage={globalLayout} theme={theme} strapiBaseUrl={baseUrl} pageTitle={page.title}>
 			{renderStartpageSections({ sections, strapiBaseUrl: baseUrl })}
 		</MainPageStructure>
 	)
