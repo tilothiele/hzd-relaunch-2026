@@ -1080,6 +1080,11 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
   options: {
     draftAndPublish: false;
   };
+  pluginOptions: {
+    'content-manager': {
+      visible: true;
+    };
+  };
   attributes: {
     breedingLicenseSince: Schema.Attribute.Date;
     createdAt: Schema.Attribute.DateTime;
@@ -1139,6 +1144,19 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 100;
       }>;
+    jBonitation: Schema.Attribute.Text;
+    jBreeder: Schema.Attribute.String;
+    jBreederId: Schema.Attribute.Integer;
+    jCategory: Schema.Attribute.String;
+    jExhibitions: Schema.Attribute.Text;
+    jId: Schema.Attribute.Integer;
+    jImage: Schema.Attribute.String;
+    jLitter: Schema.Attribute.String;
+    jLitterKind: Schema.Attribute.String;
+    jMantings: Schema.Attribute.String;
+    jRegion: Schema.Attribute.String;
+    jSex: Schema.Attribute.Integer;
+    jWithersHeight: Schema.Attribute.Integer;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',

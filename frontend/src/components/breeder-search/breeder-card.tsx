@@ -78,3 +78,4 @@ export function BreederCard({ breeder }: BreederCardProps) {
 	)
 }
 
+

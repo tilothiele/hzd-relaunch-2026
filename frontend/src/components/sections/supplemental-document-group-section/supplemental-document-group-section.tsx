@@ -70,15 +70,15 @@ export function SupplementalDocumentGroupSectionComponent({
 		return null
 	}
 
-	const groupName = documentGroup.Name || section.Headline || 'Dokumente'
+	const groupName = documentGroup.Name || section.GroupHeadline || 'Dokumente'
 
 	return (
 		<section className='mb-16 px-4'>
 			<div className='mx-auto w-full max-w-4xl'>
-				{section.Headline ? (
-					<h2 className='mb-6 text-3xl font-bold text-gray-900'>{section.Headline}</h2>
+				{section.GroupHeadline ? (
+					<h2 className='mb-6 text-3xl font-bold text-gray-900'>{section.GroupHeadline}</h2>
 				) : null}
-				{groupName && !section.Headline ? (
+				{groupName && !section.GroupHeadline ? (
 					<h2 className='mb-6 text-3xl font-bold text-gray-900'>{groupName}</h2>
 				) : null}
 

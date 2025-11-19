@@ -90,7 +90,7 @@ export interface BlocksSupplementalDocumentGroupSection
     displayName: 'SupplementalDocumentGroupSection';
   };
   attributes: {
-    Headline: Schema.Attribute.String;
+    GroupHeadline: Schema.Attribute.String;
     supplemental_document_group: Schema.Attribute.Relation<
       'oneToOne',
       'api::supplemental-document-group.supplemental-document-group'

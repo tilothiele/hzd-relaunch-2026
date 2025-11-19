@@ -72,7 +72,7 @@ export interface SupplementalDocumentGroup {
 
 export interface SupplementalDocumentGroupSection {
 	__typename: 'ComponentBlocksSupplementalDocumentGroupSection'
-	Headline?: string | null
+	GroupHeadline?: string | null
 	supplemental_document_group?: SupplementalDocumentGroup | null
 }
 

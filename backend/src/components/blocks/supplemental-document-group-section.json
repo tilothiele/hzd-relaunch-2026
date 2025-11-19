@@ -5,7 +5,7 @@
   },
   "options": {},
   "attributes": {
-    "Headline": {
+    "GroupHeadline": {
       "type": "string"
     },
     "supplemental_document_group": {
