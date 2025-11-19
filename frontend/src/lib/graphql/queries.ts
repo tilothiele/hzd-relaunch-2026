@@ -82,8 +82,8 @@ export const GET_INDEX_PAGE = `
 						}
 					}
 				}
-				... on ComponentBlocksTeaserTextWithImageSection {
-					Headline
+				... on ComponentBlocksTeaserTextWithImage {
+					TeaserHeadline
 					TeaserText
 					ImagePosition
 					Image {
