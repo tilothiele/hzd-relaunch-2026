@@ -4,6 +4,7 @@ import type { StartpageSection } from '@/types'
 import { HeroSectionSlideShowComponent } from './hero-section-slide-show/hero-section-slide-show'
 import { CardSectionComponent } from './card-section/card-section'
 import { RichTextSectionComponent } from './rich-text-section/rich-text-section'
+import { SupplementalDocumentGroupSectionComponent } from './supplemental-document-group-section/supplemental-document-group-section'
 
 interface RenderStartpageSectionsParams {
 	sections: StartpageSection[] | null | undefined
@@ -41,6 +42,14 @@ function renderStartpageSection({
 	case 'ComponentBlocksRichTextSection':
 		return (
 			<RichTextSectionComponent
+				key={key}
+				section={section}
+				strapiBaseUrl={strapiBaseUrl}
+			/>
+		)
+	case 'ComponentBlocksSupplementalDocumentGroupSection':
+		return (
+			<SupplementalDocumentGroupSectionComponent
 				key={key}
 				section={section}
 				strapiBaseUrl={strapiBaseUrl}

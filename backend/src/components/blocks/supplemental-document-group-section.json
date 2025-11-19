@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_blocks_supplemental_document_group_sections",
+  "info": {
+    "displayName": "SupplementalDocumentGroupSection"
+  },
+  "options": {},
+  "attributes": {
+    "Headline": {
+      "type": "string"
+    },
+    "supplemental_document_group": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::supplemental-document-group.supplemental-document-group"
+    }
+  },
+  "config": {}
+}

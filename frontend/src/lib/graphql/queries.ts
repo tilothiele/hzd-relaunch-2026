@@ -82,6 +82,29 @@ export const GET_INDEX_PAGE = `
 						}
 					}
 				}
+				... on ComponentBlocksSupplementalDocumentGroupSection {
+					Headline
+					supplemental_document_group {
+						documentId
+						Name
+						SortOrd
+						supplemental_documents(sort: ["Name:asc"]) {
+							documentId
+							Name
+							Description
+							ShortId
+							DownloadDocument {
+								url
+								name
+								ext
+								mime
+								size
+							}
+							VisibilityStart
+							VisibilityEnd
+						}
+					}
+				}
 			}
 		}
 	}
@@ -169,6 +192,29 @@ export const GET_PAGE_BY_SLUG = `
 									Label
 									Link
 									Primary
+								}
+							}
+						}
+						... on ComponentBlocksSupplementalDocumentGroupSection {
+							Headline
+							supplemental_document_group {
+								documentId
+								Name
+								SortOrd
+								supplemental_documents {
+									documentId
+									Name
+									Description
+									ShortId
+									DownloadDocument {
+										url
+										name
+										ext
+										mime
+										size
+									}
+									VisibilityStart
+									VisibilityEnd
 								}
 							}
 						}

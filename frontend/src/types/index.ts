@@ -45,7 +45,38 @@ export interface RichTextSection {
 	RichTextContent?: string | null
 }
 
-export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection
+export interface File {
+	url: string
+	name?: string | null
+	ext?: string | null
+	mime?: string | null
+	size?: number | null
+}
+
+export interface SupplementalDocument {
+	documentId?: string
+	Name?: string | null
+	Description?: string | null // Blocks field - can be JSON string or HTML depending on Strapi version
+	ShortId?: string | null
+	DownloadDocument?: File[] | null
+	VisibilityStart?: string | null
+	VisibilityEnd?: string | null
+}
+
+export interface SupplementalDocumentGroup {
+	documentId?: string
+	Name?: string | null
+	SortOrd?: number | null
+	supplemental_documents?: SupplementalDocument[] | null
+}
+
+export interface SupplementalDocumentGroupSection {
+	__typename: 'ComponentBlocksSupplementalDocumentGroupSection'
+	Headline?: string | null
+	supplemental_document_group?: SupplementalDocumentGroup | null
+}
+
+export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection
 
 export type PageSection = StartpageSection
 

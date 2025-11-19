@@ -83,6 +83,21 @@ export interface BlocksSlideItem extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksSupplementalDocumentGroupSection
+  extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_supplemental_document_group_sections';
+  info: {
+    displayName: 'SupplementalDocumentGroupSection';
+  };
+  attributes: {
+    Headline: Schema.Attribute.String;
+    supplemental_document_group: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::supplemental-document-group.supplemental-document-group'
+    >;
+  };
+}
+
 export interface BlocksTeaserTextWithImage extends Struct.ComponentSchema {
   collectionName: 'components_blocks_teaser_text_with_images';
   info: {
@@ -200,6 +215,7 @@ declare module '@strapi/strapi' {
       'blocks.item-list': BlocksItemList;
       'blocks.rich-text-section': BlocksRichTextSection;
       'blocks.slide-item': BlocksSlideItem;
+      'blocks.supplemental-document-group-section': BlocksSupplementalDocumentGroupSection;
       'blocks.teaser-text-with-image': BlocksTeaserTextWithImage;
       'calendar.calendar-document': CalendarCalendarDocument;
       'columns.column-item': ColumnsColumnItem;
