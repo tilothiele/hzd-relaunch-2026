@@ -1,0 +1,143 @@
+{
+  "kind": "collectionType",
+  "collectionName": "dogs",
+  "info": {
+    "singularName": "dog",
+    "pluralName": "dogs",
+    "displayName": "Dog"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {
+    "content-manager": {
+      "visible": true
+    }
+  },
+  "attributes": {
+    "givenName": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "fullKennelName": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "avatar": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files"
+      ]
+    },
+    "microchipNo": {
+      "type": "string",
+      "maxLength": 30
+    },
+    "stuntLicenseSince": {
+      "type": "date"
+    },
+    "dateOfBirth": {
+      "type": "date"
+    },
+    "dateOfDeath": {
+      "type": "date"
+    },
+    "sex": {
+      "type": "enumeration",
+      "enum": [
+        "M",
+        "F"
+      ]
+    },
+    "color": {
+      "type": "enumeration",
+      "enum": [
+        "S",
+        "SM",
+        "B"
+      ]
+    },
+    "father": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::hzd-plugin.dog",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "sex"
+            },
+            "F"
+          ]
+        }
+      }
+    },
+    "mother": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::hzd-plugin.dog",
+      "conditions": {
+        "visible": {
+          "==": [
+            {
+              "var": "sex"
+            },
+            "F"
+          ]
+        }
+      }
+    },
+    "owner": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::hzd-plugin.member"
+    },
+    "jBreederId": {
+      "type": "integer"
+    },
+    "jId": {
+      "type": "integer"
+    },
+    "jBreeder": {
+      "type": "string"
+    },
+    "jRegion": {
+      "type": "string"
+    },
+    "jBonitation": {
+      "type": "text"
+    },
+    "jLitter": {
+      "type": "string"
+    },
+    "jMantings": {
+      "type": "string"
+    },
+    "jCategory": {
+      "type": "string"
+    },
+    "jSex": {
+      "type": "integer"
+    },
+    "jLitterKind": {
+      "type": "string"
+    },
+    "jWithersHeight": {
+      "type": "integer"
+    },
+    "jExhibitions": {
+      "type": "text"
+    },
+    "jImage": {
+      "type": "string"
+    },
+    "Sod1Test": {
+      "type": "boolean"
+    },
+    "HDTest": {
+      "type": "boolean"
+    }
+  }
+}

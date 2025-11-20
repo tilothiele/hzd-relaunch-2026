@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useState } from 'react'
-import { useDogs, type ColorFilter, type PageSize, type SexFilter } from '@/hooks/use-dogs'
+import { useDogs, type ColorFilter, type PageSize, type SexFilter, type BooleanFilter } from '@/hooks/use-dogs'
 import { DogCard } from './dog-card'
 
 interface DogSearchProps {
@@ -13,6 +13,8 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 	const [sexFilter, setSexFilter] = useState<SexFilter>('')
 	const [colorFilter, setColorFilter] = useState<ColorFilter>('')
 	const [chipNoFilter, setChipNoFilter] = useState('')
+	const [sod1testFilter, setSod1testFilter] = useState<BooleanFilter>('')
+	const [hdtestFilter, setHdtestFilter] = useState<BooleanFilter>('')
 	const [page, setPage] = useState(1)
 	const [pageSize, setPageSize] = useState<PageSize>(10)
 
@@ -29,6 +31,8 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 			sexFilter,
 			colorFilter,
 			chipNoFilter,
+			sod1testFilter,
+			hdtestFilter,
 		},
 		pagination: {
 			page,
@@ -58,7 +62,7 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 		<div className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em' }}>
 			<div id='dog-suchmaske' className='grid w-full max-w-6xl gap-6'>
 			<div className='rounded-lg bg-white shadow-md grid gap-3'>
-				<div className='grid gap-6 md:grid-cols-2 lg:grid-cols-4'>
+				<div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
 					<div>
 						<label
 							htmlFor='name-filter'
@@ -138,6 +142,60 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 							className='w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none'
 						/>
 					</div>
+					<div>
+						<label
+							htmlFor='sod1test-filter'
+							className='mb-2 block text-sm font-medium text-gray-700'
+						>
+							SOD1-Test
+						</label>
+						<select
+							id='sod1test-filter'
+							value={sod1testFilter === true ? 'true' : sod1testFilter === false ? 'false' : ''}
+							onChange={(e) => {
+								const value = e.target.value
+								if (value === 'true') {
+									setSod1testFilter(true)
+								} else if (value === 'false') {
+									setSod1testFilter(false)
+								} else {
+									setSod1testFilter('')
+								}
+							}}
+							className='w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none'
+						>
+							<option value=''>Egal</option>
+							<option value='true'>Ja</option>
+							<option value='false'>Nein</option>
+						</select>
+					</div>
+					<div>
+						<label
+							htmlFor='hdtest-filter'
+							className='mb-2 block text-sm font-medium text-gray-700'
+						>
+							HD-Test
+						</label>
+						<select
+							id='hdtest-filter'
+							value={hdtestFilter === true ? 'true' : hdtestFilter === false ? 'false' : ''}
+							onChange={(e) => {
+								const value = e.target.value
+								if (value === 'true') {
+									setHdtestFilter(true)
+								} else if (value === 'false') {
+									setHdtestFilter(false)
+								} else {
+									setHdtestFilter('')
+								}
+							}}
+							className='w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none'
+						>
+							<option value=''>Egal</option>
+							<option value='true'>Ja</option>
+							<option value='false'>Nein</option>
+						</select>
+					</div>
 				</div>
 				<div className='mt-6 flex justify-end'>
 					<button
@@ -189,8 +247,22 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 			</div>
 
 			{isLoading ? (
-				<div className='text-center py-8 text-gray-600'>
-					Lade Hunde...
+				<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+					{Array.from({ length: pageSize }).map((_, index) => (
+						<div
+							key={`skeleton-${index}`}
+							className='rounded-lg border border-gray-200 bg-white p-4 shadow-sm'
+						>
+							<div className='mb-3 h-48 w-full animate-pulse rounded bg-gray-200' />
+							<div className='space-y-3'>
+								<div className='h-4 w-3/4 animate-pulse rounded bg-gray-200' />
+								<div className='h-4 w-1/2 animate-pulse rounded bg-gray-200' />
+								<div className='h-4 w-2/3 animate-pulse rounded bg-gray-200' />
+								<div className='h-4 w-1/3 animate-pulse rounded bg-gray-200' />
+								<div className='h-4 w-1/2 animate-pulse rounded bg-gray-200' />
+							</div>
+						</div>
+					))}
 				</div>
 			) : dogs.length > 0 ? (
 				<>

@@ -8,6 +8,7 @@ import type { Dog, DogSearchResult } from '@/types'
 
 export type SexFilter = 'M' | 'F' | ''
 export type ColorFilter = 'S' | 'SM' | 'B' | ''
+export type BooleanFilter = true | false | ''
 export type PageSize = 5 | 10 | 20
 
 interface DogsFilters {
@@ -15,6 +16,8 @@ interface DogsFilters {
 	sexFilter?: SexFilter
 	colorFilter?: ColorFilter
 	chipNoFilter?: string
+	sod1testFilter?: BooleanFilter
+	hdtestFilter?: BooleanFilter
 }
 
 interface DogsPagination {
@@ -55,6 +58,8 @@ export function useDogs(options: UseDogsOptions = {}) {
 	const sexFilter = filters.sexFilter ?? ''
 	const colorFilter = filters.colorFilter ?? ''
 	const chipNoFilter = filters.chipNoFilter ?? ''
+	const sod1testFilter = filters.sod1testFilter ?? ''
+	const hdtestFilter = filters.hdtestFilter ?? ''
 	const page = pagination.page ?? 1
 	const pageSize = pagination.pageSize ?? 10
 
@@ -93,6 +98,18 @@ export function useDogs(options: UseDogsOptions = {}) {
 			if (chipNoFilter.trim()) {
 				filterConditions.push({
 					microchipNo: { containsi: chipNoFilter.trim() },
+				})
+			}
+
+			if (sod1testFilter !== '') {
+				filterConditions.push({
+					Sod1Test: { eq: sod1testFilter === true },
+				})
+			}
+
+			if (hdtestFilter !== '') {
+				filterConditions.push({
+					HDTest: { eq: hdtestFilter === true },
 				})
 			}
 
@@ -146,7 +163,7 @@ export function useDogs(options: UseDogsOptions = {}) {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [baseUrl, nameFilter, sexFilter, colorFilter, chipNoFilter, page, pageSize])
+	}, [baseUrl, nameFilter, sexFilter, colorFilter, chipNoFilter, sod1testFilter, hdtestFilter, page, pageSize])
 
 	useEffect(() => {
 		if (autoLoad && baseUrl && baseUrl.trim().length > 0) {

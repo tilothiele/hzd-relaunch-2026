@@ -339,19 +339,21 @@ export const SEARCH_DOGS = `
 			sort: $sort
 		) {
 			documentId
-				givenName
-				fullKennelName
-				sex
-				color
-				dateOfBirth
-				dateOfDeath
-				microchipNo
-				avatar {
-					url
-					alternativeText
-					width
-					height
-				}
+			givenName
+			fullKennelName
+			sex
+			color
+			dateOfBirth
+			dateOfDeath
+			microchipNo
+			HDTest
+			Sod1Test
+	  		avatar {
+				url
+				alternativeText
+				width
+				height
+			}
 		}
 	}
 `

@@ -205,6 +205,8 @@ export interface Dog {
 	dateOfBirth?: string | null
 	dateOfDeath?: string | null
 	microchipNo?: string | null
+	Sod1Test?: boolean | null
+	HDTest?: boolean | null
 	avatar?: {
 		url?: string | null
 		alternativeText?: string | null

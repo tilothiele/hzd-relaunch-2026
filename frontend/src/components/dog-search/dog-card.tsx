@@ -173,6 +173,96 @@ export function DogCard({ dog, strapiBaseUrl }: DogCardProps) {
 							<td className='py-2'>{dog.microchipNo}</td>
 						</tr>
 					) : null}
+					<tr>
+						<td className='w-8 py-2' style={{ paddingLeft: '1em', paddingRight: '1em', verticalAlign: 'middle' }}>
+							{dog.Sod1Test === true ? (
+								<div
+									style={{
+										width: '20px',
+										height: '20px',
+										borderRadius: '4px',
+										backgroundColor: '#10b981',
+										border: '2px solid #10b981',
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'center',
+									}}
+								>
+									<svg
+										width='14'
+										height='14'
+										viewBox='0 0 14 14'
+										fill='none'
+										xmlns='http://www.w3.org/2000/svg'
+									>
+										<path
+											d='M11.6667 3.5L5.25 9.91667L2.33334 7'
+											stroke='white'
+											strokeWidth='2'
+											strokeLinecap='round'
+											strokeLinejoin='round'
+										/>
+									</svg>
+								</div>
+							) : (
+								<div
+									style={{
+										width: '20px',
+										height: '20px',
+										borderRadius: '4px',
+										border: '2px solid #d1d5db',
+										backgroundColor: 'transparent',
+									}}
+								/>
+							)}
+						</td>
+						<td className='py-2'>SOD1</td>
+					</tr>
+					<tr>
+						<td className='w-8 py-2' style={{ paddingLeft: '1em', paddingRight: '1em', verticalAlign: 'middle' }}>
+							{dog.HDTest === true ? (
+								<div
+									style={{
+										width: '20px',
+										height: '20px',
+										borderRadius: '4px',
+										backgroundColor: '#10b981',
+										border: '2px solid #10b981',
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'center',
+									}}
+								>
+									<svg
+										width='14'
+										height='14'
+										viewBox='0 0 14 14'
+										fill='none'
+										xmlns='http://www.w3.org/2000/svg'
+									>
+										<path
+											d='M11.6667 3.5L5.25 9.91667L2.33334 7'
+											stroke='white'
+											strokeWidth='2'
+											strokeLinecap='round'
+											strokeLinejoin='round'
+										/>
+									</svg>
+								</div>
+							) : (
+								<div
+									style={{
+										width: '20px',
+										height: '20px',
+										borderRadius: '4px',
+										border: '2px solid #d1d5db',
+										backgroundColor: 'transparent',
+									}}
+								/>
+							)}
+						</td>
+						<td className='py-2'>HD</td>
+					</tr>
 				</tbody>
 			</table>
 		</div>

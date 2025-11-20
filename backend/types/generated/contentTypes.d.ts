@@ -1150,6 +1150,7 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 100;
       }>;
+    HDTest: Schema.Attribute.Boolean;
     jBonitation: Schema.Attribute.Text;
     jBreeder: Schema.Attribute.String;
     jBreederId: Schema.Attribute.Integer;
@@ -1177,6 +1178,7 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
     owner: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.member'>;
     publishedAt: Schema.Attribute.DateTime;
     sex: Schema.Attribute.Enumeration<['M', 'F']>;
+    Sod1Test: Schema.Attribute.Boolean;
     stuntLicenseSince: Schema.Attribute.Date;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
