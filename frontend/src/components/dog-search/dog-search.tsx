@@ -3,6 +3,9 @@
 import { useCallback, useState } from 'react'
 import { useDogs, type ColorFilter, type PageSize, type SexFilter, type BooleanFilter } from '@/hooks/use-dogs'
 import { DogCard } from './dog-card'
+import { DogMap } from './dog-map'
+import { DogDetailModal } from './dog-detail-modal'
+import type { Dog } from '@/types'
 
 interface DogSearchProps {
 	strapiBaseUrl?: string | null
@@ -17,6 +20,9 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 	const [hdtestFilter, setHdtestFilter] = useState<BooleanFilter>('')
 	const [page, setPage] = useState(1)
 	const [pageSize, setPageSize] = useState<PageSize>(10)
+	const [showMap, setShowMap] = useState(false)
+	const [selectedDog, setSelectedDog] = useState<Dog | null>(null)
+	const [isModalOpen, setIsModalOpen] = useState(false)
 
 	const {
 		dogs,
@@ -55,12 +61,46 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 		setPage(newPage)
 	}, [])
 
+	const handleDogImageClick = useCallback((dog: Dog) => {
+		setSelectedDog(dog)
+		setIsModalOpen(true)
+	}, [])
+
+	const handleCloseModal = useCallback(() => {
+		setIsModalOpen(false)
+		setSelectedDog(null)
+	}, [])
+
 	const totalPages = pageCount
 	const currentPage = page
 
 	return (
 		<div className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em' }}>
 			<div id='dog-suchmaske' className='grid w-full max-w-6xl gap-6'>
+				{/* Karten-Toggle */}
+				<div className='flex items-center justify-between rounded-lg bg-white p-4 shadow-md'>
+					<label className='flex items-center gap-3 text-sm font-medium text-gray-700'>
+						<span>Karte anzeigen</span>
+						<button
+							type='button'
+							role='switch'
+							aria-checked={showMap}
+							onClick={() => setShowMap(!showMap)}
+							className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 ${
+								showMap ? 'bg-yellow-400' : 'bg-gray-300'
+							}`}
+						>
+							<span
+								className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+									showMap ? 'translate-x-6' : 'translate-x-1'
+								}`}
+							/>
+						</button>
+					</label>
+				</div>
+
+				{/* Karte */}
+				<DogMap isVisible={showMap} />
 			<div className='rounded-lg bg-white shadow-md grid gap-3'>
 				<div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
 					<div>
@@ -272,6 +312,7 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 								key={dog.documentId}
 								dog={dog}
 								strapiBaseUrl={strapiBaseUrl}
+								onImageClick={() => handleDogImageClick(dog)}
 							/>
 						))}
 					</div>
@@ -306,6 +347,14 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 				</div>
 			) : null}
 			</div>
+
+			{/* Dog Detail Modal */}
+			<DogDetailModal
+				dog={selectedDog}
+				strapiBaseUrl={strapiBaseUrl}
+				isOpen={isModalOpen}
+				onClose={handleCloseModal}
+			/>
 		</div>
 	)
 }

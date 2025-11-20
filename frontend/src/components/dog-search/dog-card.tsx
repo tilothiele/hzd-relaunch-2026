@@ -6,6 +6,7 @@ import type { Dog } from '@/types'
 interface DogCardProps {
 	dog: Dog
 	strapiBaseUrl: string | null | undefined
+	onImageClick?: () => void
 }
 
 function getColorLabel(color: string | null | undefined): string {
@@ -60,7 +61,7 @@ function getGivenNameIcon(sex: string | null | undefined): string {
 	}
 }
 
-export function DogCard({ dog, strapiBaseUrl }: DogCardProps) {
+export function DogCard({ dog, strapiBaseUrl, onImageClick }: DogCardProps) {
 	const avatarUrl = dog.avatar?.url
 	const avatarAlt = dog.avatar?.alternativeText ?? 'Hund'
 	const fullName = dog.fullKennelName ?? dog.givenName ?? 'Unbekannt'
@@ -69,7 +70,19 @@ export function DogCard({ dog, strapiBaseUrl }: DogCardProps) {
 	return (
 		<div className='rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md'>
 			{avatarUrl ? (
-				<div className='mb-3 h-48 w-full overflow-hidden rounded'>
+				<div
+					className='mb-3 h-48 w-full cursor-pointer overflow-hidden rounded transition-opacity hover:opacity-90'
+					onClick={onImageClick}
+					role='button'
+					tabIndex={0}
+					onKeyDown={(e) => {
+						if (e.key === 'Enter' || e.key === ' ') {
+							e.preventDefault()
+							onImageClick?.()
+						}
+					}}
+					aria-label='Hundedetails anzeigen'
+				>
 					<Image
 						src={`${baseUrl}${avatarUrl}`}
 						alt={avatarAlt}
@@ -80,7 +93,19 @@ export function DogCard({ dog, strapiBaseUrl }: DogCardProps) {
 					/>
 				</div>
 			) : (
-				<div className='mb-3 flex h-48 w-full items-center justify-center rounded bg-gray-100 text-gray-400'>
+				<div
+					className='mb-3 flex h-48 w-full cursor-pointer items-center justify-center rounded bg-gray-100 text-gray-400 transition-opacity hover:opacity-90'
+					onClick={onImageClick}
+					role='button'
+					tabIndex={0}
+					onKeyDown={(e) => {
+						if (e.key === 'Enter' || e.key === ' ') {
+							e.preventDefault()
+							onImageClick?.()
+						}
+					}}
+					aria-label='Hundedetails anzeigen'
+				>
 					Kein Bild
 				</div>
 			)}
