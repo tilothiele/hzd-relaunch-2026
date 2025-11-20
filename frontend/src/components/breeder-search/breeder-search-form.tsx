@@ -1,5 +1,7 @@
 'use client'
 
+import { TextField, Button, Box, Typography } from '@mui/material'
+
 interface BreederSearchFormProps {
 	nameFilter: string
 	onNameFilterChange: (value: string) => void
@@ -14,44 +16,46 @@ export function BreederSearchForm({
 	isLoading,
 }: BreederSearchFormProps) {
 	return (
-		<div className='mb-8 rounded-lg bg-white p-6 shadow-md'>
-			<h2 className='mb-6 text-2xl font-bold text-gray-900'>
+		<Box className='mb-8 rounded-lg bg-white p-6 shadow-md'>
+			<Typography variant='h5' className='mb-6 font-bold text-gray-900'>
 				Züchter suchen
-			</h2>
-			<div className='grid gap-4 md:grid-cols-1'>
-				<div>
-					<label
-						htmlFor='name-filter'
-						className='mb-2 block text-sm font-medium text-gray-700'
-					>
-						Zwingername
-					</label>
-					<input
-						id='name-filter'
-						type='text'
-						value={nameFilter}
-						onChange={(e) => onNameFilterChange(e.target.value)}
-						onKeyDown={(e) => {
-							if (e.key === 'Enter') {
-								onSearch()
-							}
-						}}
-						placeholder='Zwingername'
-						className='w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none'
-					/>
-				</div>
-			</div>
-			<div className='mt-4 flex justify-end'>
-				<button
-					type='button'
+			</Typography>
+			<Box sx={{ display: 'grid', gap: 2 }}>
+				<TextField
+					label='Zwingername'
+					value={nameFilter}
+					onChange={(e) => onNameFilterChange(e.target.value)}
+					onKeyDown={(e) => {
+						if (e.key === 'Enter') {
+							onSearch()
+						}
+					}}
+					placeholder='Zwingername'
+					fullWidth
+					size='small'
+				/>
+			</Box>
+			<Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+				<Button
+					variant='contained'
 					onClick={onSearch}
 					disabled={isLoading}
-					className='rounded bg-yellow-400 px-6 py-2 text-sm font-semibold text-gray-900 transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60'
+					sx={{
+						backgroundColor: '#facc15',
+						color: '#565757',
+						'&:hover': {
+							backgroundColor: '#e6b800',
+						},
+						'&:disabled': {
+							backgroundColor: '#d1d5db',
+							color: '#9ca3af',
+						},
+					}}
 				>
 					{isLoading ? 'Suche...' : 'Suchen'}
-				</button>
-			</div>
-		</div>
+				</Button>
+			</Box>
+		</Box>
 	)
 }
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box } from '@mui/material'
 import { fetchGraphQL } from '@/lib/graphql-client'
 import { SEARCH_LITTERS } from '@/lib/graphql/queries'
 import type { Litter, LitterSearchResult } from '@/types'
@@ -149,83 +150,73 @@ export function LitterSearch({ strapiBaseUrl }: LitterSearchProps) {
 
 	return (
 		<div className='container mx-auto px-4 py-8'>
-			<div className='mb-8 rounded-lg bg-white p-6 shadow-md'>
+			<Box className='mb-8 rounded-lg bg-white p-6 shadow-md'>
 				<h2 className='mb-6 text-2xl font-bold text-gray-900'>
 					Würfe suchen
 				</h2>
-				<div className='grid gap-4 md:grid-cols-3'>
-					<div>
-						<label
-							htmlFor='breeder-filter'
-							className='mb-2 block text-sm font-medium text-gray-700'
-						>
-							Züchter
-						</label>
-						<input
-							id='breeder-filter'
-							type='text'
-							value={breederFilter}
-							onChange={(e) => setBreederFilter(e.target.value)}
-							onKeyDown={(e) => {
-								if (e.key === 'Enter') {
-									handleSearch()
-								}
-							}}
-							placeholder='Zwingername'
-							className='w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none'
-						/>
-					</div>
-					<div>
-						<label
-							htmlFor='mother-filter'
-							className='mb-2 block text-sm font-medium text-gray-700'
-						>
-							Mutter
-						</label>
-						<input
-							id='mother-filter'
-							type='text'
-							value={motherFilter}
-							onChange={(e) => setMotherFilter(e.target.value)}
-							onKeyDown={(e) => {
-								if (e.key === 'Enter') {
-									handleSearch()
-								}
-							}}
-							placeholder='Name der Mutter'
-							className='w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none'
-						/>
-					</div>
-					<div>
-						<label
-							htmlFor='closed-filter'
-							className='mb-2 block text-sm font-medium text-gray-700'
-						>
-							Status
-						</label>
-						<select
-							id='closed-filter'
+				<Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 2 }}>
+					<TextField
+						label='Züchter'
+						value={breederFilter}
+						onChange={(e) => setBreederFilter(e.target.value)}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter') {
+								handleSearch()
+							}
+						}}
+						placeholder='Zwingername'
+						fullWidth
+						size='small'
+					/>
+
+					<TextField
+						label='Mutter'
+						value={motherFilter}
+						onChange={(e) => setMotherFilter(e.target.value)}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter') {
+								handleSearch()
+							}
+						}}
+						placeholder='Name der Mutter'
+						fullWidth
+						size='small'
+					/>
+
+					<FormControl fullWidth size='small'>
+						<InputLabel>Status</InputLabel>
+						<Select
 							value={closedFilter}
+							label='Status'
 							onChange={(e) => setClosedFilter(e.target.value as '' | 'true' | 'false')}
-							className='w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none'
 						>
-							<option value=''>Alle</option>
-							<option value='false'>Offen</option>
-							<option value='true'>Geschlossen</option>
-						</select>
-					</div>
-				</div>
-				<div className='mt-4 flex justify-end'>
-					<button
-						type='button'
+							<MenuItem value=''>Alle</MenuItem>
+							<MenuItem value='false'>Offen</MenuItem>
+							<MenuItem value='true'>Geschlossen</MenuItem>
+						</Select>
+					</FormControl>
+				</Box>
+				<Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+					<Button
+						variant='contained'
 						onClick={handleSearch}
 						disabled={isLoading}
-						className='rounded bg-yellow-400 px-6 py-2 text-sm font-semibold text-gray-900 transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60'
+						sx={{
+							backgroundColor: '#facc15',
+							color: '#565757',
+							'&:hover': {
+								backgroundColor: '#e6b800',
+							},
+							'&:disabled': {
+								backgroundColor: '#d1d5db',
+								color: '#9ca3af',
+							},
+						}}
 					>
 						{isLoading ? 'Suche...' : 'Suchen'}
-					</button>
-				</div>
-			</div>
+					</Button>
+				</Box>
+			</Box>
 
 			{error ? (
 				<div className='mb-4 rounded bg-red-50 p-4 text-sm text-red-800'>

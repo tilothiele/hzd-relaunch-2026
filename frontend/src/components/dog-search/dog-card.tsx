@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { Card, CardMedia, CardContent, Table, TableBody, TableRow, TableCell, Checkbox, Box } from '@mui/material'
 import type { Dog } from '@/types'
 
 interface DogCardProps {
@@ -68,229 +69,260 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick }: DogCardProps) {
 	const baseUrl = strapiBaseUrl ?? ''
 
 	return (
-		<div className='rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md'>
+		<Card
+			sx={{
+				'&:hover': {
+					boxShadow: 3,
+				},
+			}}
+		>
 			{avatarUrl ? (
-				<div
-					className='mb-3 h-48 w-full cursor-pointer overflow-hidden rounded transition-opacity hover:opacity-90'
+				<CardMedia
+					component='div'
+					sx={{
+						position: 'relative',
+						height: 192,
+						cursor: 'pointer',
+						'&:hover': {
+							opacity: 0.9,
+						},
+					}}
 					onClick={onImageClick}
-					role='button'
-					tabIndex={0}
 					onKeyDown={(e) => {
 						if (e.key === 'Enter' || e.key === ' ') {
 							e.preventDefault()
 							onImageClick?.()
 						}
 					}}
+					tabIndex={0}
+					role='button'
 					aria-label='Hundedetails anzeigen'
 				>
 					<Image
 						src={`${baseUrl}${avatarUrl}`}
 						alt={avatarAlt}
-						width={400}
-						height={192}
-						className='h-full w-full object-cover object-center'
+						fill
+						style={{ objectFit: 'cover' }}
 						unoptimized
 					/>
-				</div>
+				</CardMedia>
 			) : (
-				<div
-					className='mb-3 flex h-48 w-full cursor-pointer items-center justify-center rounded bg-gray-100 text-gray-400 transition-opacity hover:opacity-90'
+				<Box
+					sx={{
+						height: 192,
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						bgcolor: 'grey.100',
+						color: 'grey.400',
+						cursor: 'pointer',
+						'&:hover': {
+							opacity: 0.9,
+						},
+					}}
 					onClick={onImageClick}
-					role='button'
-					tabIndex={0}
 					onKeyDown={(e) => {
 						if (e.key === 'Enter' || e.key === ' ') {
 							e.preventDefault()
 							onImageClick?.()
 						}
 					}}
+					tabIndex={0}
+					role='button'
 					aria-label='Hundedetails anzeigen'
 				>
 					Kein Bild
-				</div>
+				</Box>
 			)}
 
-			<table className='w-full text-sm text-gray-600'>
-				<tbody>
-                    <tr>
-						<td className='w-8 py-2' style={{ paddingLeft: '1em', paddingRight: '1em', verticalAlign: 'middle' }}>
-							<div style={{ width: '20px', height: '20px', position: 'relative' }}>
-								<Image
-									src='/icons/zucht-icon-zwinger-hzd-hovawart-zuchtgemeinschaft.png'
-									alt='Zwingername'
-									width={20}
-									height={20}
-									className='object-contain'
-									unoptimized
-									style={{ width: '100%', height: '100%' }}
-								/>
-							</div>
-						</td>
-						<td className='py-2'>{fullName}</td>
-					</tr>
-					{dog.givenName && dog.fullKennelName ? (
-						<tr>
-							<td className='w-8 py-2' style={{ paddingLeft: '1em', paddingRight: '1em', verticalAlign: 'middle' }}>
-								<div style={{ width: '20px', height: '20px', position: 'relative' }}>
+			<CardContent>
+				<Table size='small'>
+					<TableBody>
+						<TableRow>
+							<TableCell
+								sx={{
+									width: 48,
+									paddingLeft: '1em',
+									paddingRight: '1em',
+									verticalAlign: 'middle',
+								}}
+							>
+								<Box sx={{ width: 20, height: 20, position: 'relative' }}>
 									<Image
-										src={getGivenNameIcon(dog.sex)}
-										alt='Rufname'
-										width={20}
-										height={20}
+										src='/icons/zucht-icon-zwinger-hzd-hovawart-zuchtgemeinschaft.png'
+										alt='Zwingername'
+										fill
 										className='object-contain'
 										unoptimized
-										style={{ width: '100%', height: '100%' }}
 									/>
-								</div>
-							</td>
-							<td className='py-2'>{dog.givenName}</td>
-						</tr>
-					) : null}
-					<tr>
-						<td className='w-8 py-2' style={{ paddingLeft: '1em', paddingRight: '1em', verticalAlign: 'middle' }}>
-							<div style={{ width: '20px', height: '20px', position: 'relative' }}>
-								<Image
-									src='/icons/zucht-icon-farbe-hzd-hovawart-zuchtgemeinschaft.png'
-									alt='Farbe'
-									width={20}
-									height={20}
-									className='object-contain'
-									unoptimized
-									style={{ width: '100%', height: '100%' }}
-								/>
-							</div>
-						</td>
-						<td className='py-2'>{getColorLabel(dog.color)}</td>
-					</tr>
-					{dog.dateOfBirth ? (
-						<tr>
-							<td className='w-8 py-2' style={{ paddingLeft: '1em', paddingRight: '1em', verticalAlign: 'middle' }}>
-								<div style={{ width: '20px', height: '20px', position: 'relative' }}>
-									<Image
-										src='/icons/zucht-icon-geburt-hzd-hovawart-zuchtgemeinschaft.png'
-										alt='Geburtsdatum'
-										width={20}
-										height={20}
-										className='object-contain'
-										unoptimized
-										style={{ width: '100%', height: '100%' }}
-									/>
-								</div>
-							</td>
-							<td className='py-2'>{formatDate(dog.dateOfBirth)}</td>
-						</tr>
-					) : null}
-					{dog.microchipNo ? (
-						<tr>
-							<td className='w-8 py-2' style={{ paddingLeft: '1em', paddingRight: '1em', verticalAlign: 'middle' }}>
-								<div style={{ width: '20px', height: '20px', position: 'relative' }}>
-									<Image
-										src='/icons/zucht-icon-microchip-hzd-hovawart-zuchtgemeinschaft.png'
-										alt='Microchipnummer'
-										width={20}
-										height={20}
-										className='object-contain'
-										unoptimized
-										style={{ width: '100%', height: '100%' }}
-									/>
-								</div>
-							</td>
-							<td className='py-2'>{dog.microchipNo}</td>
-						</tr>
-					) : null}
-					<tr>
-						<td className='w-8 py-2' style={{ paddingLeft: '1em', paddingRight: '1em', verticalAlign: 'middle' }}>
-							{dog.Sod1Test === true ? (
-								<div
-									style={{
-										width: '20px',
-										height: '20px',
-										borderRadius: '4px',
-										backgroundColor: '#10b981',
-										border: '2px solid #10b981',
-										display: 'flex',
-										alignItems: 'center',
-										justifyContent: 'center',
+								</Box>
+							</TableCell>
+							<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
+								{fullName}
+							</TableCell>
+						</TableRow>
+						{dog.givenName && dog.fullKennelName ? (
+							<TableRow>
+								<TableCell
+									sx={{
+										width: 48,
+										paddingLeft: '1em',
+										paddingRight: '1em',
+										verticalAlign: 'middle',
 									}}
 								>
-									<svg
-										width='14'
-										height='14'
-										viewBox='0 0 14 14'
-										fill='none'
-										xmlns='http://www.w3.org/2000/svg'
-									>
-										<path
-											d='M11.6667 3.5L5.25 9.91667L2.33334 7'
-											stroke='white'
-											strokeWidth='2'
-											strokeLinecap='round'
-											strokeLinejoin='round'
+									<Box sx={{ width: 20, height: 20, position: 'relative' }}>
+										<Image
+											src={getGivenNameIcon(dog.sex)}
+											alt='Rufname'
+											fill
+											className='object-contain'
+											unoptimized
 										/>
-									</svg>
-								</div>
-							) : (
-								<div
-									style={{
-										width: '20px',
-										height: '20px',
-										borderRadius: '4px',
-										border: '2px solid #d1d5db',
-										backgroundColor: 'transparent',
-									}}
-								/>
-							)}
-						</td>
-						<td className='py-2'>SOD1</td>
-					</tr>
-					<tr>
-						<td className='w-8 py-2' style={{ paddingLeft: '1em', paddingRight: '1em', verticalAlign: 'middle' }}>
-							{dog.HDTest === true ? (
-								<div
-									style={{
-										width: '20px',
-										height: '20px',
-										borderRadius: '4px',
-										backgroundColor: '#10b981',
-										border: '2px solid #10b981',
-										display: 'flex',
-										alignItems: 'center',
-										justifyContent: 'center',
+									</Box>
+								</TableCell>
+								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
+									{dog.givenName}
+								</TableCell>
+							</TableRow>
+						) : null}
+						<TableRow>
+							<TableCell
+								sx={{
+									width: 48,
+									paddingLeft: '1em',
+									paddingRight: '1em',
+									verticalAlign: 'middle',
+								}}
+							>
+								<Box sx={{ width: 20, height: 20, position: 'relative' }}>
+									<Image
+										src='/icons/zucht-icon-farbe-hzd-hovawart-zuchtgemeinschaft.png'
+										alt='Farbe'
+										fill
+										className='object-contain'
+										unoptimized
+									/>
+								</Box>
+							</TableCell>
+							<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
+								{getColorLabel(dog.color)}
+							</TableCell>
+						</TableRow>
+						{dog.dateOfBirth ? (
+							<TableRow>
+								<TableCell
+									sx={{
+										width: 48,
+										paddingLeft: '1em',
+										paddingRight: '1em',
+										verticalAlign: 'middle',
 									}}
 								>
-									<svg
-										width='14'
-										height='14'
-										viewBox='0 0 14 14'
-										fill='none'
-										xmlns='http://www.w3.org/2000/svg'
-									>
-										<path
-											d='M11.6667 3.5L5.25 9.91667L2.33334 7'
-											stroke='white'
-											strokeWidth='2'
-											strokeLinecap='round'
-											strokeLinejoin='round'
+									<Box sx={{ width: 20, height: 20, position: 'relative' }}>
+										<Image
+											src='/icons/zucht-icon-geburt-hzd-hovawart-zuchtgemeinschaft.png'
+											alt='Geburtsdatum'
+											fill
+											className='object-contain'
+											unoptimized
 										/>
-									</svg>
-								</div>
-							) : (
-								<div
-									style={{
-										width: '20px',
-										height: '20px',
-										borderRadius: '4px',
-										border: '2px solid #d1d5db',
-										backgroundColor: 'transparent',
+									</Box>
+								</TableCell>
+								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
+									{formatDate(dog.dateOfBirth)}
+								</TableCell>
+							</TableRow>
+						) : null}
+						{dog.microchipNo ? (
+							<TableRow>
+								<TableCell
+									sx={{
+										width: 48,
+										paddingLeft: '1em',
+										paddingRight: '1em',
+										verticalAlign: 'middle',
+									}}
+								>
+									<Box sx={{ width: 20, height: 20, position: 'relative' }}>
+										<Image
+											src='/icons/zucht-icon-microchip-hzd-hovawart-zuchtgemeinschaft.png'
+											alt='Microchipnummer'
+											fill
+											className='object-contain'
+											unoptimized
+										/>
+									</Box>
+								</TableCell>
+								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
+									{dog.microchipNo}
+								</TableCell>
+							</TableRow>
+						) : null}
+						<TableRow>
+							<TableCell
+								sx={{
+									width: 48,
+									paddingLeft: '1em',
+									paddingRight: '1em',
+									verticalAlign: 'middle',
+								}}
+							>
+								<Checkbox
+									checked={dog.Sod1Test === true}
+									disabled
+									sx={{
+										padding: 0,
+										width: 20,
+										height: 20,
+										color: '#10b981',
+										'&.Mui-checked': {
+											color: '#10b981',
+										},
+										'&.Mui-disabled': {
+											color: dog.Sod1Test === true ? '#10b981' : '#d1d5db',
+										},
 									}}
 								/>
-							)}
-						</td>
-						<td className='py-2'>HD</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+							</TableCell>
+							<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
+								SOD1
+							</TableCell>
+						</TableRow>
+						<TableRow>
+							<TableCell
+								sx={{
+									width: 48,
+									paddingLeft: '1em',
+									paddingRight: '1em',
+									verticalAlign: 'middle',
+								}}
+							>
+								<Checkbox
+									checked={dog.HDTest === true}
+									disabled
+									sx={{
+										padding: 0,
+										width: 20,
+										height: 20,
+										color: '#10b981',
+										'&.Mui-checked': {
+											color: '#10b981',
+										},
+										'&.Mui-disabled': {
+											color: dog.HDTest === true ? '#10b981' : '#d1d5db',
+										},
+									}}
+								/>
+							</TableCell>
+							<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
+								HD
+							</TableCell>
+						</TableRow>
+					</TableBody>
+				</Table>
+			</CardContent>
+		</Card>
 	)
 }
 

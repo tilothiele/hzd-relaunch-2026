@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useState } from 'react'
+import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, FormControlLabel } from '@mui/material'
 import { useDogs, type ColorFilter, type PageSize, type SexFilter, type BooleanFilter } from '@/hooks/use-dogs'
 import { DogCard } from './dog-card'
 import { DogMap } from './dog-map'
@@ -78,120 +79,90 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 		<div className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em' }}>
 			<div id='dog-suchmaske' className='grid w-full max-w-6xl gap-6'>
 				{/* Karten-Toggle */}
-				<div className='flex items-center justify-between rounded-lg bg-white p-4 shadow-md'>
-					<label className='flex items-center gap-3 text-sm font-medium text-gray-700'>
-						<span>Karte anzeigen</span>
-						<button
-							type='button'
-							role='switch'
-							aria-checked={showMap}
-							onClick={() => setShowMap(!showMap)}
-							className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 ${
-								showMap ? 'bg-yellow-400' : 'bg-gray-300'
-							}`}
-						>
-							<span
-								className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-									showMap ? 'translate-x-6' : 'translate-x-1'
-								}`}
+				<Box className='rounded-lg bg-white p-4 shadow-md'>
+					<FormControlLabel
+						control={
+							<Switch
+								checked={showMap}
+								onChange={(e) => setShowMap(e.target.checked)}
+								sx={{
+									'& .MuiSwitch-switchBase.Mui-checked': {
+										color: '#facc15',
+									},
+									'& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+										backgroundColor: '#facc15',
+									},
+								}}
 							/>
-						</button>
-					</label>
-				</div>
+						}
+						label='Karte anzeigen'
+					/>
+				</Box>
 
 				{/* Karte */}
 				<DogMap isVisible={showMap} />
-			<div className='rounded-lg bg-white shadow-md grid gap-3'>
-				<div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
-					<div>
-						<label
-							htmlFor='name-filter'
-							className='mb-2 block text-sm font-medium text-gray-700'
-						>
-							Name
-						</label>
-						<input
-							id='name-filter'
-							type='text'
-							value={nameFilter}
-							onChange={(e) => setNameFilter(e.target.value)}
-							onKeyDown={(e) => {
-								if (e.key === 'Enter') {
-									handleSearch()
-								}
-							}}
-							placeholder='Name oder Zuchtname'
-							className='w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none'
-						/>
-					</div>
-					<div className='space-y-2'>
-						<label
-							htmlFor='sex-filter'
-							className='mb-2 block text-sm font-medium text-gray-700'
-						>
-							Geschlecht
-						</label>
-						<select
-							id='sex-filter'
+			<Box className='rounded-lg bg-white p-4 shadow-md'>
+				<Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: 3 }}>
+					<TextField
+						label='Name'
+						value={nameFilter}
+						onChange={(e) => setNameFilter(e.target.value)}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter') {
+								handleSearch()
+							}
+						}}
+						placeholder='Name oder Zuchtname'
+						fullWidth
+						size='small'
+					/>
+
+					<FormControl fullWidth size='small'>
+						<InputLabel>Geschlecht</InputLabel>
+						<Select
 							value={sexFilter}
+							label='Geschlecht'
 							onChange={(e) => setSexFilter(e.target.value as SexFilter)}
-							className='w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none'
 						>
-							<option value=''>Alle</option>
-							<option value='M'>Rüde</option>
-							<option value='F'>Hündin</option>
-						</select>
-					</div>
-					<div className='my-2'>
-						<label
-							htmlFor='color-filter'
-							className='mb-2 block text-sm font-medium text-gray-700'
-						>
-							Farbe
-						</label>
-						<select
-							id='color-filter'
+							<MenuItem value=''>Alle</MenuItem>
+							<MenuItem value='M'>Rüde</MenuItem>
+							<MenuItem value='F'>Hündin</MenuItem>
+						</Select>
+					</FormControl>
+
+					<FormControl fullWidth size='small'>
+						<InputLabel>Farbe</InputLabel>
+						<Select
 							value={colorFilter}
+							label='Farbe'
 							onChange={(e) => setColorFilter(e.target.value as ColorFilter)}
-							className='w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none'
 						>
-							<option value=''>Alle</option>
-							<option value='S'>Schwarz</option>
-							<option value='SM'>Schwarz-Marken</option>
-							<option value='B'>Braun</option>
-						</select>
-					</div>
-					<div>
-						<label
-							htmlFor='chipno-filter'
-							className='mb-2 block text-sm font-medium text-gray-700'
-						>
-							Chipnummer
-						</label>
-						<input
-							id='chipno-filter'
-							type='text'
-							value={chipNoFilter}
-							onChange={(e) => setChipNoFilter(e.target.value)}
-							onKeyDown={(e) => {
-								if (e.key === 'Enter') {
-									handleSearch()
-								}
-							}}
-							placeholder='Chipnummer'
-							className='w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none'
-						/>
-					</div>
-					<div>
-						<label
-							htmlFor='sod1test-filter'
-							className='mb-2 block text-sm font-medium text-gray-700'
-						>
-							SOD1-Test
-						</label>
-						<select
-							id='sod1test-filter'
+							<MenuItem value=''>Alle</MenuItem>
+							<MenuItem value='S'>Schwarz</MenuItem>
+							<MenuItem value='SM'>Schwarz-Marken</MenuItem>
+							<MenuItem value='B'>Braun</MenuItem>
+						</Select>
+					</FormControl>
+
+					<TextField
+						label='Chipnummer'
+						value={chipNoFilter}
+						onChange={(e) => setChipNoFilter(e.target.value)}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter') {
+								handleSearch()
+							}
+						}}
+						placeholder='Chipnummer'
+						fullWidth
+						size='small'
+					/>
+
+					<FormControl fullWidth size='small'>
+						<InputLabel>SOD1-Test</InputLabel>
+						<Select
 							value={sod1testFilter === true ? 'true' : sod1testFilter === false ? 'false' : ''}
+							label='SOD1-Test'
 							onChange={(e) => {
 								const value = e.target.value
 								if (value === 'true') {
@@ -202,23 +173,18 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 									setSod1testFilter('')
 								}
 							}}
-							className='w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none'
 						>
-							<option value=''>Egal</option>
-							<option value='true'>Ja</option>
-							<option value='false'>Nein</option>
-						</select>
-					</div>
-					<div>
-						<label
-							htmlFor='hdtest-filter'
-							className='mb-2 block text-sm font-medium text-gray-700'
-						>
-							HD-Test
-						</label>
-						<select
-							id='hdtest-filter'
+							<MenuItem value=''>Egal</MenuItem>
+							<MenuItem value='true'>Ja</MenuItem>
+							<MenuItem value='false'>Nein</MenuItem>
+						</Select>
+					</FormControl>
+
+					<FormControl fullWidth size='small'>
+						<InputLabel>HD-Test</InputLabel>
+						<Select
 							value={hdtestFilter === true ? 'true' : hdtestFilter === false ? 'false' : ''}
+							label='HD-Test'
 							onChange={(e) => {
 								const value = e.target.value
 								if (value === 'true') {
@@ -229,25 +195,35 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 									setHdtestFilter('')
 								}
 							}}
-							className='w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none'
 						>
-							<option value=''>Egal</option>
-							<option value='true'>Ja</option>
-							<option value='false'>Nein</option>
-						</select>
-					</div>
-				</div>
-				<div className='mt-6 flex justify-end'>
-					<button
-						type='button'
+							<MenuItem value=''>Egal</MenuItem>
+							<MenuItem value='true'>Ja</MenuItem>
+							<MenuItem value='false'>Nein</MenuItem>
+						</Select>
+					</FormControl>
+				</Box>
+
+				<Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+					<Button
+						variant='contained'
 						onClick={handleSearch}
 						disabled={isLoading}
-						className='rounded bg-yellow-400 px-6 py-2 text-sm font-semibold text-gray-900 transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60'
+						sx={{
+							backgroundColor: '#facc15',
+							color: '#565757',
+							'&:hover': {
+								backgroundColor: '#e6b800',
+							},
+							'&:disabled': {
+								backgroundColor: '#d1d5db',
+								color: '#9ca3af',
+							},
+						}}
 					>
 						{isLoading ? 'Suche...' : 'Suchen'}
-					</button>
-				</div>
-			</div>
+					</Button>
+				</Box>
+			</Box>
 
 			{error ? (
 				<div className='rounded bg-red-50 p-4 text-sm text-red-800'>
