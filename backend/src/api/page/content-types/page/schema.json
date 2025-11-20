@@ -34,7 +34,9 @@
         "blocks.rich-text-section",
         "blocks.supplemental-document-group-section",
         "blocks.teaser-text-with-image",
-        "blocks.text-columns-section"
+        "blocks.text-columns-section",
+        "blocks.image-gallery-section",
+        "blocks.simple-cta-section"
       ]
     }
   }

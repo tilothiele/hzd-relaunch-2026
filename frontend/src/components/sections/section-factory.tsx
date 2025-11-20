@@ -7,6 +7,8 @@ import { RichTextSectionComponent } from './rich-text-section/rich-text-section'
 import { SupplementalDocumentGroupSectionComponent } from './supplemental-document-group-section/supplemental-document-group-section'
 import { TeaserTextWithImageSectionComponent } from './teaser-text-with-image-section/teaser-text-with-image-section'
 import { TextColumnsSectionComponent } from './text-columns-section/text-columns-section'
+import { ImageGallerySectionComponent } from './image-gallery-section/image-gallery-section'
+import { SimpleCtaSectionComponent } from './simple-cta-section/simple-cta-section'
 
 interface RenderStartpageSectionsParams {
 	sections: StartpageSection[] | null | undefined
@@ -68,6 +70,22 @@ function renderStartpageSection({
 	case 'ComponentBlocksTextColumnsSection':
 		return (
 			<TextColumnsSectionComponent
+				key={key}
+				section={section}
+				strapiBaseUrl={strapiBaseUrl}
+			/>
+		)
+	case 'ComponentBlocksImageGallerySection':
+		return (
+			<ImageGallerySectionComponent
+				key={key}
+				section={section}
+				strapiBaseUrl={strapiBaseUrl}
+			/>
+		)
+	case 'ComponentBlocksSimpleCtaSection':
+		return (
+			<SimpleCtaSectionComponent
 				key={key}
 				section={section}
 				strapiBaseUrl={strapiBaseUrl}

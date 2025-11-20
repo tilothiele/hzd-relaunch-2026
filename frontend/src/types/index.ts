@@ -93,7 +93,9 @@ export interface BulletItem {
 
 export interface TextColumn {
 	id?: string
+	ColumnHeadline?: string | null
 	ColumnText?: string | null
+	ColumnActionButton?: ActionButton | null
 	BulletItems?: BulletItem[] | null
 }
 
@@ -104,7 +106,21 @@ export interface TextColumnsSection {
 	TextColumn?: TextColumn[] | null
 }
 
-export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection
+export interface ImageGallerySection {
+	__typename: 'ComponentBlocksImageGallerySection'
+	GalleryHeadline?: string | null
+	GalleryImages?: Image[] | null
+}
+
+export interface SimpleCtaSection {
+	__typename: 'ComponentBlocksSimpleCtaSection'
+	CtaHeadline?: string | null
+	CtaInfoText?: string | null
+	CtaBackgroundImage?: Image | null
+	CtaActionButton?: ActionButton | null
+}
+
+export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | SimpleCtaSection
 
 export type PageSection = StartpageSection
 

@@ -105,12 +105,46 @@ export const GET_INDEX_PAGE = `
 					TextColumnsSubHeadline
 					TextColumn {
 						id
+						ColumnHeadline
 						ColumnText
+						ColumnActionButton {
+							Label
+							Link
+							Primary
+						}
 						BulletItems {
 							id
 							Headline
 							ItemBody
 						}
+					}
+				}
+				... on ComponentBlocksImageGallerySection {
+					GalleryHeadline
+					GalleryImages {
+						url
+						alternativeText
+						width
+						height
+						caption
+						previewUrl
+					}
+				}
+				... on ComponentBlocksSimpleCtaSection {
+					CtaHeadline
+					CtaInfoText
+					CtaBackgroundImage {
+						url
+						alternativeText
+						width
+						height
+						caption
+						previewUrl
+					}
+					CtaActionButton {
+						Label
+						Link
+						Primary
 					}
 				}
 			}
@@ -250,12 +284,46 @@ export const GET_PAGE_BY_SLUG = `
 							TextColumnsSubHeadline
 							TextColumn {
 								id
+								ColumnHeadline
 								ColumnText
+								ColumnActionButton {
+									Label
+									Link
+									Primary
+								}
 								BulletItems {
 									id
 									Headline
 									ItemBody
 								}
+							}
+						}
+						... on ComponentBlocksImageGallerySection {
+							GalleryHeadline
+							GalleryImages {
+								url
+								alternativeText
+								width
+								height
+								caption
+								previewUrl
+							}
+						}
+						... on ComponentBlocksSimpleCtaSection {
+							CtaHeadline
+							CtaInfoText
+							CtaBackgroundImage {
+								url
+								alternativeText
+								width
+								height
+								caption
+								previewUrl
+							}
+							CtaActionButton {
+								Label
+								Link
+								Primary
 							}
 						}
 					}

@@ -1,0 +1,35 @@
+{
+  "collectionName": "components_blocks_simple_cta_sections",
+  "info": {
+    "displayName": "SimpleCtaSection"
+  },
+  "options": {},
+  "attributes": {
+    "CtaHeadline": {
+      "type": "string"
+    },
+    "CtaInfoText": {
+      "type": "customField",
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultHtml"
+      }
+    },
+    "CtaActionButton": {
+      "type": "component",
+      "component": "links.action-button",
+      "repeatable": true
+    },
+    "CtaBackgroundImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  },
+  "config": {}
+}

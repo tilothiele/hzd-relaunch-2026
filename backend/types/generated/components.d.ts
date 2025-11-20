@@ -42,6 +42,17 @@ export interface BlocksHeroSectionSlideShow extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksImageGallerySection extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_image_gallery_sections';
+  info: {
+    displayName: 'ImageGallerySection';
+  };
+  attributes: {
+    GalleryHeadline: Schema.Attribute.String;
+    GalleryImages: Schema.Attribute.Media<'images', true>;
+  };
+}
+
 export interface BlocksItemList extends Struct.ComponentSchema {
   collectionName: 'components_blocks_item_lists';
   info: {
@@ -67,6 +78,27 @@ export interface BlocksRichTextSection extends Struct.ComponentSchema {
       >;
     Subtitle: Schema.Attribute.String;
     Title: Schema.Attribute.String;
+  };
+}
+
+export interface BlocksSimpleCtaSection extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_simple_cta_sections';
+  info: {
+    displayName: 'SimpleCtaSection';
+  };
+  attributes: {
+    CtaActionButton: Schema.Attribute.Component<'links.action-button', true>;
+    CtaBackgroundImage: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
+    CtaHeadline: Schema.Attribute.String;
+    CtaInfoText: Schema.Attribute.RichText &
+      Schema.Attribute.CustomField<
+        'plugin::ckeditor5.CKEditor',
+        {
+          preset: 'defaultHtml';
+        }
+      >;
   };
 }
 
@@ -159,6 +191,11 @@ export interface ColumnsTextColumn extends Struct.ComponentSchema {
   };
   attributes: {
     BulletItems: Schema.Attribute.Component<'columns.column-item', true>;
+    ColumnActionButton: Schema.Attribute.Component<
+      'links.action-button',
+      false
+    >;
+    ColumnHeadline: Schema.Attribute.String;
     ColumnText: Schema.Attribute.RichText &
       Schema.Attribute.CustomField<
         'plugin::ckeditor5.CKEditor',
@@ -230,8 +267,10 @@ declare module '@strapi/strapi' {
       'blocks.card-item': BlocksCardItem;
       'blocks.card-section': BlocksCardSection;
       'blocks.hero-section-slide-show': BlocksHeroSectionSlideShow;
+      'blocks.image-gallery-section': BlocksImageGallerySection;
       'blocks.item-list': BlocksItemList;
       'blocks.rich-text-section': BlocksRichTextSection;
+      'blocks.simple-cta-section': BlocksSimpleCtaSection;
       'blocks.slide-item': BlocksSlideItem;
       'blocks.supplemental-document-group-section': BlocksSupplementalDocumentGroupSection;
       'blocks.teaser-text-with-image': BlocksTeaserTextWithImage;

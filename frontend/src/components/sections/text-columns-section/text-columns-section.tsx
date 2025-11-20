@@ -104,13 +104,21 @@ export function TextColumnsSectionComponent({
 				<div className='grid gap-8 md:grid-cols-2'>
 					{columns.map((column, columnIndex) => {
 						const key = column.id ?? `column-${columnIndex}`
+						const columnHeadline = column.ColumnHeadline
 						const columnText = column.ColumnText
+						const columnActionButton = column.ColumnActionButton
 						const bulletItems = column.BulletItems?.filter(
 							(item): item is BulletItem => Boolean(item),
 						) ?? []
 
 						return (
 							<div key={key} className='flex flex-col gap-4'>
+								{columnHeadline ? (
+									<h3 className='text-2xl font-semibold text-gray-900'>
+										{columnHeadline}
+									</h3>
+								) : null}
+
 								{columnText ? (
 									<div
 										className='prose prose-lg max-w-none text-gray-700'
@@ -133,6 +141,21 @@ export function TextColumnsSectionComponent({
 												/>
 											)
 										})}
+									</div>
+								) : null}
+
+								{columnActionButton?.Link ? (
+									<div className='mt-4'>
+										<a
+											href={columnActionButton.Link}
+											className={`inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold transition-opacity hover:opacity-90 ${
+												columnActionButton.Primary
+													? 'bg-yellow-400 text-gray-900'
+													: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+											}`}
+										>
+											{columnActionButton.Label ?? 'Mehr erfahren'}
+										</a>
 									</div>
 								) : null}
 							</div>

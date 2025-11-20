@@ -18,7 +18,9 @@
         "blocks.hero-section-slide-show",
         "blocks.card-section",
         "blocks.teaser-text-with-image",
-        "blocks.text-columns-section"
+        "blocks.text-columns-section",
+        "blocks.image-gallery-section",
+        "blocks.simple-cta-section"
       ]
     }
   }

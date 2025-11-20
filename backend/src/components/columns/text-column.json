@@ -5,6 +5,9 @@
   },
   "options": {},
   "attributes": {
+    "ColumnHeadline": {
+      "type": "string"
+    },
     "ColumnText": {
       "type": "customField",
       "customField": "plugin::ckeditor5.CKEditor",
@@ -16,6 +19,11 @@
       "type": "component",
       "component": "columns.column-item",
       "repeatable": true
+    },
+    "ColumnActionButton": {
+      "type": "component",
+      "component": "links.action-button",
+      "repeatable": false
     }
   },
   "config": {}
