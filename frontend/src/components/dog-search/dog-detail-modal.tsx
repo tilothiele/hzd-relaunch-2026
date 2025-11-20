@@ -1,13 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Tabs, Tab, Box } from '@mui/material'
+import { Tabs, Tab, Box, IconButton } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
 import type { Dog } from '@/types'
 import { DogDataTab } from './dog-detail-modal/dog-data-tab'
 import { DogPedigreeTab } from './dog-detail-modal/dog-pedigree-tab'
 import { DogPersonalWordsTab } from './dog-detail-modal/dog-personal-words-tab'
 import { DogImagesTab } from './dog-detail-modal/dog-images-tab'
 import { DogPerformanceTab } from './dog-detail-modal/dog-performance-tab'
+import { DogChatTab } from './dog-detail-modal/dog-chat-tab'
 
 interface DogDetailModalProps {
 	dog: Dog | null
@@ -16,7 +18,7 @@ interface DogDetailModalProps {
 	onClose: () => void
 }
 
-type TabId = 0 | 1 | 2 | 3 | 4
+type TabId = 0 | 1 | 2 | 3 | 4 | 5
 
 export function DogDetailModal({
 	dog,
@@ -75,26 +77,23 @@ export function DogDetailModal({
 				onClick={(e) => e.stopPropagation()}
 			>
 				{/* Close Button */}
-				<button
-					type='button'
+				<IconButton
 					onClick={onClose}
-					className='absolute right-4 top-4 z-10 rounded-full bg-white/90 p-2 shadow-md transition-colors hover:bg-white'
 					aria-label='Schließen'
+					sx={{
+						position: 'absolute',
+						right: 16,
+						top: 16,
+						zIndex: 10,
+						backgroundColor: 'rgba(255, 255, 255, 0.9)',
+						boxShadow: 2,
+						'&:hover': {
+							backgroundColor: 'white',
+						},
+					}}
 				>
-					<svg
-						className='h-6 w-6 text-gray-600'
-						fill='none'
-						viewBox='0 0 24 24'
-						stroke='currentColor'
-					>
-						<path
-							strokeLinecap='round'
-							strokeLinejoin='round'
-							strokeWidth={2}
-							d='M6 18L18 6M6 6l12 12'
-						/>
-					</svg>
-				</button>
+					<CloseIcon />
+				</IconButton>
 
 				{/* Content */}
 				<div className='p-8'>
@@ -131,11 +130,12 @@ export function DogDetailModal({
 							<Tab label='Persönliche Worte' />
 							<Tab label='Bilder' />
 							<Tab label='Leistungen' />
+							<Tab label='Chat' />
 						</Tabs>
 					</Box>
 
 					{/* Tab Panels */}
-					<Box sx={{ mt: 3, minHeight: '400px' }}>
+					<Box sx={{ mt: 3, minHeight: '400px', height: activeTab === 5 ? '500px' : 'auto' }}>
 						{activeTab === 0 && (
 							<DogDataTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
 						)}
@@ -154,6 +154,10 @@ export function DogDetailModal({
 
 						{activeTab === 4 && (
 							<DogPerformanceTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
+						)}
+
+						{activeTab === 5 && (
+							<DogChatTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
 						)}
 					</Box>
 				</div>
