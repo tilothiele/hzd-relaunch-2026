@@ -31,7 +31,7 @@ export interface CardItem {
 	Headline?: string | null
 	Subheadline?: string | null
 	BackgroundImage?: Image | null
-	FarbThema?: 'A' | 'B' | 'C' | null
+	FarbThema?: 'A' | 'B' | 'C' | 'D' | null
 	ActionButton?: ActionButton | null
 }
 
@@ -85,7 +85,26 @@ export interface TeaserTextWithImageSection {
 	ActionButton?: ActionButton | null
 }
 
-export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection
+export interface BulletItem {
+	id?: string
+	Headline?: string | null
+	ItemBody?: string | null
+}
+
+export interface TextColumn {
+	id?: string
+	ColumnText?: string | null
+	BulletItems?: BulletItem[] | null
+}
+
+export interface TextColumnsSection {
+	__typename: 'ComponentBlocksTextColumnsSection'
+	TextColumnsHeadline?: string | null
+	TextColumnsSubHeadline?: string | null
+	TextColumn?: TextColumn[] | null
+}
+
+export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection
 
 export type PageSection = StartpageSection
 

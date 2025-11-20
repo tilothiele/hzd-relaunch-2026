@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_blocks_text_columns_sections",
+  "info": {
+    "displayName": "TextColumnsSection"
+  },
+  "options": {},
+  "attributes": {
+    "TextColumnsHeadline": {
+      "type": "string"
+    },
+    "TextColumnsSubHeadline": {
+      "type": "string"
+    },
+    "TextColumn": {
+      "type": "component",
+      "component": "columns.text-column",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}

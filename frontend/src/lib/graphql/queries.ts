@@ -100,6 +100,19 @@ export const GET_INDEX_PAGE = `
 						Primary
 					}
 				}
+				... on ComponentBlocksTextColumnsSection {
+					TextColumnsHeadline
+					TextColumnsSubHeadline
+					TextColumn {
+						id
+						ColumnText
+						BulletItems {
+							id
+							Headline
+							ItemBody
+						}
+					}
+				}
 			}
 		}
 	}
@@ -230,6 +243,19 @@ export const GET_PAGE_BY_SLUG = `
 								Label
 								Link
 								Primary
+							}
+						}
+						... on ComponentBlocksTextColumnsSection {
+							TextColumnsHeadline
+							TextColumnsSubHeadline
+							TextColumn {
+								id
+								ColumnText
+								BulletItems {
+									id
+									Headline
+									ItemBody
+								}
 							}
 						}
 					}

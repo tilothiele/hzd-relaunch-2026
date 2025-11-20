@@ -5,11 +5,17 @@
   },
   "options": {},
   "attributes": {
-    "Content": {
-      "type": "string"
+    "ColumnText": {
+      "type": "customField",
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultHtml"
+      }
     },
-    "Blocks": {
-      "type": "blocks"
+    "BulletItems": {
+      "type": "component",
+      "component": "columns.column-item",
+      "repeatable": true
     }
   },
   "config": {}

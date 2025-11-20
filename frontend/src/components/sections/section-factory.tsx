@@ -6,6 +6,7 @@ import { CardSectionComponent } from './card-section/card-section'
 import { RichTextSectionComponent } from './rich-text-section/rich-text-section'
 import { SupplementalDocumentGroupSectionComponent } from './supplemental-document-group-section/supplemental-document-group-section'
 import { TeaserTextWithImageSectionComponent } from './teaser-text-with-image-section/teaser-text-with-image-section'
+import { TextColumnsSectionComponent } from './text-columns-section/text-columns-section'
 
 interface RenderStartpageSectionsParams {
 	sections: StartpageSection[] | null | undefined
@@ -59,6 +60,14 @@ function renderStartpageSection({
 	case 'ComponentBlocksTeaserTextWithImage':
 		return (
 			<TeaserTextWithImageSectionComponent
+				key={key}
+				section={section}
+				strapiBaseUrl={strapiBaseUrl}
+			/>
+		)
+	case 'ComponentBlocksTextColumnsSection':
+		return (
+			<TextColumnsSectionComponent
 				key={key}
 				section={section}
 				strapiBaseUrl={strapiBaseUrl}

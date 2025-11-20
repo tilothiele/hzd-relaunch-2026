@@ -118,6 +118,18 @@ export interface BlocksTeaserTextWithImage extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksTextColumnsSection extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_text_columns_sections';
+  info: {
+    displayName: 'TextColumnsSection';
+  };
+  attributes: {
+    TextColumn: Schema.Attribute.Component<'columns.text-column', true>;
+    TextColumnsHeadline: Schema.Attribute.String;
+    TextColumnsSubHeadline: Schema.Attribute.String;
+  };
+}
+
 export interface CalendarCalendarDocument extends Struct.ComponentSchema {
   collectionName: 'components_calendar_calendar_documents';
   info: {
@@ -146,8 +158,14 @@ export interface ColumnsTextColumn extends Struct.ComponentSchema {
     displayName: 'Text Column';
   };
   attributes: {
-    Blocks: Schema.Attribute.Blocks;
-    Content: Schema.Attribute.String;
+    BulletItems: Schema.Attribute.Component<'columns.column-item', true>;
+    ColumnText: Schema.Attribute.RichText &
+      Schema.Attribute.CustomField<
+        'plugin::ckeditor5.CKEditor',
+        {
+          preset: 'defaultHtml';
+        }
+      >;
   };
 }
 
@@ -217,6 +235,7 @@ declare module '@strapi/strapi' {
       'blocks.slide-item': BlocksSlideItem;
       'blocks.supplemental-document-group-section': BlocksSupplementalDocumentGroupSection;
       'blocks.teaser-text-with-image': BlocksTeaserTextWithImage;
+      'blocks.text-columns-section': BlocksTextColumnsSection;
       'calendar.calendar-document': CalendarCalendarDocument;
       'columns.column-item': ColumnsColumnItem;
       'columns.text-column': ColumnsTextColumn;

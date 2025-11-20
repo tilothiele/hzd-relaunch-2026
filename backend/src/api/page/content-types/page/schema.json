@@ -33,7 +33,8 @@
         "blocks.card-section",
         "blocks.rich-text-section",
         "blocks.supplemental-document-group-section",
-        "blocks.teaser-text-with-image"
+        "blocks.teaser-text-with-image",
+        "blocks.text-columns-section"
       ]
     }
   }

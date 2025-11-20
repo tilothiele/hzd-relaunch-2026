@@ -595,6 +595,7 @@ export interface ApiIndexPageIndexPage extends Struct.SingleTypeSchema {
         'blocks.hero-section-slide-show',
         'blocks.card-section',
         'blocks.teaser-text-with-image',
+        'blocks.text-columns-section',
       ]
     >;
     updatedAt: Schema.Attribute.DateTime;
@@ -855,6 +856,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.rich-text-section',
         'blocks.supplemental-document-group-section',
         'blocks.teaser-text-with-image',
+        'blocks.text-columns-section',
       ]
     >;
     slug: Schema.Attribute.String;
