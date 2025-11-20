@@ -22,7 +22,7 @@ function convertToPhotoAlbumImages(
 			const height = image.height ?? 300
 
 			return {
-				src: url,
+				src: url ?? '',
 				width,
 				height,
 				alt: image.alternativeText ?? '',
