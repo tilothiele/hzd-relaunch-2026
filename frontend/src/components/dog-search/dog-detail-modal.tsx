@@ -7,6 +7,7 @@ import { DogDataTab } from './dog-detail-modal/dog-data-tab'
 import { DogPedigreeTab } from './dog-detail-modal/dog-pedigree-tab'
 import { DogPersonalWordsTab } from './dog-detail-modal/dog-personal-words-tab'
 import { DogImagesTab } from './dog-detail-modal/dog-images-tab'
+import { DogPerformanceTab } from './dog-detail-modal/dog-performance-tab'
 
 interface DogDetailModalProps {
 	dog: Dog | null
@@ -15,7 +16,7 @@ interface DogDetailModalProps {
 	onClose: () => void
 }
 
-type TabId = 0 | 1 | 2 | 3
+type TabId = 0 | 1 | 2 | 3 | 4
 
 export function DogDetailModal({
 	dog,
@@ -129,6 +130,7 @@ export function DogDetailModal({
 							<Tab label='Pedigree' />
 							<Tab label='Persönliche Worte' />
 							<Tab label='Bilder' />
+							<Tab label='Leistungen' />
 						</Tabs>
 					</Box>
 
@@ -148,6 +150,10 @@ export function DogDetailModal({
 
 						{activeTab === 3 && (
 							<DogImagesTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
+						)}
+
+						{activeTab === 4 && (
+							<DogPerformanceTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
 						)}
 					</Box>
 				</div>
