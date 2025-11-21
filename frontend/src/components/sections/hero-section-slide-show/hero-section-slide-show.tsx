@@ -8,6 +8,8 @@ import 'swiper/css/pagination'
 
 import type { HeroSectionSlideShow } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
+import { ActionButton } from '@/components/ui/action-button'
+import { themes } from '@/themes'
 
 interface HeroSectionSlideShowProps {
 	section: HeroSectionSlideShow
@@ -30,7 +32,7 @@ export function HeroSectionSlideShowComponent({
 	}
 
 	return (
-		<section className='relative mb-16 overflow-hidden'>
+		<section className='relative overflow-hidden'>
 			<Swiper
 				modules={[Autoplay, Pagination, A11y, Keyboard]}
 				slidesPerView={1}
@@ -83,14 +85,9 @@ export function HeroSectionSlideShowComponent({
 											{slide.Subheadline}
 										</p>
 									) : null}
-									{slide?.ActionButton?.Link ? (
+									{slide?.ActionButton ? (
 										<div className='flex justify-center'>
-											<a
-												href={slide.ActionButton.Link}
-												className='bg-[#3d5b4f] px-16 py-4 text-base font-semibold uppercase tracking-[0.25em] text-white transition-transform duration-200 hover:scale-[1.03] hover:bg-[#2f4a3f]'
-											>
-												{slide.ActionButton.Label ?? 'Mehr erfahren'}
-											</a>
+											<ActionButton actionButton={slide.ActionButton} theme={themes.A} />
 										</div>
 									) : null}
 								</div>

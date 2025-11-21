@@ -1,7 +1,10 @@
 'use client'
 
+import { Box, Paper, Typography, Container } from '@mui/material'
 import type { SimpleCtaSection } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
+import { ActionButton } from '@/components/ui/action-button'
+import { themes } from '@/themes'
 
 interface SimpleCtaSectionComponentProps {
 	section: SimpleCtaSection
@@ -22,9 +25,12 @@ export function SimpleCtaSectionComponent({
 	}
 
 	return (
-		<section
-			className='relative min-h-[500px] w-full'
-			style={{
+		<Box
+			component='section'
+			sx={{
+				position: 'relative',
+				minHeight: '500px',
+				width: '100%',
 				backgroundImage: backgroundImageUrl ? `url('${backgroundImageUrl}')` : undefined,
 				backgroundAttachment: 'fixed',
 				backgroundPosition: 'center',
@@ -32,38 +38,78 @@ export function SimpleCtaSectionComponent({
 				backgroundSize: 'cover',
 			}}
 		>
-			<div className='flex min-h-[500px] w-full items-center justify-center px-4 py-16'>
-				<div className='w-full max-w-4xl rounded-lg bg-white/90 px-8 py-12 shadow-lg'>
-					{headline ? (
-						<h2 className='mb-6 text-3xl font-bold' style={{ color: '#A8267D' }}>
-							{headline}
-						</h2>
-					) : null}
-
-					{text ? (
-						<div
-							className='mb-8 text-justify text-gray-700 prose prose-lg max-w-none'
-							dangerouslySetInnerHTML={{ __html: text }}
-						/>
-					) : null}
-
-					{actionButton?.Link ? (
-						<div className='flex justify-center'>
-							<a
-								href={actionButton.Link}
-								className='inline-flex items-center justify-center rounded-lg px-8 py-4 text-base font-semibold uppercase transition-opacity hover:opacity-90'
-								style={{
-									backgroundColor: '#FAD857',
-									color: '#565757',
+			<Box
+				sx={{
+					display: 'flex',
+					minHeight: '500px',
+					width: '100%',
+					alignItems: 'center',
+					justifyContent: 'center',
+					px: 2,
+					py: 4,
+				}}
+			>
+				<Container maxWidth='md'>
+					<Paper
+						elevation={3}
+						sx={{
+							width: '100%',
+							borderRadius: 2,
+							backgroundColor: 'rgba(255, 255, 255, 0.9)',
+							px: 4,
+							py: 6,
+						}}
+					>
+						{headline ? (
+							<Typography
+								variant='h3'
+								component='h2'
+								sx={{
+									mb: 3,
+									fontWeight: 'bold',
+									color: '#A8267D',
 								}}
 							>
-								{actionButton.Label ?? 'Mehr erfahren'}
-							</a>
-						</div>
-					) : null}
-				</div>
-			</div>
-		</section>
+								{headline}
+							</Typography>
+						) : null}
+
+						{text ? (
+							<Box
+								sx={{
+									mb: 4,
+									textAlign: 'justify',
+									color: 'text.secondary',
+									'& p': {
+										fontSize: '1.125rem',
+										lineHeight: 1.75,
+									},
+									'& a': {
+										color: 'primary.main',
+										textDecoration: 'none',
+										'&:hover': {
+											textDecoration: 'underline',
+										},
+									},
+								}}
+								dangerouslySetInnerHTML={{ __html: text }}
+							/>
+						) : null}
+
+						{actionButton ? (
+							<Box
+								sx={{
+									display: 'flex',
+									justifyContent: 'center',
+								}}
+							>
+								<ActionButton actionButton={actionButton} theme={themes.C} />
+							</Box>
+						) : null}
+					</Paper>
+				</Container>
+			</Box>
+		</Box>
 	)
 }
 

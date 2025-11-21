@@ -3,6 +3,7 @@ import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
 import './globals.css'
 import { Providers } from './providers'
+import { TestBanner } from '@/components/test-banner/test-banner'
 
 config.autoAddCss = false
 
@@ -19,6 +20,7 @@ export default function RootLayout({
 	return (
 		<html lang='de'>
 			<body className='antialiased'>
+				<TestBanner />
 				<Providers>
 					{children}
 				</Providers>

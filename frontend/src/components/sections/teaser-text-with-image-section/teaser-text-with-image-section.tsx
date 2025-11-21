@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import type { TeaserTextWithImageSection } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
+import { ActionButton } from '@/components/ui/action-button'
 
 interface TeaserTextWithImageSectionComponentProps {
 	section: TeaserTextWithImageSection
@@ -59,18 +60,9 @@ export function TeaserTextWithImageSectionComponent({
 							/>
 						) : null}
 
-						{actionButton?.Link ? (
+						{actionButton ? (
 							<div className='mt-4'>
-								<a
-									href={actionButton.Link}
-									className={`inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold transition-opacity hover:opacity-90 ${
-										actionButton.Primary
-											? 'bg-yellow-400 text-gray-900'
-											: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
-									}`}
-								>
-									{actionButton.Label ?? 'Mehr erfahren'}
-								</a>
+								<ActionButton actionButton={actionButton} />
 							</div>
 						) : null}
 					</div>

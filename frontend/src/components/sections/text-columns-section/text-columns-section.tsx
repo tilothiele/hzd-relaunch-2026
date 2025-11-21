@@ -1,7 +1,10 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { Box, Typography, Accordion, AccordionSummary, AccordionDetails } from '@mui/material'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import type { TextColumnsSection, BulletItem } from '@/types'
+import { ActionButton } from '@/components/ui/action-button'
 
 interface TextColumnsSectionComponentProps {
 	section: TextColumnsSection
@@ -23,41 +26,56 @@ function BulletItemAccordion({
 	const itemBody = item.ItemBody
 
 	return (
-		<div className='border-b border-gray-200'>
-			<button
-				type='button'
-				onClick={onToggle}
-				className='flex w-full items-center justify-between py-4 text-left transition-colors hover:text-gray-700'
-				aria-expanded={isOpen}
+		<Accordion
+			expanded={isOpen}
+			onChange={onToggle}
+			sx={{
+				boxShadow: 'none',
+				borderBottom: '1px solid',
+				borderColor: 'divider',
+				'&:before': {
+					display: 'none',
+				},
+			}}
+		>
+			<AccordionSummary
+				expandIcon={<ExpandMoreIcon />}
+				sx={{
+					px: 0,
+					py: 2,
+					'& .MuiAccordionSummary-content': {
+						margin: 0,
+					},
+				}}
 			>
-				<div className='flex items-center gap-3'>
-					{headline ? (
-						<span className='text-base font-medium'>{headline}</span>
-					) : null}
-				</div>
-				<svg
-					className={`h-5 w-5 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-					fill='none'
-					viewBox='0 0 24 24'
-					stroke='currentColor'
-				>
-					<path
-						strokeLinecap='round'
-						strokeLinejoin='round'
-						strokeWidth={2}
-						d='M19 9l-7 7-7-7'
-					/>
-				</svg>
-			</button>
-			{isOpen && itemBody ? (
-				<div className='pb-4 pl-8'>
-					<div
-						className='prose prose-sm max-w-none text-gray-600'
-						dangerouslySetInnerHTML={{ __html: itemBody }}
-					/>
-				</div>
+				{headline ? (
+					<Typography variant='body1' sx={{ fontWeight: 500 }}>
+						{headline}
+					</Typography>
+				) : null}
+			</AccordionSummary>
+			{itemBody ? (
+				<AccordionDetails
+					sx={{
+						px: 4,
+						pb: 2,
+						'& p': {
+							fontSize: '0.875rem',
+							color: 'text.secondary',
+							lineHeight: 1.75,
+						},
+						'& a': {
+							color: 'primary.main',
+							textDecoration: 'none',
+							'&:hover': {
+								textDecoration: 'underline',
+							},
+						},
+					}}
+					dangerouslySetInnerHTML={{ __html: itemBody }}
+				/>
 			) : null}
-		</div>
+		</Accordion>
 	)
 }
 
@@ -88,20 +106,51 @@ export function TextColumnsSectionComponent({
 	}
 
 	return (
-		<section className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em' }}>
-			<div className='w-full max-w-6xl'>
+		<Box
+			component='section'
+			sx={{
+				width: '100%',
+				py: 2,
+				px: 2,
+				display: 'flex',
+				justifyContent: 'center',
+			}}
+		>
+			<Box sx={{ width: '100%', maxWidth: '1200px' }}>
 				{section.TextColumnsHeadline ? (
-					<h2 className='mb-8 text-3xl font-semibold text-gray-900'>
+					<Typography
+						variant='h3'
+						component='h2'
+						sx={{
+							mb: 4,
+							fontWeight: 600,
+							color: 'text.primary',
+						}}
+					>
 						{section.TextColumnsHeadline}
-					</h2>
+					</Typography>
 				) : null}
 				{section.TextColumnsSubHeadline ? (
-					<p className='mb-8 text-lg text-gray-600'>
+					<Typography
+						variant='h6'
+						component='p'
+						sx={{
+							mb: 4,
+							color: 'text.secondary',
+						}}
+					>
 						{section.TextColumnsSubHeadline}
-					</p>
+					</Typography>
 				) : null}
 
-				<div className='grid gap-8 md:grid-cols-2'>
+				<Box
+					sx={{
+						display: 'flex',
+						flexWrap: 'wrap',
+						gap: 5,
+						width: '100%',
+					}}
+				>
 					{columns.map((column, columnIndex) => {
 						const key = column.id ?? `column-${columnIndex}`
 						const columnHeadline = column.ColumnHeadline
@@ -112,58 +161,79 @@ export function TextColumnsSectionComponent({
 						) ?? []
 
 						return (
-							<div key={key} className='flex flex-col gap-4'>
-								{columnHeadline ? (
-									<h3 className='text-2xl font-semibold text-gray-900'>
-										{columnHeadline}
-									</h3>
-								) : null}
-
-								{columnText ? (
-									<div
-										className='prose prose-lg max-w-none text-gray-700'
-										dangerouslySetInnerHTML={{ __html: columnText }}
-									/>
-								) : null}
-
-								{bulletItems.length > 0 ? (
-									<div className='space-y-0'>
-										{bulletItems.map((item, itemIndex) => {
-											const itemKey = item.id ?? `${key}-item-${itemIndex}`
-											const isOpen = openItems.has(itemKey)
-
-											return (
-												<BulletItemAccordion
-													key={itemKey}
-													item={item}
-													isOpen={isOpen}
-													onToggle={() => toggleItem(itemKey)}
-												/>
-											)
-										})}
-									</div>
-								) : null}
-
-								{columnActionButton?.Link ? (
-									<div className='mt-4'>
-										<a
-											href={columnActionButton.Link}
-											className={`inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold transition-opacity hover:opacity-90 ${
-												columnActionButton.Primary
-													? 'bg-yellow-400 text-gray-900'
-													: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
-											}`}
+							<Box
+								key={key}
+								sx={{
+									width: { xs: '100%', md: 'calc(50% - 20px)' },
+									flexGrow: 0,
+									flexShrink: 0,
+								}}
+							>
+								<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+									{columnHeadline ? (
+										<Typography
+											variant='h5'
+											component='h3'
+											sx={{
+												fontWeight: 600,
+												color: 'text.primary',
+											}}
 										>
-											{columnActionButton.Label ?? 'Mehr erfahren'}
-										</a>
-									</div>
-								) : null}
-							</div>
+											{columnHeadline}
+										</Typography>
+									) : null}
+
+									{columnText ? (
+										<Box
+											sx={{
+												color: 'text.secondary',
+												'& p': {
+													fontSize: '1.125rem',
+													lineHeight: 1.75,
+													mb: 2,
+												},
+												'& a': {
+													color: 'primary.main',
+													textDecoration: 'none',
+													'&:hover': {
+														textDecoration: 'underline',
+													},
+												},
+											}}
+											dangerouslySetInnerHTML={{ __html: columnText }}
+										/>
+									) : null}
+
+									{bulletItems.length > 0 ? (
+										<Box>
+											{bulletItems.map((item, itemIndex) => {
+												const itemKey = item.id ?? `${key}-item-${itemIndex}`
+												const isOpen = openItems.has(itemKey)
+
+												return (
+													<BulletItemAccordion
+														key={itemKey}
+														item={item}
+														isOpen={isOpen}
+														onToggle={() => toggleItem(itemKey)}
+													/>
+												)
+											})}
+										</Box>
+									) : null}
+
+									{columnActionButton ? (
+										<Box sx={{ mt: 2 }}>
+											<ActionButton actionButton={columnActionButton} />
+										</Box>
+									) : null}
+								</Box>
+							</Box>
 						)
 					})}
-				</div>
-			</div>
-		</section>
+				</Box>
+			</Box>
+		</Box>
 	)
 }
 
