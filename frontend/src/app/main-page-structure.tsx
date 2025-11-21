@@ -93,7 +93,7 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 				isAuthenticating={isAuthenticating}
 				error={authError}
 			/>
-			<main className='flex flex-col gap-12'>
+			<main className='flex flex-col'>
 				{children}
 			</main>
 			<Footer
