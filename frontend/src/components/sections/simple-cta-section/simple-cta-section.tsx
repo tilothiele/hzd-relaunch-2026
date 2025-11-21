@@ -18,9 +18,11 @@ export function SimpleCtaSectionComponent({
 	const backgroundImageUrl = resolveMediaUrl(section.CtaBackgroundImage, strapiBaseUrl)
 	const headline = section.CtaHeadline
 	const text = section.CtaInfoText
-	const actionButton = section.CtaActionButton
+	const actionButtons = section.CtaActionButton?.filter(
+		(button): button is NonNullable<typeof button> => Boolean(button),
+	) ?? []
 
-	if (!headline && !text && !actionButton) {
+	if (!headline && !text && actionButtons.length === 0) {
 		return null
 	}
 
@@ -96,14 +98,22 @@ export function SimpleCtaSectionComponent({
 							/>
 						) : null}
 
-						{actionButton ? (
+						{actionButtons.length > 0 ? (
 							<Box
 								sx={{
 									display: 'flex',
 									justifyContent: 'center',
+									gap: 2,
+									flexWrap: 'wrap',
 								}}
 							>
-								<ActionButton actionButton={actionButton} theme={themes.C} />
+								{actionButtons.map((actionButton, index) => (
+									<ActionButton
+										key={actionButton.Link ?? index}
+										actionButton={actionButton}
+										theme={themes.C}
+									/>
+								))}
 							</Box>
 						) : null}
 					</Paper>

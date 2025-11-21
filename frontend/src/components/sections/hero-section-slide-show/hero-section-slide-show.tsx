@@ -5,6 +5,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Pagination, A11y, Keyboard } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/pagination'
+import { Typography } from '@mui/material'
 
 import type { HeroSectionSlideShow } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
@@ -76,14 +77,31 @@ export function HeroSectionSlideShowComponent({
 								/>
 								<div className='hero-section-slide-content relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-24 text-center sm:px-12 md:px-24'>
 									{slide?.Headline ? (
-										<h2 className='hero-section-slide-headline font-heading font-bold tracking-tight'>
+										<Typography
+											variant='h2'
+											className='hero-section-slide-headline'
+											sx={{
+												fontWeight: 600,
+												letterSpacing: '-0.025em',
+												textAlign: 'center',
+												width: '100%',
+											}}
+										>
 											{slide.Headline}
-										</h2>
+										</Typography>
 									) : null}
 									{slide?.Subheadline ? (
-										<p className='hero-section-slide-subheadline font-medium'>
+										<Typography
+											variant='h4'
+											className='hero-section-slide-subheadline'
+											sx={{
+												fontWeight: 500,
+												textAlign: 'center',
+												width: '100%',
+											}}
+										>
 											{slide.Subheadline}
-										</p>
+										</Typography>
 									) : null}
 									{slide?.ActionButton ? (
 										<div className='flex justify-center'>

@@ -174,3 +174,4 @@ export function DogChatTab({ dog, strapiBaseUrl }: DogChatTabProps) {
 	)
 }
 
+

@@ -117,7 +117,7 @@ export interface SimpleCtaSection {
 	CtaHeadline?: string | null
 	CtaInfoText?: string | null
 	CtaBackgroundImage?: Image | null
-	CtaActionButton?: ActionButton | null
+	CtaActionButton?: (ActionButton | null)[] | null
 }
 
 export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | SimpleCtaSection

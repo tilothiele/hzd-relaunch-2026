@@ -40,9 +40,10 @@ export function TestBanner() {
 					letterSpacing: '1px',
 				}}
 			>
-				TEST
+				TEST-SYSTEM
 			</div>
 		</div>
 	)
 }
+
 
