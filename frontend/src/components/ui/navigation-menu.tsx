@@ -1,116 +1,448 @@
 'use client'
 
-import * as NavigationMenuPrimitive from '@radix-ui/react-navigation-menu'
-import type { ComponentPropsWithoutRef, ElementRef } from 'react'
-import { forwardRef } from 'react'
-import { cn } from '@/lib/utils'
+import { useState } from 'react'
+import {
+	Box,
+	Menu,
+	MenuItem,
+	Button,
+	Drawer,
+	IconButton,
+	List,
+	ListItem,
+	ListItemButton,
+	ListItemText,
+	Collapse,
+	Typography,
+	useMediaQuery,
+	useTheme,
+} from '@mui/material'
+import MenuIcon from '@mui/icons-material/Menu'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import ExpandLessIcon from '@mui/icons-material/ExpandLess'
+import Link from 'next/link'
+import type { MenuItem as MenuItemType } from '@/types'
 
-export const NavigationMenu = forwardRef<
-	ElementRef<typeof NavigationMenuPrimitive.Root>,
-	ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Root>
->(({ className, ...props }, ref) => (
-	<NavigationMenuPrimitive.Root
-		ref={ref}
-		className={cn('relative z-20 flex w-full items-center justify-center', className)}
-		{...props}
-	/>
-))
-NavigationMenu.displayName = NavigationMenuPrimitive.Root.displayName
+interface NavigationMenuProps {
+	menuItems: MenuItemType[]
+	theme: {
+		textColor: string
+		headerFooterTextColor: string
+	}
+}
 
-export const NavigationMenuList = forwardRef<
-	ElementRef<typeof NavigationMenuPrimitive.List>,
-	ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.List>
->(({ className, ...props }, ref) => (
-	<NavigationMenuPrimitive.List
-		ref={ref}
-		className={cn('group flex items-center justify-center gap-6', className)}
-		{...props}
-	/>
-))
-NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName
+function DesktopMenuItem({
+	item,
+	theme,
+}: {
+	item: MenuItemType
+	theme: { textColor: string; headerFooterTextColor: string }
+}) {
+	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+	const open = Boolean(anchorEl)
+	const hasChildren = Boolean(item.children?.length)
+	const itemKey = item.url ?? item.name
 
-export const NavigationMenuItem = NavigationMenuPrimitive.Item
+	const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+		setAnchorEl(event.currentTarget)
+	}
 
-export const NavigationMenuTrigger = forwardRef<
-	ElementRef<typeof NavigationMenuPrimitive.Trigger>,
-	ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Trigger>
->(({ className, ...props }, ref) => (
-	<NavigationMenuPrimitive.Trigger
-		ref={ref}
-		className={cn(
-			'group inline-flex h-10 items-center justify-center gap-1 rounded-md px-3 py-2 text-xl font-medium transition-colors focus:outline-none focus-visible:ring-yellow-400 focus-visible:ring-2',
-			'hover:text-yellow-400 focus-visible:text-yellow-400 data-[state=open]:text-yellow-400',
-			className,
-		)}
-		{...props}
-	/>
-))
-NavigationMenuTrigger.displayName = NavigationMenuPrimitive.Trigger.displayName
+	const handleClose = () => {
+		setAnchorEl(null)
+	}
 
-export const NavigationMenuContent = forwardRef<
-	ElementRef<typeof NavigationMenuPrimitive.Content>,
-	ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Content>
->(({ className, ...props }, ref) => (
-	<NavigationMenuPrimitive.Content
-		ref={ref}
-		className={cn(
-			'absolute left-0 top-full z-20 mt-2 min-w-[12rem] rounded-lg border border-transparent bg-white p-4 shadow-lg',
-			'data-[motion=from-start]:animate-enterFromLeft data-[motion=from-end]:animate-enterFromRight data-[motion=to-start]:animate-exitToLeft data-[motion=to-end]:animate-exitToRight',
-			className,
-		)}
-		{...props}
-	/>
-))
-NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName
+	if (hasChildren) {
+		return (
+			<>
+				<Button
+					onClick={handleClick}
+					endIcon={<ExpandMoreIcon />}
+					sx={{
+						color: theme.headerFooterTextColor,
+						fontSize: '1.25rem',
+						fontWeight: 500,
+						textTransform: 'none',
+						'&:hover': {
+							color: '#FCD34D',
+							backgroundColor: 'transparent',
+						},
+					}}
+				>
+					{item.name}
+				</Button>
+				<Menu
+					anchorEl={anchorEl}
+					open={open}
+					onClose={handleClose}
+					anchorOrigin={{
+						vertical: 'bottom',
+						horizontal: 'left',
+					}}
+					transformOrigin={{
+						vertical: 'top',
+						horizontal: 'left',
+					}}
+					sx={{
+						'& .MuiPaper-root': {
+							backgroundColor: '#F2F5F7',
+							color: theme.textColor,
+							mt: 1,
+							padding: 2,
+							borderRadius: 2,
+							border: '1px solid rgba(0, 0, 0, 0.08)',
+							minWidth: 200,
+						},
+					}}
+				>
+					{item.children?.map((child) => {
+						const childKey = child.url ?? child.name
+						const hasGrandchildren = Boolean(child.children?.length)
 
-export const NavigationMenuLink = forwardRef<
-	ElementRef<typeof NavigationMenuPrimitive.Link>,
-	ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Link>
->(({ className, ...props }, ref) => (
-	<NavigationMenuPrimitive.Link
-		ref={ref}
-		className={cn(
-			'block rounded-md px-3 py-2 text-base transition-colors hover:bg-yellow-100 hover:text-yellow-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400',
-			className,
-		)}
-		{...props}
-	/>
-))
-NavigationMenuLink.displayName = NavigationMenuPrimitive.Link.displayName
+						if (hasGrandchildren) {
+							return (
+								<Box key={childKey} sx={{ mb: 2 }}>
+									<Typography
+										variant='body1'
+										sx={{
+											fontSize: '1.125rem',
+											fontWeight: 600,
+											padding: '8px 16px',
+											color: theme.textColor,
+										}}
+									>
+										{child.name}
+									</Typography>
+									{child.children?.map((grandchild) => {
+										const grandchildKey = grandchild.url ?? grandchild.name
+										return (
+											<MenuItem
+												key={grandchildKey}
+												component={Link}
+												href={grandchild.url ?? '#'}
+												onClick={handleClose}
+												sx={{
+													paddingLeft: 4,
+													color: theme.textColor,
+													'&:hover': {
+														backgroundColor: 'rgba(252, 211, 77, 0.1)',
+														color: '#FCD34D',
+													},
+												}}
+											>
+												{grandchild.name}
+											</MenuItem>
+										)
+									})}
+								</Box>
+							)
+						}
 
-export const NavigationMenuIndicator = forwardRef<
-	ElementRef<typeof NavigationMenuPrimitive.Indicator>,
-	ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Indicator>
->(({ className, ...props }, ref) => (
-	<NavigationMenuPrimitive.Indicator
-		ref={ref}
-		className={cn(
-			'pointer-events-none absolute left-1/2 top-full z-30 flex h-2 -translate-x-1/2 items-end justify-center overflow-hidden',
-			className,
-		)}
-		{...props}
-	/>
-))
-NavigationMenuIndicator.displayName = NavigationMenuPrimitive.Indicator.displayName
+						return (
+							<MenuItem
+								key={childKey}
+								component={Link}
+								href={child.url ?? '#'}
+								onClick={handleClose}
+								sx={{
+									color: theme.textColor,
+									'&:hover': {
+										backgroundColor: 'rgba(252, 211, 77, 0.1)',
+										color: '#FCD34D',
+									},
+								}}
+							>
+								{child.name}
+							</MenuItem>
+						)
+					})}
+				</Menu>
+			</>
+		)
+	}
 
-export const NavigationMenuViewport = forwardRef<
-	ElementRef<typeof NavigationMenuPrimitive.Viewport>,
-	ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Viewport>
->(({ className, ...props }, ref) => (
-	<div className='absolute left-0 top-full flex w-full justify-center'>
-		<NavigationMenuPrimitive.Viewport
-			ref={ref}
-			className={cn(
-				'mt-4 w-full origin-top overflow-hidden rounded-md border border-yellow-400 bg-white shadow-lg',
-				'h-[var(--radix-navigation-menu-viewport-height)] w-[var(--radix-navigation-menu-viewport-width)]',
-				className,
-			)}
-			{...props}
-		/>
-	</div>
-))
-NavigationMenuViewport.displayName = NavigationMenuPrimitive.Viewport.displayName
+	if (item.url) {
+		return (
+			<Button
+				component={Link}
+				href={item.url}
+				sx={{
+					color: theme.headerFooterTextColor,
+					fontSize: '1.25rem',
+					fontWeight: 500,
+					textTransform: 'none',
+					'&:hover': {
+						color: '#FCD34D',
+						backgroundColor: 'transparent',
+					},
+				}}
+			>
+				{item.name}
+			</Button>
+		)
+	}
 
-export const navigationMenuTriggerStyle =
-	'inline-flex h-10 items-center justify-center gap-1 rounded-md px-3 py-2 text-xl font-medium transition-colors hover:text-yellow-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400'
+	return (
+		<Typography
+			variant='body1'
+			sx={{
+				color: theme.headerFooterTextColor,
+				fontSize: '1.25rem',
+				fontWeight: 500,
+				padding: '6px 16px',
+			}}
+		>
+			{item.name}
+		</Typography>
+	)
+}
 
+export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
+	const muiTheme = useTheme()
+	const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'))
+	const [mobileOpen, setMobileOpen] = useState(false)
+	const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({})
+
+	const handleMobileToggle = () => {
+		setMobileOpen(!mobileOpen)
+	}
+
+	const handleSubmenuToggle = (itemKey: string) => {
+		setOpenSubmenus((prev) => ({
+			...prev,
+			[itemKey]: !prev[itemKey],
+		}))
+	}
+
+	if (isMobile) {
+		return (
+			<>
+				<IconButton
+					onClick={handleMobileToggle}
+					sx={{
+						color: theme.headerFooterTextColor,
+					}}
+					aria-label='Menü öffnen'
+				>
+					<MenuIcon />
+				</IconButton>
+				<Drawer
+					anchor='right'
+					open={mobileOpen}
+					onClose={handleMobileToggle}
+					sx={{
+						'& .MuiDrawer-paper': {
+							width: 280,
+							backgroundColor: '#F2F5F7',
+						},
+					}}
+				>
+					<Box
+						sx={{
+							width: 280,
+							padding: 2,
+						}}
+					>
+						<List>
+							{menuItems.map((item) => {
+								const hasChildren = Boolean(item.children?.length)
+								const itemKey = item.url ?? item.name
+								const isSubmenuOpen = openSubmenus[itemKey]
+
+								return (
+									<Box key={itemKey}>
+										{hasChildren ? (
+											<>
+												<ListItem disablePadding>
+													<ListItemButton
+														onClick={() => handleSubmenuToggle(itemKey)}
+														sx={{
+															color: theme.textColor,
+															'&:hover': {
+																backgroundColor: 'rgba(0, 0, 0, 0.04)',
+															},
+														}}
+													>
+														<ListItemText
+															primary={
+																<Typography
+																	variant='body1'
+																	sx={{
+																		fontSize: '1.125rem',
+																		fontWeight: 500,
+																	}}
+																>
+																	{item.name}
+																</Typography>
+															}
+														/>
+														{isSubmenuOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+													</ListItemButton>
+												</ListItem>
+												<Collapse in={isSubmenuOpen} timeout='auto' unmountOnExit>
+													<List component='div' disablePadding>
+														{item.children?.map((child) => {
+															const childKey = child.url ?? child.name
+															const hasGrandchildren = Boolean(child.children?.length)
+
+															if (hasGrandchildren) {
+																return (
+																	<Box key={childKey}>
+																		<ListItem disablePadding>
+																			<ListItemButton
+																				sx={{
+																					pl: 4,
+																					color: theme.textColor,
+																					'&:hover': {
+																						backgroundColor: 'rgba(0, 0, 0, 0.04)',
+																					},
+																				}}
+																			>
+																				<ListItemText
+																					primary={
+																						<Typography
+																							variant='body2'
+																							sx={{
+																								fontSize: '1rem',
+																								fontWeight: 600,
+																							}}
+																						>
+																							{child.name}
+																						</Typography>
+																					}
+																				/>
+																			</ListItemButton>
+																		</ListItem>
+																		{child.children?.map((grandchild) => {
+																			const grandchildKey = grandchild.url ?? grandchild.name
+																			return (
+																				<ListItem key={grandchildKey} disablePadding>
+																					<ListItemButton
+																						component={Link}
+																						href={grandchild.url ?? '#'}
+																						onClick={handleMobileToggle}
+																						sx={{
+																							pl: 6,
+																							color: theme.textColor,
+																							'&:hover': {
+																								backgroundColor: 'rgba(0, 0, 0, 0.04)',
+																							},
+																						}}
+																					>
+																						<ListItemText
+																							primary={
+																								<Typography variant='body2'>
+																									{grandchild.name}
+																								</Typography>
+																							}
+																						/>
+																					</ListItemButton>
+																				</ListItem>
+																			)
+																		})}
+																	</Box>
+																)
+															}
+
+															return (
+																<ListItem key={childKey} disablePadding>
+																	<ListItemButton
+																		component={Link}
+																		href={child.url ?? '#'}
+																		onClick={handleMobileToggle}
+																		sx={{
+																			pl: 4,
+																			color: theme.textColor,
+																			'&:hover': {
+																				backgroundColor: 'rgba(0, 0, 0, 0.04)',
+																			},
+																		}}
+																	>
+																		<ListItemText
+																			primary={
+																				<Typography variant='body2'>
+																					{child.name}
+																				</Typography>
+																			}
+																		/>
+																	</ListItemButton>
+																</ListItem>
+															)
+														})}
+													</List>
+												</Collapse>
+											</>
+										) : item.url ? (
+											<ListItem disablePadding>
+												<ListItemButton
+													component={Link}
+													href={item.url}
+													onClick={handleMobileToggle}
+													sx={{
+														color: theme.textColor,
+														'&:hover': {
+															backgroundColor: 'rgba(0, 0, 0, 0.04)',
+														},
+													}}
+												>
+													<ListItemText
+														primary={
+															<Typography
+																variant='body1'
+																sx={{
+																	fontSize: '1.125rem',
+																	fontWeight: 500,
+																}}
+															>
+																{item.name}
+															</Typography>
+														}
+													/>
+												</ListItemButton>
+											</ListItem>
+										) : (
+											<ListItem disablePadding>
+												<ListItemText
+													primary={
+														<Typography
+															variant='body1'
+															sx={{
+																fontSize: '1.125rem',
+																fontWeight: 500,
+																color: theme.textColor,
+															}}
+														>
+															{item.name}
+														</Typography>
+													}
+												/>
+											</ListItem>
+										)}
+									</Box>
+								)
+							})}
+						</List>
+					</Box>
+				</Drawer>
+			</>
+		)
+	}
+
+	return (
+		<Box
+			sx={{
+				display: 'flex',
+				alignItems: 'center',
+				gap: 3,
+			}}
+		>
+			{menuItems.map((item) => {
+				const itemKey = item.url ?? item.name
+				return (
+					<Box key={itemKey}>
+						<DesktopMenuItem item={item} theme={theme} />
+					</Box>
+				)
+			})}
+		</Box>
+	)
+}
