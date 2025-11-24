@@ -1,8 +1,10 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react'
+import { useCallback, useEffect, useMemo, useState, useRef, type ChangeEvent, type FormEvent } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser, faRightFromBracket, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { Menu, MenuItem, IconButton, Box } from '@mui/material'
+import Link from 'next/link'
 import type { AuthUser } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 
@@ -34,6 +36,7 @@ export function LoginControls({
 	const [identifier, setIdentifier] = useState('')
 	const [password, setPassword] = useState('')
 	const [localError, setLocalError] = useState<string | null>(null)
+	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
 	const userLabel = useMemo(() => {
 		if (!user) {
@@ -81,25 +84,136 @@ export function LoginControls({
 		}
 	}, [identifier, onLogin, password])
 
+	const open = Boolean(anchorEl)
+	const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+	const clearCloseTimeout = useCallback(() => {
+		if (closeTimeoutRef.current) {
+			clearTimeout(closeTimeoutRef.current)
+			closeTimeoutRef.current = null
+		}
+	}, [])
+
+	const handleMouseEnter = useCallback((event: React.MouseEvent<HTMLElement>) => {
+		clearCloseTimeout()
+		setAnchorEl(event.currentTarget)
+	}, [clearCloseTimeout])
+
+	const handleMouseLeave = useCallback(() => {
+		// Verzögerung, damit der Benutzer zum Menü navigieren kann
+		clearCloseTimeout()
+		closeTimeoutRef.current = setTimeout(() => {
+			setAnchorEl(null)
+			closeTimeoutRef.current = null
+		}, 300)
+	}, [clearCloseTimeout])
+
+	const handleMenuMouseEnter = useCallback(() => {
+		clearCloseTimeout()
+	}, [clearCloseTimeout])
+
+	const handleMenuMouseLeave = useCallback(() => {
+		clearCloseTimeout()
+		setAnchorEl(null)
+	}, [clearCloseTimeout])
+
+	const handleLogoutClick = useCallback(() => {
+		setAnchorEl(null)
+		handleLogout()
+	}, [handleLogout])
+
 	if (isAuthenticated) {
+
 		return (
-			<div className='flex items-center gap-3'>
-				<span className='flex items-center gap-2 text-sm'>
+			<Box>
+				<Box
+					onMouseEnter={handleMouseEnter}
+					onMouseLeave={handleMouseLeave}
+					sx={{
+						display: 'flex',
+						alignItems: 'center',
+						gap: 1,
+						cursor: 'pointer',
+						padding: '4px 8px',
+						borderRadius: 1,
+						transition: 'background-color 0.2s',
+						'&:hover': {
+							backgroundColor: 'rgba(255, 255, 255, 0.1)',
+						},
+					}}
+					aria-label='Benutzermenü'
+					aria-controls={open ? 'user-menu' : undefined}
+					aria-haspopup='true'
+					aria-expanded={open ? 'true' : undefined}
+				>
 					<FontAwesomeIcon
 						icon={faUser}
-						className='text-green-500'
+						style={{ color: '#22c55e', fontSize: '2rem' }}
 					/>
-					{userLabel}
-				</span>
-				<button
-					type='button'
-					onClick={handleLogout}
-					className='flex items-center gap-2 text-sm transition-colors hover:text-yellow-400'
+					<span style={{ fontSize: '1.4rem', color: theme.headerFooterTextColor }}>{userLabel}</span>
+				</Box>
+				<Menu
+					id='user-menu'
+					anchorEl={anchorEl}
+					open={open}
+					onClose={handleMenuMouseLeave}
+					onMouseEnter={handleMenuMouseEnter}
+					onMouseLeave={handleMenuMouseLeave}
+					MenuListProps={{
+						onMouseEnter: handleMenuMouseEnter,
+						onMouseLeave: handleMenuMouseLeave,
+					}}
+					anchorOrigin={{
+						vertical: 'bottom',
+						horizontal: 'right',
+					}}
+					transformOrigin={{
+						vertical: 'top',
+						horizontal: 'right',
+					}}
+					sx={{
+						'& .MuiPaper-root': {
+							backgroundColor: '#ffffff',
+							color: theme.textColor,
+							mt: 1,
+							minWidth: 180,
+							borderRadius: 2,
+							border: '1px solid rgba(0, 0, 0, 0.08)',
+							boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+						},
+					}}
 				>
-					<FontAwesomeIcon icon={faRightFromBracket} />
-					Logout
-				</button>
-			</div>
+					<MenuItem
+						component={Link}
+						href='/mein-hzd'
+						onClick={() => setAnchorEl(null)}
+						sx={{
+							color: theme.textColor,
+							'&:hover': {
+								backgroundColor: 'rgba(252, 211, 77, 0.1)',
+								color: '#FCD34D',
+							},
+						}}
+					>
+						Mein HZD
+					</MenuItem>
+					<MenuItem
+						onClick={handleLogoutClick}
+						sx={{
+							color: theme.textColor,
+							'&:hover': {
+								backgroundColor: 'rgba(252, 211, 77, 0.1)',
+								color: '#FCD34D',
+							},
+						}}
+					>
+						<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+							<FontAwesomeIcon icon={faRightFromBracket} style={{ fontSize: '0.875rem' }} />
+							Logout
+						</Box>
+					</MenuItem>
+				</Menu>
+			</Box>
 		)
 	}
 

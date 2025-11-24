@@ -1,9 +1,8 @@
 'use client'
 
-import { useCallback, useEffect, useState, useContext } from 'react'
+import { createContext, useContext, useCallback, useEffect, useState, type ReactNode } from 'react'
 import { setGraphQLAuthToken } from '@/lib/graphql-client'
 import type { AuthUser } from '@/types'
-import { AuthContext } from '@/contexts/auth-context'
 
 interface AuthState {
 	token: string | null
@@ -19,6 +18,18 @@ interface StrapiAuthResponse {
 	jwt: string
 	user: AuthUser
 }
+
+interface AuthContextValue {
+	authState: AuthState
+	isAuthenticated: boolean
+	user: AuthUser | null
+	authError: string | null
+	isAuthenticating: boolean
+	handleLogin: (credentials: LoginCredentials) => Promise<void>
+	handleLogout: () => void
+}
+
+export const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
 const AUTH_STORAGE_KEY = 'hzd_auth_state'
 
@@ -59,26 +70,38 @@ function saveAuthState(state: AuthState) {
 	}
 }
 
-export function useAuth(strapiBaseUrl?: string | null) {
-	// Versuche zuerst, den Context zu verwenden (wenn verfügbar)
-	const context = useContext(AuthContext)
+interface AuthProviderProps {
+	children: ReactNode
+	strapiBaseUrl?: string | null
+}
 
-	// Wenn Context verfügbar ist, verwende ihn
-	if (context !== undefined) {
-		return context
-	}
-
-	// Fallback: Alte Implementierung für Komponenten ohne Context
+export function AuthProvider({ children, strapiBaseUrl }: AuthProviderProps) {
 	// Initialisiere immer mit null, um Hydration-Fehler zu vermeiden
 	// Der tatsächliche Wert wird nach dem Mount geladen
 	const [authState, setAuthState] = useState<AuthState>({ token: null, user: null })
 	const [authError, setAuthError] = useState<string | null>(null)
 	const [isAuthenticating, setIsAuthenticating] = useState(false)
 
+	// Lade Auth-Status beim Mount
 	useEffect(() => {
 		const loaded = loadAuthState()
 		if (loaded.token && loaded.user) {
 			setAuthState(loaded)
+		}
+	}, [])
+
+	// Höre auf localStorage Änderungen (für Cross-Tab-Synchronisation)
+	useEffect(() => {
+		const handleStorageChange = (e: StorageEvent) => {
+			if (e.key === AUTH_STORAGE_KEY) {
+				const loaded = loadAuthState()
+				setAuthState(loaded)
+			}
+		}
+
+		window.addEventListener('storage', handleStorageChange)
+		return () => {
+			window.removeEventListener('storage', handleStorageChange)
 		}
 	}, [])
 
@@ -114,6 +137,11 @@ export function useAuth(strapiBaseUrl?: string | null) {
 			setAuthState(newState)
 			setGraphQLAuthToken(result.jwt)
 			saveAuthState(newState)
+
+			// Dispatch custom event für Cross-Component-Synchronisation
+			if (typeof window !== 'undefined') {
+				window.dispatchEvent(new Event('auth-state-changed'))
+			}
 		} catch (error) {
 			if (error instanceof Error) {
 				setAuthError(error.message)
@@ -134,9 +162,27 @@ export function useAuth(strapiBaseUrl?: string | null) {
 		setAuthError(null)
 		setGraphQLAuthToken(null)
 		saveAuthState(newState)
+
+		// Dispatch custom event für Cross-Component-Synchronisation
+		if (typeof window !== 'undefined') {
+			window.dispatchEvent(new Event('auth-state-changed'))
+		}
 	}, [])
 
-	return {
+	// Höre auf custom events für Auth-Status-Änderungen
+	useEffect(() => {
+		const handleAuthStateChange = () => {
+			const loaded = loadAuthState()
+			setAuthState(loaded)
+		}
+
+		window.addEventListener('auth-state-changed', handleAuthStateChange)
+		return () => {
+			window.removeEventListener('auth-state-changed', handleAuthStateChange)
+		}
+	}, [])
+
+	const value: AuthContextValue = {
 		authState,
 		isAuthenticated: Boolean(authState.token),
 		user: authState.user,
@@ -145,6 +191,7 @@ export function useAuth(strapiBaseUrl?: string | null) {
 		handleLogin,
 		handleLogout,
 	}
-}
 
+	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+}
 

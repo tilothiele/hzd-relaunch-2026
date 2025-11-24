@@ -549,6 +549,7 @@ export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    FciLink: Schema.Attribute.String;
     Footer: Schema.Attribute.Component<'layout.footer', false>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -557,14 +558,17 @@ export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
     > &
       Schema.Attribute.Private;
     Logo: Schema.Attribute.Media<'images'>;
+    MagazinLink: Schema.Attribute.String;
     Menu: Schema.Attribute.JSON;
     publishedAt: Schema.Attribute.DateTime;
+    ShopLink: Schema.Attribute.String;
     SocialLinkFB: Schema.Attribute.String;
     SocialLinkYT: Schema.Attribute.String;
     UnserHovawartImage: Schema.Attribute.Media<'images'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    VdhLink: Schema.Attribute.String;
   };
 }
 
