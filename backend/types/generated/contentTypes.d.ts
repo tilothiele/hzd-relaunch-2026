@@ -724,41 +724,6 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiOfficerRoleOfficerRole extends Struct.CollectionTypeSchema {
-  collectionName: 'officer_roles';
-  info: {
-    displayName: 'OfficerRole';
-    pluralName: 'officer-roles';
-    singularName: 'officer-role';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::officer-role.officer-role'
-    > &
-      Schema.Attribute.Private;
-    members: Schema.Attribute.Relation<
-      'manyToMany',
-      'plugin::hzd-plugin.member'
-    >;
-    Name: Schema.Attribute.String;
-    publishedAt: Schema.Attribute.DateTime;
-    RegionalUnit: Schema.Attribute.Enumeration<
-      ['NORD', 'OST', 'S\u00DCD', 'WEST', 'MITTE']
-    >;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
 export interface ApiOrderItemOrderItem extends Struct.CollectionTypeSchema {
   collectionName: 'order_items';
   info: {
@@ -1286,10 +1251,6 @@ export interface PluginHzdPluginMember extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     membershipNo: Schema.Attribute.Integer;
     memberSince: Schema.Attribute.Date;
-    officer_roles: Schema.Attribute.Relation<
-      'manyToMany',
-      'api::officer-role.officer-role'
-    >;
     phone: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 50;
@@ -1670,6 +1631,10 @@ export interface PluginUsersPermissionsRole
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     description: Schema.Attribute.String;
+    localCommunity: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::local-cummunity.local-cummunity'
+    >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -1686,6 +1651,10 @@ export interface PluginUsersPermissionsRole
       'plugin::users-permissions.permission'
     >;
     publishedAt: Schema.Attribute.DateTime;
+    regionalUnit: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::regional-unit.regional-unit'
+    >;
     type: Schema.Attribute.String & Schema.Attribute.Unique;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1773,7 +1742,6 @@ declare module '@strapi/strapi' {
       'api::local-cummunity.local-cummunity': ApiLocalCummunityLocalCummunity;
       'api::merchandising-product.merchandising-product': ApiMerchandisingProductMerchandisingProduct;
       'api::news-article.news-article': ApiNewsArticleNewsArticle;
-      'api::officer-role.officer-role': ApiOfficerRoleOfficerRole;
       'api::order-item.order-item': ApiOrderItemOrderItem;
       'api::order.order': ApiOrderOrder;
       'api::page.page': ApiPagePage;

@@ -1,10 +1,34 @@
 import type { Core } from '@strapi/strapi';
+import { extendJWT } from './extend-jwt';
+import { setupRoles } from './setup-roles';
 
 const bootstrap = async ({ strapi }: { strapi: Core.Strapi }) => {
+	// Erweitere JWT-Service mit member und officer_roles
+	await extendJWT(strapi);
+
 	// Warte kurz, damit Strapi vollständig initialisiert ist
-	await new Promise((resolve) => setTimeout(resolve, 1000))
+	await new Promise((resolve) => setTimeout(resolve, 2000))
 
 	try {
+		// Warte, bis users-permissions Plugin vollständig geladen ist
+		let retries = 0;
+		while (retries < 10) {
+			try {
+				const testRole = await strapi.query('plugin::users-permissions.role').findOne({ where: { type: 'public' } });
+				if (testRole) {
+					break; // Plugin ist bereit
+				}
+			} catch (error) {
+				// Plugin noch nicht bereit, warte weiter
+			}
+			await new Promise((resolve) => setTimeout(resolve, 500));
+			retries++;
+		}
+
+		// Lege Roles an
+		console.log('[HZD Plugin] Setting up roles...')
+		await setupRoles(strapi);
+
 		// GraphQL Permissions für alle Content-Types aktivieren
 		const publicRole = await strapi
 			.query('plugin::users-permissions.role')

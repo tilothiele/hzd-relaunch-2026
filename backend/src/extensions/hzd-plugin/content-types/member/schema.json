@@ -95,12 +95,6 @@
       "options": {
         "preset": "defaultHtml"
       }
-    },
-    "officer_roles": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "api::officer-role.officer-role",
-      "inversedBy": "members"
     }
   }
 }

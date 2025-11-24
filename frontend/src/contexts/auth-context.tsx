@@ -33,6 +33,58 @@ export const AuthContext = createContext<AuthContextValue | undefined>(undefined
 
 const AUTH_STORAGE_KEY = 'hzd_auth_state'
 
+/**
+ * Dekodiert einen Base64URL-String
+ */
+function decodeBase64URL(base64url: string): string {
+	try {
+		// Base64URL dekodieren (ersetzt - durch + und _ durch /)
+		const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/')
+
+		// Padding hinzufügen falls nötig
+		const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4)
+
+		// Base64 dekodieren
+		return atob(padded)
+	} catch (error) {
+		console.error('Fehler beim Dekodieren:', error)
+		throw error
+	}
+}
+
+/**
+ * Dekodiert einen JWT-Token und gibt Header und Payload zurück.
+ * @param token - Der JWT-Token String
+ * @returns Objekt mit header, payload und dem vollständigen Token oder null bei Fehler
+ */
+function decodeJWT(token: string): { header: Record<string, unknown>; payload: Record<string, unknown>; fullToken: string } | null {
+	try {
+		// JWT hat das Format: header.payload.signature
+		const parts = token.split('.')
+		if (parts.length !== 3) {
+			console.error('Ungültiges JWT-Format')
+			return null
+		}
+
+		// Dekodiere Header (erster Teil)
+		const headerDecoded = decodeBase64URL(parts[0])
+		const header = JSON.parse(headerDecoded) as Record<string, unknown>
+
+		// Dekodiere Payload (zweiter Teil)
+		const payloadDecoded = decodeBase64URL(parts[1])
+		const payload = JSON.parse(payloadDecoded) as Record<string, unknown>
+
+		return {
+			header,
+			payload,
+			fullToken: token,
+		}
+	} catch (error) {
+		console.error('Fehler beim Dekodieren des JWT-Tokens:', error)
+		return null
+	}
+}
+
 function loadAuthState(): AuthState {
 	if (typeof window === 'undefined') {
 		return { token: null, user: null }
@@ -132,6 +184,21 @@ export function AuthProvider({ children, strapiBaseUrl }: AuthProviderProps) {
 			const newState: AuthState = {
 				token: result.jwt,
 				user: result.user,
+			}
+
+			// Dekodiere und logge den JWT-Token
+			const decodedToken = decodeJWT(result.jwt)
+			if (decodedToken) {
+				console.log('=== JWT Token Dekodiert ===')
+				console.log('Header:', decodedToken.header)
+				console.log('Payload:', decodedToken.payload)
+				console.log('Vollständiger Token:', decodedToken.fullToken)
+				console.log('Token Länge:', decodedToken.fullToken.length, 'Zeichen')
+				
+				// Zeige auch die User-Daten aus der Response
+				console.log('User-Daten (aus Response):', result.user)
+			} else {
+				console.warn('JWT-Token konnte nicht dekodiert werden')
 			}
 
 			setAuthState(newState)
