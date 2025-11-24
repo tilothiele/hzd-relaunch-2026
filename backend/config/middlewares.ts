@@ -1,7 +1,7 @@
 
 const cors = process.env.CORS_ORIGIN
         ? process.env.CORS_ORIGIN.split(',')
-        : ['http://localhost:1337', 'http://127.0.0.1:1337', 'http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000'];
+        : ['http://localhost:1337', 'http://127.0.0.1:1337', 'http://localhost:3000', 'http://127.0.0.1:3000'];
 
         // Das muss nun in die Umgebungsvariable CORS_ORIGIN eingetragen werden (backend und frontend)
 //      : ['https://hzd-backend.app.tilothiele.de', 'https://hovawarte.app.tilothiele.de']
