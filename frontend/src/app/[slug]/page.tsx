@@ -1,9 +1,8 @@
-'use client'
-
 import Image from 'next/image'
-import { usePage } from '@/hooks/use-page'
 import { MainPageStructure } from '../main-page-structure'
 import { themes } from '@/themes'
+import { fetchPageBySlug, fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
+import { renderServerSections } from '@/components/sections/server-section-factory'
 
 interface PageProps {
 	params: Promise<{
@@ -39,34 +38,61 @@ function NotFoundSection() {
 	)
 }
 
-export default function Page({ params }: PageProps) {
-	const pageData = usePage(params)
-	const { page, globalLayout, baseUrl, status } = pageData
-	const theme = themes[page?.FarbThema ?? 'A']
+export default async function Page({ params }: PageProps) {
+	const { slug } = await params
 
-	if (status.type === 'loading' || !globalLayout || !baseUrl) {
-		return <MainPageStructure homepage={globalLayout} strapiBaseUrl={baseUrl} loading={true}>{null}</MainPageStructure>
+	if (!slug || slug.trim().length === 0) {
+		// Lade Layout für 404-Seite
+		const { globalLayout, baseUrl } = await fetchGlobalLayout()
+		return (
+			<MainPageStructure
+				homepage={globalLayout}
+				strapiBaseUrl={baseUrl}
+				pageTitle='404 - Seite nicht gefunden'
+			>
+				<NotFoundSection />
+			</MainPageStructure>
+		)
 	}
 
-	if (status.type === 'error') {
+	const { page, globalLayout, baseUrl, error } = await fetchPageBySlug(slug.trim())
+
+	if (error) {
 		return (
 			<MainPageStructure homepage={globalLayout} strapiBaseUrl={baseUrl}>
 				<div className='flex min-h-[50vh] items-center justify-center px-4 text-center text-sm text-gray-600'>
-					<p>{status.message}</p>
+					<p>{error.message ?? 'Fehler beim Laden der Seite.'}</p>
 				</div>
 			</MainPageStructure>
 		)
 	}
 
-	if (!page || status.type === 'empty') {
+	if (!globalLayout) {
 		return (
-			<MainPageStructure homepage={globalLayout} strapiBaseUrl={baseUrl} pageTitle='404 - Seite nicht gefunden'>
+			<MainPageStructure homepage={null} strapiBaseUrl={baseUrl}>
+				<div className='flex min-h-[50vh] items-center justify-center px-4 text-center text-sm text-gray-600'>
+					<p>Keine Daten verfügbar. Bitte Strapi Backend starten und Daten anlegen.</p>
+				</div>
+			</MainPageStructure>
+		)
+	}
+
+	if (!page) {
+		// Seite nicht gefunden - zeige schöne 404-Seite mit Layout
+		return (
+			<MainPageStructure
+				homepage={globalLayout}
+				strapiBaseUrl={baseUrl}
+				pageTitle='404 - Seite nicht gefunden'
+			>
 				<NotFoundSection />
 			</MainPageStructure>
 		)
 	}
 
 	const sections = page.Sections || []
+	const theme = themes[page.FarbThema ?? 'A']
+	const renderedSections = renderServerSections({ sections, strapiBaseUrl: baseUrl })
 
 	return (
 		<MainPageStructure
@@ -74,7 +100,8 @@ export default function Page({ params }: PageProps) {
 			theme={theme}
 			strapiBaseUrl={baseUrl}
 			pageTitle={page.title}
-			sections={sections}
-		/>
+		>
+			{renderedSections}
+		</MainPageStructure>
 	)
 }

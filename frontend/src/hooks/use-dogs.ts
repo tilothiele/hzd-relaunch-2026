@@ -102,15 +102,37 @@ export function useDogs(options: UseDogsOptions = {}) {
 			}
 
 			if (sod1testFilter !== '') {
-				filterConditions.push({
-					Sod1Test: { eq: sod1testFilter === true },
-				})
+				if (sod1testFilter === true) {
+					// Suche nach explizit "Ja" (true)
+					filterConditions.push({
+						Sod1Test: { eq: true },
+					})
+				} else {
+					// Suche nach "Nein" (false ODER null/undefined)
+					filterConditions.push({
+						or: [
+							{ Sod1Test: { eq: false } },
+							{ Sod1Test: { null: true } },
+						],
+					})
+				}
 			}
 
 			if (hdtestFilter !== '') {
-				filterConditions.push({
-					HDTest: { eq: hdtestFilter === true },
-				})
+				if (hdtestFilter === true) {
+					// Suche nach explizit "Ja" (true)
+					filterConditions.push({
+						HDTest: { eq: true },
+					})
+				} else {
+					// Suche nach "Nein" (false ODER null/undefined)
+					filterConditions.push({
+						or: [
+							{ HDTest: { eq: false } },
+							{ HDTest: { null: true } },
+						],
+					})
+				}
 			}
 
 			const variables: Record<string, unknown> = {
