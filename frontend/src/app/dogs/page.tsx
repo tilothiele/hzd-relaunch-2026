@@ -1,16 +1,29 @@
-'use client'
-
-import { useGlobalLayout } from '@/hooks/use-global-layout'
 import { MainPageStructure } from '../main-page-structure'
 import { DogSearch } from '@/components/dog-search/dog-search'
 import { themes } from '@/themes'
-import { useTheme } from '@/hooks/use-theme'
+import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 
-export default function DogsPage() {
-	const { globalLayout, isLoading, error, baseUrl } = useGlobalLayout()
+export default async function DogsPage() {
+	const { globalLayout, baseUrl, error } = await fetchGlobalLayout()
 	const theme = themes.B
+
+	if (error) {
+		return (
+			<MainPageStructure homepage={globalLayout} strapiBaseUrl={baseUrl}>
+				<div className='flex min-h-[50vh] items-center justify-center px-4 text-center text-sm text-gray-600'>
+					<p>{error.message ?? 'Fehler beim Laden der Seite.'}</p>
+				</div>
+			</MainPageStructure>
+		)
+	}
+
 	return (
-		<MainPageStructure homepage={globalLayout} strapiBaseUrl={baseUrl} loading={isLoading} theme={theme} pageTitle='Hunde'>
+		<MainPageStructure
+			homepage={globalLayout}
+			strapiBaseUrl={baseUrl}
+			theme={theme}
+			pageTitle='Hunde'
+		>
 			<DogSearch strapiBaseUrl={baseUrl} />
 		</MainPageStructure>
 	)

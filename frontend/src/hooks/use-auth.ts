@@ -59,7 +59,9 @@ function saveAuthState(state: AuthState) {
 }
 
 export function useAuth(strapiBaseUrl?: string | null) {
-	const [authState, setAuthState] = useState<AuthState>(loadAuthState)
+	// Initialisiere immer mit null, um Hydration-Fehler zu vermeiden
+	// Der tatsächliche Wert wird nach dem Mount geladen
+	const [authState, setAuthState] = useState<AuthState>({ token: null, user: null })
 	const [authError, setAuthError] = useState<string | null>(null)
 	const [isAuthenticating, setIsAuthenticating] = useState(false)
 
@@ -75,7 +77,8 @@ export function useAuth(strapiBaseUrl?: string | null) {
 		setAuthError(null)
 
 		try {
-			const response = await fetch(`${strapiBaseUrl}/api/auth/local`, {
+			// Verwende Next.js API-Route als Proxy, um CORS-Probleme zu vermeiden
+			const response = await fetch('/api/auth/local', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

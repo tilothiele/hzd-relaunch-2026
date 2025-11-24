@@ -25,31 +25,38 @@ export async function fetchGraphQL<T>(
 	query: string,
 	options: FetchGraphQLOptions = {},
 ): Promise<T> {
-	const { variables, token, baseUrl } = options
+	const { variables, token } = options
 
 	const effectiveToken = token ?? persistedAuthToken
-	const resolvedBaseUrl = baseUrl ?? persistedBaseUrl
 
-	if (!resolvedBaseUrl || resolvedBaseUrl.trim().length === 0) {
-		throw new Error('Strapi Base URL ist nicht gesetzt. Bitte Konfiguration laden.')
-	}
-
-	const effectiveBaseUrl = resolvedBaseUrl.replace(/\/$/, '')
-	const endpoint = `${effectiveBaseUrl}/graphql`
-	const client = new GraphQLClient(endpoint)
-
-	if (effectiveToken) {
-		client.setHeader('Authorization', `Bearer ${effectiveToken}`)
-	}
-
+	// Verwende Next.js API-Route als Proxy, um CORS-Probleme zu vermeiden
 	try {
-		const data = await client.request<T>(query, variables)
+		const response = await fetch('/api/graphql', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				query,
+				variables,
+				token: effectiveToken,
+			}),
+		})
+
+		if (!response.ok) {
+			const errorData = await response.json().catch(() => null)
+			const errorMessage = errorData?.error?.message ?? 'GraphQL-Anfrage fehlgeschlagen'
+			throw new Error(errorMessage)
+		}
+
+		const data = (await response.json()) as T
 		return data
 	} catch (error) {
 		console.error('GraphQL Error:', error)
 		if (error instanceof Error) {
 			console.error('Error message:', error.message)
+			throw error
 		}
-		throw error
+		throw new Error('GraphQL-Anfrage fehlgeschlagen')
 	}
 }
