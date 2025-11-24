@@ -1,5 +1,3 @@
-'use client'
-
 import { Box, Paper, Typography, Container } from '@mui/material'
 import type { SimpleCtaSection } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'

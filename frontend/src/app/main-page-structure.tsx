@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, type CSSProperties } from 'react'
-import type { GlobalLayout } from '@/types'
+import type { GlobalLayout, StartpageSection } from '@/types'
 import { Header } from '@/components/header/header'
 import { Footer } from '@/components/footer/footer'
 import { CookieBanner } from '@/components/cookie-banner/cookie-banner'
@@ -9,6 +9,7 @@ import { themes } from '@/themes'
 import { useAuth } from '@/hooks/use-auth'
 import { Skeleton } from '@chakra-ui/react'
 import { DEFAULT_THEME_ID, ThemeDefinition } from '@/themes'
+import { renderStartpageSections } from '@/components/sections/section-factory'
 
 const textSkeletonKeys = [
 	'text-primary',
@@ -53,11 +54,12 @@ interface MainPageStructure {
 	pageTitle?: string | null
 	strapiBaseUrl?: string | null
 	theme?: ThemeDefinition | null
-	children: React.ReactNode
+	children?: React.ReactNode
+	sections?: StartpageSection[] | null
 	loading?: boolean
 }
 
-export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pageTitle, theme, children }: MainPageStructure) {
+export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pageTitle, theme, children, sections }: MainPageStructure) {
 	const {
 		isAuthenticated,
 		user,
@@ -79,6 +81,11 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 		return <MainPageSkeleton />
 	}
 
+	// Bevorzuge children (Server Components), falls vorhanden, sonst rendere sections (Client Components)
+	const content = children ?? (sections && strapiBaseUrl
+		? renderStartpageSections({ sections, strapiBaseUrl })
+		: null)
+
 	return (
 		<div style={themeStyles}>
 			<Header
@@ -94,7 +101,7 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 				error={authError}
 			/>
 			<main className='flex flex-col'>
-				{children}
+				{content}
 			</main>
 			<Footer
 				globalLayout={homepage}

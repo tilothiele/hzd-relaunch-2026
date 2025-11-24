@@ -19,3 +19,4 @@ export function DogPerformanceTab({ dog, strapiBaseUrl }: DogPerformanceTabProps
 }
 
 
+

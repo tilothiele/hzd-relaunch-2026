@@ -1,5 +1,3 @@
-'use client'
-
 import { Box, Card, CardContent, Typography } from '@mui/material'
 import type { CardItem, CardSection } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'

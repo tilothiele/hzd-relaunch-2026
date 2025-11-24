@@ -1,26 +1,37 @@
-'use client'
-
 import { MainPageStructure } from './main-page-structure'
-import { useIndexPage } from '@/hooks/use-index-page'
-import { renderStartpageSections } from '@/components/sections/section-factory'
 import { themes } from '@/themes'
+import { fetchIndexPage } from '@/lib/server/fetch-index-page'
+import { renderServerSections } from '@/components/sections/server-section-factory'
 
+export default async function Home() {
+	const { globalLayout, baseUrl, error } = await fetchIndexPage()
+	const sections = globalLayout?.Sections ?? []
 
-
-export default function Home() {
-	const indexPage = useIndexPage()
-	const { globalLayout, baseUrl, status } = indexPage
-	const sections = indexPage?.globalLayout?.Sections ?? []
-
-	if (status.type) {
+	if (error) {
 		return (
 			<div className='flex min-h-screen items-center justify-center px-4 text-center text-sm text-gray-600'>
-				<p>{status.message}</p>
+				<p>{error.message ?? 'Fehler beim Laden der Seite.'}</p>
 			</div>
 		)
 	}
 
-	return <MainPageStructure homepage={globalLayout} strapiBaseUrl={baseUrl!} theme={themes.A}>
-		{renderStartpageSections({ sections, strapiBaseUrl: baseUrl! })}
-	</MainPageStructure>
+	if (!globalLayout) {
+		return (
+			<div className='flex min-h-screen items-center justify-center px-4 text-center text-sm text-gray-600'>
+				<p>Keine Daten verfügbar. Bitte Strapi Backend starten und Daten anlegen.</p>
+			</div>
+		)
+	}
+
+	const renderedSections = renderServerSections({ sections, strapiBaseUrl: baseUrl })
+
+	return (
+		<MainPageStructure
+			homepage={globalLayout}
+			strapiBaseUrl={baseUrl}
+			theme={themes.A}
+		>
+			{renderedSections}
+		</MainPageStructure>
+	)
 }

@@ -1,5 +1,3 @@
-'use client'
-
 import Image from 'next/image'
 import type { TeaserTextWithImageSection } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'

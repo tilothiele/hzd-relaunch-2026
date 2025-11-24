@@ -16,3 +16,4 @@ export function DogPersonalWordsTab({ dog, strapiBaseUrl }: DogPersonalWordsTabP
 }
 
 
+

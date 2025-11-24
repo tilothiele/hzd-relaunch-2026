@@ -13,7 +13,7 @@ export function getStrapiBaseUrl(): string {
 	}
 
 	throw new Error(
-		'Strapi Base URL ist nicht gesetzt. Bitte STRAPI_BASE_URL oder NEXT_PUBLIC_STRAPI_BASE_URL in der Umgebungsvariable setzen.',
+		'Strapi Base URL ist nicht gesetzt. Bitte STRAPI_BASE_URL in der Umgebungsvariable setzen.',
 	)
 }
 

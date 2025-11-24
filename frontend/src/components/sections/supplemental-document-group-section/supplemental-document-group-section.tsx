@@ -1,6 +1,3 @@
-'use client'
-
-import { useMemo } from 'react'
 import type { SupplementalDocumentGroupSection, SupplementalDocument } from '@/types'
 
 interface SupplementalDocumentGroupSectionComponentProps {
@@ -44,27 +41,28 @@ function formatFileSize(bytes: number | null | undefined): string {
 	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
+function getVisibleDocuments(documentGroup: SupplementalDocumentGroupSection['supplemental_document_group']): SupplementalDocument[] {
+	if (!documentGroup?.supplemental_documents) {
+		return []
+	}
+
+	return documentGroup.supplemental_documents
+		.filter(isDocumentVisible)
+		.sort((a, b) => {
+			// Sortiere nach Name, falls SortOrd nicht vorhanden
+			if (!a.Name || !b.Name) {
+				return 0
+			}
+			return a.Name.localeCompare(b.Name, 'de')
+		})
+}
+
 export function SupplementalDocumentGroupSectionComponent({
 	section,
 	strapiBaseUrl,
 }: SupplementalDocumentGroupSectionComponentProps) {
 	const documentGroup = section.supplemental_document_group
-
-	const visibleDocuments = useMemo(() => {
-		if (!documentGroup?.supplemental_documents) {
-			return []
-		}
-
-		return documentGroup.supplemental_documents
-			.filter(isDocumentVisible)
-			.sort((a, b) => {
-				// Sortiere nach Name, falls SortOrd nicht vorhanden
-				if (!a.Name || !b.Name) {
-					return 0
-				}
-				return a.Name.localeCompare(b.Name, 'de')
-			})
-	}, [documentGroup])
+	const visibleDocuments = getVisibleDocuments(documentGroup)
 
 	if (!documentGroup || visibleDocuments.length === 0) {
 		return null

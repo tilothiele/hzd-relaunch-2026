@@ -2,7 +2,6 @@
 
 import Image from 'next/image'
 import { usePage } from '@/hooks/use-page'
-import { renderStartpageSections } from '@/components/sections/section-factory'
 import { MainPageStructure } from '../main-page-structure'
 import { themes } from '@/themes'
 
@@ -70,8 +69,12 @@ export default function Page({ params }: PageProps) {
 	const sections = page.Sections || []
 
 	return (
-		<MainPageStructure homepage={globalLayout} theme={theme} strapiBaseUrl={baseUrl} pageTitle={page.title}>
-			{renderStartpageSections({ sections, strapiBaseUrl: baseUrl })}
-		</MainPageStructure>
+		<MainPageStructure
+			homepage={globalLayout}
+			theme={theme}
+			strapiBaseUrl={baseUrl}
+			pageTitle={page.title}
+			sections={sections}
+		/>
 	)
 }
