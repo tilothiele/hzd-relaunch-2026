@@ -17,6 +17,13 @@
       "options": {
         "preset": "defaultHtml"
       }
+    },
+    "RichTextOddEven": {
+      "type": "enumeration",
+      "enum": [
+        "Odd",
+        "Even"
+      ]
     }
   },
   "config": {}

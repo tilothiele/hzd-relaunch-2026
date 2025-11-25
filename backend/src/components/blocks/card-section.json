@@ -13,6 +13,13 @@
       "component": "blocks.card-item",
       "repeatable": true,
       "min": 1
+    },
+    "CardColumnsOddEven": {
+      "type": "enumeration",
+      "enum": [
+        "Odd",
+        "Even"
+      ]
     }
   },
   "config": {}

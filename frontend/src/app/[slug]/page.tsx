@@ -92,7 +92,7 @@ export default async function Page({ params }: PageProps) {
 
 	const sections = page.Sections || []
 	const theme = themes[page.FarbThema ?? 'A']
-	const renderedSections = renderServerSections({ sections, strapiBaseUrl: baseUrl })
+	const renderedSections = renderServerSections({ sections, strapiBaseUrl: baseUrl, theme })
 
 	return (
 		<MainPageStructure

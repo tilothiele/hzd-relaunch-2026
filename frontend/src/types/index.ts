@@ -37,11 +37,13 @@ export interface CardItem {
 
 export interface CardSection {
 	__typename: 'ComponentBlocksCardSection'
+	CardColumnsOddEven?: 'Odd' | 'Even' | null
 	CardItem?: CardItem[] | null
 }
 
 export interface RichTextSection {
 	__typename: 'ComponentBlocksRichTextSection'
+	RichTextOddEven?: 'Odd' | 'Even' | null
 	RichTextContent?: string | null
 }
 
@@ -72,12 +74,14 @@ export interface SupplementalDocumentGroup {
 
 export interface SupplementalDocumentGroupSection {
 	__typename: 'ComponentBlocksSupplementalDocumentGroupSection'
+	SupplementalsOddEven?: 'Odd' | 'Even' | null
 	GroupHeadline?: string | null
 	supplemental_document_group?: SupplementalDocumentGroup | null
 }
 
 export interface TeaserTextWithImageSection {
 	__typename: 'ComponentBlocksTeaserTextWithImage'
+	TeaserOddEven?: 'Odd' | 'Even' | null
 	TeaserHeadline?: string | null
 	TeaserText?: string | null
 	Image?: Image | null
@@ -101,6 +105,7 @@ export interface TextColumn {
 
 export interface TextColumnsSection {
 	__typename: 'ComponentBlocksTextColumnsSection'
+	TextColumnsOddEven?: 'Odd' | 'Even' | null
 	TextColumnsHeadline?: string | null
 	TextColumnsSubHeadline?: string | null
 	TextColumn?: TextColumn[] | null
@@ -108,12 +113,14 @@ export interface TextColumnsSection {
 
 export interface ImageGallerySection {
 	__typename: 'ComponentBlocksImageGallerySection'
+	OddEven?: 'Odd' | 'Even' | null
 	GalleryHeadline?: string | null
 	GalleryImages?: Image[] | null
 }
 
 export interface SimpleCtaSection {
 	__typename: 'ComponentBlocksSimpleCtaSection'
+	OddEven?: 'Odd' | 'Even' | null
 	CtaHeadline?: string | null
 	CtaInfoText?: string | null
 	CtaBackgroundImage?: Image | null

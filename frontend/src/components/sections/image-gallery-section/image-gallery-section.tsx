@@ -2,12 +2,14 @@
 
 import PhotoAlbum from 'react-photo-album'
 import type { ImageGallerySection, Image } from '@/types'
+import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import type { Photo } from 'react-photo-album'
 
 interface ImageGallerySectionComponentProps {
 	section: ImageGallerySection
 	strapiBaseUrl: string
+	theme: ThemeDefinition
 }
 
 function convertToPhotoAlbumImages(
@@ -33,6 +35,7 @@ function convertToPhotoAlbumImages(
 export function ImageGallerySectionComponent({
 	section,
 	strapiBaseUrl,
+	theme,
 }: ImageGallerySectionComponentProps) {
 	const images = section.GalleryImages?.filter(
 		(image): image is Image => Boolean(image),
@@ -43,9 +46,17 @@ export function ImageGallerySectionComponent({
 	}
 
 	const photos = convertToPhotoAlbumImages(images, strapiBaseUrl)
+	const backgroundColor = section.OddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
 
 	return (
-		<section className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em' }}>
+		<section
+			className='flex w-full justify-center px-4'
+			style={{
+				paddingTop: '1em',
+				paddingBottom: '1em',
+				backgroundColor,
+			}}
+		>
 			<div className='w-full max-w-6xl'>
 				{section.GalleryHeadline ? (
 					<h2 className='mb-8 text-3xl font-semibold text-gray-900'>

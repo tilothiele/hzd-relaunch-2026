@@ -1,8 +1,10 @@
 import type { SupplementalDocumentGroupSection, SupplementalDocument } from '@/types'
+import type { ThemeDefinition } from '@/themes'
 
 interface SupplementalDocumentGroupSectionComponentProps {
 	section: SupplementalDocumentGroupSection
 	strapiBaseUrl: string
+	theme: ThemeDefinition
 }
 
 function isDocumentVisible(document: SupplementalDocument | null | undefined): boolean {
@@ -60,6 +62,7 @@ function getVisibleDocuments(documentGroup: SupplementalDocumentGroupSection['su
 export function SupplementalDocumentGroupSectionComponent({
 	section,
 	strapiBaseUrl,
+	theme,
 }: SupplementalDocumentGroupSectionComponentProps) {
 	const documentGroup = section.supplemental_document_group
 	const visibleDocuments = getVisibleDocuments(documentGroup)
@@ -69,9 +72,10 @@ export function SupplementalDocumentGroupSectionComponent({
 	}
 
 	const groupName = documentGroup.Name || section.GroupHeadline || 'Dokumente'
+	const backgroundColor = section.SupplementalsOddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
 
 	return (
-		<section className='mb-16 px-4'>
+		<section className='mb-16 px-4' style={{ backgroundColor }}>
 			<div className='mx-auto w-full max-w-4xl'>
 				{section.GroupHeadline ? (
 					<h2 className='mb-6 text-3xl font-bold text-gray-900'>{section.GroupHeadline}</h2>

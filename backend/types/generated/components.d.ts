@@ -21,6 +21,7 @@ export interface BlocksCardSection extends Struct.ComponentSchema {
     displayName: 'Card Section';
   };
   attributes: {
+    CardColumnsOddEven: Schema.Attribute.Enumeration<['Odd', 'Even']>;
     CardItem: Schema.Attribute.Component<'blocks.card-item', true> &
       Schema.Attribute.SetMinMax<
         {
@@ -76,6 +77,7 @@ export interface BlocksRichTextSection extends Struct.ComponentSchema {
           preset: 'defaultHtml';
         }
       >;
+    RichTextOddEven: Schema.Attribute.Enumeration<['Odd', 'Even']>;
     Subtitle: Schema.Attribute.String;
     Title: Schema.Attribute.String;
   };
@@ -127,6 +129,7 @@ export interface BlocksSupplementalDocumentGroupSection
       'oneToOne',
       'api::supplemental-document-group.supplemental-document-group'
     >;
+    SupplementalsOddEven: Schema.Attribute.Enumeration<['Odd', 'Even']>;
   };
 }
 
@@ -140,6 +143,7 @@ export interface BlocksTeaserTextWithImage extends Struct.ComponentSchema {
     Image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     ImagePosition: Schema.Attribute.Enumeration<['Left', 'Right']>;
     TeaserHeadline: Schema.Attribute.String;
+    TeaserOddEven: Schema.Attribute.Enumeration<['Odd', 'Even']>;
     TeaserText: Schema.Attribute.RichText &
       Schema.Attribute.CustomField<
         'plugin::ckeditor5.CKEditor',
@@ -158,6 +162,7 @@ export interface BlocksTextColumnsSection extends Struct.ComponentSchema {
   attributes: {
     TextColumn: Schema.Attribute.Component<'columns.text-column', true>;
     TextColumnsHeadline: Schema.Attribute.String;
+    TextColumnsOddEven: Schema.Attribute.Enumeration<['Odd', 'Even']>;
     TextColumnsSubHeadline: Schema.Attribute.String;
   };
 }

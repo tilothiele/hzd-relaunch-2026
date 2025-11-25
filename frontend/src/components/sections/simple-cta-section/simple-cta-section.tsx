@@ -1,18 +1,21 @@
 import { Box, Paper, Typography, Container } from '@mui/material'
 import type { SimpleCtaSection } from '@/types'
+import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { ActionButton } from '@/components/ui/action-button'
-import { themes } from '@/themes'
 
 interface SimpleCtaSectionComponentProps {
 	section: SimpleCtaSection
 	strapiBaseUrl: string
+	theme: ThemeDefinition
 }
 
 export function SimpleCtaSectionComponent({
 	section,
 	strapiBaseUrl,
+	theme,
 }: SimpleCtaSectionComponentProps) {
+	const backgroundColor = section.OddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
 	const backgroundImageUrl = resolveMediaUrl(section.CtaBackgroundImage, strapiBaseUrl)
 	const headline = section.CtaHeadline
 	const text = section.CtaInfoText
@@ -31,8 +34,9 @@ export function SimpleCtaSectionComponent({
 				position: 'relative',
 				minHeight: '500px',
 				width: '100%',
+				backgroundColor: backgroundColor,
 				backgroundImage: backgroundImageUrl ? `url('${backgroundImageUrl}')` : undefined,
-				backgroundAttachment: 'fixed',
+				backgroundAttachment: backgroundImageUrl ? 'fixed' : undefined,
 				backgroundPosition: 'center',
 				backgroundRepeat: 'no-repeat',
 				backgroundSize: 'cover',
@@ -109,7 +113,7 @@ export function SimpleCtaSectionComponent({
 									<ActionButton
 										key={actionButton.Link ?? index}
 										actionButton={actionButton}
-										theme={themes.C}
+										theme={theme}
 									/>
 								))}
 							</Box>

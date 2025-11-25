@@ -4,11 +4,13 @@ import { useState, useCallback } from 'react'
 import { Box, Typography, Accordion, AccordionSummary, AccordionDetails } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import type { TextColumnsSection, BulletItem } from '@/types'
+import type { ThemeDefinition } from '@/themes'
 import { ActionButton } from '@/components/ui/action-button'
 
 interface TextColumnsSectionComponentProps {
 	section: TextColumnsSection
 	strapiBaseUrl: string
+	theme: ThemeDefinition
 }
 
 interface BulletItemAccordionProps {
@@ -82,6 +84,7 @@ function BulletItemAccordion({
 export function TextColumnsSectionComponent({
 	section,
 	strapiBaseUrl,
+	theme,
 }: TextColumnsSectionComponentProps) {
 	const [openItems, setOpenItems] = useState<Set<string>>(new Set())
 
@@ -105,6 +108,8 @@ export function TextColumnsSectionComponent({
 		return null
 	}
 
+	const backgroundColor = section.TextColumnsOddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
+
 	return (
 		<Box
 			component='section'
@@ -114,6 +119,7 @@ export function TextColumnsSectionComponent({
 				px: 2,
 				display: 'flex',
 				justifyContent: 'center',
+				backgroundColor,
 			}}
 		>
 			<Box sx={{ width: '100%', maxWidth: '1200px' }}>

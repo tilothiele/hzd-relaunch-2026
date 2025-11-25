@@ -1,16 +1,19 @@
 import Image from 'next/image'
 import type { TeaserTextWithImageSection } from '@/types'
+import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { ActionButton } from '@/components/ui/action-button'
 
 interface TeaserTextWithImageSectionComponentProps {
 	section: TeaserTextWithImageSection
 	strapiBaseUrl: string
+	theme: ThemeDefinition
 }
 
 export function TeaserTextWithImageSectionComponent({
 	section,
 	strapiBaseUrl,
+	theme,
 }: TeaserTextWithImageSectionComponentProps) {
 	const imageUrl = resolveMediaUrl(section.Image, strapiBaseUrl)
 	const imageAlt = section.Image?.alternativeText ?? 'Teaser Bild'
@@ -24,9 +27,17 @@ export function TeaserTextWithImageSectionComponent({
 	}
 
 	const isImageLeft = imagePosition === 'left'
+	const backgroundColor = section.TeaserOddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
 
 	return (
-		<section className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em' }}>
+		<section 
+			className='flex w-full justify-center px-4' 
+			style={{ 
+				paddingTop: '1em', 
+				paddingBottom: '1em',
+				backgroundColor,
+			}}
+		>
 			<div className='w-full max-w-6xl'>
 				<div className={`grid gap-8 md:grid-cols-2 ${isImageLeft ? '' : 'md:[&>*:first-child]:order-2 md:[&>*:last-child]:order-1'}`}>
 					{imageUrl ? (

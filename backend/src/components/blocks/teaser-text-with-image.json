@@ -36,6 +36,13 @@
         "Left",
         "Right"
       ]
+    },
+    "TeaserOddEven": {
+      "type": "enumeration",
+      "enum": [
+        "Odd",
+        "Even"
+      ]
     }
   },
   "config": {}

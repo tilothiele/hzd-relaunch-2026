@@ -1,4 +1,5 @@
 import type { StartpageSection } from '@/types'
+import type { ThemeDefinition } from '@/themes'
 import { HeroSectionSlideShowComponent } from './hero-section-slide-show/hero-section-slide-show'
 import { CardSectionComponent } from './card-section/card-section'
 import { RichTextSectionComponent } from './rich-text-section/rich-text-section'
@@ -11,12 +12,14 @@ import { SimpleCtaSectionComponent } from './simple-cta-section/simple-cta-secti
 interface RenderSectionParams {
 	section: StartpageSection
 	strapiBaseUrl: string
+	theme: ThemeDefinition
 	key: string
 }
 
 function renderSection({
 	section,
 	strapiBaseUrl,
+	theme,
 	key,
 }: RenderSectionParams) {
 	switch (section.__typename) {
@@ -26,6 +29,7 @@ function renderSection({
 				key={key}
 				section={section}
 				strapiBaseUrl={strapiBaseUrl}
+				theme={theme}
 			/>
 		)
 	case 'ComponentBlocksCardSection':
@@ -34,6 +38,7 @@ function renderSection({
 				key={key}
 				section={section}
 				strapiBaseUrl={strapiBaseUrl}
+				theme={theme}
 			/>
 		)
 	case 'ComponentBlocksRichTextSection':
@@ -42,6 +47,7 @@ function renderSection({
 				key={key}
 				section={section}
 				strapiBaseUrl={strapiBaseUrl}
+				theme={theme}
 			/>
 		)
 	case 'ComponentBlocksSupplementalDocumentGroupSection':
@@ -50,6 +56,7 @@ function renderSection({
 				key={key}
 				section={section}
 				strapiBaseUrl={strapiBaseUrl}
+				theme={theme}
 			/>
 		)
 	case 'ComponentBlocksTeaserTextWithImage':
@@ -58,6 +65,7 @@ function renderSection({
 				key={key}
 				section={section}
 				strapiBaseUrl={strapiBaseUrl}
+				theme={theme}
 			/>
 		)
 	case 'ComponentBlocksTextColumnsSection':
@@ -66,6 +74,7 @@ function renderSection({
 				key={key}
 				section={section}
 				strapiBaseUrl={strapiBaseUrl}
+				theme={theme}
 			/>
 		)
 	case 'ComponentBlocksImageGallerySection':
@@ -74,6 +83,7 @@ function renderSection({
 				key={key}
 				section={section}
 				strapiBaseUrl={strapiBaseUrl}
+				theme={theme}
 			/>
 		)
 	case 'ComponentBlocksSimpleCtaSection':
@@ -82,6 +92,7 @@ function renderSection({
 				key={key}
 				section={section}
 				strapiBaseUrl={strapiBaseUrl}
+				theme={theme}
 			/>
 		)
 	default:
@@ -92,9 +103,11 @@ function renderSection({
 export function renderServerSections({
 	sections,
 	strapiBaseUrl,
+	theme,
 }: {
 	sections: StartpageSection[] | null | undefined
 	strapiBaseUrl: string
+	theme: ThemeDefinition
 }) {
 	if (!sections?.length) {
 		return null
@@ -103,7 +116,7 @@ export function renderServerSections({
 	return sections
 		.map((section, index) => {
 			const key = `${section.__typename}-${index}`
-			return renderSection({ section, strapiBaseUrl, key })
+			return renderSection({ section, strapiBaseUrl, theme, key })
 		})
 		.filter((node) => node !== null)
 }

@@ -15,6 +15,13 @@
       "type": "component",
       "component": "columns.text-column",
       "repeatable": true
+    },
+    "TextColumnsOddEven": {
+      "type": "enumeration",
+      "enum": [
+        "Odd",
+        "Even"
+      ]
     }
   },
   "config": {}

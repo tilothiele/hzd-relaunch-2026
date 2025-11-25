@@ -8,6 +8,8 @@ export interface ThemeDefinition {
 	buttonColor: string
 	buttonTextColor: string
 	headerFooterTextColor: string
+	oddBgColor: string
+	evenBgColor: string
 	name: string
 }
 
@@ -20,6 +22,8 @@ export const themes: Record<ThemeId, ThemeDefinition> = {
 		textColor: '#565757',
 		buttonColor: '#64574E',
 		buttonTextColor: '#ffffff',
+		oddBgColor: '#f2f2f2',
+		evenBgColor: '#ffffff',
 		name: 'Klassisch',
 	},
 	B: {
@@ -30,6 +34,8 @@ export const themes: Record<ThemeId, ThemeDefinition> = {
 		buttonColor: '#90C6BF',
 		buttonTextColor: '#ffffff',
 		textColor: '#565757',
+		oddBgColor: '#f2f2f2',
+		evenBgColor: '#ffffff',
 		name: 'Nordic Breeze',
 	},
 	C: {
@@ -40,6 +46,8 @@ export const themes: Record<ThemeId, ThemeDefinition> = {
 		buttonColor: '#FAD857',
 		buttonTextColor: '#ffffff',
 		textColor: '#565757',
+		oddBgColor: '#f2f2f2',
+		evenBgColor: '#ffffff',
 		name: 'Sommerlicht',
 	},
 	D: {
@@ -50,6 +58,8 @@ export const themes: Record<ThemeId, ThemeDefinition> = {
 		textColor: '#565757',
 		buttonColor: '#A8267D',
 		buttonTextColor: '#ffffff',
+		oddBgColor: '#f2f2f2',
+		evenBgColor: '#ffffff',
 		name: 'Beerenzauber',
 	},
 }

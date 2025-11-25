@@ -1,5 +1,6 @@
 import { Box, Card, CardContent, Typography } from '@mui/material'
 import type { CardItem, CardSection } from '@/types'
+import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { getThemeById, type ThemeId } from '@/themes'
 import { ActionButton } from '@/components/ui/action-button'
@@ -7,6 +8,7 @@ import { ActionButton } from '@/components/ui/action-button'
 interface CardSectionComponentProps {
 	section: CardSection
 	strapiBaseUrl: string
+	theme: ThemeDefinition
 }
 
 function getThemeColor(themeId: ThemeId | null | undefined): string {
@@ -20,6 +22,7 @@ function getThemeColor(themeId: ThemeId | null | undefined): string {
 export function CardSectionComponent({
 	section,
 	strapiBaseUrl,
+	theme,
 }: CardSectionComponentProps) {
 	const cards =
 		section.CardItem?.filter(
@@ -30,12 +33,15 @@ export function CardSectionComponent({
 		return null
 	}
 
+	const backgroundColor = section.CardColumnsOddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
+
 	return (
 		<Box
 			component='section'
 			sx={{
 				width: '100%',
 				pb: 2,
+				backgroundColor,
 			}}
 		>
 			<Box

@@ -45,6 +45,7 @@ export const GET_INDEX_PAGE = `
 				__typename
 			    ... on ComponentBlocksRichTextSection {
 					RichTextContent
+					RichTextOddEven
 				}
 				... on ComponentBlocksHeroSectionSlideShow {
 					Headline {
@@ -67,6 +68,7 @@ export const GET_INDEX_PAGE = `
 					}
 				}
 				... on ComponentBlocksCardSection {
+					CardColumnsOddEven
 					CardItem {
 						id
 						Headline
@@ -88,6 +90,7 @@ export const GET_INDEX_PAGE = `
 					}
 				}
 				... on ComponentBlocksTeaserTextWithImage {
+					TeaserOddEven
 					TeaserHeadline
 					TeaserText
 					ImagePosition
@@ -106,6 +109,7 @@ export const GET_INDEX_PAGE = `
 					}
 				}
 				... on ComponentBlocksTextColumnsSection {
+					TextColumnsOddEven
 					TextColumnsHeadline
 					TextColumnsSubHeadline
 					TextColumn {
@@ -203,6 +207,7 @@ export const GET_PAGE_BY_SLUG = `
 						__typename
 						... on ComponentBlocksRichTextSection {
 							RichTextContent
+							RichTextOddEven
 						}
 						... on ComponentBlocksHeroSectionSlideShow {
 							Headline {
@@ -224,6 +229,7 @@ export const GET_PAGE_BY_SLUG = `
 							}
 						}
 						... on ComponentBlocksCardSection {
+							CardColumnsOddEven
 							CardItem {
 								Headline
 								Subheadline
@@ -244,6 +250,7 @@ export const GET_PAGE_BY_SLUG = `
 							}
 						}
 						... on ComponentBlocksSupplementalDocumentGroupSection {
+							SupplementalsOddEven
 							GroupHeadline
 							supplemental_document_group {
 								documentId
@@ -267,6 +274,7 @@ export const GET_PAGE_BY_SLUG = `
 							}
 						}
 						... on ComponentBlocksTeaserTextWithImage {
+							TeaserOddEven
 							TeaserHeadline
 							TeaserText
 							ImagePosition
@@ -285,6 +293,7 @@ export const GET_PAGE_BY_SLUG = `
 							}
 						}
 						... on ComponentBlocksTextColumnsSection {
+							TextColumnsOddEven
 							TextColumnsHeadline
 							TextColumnsSubHeadline
 							TextColumn {
@@ -304,6 +313,7 @@ export const GET_PAGE_BY_SLUG = `
 							}
 						}
 						... on ComponentBlocksImageGallerySection {
+							OddEven
 							GalleryHeadline
 							GalleryImages {
 								url
@@ -315,6 +325,7 @@ export const GET_PAGE_BY_SLUG = `
 							}
 						}
 						... on ComponentBlocksSimpleCtaSection {
+							OddEven
 							CtaHeadline
 							CtaInfoText
 							CtaBackgroundImage {

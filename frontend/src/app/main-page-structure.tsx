@@ -83,7 +83,7 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 
 	// Bevorzuge children (Server Components), falls vorhanden, sonst rendere sections (Client Components)
 	const content = children ?? (sections && strapiBaseUrl
-		? renderStartpageSections({ sections, strapiBaseUrl })
+		? renderStartpageSections({ sections, strapiBaseUrl, theme: themex })
 		: null)
 
 	return (
