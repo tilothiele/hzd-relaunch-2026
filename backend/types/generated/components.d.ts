@@ -233,6 +233,18 @@ export interface LinksActionButton extends Struct.ComponentSchema {
   };
 }
 
+export interface LinksPartnerlLink extends Struct.ComponentSchema {
+  collectionName: 'components_links_partnerl_links';
+  info: {
+    displayName: 'PartnerlLink';
+  };
+  attributes: {
+    AltText: Schema.Attribute.String;
+    Logo: Schema.Attribute.Media<'images'>;
+    PartnerLinkUrl: Schema.Attribute.String;
+  };
+}
+
 export interface PermissionGroups extends Struct.ComponentSchema {
   collectionName: 'components_permission_groups';
   info: {
@@ -261,6 +273,18 @@ export interface PersonalShippingAddress extends Struct.ComponentSchema {
   };
 }
 
+export interface SeoSeo extends Struct.ComponentSchema {
+  collectionName: 'components_seo_seos';
+  info: {
+    displayName: 'SEO';
+  };
+  attributes: {
+    Keywords: Schema.Attribute.String;
+    MetaDescription: Schema.Attribute.String;
+    TitleTag: Schema.Attribute.String;
+  };
+}
+
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
@@ -280,8 +304,10 @@ declare module '@strapi/strapi' {
       'columns.text-column': ColumnsTextColumn;
       'layout.footer': LayoutFooter;
       'links.action-button': LinksActionButton;
+      'links.partnerl-link': LinksPartnerlLink;
       'permission.groups': PermissionGroups;
       'personal.shipping-address': PersonalShippingAddress;
+      'seo.seo': SeoSeo;
     }
   }
 }

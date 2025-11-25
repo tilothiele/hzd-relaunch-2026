@@ -15,9 +15,14 @@ export const setupRoles = async (strapi: Core.Strapi) => {
   // Definiere die Roles, die angelegt werden sollen
   const rolesToCreate: RoleDefinition[] = [
     {
-      name: 'Präsidium',
-      type: 'praesidium',
-      description: 'Präsidium',
+      name: 'Präsident',
+      type: 'praesident',
+      description: 'Präsident',
+    },
+    {
+      name: 'Vizepräsident',
+      type: 'vizepraesident',
+      description: 'Vizepräsident',
     },
     {
       name: 'Deckrüdenstelle',

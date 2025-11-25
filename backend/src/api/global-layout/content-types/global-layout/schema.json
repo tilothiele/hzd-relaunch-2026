@@ -42,17 +42,10 @@
         "images"
       ]
     },
-    "MagazinLink": {
-      "type": "string"
-    },
-    "ShopLink": {
-      "type": "string"
-    },
-    "FciLink": {
-      "type": "string"
-    },
-    "VdhLink": {
-      "type": "string"
+    "PartnerLink": {
+      "type": "component",
+      "component": "links.partnerl-link",
+      "repeatable": true
     }
   }
 }

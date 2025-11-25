@@ -17,6 +17,11 @@
     "title": {
       "type": "string"
     },
+    "SEO": {
+      "type": "component",
+      "component": "seo.seo",
+      "repeatable": true
+    },
     "FarbThema": {
       "type": "enumeration",
       "enum": [

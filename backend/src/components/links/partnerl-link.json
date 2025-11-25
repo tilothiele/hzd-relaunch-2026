@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_links_partnerl_links",
+  "info": {
+    "displayName": "PartnerlLink"
+  },
+  "options": {},
+  "attributes": {
+    "Logo": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "PartnerLinkUrl": {
+      "type": "string"
+    },
+    "AltText": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

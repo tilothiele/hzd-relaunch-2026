@@ -26,7 +26,6 @@ const bootstrap = async ({ strapi }: { strapi: Core.Strapi }) => {
 		}
 
 		// Lege Roles an
-		console.log('[HZD Plugin] Setting up roles...')
 		await setupRoles(strapi);
 
 		// GraphQL Permissions für alle Content-Types aktivieren

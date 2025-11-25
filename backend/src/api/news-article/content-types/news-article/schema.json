@@ -14,6 +14,12 @@
     "Headline": {
       "type": "string"
     },
+    "SubHeadline": {
+      "type": "string"
+    },
+    "TeaserText": {
+      "type": "text"
+    },
     "Image": {
       "type": "media",
       "multiple": false,
@@ -21,6 +27,27 @@
         "images",
         "files"
       ]
+    },
+    "Author": {
+      "type": "string"
+    },
+    "DateOfPublication": {
+      "type": "date"
+    },
+    "Slug": {
+      "type": "string"
+    },
+    "SEO": {
+      "type": "component",
+      "component": "seo.seo",
+      "repeatable": false
+    },
+    "NewsBody": {
+      "type": "customField",
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultHtml"
+      }
     }
   }
 }

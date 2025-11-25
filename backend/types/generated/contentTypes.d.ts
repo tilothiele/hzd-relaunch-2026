@@ -549,7 +549,6 @@ export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    FciLink: Schema.Attribute.String;
     Footer: Schema.Attribute.Component<'layout.footer', false>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -558,17 +557,15 @@ export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
     > &
       Schema.Attribute.Private;
     Logo: Schema.Attribute.Media<'images'>;
-    MagazinLink: Schema.Attribute.String;
     Menu: Schema.Attribute.JSON;
+    PartnerLink: Schema.Attribute.Component<'links.partnerl-link', true>;
     publishedAt: Schema.Attribute.DateTime;
-    ShopLink: Schema.Attribute.String;
     SocialLinkFB: Schema.Attribute.String;
     SocialLinkYT: Schema.Attribute.String;
     UnserHovawartImage: Schema.Attribute.Media<'images'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    VdhLink: Schema.Attribute.String;
   };
 }
 
@@ -604,6 +601,7 @@ export interface ApiIndexPageIndexPage extends Struct.SingleTypeSchema {
         'blocks.simple-cta-section',
       ]
     >;
+    SEO: Schema.Attribute.Component<'seo.seo', false>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -706,9 +704,11 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    Author: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    DateOfPublication: Schema.Attribute.Date;
     Headline: Schema.Attribute.String;
     Image: Schema.Attribute.Media<'images' | 'files'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
@@ -717,7 +717,18 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
       'api::news-article.news-article'
     > &
       Schema.Attribute.Private;
+    NewsBody: Schema.Attribute.RichText &
+      Schema.Attribute.CustomField<
+        'plugin::ckeditor5.CKEditor',
+        {
+          preset: 'defaultHtml';
+        }
+      >;
     publishedAt: Schema.Attribute.DateTime;
+    SEO: Schema.Attribute.Component<'seo.seo', false>;
+    Slug: Schema.Attribute.String;
+    SubHeadline: Schema.Attribute.String;
+    TeaserText: Schema.Attribute.Text;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -832,6 +843,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.simple-cta-section',
       ]
     >;
+    SEO: Schema.Attribute.Component<'seo.seo', true>;
     slug: Schema.Attribute.String;
     title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
