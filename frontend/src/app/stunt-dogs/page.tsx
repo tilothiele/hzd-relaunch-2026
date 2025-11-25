@@ -3,7 +3,7 @@ import { DogSearch } from '@/components/dog-search/dog-search'
 import { themes } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 
-export default async function DogsPage() {
+export default async function StuntDogsPage() {
 	const { globalLayout, baseUrl, error } = await fetchGlobalLayout()
 	const theme = themes.B
 
@@ -22,9 +22,9 @@ export default async function DogsPage() {
 			homepage={globalLayout}
 			strapiBaseUrl={baseUrl}
 			theme={theme}
-			pageTitle='Zuchthündinnen'
+			pageTitle='Deckrüden'
 		>
-			<DogSearch strapiBaseUrl={baseUrl} sexFilter='F' />
+			<DogSearch strapiBaseUrl={baseUrl} sexFilter='M' />
 		</MainPageStructure>
 	)
 }

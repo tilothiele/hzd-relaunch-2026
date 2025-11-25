@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react'
 import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, FormControlLabel } from '@mui/material'
-import { useDogs, type ColorFilter, type PageSize, type SexFilter, type BooleanFilter } from '@/hooks/use-dogs'
+import { useDogs, type ColorFilter, type PageSize, type BooleanFilter, type SexFilter } from '@/hooks/use-dogs'
 import { DogCard } from './dog-card'
 import { DogMap } from './dog-map'
 import { DogDetailModal } from './dog-detail-modal'
@@ -10,11 +10,11 @@ import type { Dog } from '@/types'
 
 interface DogSearchProps {
 	strapiBaseUrl?: string | null
+	sexFilter: SexFilter
 }
 
-export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
+export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 	const [nameFilter, setNameFilter] = useState('')
-	const [sexFilter, setSexFilter] = useState<SexFilter>('')
 	const [colorFilter, setColorFilter] = useState<ColorFilter>('')
 	const [chipNoFilter, setChipNoFilter] = useState('')
 	const [sod1testFilter, setSod1testFilter] = useState<BooleanFilter>('')
@@ -116,19 +116,6 @@ export function DogSearch({ strapiBaseUrl }: DogSearchProps) {
 						fullWidth
 						size='small'
 					/>
-
-					<FormControl fullWidth size='small'>
-						<InputLabel>Geschlecht</InputLabel>
-						<Select
-							value={sexFilter}
-							label='Geschlecht'
-							onChange={(e) => setSexFilter(e.target.value as SexFilter)}
-						>
-							<MenuItem value=''>Alle</MenuItem>
-							<MenuItem value='M'>Rüde</MenuItem>
-							<MenuItem value='F'>Hündin</MenuItem>
-						</Select>
-					</FormControl>
 
 					<FormControl fullWidth size='small'>
 						<InputLabel>Farbe</InputLabel>

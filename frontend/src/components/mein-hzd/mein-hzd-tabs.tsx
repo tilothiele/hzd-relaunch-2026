@@ -34,6 +34,7 @@ export function MeinHzdTabs() {
 					}}
 				>
 					<Tab label='Mein Profil' />
+					<Tab label='Mein Zwinger' />
 					<Tab label='Meine Würfe' />
 					<Tab label='Meine Deckrüden' />
 					<Tab label='Mitteilungen' />
