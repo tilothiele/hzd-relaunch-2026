@@ -562,7 +562,6 @@ export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
     publishedAt: Schema.Attribute.DateTime;
     SocialLinkFB: Schema.Attribute.String;
     SocialLinkYT: Schema.Attribute.String;
-    UnserHovawartImage: Schema.Attribute.Media<'images'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

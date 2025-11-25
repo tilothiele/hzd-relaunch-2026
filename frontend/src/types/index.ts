@@ -140,15 +140,22 @@ export interface Footer {
 	PraesidiumTelefon?: string | null
 }
 
+export interface PartnerLink {
+	id?: string
+	Logo?: Image | null
+	PartnerLinkUrl?: string | null
+	AltText?: string | null
+}
+
 export interface GlobalLayout {
 	Menu?: Menu | null
 	Logo?: Image | null
-	UnserHovawartImage?: Image | null
 	Footer?: Footer | null
 	Copyright?: string | null
 	SocialLinkFB?: string | null
 	SocialLinkYT?: string | null
 	Sections?: StartpageSection[] | null
+	PartnerLink?: PartnerLink[] | null
 }
 
 export interface Contact {

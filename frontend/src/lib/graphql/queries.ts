@@ -10,14 +10,6 @@ export const GET_LAYOUT = `
 				caption
 				previewUrl
 			}
-			UnserHovawartImage {
-				url
-				alternativeText
-				width
-				height
-				caption
-				previewUrl
-			}
 			Footer {
 				ItProjektleitungName
 				ItProjektleitungOrt
@@ -29,6 +21,19 @@ export const GET_LAYOUT = `
 			Copyright
 			SocialLinkFB
 			SocialLinkYT
+			PartnerLink {
+				id
+				Logo {
+					url
+					alternativeText
+					width
+					height
+					caption
+					previewUrl
+				}
+				PartnerLinkUrl
+				AltText
+			}
 		}
 	}
 `

@@ -23,12 +23,9 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 	const logoWidth = 150
 	const logoHeight = 150
 
-	const magaizinImage = globalLayout?.UnserHovawartImage
-
-	const magazinSrc = resolveMediaUrl(magaizinImage, strapiBaseUrl) ?? ''
-	const magazinAlt = magaizinImage?.alternativeText ?? 'Hovawart Magazin'
-	const magazinWidth = 200
-	const magazinHeight = 100
+	const partnerLinks = globalLayout?.PartnerLink ?? []
+	const firstPartnerLink = partnerLinks[0]
+	const remainingPartnerLinks = partnerLinks.slice(1, 4) // Nimm die nächsten 3 Partner-Links
 
 	return (
 		<footer
@@ -111,19 +108,44 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 						</div>
 					</div>
 					<div>
-						{magazinSrc ? (
-							<Image
-								src={magazinSrc}
-								alt={magazinAlt}
-								width={magazinWidth}
-								height={magazinHeight}
-								className='object-contain'
-								unoptimized
-								priority
-								style={{
-									margin: 'auto',
-								}}
-							/>
+						{firstPartnerLink?.Logo ? (
+							firstPartnerLink.PartnerLinkUrl ? (
+								<Link
+									href={firstPartnerLink.PartnerLinkUrl}
+									target='_blank'
+									rel='noopener noreferrer'
+									style={{
+										display: 'block',
+										margin: 'auto',
+									}}
+								>
+									<Image
+										src={resolveMediaUrl(firstPartnerLink.Logo, strapiBaseUrl) ?? ''}
+										alt={firstPartnerLink.Logo.alternativeText ?? firstPartnerLink.AltText ?? 'Partner Logo'}
+										width={200}
+										height={100}
+										className='object-contain'
+										unoptimized
+										priority
+										style={{
+											margin: 'auto',
+										}}
+									/>
+								</Link>
+							) : (
+								<Image
+									src={resolveMediaUrl(firstPartnerLink.Logo, strapiBaseUrl) ?? ''}
+									alt={firstPartnerLink.Logo.alternativeText ?? firstPartnerLink.AltText ?? 'Partner Logo'}
+									width={200}
+									height={100}
+									className='object-contain'
+									unoptimized
+									priority
+									style={{
+										margin: 'auto',
+									}}
+								/>
+							)
 						) : null}
 					</div>
 					<div>
@@ -134,39 +156,49 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 							Unsere Partner
 						</h3>
 						<div className='flex flex-col items-center' style={{ gap: '1rem' }}>
-							<div className='flex justify-center' style={{ marginTop: '0.5rem' }}>
-								<Image
-									src='/logos/HZD_Shop-hovawart-zuchgemeinschaft.png'
-									alt='VDH Logo'
-									width={100}
-									height={300}
-									className='object-contain'
-									unoptimized
-									priority
-								/>
-							</div>
-							<div className='flex justify-center'>
-								<Image
-									src='/logos/FCI-federal-cynologique-internationale-hzd-hovawart.png'
-									alt='FCI Logo'
-									width={100}
-									height={100}
-									className='object-contain'
-									unoptimized
-									priority
-								/>
-							</div>
-							<div className='flex justify-center' style={{ marginBottom: '0.5rem' }}>
-								<Image
-									src='/logos/verband-deutsches-hundewesen-hzd-hovawart.png'
-									alt='VDH Logo'
-									width={100}
-									height={100}
-									className='object-contain'
-									unoptimized
-									priority
-								/>
-							</div>
+							{remainingPartnerLinks.map((partnerLink, index) => {
+								if (!partnerLink.Logo) return null
+
+								const logoUrl = resolveMediaUrl(partnerLink.Logo, strapiBaseUrl) ?? ''
+								const logoAlt = partnerLink.Logo.alternativeText ?? partnerLink.AltText ?? 'Partner Logo'
+								const isFirst = index === 0
+								const isLast = index === remainingPartnerLinks.length - 1
+
+								const imageElement = (
+									<Image
+										src={logoUrl}
+										alt={logoAlt}
+										width={100}
+										height={100}
+										className='object-contain'
+										unoptimized
+										priority
+									/>
+								)
+
+								return (
+									<div
+										key={partnerLink.id ?? index}
+										className='flex justify-center'
+										style={{
+											marginTop: isFirst ? '0.5rem' : undefined,
+											marginBottom: isLast ? '0.5rem' : undefined,
+										}}
+									>
+										{partnerLink.PartnerLinkUrl ? (
+											<Link
+												href={partnerLink.PartnerLinkUrl}
+												target='_blank'
+												rel='noopener noreferrer'
+											>
+												{imageElement}
+											</Link>
+										) : (
+											imageElement
+										)}
+									</div>
+								)
+							})}
 						</div>
 					</div>
 				</div>

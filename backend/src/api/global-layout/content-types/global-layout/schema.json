@@ -35,13 +35,6 @@
     "SocialLinkYT": {
       "type": "string"
     },
-    "UnserHovawartImage": {
-      "type": "media",
-      "multiple": false,
-      "allowedTypes": [
-        "images"
-      ]
-    },
     "PartnerLink": {
       "type": "component",
       "component": "links.partnerl-link",
