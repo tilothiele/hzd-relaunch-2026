@@ -112,7 +112,6 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 							firstPartnerLink.PartnerLinkUrl ? (
 								<Link
 									href={firstPartnerLink.PartnerLinkUrl}
-									target='_blank'
 									rel='noopener noreferrer'
 									style={{
 										display: 'block',
