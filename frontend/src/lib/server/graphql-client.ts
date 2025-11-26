@@ -54,6 +54,7 @@ export async function fetchGraphQLServer<T>(
 
 	try {
 		const data = await client.request<T>(query, variables)
+		console.log('GraphQL Data:', query, variables, data)
 		return data
 	} catch (error) {
 		console.error('GraphQL Error:', error)
