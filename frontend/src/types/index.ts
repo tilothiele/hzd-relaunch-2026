@@ -113,14 +113,12 @@ export interface TextColumnsSection {
 
 export interface ImageGallerySection {
 	__typename: 'ComponentBlocksImageGallerySection'
-	OddEven?: 'Odd' | 'Even' | null
 	GalleryHeadline?: string | null
 	GalleryImages?: Image[] | null
 }
 
 export interface SimpleCtaSection {
 	__typename: 'ComponentBlocksSimpleCtaSection'
-	OddEven?: 'Odd' | 'Even' | null
 	CtaHeadline?: string | null
 	CtaInfoText?: string | null
 	CtaBackgroundImage?: Image | null

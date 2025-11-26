@@ -313,7 +313,6 @@ export const GET_PAGE_BY_SLUG = `
 							}
 						}
 						... on ComponentBlocksImageGallerySection {
-							OddEven
 							GalleryHeadline
 							GalleryImages {
 								url
@@ -325,7 +324,6 @@ export const GET_PAGE_BY_SLUG = `
 							}
 						}
 						... on ComponentBlocksSimpleCtaSection {
-							OddEven
 							CtaHeadline
 							CtaInfoText
 							CtaBackgroundImage {

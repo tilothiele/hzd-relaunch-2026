@@ -15,7 +15,7 @@ export function SimpleCtaSectionComponent({
 	strapiBaseUrl,
 	theme,
 }: SimpleCtaSectionComponentProps) {
-	const backgroundColor = section.OddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
+	const backgroundColor = theme.evenBgColor
 	const backgroundImageUrl = resolveMediaUrl(section.CtaBackgroundImage, strapiBaseUrl)
 	const headline = section.CtaHeadline
 	const text = section.CtaInfoText

@@ -46,7 +46,7 @@ export function ImageGallerySectionComponent({
 	}
 
 	const photos = convertToPhotoAlbumImages(images, strapiBaseUrl)
-	const backgroundColor = section.OddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
+	const backgroundColor = theme.evenBgColor
 
 	return (
 		<section
