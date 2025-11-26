@@ -11,7 +11,7 @@
   },
   "pluginOptions": {
     "content-manager": {
-          "visible": true
+      "visible": true
     }
   },
   "attributes": {
@@ -42,6 +42,24 @@
     },
     "closed": {
       "type": "boolean"
+    },
+    "AmountS": {
+      "type": "component",
+      "component": "breeding.puppy-amount",
+      "repeatable": false
+    },
+    "AmountSM": {
+      "type": "component",
+      "component": "breeding.puppy-amount",
+      "repeatable": false
+    },
+    "AmountB": {
+      "type": "component",
+      "component": "breeding.puppy-amount",
+      "repeatable": false
+    },
+    "StatusMessage": {
+      "type": "text"
     }
   }
 }

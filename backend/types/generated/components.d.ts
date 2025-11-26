@@ -167,6 +167,29 @@ export interface BlocksTextColumnsSection extends Struct.ComponentSchema {
   };
 }
 
+export interface BreedingPuppyAmount extends Struct.ComponentSchema {
+  collectionName: 'components_breeding_puppy_amounts';
+  info: {
+    displayName: 'PuppyAmount';
+  };
+  attributes: {
+    Available: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+    Total: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+  };
+}
+
 export interface CalendarCalendarDocument extends Struct.ComponentSchema {
   collectionName: 'components_calendar_calendar_documents';
   info: {
@@ -304,6 +327,7 @@ declare module '@strapi/strapi' {
       'blocks.supplemental-document-group-section': BlocksSupplementalDocumentGroupSection;
       'blocks.teaser-text-with-image': BlocksTeaserTextWithImage;
       'blocks.text-columns-section': BlocksTextColumnsSection;
+      'breeding.puppy-amount': BreedingPuppyAmount;
       'calendar.calendar-document': CalendarCalendarDocument;
       'columns.column-item': ColumnsColumnItem;
       'columns.text-column': ColumnsTextColumn;

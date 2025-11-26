@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_breeding_puppy_amounts",
+  "info": {
+    "displayName": "PuppyAmount"
+  },
+  "options": {},
+  "attributes": {
+    "Total": {
+      "type": "integer",
+      "min": 0
+    },
+    "Available": {
+      "type": "integer",
+      "min": 0
+    }
+  },
+  "config": {}
+}

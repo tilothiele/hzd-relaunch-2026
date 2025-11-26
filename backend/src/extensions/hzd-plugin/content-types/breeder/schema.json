@@ -1,0 +1,51 @@
+{
+  "kind": "collectionType",
+  "collectionName": "breeders",
+  "info": {
+    "singularName": "breeder",
+    "pluralName": "breeders",
+    "displayName": "Breeder"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {
+    "content-manager": {
+      "visible": true
+    }
+  },
+  "attributes": {
+    "member": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::hzd-plugin.member"
+    },
+    "kennelName": {
+      "type": "string",
+      "maxLength": 200
+    },
+    "breedingLicenseSince": {
+      "type": "date"
+    },
+    "litters": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::hzd-plugin.litter",
+      "mappedBy": "breeder"
+    },
+    "MemosDraft": {
+      "type": "customField",
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultHtml"
+      }
+    },
+    "MemosReleased": {
+      "type": "customField",
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultHtml"
+      }
+    }
+  }
+}

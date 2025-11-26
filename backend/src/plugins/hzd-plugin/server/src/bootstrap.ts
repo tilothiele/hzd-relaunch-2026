@@ -50,7 +50,6 @@ const bootstrap = async ({ strapi }: { strapi: Core.Strapi }) => {
 			{ name: 'breeder', actions: ['find', 'findOne'] },
 			{ name: 'member', actions: ['find', 'findOne'] },
 			{ name: 'litter', actions: ['find', 'findOne'] },
-			{ name: 'puppy', actions: ['find', 'findOne'] },
 			{ name: 'homepage', actions: ['find'] }, // singleType hat nur find
 			{ name: 'news-article', actions: ['find', 'findOne'] },
 			{ name: 'homepage-section', actions: ['find', 'findOne'] },

@@ -133,11 +133,48 @@
     "jImage": {
       "type": "string"
     },
-    "Sod1Test": {
+    "SOD1": {
+      "type": "enumeration",
+      "enum": [
+        "NN",
+        "NDM",
+        "DMDM"
+      ]
+    },
+    "HD": {
+      "type": "enumeration",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ]
+    },
+    "Genprofil": {
       "type": "boolean"
     },
-    "HDTest": {
+    "EyesCheck": {
       "type": "boolean"
+    },
+    "HeartCheck": {
+      "type": "boolean"
+    },
+    "ColorCheck": {
+      "type": "boolean"
+    },
+    "MemosDraft": {
+      "type": "customField",
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultHtml"
+      }
+    },
+    "MemosReleased": {
+      "type": "customField",
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultHtml"
+      }
     }
   }
 }

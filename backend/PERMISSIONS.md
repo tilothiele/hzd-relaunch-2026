@@ -51,10 +51,6 @@ Das Bootstrap-Skript sollte beim Start des Backends automatisch die Permissions 
   - ✅ `find`
   - ✅ `findOne`
 
-- **Puppy**:
-  - ✅ `find`
-  - ✅ `findOne`
-
 4. Klicke auf **Save**
 
 ## Manuelles Setup über Strapi Console
