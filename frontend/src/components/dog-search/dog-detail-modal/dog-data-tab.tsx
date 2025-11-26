@@ -333,3 +333,4 @@ export function DogDataTab({ dog, strapiBaseUrl }: DogDataTabProps) {
 
 
 
+

@@ -13,3 +13,4 @@ export default async function createRoles(strapi: Core.Strapi) {
   console.log('\n✅ Done! Please check the admin UI for the roles.');
 }
 
+

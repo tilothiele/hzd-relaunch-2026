@@ -17,3 +17,4 @@ export function DogPedigreeTab({ dog, strapiBaseUrl }: DogPedigreeTabProps) {
 
 
 
+

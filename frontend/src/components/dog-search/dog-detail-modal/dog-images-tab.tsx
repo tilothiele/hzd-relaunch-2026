@@ -17,3 +17,4 @@ export function DogImagesTab({ dog, strapiBaseUrl }: DogImagesTabProps) {
 
 
 
+
