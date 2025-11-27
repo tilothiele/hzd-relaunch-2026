@@ -167,6 +167,17 @@ export interface BlocksTextColumnsSection extends Struct.ComponentSchema {
   };
 }
 
+export interface BreedingGeoLocation extends Struct.ComponentSchema {
+  collectionName: 'components_breeding_geo_locations';
+  info: {
+    displayName: 'GeoLocation';
+  };
+  attributes: {
+    lat: Schema.Attribute.Decimal & Schema.Attribute.Required;
+    lng: Schema.Attribute.Decimal & Schema.Attribute.Required;
+  };
+}
+
 export interface BreedingPuppyAmount extends Struct.ComponentSchema {
   collectionName: 'components_breeding_puppy_amounts';
   info: {
@@ -327,6 +338,7 @@ declare module '@strapi/strapi' {
       'blocks.supplemental-document-group-section': BlocksSupplementalDocumentGroupSection;
       'blocks.teaser-text-with-image': BlocksTeaserTextWithImage;
       'blocks.text-columns-section': BlocksTextColumnsSection;
+      'breeding.geo-location': BreedingGeoLocation;
       'breeding.puppy-amount': BreedingPuppyAmount;
       'calendar.calendar-document': CalendarCalendarDocument;
       'columns.column-item': ColumnsColumnItem;

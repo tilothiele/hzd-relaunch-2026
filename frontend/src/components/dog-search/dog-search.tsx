@@ -1,8 +1,9 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, FormControlLabel, Chip, OutlinedInput } from '@mui/material'
-import { useDogs, type ColorFilter, type PageSize, type SexFilter, type Sod1Filter, type HDFilter } from '@/hooks/use-dogs'
+import { useDogs, type ColorFilter, type PageSize, type SexFilter, type Sod1Filter, type HDFilter, type DistanceFilter } from '@/hooks/use-dogs'
+import { useGeolocation } from '@/hooks/use-geolocation'
 
 type ExaminationFilter = 'HD' | 'HeartCheck' | 'Genprofil' | 'EyesCheck' | 'ColorCheck'
 import { DogCard } from './dog-card'
@@ -22,11 +23,76 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 	const [sod1Filters, setSod1Filters] = useState<Sod1Filter[]>([])
 	const [hdFilters, setHdFilters] = useState<HDFilter[]>([])
 	const [examinationFilters, setExaminationFilters] = useState<ExaminationFilter[]>([])
+	const [zipCode, setZipCode] = useState('')
+	const [zipLocation, setZipLocation] = useState<{ lat: number; lng: number } | null>(null)
+	const [isGeocodingZip, setIsGeocodingZip] = useState(false)
+	const [maxDistance, setMaxDistance] = useState<DistanceFilter>('')
 	const [page, setPage] = useState(1)
 	const [pageSize, setPageSize] = useState<PageSize>(10)
 	const [showMap, setShowMap] = useState(false)
 	const [selectedDog, setSelectedDog] = useState<Dog | null>(null)
 	const [isModalOpen, setIsModalOpen] = useState(false)
+
+	const { location: ipLocation, zip: ipZip, isLoading: isGeolocationLoading } = useGeolocation()
+
+	// Fülle PLZ automatisch aus IP, wenn verfügbar
+	useEffect(() => {
+		if (ipZip && !zipCode) {
+			setZipCode(ipZip)
+		}
+	}, [ipZip, zipCode])
+
+	// Geocode PLZ zu Koordinaten
+	const geocodeZip = useCallback(async (zip: string) => {
+		if (!zip || zip.trim().length === 0) {
+			setZipLocation(null)
+			return
+		}
+
+		// Validiere PLZ (5-stellige deutsche PLZ)
+		const zipPattern = /^\d{5}$/
+		if (!zipPattern.test(zip.trim())) {
+			setZipLocation(null)
+			return
+		}
+
+		setIsGeocodingZip(true)
+		try {
+			const response = await fetch(`/api/geocode?zip=${encodeURIComponent(zip.trim())}`)
+			const data = await response.json()
+
+			if (data.success && data.lat && data.lng) {
+				setZipLocation({
+					lat: data.lat,
+					lng: data.lng,
+				})
+			} else {
+				setZipLocation(null)
+			}
+		} catch (error) {
+			console.error('Geocoding fehlgeschlagen:', error)
+			setZipLocation(null)
+		} finally {
+			setIsGeocodingZip(false)
+		}
+	}, [])
+
+	// Geocode PLZ, wenn sie sich ändert
+	useEffect(() => {
+		const timeoutId = setTimeout(() => {
+			if (zipCode.trim().length > 0) {
+				void geocodeZip(zipCode)
+			} else {
+				setZipLocation(null)
+			}
+		}, 500) // Debounce: 500ms
+
+		return () => clearTimeout(timeoutId)
+	}, [zipCode, geocodeZip])
+
+	// Verwende zipLocation für Filter, falls verfügbar, sonst ipLocation
+	const userLocation = zipLocation || ipLocation || null
+	const isLocationAvailable = !!userLocation
 
 	// Stabilisiere Arrays für stabile Dependencies
 	const sod1FiltersKey = useMemo(() => JSON.stringify([...sod1Filters].sort()), [sod1Filters])
@@ -52,7 +118,9 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 		onlyGenprofil: onlyGenprofil || undefined,
 		onlyEyesCheck: onlyEyesCheck || undefined,
 		onlyColorCheck: onlyColorCheck || undefined,
-	}), [nameFilter, sexFilter, colorFilter, chipNoFilter, sod1FiltersKey, hdFiltersKey, examinationFiltersKey])
+		maxDistance: maxDistance === '' ? undefined : maxDistance,
+		userLocation: userLocation || undefined,
+	}), [nameFilter, sexFilter, colorFilter, chipNoFilter, sod1FiltersKey, hdFiltersKey, examinationFiltersKey, maxDistance, userLocation])
 
 	const {
 		dogs,
@@ -122,7 +190,7 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 				</Box>
 
 				{/* Karte */}
-				<DogMap isVisible={showMap} />
+				<DogMap isVisible={showMap} dogs={dogs} />
 			<Box className='rounded-lg bg-white p-4 shadow-md'>
 				<Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: 3 }}>
 					<TextField
@@ -254,6 +322,51 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 							<MenuItem value='Genprofil'>Nur mit Genprofil</MenuItem>
 							<MenuItem value='EyesCheck'>Nur mit Augenuntersuchung</MenuItem>
 							<MenuItem value='ColorCheck'>Nur mit Farbverdünnung</MenuItem>
+						</Select>
+					</FormControl>
+				</Box>
+
+				{/* PLZ und Maximale Entfernung */}
+				<Box sx={{ mt: 2, display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 2 }}>
+					<TextField
+						label='PLZ'
+						value={zipCode}
+						onChange={(e) => {
+							const value = e.target.value.replace(/\D/g, '').slice(0, 5) // Nur Zahlen, max. 5 Zeichen
+							setZipCode(value)
+						}}
+						onKeyDown={(e) => {
+							if (e.key === 'Enter') {
+								handleSearch()
+							}
+						}}
+						placeholder='Postleitzahl'
+						fullWidth
+						size='small'
+						helperText={isGeocodingZip ? 'Suche Koordinaten...' : zipLocation ? 'Koordinaten gefunden' : zipCode && zipCode.length === 5 ? 'Koordinaten werden gesucht...' : ''}
+					/>
+					<FormControl fullWidth size='small' disabled={!isLocationAvailable || isGeocodingZip}>
+						<InputLabel>Maximale Entfernung</InputLabel>
+						<Select
+							value={maxDistance === '' ? '' : String(maxDistance)}
+							label='Maximale Entfernung'
+							onChange={(e) => {
+								const value = e.target.value
+								if (value === '') {
+									setMaxDistance('')
+								} else {
+									const numValue = Number(value)
+									if (!isNaN(numValue) && (numValue === 50 || numValue === 100 || numValue === 300 || numValue === 800)) {
+										setMaxDistance(numValue as DistanceFilter)
+									}
+								}
+							}}
+						>
+							<MenuItem value=''>-</MenuItem>
+							<MenuItem value='50'>50 km</MenuItem>
+							<MenuItem value='100'>100 km</MenuItem>
+							<MenuItem value='300'>300 km</MenuItem>
+							<MenuItem value='800'>800 km</MenuItem>
 						</Select>
 					</FormControl>
 				</Box>

@@ -6,6 +6,20 @@ import { SEARCH_DOGS } from '@/lib/graphql/queries'
 import { useConfig } from '@/hooks/use-config'
 import type { Dog, DogSearchResult } from '@/types'
 
+/**
+ * Berechnet die Entfernung zwischen zwei Koordinaten in Kilometern (Haversine-Formel)
+ */
+function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+	const R = 6371 // Erdradius in Kilometern
+	const dLat = (lat2 - lat1) * Math.PI / 180
+	const dLng = (lng2 - lng1) * Math.PI / 180
+	const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+		Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+		Math.sin(dLng / 2) * Math.sin(dLng / 2)
+	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+	return R * c
+}
+
 const EMPTY_SOD1_FILTERS: Sod1Filter[] = []
 const EMPTY_HD_FILTERS: HDFilter[] = []
 
@@ -13,6 +27,7 @@ export type SexFilter = 'M' | 'F' | ''
 export type ColorFilter = 'S' | 'SM' | 'B' | ''
 export type Sod1Filter = 'N/N' | 'N/DM' | 'DM/DM'
 export type HDFilter = 'A1' | 'A2' | 'B1' | 'B2'
+export type DistanceFilter = '' | 50 | 100 | 300 | 800
 export type PageSize = 5 | 10 | 20
 
 interface DogsFilters {
@@ -27,6 +42,8 @@ interface DogsFilters {
 	onlyGenprofil?: boolean
 	onlyEyesCheck?: boolean
 	onlyColorCheck?: boolean
+	maxDistance?: DistanceFilter
+	userLocation?: { lat: number; lng: number }
 }
 
 interface DogsPagination {
@@ -67,6 +84,8 @@ export function useDogs(options: UseDogsOptions = {}) {
 	const sexFilter = filters.sexFilter ?? ''
 	const colorFilter = filters.colorFilter ?? ''
 	const chipNoFilter = filters.chipNoFilter ?? ''
+	const maxDistance = filters.maxDistance ?? ''
+	const userLocation = filters.userLocation
 	const onlyHD = filters.onlyHD ?? false
 	const onlyHeartCheck = filters.onlyHeartCheck ?? false
 	const onlyGenprofil = filters.onlyGenprofil ?? false
@@ -192,22 +211,43 @@ export function useDogs(options: UseDogsOptions = {}) {
 				},
 			)
 
-			const dogsArray = Array.isArray(data.hzdPluginDogs) ? data.hzdPluginDogs : []
-			setDogs(dogsArray)
+			let dogsArray = Array.isArray(data.hzdPluginDogs) ? data.hzdPluginDogs : []
 
-			// Berechne Paginierung basierend auf den übergebenen Parametern
-			// Da die Meta-Informationen nicht in der Antwort enthalten sind,
-			// schätzen wir die Gesamtzahl basierend auf der Anzahl der zurückgegebenen Ergebnisse
-			// Wenn wir genau pageSize Ergebnisse haben, gibt es wahrscheinlich mehr
-			const estimatedTotal = dogsArray.length === pageSize && page > 1
-				? page * pageSize + 1
-				: dogsArray.length === pageSize
-					? page * pageSize
-					: (page - 1) * pageSize + dogsArray.length
+			// Clientseitige Filterung nach Entfernung
+			const maxDistanceNum = maxDistance === '' || maxDistance === null || maxDistance === undefined
+				? null
+				: (typeof maxDistance === 'string' ? Number(maxDistance) : maxDistance)
 
-			const calculatedPageCount = Math.ceil(estimatedTotal / pageSize)
+			if (maxDistanceNum !== null && !isNaN(maxDistanceNum) && maxDistanceNum > 0 && userLocation && typeof userLocation.lat === 'number' && typeof userLocation.lng === 'number') {
+				dogsArray = dogsArray.filter((dog) => {
+					// Hunde ohne Location werden ausgeschlossen, wenn Entfernungsfilter aktiv ist
+					if (!dog.Location || typeof dog.Location.lat !== 'number' || typeof dog.Location.lng !== 'number') {
+						return false
+					}
 
-			setTotalDogs(estimatedTotal)
+					const distance = calculateDistance(
+						userLocation.lat,
+						userLocation.lng,
+						dog.Location.lat,
+						dog.Location.lng,
+					)
+
+					return distance <= maxDistanceNum
+				})
+			}
+
+			// Clientseitige Paginierung nach Filterung
+			const totalFiltered = dogsArray.length
+			const startIndex = (page - 1) * pageSize
+			const endIndex = startIndex + pageSize
+			const paginatedDogs = dogsArray.slice(startIndex, endIndex)
+
+			setDogs(paginatedDogs)
+
+			// Berechne Paginierung basierend auf den gefilterten Ergebnissen
+			const calculatedPageCount = Math.ceil(totalFiltered / pageSize)
+
+			setTotalDogs(totalFiltered)
 			setPageCount(calculatedPageCount)
 		} catch (err) {
 			const fetchError = err instanceof Error
@@ -220,7 +260,7 @@ export function useDogs(options: UseDogsOptions = {}) {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [baseUrl, nameFilter, sexFilter, colorFilter, chipNoFilter, sod1Filters, hdFilters, onlyHD, onlyHeartCheck, onlyGenprofil, onlyEyesCheck, onlyColorCheck, page, pageSize])
+	}, [baseUrl, nameFilter, sexFilter, colorFilter, chipNoFilter, sod1Filters, hdFilters, onlyHD, onlyHeartCheck, onlyGenprofil, onlyEyesCheck, onlyColorCheck, maxDistance, userLocation, page, pageSize])
 
 	useEffect(() => {
 		if (autoLoad && baseUrl && baseUrl.trim().length > 0) {

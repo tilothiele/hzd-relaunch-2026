@@ -213,6 +213,11 @@ export interface PuppyAmount {
 	Available?: number | null
 }
 
+export interface GeoLocation {
+	lat: number
+	lng: number
+}
+
 export interface Dog {
 	documentId: string
 	givenName?: string | null
@@ -245,6 +250,7 @@ export interface Dog {
 	ColorCheck?: boolean | null
 	MemosDraft?: string | null
 	MemosReleased?: string | null
+	Location?: GeoLocation | null
 	avatar?: {
 		url?: string | null
 		alternativeText?: string | null

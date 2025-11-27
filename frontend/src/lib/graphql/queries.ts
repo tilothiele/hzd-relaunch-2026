@@ -383,6 +383,10 @@ export const SEARCH_DOGS = `
 			ColorCheck
 			MemosDraft
 			MemosReleased
+			Location {
+				lat
+				lng
+			}
 	  		avatar {
 				url
 				alternativeText

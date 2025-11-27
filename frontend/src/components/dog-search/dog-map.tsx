@@ -3,6 +3,7 @@
 import { useMemo, useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import 'leaflet/dist/leaflet.css'
+import type { Dog } from '@/types'
 
 // Dynamischer Import der Karte für SSR-Kompatibilität
 const MapContainer = dynamic(
@@ -21,6 +22,10 @@ const Popup = dynamic(
 	() => import('react-leaflet').then((mod) => mod.Popup),
 	{ ssr: false }
 )
+const Tooltip = dynamic(
+	() => import('react-leaflet').then((mod) => mod.Tooltip),
+	{ ssr: false }
+)
 
 // Fix für Leaflet-Icons in Next.js
 if (typeof window !== 'undefined') {
@@ -36,33 +41,58 @@ if (typeof window !== 'undefined') {
 
 interface DogMapProps {
 	isVisible: boolean
+	dogs: Dog[]
 }
 
 // Deutschland Zentrum
 const GERMANY_CENTER: [number, number] = [51.1657, 10.4515]
 const GERMANY_ZOOM = 6
 
-// Generiere 10 zufällige Marker in Deutschland
-function generateRandomMarkers(count: number): Array<{ id: number; position: [number, number]; name: string }> {
-	const markers: Array<{ id: number; position: [number, number]; name: string }> = []
-	
-	// Deutschland grobe Grenzen: Lat 47-55, Lon 5-15
-	for (let i = 0; i < count; i++) {
-		const lat = 47 + Math.random() * 8 // 47-55
-		const lon = 5 + Math.random() * 10 // 5-15
-		markers.push({
-			id: i + 1,
-			position: [lat, lon],
-			name: `Hund ${i + 1}`,
-		})
-	}
-	
-	return markers
+// Deutschland grobe Grenzen: Lat 47-55, Lon 5-15
+const GERMANY_BOUNDS = {
+	minLat: 47.0,
+	maxLat: 55.0,
+	minLng: 5.0,
+	maxLng: 15.0,
 }
 
-export function DogMap({ isVisible }: DogMapProps) {
+/**
+ * Generiert zufällige Koordinaten innerhalb oder sehr nah bei Deutschland
+ */
+function generateRandomLocationInGermany(): [number, number] {
+	const lat = GERMANY_BOUNDS.minLat + Math.random() * (GERMANY_BOUNDS.maxLat - GERMANY_BOUNDS.minLat)
+	const lng = GERMANY_BOUNDS.minLng + Math.random() * (GERMANY_BOUNDS.maxLng - GERMANY_BOUNDS.minLng)
+	return [lat, lng]
+}
+
+/**
+ * Erstellt Marker-Daten aus Hunde-Daten
+ */
+function createMarkersFromDogs(dogs: Dog[]): Array<{ id: string; position: [number, number]; name: string; dog: Dog }> {
+	return dogs.map((dog) => {
+		let position: [number, number]
+
+		if (dog.Location?.lat && dog.Location?.lng) {
+			position = [dog.Location.lat, dog.Location.lng]
+		} else {
+			// Generiere zufällige Position in Deutschland, wenn keine Location vorhanden
+			position = generateRandomLocationInGermany()
+		}
+
+		const fullName = dog.fullKennelName ?? dog.givenName ?? 'Unbekannt'
+
+		return {
+			id: dog.documentId,
+			position,
+			name: fullName,
+			dog,
+		}
+	})
+}
+
+export function DogMap({ isVisible, dogs }: DogMapProps) {
 	const [isMounted, setIsMounted] = useState(false)
-	const markers = useMemo(() => generateRandomMarkers(10), [])
+	const markers = useMemo(() => createMarkersFromDogs(dogs), [dogs])
 
 	useEffect(() => {
 		setIsMounted(true)
@@ -86,8 +116,16 @@ export function DogMap({ isVisible }: DogMapProps) {
 				/>
 				{markers.map((marker) => (
 					<Marker key={marker.id} position={marker.position}>
-						<Popup>
+						<Tooltip permanent={false}>
 							{marker.name}
+						</Tooltip>
+						<Popup>
+							<div>
+								<strong>{marker.name}</strong>
+								{marker.dog.givenName && marker.dog.fullKennelName ? (
+									<div>{marker.dog.givenName}</div>
+								) : null}
+							</div>
 						</Popup>
 					</Marker>
 				))}

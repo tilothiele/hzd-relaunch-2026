@@ -1168,6 +1168,7 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
       'plugin::hzd-plugin.dog'
     > &
       Schema.Attribute.Private;
+    Location: Schema.Attribute.Component<'breeding.geo-location', false>;
     MemosDraft: Schema.Attribute.RichText &
       Schema.Attribute.CustomField<
         'plugin::ckeditor5.CKEditor',
