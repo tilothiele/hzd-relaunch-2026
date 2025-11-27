@@ -192,6 +192,7 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 				{/* Karte */}
 				<DogMap isVisible={showMap} dogs={dogs} />
 			<Box className='rounded-lg bg-white p-4 shadow-md'>
+				{/* Erste Zeile: Name, Farbe, Chipnummer */}
 				<Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: 3 }}>
 					<TextField
 						label='Name'
@@ -234,7 +235,10 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 						fullWidth
 						size='small'
 					/>
+				</Box>
 
+				{/* Zweite Zeile: SOD1, HD, Untersuchungen (rechts neben HD, unter Chipnummer) */}
+				<Box sx={{ mt: 3, display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 3, alignItems: 'start' }}>
 					<FormControl fullWidth size='small'>
 						<InputLabel>SOD1</InputLabel>
 						<Select
@@ -285,10 +289,7 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 							<MenuItem value='B2'>B2</MenuItem>
 						</Select>
 					</FormControl>
-				</Box>
 
-				{/* Untersuchungen Filter */}
-				<Box sx={{ mt: 2 }}>
 					<FormControl fullWidth size='small'>
 						<InputLabel>Untersuchungen</InputLabel>
 						<Select
