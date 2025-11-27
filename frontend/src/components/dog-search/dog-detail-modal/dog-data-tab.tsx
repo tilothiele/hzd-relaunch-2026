@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { Checkbox, FormControlLabel } from '@mui/material'
 import type { Dog } from '@/types'
 
 interface DogDataTabProps {
@@ -224,43 +225,118 @@ export function DogDataTab({ dog, strapiBaseUrl }: DogDataTabProps) {
 						</div>
 					) : null}
 
-					{dog.SOD1 ? (
-						<div className='flex items-center gap-4'>
-							<div className='flex h-10 w-10 items-center justify-center'>
-								<Image
-									src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
-									alt='SOD1'
-									width={24}
-									height={24}
-									className='object-contain'
-									unoptimized
-								/>
-							</div>
-							<div>
-								<p className='text-sm font-medium text-gray-500'>SOD1</p>
-								<p className='text-base text-gray-900'>{dog.SOD1}</p>
-							</div>
+					<div className='flex items-center gap-4'>
+						<div className='flex h-10 w-10 items-center justify-center'>
+							<Image
+								src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
+								alt='SOD1'
+								width={24}
+								height={24}
+								className='object-contain'
+								unoptimized
+							/>
 						</div>
-					) : null}
+						<div>
+							<p className='text-sm font-medium text-gray-500'>SOD1</p>
+							<p className='text-base text-gray-900'>{dog.SOD1 ?? 'Nicht verfügbar'}</p>
+						</div>
+					</div>
 
-					{dog.HD ? (
-						<div className='flex items-center gap-4'>
-							<div className='flex h-10 w-10 items-center justify-center'>
-								<Image
-									src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
-									alt='HD'
-									width={24}
-									height={24}
-									className='object-contain'
-									unoptimized
-								/>
-							</div>
-							<div>
-								<p className='text-sm font-medium text-gray-500'>HD</p>
-								<p className='text-base text-gray-900'>{dog.HD}</p>
-							</div>
+					<div className='flex items-center gap-4'>
+						<div className='flex h-10 w-10 items-center justify-center'>
+							<Image
+								src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
+								alt='HD'
+								width={24}
+								height={24}
+								className='object-contain'
+								unoptimized
+							/>
 						</div>
-					) : null}
+						<div>
+							<p className='text-sm font-medium text-gray-500'>HD</p>
+							<p className='text-base text-gray-900'>{dog.HD ?? 'Nicht verfügbar'}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			{/* Untersuchungen */}
+			<div className='mt-6 border-t border-gray-200 pt-6'>
+				<h3 className='mb-4 text-lg font-semibold text-gray-900'>Untersuchungen</h3>
+				<div className='grid gap-4 md:grid-cols-2'>
+					<FormControlLabel
+						control={
+							<Checkbox
+								checked={dog.Genprofil === true}
+								disabled
+								sx={{
+									color: dog.Genprofil === true ? '#10b981' : '#d1d5db',
+									'&.Mui-checked': {
+										color: '#10b981',
+									},
+									'&.Mui-disabled': {
+										color: dog.Genprofil === true ? '#10b981' : '#d1d5db',
+									},
+								}}
+							/>
+						}
+						label='Genprofil'
+					/>
+					<FormControlLabel
+						control={
+							<Checkbox
+								checked={dog.EyesCheck === true}
+								disabled
+								sx={{
+									color: dog.EyesCheck === true ? '#10b981' : '#d1d5db',
+									'&.Mui-checked': {
+										color: '#10b981',
+									},
+									'&.Mui-disabled': {
+										color: dog.EyesCheck === true ? '#10b981' : '#d1d5db',
+									},
+								}}
+							/>
+						}
+						label='Augenuntersuchung'
+					/>
+					<FormControlLabel
+						control={
+							<Checkbox
+								checked={dog.HeartCheck === true}
+								disabled
+								sx={{
+									color: dog.HeartCheck === true ? '#10b981' : '#d1d5db',
+									'&.Mui-checked': {
+										color: '#10b981',
+									},
+									'&.Mui-disabled': {
+										color: dog.HeartCheck === true ? '#10b981' : '#d1d5db',
+									},
+								}}
+							/>
+						}
+						label='Herzuntersuchung'
+					/>
+					<FormControlLabel
+						control={
+							<Checkbox
+								checked={dog.ColorCheck === true}
+								disabled
+								sx={{
+									color: dog.ColorCheck === true ? '#10b981' : '#d1d5db',
+									'&.Mui-checked': {
+										color: '#10b981',
+									},
+									'&.Mui-disabled': {
+										color: dog.ColorCheck === true ? '#10b981' : '#d1d5db',
+									},
+								}}
+							/>
+						}
+						label='Farbverdünnung'
+					/>
 				</div>
 			</div>
 		</div>
