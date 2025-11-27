@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { Card, CardMedia, CardContent, Table, TableBody, TableRow, TableCell, Checkbox, Box } from '@mui/material'
+import { Card, CardMedia, CardContent, Table, TableBody, TableRow, TableCell, Box } from '@mui/material'
 import type { Dog } from '@/types'
 
 interface DogCardProps {
@@ -259,66 +259,56 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick }: DogCardProps) {
 								</TableCell>
 							</TableRow>
 						) : null}
-						<TableRow>
-							<TableCell
-								sx={{
-									width: 48,
-									paddingLeft: '1em',
-									paddingRight: '1em',
-									verticalAlign: 'middle',
-								}}
-							>
-								<Checkbox
-									checked={dog.Sod1Test === true}
-									disabled
+						{dog.SOD1 ? (
+							<TableRow>
+								<TableCell
 									sx={{
-										padding: 0,
-										width: 20,
-										height: 20,
-										color: '#10b981',
-										'&.Mui-checked': {
-											color: '#10b981',
-										},
-										'&.Mui-disabled': {
-											color: dog.Sod1Test === true ? '#10b981' : '#d1d5db',
-										},
+										width: 48,
+										paddingLeft: '1em',
+										paddingRight: '1em',
+										verticalAlign: 'middle',
 									}}
-								/>
-							</TableCell>
-							<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-								SOD1
-							</TableCell>
-						</TableRow>
-						<TableRow>
-							<TableCell
-								sx={{
-									width: 48,
-									paddingLeft: '1em',
-									paddingRight: '1em',
-									verticalAlign: 'middle',
-								}}
-							>
-								<Checkbox
-									checked={dog.HDTest === true}
-									disabled
+								>
+									<Box sx={{ width: 20, height: 20, position: 'relative' }}>
+										<Image
+											src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
+											alt='SOD1'
+											fill
+											className='object-contain'
+											unoptimized
+										/>
+									</Box>
+								</TableCell>
+								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
+									SOD1: {dog.SOD1}
+								</TableCell>
+							</TableRow>
+						) : null}
+						{dog.HD ? (
+							<TableRow>
+								<TableCell
 									sx={{
-										padding: 0,
-										width: 20,
-										height: 20,
-										color: '#10b981',
-										'&.Mui-checked': {
-											color: '#10b981',
-										},
-										'&.Mui-disabled': {
-											color: dog.HDTest === true ? '#10b981' : '#d1d5db',
-										},
+										width: 48,
+										paddingLeft: '1em',
+										paddingRight: '1em',
+										verticalAlign: 'middle',
 									}}
-								/>
-							</TableCell>
-							<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-								HD
-							</TableCell>
-						</TableRow>
+								>
+									<Box sx={{ width: 20, height: 20, position: 'relative' }}>
+										<Image
+											src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
+											alt='HD'
+											fill
+											className='object-contain'
+											unoptimized
+										/>
+									</Box>
+								</TableCell>
+								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
+									HD: {dog.HD}
+								</TableCell>
+							</TableRow>
+						) : null}
 					</TableBody>
 				</Table>
 			</CardContent>

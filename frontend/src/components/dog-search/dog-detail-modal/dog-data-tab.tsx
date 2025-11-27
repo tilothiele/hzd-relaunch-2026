@@ -224,107 +224,43 @@ export function DogDataTab({ dog, strapiBaseUrl }: DogDataTabProps) {
 						</div>
 					) : null}
 
-					<div className='flex items-center gap-4'>
-						<div className='flex h-10 w-10 items-center justify-center'>
-							{dog.Sod1Test === true ? (
-								<div
-									style={{
-										width: '24px',
-										height: '24px',
-										borderRadius: '4px',
-										backgroundColor: '#10b981',
-										border: '2px solid #10b981',
-										display: 'flex',
-										alignItems: 'center',
-										justifyContent: 'center',
-									}}
-								>
-									<svg
-										width='16'
-										height='16'
-										viewBox='0 0 14 14'
-										fill='none'
-										xmlns='http://www.w3.org/2000/svg'
-									>
-										<path
-											d='M11.6667 3.5L5.25 9.91667L2.33334 7'
-											stroke='white'
-											strokeWidth='2'
-											strokeLinecap='round'
-											strokeLinejoin='round'
-										/>
-									</svg>
-								</div>
-							) : (
-								<div
-									style={{
-										width: '24px',
-										height: '24px',
-										borderRadius: '4px',
-										border: '2px solid #d1d5db',
-										backgroundColor: 'transparent',
-									}}
+					{dog.SOD1 ? (
+						<div className='flex items-center gap-4'>
+							<div className='flex h-10 w-10 items-center justify-center'>
+								<Image
+									src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
+									alt='SOD1'
+									width={24}
+									height={24}
+									className='object-contain'
+									unoptimized
 								/>
-							)}
+							</div>
+							<div>
+								<p className='text-sm font-medium text-gray-500'>SOD1</p>
+								<p className='text-base text-gray-900'>{dog.SOD1}</p>
+							</div>
 						</div>
-						<div>
-							<p className='text-sm font-medium text-gray-500'>SOD1-Test</p>
-							<p className='text-base text-gray-900'>
-								{dog.Sod1Test === true ? 'Ja' : dog.Sod1Test === false ? 'Nein' : 'Nicht verfügbar'}
-							</p>
-						</div>
-					</div>
+					) : null}
 
-					<div className='flex items-center gap-4'>
-						<div className='flex h-10 w-10 items-center justify-center'>
-							{dog.HDTest === true ? (
-								<div
-									style={{
-										width: '24px',
-										height: '24px',
-										borderRadius: '4px',
-										backgroundColor: '#10b981',
-										border: '2px solid #10b981',
-										display: 'flex',
-										alignItems: 'center',
-										justifyContent: 'center',
-									}}
-								>
-									<svg
-										width='16'
-										height='16'
-										viewBox='0 0 14 14'
-										fill='none'
-										xmlns='http://www.w3.org/2000/svg'
-									>
-										<path
-											d='M11.6667 3.5L5.25 9.91667L2.33334 7'
-											stroke='white'
-											strokeWidth='2'
-											strokeLinecap='round'
-											strokeLinejoin='round'
-										/>
-									</svg>
-								</div>
-							) : (
-								<div
-									style={{
-										width: '24px',
-										height: '24px',
-										borderRadius: '4px',
-										border: '2px solid #d1d5db',
-										backgroundColor: 'transparent',
-									}}
+					{dog.HD ? (
+						<div className='flex items-center gap-4'>
+							<div className='flex h-10 w-10 items-center justify-center'>
+								<Image
+									src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
+									alt='HD'
+									width={24}
+									height={24}
+									className='object-contain'
+									unoptimized
 								/>
-							)}
+							</div>
+							<div>
+								<p className='text-sm font-medium text-gray-500'>HD</p>
+								<p className='text-base text-gray-900'>{dog.HD}</p>
+							</div>
 						</div>
-						<div>
-							<p className='text-sm font-medium text-gray-500'>HD-Test</p>
-							<p className='text-base text-gray-900'>
-								{dog.HDTest === true ? 'Ja' : dog.HDTest === false ? 'Nein' : 'Nicht verfügbar'}
-							</p>
-						</div>
-					</div>
+					) : null}
 				</div>
 			</div>
 		</div>

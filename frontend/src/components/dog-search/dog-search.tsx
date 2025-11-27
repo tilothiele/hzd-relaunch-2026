@@ -1,8 +1,10 @@
 'use client'
 
-import { useCallback, useState } from 'react'
-import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, FormControlLabel } from '@mui/material'
-import { useDogs, type ColorFilter, type PageSize, type BooleanFilter, type SexFilter } from '@/hooks/use-dogs'
+import { useCallback, useMemo, useState } from 'react'
+import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, FormControlLabel, Chip, OutlinedInput } from '@mui/material'
+import { useDogs, type ColorFilter, type PageSize, type SexFilter, type Sod1Filter, type HDFilter } from '@/hooks/use-dogs'
+
+type ExaminationFilter = 'HD' | 'HeartCheck' | 'Genprofil' | 'EyesCheck' | 'ColorCheck'
 import { DogCard } from './dog-card'
 import { DogMap } from './dog-map'
 import { DogDetailModal } from './dog-detail-modal'
@@ -17,13 +19,40 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 	const [nameFilter, setNameFilter] = useState('')
 	const [colorFilter, setColorFilter] = useState<ColorFilter>('')
 	const [chipNoFilter, setChipNoFilter] = useState('')
-	const [sod1testFilter, setSod1testFilter] = useState<BooleanFilter>('')
-	const [hdtestFilter, setHdtestFilter] = useState<BooleanFilter>('')
+	const [sod1Filters, setSod1Filters] = useState<Sod1Filter[]>([])
+	const [hdFilters, setHdFilters] = useState<HDFilter[]>([])
+	const [examinationFilters, setExaminationFilters] = useState<ExaminationFilter[]>([])
 	const [page, setPage] = useState(1)
 	const [pageSize, setPageSize] = useState<PageSize>(10)
 	const [showMap, setShowMap] = useState(false)
 	const [selectedDog, setSelectedDog] = useState<Dog | null>(null)
 	const [isModalOpen, setIsModalOpen] = useState(false)
+
+	// Stabilisiere Arrays für stabile Dependencies
+	const sod1FiltersKey = useMemo(() => JSON.stringify([...sod1Filters].sort()), [sod1Filters])
+	const hdFiltersKey = useMemo(() => JSON.stringify([...hdFilters].sort()), [hdFilters])
+	const examinationFiltersKey = useMemo(() => JSON.stringify([...examinationFilters].sort()), [examinationFilters])
+
+	// Mappe ExaminationFilter auf die entsprechenden Filter
+	const onlyHD = examinationFilters.includes('HD')
+	const onlyHeartCheck = examinationFilters.includes('HeartCheck')
+	const onlyGenprofil = examinationFilters.includes('Genprofil')
+	const onlyEyesCheck = examinationFilters.includes('EyesCheck')
+	const onlyColorCheck = examinationFilters.includes('ColorCheck')
+
+	const filters = useMemo(() => ({
+		nameFilter,
+		sexFilter,
+		colorFilter,
+		chipNoFilter,
+		sod1Filters: sod1Filters.length > 0 ? sod1Filters : undefined,
+		hdFilters: hdFilters.length > 0 ? hdFilters : undefined,
+		onlyHD: onlyHD || undefined,
+		onlyHeartCheck: onlyHeartCheck || undefined,
+		onlyGenprofil: onlyGenprofil || undefined,
+		onlyEyesCheck: onlyEyesCheck || undefined,
+		onlyColorCheck: onlyColorCheck || undefined,
+	}), [nameFilter, sexFilter, colorFilter, chipNoFilter, sod1FiltersKey, hdFiltersKey, examinationFiltersKey])
 
 	const {
 		dogs,
@@ -33,14 +62,7 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 		error,
 		searchDogs,
 	} = useDogs({
-		filters: {
-			nameFilter,
-			sexFilter,
-			colorFilter,
-			chipNoFilter,
-			sod1testFilter,
-			hdtestFilter,
-		},
+		filters,
 		pagination: {
 			page,
 			pageSize,
@@ -146,46 +168,92 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 					/>
 
 					<FormControl fullWidth size='small'>
-						<InputLabel>SOD1-Test</InputLabel>
+						<InputLabel>SOD1</InputLabel>
 						<Select
-							value={sod1testFilter === true ? 'true' : sod1testFilter === false ? 'false' : ''}
-							label='SOD1-Test'
+							multiple
+							value={sod1Filters}
+							label='SOD1'
 							onChange={(e) => {
 								const value = e.target.value
-								if (value === 'true') {
-									setSod1testFilter(true)
-								} else if (value === 'false') {
-									setSod1testFilter(false)
-								} else {
-									setSod1testFilter('')
-								}
+								setSod1Filters(typeof value === 'string' ? value.split(',') as Sod1Filter[] : value as Sod1Filter[])
 							}}
+							input={<OutlinedInput label='SOD1' />}
+							renderValue={(selected) => (
+								<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+									{selected.map((value) => (
+										<Chip key={value} label={value} size='small' />
+									))}
+								</Box>
+							)}
 						>
-							<MenuItem value=''>Egal</MenuItem>
-							<MenuItem value='true'>Ja</MenuItem>
-							<MenuItem value='false'>Nein</MenuItem>
+							<MenuItem value='N/N'>N/N</MenuItem>
+							<MenuItem value='N/DM'>N/DM</MenuItem>
+							<MenuItem value='DM/DM'>DM/DM</MenuItem>
 						</Select>
 					</FormControl>
 
 					<FormControl fullWidth size='small'>
-						<InputLabel>HD-Test</InputLabel>
+						<InputLabel>HD</InputLabel>
 						<Select
-							value={hdtestFilter === true ? 'true' : hdtestFilter === false ? 'false' : ''}
-							label='HD-Test'
+							multiple
+							value={hdFilters}
+							label='HD'
 							onChange={(e) => {
 								const value = e.target.value
-								if (value === 'true') {
-									setHdtestFilter(true)
-								} else if (value === 'false') {
-									setHdtestFilter(false)
-								} else {
-									setHdtestFilter('')
-								}
+								setHdFilters(typeof value === 'string' ? value.split(',') as HDFilter[] : value as HDFilter[])
 							}}
+							input={<OutlinedInput label='HD' />}
+							renderValue={(selected) => (
+								<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+									{selected.map((value) => (
+										<Chip key={value} label={value} size='small' />
+									))}
+								</Box>
+							)}
 						>
-							<MenuItem value=''>Egal</MenuItem>
-							<MenuItem value='true'>Ja</MenuItem>
-							<MenuItem value='false'>Nein</MenuItem>
+							<MenuItem value='A1'>A1</MenuItem>
+							<MenuItem value='A2'>A2</MenuItem>
+							<MenuItem value='B1'>B1</MenuItem>
+							<MenuItem value='B2'>B2</MenuItem>
+						</Select>
+					</FormControl>
+				</Box>
+
+				{/* Untersuchungen Filter */}
+				<Box sx={{ mt: 2 }}>
+					<FormControl fullWidth size='small'>
+						<InputLabel>Untersuchungen</InputLabel>
+						<Select
+							multiple
+							value={examinationFilters}
+							label='Untersuchungen'
+							onChange={(e) => {
+								const value = e.target.value
+								setExaminationFilters(typeof value === 'string' ? value.split(',') as ExaminationFilter[] : value as ExaminationFilter[])
+							}}
+							input={<OutlinedInput label='Untersuchungen' />}
+							renderValue={(selected) => (
+								<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+									{selected.map((value) => {
+										const labels: Record<ExaminationFilter, string> = {
+											HD: 'Nur HD',
+											HeartCheck: 'Nur mit Herzuntersuchung',
+											Genprofil: 'Nur mit Genprofil',
+											EyesCheck: 'Nur mit Augenuntersuchung',
+											ColorCheck: 'Nur mit Farbverdünnung',
+										}
+										return (
+											<Chip key={value} label={labels[value]} size='small' />
+										)
+									})}
+								</Box>
+							)}
+						>
+							<MenuItem value='HD'>Nur HD</MenuItem>
+							<MenuItem value='HeartCheck'>Nur mit Herzuntersuchung</MenuItem>
+							<MenuItem value='Genprofil'>Nur mit Genprofil</MenuItem>
+							<MenuItem value='EyesCheck'>Nur mit Augenuntersuchung</MenuItem>
+							<MenuItem value='ColorCheck'>Nur mit Farbverdünnung</MenuItem>
 						</Select>
 					</FormControl>
 				</Box>

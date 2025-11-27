@@ -360,8 +360,29 @@ export const SEARCH_DOGS = `
 			dateOfBirth
 			dateOfDeath
 			microchipNo
-			HDTest
-			Sod1Test
+			SOD1
+			HD
+			stuntLicenseSince
+			father {
+				documentId
+				fullKennelName
+				givenName
+			}
+			mother {
+				documentId
+				fullKennelName
+				givenName
+			}
+			owner {
+				documentId
+				fullName
+			}
+			Genprofil
+			EyesCheck
+			HeartCheck
+			ColorCheck
+			MemosDraft
+			MemosReleased
 	  		avatar {
 				url
 				alternativeText
@@ -407,6 +428,19 @@ export const SEARCH_LITTERS = `
 			expectedDateOfBirth
 			dateOfBirth
 			closed
+			StatusMessage
+			AmountS {
+				Total
+				Available
+			}
+			AmountSM {
+				Total
+				Available
+			}
+			AmountB {
+				Total
+				Available
+			}
 			breeder {
 				kennelName
 				member {

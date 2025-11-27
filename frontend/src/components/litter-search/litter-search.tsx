@@ -315,6 +315,32 @@ export function LitterSearch({ strapiBaseUrl }: LitterSearchProps) {
 												<strong>Geburtsdatum:</strong> {formatDate(litter.dateOfBirth)}
 											</p>
 										) : null}
+										{(litter.AmountS || litter.AmountSM || litter.AmountB) ? (
+											<div className='mt-3 space-y-1 border-t border-gray-200 pt-2'>
+												<p className='font-medium text-gray-700'>Welpen:</p>
+												{litter.AmountS ? (
+													<p className='pl-2'>
+														<strong>Schwarz:</strong> {litter.AmountS.Available ?? 0} / {litter.AmountS.Total ?? 0} verfügbar
+													</p>
+												) : null}
+												{litter.AmountSM ? (
+													<p className='pl-2'>
+														<strong>Schwarz-Marken:</strong> {litter.AmountSM.Available ?? 0} / {litter.AmountSM.Total ?? 0} verfügbar
+													</p>
+												) : null}
+												{litter.AmountB ? (
+													<p className='pl-2'>
+														<strong>Blond:</strong> {litter.AmountB.Available ?? 0} / {litter.AmountB.Total ?? 0} verfügbar
+													</p>
+												) : null}
+											</div>
+										) : null}
+										{litter.StatusMessage ? (
+											<div className='mt-3 rounded bg-blue-50 p-2'>
+												<p className='text-xs font-medium text-blue-800'>Status:</p>
+												<p className='text-xs text-blue-700'>{litter.StatusMessage}</p>
+											</div>
+										) : null}
 									</div>
 								</div>
 							)

@@ -208,6 +208,11 @@ export interface AuthUser {
 	email?: string | null
 }
 
+export interface PuppyAmount {
+	Total?: number | null
+	Available?: number | null
+}
+
 export interface Dog {
 	documentId: string
 	givenName?: string | null
@@ -217,8 +222,29 @@ export interface Dog {
 	dateOfBirth?: string | null
 	dateOfDeath?: string | null
 	microchipNo?: string | null
-	Sod1Test?: boolean | null
-	HDTest?: boolean | null
+	SOD1?: 'N/N' | 'N/DM' | 'DM/DM' | null
+	HD?: 'A1' | 'A2' | 'B1' | 'B2' | null
+	stuntLicenseSince?: string | null
+	father?: {
+		documentId: string
+		fullKennelName?: string | null
+		givenName?: string | null
+	} | null
+	mother?: {
+		documentId: string
+		fullKennelName?: string | null
+		givenName?: string | null
+	} | null
+	owner?: {
+		documentId: string
+		fullName?: string | null
+	} | null
+	Genprofil?: boolean | null
+	EyesCheck?: boolean | null
+	HeartCheck?: boolean | null
+	ColorCheck?: boolean | null
+	MemosDraft?: string | null
+	MemosReleased?: string | null
 	avatar?: {
 		url?: string | null
 		alternativeText?: string | null
@@ -256,6 +282,10 @@ export interface Litter {
 	expectedDateOfBirth?: string | null
 	dateOfBirth?: string | null
 	closed?: boolean | null
+	StatusMessage?: string | null
+	AmountS?: PuppyAmount | null
+	AmountSM?: PuppyAmount | null
+	AmountB?: PuppyAmount | null
 	breeder?: {
 		kennelName?: string | null
 		member?: {
