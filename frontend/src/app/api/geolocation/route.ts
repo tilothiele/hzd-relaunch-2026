@@ -9,9 +9,10 @@ export async function GET(request: NextRequest) {
 		// Ermittle die IP-Adresse des Clients
 		const forwarded = request.headers.get('x-forwarded-for')
 		const realIp = request.headers.get('x-real-ip')
-		const ip = forwarded?.split(',')[0] || realIp || request.ip || ''
+		const cfConnectingIp = request.headers.get('cf-connecting-ip') // Cloudflare
+		const ip = forwarded?.split(',')[0]?.trim() || realIp || cfConnectingIp || ''
 
-		if (!ip || ip === '::1' || ip === '127.0.0.1') {
+		if (!ip || ip === '::1' || ip === '127.0.0.1' || ip === 'localhost') {
 			// Lokale IP, verwende einen Fallback
 			return NextResponse.json({
 				success: false,
