@@ -136,9 +136,9 @@
     "SOD1": {
       "type": "enumeration",
       "enum": [
-        "NN",
-        "NDM",
-        "DMDM"
+        "N/N",
+        "N/DM",
+        "DM/DM"
       ]
     },
     "HD": {
