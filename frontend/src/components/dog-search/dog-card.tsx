@@ -356,7 +356,7 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 								>
 									<Box sx={{ width: 20, height: 20, position: 'relative' }}>
 										<Image
-											src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
+											src='/icons/zucht-icon-position-hzd-hovawart-zuchtgemeinschaft.png'
 											alt='Entfernung'
 											fill
 											className='object-contain'

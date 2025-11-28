@@ -181,7 +181,7 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 			page,
 			pageSize,
 		},
-		autoLoad: true,
+		autoLoad: false,
 	})
 
 	const handleSearch = useCallback(() => {
