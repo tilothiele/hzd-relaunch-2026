@@ -4,6 +4,9 @@ import { useMemo, useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import 'leaflet/dist/leaflet.css'
 import type { Dog } from '@/types'
+import type L from 'leaflet'
+
+type LeafletIcon = InstanceType<typeof L.Icon>
 
 // Dynamischer Import der Karte für SSR-Kompatibilität
 const MapContainer = dynamic(
@@ -94,7 +97,7 @@ function createMarkersFromDogs(dogs: Dog[]): Array<{ id: string; position: [numb
 }
 
 // Komponente für Benutzerposition-Marker
-function UserLocationMarker({ position, icon }: { position: [number, number]; icon: InstanceType<typeof import('leaflet').default.Icon> }) {
+function UserLocationMarker({ position, icon }: { position: [number, number]; icon: LeafletIcon }) {
 	return (
 		<Marker position={position} icon={icon}>
 			<Tooltip permanent={false}>Ihre Position (PLZ)</Tooltip>
@@ -117,7 +120,7 @@ function MapReady({ onReady }: { onReady: () => void }) {
 export function DogMap({ isVisible, dogs, userLocation }: DogMapProps) {
 	const [isMounted, setIsMounted] = useState(false)
 	const [isMapReady, setIsMapReady] = useState(false)
-	const [grayIcon, setGrayIcon] = useState<InstanceType<typeof import('leaflet').default.Icon> | null>(null)
+	const [grayIcon, setGrayIcon] = useState<LeafletIcon | null>(null)
 	const markers = useMemo(() => createMarkersFromDogs(dogs), [dogs])
 
 	useEffect(() => {
