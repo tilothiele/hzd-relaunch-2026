@@ -211,43 +211,23 @@ export function useDogs(options: UseDogsOptions = {}) {
 				},
 			)
 
-			let dogsArray = Array.isArray(data.hzdPluginDogs) ? data.hzdPluginDogs : []
+			const dogsArray = Array.isArray(data.hzdPluginDogs) ? data.hzdPluginDogs : []
 
-			// Clientseitige Filterung nach Entfernung
-			const maxDistanceNum = maxDistance === '' || maxDistance === null || maxDistance === undefined
-				? null
-				: (typeof maxDistance === 'string' ? Number(maxDistance) : maxDistance)
+			setDogs(dogsArray)
 
-			if (maxDistanceNum !== null && !isNaN(maxDistanceNum) && maxDistanceNum > 0 && userLocation && typeof userLocation.lat === 'number' && typeof userLocation.lng === 'number') {
-				dogsArray = dogsArray.filter((dog) => {
-					// Hunde ohne Location werden ausgeschlossen, wenn Entfernungsfilter aktiv ist
-					if (!dog.Location || typeof dog.Location.lat !== 'number' || typeof dog.Location.lng !== 'number') {
-						return false
-					}
+			// Berechne Paginierung basierend auf den serverseitigen Ergebnissen
+			// Da die Meta-Informationen nicht in der Antwort enthalten sind,
+			// schätzen wir die Gesamtzahl basierend auf der Anzahl der zurückgegebenen Ergebnisse
+			// Wenn wir genau pageSize Ergebnisse haben, gibt es wahrscheinlich mehr
+			const estimatedTotal = dogsArray.length === pageSize && page > 1
+				? page * pageSize + 1
+				: dogsArray.length === pageSize
+					? page * pageSize
+					: (page - 1) * pageSize + dogsArray.length
 
-					const distance = calculateDistance(
-						userLocation.lat,
-						userLocation.lng,
-						dog.Location.lat,
-						dog.Location.lng,
-					)
+			const calculatedPageCount = Math.ceil(estimatedTotal / pageSize)
 
-					return distance <= maxDistanceNum
-				})
-			}
-
-			// Clientseitige Paginierung nach Filterung
-			const totalFiltered = dogsArray.length
-			const startIndex = (page - 1) * pageSize
-			const endIndex = startIndex + pageSize
-			const paginatedDogs = dogsArray.slice(startIndex, endIndex)
-
-			setDogs(paginatedDogs)
-
-			// Berechne Paginierung basierend auf den gefilterten Ergebnissen
-			const calculatedPageCount = Math.ceil(totalFiltered / pageSize)
-
-			setTotalDogs(totalFiltered)
+			setTotalDogs(estimatedTotal)
 			setPageCount(calculatedPageCount)
 		} catch (err) {
 			const fetchError = err instanceof Error
@@ -260,7 +240,7 @@ export function useDogs(options: UseDogsOptions = {}) {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [baseUrl, nameFilter, sexFilter, colorFilter, chipNoFilter, sod1Filters, hdFilters, onlyHD, onlyHeartCheck, onlyGenprofil, onlyEyesCheck, onlyColorCheck, maxDistance, userLocation, page, pageSize])
+	}, [baseUrl, nameFilter, sexFilter, colorFilter, chipNoFilter, sod1Filters, hdFilters, onlyHD, onlyHeartCheck, onlyGenprofil, onlyEyesCheck, onlyColorCheck, page, pageSize])
 
 	useEffect(() => {
 		if (autoLoad && baseUrl && baseUrl.trim().length > 0) {

@@ -458,6 +458,8 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 								dog={dog}
 								strapiBaseUrl={strapiBaseUrl}
 								onImageClick={() => handleDogImageClick(dog)}
+								userLocation={userLocation}
+								maxDistance={maxDistance === '' ? undefined : maxDistance}
 							/>
 						))}
 					</div>
