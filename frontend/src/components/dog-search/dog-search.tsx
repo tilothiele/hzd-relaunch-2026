@@ -9,7 +9,53 @@ type ExaminationFilter = 'HD' | 'HeartCheck' | 'Genprofil' | 'EyesCheck' | 'Colo
 import { DogCard } from './dog-card'
 import { DogMap } from './dog-map'
 import { DogDetailModal } from './dog-detail-modal'
-import type { Dog } from '@/types'
+import type { Dog, GeoLocation } from '@/types'
+
+// Deutschland grobe Grenzen: Lat 47-55, Lon 5-15
+const GERMANY_BOUNDS = {
+	minLat: 47.0,
+	maxLat: 55.0,
+	minLng: 5.0,
+	maxLng: 15.0,
+}
+
+/**
+ * Generiert deterministische Fake-Koordinaten basierend auf der documentId
+ * Dies stellt sicher, dass jeder Hund immer die gleichen Koordinaten hat
+ */
+function generateFakeLocationForDog(documentId: string): GeoLocation {
+	// Verwende einen einfachen Hash der documentId, um deterministische Werte zu erhalten
+	let hash = 0
+	for (let i = 0; i < documentId.length; i++) {
+		const char = documentId.charCodeAt(i)
+		hash = ((hash << 5) - hash) + char
+		hash = hash & hash // Convert to 32bit integer
+	}
+
+	// Normalisiere den Hash auf 0-1 Bereich
+	const normalizedHash = Math.abs(hash) / 2147483647
+
+	// Generiere Koordinaten innerhalb Deutschlands
+	const lat = GERMANY_BOUNDS.minLat + normalizedHash * (GERMANY_BOUNDS.maxLat - GERMANY_BOUNDS.minLat)
+	const lng = GERMANY_BOUNDS.minLng + (1 - normalizedHash) * (GERMANY_BOUNDS.maxLng - GERMANY_BOUNDS.minLng)
+
+	return { lat, lng }
+}
+
+/**
+ * Erweitert Hunde mit Fake-Koordinaten, wenn keine Location vorhanden ist
+ */
+function enrichDogsWithFakeLocations(dogs: Dog[]): Dog[] {
+	return dogs.map((dog) => {
+		if (!dog.Location) {
+			return {
+				...dog,
+				Location: generateFakeLocationForDog(dog.documentId),
+			}
+		}
+		return dog
+	})
+}
 
 interface DogSearchProps {
 	strapiBaseUrl?: string | null
@@ -162,6 +208,9 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 		setSelectedDog(null)
 	}, [])
 
+	// Erweitere Hunde mit Fake-Koordinaten, wenn keine Location vorhanden ist
+	const enrichedDogs = useMemo(() => enrichDogsWithFakeLocations(dogs), [dogs])
+
 	const totalPages = pageCount
 	const currentPage = page
 
@@ -190,7 +239,7 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 				</Box>
 
 				{/* Karte */}
-				<DogMap isVisible={showMap} dogs={dogs} />
+				<DogMap isVisible={showMap} dogs={enrichedDogs} userLocation={zipLocation} />
 			<Box className='rounded-lg bg-white p-4 shadow-md'>
 				{/* Erste Zeile: Name, Farbe, Chipnummer */}
 				<Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: 3 }}>
@@ -449,10 +498,10 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 						</div>
 					))}
 				</div>
-			) : dogs.length > 0 ? (
+			) : enrichedDogs.length > 0 ? (
 				<>
 					<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-						{dogs.map((dog) => (
+						{enrichedDogs.map((dog) => (
 							<DogCard
 								key={dog.documentId}
 								dog={dog}

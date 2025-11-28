@@ -42,6 +42,7 @@ if (typeof window !== 'undefined') {
 interface DogMapProps {
 	isVisible: boolean
 	dogs: Dog[]
+	userLocation?: { lat: number; lng: number } | null
 }
 
 // Deutschland Zentrum
@@ -70,12 +71,14 @@ function generateRandomLocationInGermany(): [number, number] {
  */
 function createMarkersFromDogs(dogs: Dog[]): Array<{ id: string; position: [number, number]; name: string; dog: Dog }> {
 	return dogs.map((dog) => {
+		// Verwende die Location aus dem Dog-Objekt (kann echte oder Fake-Koordinaten sein)
 		let position: [number, number]
 
 		if (dog.Location?.lat && dog.Location?.lng) {
 			position = [dog.Location.lat, dog.Location.lng]
 		} else {
-			// Generiere zufällige Position in Deutschland, wenn keine Location vorhanden
+			// Fallback: Generiere zufällige Position in Deutschland, wenn keine Location vorhanden
+			// (sollte nicht mehr vorkommen, da Fake-Koordinaten im Dog-Objekt gespeichert werden)
 			position = generateRandomLocationInGermany()
 		}
 
@@ -90,23 +93,77 @@ function createMarkersFromDogs(dogs: Dog[]): Array<{ id: string; position: [numb
 	})
 }
 
-export function DogMap({ isVisible, dogs }: DogMapProps) {
+// Komponente für Benutzerposition-Marker
+function UserLocationMarker({ position, icon }: { position: [number, number]; icon: InstanceType<typeof import('leaflet').default.Icon> }) {
+	return (
+		<Marker position={position} icon={icon}>
+			<Tooltip permanent={false}>Ihre Position (PLZ)</Tooltip>
+		</Marker>
+	)
+}
+
+// Komponente, die prüft, ob die Map bereit ist
+function MapReady({ onReady }: { onReady: () => void }) {
+	useEffect(() => {
+		// Warte, bis die Map vollständig initialisiert ist
+		const timer = setTimeout(() => {
+			onReady()
+		}, 200)
+		return () => clearTimeout(timer)
+	}, [onReady])
+	return null
+}
+
+export function DogMap({ isVisible, dogs, userLocation }: DogMapProps) {
 	const [isMounted, setIsMounted] = useState(false)
+	const [isMapReady, setIsMapReady] = useState(false)
+	const [grayIcon, setGrayIcon] = useState<InstanceType<typeof import('leaflet').default.Icon> | null>(null)
 	const markers = useMemo(() => createMarkersFromDogs(dogs), [dogs])
 
 	useEffect(() => {
 		setIsMounted(true)
 	}, [])
 
+	// Lade graues Icon, wenn userLocation vorhanden ist
+	useEffect(() => {
+		if (!userLocation || typeof window === 'undefined') {
+			return
+		}
+
+		const initGrayIcon = async () => {
+			try {
+				const L = await import('leaflet')
+				const icon = L.default.icon({
+					iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png',
+					iconRetinaUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-grey.png',
+					shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+					iconSize: [25, 41],
+					iconAnchor: [12, 41],
+					popupAnchor: [1, -34],
+					shadowSize: [41, 41],
+				})
+				setGrayIcon(icon)
+			} catch (error) {
+				console.error('Fehler beim Laden des grauen Icons:', error)
+			}
+		}
+
+		void initGrayIcon()
+	}, [userLocation])
+
 	if (!isVisible || !isMounted) {
 		return null
 	}
 
+	const userPosition: [number, number] | null = userLocation
+		? [userLocation.lat, userLocation.lng]
+		: null
+
 	return (
 		<div className='mb-6 h-96 w-full overflow-hidden rounded-lg border border-gray-200 shadow-md'>
 			<MapContainer
-				center={GERMANY_CENTER}
-				zoom={GERMANY_ZOOM}
+				center={userPosition || GERMANY_CENTER}
+				zoom={userPosition ? 8 : GERMANY_ZOOM}
 				style={{ height: '100%', width: '100%' }}
 				scrollWheelZoom={true}
 			>
@@ -114,6 +171,10 @@ export function DogMap({ isVisible, dogs }: DogMapProps) {
 					attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 					url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
 				/>
+				<MapReady onReady={() => setIsMapReady(true)} />
+				{userPosition && isMapReady && grayIcon && (
+					<UserLocationMarker position={userPosition} icon={grayIcon} />
+				)}
 				{markers.map((marker) => (
 					<Marker key={marker.id} position={marker.position}>
 						<Tooltip permanent={false}>
