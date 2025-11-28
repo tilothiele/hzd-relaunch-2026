@@ -17,10 +17,10 @@ export async function GET(request: NextRequest) {
 		}
 
 		// Verwende Nominatim für Geocoding (kostenlos, OpenStreetMap)
-		// Suche nach PLZ in Deutschland
-		const query = `${zip.trim()}, Deutschland`
+		// Suche spezifisch nach Postleitzahl in Deutschland
+		const zipCode = zip.trim()
 		const response = await fetch(
-			`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&countrycodes=de`,
+			`https://nominatim.openstreetmap.org/search?format=json&postalcode=${encodeURIComponent(zipCode)}&countrycodes=de&limit=1&addressdetails=1`,
 			{
 				headers: {
 					'Accept': 'application/json',
@@ -36,11 +36,22 @@ export async function GET(request: NextRequest) {
 		const data = await response.json()
 
 		if (Array.isArray(data) && data.length > 0 && data[0].lat && data[0].lon) {
+			const result = data[0]
+			// Validiere, dass die gefundene PLZ mit der gesuchten übereinstimmt
+			const foundPostalCode = result.address?.postcode || result.address?.postal_code
+			if (foundPostalCode && foundPostalCode !== zipCode) {
+				// PLZ stimmt nicht überein - möglicherweise falsches Ergebnis
+				return NextResponse.json({
+					success: false,
+					message: `PLZ ${zipCode} konnte nicht eindeutig gefunden werden`,
+				})
+			}
+
 			return NextResponse.json({
 				success: true,
-				lat: parseFloat(data[0].lat),
-				lng: parseFloat(data[0].lon),
-				zip: zip.trim(),
+				lat: parseFloat(result.lat),
+				lng: parseFloat(result.lon),
+				zip: zipCode,
 			})
 		}
 
