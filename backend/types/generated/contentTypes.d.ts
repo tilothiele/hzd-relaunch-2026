@@ -1129,8 +1129,11 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
   };
   attributes: {
     avatar: Schema.Attribute.Media<'images' | 'files'>;
+    cBreederId: Schema.Attribute.Integer;
+    cId: Schema.Attribute.Integer;
     color: Schema.Attribute.Enumeration<['S', 'SM', 'B']>;
     ColorCheck: Schema.Attribute.Boolean;
+    cOwnerId: Schema.Attribute.Integer;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1149,19 +1152,6 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
       }>;
     HD: Schema.Attribute.Enumeration<['A1', 'A2', 'B1', 'B2']>;
     HeartCheck: Schema.Attribute.Boolean;
-    jBonitation: Schema.Attribute.Text;
-    jBreeder: Schema.Attribute.String;
-    jBreederId: Schema.Attribute.Integer;
-    jCategory: Schema.Attribute.String;
-    jExhibitions: Schema.Attribute.Text;
-    jId: Schema.Attribute.Integer;
-    jImage: Schema.Attribute.String;
-    jLitter: Schema.Attribute.String;
-    jLitterKind: Schema.Attribute.String;
-    jMantings: Schema.Attribute.String;
-    jRegion: Schema.Attribute.String;
-    jSex: Schema.Attribute.Integer;
-    jWithersHeight: Schema.Attribute.Integer;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
