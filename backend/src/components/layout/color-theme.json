@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_layout_color_themes",
+  "info": {
+    "displayName": "ColorTheme"
+  },
+  "options": {},
+  "attributes": {
+    "ShortName": {
+      "type": "enumeration",
+      "enum": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ]
+    }
+  },
+  "config": {}
+}

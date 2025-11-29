@@ -22,15 +22,6 @@
       "component": "seo.seo",
       "repeatable": true
     },
-    "FarbThema": {
-      "type": "enumeration",
-      "enum": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ]
-    },
     "Sections": {
       "type": "dynamiczone",
       "components": [
@@ -43,6 +34,11 @@
         "blocks.image-gallery-section",
         "blocks.simple-cta-section"
       ]
+    },
+    "ColorTheme": {
+      "type": "component",
+      "component": "layout.color-theme",
+      "repeatable": false
     }
   }
 }

@@ -73,7 +73,9 @@ export const GET_INDEX_PAGE = `
 						id
 						Headline
 						Subheadline
-						FarbThema
+						ColorTheme {
+							ShortName
+						}
 						BackgroundImage {
 							url
 							alternativeText
@@ -202,7 +204,9 @@ export const GET_PAGE_BY_SLUG = `
 		pages(filters: { slug: { eq: $slug } }, pagination: { pageSize: 1 }) {
 					slug
 					title
-					FarbThema
+					ColorTheme {
+						ShortName
+					}
 					Sections {
 						__typename
 						... on ComponentBlocksRichTextSection {
@@ -233,7 +237,9 @@ export const GET_PAGE_BY_SLUG = `
 							CardItem {
 								Headline
 								Subheadline
-								FarbThema
+								ColorTheme {
+									ShortName
+								}
 								BackgroundImage {
 									url
 									alternativeText

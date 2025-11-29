@@ -207,7 +207,6 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 				style={{
 					backgroundColor: '#FAD857',
 					color: '#0A0A0A',
-					borderTop: '1px solid',
 					paddingTop: '.5em',
 					paddingBottom: '.5em',
 					fontSize: '0.875em',

@@ -22,14 +22,10 @@
         "files"
       ]
     },
-    "FarbThema": {
-      "type": "enumeration",
-      "enum": [
-        "A",
-        "B",
-        "C",
-        "D"
-      ]
+    "ColorTheme": {
+      "type": "component",
+      "component": "layout.color-theme",
+      "repeatable": true
     },
     "ActionButton": {
       "type": "component",

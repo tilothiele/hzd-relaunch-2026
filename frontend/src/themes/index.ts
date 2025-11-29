@@ -1,4 +1,4 @@
-export type ThemeId = 'A' | 'B' | 'C' | 'D'
+export type ThemeId = 'A' | 'B' | 'C' | 'D' | 'E'
 
 export interface ThemeDefinition {
 	id: ThemeId
@@ -61,6 +61,18 @@ export const themes: Record<ThemeId, ThemeDefinition> = {
 		oddBgColor: '#f2f2f2',
 		evenBgColor: '#ffffff',
 		name: 'Beerenzauber',
+	},
+	E: {
+		id: 'E',
+		headerBackground: '#46605C',
+		footerBackground: '#46605C',
+		headerFooterTextColor: '#ffffff',
+		textColor: '#ffffff',
+		buttonColor: '#46605C',
+		buttonTextColor: '#ffffff',
+		oddBgColor: '#f2f2f2',
+		evenBgColor: '#ffffff',
+		name: 'Mineral Green',
 	},
 }
 

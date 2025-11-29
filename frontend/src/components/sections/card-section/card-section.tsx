@@ -55,8 +55,8 @@ export function CardSectionComponent({
 				{cards.map((card, index) => {
 					const key = card.id ?? card.Headline ?? `card-${index}`
 					const imageUrl = resolveMediaUrl(card.BackgroundImage, strapiBaseUrl)
-					const themeColor = getThemeColor(card.FarbThema)
-					const theme = card.FarbThema ? getThemeById(card.FarbThema) : null
+					const themeColor = getThemeColor(card.ColorTheme?.ShortName)
+					const theme = card.ColorTheme?.ShortName ? getThemeById(card.ColorTheme.ShortName) : null
 
 					return (
 						<Box

@@ -8,7 +8,7 @@ export interface BlocksCardItem extends Struct.ComponentSchema {
   attributes: {
     ActionButton: Schema.Attribute.Component<'links.action-button', false>;
     BackgroundImage: Schema.Attribute.Media<'images' | 'files'>;
-    FarbThema: Schema.Attribute.Enumeration<['A', 'B', 'C', 'D']>;
+    ColorTheme: Schema.Attribute.Component<'layout.color-theme', true>;
     Headline: Schema.Attribute.String;
     Subheadline: Schema.Attribute.String;
     TeaserText: Schema.Attribute.Text;
@@ -245,6 +245,16 @@ export interface ColumnsTextColumn extends Struct.ComponentSchema {
   };
 }
 
+export interface LayoutColorTheme extends Struct.ComponentSchema {
+  collectionName: 'components_layout_color_themes';
+  info: {
+    displayName: 'ColorTheme';
+  };
+  attributes: {
+    ShortName: Schema.Attribute.Enumeration<['A', 'B', 'C', 'D', 'E']>;
+  };
+}
+
 export interface LayoutFooter extends Struct.ComponentSchema {
   collectionName: 'components_layout_footers';
   info: {
@@ -343,6 +353,7 @@ declare module '@strapi/strapi' {
       'calendar.calendar-document': CalendarCalendarDocument;
       'columns.column-item': ColumnsColumnItem;
       'columns.text-column': ColumnsTextColumn;
+      'layout.color-theme': LayoutColorTheme;
       'layout.footer': LayoutFooter;
       'links.action-button': LinksActionButton;
       'links.partnerl-link': LinksPartnerlLink;
