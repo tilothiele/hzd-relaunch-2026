@@ -62,7 +62,7 @@ export interface File {
 export interface SupplementalDocument {
 	documentId?: string
 	Name?: string | null
-	Description?: string | null // Blocks field - can be JSON string or HTML depending on Strapi version
+	Description?: string | unknown | null // Blocks field - can be JSON object, JSON string or HTML depending on Strapi version
 	ShortId?: string | null
 	DownloadDocument?: File[] | null
 	VisibilityStart?: string | null

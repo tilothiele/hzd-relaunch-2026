@@ -3,6 +3,113 @@ import DownloadIcon from '@mui/icons-material/Download'
 import type { SupplementalDocumentGroupSection, SupplementalDocument } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 
+// Strapi Blocks Format Types
+interface StrapiBlock {
+	type: string
+	children?: StrapiBlock[]
+	text?: string
+	bold?: boolean
+	italic?: boolean
+	underline?: boolean
+	code?: boolean
+	url?: string
+}
+
+/**
+ * Konvertiert Strapi Blocks JSON zu HTML
+ */
+function renderStrapiBlocks(blocks: unknown): string {
+	if (!blocks) {
+		return ''
+	}
+
+	// Wenn es bereits ein String ist, zurückgeben
+	if (typeof blocks === 'string') {
+		return blocks
+	}
+
+	// Wenn es ein Array ist, verarbeite es als Blocks
+	if (Array.isArray(blocks)) {
+		return blocks.map((block) => renderBlock(block)).join('')
+	}
+
+	// Wenn es ein Objekt ist, versuche es als Block zu behandeln
+	if (typeof blocks === 'object' && blocks !== null) {
+		return renderBlock(blocks as StrapiBlock)
+	}
+
+	return ''
+}
+
+function renderBlock(block: StrapiBlock): string {
+	if (!block || typeof block !== 'object') {
+		return ''
+	}
+
+	const { type, children, text, bold, italic, underline, code, url } = block
+
+	// Text-Node
+	if (type === 'text' || text !== undefined) {
+		let content = text || ''
+		if (bold) content = `<strong>${content}</strong>`
+		if (italic) content = `<em>${content}</em>`
+		if (underline) content = `<u>${content}</u>`
+		if (code) content = `<code>${content}</code>`
+		return content
+	}
+
+	// Link
+	if (type === 'link' && url) {
+		const linkContent = children ? children.map(renderBlock).join('') : ''
+		return `<a href="${url}">${linkContent}</a>`
+	}
+
+	// Paragraph
+	if (type === 'paragraph') {
+		const content = children ? children.map(renderBlock).join('') : ''
+		return `<p>${content}</p>`
+	}
+
+	// Heading
+	if (type === 'heading') {
+		const level = (block as { level?: number }).level || 1
+		const content = children ? children.map(renderBlock).join('') : ''
+		return `<h${level}>${content}</h${level}>`
+	}
+
+	// List
+	if (type === 'list') {
+		const listType = (block as { format?: string }).format === 'ordered' ? 'ol' : 'ul'
+		const content = children ? children.map((child) => `<li>${renderBlock(child)}</li>`).join('') : ''
+		return `<${listType}>${content}</${listType}>`
+	}
+
+	// List Item
+	if (type === 'list-item') {
+		const content = children ? children.map(renderBlock).join('') : ''
+		return content
+	}
+
+	// Quote
+	if (type === 'quote') {
+		const content = children ? children.map(renderBlock).join('') : ''
+		return `<blockquote>${content}</blockquote>`
+	}
+
+	// Code
+	if (type === 'code') {
+		const content = children ? children.map(renderBlock).join('') : ''
+		return `<pre><code>${content}</code></pre>`
+	}
+
+	// Generic: Rendere Children falls vorhanden
+	if (children && Array.isArray(children)) {
+		return children.map(renderBlock).join('')
+	}
+
+	return ''
+}
+
 interface SupplementalDocumentGroupSectionComponentProps {
 	section: SupplementalDocumentGroupSection
 	strapiBaseUrl: string
@@ -88,8 +195,8 @@ export function SupplementalDocumentGroupSectionComponent({
 			<Container maxWidth='md'>
 				{section.GroupHeadline ? (
 					<Typography
-						variant='h2'
-						component='h2'
+						variant='h3'
+						component='h3'
 						sx={{
 							mb: 3,
 							fontWeight: 700,
@@ -101,8 +208,8 @@ export function SupplementalDocumentGroupSectionComponent({
 				) : null}
 				{groupName && !section.GroupHeadline ? (
 					<Typography
-						variant='h2'
-						component='h2'
+						variant='h3'
+						component='h3'
 						sx={{
 							mb: 3,
 							fontWeight: 700,
@@ -117,18 +224,40 @@ export function SupplementalDocumentGroupSectionComponent({
 					<Table>
 						<TableHead>
 							<TableRow>
-								<TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
-								<TableCell sx={{ fontWeight: 600 }}>Beschreibung</TableCell>
 								<TableCell sx={{ fontWeight: 600 }}>ID</TableCell>
+								<TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
 								<TableCell sx={{ fontWeight: 600 }} align='right'>Download</TableCell>
 							</TableRow>
 						</TableHead>
 						<TableBody>
-							{visibleDocuments.map((document) => {
+							{visibleDocuments.flatMap((document) => {
 								const documents = document.DownloadDocument || []
 								const documentId = document.documentId || document.Name || 'unknown'
 
-								return (
+								// Parse Description (kann String oder JSON-Objekt sein)
+								let descriptionHtml = ''
+								let hasDescription = false
+
+								if (document.Description) {
+									if (typeof document.Description === 'string') {
+										// Versuche, es als JSON zu parsen (falls es ein JSON-String ist)
+										try {
+											const parsed = JSON.parse(document.Description)
+											descriptionHtml = renderStrapiBlocks(parsed)
+										} catch {
+											// Wenn Parsing fehlschlägt, ist es bereits HTML
+											descriptionHtml = document.Description
+										}
+									} else if (typeof document.Description === 'object') {
+										// Es ist bereits ein JSON-Objekt
+										descriptionHtml = renderStrapiBlocks(document.Description)
+									}
+
+									// Prüfe, ob nach Rendering noch Inhalt vorhanden ist
+									hasDescription = descriptionHtml.replace(/<[^>]*>/g, '').trim().length > 0
+								}
+
+								const rows = [
 									<TableRow
 										key={documentId}
 										sx={{
@@ -138,33 +267,6 @@ export function SupplementalDocumentGroupSectionComponent({
 										}}
 									>
 										<TableCell>
-											{document.Name ? (
-												<Typography variant='body1' sx={{ fontWeight: 600 }}>
-													{document.Name}
-												</Typography>
-											) : (
-												<Typography variant='body2' color='text.secondary'>
-													-
-												</Typography>
-											)}
-										</TableCell>
-										<TableCell>
-											{document.Description ? (
-												<Box
-													sx={{
-														'& p': {
-															margin: 0,
-														},
-													}}
-													dangerouslySetInnerHTML={{ __html: document.Description }}
-												/>
-											) : (
-												<Typography variant='body2' color='text.secondary'>
-													-
-												</Typography>
-											)}
-										</TableCell>
-										<TableCell>
 											{document.ShortId ? (
 												<Chip
 													label={document.ShortId}
@@ -173,6 +275,17 @@ export function SupplementalDocumentGroupSectionComponent({
 														fontSize: '0.75rem',
 													}}
 												/>
+											) : (
+												<Typography variant='body2' color='text.secondary'>
+													-
+												</Typography>
+											)}
+										</TableCell>
+										<TableCell>
+											{document.Name ? (
+												<Typography variant='body1' sx={{ fontWeight: 600 }}>
+													{document.Name}
+												</Typography>
 											) : (
 												<Typography variant='body2' color='text.secondary'>
 													-
@@ -231,8 +344,45 @@ export function SupplementalDocumentGroupSectionComponent({
 												)}
 											</Box>
 										</TableCell>
-									</TableRow>
-								)
+									</TableRow>,
+								]
+
+								if (hasDescription) {
+									rows.push(
+										<TableRow
+											key={`${documentId}-description`}
+											sx={{
+												'&:hover': {
+													backgroundColor: 'action.hover',
+												},
+											}}
+										>
+											<TableCell colSpan={3}>
+												<Box
+													sx={{
+														'& p': {
+															margin: 0,
+															mb: 1,
+														},
+														'& p:last-child': {
+															mb: 0,
+														},
+														'& a': {
+															color: 'primary.main',
+															textDecoration: 'none',
+															'&:hover': {
+																textDecoration: 'underline',
+															},
+														},
+													}}
+													dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+												/>
+											</TableCell>
+										</TableRow>,
+									)
+								}
+
+								return rows
 							})}
 						</TableBody>
 					</Table>
