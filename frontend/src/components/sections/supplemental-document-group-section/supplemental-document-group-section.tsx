@@ -272,6 +272,11 @@ export function SupplementalDocumentGroupSectionComponent({
 											'&:hover': {
 												backgroundColor: 'action.hover',
 											},
+											...(hasDescription && {
+												'& td': {
+													borderBottom: 'none',
+												},
+											}),
 										}}
 									>
 										<TableCell>
@@ -362,6 +367,9 @@ export function SupplementalDocumentGroupSectionComponent({
 											sx={{
 												'&:hover': {
 													backgroundColor: 'action.hover',
+												},
+												'& td': {
+													borderTop: 'none',
 												},
 											}}
 										>
