@@ -13,7 +13,8 @@ export default {
 		return service.find(ctx)
 	},
 	async findOne(ctx) {
-		return defaultController.findOne(ctx)
+		const service = strapi.service('plugin::hzd-plugin.dog')
+		return service.findOne(ctx)
 	},
 }
 
