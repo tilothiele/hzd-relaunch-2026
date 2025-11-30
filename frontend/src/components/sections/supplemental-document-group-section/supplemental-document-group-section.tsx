@@ -1,3 +1,5 @@
+import { Container, Box, Typography, Card, CardContent, Button, Stack, Chip } from '@mui/material'
+import DownloadIcon from '@mui/icons-material/Download'
 import type { SupplementalDocumentGroupSection, SupplementalDocument } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 
@@ -75,87 +77,165 @@ export function SupplementalDocumentGroupSectionComponent({
 	const backgroundColor = section.SupplementalsOddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
 
 	return (
-		<section className='mb-16 px-4' style={{ backgroundColor }}>
-			<div className='mx-auto w-full max-w-4xl'>
+		<Box
+			component='section'
+			sx={{
+				mb: 8,
+				px: 2,
+				backgroundColor,
+			}}
+		>
+			<Container maxWidth='md'>
 				{section.GroupHeadline ? (
-					<h2 className='mb-6 text-3xl font-bold text-gray-900'>{section.GroupHeadline}</h2>
+					<Typography
+						variant='h2'
+						component='h2'
+						sx={{
+							mb: 3,
+							fontWeight: 700,
+							color: 'text.primary',
+						}}
+					>
+						{section.GroupHeadline}
+					</Typography>
 				) : null}
 				{groupName && !section.GroupHeadline ? (
-					<h2 className='mb-6 text-3xl font-bold text-gray-900'>{groupName}</h2>
+					<Typography
+						variant='h2'
+						component='h2'
+						sx={{
+							mb: 3,
+							fontWeight: 700,
+							color: 'text.primary',
+						}}
+					>
+						{groupName}
+					</Typography>
 				) : null}
 
-				<div className='space-y-4'>
+				<Stack spacing={2}>
 					{visibleDocuments.map((document) => {
 						const documents = document.DownloadDocument || []
 						const documentId = document.documentId || document.Name || 'unknown'
 
 						return (
-							<article
+							<Card
 								key={documentId}
-								className='rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md'
+								sx={{
+									transition: 'box-shadow 0.3s ease-in-out',
+									'&:hover': {
+										boxShadow: 4,
+									},
+								}}
 							>
-								<div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
-									<div className='flex-1'>
-										{document.Name ? (
-											<h3 className='text-xl font-semibold text-gray-900'>{document.Name}</h3>
-										) : null}
-										{document.Description ? (
-											<div
-												className='mt-2 text-sm text-gray-600 prose prose-sm max-w-none'
-												dangerouslySetInnerHTML={{ __html: document.Description }}
-											/>
-										) : null}
-										{document.ShortId ? (
-											<p className='mt-2 text-xs text-gray-500'>ID: {document.ShortId}</p>
-										) : null}
-									</div>
-
-									<div className='flex flex-col gap-2 md:items-end'>
-										{documents.map((file, fileIndex) => {
-											const fileUrl = file.url.startsWith('http')
-												? file.url
-												: `${strapiBaseUrl}${file.url}`
-
-											return (
-												<a
-													key={fileIndex}
-													href={fileUrl}
-													download
-													className='inline-flex items-center gap-2 rounded-lg bg-yellow-400 px-4 py-2 text-sm font-semibold text-gray-900 transition-colors hover:bg-yellow-500'
+								<CardContent>
+									<Box
+										sx={{
+											display: 'flex',
+											flexDirection: { xs: 'column', md: 'row' },
+											gap: 2,
+											alignItems: { md: 'center' },
+											justifyContent: { md: 'space-between' },
+										}}
+									>
+										<Box sx={{ flex: 1 }}>
+											{document.Name ? (
+												<Typography
+													variant='h6'
+													component='h3'
+													sx={{
+														fontWeight: 600,
+														color: 'text.primary',
+														mb: 1,
+													}}
 												>
-													<svg
-														className='h-5 w-5'
-														fill='none'
-														stroke='currentColor'
-														viewBox='0 0 24 24'
-													>
-														<path
-															strokeLinecap='round'
-															strokeLinejoin='round'
-															strokeWidth={2}
-															d='M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
-														/>
-													</svg>
-													<span>Download</span>
-													{file.name ? (
-														<span className='text-xs opacity-75'>({file.name})</span>
-													) : null}
-													{file.size ? (
-														<span className='text-xs opacity-75'>
-															{formatFileSize(file.size)}
-														</span>
-													) : null}
-												</a>
-											)
-										})}
-									</div>
-								</div>
-							</article>
+													{document.Name}
+												</Typography>
+											) : null}
+											{document.Description ? (
+												<Typography
+													variant='body2'
+													sx={{
+														mt: 1,
+														color: 'text.secondary',
+														'& p': {
+															margin: 0,
+														},
+													}}
+													dangerouslySetInnerHTML={{ __html: document.Description }}
+												/>
+											) : null}
+											{document.ShortId ? (
+												<Chip
+													label={`ID: ${document.ShortId}`}
+													size='small'
+													sx={{
+														mt: 1,
+														fontSize: '0.75rem',
+													}}
+												/>
+											) : null}
+										</Box>
+
+										<Stack
+											direction='column'
+											spacing={1}
+											sx={{
+												alignItems: { xs: 'stretch', md: 'flex-end' },
+											}}
+										>
+											{documents.map((file, fileIndex) => {
+												const fileUrl = file.url.startsWith('http')
+													? file.url
+													: `${strapiBaseUrl}${file.url}`
+
+												return (
+													<Box key={fileIndex}>
+														<Button
+															component='a'
+															href={fileUrl}
+															download
+															variant='contained'
+															startIcon={<DownloadIcon />}
+															sx={{
+																backgroundColor: '#facc15',
+																color: 'text.primary',
+																fontWeight: 600,
+																'&:hover': {
+																	backgroundColor: '#eab308',
+																},
+															}}
+														>
+															Download
+														</Button>
+														{(file.name || file.size) && (
+															<Typography
+																variant='caption'
+																display='block'
+																sx={{
+																	mt: 0.5,
+																	textAlign: { xs: 'left', md: 'right' },
+																	color: 'text.secondary',
+																	fontSize: '0.75rem',
+																}}
+															>
+																{file.name && `(${file.name})`}
+																{file.name && file.size && ' '}
+																{file.size && formatFileSize(file.size)}
+															</Typography>
+														)}
+													</Box>
+												)
+											})}
+										</Stack>
+									</Box>
+								</CardContent>
+							</Card>
 						)
 					})}
-				</div>
-			</div>
-		</section>
+				</Stack>
+			</Container>
+		</Box>
 	)
 }
 
