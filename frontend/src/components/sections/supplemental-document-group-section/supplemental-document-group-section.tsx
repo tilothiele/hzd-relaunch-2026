@@ -1,4 +1,4 @@
-import { Container, Box, Typography, Card, CardContent, Button, Stack, Chip } from '@mui/material'
+import { Container, Box, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip } from '@mui/material'
 import DownloadIcon from '@mui/icons-material/Download'
 import type { SupplementalDocumentGroupSection, SupplementalDocument } from '@/types'
 import type { ThemeDefinition } from '@/themes'
@@ -113,127 +113,130 @@ export function SupplementalDocumentGroupSectionComponent({
 					</Typography>
 				) : null}
 
-				<Stack spacing={2}>
-					{visibleDocuments.map((document) => {
-						const documents = document.DownloadDocument || []
-						const documentId = document.documentId || document.Name || 'unknown'
+				<TableContainer component={Paper} sx={{ boxShadow: 2 }}>
+					<Table>
+						<TableHead>
+							<TableRow>
+								<TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
+								<TableCell sx={{ fontWeight: 600 }}>Beschreibung</TableCell>
+								<TableCell sx={{ fontWeight: 600 }}>ID</TableCell>
+								<TableCell sx={{ fontWeight: 600 }} align='right'>Download</TableCell>
+							</TableRow>
+						</TableHead>
+						<TableBody>
+							{visibleDocuments.map((document) => {
+								const documents = document.DownloadDocument || []
+								const documentId = document.documentId || document.Name || 'unknown'
 
-						return (
-							<Card
-								key={documentId}
-								sx={{
-									transition: 'box-shadow 0.3s ease-in-out',
-									'&:hover': {
-										boxShadow: 4,
-									},
-								}}
-							>
-								<CardContent>
-									<Box
+								return (
+									<TableRow
+										key={documentId}
 										sx={{
-											display: 'flex',
-											flexDirection: { xs: 'column', md: 'row' },
-											gap: 2,
-											alignItems: { md: 'center' },
-											justifyContent: { md: 'space-between' },
+											'&:hover': {
+												backgroundColor: 'action.hover',
+											},
 										}}
 									>
-										<Box sx={{ flex: 1 }}>
+										<TableCell>
 											{document.Name ? (
-												<Typography
-													variant='h6'
-													component='h3'
-													sx={{
-														fontWeight: 600,
-														color: 'text.primary',
-														mb: 1,
-													}}
-												>
+												<Typography variant='body1' sx={{ fontWeight: 600 }}>
 													{document.Name}
 												</Typography>
-											) : null}
+											) : (
+												<Typography variant='body2' color='text.secondary'>
+													-
+												</Typography>
+											)}
+										</TableCell>
+										<TableCell>
 											{document.Description ? (
-												<Typography
-													variant='body2'
+												<Box
 													sx={{
-														mt: 1,
-														color: 'text.secondary',
 														'& p': {
 															margin: 0,
 														},
 													}}
 													dangerouslySetInnerHTML={{ __html: document.Description }}
 												/>
-											) : null}
+											) : (
+												<Typography variant='body2' color='text.secondary'>
+													-
+												</Typography>
+											)}
+										</TableCell>
+										<TableCell>
 											{document.ShortId ? (
 												<Chip
-													label={`ID: ${document.ShortId}`}
+													label={document.ShortId}
 													size='small'
 													sx={{
-														mt: 1,
 														fontSize: '0.75rem',
 													}}
 												/>
-											) : null}
-										</Box>
+											) : (
+												<Typography variant='body2' color='text.secondary'>
+													-
+												</Typography>
+											)}
+										</TableCell>
+										<TableCell align='right'>
+											<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'flex-end' }}>
+												{documents.length > 0 ? (
+													documents.map((file, fileIndex) => {
+														const fileUrl = file.url.startsWith('http')
+															? file.url
+															: `${strapiBaseUrl}${file.url}`
 
-										<Stack
-											direction='column'
-											spacing={1}
-											sx={{
-												alignItems: { xs: 'stretch', md: 'flex-end' },
-											}}
-										>
-											{documents.map((file, fileIndex) => {
-												const fileUrl = file.url.startsWith('http')
-													? file.url
-													: `${strapiBaseUrl}${file.url}`
-
-												return (
-													<Box key={fileIndex}>
-														<Button
-															component='a'
-															href={fileUrl}
-															download
-															variant='contained'
-															startIcon={<DownloadIcon />}
-															sx={{
-																backgroundColor: '#facc15',
-																color: 'text.primary',
-																fontWeight: 600,
-																'&:hover': {
-																	backgroundColor: '#eab308',
-																},
-															}}
-														>
-															Download
-														</Button>
-														{(file.name || file.size) && (
-															<Typography
-																variant='caption'
-																display='block'
-																sx={{
-																	mt: 0.5,
-																	textAlign: { xs: 'left', md: 'right' },
-																	color: 'text.secondary',
-																	fontSize: '0.75rem',
-																}}
-															>
-																{file.name && `(${file.name})`}
-																{file.name && file.size && ' '}
-																{file.size && formatFileSize(file.size)}
-															</Typography>
-														)}
-													</Box>
-												)
-											})}
-										</Stack>
-									</Box>
-								</CardContent>
-							</Card>
-						)
-					})}
-				</Stack>
+														return (
+															<Box key={fileIndex} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+																<Button
+																	component='a'
+																	href={fileUrl}
+																	download
+																	variant='contained'
+																	size='small'
+																	startIcon={<DownloadIcon />}
+																	sx={{
+																		backgroundColor: '#facc15',
+																		color: 'text.primary',
+																		fontWeight: 600,
+																		'&:hover': {
+																			backgroundColor: '#eab308',
+																		},
+																	}}
+																>
+																	Download
+																</Button>
+																{(file.name || file.size) && (
+																	<Typography
+																		variant='caption'
+																		sx={{
+																			mt: 0.5,
+																			color: 'text.secondary',
+																			fontSize: '0.75rem',
+																		}}
+																	>
+																		{file.name && file.name}
+																		{file.name && file.size && ' • '}
+																		{file.size && formatFileSize(file.size)}
+																	</Typography>
+																)}
+															</Box>
+														)
+													})
+												) : (
+													<Typography variant='body2' color='text.secondary'>
+														-
+													</Typography>
+												)}
+											</Box>
+										</TableCell>
+									</TableRow>
+								)
+							})}
+						</TableBody>
+					</Table>
+				</TableContainer>
 			</Container>
 		</Box>
 	)
