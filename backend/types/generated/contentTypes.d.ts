@@ -951,6 +951,7 @@ export interface ApiSupplementalDocumentSupplementalDocument
     Name: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     ShortId: Schema.Attribute.String;
+    SortOrd: Schema.Attribute.Integer & Schema.Attribute.Unique;
     supplemental_document_group: Schema.Attribute.Relation<
       'manyToOne',
       'api::supplemental-document-group.supplemental-document-group'

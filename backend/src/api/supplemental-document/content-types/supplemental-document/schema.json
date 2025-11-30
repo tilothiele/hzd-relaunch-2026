@@ -18,6 +18,10 @@
     "Description": {
       "type": "blocks"
     },
+    "SortOrd": {
+      "type": "integer",
+      "unique": true
+    },
     "ShortId": {
       "type": "string"
     },

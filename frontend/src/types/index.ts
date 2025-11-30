@@ -64,6 +64,7 @@ export interface SupplementalDocument {
 	Name?: string | null
 	Description?: string | unknown | null // Blocks field - can be JSON object, JSON string or HTML depending on Strapi version
 	ShortId?: string | null
+	SortOrd?: number | null
 	DownloadDocument?: File[] | null
 	VisibilityStart?: string | null
 	VisibilityEnd?: string | null

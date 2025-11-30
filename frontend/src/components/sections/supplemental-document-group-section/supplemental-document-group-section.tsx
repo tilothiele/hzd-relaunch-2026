@@ -160,7 +160,15 @@ function getVisibleDocuments(documentGroup: SupplementalDocumentGroupSection['su
 	return documentGroup.supplemental_documents
 		.filter(isDocumentVisible)
 		.sort((a, b) => {
-			// Sortiere nach Name, falls SortOrd nicht vorhanden
+			// Sortiere primär nach SortOrd, dann nach Name
+			const aSortOrd = a.SortOrd ?? Number.MAX_SAFE_INTEGER
+			const bSortOrd = b.SortOrd ?? Number.MAX_SAFE_INTEGER
+
+			if (aSortOrd !== bSortOrd) {
+				return aSortOrd - bSortOrd
+			}
+
+			// Falls SortOrd gleich oder nicht vorhanden, sortiere nach Name
 			if (!a.Name || !b.Name) {
 				return 0
 			}
