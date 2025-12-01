@@ -95,7 +95,8 @@
       "target": "plugin::hzd-plugin.member"
     },
     "cId": {
-      "type": "integer"
+      "type": "integer",
+      "unique": true
     },
     "cBreederId": {
       "type": "integer"
@@ -106,9 +107,9 @@
     "SOD1": {
       "type": "enumeration",
       "enum": [
-        "N/N",
-        "N/DM",
-        "DM/DM"
+        "N_N",
+        "N_DM",
+        "DM_DM"
       ]
     },
     "HD": {

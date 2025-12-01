@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import csv
 import sys
+import time
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -11,6 +12,7 @@ from typing import Any, Optional
 
 try:
 	import requests
+	from requests.exceptions import ConnectionError, RequestException, Timeout
 except ImportError as exc:  # pragma: no cover
 	print('Das Skript benötigt das Paket "requests". Installiere es mit "pip install requests".', file=sys.stderr)
 	sys.exit(1)
@@ -24,10 +26,7 @@ except ImportError as exc:  # pragma: no cover
 DOG_BY_CID_QUERY = """
 query DogByCId($cId: Int) {
   hzdPluginDogs(filters: { cId: { eq: $cId } }) {
-    data {
-      id
       documentId
-    }
   }
 }
 """
@@ -35,21 +34,15 @@ query DogByCId($cId: Int) {
 CREATE_DOG_MUTATION = """
 mutation CreateDog($data: HzdPluginDogInput!) {
   createHzdPluginDog(data: $data) {
-    data {
-      id
       documentId
-    }
   }
 }
 """
 
 UPDATE_DOG_MUTATION = """
-mutation UpdateDog($id: ID!, $data: HzdPluginDogInput!) {
-  updateHzdPluginDog(id: $id, data: $data) {
-    data {
-      id
+mutation UpdateDog($documentId: ID!, $data: HzdPluginDogInput!) {
+  updateHzdPluginDog(documentId: $documentId, data: $data) {
       documentId
-    }
   }
 }
 """
@@ -82,14 +75,20 @@ HD_ENUM_MAP = {
 }
 
 SOD1_ENUM_MAP = {
-	'N/N': 'N/N',
-	'N/DM': 'N/DM',
-	'DM/DM': 'DM/DM',
+	'N/N': 'N_N',
+	'N/DM': 'N_DM',
+	'DM/DM': 'DM_DM',
 	'-': None,
 	'': None,
 }
 
-
+COLOR_ENUM_MAP = {
+	'': None,
+	'-': None,
+	'schwarz': 'S',
+	'schwarzmarken': 'SM',
+	'blond': 'B',
+}
 @dataclass
 class ChromosoftDogRecord:
 	c_id: int
@@ -106,49 +105,95 @@ class ChromosoftDogRecord:
 	sod1: str
 	herzuntersuchung: str
 	augenuntersuchung: str
+	color: str
 
 
 class GraphQLClient:
-	def __init__(self, endpoint: str, token: Optional[str], timeout: int = 30) -> None:
+	def __init__(self, endpoint: str, token: Optional[str], timeout: int = 30, max_retries: int = 3, retry_delay: float = 1.0, verbose: bool = False) -> None:
 		self.endpoint = endpoint
 		self.timeout = timeout
+		self.max_retries = max_retries
+		self.retry_delay = retry_delay
+		self.verbose = verbose
 		self.session = requests.Session()
 		self.session.headers.update({'Content-Type': 'application/json'})
 		if token:
 			self.session.headers['Authorization'] = f'Bearer {token}'
 
 	def execute(self, query: str, variables: dict[str, Any]) -> dict[str, Any]:
-		response = self.session.post(
-			self.endpoint,
-			json={'query': query, 'variables': variables},
-			timeout=self.timeout,
-		)
-		response.raise_for_status()
-		payload = response.json()
-		errors = payload.get('errors', [])
-		if errors:
-			raise RuntimeError(f'GraphQL Fehler: {errors}')
-		return payload
+		last_exception = None
+		for attempt in range(self.max_retries):
+			try:
+				if attempt > 0:
+					# Exponential backoff: 1s, 2s, 4s, etc.
+					delay = self.retry_delay * (2 ** (attempt - 1))
+					if self.verbose:
+						print(f'Warte {delay:.1f}s vor Wiederholung {attempt + 1}/{self.max_retries}...', file=sys.stderr)
+					time.sleep(delay)
+				
+				if self.verbose:
+					print(f'Verbinde mit: {self.endpoint}', file=sys.stderr)
+				
+				response = self.session.post(
+					self.endpoint,
+					json={'query': query, 'variables': variables},
+					timeout=self.timeout,
+				)
+				response.raise_for_status()
+				payload = response.json()
+				errors = payload.get('errors', [])
+				if errors:
+					raise RuntimeError(f'GraphQL Fehler: {errors}')
+				return payload
+			except (ConnectionError, Timeout, RequestException) as e:
+				last_exception = e
+				if attempt < self.max_retries - 1:
+					if self.verbose:
+						print(f'Verbindungsfehler (Versuch {attempt + 1}/{self.max_retries}): {e}', file=sys.stderr)
+					continue
+				# Bei finalem Fehler ausführliche Fehlermeldung
+				raise ConnectionError(
+					f'Konnte keine Verbindung zu {self.endpoint} herstellen: {e}\n'
+					f'Hinweis: Prüfe, ob der Endpoint korrekt ist. '
+					f'Versuche ggf. "127.0.0.1" statt "localhost" oder umgekehrt.'
+				) from e
+		
+		if last_exception:
+			raise last_exception
+		raise RuntimeError('Unerwarteter Fehler bei der Ausführung')
 
 	def find_by_cid(self, c_id: Optional[int]) -> Optional[str]:
 		if c_id is None:
 			return None
 		data = self.execute(DOG_BY_CID_QUERY, {"cId": c_id})
-		collection = data.get('hzdPluginDogs', {})
-		items = collection.get('data') or []
+		d = data.get('data') or {}
+		items = d.get('hzdPluginDogs') or []
 		if not items:
 			return None
-		return items[0].get('id')
+		return items[0].get('documentId')
 
 	def create_dog(self, payload: dict[str, Any]) -> Optional[str]:
 		data = self.execute(CREATE_DOG_MUTATION, {'data': payload})
 		result = data.get('createHzdPluginDog', {})
-		return result.get('data', {}).get('id')
+		return result.get('data', {}).get('documentId')
 
 	def update_dog(self, dog_id: str, payload: dict[str, Any]) -> Optional[str]:
-		data = self.execute(UPDATE_DOG_MUTATION, {'id': dog_id, 'data': payload})
+		print(payload)
+		data = self.execute(UPDATE_DOG_MUTATION, {'documentId': dog_id, 'data': payload})
+		print(data)
 		result = data.get('updateHzdPluginDog', {})
-		return result.get('data', {}).get('id')
+		return result.get('data', {}).get('documentId')
+
+	def test_connection(self) -> bool:
+		"""Testet die Verbindung zum GraphQL-Endpoint mit einer einfachen Query."""
+		try:
+			# Einfache Introspection-Query zum Testen
+			test_query = 'query { __typename }'
+			self.execute(test_query, {})
+			return True
+		except Exception as e:
+			print(f'Verbindungstest fehlgeschlagen: {e}', file=sys.stderr)
+			return False
 
 
 def parse_int(value: str) -> Optional[int]:
@@ -195,6 +240,13 @@ def map_sod1_enum(raw: str) -> Optional[str]:
 	return SOD1_ENUM_MAP.get(value) or SOD1_ENUM_MAP.get(value.upper())
 
 
+def map_color_enum(raw: str) -> Optional[str]:
+	value = raw.strip()
+	if not value or value == '-':
+		return None
+	return COLOR_ENUM_MAP.get(value) or COLOR_ENUM_MAP.get(value.upper())
+
+
 def parse_bool_check(value: str) -> Optional[bool]:
 	value = value.strip()
 	if not value or value == '-':
@@ -229,6 +281,7 @@ def row_to_record(row: dict[str, str]) -> ChromosoftDogRecord:
 		sod1=row.get('Gentest SOD1', '').strip(),
 		herzuntersuchung=row.get('Herzuntersuchung', '').strip(),
 		augenuntersuchung=row.get('Augenuntersuchung', '').strip(),
+		color=row.get('color', '').strip(),
 	)
 
 
@@ -288,6 +341,10 @@ def build_graphql_payload(record: ChromosoftDogRecord) -> dict[str, Any]:
 	if eyes_check is not None:
 		assign('EyesCheck', eyes_check)
 
+	# Color
+	color_enum = map_color_enum(record.color)
+	assign('color', color_enum)
+
 	return payload
 
 
@@ -295,18 +352,25 @@ def import_records(
 	records: list[ChromosoftDogRecord],
 	client: GraphQLClient,
 	verbose: bool,
+	delay_between_requests: float = 0.1,
 ) -> dict[str, int]:
 	stats = {'created': 0, 'updated': 0, 'failed': 0}
-	for record in records:
+	for idx, record in enumerate(records):
 		try:
+			# Kleine Pause zwischen Anfragen, um den Server nicht zu überlasten
+			if idx > 0:
+				time.sleep(delay_between_requests)
+			
 			payload = build_graphql_payload(record)
 			existing_id = client.find_by_cid(record.c_id)
 			if existing_id:
+				print(f'gefunden - Hund cId={record.c_id} (ID {existing_id}).')
 				client.update_dog(existing_id, payload)
 				stats['updated'] += 1
 				if verbose:
 					print(f'Aktualisiert Hund cId={record.c_id} (ID {existing_id}).')
 			else:
+				print(f'nicht gefunden - Hund cId={record.c_id} (ID {existing_id}).')
 				created_id = client.create_dog(payload)
 				stats['created'] += 1
 				if verbose:
@@ -344,6 +408,18 @@ def build_arg_parser() -> argparse.ArgumentParser:
 		action='store_true',
 		help='Ausführliche Ausgaben anzeigen'
 	)
+	parser.add_argument(
+		'--delay',
+		type=float,
+		default=0.1,
+		help='Pause zwischen Anfragen in Sekunden (Standard: 0.1)'
+	)
+	parser.add_argument(
+		'--max-retries',
+		type=int,
+		default=3,
+		help='Maximale Anzahl Wiederholungen bei Fehlern (Standard: 3)'
+	)
 	return parser
 
 
@@ -369,8 +445,26 @@ def main() -> None:
 	if not args.token:
 		parser.error('Für den Import muss ein gültiges API-Token angegeben werden (--token).')
 
-	client = GraphQLClient(args.graphql_endpoint, args.token)
-	stats = import_records(records, client, verbose=args.verbose)
+	client = GraphQLClient(args.graphql_endpoint, args.token, max_retries=args.max_retries, verbose=args.verbose)
+	
+	# Verbindungstest vor dem Import
+	print(f'Teste Verbindung zu {args.graphql_endpoint}...', file=sys.stderr)
+	if not client.test_connection():
+		print(
+			f'\nFEHLER: Konnte keine Verbindung zum GraphQL-Endpoint herstellen.\n'
+			f'Endpoint: {args.graphql_endpoint}\n'
+			f'\nMögliche Lösungen:\n'
+			f'  1. Prüfe, ob der Server läuft\n'
+			f'  2. Versuche "127.0.0.1" statt "localhost" (oder umgekehrt)\n'
+			f'  3. Prüfe, ob der Port korrekt ist\n'
+			f'  4. Prüfe Firewall-Einstellungen\n'
+			f'  5. Teste den Endpoint im Browser: {args.graphql_endpoint}',
+			file=sys.stderr
+		)
+		sys.exit(1)
+	print('Verbindung erfolgreich!', file=sys.stderr)
+	
+	stats = import_records(records, client, verbose=args.verbose, delay_between_requests=args.delay)
 
 	print('Import abgeschlossen:')
 	for key, value in stats.items():
@@ -379,4 +473,5 @@ def main() -> None:
 
 if __name__ == '__main__':
 	main()
+
 

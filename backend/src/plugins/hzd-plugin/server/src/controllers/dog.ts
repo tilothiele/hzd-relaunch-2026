@@ -16,6 +16,14 @@ export default {
 		const service = strapi.service('plugin::hzd-plugin.dog')
 		return service.findOne(ctx)
 	},
+	async create(ctx) {
+		const service = strapi.service('plugin::hzd-plugin.dog')
+		return service.create(ctx)
+	},
+	async update(ctx) {
+		const service = strapi.service('plugin::hzd-plugin.dog')
+		return service.update(ctx)
+	},
 }
 
 

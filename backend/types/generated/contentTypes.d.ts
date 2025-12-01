@@ -1131,7 +1131,7 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
   attributes: {
     avatar: Schema.Attribute.Media<'images' | 'files'>;
     cBreederId: Schema.Attribute.Integer;
-    cId: Schema.Attribute.Integer;
+    cId: Schema.Attribute.Integer & Schema.Attribute.Unique;
     color: Schema.Attribute.Enumeration<['S', 'SM', 'B']>;
     ColorCheck: Schema.Attribute.Boolean;
     cOwnerId: Schema.Attribute.Integer;
@@ -1182,7 +1182,7 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
     owner: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.member'>;
     publishedAt: Schema.Attribute.DateTime;
     sex: Schema.Attribute.Enumeration<['M', 'F']>;
-    SOD1: Schema.Attribute.Enumeration<['N/N', 'N/DM', 'DM/DM']>;
+    SOD1: Schema.Attribute.Enumeration<['N_N', 'N_DM', 'DM_DM']>;
     stuntLicenseSince: Schema.Attribute.Date;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
