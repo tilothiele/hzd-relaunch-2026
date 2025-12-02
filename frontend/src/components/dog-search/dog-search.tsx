@@ -398,7 +398,7 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 				{/* PLZ und Maximale Entfernung */}
 				<Box sx={{ mt: 2, display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 2 }}>
 					<TextField
-						label='PLZ'
+						label='MeinePLZ'
 						value={zipCode}
 						onChange={(e) => {
 							const value = e.target.value.replace(/\D/g, '').slice(0, 5) // Nur Zahlen, max. 5 Zeichen
