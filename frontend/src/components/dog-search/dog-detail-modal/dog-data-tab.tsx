@@ -61,6 +61,16 @@ function getGivenNameIcon(sex: string | null | undefined): string {
 	}
 }
 
+/**
+ * Konvertiert SOD1-Wert von Schema-Format (N_N) zu Anzeige-Format (N/N)
+ */
+function formatSod1ForDisplay(sod1: string | null | undefined): string {
+	if (!sod1) {
+		return ''
+	}
+	return sod1.replace(/_/g, '/')
+}
+
 export function DogDataTab({ dog, strapiBaseUrl }: DogDataTabProps) {
 	const avatarUrl = dog.avatar?.url
 	const avatarAlt = dog.avatar?.alternativeText ?? 'Hund'
@@ -238,7 +248,7 @@ export function DogDataTab({ dog, strapiBaseUrl }: DogDataTabProps) {
 						</div>
 						<div>
 							<p className='text-sm font-medium text-gray-500'>SOD1</p>
-							<p className='text-base text-gray-900'>{dog.SOD1 ?? 'Nicht verfügbar'}</p>
+							<p className='text-base text-gray-900'>{dog.SOD1 ? formatSod1ForDisplay(dog.SOD1) : 'Nicht verfügbar'}</p>
 						</div>
 					</div>
 

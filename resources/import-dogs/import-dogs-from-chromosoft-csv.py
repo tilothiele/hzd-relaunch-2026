@@ -9,6 +9,12 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
+from dotenv import load_dotenv
+import os
+import requests
+
+load_dotenv()
+
 
 try:
 	import requests
@@ -19,8 +25,6 @@ except ImportError as exc:  # pragma: no cover
 
 # python scripts/import-dogs-from-chromosoft-csv.py \
 #  pfad/zur/chromosoft.csv \
-#  --graphql-endpoint http://localhost:1337/graphql \
-#  --token <API_TOKEN> \
 #  --verbose
 
 DOG_BY_CID_QUERY = """
@@ -130,10 +134,10 @@ class GraphQLClient:
 					if self.verbose:
 						print(f'Warte {delay:.1f}s vor Wiederholung {attempt + 1}/{self.max_retries}...', file=sys.stderr)
 					time.sleep(delay)
-				
+
 				if self.verbose:
 					print(f'Verbinde mit: {self.endpoint}', file=sys.stderr)
-				
+
 				response = self.session.post(
 					self.endpoint,
 					json={'query': query, 'variables': variables},
@@ -157,7 +161,7 @@ class GraphQLClient:
 					f'Hinweis: Prüfe, ob der Endpoint korrekt ist. '
 					f'Versuche ggf. "127.0.0.1" statt "localhost" oder umgekehrt.'
 				) from e
-		
+
 		if last_exception:
 			raise last_exception
 		raise RuntimeError('Unerwarteter Fehler bei der Ausführung')
@@ -360,7 +364,7 @@ def import_records(
 			# Kleine Pause zwischen Anfragen, um den Server nicht zu überlasten
 			if idx > 0:
 				time.sleep(delay_between_requests)
-			
+
 			payload = build_graphql_payload(record)
 			existing_id = client.find_by_cid(record.c_id)
 			if existing_id:
@@ -389,15 +393,6 @@ def build_arg_parser() -> argparse.ArgumentParser:
 		description='Importiert Chromosoft-Hundedaten via GraphQL in Strapi.'
 	)
 	parser.add_argument('csv_path', type=Path, help='Pfad zur Chromosoft CSV-Datei')
-	parser.add_argument(
-		'--graphql-endpoint',
-		default='http://localhost:1337/graphql',
-		help='GraphQL Endpoint von Strapi'
-	)
-	parser.add_argument(
-		'--token',
-		help='API-Token mit Berechtigung für die Dog-Collection'
-	)
 	parser.add_argument(
 		'--dry-run',
 		action='store_true',
@@ -431,6 +426,9 @@ def main() -> None:
 	if not csv_path.is_file():
 		parser.error(f'Datei nicht gefunden: {csv_path}')
 
+	token = os.getenv("TOKEN")
+	endpoint = os.getenv("ENDPOINT")
+
 	records = read_chromosoft_csv(csv_path)
 	print(f'{len(records)} Datensätze aus {csv_path} gelesen.')
 
@@ -442,28 +440,25 @@ def main() -> None:
 				print(f'cId={record.c_id}: {payload}')
 		return
 
-	if not args.token:
-		parser.error('Für den Import muss ein gültiges API-Token angegeben werden (--token).')
+	client = GraphQLClient(endpoint, token, max_retries=args.max_retries, verbose=args.verbose)
 
-	client = GraphQLClient(args.graphql_endpoint, args.token, max_retries=args.max_retries, verbose=args.verbose)
-	
 	# Verbindungstest vor dem Import
-	print(f'Teste Verbindung zu {args.graphql_endpoint}...', file=sys.stderr)
+	print(f'Teste Verbindung zu {endpoint}...', file=sys.stderr)
 	if not client.test_connection():
 		print(
 			f'\nFEHLER: Konnte keine Verbindung zum GraphQL-Endpoint herstellen.\n'
-			f'Endpoint: {args.graphql_endpoint}\n'
+			f'Endpoint: {endpoint}\n'
 			f'\nMögliche Lösungen:\n'
 			f'  1. Prüfe, ob der Server läuft\n'
 			f'  2. Versuche "127.0.0.1" statt "localhost" (oder umgekehrt)\n'
 			f'  3. Prüfe, ob der Port korrekt ist\n'
 			f'  4. Prüfe Firewall-Einstellungen\n'
-			f'  5. Teste den Endpoint im Browser: {args.graphql_endpoint}',
+			f'  5. Teste den Endpoint im Browser: {endpoint}',
 			file=sys.stderr
 		)
 		sys.exit(1)
 	print('Verbindung erfolgreich!', file=sys.stderr)
-	
+
 	stats = import_records(records, client, verbose=args.verbose, delay_between_requests=args.delay)
 
 	print('Import abgeschlossen:')

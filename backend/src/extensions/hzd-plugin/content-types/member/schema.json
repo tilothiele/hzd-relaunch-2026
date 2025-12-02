@@ -27,6 +27,15 @@
     "cancellationDueDate": {
       "type": "date"
     },
+    "title": {
+      "type": "string"
+    },
+    "firstName": {
+      "type": "string"
+    },
+    "lastName": {
+      "type": "string"
+    },
     "adress1": {
       "type": "string",
       "maxLength": 100
@@ -69,9 +78,6 @@
       "target": "plugin::users-permissions.user",
       "mappedBy": "member"
     },
-    "fullName": {
-      "type": "string"
-    },
     "region": {
       "type": "enumeration",
       "enum": [
@@ -95,6 +101,16 @@
       "options": {
         "preset": "defaultHtml"
       }
+    },
+    "cId": {
+      "type": "integer",
+      "unique": true
+    },
+    "cFlagBreeder": {
+      "type": "boolean"
+    },
+    "cFlagAccess": {
+      "type": "boolean"
     }
   }
 }

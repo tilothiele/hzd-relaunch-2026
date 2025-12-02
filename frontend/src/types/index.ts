@@ -232,7 +232,7 @@ export interface Dog {
 	dateOfBirth?: string | null
 	dateOfDeath?: string | null
 	microchipNo?: string | null
-	SOD1?: 'N/N' | 'N/DM' | 'DM/DM' | null
+	SOD1?: 'N_N' | 'N_DM' | 'DM_DM' | null
 	HD?: 'A1' | 'A2' | 'B1' | 'B2' | null
 	stuntLicenseSince?: string | null
 	father?: {
@@ -247,7 +247,8 @@ export interface Dog {
 	} | null
 	owner?: {
 		documentId: string
-		fullName?: string | null
+		firstName?: string | null
+		lastName?: string | null
 	} | null
 	Genprofil?: boolean | null
 	EyesCheck?: boolean | null

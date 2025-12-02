@@ -382,7 +382,8 @@ export const SEARCH_DOGS = `
 			}
 			owner {
 				documentId
-				fullName
+				firstName
+				lastName
 			}
 			Genprofil
 			EyesCheck

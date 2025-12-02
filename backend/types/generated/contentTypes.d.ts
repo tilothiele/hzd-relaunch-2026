@@ -1263,6 +1263,9 @@ export interface PluginHzdPluginMember extends Struct.CollectionTypeSchema {
     Avatar: Schema.Attribute.Media<'images'>;
     cancellationDueDate: Schema.Attribute.Date;
     cancellationOn: Schema.Attribute.Date;
+    cFlagAccess: Schema.Attribute.Boolean;
+    cFlagBreeder: Schema.Attribute.Boolean;
+    cId: Schema.Attribute.Integer & Schema.Attribute.Unique;
     city: Schema.Attribute.String;
     countryCode: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
@@ -1273,7 +1276,7 @@ export interface PluginHzdPluginMember extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     dateOfBirth: Schema.Attribute.Date;
     dateOfDeath: Schema.Attribute.Date;
-    fullName: Schema.Attribute.String;
+    firstName: Schema.Attribute.String;
     Intro: Schema.Attribute.RichText &
       Schema.Attribute.CustomField<
         'plugin::ckeditor5.CKEditor',
@@ -1281,6 +1284,7 @@ export interface PluginHzdPluginMember extends Struct.CollectionTypeSchema {
           preset: 'defaultHtml';
         }
       >;
+    lastName: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -1298,6 +1302,7 @@ export interface PluginHzdPluginMember extends Struct.CollectionTypeSchema {
       ['Nord', 'Ost', 'Mitte', 'S\u00FCd', 'West']
     >;
     sex: Schema.Attribute.Enumeration<['M', 'F']>;
+    title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

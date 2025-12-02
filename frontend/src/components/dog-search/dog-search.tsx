@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, FormControlLabel, Chip, OutlinedInput } from '@mui/material'
+import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, FormControlLabel, Chip, OutlinedInput, Pagination } from '@mui/material'
 import { useDogs, type ColorFilter, type PageSize, type SexFilter, type Sod1Filter, type HDFilter, type DistanceFilter } from '@/hooks/use-dogs'
 import { useGeolocation } from '@/hooks/use-geolocation'
 
@@ -17,6 +17,16 @@ const GERMANY_BOUNDS = {
 	maxLat: 55.0,
 	minLng: 5.0,
 	maxLng: 15.0,
+}
+
+/**
+ * Konvertiert SOD1-Wert von Schema-Format (N_N) zu Anzeige-Format (N/N)
+ */
+function formatSod1ForDisplay(sod1: string | null | undefined): string {
+	if (!sod1) {
+		return ''
+	}
+	return sod1.replace(/_/g, '/')
 }
 
 /**
@@ -78,6 +88,7 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 	const [showMap, setShowMap] = useState(false)
 	const [selectedDog, setSelectedDog] = useState<Dog | null>(null)
 	const [isModalOpen, setIsModalOpen] = useState(false)
+	const [hasSearched, setHasSearched] = useState(false)
 
 	const { location: ipLocation, zip: ipZip, isLoading: isGeolocationLoading } = useGeolocation()
 
@@ -186,6 +197,7 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 
 	const handleSearch = useCallback(() => {
 		setPage(1)
+		setHasSearched(true)
 		void searchDogs()
 	}, [searchDogs])
 
@@ -210,6 +222,13 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 
 	// Erweitere Hunde mit Fake-Koordinaten, wenn keine Location vorhanden ist
 	const enrichedDogs = useMemo(() => enrichDogsWithFakeLocations(dogs), [dogs])
+
+	// Automatische Suche auslösen, wenn sich die Seite ändert und bereits gesucht wurde
+	useEffect(() => {
+		if (hasSearched && page > 0) {
+			void searchDogs()
+		}
+	}, [page, hasSearched, searchDogs])
 
 	const totalPages = pageCount
 	const currentPage = page
@@ -302,14 +321,14 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 							renderValue={(selected) => (
 								<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
 									{selected.map((value) => (
-										<Chip key={value} label={value} size='small' />
+										<Chip key={value} label={formatSod1ForDisplay(value)} size='small' />
 									))}
 								</Box>
 							)}
 						>
-							<MenuItem value='N/N'>N/N</MenuItem>
-							<MenuItem value='N/DM'>N/DM</MenuItem>
-							<MenuItem value='DM/DM'>DM/DM</MenuItem>
+							<MenuItem value='N_N'>N/N</MenuItem>
+							<MenuItem value='N_DM'>N/DM</MenuItem>
+							<MenuItem value='DM_DM'>DM/DM</MenuItem>
 						</Select>
 					</FormControl>
 
@@ -500,6 +519,34 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 				</div>
 			) : enrichedDogs.length > 0 ? (
 				<>
+					{totalPages > 1 ? (
+						<Box className='mb-6 flex items-center justify-center'>
+							<Pagination
+								count={totalPages}
+								page={currentPage}
+								onChange={(_, value) => handlePageChange(value)}
+								disabled={isLoading}
+								color='primary'
+								showFirstButton
+								showLastButton
+								sx={{
+									'& .MuiPaginationItem-root': {
+										fontSize: '0.875rem',
+									},
+									'& .MuiPaginationItem-page.Mui-selected': {
+										backgroundColor: '#facc15',
+										color: '#565757',
+										'&:hover': {
+											backgroundColor: '#e6b800',
+										},
+									},
+									'& .MuiPaginationItem-root.Mui-disabled': {
+										opacity: 0.5,
+									},
+								}}
+							/>
+						</Box>
+					) : null}
 					<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
 						{enrichedDogs.map((dog) => (
 							<DogCard
@@ -514,27 +561,32 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 					</div>
 
 					{totalPages > 1 ? (
-						<div className='mt-6 flex items-center justify-center gap-2'>
-							<button
-								type='button'
-								onClick={() => handlePageChange(currentPage - 1)}
-								disabled={currentPage === 1 || isLoading}
-								className='rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50'
-							>
-								Zurück
-							</button>
-							<span className='text-sm text-gray-600'>
-								Seite {currentPage} von {totalPages}
-							</span>
-							<button
-								type='button'
-								onClick={() => handlePageChange(currentPage + 1)}
-								disabled={currentPage === totalPages || isLoading}
-								className='rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50'
-							>
-								Weiter
-							</button>
-						</div>
+						<Box className='mt-6 flex items-center justify-center'>
+							<Pagination
+								count={totalPages}
+								page={currentPage}
+								onChange={(_, value) => handlePageChange(value)}
+								disabled={isLoading}
+								color='primary'
+								showFirstButton
+								showLastButton
+								sx={{
+									'& .MuiPaginationItem-root': {
+										fontSize: '0.875rem',
+									},
+									'& .MuiPaginationItem-page.Mui-selected': {
+										backgroundColor: '#facc15',
+										color: '#565757',
+										'&:hover': {
+											backgroundColor: '#e6b800',
+										},
+									},
+									'& .MuiPaginationItem-root.Mui-disabled': {
+										opacity: 0.5,
+									},
+								}}
+							/>
+						</Box>
 					) : null}
 				</>
 			) : !isLoading ? (

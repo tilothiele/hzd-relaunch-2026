@@ -79,11 +79,87 @@ function getGivenNameIcon(sex: string | null | undefined): string {
 	}
 }
 
+/**
+ * Konvertiert SOD1-Wert von Schema-Format (N_N) zu Anzeige-Format (N/N)
+ */
+function formatSod1ForDisplay(sod1: string | null | undefined): string {
+	if (!sod1) {
+		return ''
+	}
+	return sod1.replace(/_/g, '/')
+}
+
+/**
+ * Gibt das passende Standardbild basierend auf der Farbe zurück
+ */
+function getDefaultImageForColor(color: string | null | undefined): string {
+	switch (color) {
+	case 'S':
+		return '/static-images/hovis/hovi-schwarz.png'
+	case 'SM':
+		return '/static-images/hovis/hovi-schwarzmarken.png'
+	case 'B':
+		return '/static-images/hovis/hovi-blond.png'
+	default:
+		return '/static-images/hovis/hovi-schwarz.png'
+	}
+}
+
+/**
+ * Berechnet das Alter basierend auf dem Geburtsdatum und gibt es als "Jahre Monate" zurück
+ */
+function calculateAge(dateOfBirth: string | null | undefined): string | null {
+	if (!dateOfBirth) {
+		return null
+	}
+
+	try {
+		const birthDate = new Date(dateOfBirth)
+		const today = new Date()
+
+		// Prüfe, ob das Datum gültig ist
+		if (isNaN(birthDate.getTime())) {
+			return null
+		}
+
+		// Berechne die Differenz
+		let years = today.getFullYear() - birthDate.getFullYear()
+		let months = today.getMonth() - birthDate.getMonth()
+
+		// Korrigiere, falls der Geburtstag noch nicht in diesem Monat war
+		if (months < 0 || (months === 0 && today.getDate() < birthDate.getDate())) {
+			years--
+			months += 12
+		}
+
+		// Formatiere das Ergebnis
+		if (years === 0 && months === 0) {
+			return '(0 Jahre 0 Monate)'
+		}
+
+		const yearsText = years === 1 ? 'Jahr' : 'Jahre'
+		const monthsText = months === 1 ? 'Monat' : 'Monate'
+
+		if (years === 0) {
+			return `(${months} ${monthsText})`
+		}
+
+		if (months === 0) {
+			return `(${years} ${yearsText})`
+		}
+
+		return `(${years} ${yearsText} ${months} ${monthsText})`
+	} catch {
+		return null
+	}
+}
+
 export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDistance }: DogCardProps) {
 	const avatarUrl = dog.avatar?.url
 	const avatarAlt = dog.avatar?.alternativeText ?? 'Hund'
 	const fullName = dog.fullKennelName ?? dog.givenName ?? 'Unbekannt'
 	const baseUrl = strapiBaseUrl ?? ''
+	const age = calculateAge(dog.dateOfBirth)
 
 	// Berechne Entfernung, falls userLocation und dog.Location verfügbar sind
 	let distance: number | null = null
@@ -142,14 +218,11 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 					/>
 				</CardMedia>
 			) : (
-				<Box
+				<CardMedia
+					component='div'
 					sx={{
+						position: 'relative',
 						height: 192,
-						display: 'flex',
-						alignItems: 'center',
-						justifyContent: 'center',
-						bgcolor: 'grey.100',
-						color: 'grey.400',
 						cursor: 'pointer',
 						'&:hover': {
 							opacity: 0.9,
@@ -166,8 +239,14 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 					role='button'
 					aria-label='Hundedetails anzeigen'
 				>
-					Kein Bild
-				</Box>
+					<Image
+						src={getDefaultImageForColor(dog.color)}
+						alt={avatarAlt}
+						fill
+						style={{ objectFit: 'cover' }}
+						unoptimized
+					/>
+				</CardMedia>
 			)}
 
 			<CardContent>
@@ -266,31 +345,7 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 								</TableCell>
 								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
 									{formatDate(dog.dateOfBirth)}
-								</TableCell>
-							</TableRow>
-						) : null}
-						{dog.microchipNo ? (
-							<TableRow>
-								<TableCell
-									sx={{
-										width: 48,
-										paddingLeft: '1em',
-										paddingRight: '1em',
-										verticalAlign: 'middle',
-									}}
-								>
-									<Box sx={{ width: 20, height: 20, position: 'relative' }}>
-										<Image
-											src='/icons/zucht-icon-microchip-hzd-hovawart-zuchtgemeinschaft.png'
-											alt='Microchipnummer'
-											fill
-											className='object-contain'
-											unoptimized
-										/>
-									</Box>
-								</TableCell>
-								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-									{dog.microchipNo}
+									{age ? ` ${age}` : ''}
 								</TableCell>
 							</TableRow>
 						) : null}
@@ -315,7 +370,7 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 									</Box>
 								</TableCell>
 								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-									SOD1: {dog.SOD1}
+									SOD1: {formatSod1ForDisplay(dog.SOD1)}
 								</TableCell>
 							</TableRow>
 						) : null}

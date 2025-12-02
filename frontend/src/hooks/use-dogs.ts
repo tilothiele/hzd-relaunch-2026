@@ -25,7 +25,7 @@ const EMPTY_HD_FILTERS: HDFilter[] = []
 
 export type SexFilter = 'M' | 'F' | ''
 export type ColorFilter = 'S' | 'SM' | 'B' | ''
-export type Sod1Filter = 'N/N' | 'N/DM' | 'DM/DM'
+export type Sod1Filter = 'N_N' | 'N_DM' | 'DM_DM'
 export type HDFilter = 'A1' | 'A2' | 'B1' | 'B2'
 export type DistanceFilter = '' | 50 | 100 | 300 | 800
 export type PageSize = 5 | 10 | 20
@@ -216,16 +216,25 @@ export function useDogs(options: UseDogsOptions = {}) {
 			setDogs(dogsArray)
 
 			// Berechne Paginierung basierend auf den serverseitigen Ergebnissen
-			// Da die Meta-Informationen nicht in der Antwort enthalten sind,
-			// schätzen wir die Gesamtzahl basierend auf der Anzahl der zurückgegebenen Ergebnisse
-			// Wenn wir genau pageSize Ergebnisse haben, gibt es wahrscheinlich mehr
-			const estimatedTotal = dogsArray.length === pageSize && page > 1
-				? page * pageSize + 1
-				: dogsArray.length === pageSize
-					? page * pageSize
-					: (page - 1) * pageSize + dogsArray.length
+			// Wenn wir genau pageSize Ergebnisse haben, gibt es wahrscheinlich weitere Seiten
+			// Wenn wir weniger als pageSize haben, ist das die letzte Seite
+			let calculatedPageCount: number
+			let estimatedTotal: number
 
-			const calculatedPageCount = Math.ceil(estimatedTotal / pageSize)
+			if (dogsArray.length === 0) {
+				// Keine Ergebnisse
+				calculatedPageCount = 0
+				estimatedTotal = 0
+			} else if (dogsArray.length < pageSize) {
+				// Weniger als pageSize Ergebnisse = letzte Seite
+				estimatedTotal = (page - 1) * pageSize + dogsArray.length
+				calculatedPageCount = page
+			} else {
+				// Genau pageSize Ergebnisse = es gibt wahrscheinlich weitere Seiten
+				// Wir nehmen an, dass es mindestens page + 1 Seiten gibt
+				calculatedPageCount = page + 1
+				estimatedTotal = page * pageSize + 1
+			}
 
 			setTotalDogs(estimatedTotal)
 			setPageCount(calculatedPageCount)
