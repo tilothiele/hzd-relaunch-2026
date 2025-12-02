@@ -1,7 +1,8 @@
 'use client'
 
+import { useId } from 'react'
 import Image from 'next/image'
-import { Card, CardMedia, CardContent, Table, TableBody, TableRow, TableCell, Box } from '@mui/material'
+import { Card, CardMedia, CardContent, Table, TableBody, TableRow, TableCell, Box, Tooltip } from '@mui/material'
 import type { Dog } from '@/types'
 import type { DistanceFilter } from '@/hooks/use-dogs'
 
@@ -154,6 +155,92 @@ function calculateAge(dateOfBirth: string | null | undefined): string | null {
 	}
 }
 
+/**
+ * Männliches Geschlechtssymbol (Mars-Symbol)
+ */
+function MaleSexSymbol() {
+	return (
+		<Box
+			sx={{
+				position: 'absolute',
+				top: 8,
+				right: 8,
+				width: 32,
+				height: 32,
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+				zIndex: 1,
+			}}
+		>
+			<svg
+				width='32'
+				height='32'
+				viewBox='0 0 100 100'
+				xmlns='http://www.w3.org/2000/svg'
+			>
+				<circle
+					cx='50'
+					cy='50'
+					r='30'
+					fill='none'
+					stroke='#4E6AAA'
+					strokeWidth='20'
+					strokeLinecap='round'
+				/>
+				<path
+					d='M 75 25 L 90 10'
+					stroke='#4E6AAA'
+					strokeWidth='24'
+					strokeLinecap='round'
+				/>
+				<polygon
+					points='90,10 104,10 97,22'
+					fill='#4E6AAA'
+				/>
+			</svg>
+		</Box>
+	)
+}
+
+/**
+ * Weibliches Geschlechtssymbol (Venus-Symbol)
+ */
+function FemaleSexSymbol() {
+	const maskId = useId()
+
+	return (
+		<Box
+			sx={{
+				position: 'absolute',
+				top: 8,
+				left: 8,
+				width: 32,
+				height: 32,
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+				zIndex: 1,
+			}}
+		>
+			<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 450' width='300' height='450'>
+				<defs>
+					<mask id={maskId}>
+						<rect width='100%' height='100%' fill='white' />
+						<circle cx='150' cy='120' r='60' fill='black' />
+					</mask>
+				</defs>
+				<g fill='#E7286B' mask={`url(#${maskId})`}>
+					<circle cx='150' cy='120' r='100' />
+					<rect x='138' y='220' width='24' height='100' />
+					<rect x='100' y='280' width='100' height='24' />
+				</g>
+			</svg>
+		</Box>
+	)
+}
+
+
 export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDistance }: DogCardProps) {
 	const avatarUrl = dog.avatar?.url
 	const avatarAlt = dog.avatar?.alternativeText ?? 'Hund'
@@ -216,6 +303,8 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 						style={{ objectFit: 'cover' }}
 						unoptimized
 					/>
+					{dog.sex === 'M' && <MaleSexSymbol />}
+					{dog.sex === 'F' && <FemaleSexSymbol />}
 				</CardMedia>
 			) : (
 				<CardMedia
@@ -246,6 +335,8 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 						style={{ objectFit: 'cover' }}
 						unoptimized
 					/>
+					{dog.sex === 'M' && <MaleSexSymbol />}
+					{dog.sex === 'F' && <FemaleSexSymbol />}
 				</CardMedia>
 			)}
 
@@ -261,45 +352,22 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 									verticalAlign: 'middle',
 								}}
 							>
-								<Box sx={{ width: 20, height: 20, position: 'relative' }}>
-									<Image
-										src='/icons/zucht-icon-zwinger-hzd-hovawart-zuchtgemeinschaft.png'
-										alt='Zwingername'
-										fill
-										className='object-contain'
-										unoptimized
-									/>
-								</Box>
-							</TableCell>
-							<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-								{fullName}
-							</TableCell>
-						</TableRow>
-						{dog.givenName && dog.fullKennelName ? (
-							<TableRow>
-								<TableCell
-									sx={{
-										width: 48,
-										paddingLeft: '1em',
-										paddingRight: '1em',
-										verticalAlign: 'middle',
-									}}
-								>
-									<Box sx={{ width: 20, height: 20, position: 'relative' }}>
+								<Tooltip title='Zwingername' arrow>
+									<Box sx={{ width: 20, height: 20, position: 'relative', cursor: 'help' }}>
 										<Image
-											src={getGivenNameIcon(dog.sex)}
-											alt='Rufname'
+											src='/icons/zucht-icon-zwinger-hzd-hovawart-zuchtgemeinschaft.png'
+											alt='Zwingername'
 											fill
 											className='object-contain'
 											unoptimized
 										/>
 									</Box>
-								</TableCell>
-								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-									{dog.givenName}
-								</TableCell>
-							</TableRow>
-						) : null}
+								</Tooltip>
+							</TableCell>
+							<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
+								{fullName}
+							</TableCell>
+						</TableRow>
 						<TableRow>
 							<TableCell
 								sx={{
@@ -309,15 +377,17 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 									verticalAlign: 'middle',
 								}}
 							>
-								<Box sx={{ width: 20, height: 20, position: 'relative' }}>
-									<Image
-										src='/icons/zucht-icon-farbe-hzd-hovawart-zuchtgemeinschaft.png'
-										alt='Farbe'
-										fill
-										className='object-contain'
-										unoptimized
-									/>
-								</Box>
+								<Tooltip title='Farbe' arrow>
+									<Box sx={{ width: 20, height: 20, position: 'relative', cursor: 'help' }}>
+										<Image
+											src='/icons/zucht-icon-farbe-hzd-hovawart-zuchtgemeinschaft.png'
+											alt='Farbe'
+											fill
+											className='object-contain'
+											unoptimized
+										/>
+									</Box>
+								</Tooltip>
 							</TableCell>
 							<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
 								{getColorLabel(dog.color)}
@@ -333,15 +403,17 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 										verticalAlign: 'middle',
 									}}
 								>
-									<Box sx={{ width: 20, height: 20, position: 'relative' }}>
-										<Image
-											src='/icons/zucht-icon-geburt-hzd-hovawart-zuchtgemeinschaft.png'
-											alt='Geburtsdatum'
-											fill
-											className='object-contain'
-											unoptimized
-										/>
-									</Box>
+									<Tooltip title='Geburtsdatum' arrow>
+										<Box sx={{ width: 20, height: 20, position: 'relative', cursor: 'help' }}>
+											<Image
+												src='/icons/zucht-icon-geburt-hzd-hovawart-zuchtgemeinschaft.png'
+												alt='Geburtsdatum'
+												fill
+												className='object-contain'
+												unoptimized
+											/>
+										</Box>
+									</Tooltip>
 								</TableCell>
 								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
 									{formatDate(dog.dateOfBirth)}
@@ -359,15 +431,17 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 										verticalAlign: 'middle',
 									}}
 								>
-									<Box sx={{ width: 20, height: 20, position: 'relative' }}>
-										<Image
-											src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
-											alt='SOD1'
-											fill
-											className='object-contain'
-											unoptimized
-										/>
-									</Box>
+									<Tooltip title='SOD1' arrow>
+										<Box sx={{ width: 20, height: 20, position: 'relative', cursor: 'help' }}>
+											<Image
+												src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
+												alt='SOD1'
+												fill
+												className='object-contain'
+												unoptimized
+											/>
+										</Box>
+									</Tooltip>
 								</TableCell>
 								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
 									SOD1: {formatSod1ForDisplay(dog.SOD1)}
@@ -384,15 +458,17 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 										verticalAlign: 'middle',
 									}}
 								>
-									<Box sx={{ width: 20, height: 20, position: 'relative' }}>
-										<Image
-											src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
-											alt='HD'
-											fill
-											className='object-contain'
-											unoptimized
-										/>
-									</Box>
+									<Tooltip title='HD' arrow>
+										<Box sx={{ width: 20, height: 20, position: 'relative', cursor: 'help' }}>
+											<Image
+												src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
+												alt='HD'
+												fill
+												className='object-contain'
+												unoptimized
+											/>
+										</Box>
+									</Tooltip>
 								</TableCell>
 								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
 									HD: {dog.HD}
@@ -409,15 +485,17 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 										verticalAlign: 'middle',
 									}}
 								>
-									<Box sx={{ width: 20, height: 20, position: 'relative' }}>
-										<Image
-											src='/icons/zucht-icon-position-hzd-hovawart-zuchtgemeinschaft.png'
-											alt='Entfernung'
-											fill
-											className='object-contain'
-											unoptimized
-										/>
-									</Box>
+									<Tooltip title='Entfernung' arrow>
+										<Box sx={{ width: 20, height: 20, position: 'relative', cursor: 'help' }}>
+											<Image
+												src='/icons/zucht-icon-position-hzd-hovawart-zuchtgemeinschaft.png'
+												alt='Entfernung'
+												fill
+												className='object-contain'
+												unoptimized
+											/>
+										</Box>
+									</Tooltip>
 								</TableCell>
 								<TableCell
 									sx={{

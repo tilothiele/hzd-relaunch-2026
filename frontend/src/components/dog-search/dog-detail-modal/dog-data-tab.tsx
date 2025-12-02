@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { Checkbox, FormControlLabel } from '@mui/material'
+import { Checkbox, Tooltip } from '@mui/material'
 import type { Dog } from '@/types'
 
 interface DogDataTabProps {
@@ -71,10 +71,60 @@ function formatSod1ForDisplay(sod1: string | null | undefined): string {
 	return sod1.replace(/_/g, '/')
 }
 
+/**
+ * Berechnet das Alter basierend auf dem Geburtsdatum und gibt es als "Jahre Monate" zurück
+ */
+function calculateAge(dateOfBirth: string | null | undefined): string | null {
+	if (!dateOfBirth) {
+		return null
+	}
+
+	try {
+		const birthDate = new Date(dateOfBirth)
+		const today = new Date()
+
+		// Prüfe, ob das Datum gültig ist
+		if (isNaN(birthDate.getTime())) {
+			return null
+		}
+
+		// Berechne die Differenz
+		let years = today.getFullYear() - birthDate.getFullYear()
+		let months = today.getMonth() - birthDate.getMonth()
+
+		// Korrigiere, falls der Geburtstag noch nicht in diesem Monat war
+		if (months < 0 || (months === 0 && today.getDate() < birthDate.getDate())) {
+			years--
+			months += 12
+		}
+
+		// Formatiere das Ergebnis
+		if (years === 0 && months === 0) {
+			return '(0 Jahre 0 Monate)'
+		}
+
+		const yearsText = years === 1 ? 'Jahr' : 'Jahre'
+		const monthsText = months === 1 ? 'Monat' : 'Monate'
+
+		if (years === 0) {
+			return `(${months} ${monthsText})`
+		}
+
+		if (months === 0) {
+			return `(${years} ${yearsText})`
+		}
+
+		return `(${years} ${yearsText} ${months} ${monthsText})`
+	} catch {
+		return null
+	}
+}
+
 export function DogDataTab({ dog, strapiBaseUrl }: DogDataTabProps) {
 	const avatarUrl = dog.avatar?.url
 	const avatarAlt = dog.avatar?.alternativeText ?? 'Hund'
 	const baseUrl = strapiBaseUrl ?? ''
+	const age = calculateAge(dog.dateOfBirth)
 
 	return (
 		<div>
@@ -100,18 +150,19 @@ export function DogDataTab({ dog, strapiBaseUrl }: DogDataTabProps) {
 			<div className='grid gap-6 md:grid-cols-2'>
 				<div className='space-y-4'>
 					<div className='flex items-center gap-4'>
-						<div className='flex h-10 w-10 items-center justify-center'>
-							<Image
-								src='/icons/zucht-icon-zwinger-hzd-hovawart-zuchtgemeinschaft.png'
-								alt='Zwingername'
-								width={24}
-								height={24}
-								className='object-contain'
-								unoptimized
-							/>
-						</div>
+						<Tooltip title='Zwingername' arrow>
+							<div className='flex h-10 w-10 cursor-help items-center justify-center'>
+								<Image
+									src='/icons/zucht-icon-zwinger-hzd-hovawart-zuchtgemeinschaft.png'
+									alt='Zwingername'
+									width={24}
+									height={24}
+									className='object-contain'
+									unoptimized
+								/>
+							</div>
+						</Tooltip>
 						<div>
-							<p className='text-sm font-medium text-gray-500'>Zwingername</p>
 							<p className='text-base text-gray-900'>
 								{dog.fullKennelName ?? dog.givenName ?? 'Unbekannt'}
 							</p>
@@ -120,53 +171,56 @@ export function DogDataTab({ dog, strapiBaseUrl }: DogDataTabProps) {
 
 					{dog.givenName && dog.fullKennelName ? (
 						<div className='flex items-center gap-4'>
-							<div className='flex h-10 w-10 items-center justify-center'>
-								<Image
-									src={getGivenNameIcon(dog.sex)}
-									alt='Rufname'
-									width={24}
-									height={24}
-									className='object-contain'
-									unoptimized
-								/>
-							</div>
+							<Tooltip title='Rufname' arrow>
+								<div className='flex h-10 w-10 cursor-help items-center justify-center'>
+									<Image
+										src={getGivenNameIcon(dog.sex)}
+										alt='Rufname'
+										width={24}
+										height={24}
+										className='object-contain'
+										unoptimized
+									/>
+								</div>
+							</Tooltip>
 							<div>
-								<p className='text-sm font-medium text-gray-500'>Rufname</p>
 								<p className='text-base text-gray-900'>{dog.givenName}</p>
 							</div>
 						</div>
 					) : null}
 
 					<div className='flex items-center gap-4'>
-						<div className='flex h-10 w-10 items-center justify-center'>
-							<Image
-								src={getGivenNameIcon(dog.sex)}
-								alt='Geschlecht'
-								width={24}
-								height={24}
-								className='object-contain'
-								unoptimized
-							/>
-						</div>
+						<Tooltip title='Geschlecht' arrow>
+							<div className='flex h-10 w-10 cursor-help items-center justify-center'>
+								<Image
+									src={getGivenNameIcon(dog.sex)}
+									alt='Geschlecht'
+									width={24}
+									height={24}
+									className='object-contain'
+									unoptimized
+								/>
+							</div>
+						</Tooltip>
 						<div>
-							<p className='text-sm font-medium text-gray-500'>Geschlecht</p>
 							<p className='text-base text-gray-900'>{getSexLabel(dog.sex)}</p>
 						</div>
 					</div>
 
 					<div className='flex items-center gap-4'>
-						<div className='flex h-10 w-10 items-center justify-center'>
-							<Image
-								src='/icons/zucht-icon-farbe-hzd-hovawart-zuchtgemeinschaft.png'
-								alt='Farbe'
-								width={24}
-								height={24}
-								className='object-contain'
-								unoptimized
-							/>
-						</div>
+						<Tooltip title='Farbe' arrow>
+							<div className='flex h-10 w-10 cursor-help items-center justify-center'>
+								<Image
+									src='/icons/zucht-icon-farbe-hzd-hovawart-zuchtgemeinschaft.png'
+									alt='Farbe'
+									width={24}
+									height={24}
+									className='object-contain'
+									unoptimized
+								/>
+							</div>
+						</Tooltip>
 						<div>
-							<p className='text-sm font-medium text-gray-500'>Farbe</p>
 							<p className='text-base text-gray-900'>{getColorLabel(dog.color)}</p>
 						</div>
 					</div>
@@ -175,42 +229,47 @@ export function DogDataTab({ dog, strapiBaseUrl }: DogDataTabProps) {
 				<div className='space-y-4'>
 					{dog.dateOfBirth ? (
 						<div className='flex items-center gap-4'>
-							<div className='flex h-10 w-10 items-center justify-center'>
-								<Image
-									src='/icons/zucht-icon-geburt-hzd-hovawart-zuchtgemeinschaft.png'
-									alt='Geburtsdatum'
-									width={24}
-									height={24}
-									className='object-contain'
-									unoptimized
-								/>
-							</div>
+							<Tooltip title='Geburtsdatum' arrow>
+								<div className='flex h-10 w-10 cursor-help items-center justify-center'>
+									<Image
+										src='/icons/zucht-icon-geburt-hzd-hovawart-zuchtgemeinschaft.png'
+										alt='Geburtsdatum'
+										width={24}
+										height={24}
+										className='object-contain'
+										unoptimized
+									/>
+								</div>
+							</Tooltip>
 							<div>
-								<p className='text-sm font-medium text-gray-500'>Geburtsdatum</p>
-								<p className='text-base text-gray-900'>{formatDate(dog.dateOfBirth)}</p>
+								<p className='text-base text-gray-900'>
+									{formatDate(dog.dateOfBirth)}
+									{age ? ` - ${age}` : ''}
+								</p>
 							</div>
 						</div>
 					) : null}
 
 					{dog.dateOfDeath ? (
 						<div className='flex items-center gap-4'>
-							<div className='flex h-10 w-10 items-center justify-center'>
-								<svg
-									className='h-6 w-6 text-gray-400'
-									fill='none'
-									viewBox='0 0 24 24'
-									stroke='currentColor'
-								>
-									<path
-										strokeLinecap='round'
-										strokeLinejoin='round'
-										strokeWidth={2}
-										d='M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-									/>
-								</svg>
-							</div>
+							<Tooltip title='Todesdatum' arrow>
+								<div className='flex h-10 w-10 cursor-help items-center justify-center'>
+									<svg
+										className='h-6 w-6 text-gray-400'
+										fill='none'
+										viewBox='0 0 24 24'
+										stroke='currentColor'
+									>
+										<path
+											strokeLinecap='round'
+											strokeLinejoin='round'
+											strokeWidth={2}
+											d='M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+										/>
+									</svg>
+								</div>
+							</Tooltip>
 							<div>
-								<p className='text-sm font-medium text-gray-500'>Todesdatum</p>
 								<p className='text-base text-gray-900'>{formatDate(dog.dateOfDeath)}</p>
 							</div>
 						</div>
@@ -218,53 +277,56 @@ export function DogDataTab({ dog, strapiBaseUrl }: DogDataTabProps) {
 
 					{dog.microchipNo ? (
 						<div className='flex items-center gap-4'>
-							<div className='flex h-10 w-10 items-center justify-center'>
-								<Image
-									src='/icons/zucht-icon-microchip-hzd-hovawart-zuchtgemeinschaft.png'
-									alt='Microchipnummer'
-									width={24}
-									height={24}
-									className='object-contain'
-									unoptimized
-								/>
-							</div>
+							<Tooltip title='Chipnummer' arrow>
+								<div className='flex h-10 w-10 cursor-help items-center justify-center'>
+									<Image
+										src='/icons/zucht-icon-microchip-hzd-hovawart-zuchtgemeinschaft.png'
+										alt='Microchipnummer'
+										width={24}
+										height={24}
+										className='object-contain'
+										unoptimized
+									/>
+								</div>
+							</Tooltip>
 							<div>
-								<p className='text-sm font-medium text-gray-500'>Chipnummer</p>
 								<p className='text-base text-gray-900'>{dog.microchipNo}</p>
 							</div>
 						</div>
 					) : null}
 
 					<div className='flex items-center gap-4'>
-						<div className='flex h-10 w-10 items-center justify-center'>
-							<Image
-								src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
-								alt='SOD1'
-								width={24}
-								height={24}
-								className='object-contain'
-								unoptimized
-							/>
-						</div>
+						<Tooltip title='SOD1' arrow>
+							<div className='flex h-10 w-10 cursor-help items-center justify-center'>
+								<Image
+									src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
+									alt='SOD1'
+									width={24}
+									height={24}
+									className='object-contain'
+									unoptimized
+								/>
+							</div>
+						</Tooltip>
 						<div>
-							<p className='text-sm font-medium text-gray-500'>SOD1</p>
 							<p className='text-base text-gray-900'>{dog.SOD1 ? formatSod1ForDisplay(dog.SOD1) : 'Nicht verfügbar'}</p>
 						</div>
 					</div>
 
 					<div className='flex items-center gap-4'>
-						<div className='flex h-10 w-10 items-center justify-center'>
-							<Image
-								src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
-								alt='HD'
-								width={24}
-								height={24}
-								className='object-contain'
-								unoptimized
-							/>
-						</div>
+						<Tooltip title='HD' arrow>
+							<div className='flex h-10 w-10 cursor-help items-center justify-center'>
+								<Image
+									src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
+									alt='HD'
+									width={24}
+									height={24}
+									className='object-contain'
+									unoptimized
+								/>
+							</div>
+						</Tooltip>
 						<div>
-							<p className='text-sm font-medium text-gray-500'>HD</p>
 							<p className='text-base text-gray-900'>{dog.HD ?? 'Nicht verfügbar'}</p>
 						</div>
 					</div>
@@ -272,81 +334,104 @@ export function DogDataTab({ dog, strapiBaseUrl }: DogDataTabProps) {
 			</div>
 
 			{/* Untersuchungen */}
-			<div className='mt-6 border-t border-gray-200 pt-6'>
-				<h3 className='mb-4 text-lg font-semibold text-gray-900'>Untersuchungen</h3>
-				<div className='grid gap-4 md:grid-cols-2'>
-					<FormControlLabel
-						control={
-							<Checkbox
-								checked={dog.Genprofil === true}
-								disabled
-								sx={{
-									color: dog.Genprofil === true ? '#10b981' : '#d1d5db',
-									'&.Mui-checked': {
-										color: '#10b981',
-									},
-									'&.Mui-disabled': {
+			<div className='mt-8 border-t border-gray-200 pt-8 pb-8'>
+				<div className='grid gap-6 md:grid-cols-2'>
+					<div className='space-y-4'>
+						<div className='flex items-center gap-4'>
+							<div className='flex h-10 w-10 items-center justify-center'>
+								<Checkbox
+									checked={dog.Genprofil === true}
+									disabled
+									sx={{
 										color: dog.Genprofil === true ? '#10b981' : '#d1d5db',
-									},
-								}}
-							/>
-						}
-						label='Genprofil'
-					/>
-					<FormControlLabel
-						control={
-							<Checkbox
-								checked={dog.EyesCheck === true}
-								disabled
-								sx={{
-									color: dog.EyesCheck === true ? '#10b981' : '#d1d5db',
-									'&.Mui-checked': {
-										color: '#10b981',
-									},
-									'&.Mui-disabled': {
-										color: dog.EyesCheck === true ? '#10b981' : '#d1d5db',
-									},
-								}}
-							/>
-						}
-						label='Augenuntersuchung'
-					/>
-					<FormControlLabel
-						control={
-							<Checkbox
-								checked={dog.HeartCheck === true}
-								disabled
-								sx={{
-									color: dog.HeartCheck === true ? '#10b981' : '#d1d5db',
-									'&.Mui-checked': {
-										color: '#10b981',
-									},
-									'&.Mui-disabled': {
+										'&.Mui-checked': {
+											color: '#10b981',
+										},
+										'&.Mui-disabled': {
+											color: dog.Genprofil === true ? '#10b981' : '#d1d5db',
+										},
+									}}
+								/>
+							</div>
+							<div>
+								<p className={`text-base text-gray-900 ${dog.Genprofil !== true ? 'line-through' : ''}`}>
+									Genprofil
+								</p>
+							</div>
+						</div>
+						<div className='flex items-center gap-4'>
+							<div className='flex h-10 w-10 items-center justify-center'>
+								<Checkbox
+									checked={dog.HeartCheck === true}
+									disabled
+									sx={{
 										color: dog.HeartCheck === true ? '#10b981' : '#d1d5db',
-									},
-								}}
-							/>
-						}
-						label='Herzuntersuchung'
-					/>
-					<FormControlLabel
-						control={
-							<Checkbox
-								checked={dog.ColorCheck === true}
-								disabled
-								sx={{
-									color: dog.ColorCheck === true ? '#10b981' : '#d1d5db',
-									'&.Mui-checked': {
-										color: '#10b981',
-									},
-									'&.Mui-disabled': {
+										'&.Mui-checked': {
+											color: '#10b981',
+										},
+										'&.Mui-disabled': {
+											color: dog.HeartCheck === true ? '#10b981' : '#d1d5db',
+										},
+									}}
+								/>
+							</div>
+							<div>
+								<p className={`text-base text-gray-900 ${dog.HeartCheck !== true ? 'line-through' : ''}`}>
+									Herzuntersuchung
+								</p>
+							</div>
+						</div>
+					</div>
+					<div className='space-y-4'>
+						<div className='flex items-center gap-4'>
+							<div className='flex h-10 w-10 items-center justify-center'>
+								<Checkbox
+									checked={dog.EyesCheck === true}
+									disabled
+									sx={{
+										color: dog.EyesCheck === true ? '#10b981' : '#d1d5db',
+										'&.Mui-checked': {
+											color: '#10b981',
+										},
+										'&.Mui-disabled': {
+											color: dog.EyesCheck === true ? '#10b981' : '#d1d5db',
+										},
+									}}
+								/>
+							</div>
+							<div>
+								<p className={`text-base text-gray-900 ${dog.EyesCheck !== true ? 'line-through' : ''}`}>
+									Augenuntersuchung
+								</p>
+							</div>
+						</div>
+						<div className='flex items-center gap-4'>
+							<div className='flex h-10 w-10 items-center justify-center'>
+								<Checkbox
+									checked={dog.ColorCheck === true}
+									disabled
+									sx={{
 										color: dog.ColorCheck === true ? '#10b981' : '#d1d5db',
-									},
-								}}
-							/>
-						}
-						label='Farbverdünnung'
-					/>
+										'&.Mui-checked': {
+											color: '#10b981',
+										},
+										'&.Mui-disabled': {
+											color: dog.ColorCheck === true ? '#10b981' : '#d1d5db',
+										},
+									}}
+								/>
+							</div>
+							<div>
+								<p
+									className={`text-base text-gray-900 ${
+										dog.ColorCheck !== true ? 'line-through' : ''
+									}`}
+								>
+									Farbverdünnung
+								</p>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
