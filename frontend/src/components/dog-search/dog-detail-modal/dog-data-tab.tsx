@@ -14,7 +14,7 @@ function getColorLabel(color: string | null | undefined): string {
 	case 'S':
 		return 'Schwarz'
 	case 'SM':
-		return 'Schwarz-Marken'
+		return 'Schwarzmarken'
 	case 'B':
 		return 'Blond'
 	default:

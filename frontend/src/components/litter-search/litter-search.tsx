@@ -325,7 +325,7 @@ export function LitterSearch({ strapiBaseUrl }: LitterSearchProps) {
 												) : null}
 												{litter.AmountSM ? (
 													<p className='pl-2'>
-														<strong>Schwarz-Marken:</strong> {litter.AmountSM.Available ?? 0} / {litter.AmountSM.Total ?? 0} verfügbar
+														<strong>Schwarzmarken:</strong> {litter.AmountSM.Available ?? 0} / {litter.AmountSM.Total ?? 0} verfügbar
 													</p>
 												) : null}
 												{litter.AmountB ? (

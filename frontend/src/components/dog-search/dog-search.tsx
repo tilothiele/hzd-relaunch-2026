@@ -285,7 +285,7 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 						>
 							<MenuItem value=''>Alle</MenuItem>
 							<MenuItem value='S'>Schwarz</MenuItem>
-							<MenuItem value='SM'>Schwarz-Marken</MenuItem>
+							<MenuItem value='SM'>Schwarzmarken</MenuItem>
 							<MenuItem value='B'>Blond</MenuItem>
 						</Select>
 					</FormControl>
