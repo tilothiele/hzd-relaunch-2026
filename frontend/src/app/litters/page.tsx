@@ -10,6 +10,8 @@ import { LitterSearch } from '@/components/litter-search/litter-search'
 import { useTheme } from '@/hooks/use-theme'
 import { useAuth } from '@/hooks/use-auth'
 
+export const dynamic = 'force-dynamic'
+
 function LittersPageSkeleton() {
 	return (
 		<div

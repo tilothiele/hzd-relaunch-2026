@@ -3,6 +3,8 @@ import { themes } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { MeinHzdContent } from '@/components/mein-hzd/mein-hzd-content'
 
+export const dynamic = 'force-dynamic'
+
 export default async function MeinHzdPage() {
 	const { globalLayout, baseUrl, error } = await fetchGlobalLayout()
 	const theme = themes.A

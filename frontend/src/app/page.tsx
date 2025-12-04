@@ -3,6 +3,8 @@ import { themes } from '@/themes'
 import { fetchIndexPage } from '@/lib/server/fetch-index-page'
 import { renderServerSections } from '@/components/sections/server-section-factory'
 
+export const dynamic = 'force-dynamic'
+
 export default async function Home() {
 	const { globalLayout, baseUrl, error } = await fetchIndexPage()
 	const sections = globalLayout?.Sections ?? []

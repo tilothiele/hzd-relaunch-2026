@@ -4,6 +4,8 @@ import { themes } from '@/themes'
 import { fetchPageBySlug, fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { renderServerSections } from '@/components/sections/server-section-factory'
 
+export const dynamic = 'force-dynamic'
+
 interface PageProps {
 	params: Promise<{
 		slug: string

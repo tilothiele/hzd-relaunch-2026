@@ -3,6 +3,8 @@ import { BreederSearch } from '@/components/breeder-search/breeder-search'
 import { themes } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 
+export const dynamic = 'force-dynamic'
+
 export default async function BreedersPage() {
 	const { globalLayout, baseUrl, error } = await fetchGlobalLayout()
 	const theme = themes.B

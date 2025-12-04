@@ -3,6 +3,8 @@ import { DogSearch } from '@/components/dog-search/dog-search'
 import { themes } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 
+export const dynamic = 'force-dynamic'
+
 export default async function StuntDogsPage() {
 	const { globalLayout, baseUrl, error } = await fetchGlobalLayout()
 	const theme = themes.B
