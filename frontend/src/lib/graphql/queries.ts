@@ -416,7 +416,8 @@ export const SEARCH_BREEDERS = `
 			kennelName
 			breedingLicenseSince
 			member {
-				fullName
+				firstName
+				lastName
 				region
 				phone
 				adress1
@@ -456,7 +457,8 @@ export const SEARCH_LITTERS = `
 			breeder {
 				kennelName
 				member {
-					fullName
+					firstName
+					lastName
 				}
 			}
 			mother {

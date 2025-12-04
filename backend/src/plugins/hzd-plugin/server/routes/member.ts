@@ -23,4 +23,20 @@ export default [
       auth: false, // öffentlich - alternativer Pfad im Singular
     },
   },
+  {
+    method: 'POST',
+    path: '/members',
+    handler: 'member.create',
+    config: {
+      // auth wird weggelassen, damit Standard-Authentifizierung verwendet wird
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/members/:id',
+    handler: 'member.update',
+    config: {
+      // auth wird weggelassen, damit Standard-Authentifizierung verwendet wird
+    },
+  },
 ];

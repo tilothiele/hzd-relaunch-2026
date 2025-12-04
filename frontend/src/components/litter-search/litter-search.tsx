@@ -263,8 +263,8 @@ export function LitterSearch({ strapiBaseUrl }: LitterSearchProps) {
 				<>
 					<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
 						{litters.map((litter) => {
-							const breederName = litter.breeder?.kennelName ?? 'Unbekannt'
-							const breederMember = litter.breeder?.member?.fullName
+							const breederName = litter.breeder?.kennelName ?? 'Kein Zwingername bekannt'
+							const breederMember = `{(litter.breeder?.member?.firstName || '') (litter.breeder?.member?.lastName || '')}`
 							const motherName = litter.mother?.fullKennelName ?? litter.mother?.givenName ?? 'Unbekannt'
 							const stuntDogName = litter.stuntDog?.fullKennelName ?? litter.stuntDog?.givenName
 

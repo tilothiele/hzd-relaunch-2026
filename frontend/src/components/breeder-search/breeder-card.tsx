@@ -32,7 +32,7 @@ function getRegionLabel(region: string | null | undefined): string {
 }
 
 export function BreederCard({ breeder }: BreederCardProps) {
-	const kennelName = breeder.kennelName ?? 'Unbekannt'
+	const kennelName = breeder.kennelName ?? 'Kein Zwingername bekannt'
 	const member = breeder.member
 
 	return (
@@ -46,9 +46,9 @@ export function BreederCard({ breeder }: BreederCardProps) {
 						<strong>Zuchterlaubnis seit:</strong> {formatDate(breeder.breedingLicenseSince)}
 					</p>
 				) : null}
-				{member?.fullName ? (
+				{member?.firstName && member?.lastName ? (
 					<p>
-						<strong>Züchter:</strong> {member.fullName}
+						<strong>Züchter:</strong> {member.firstName} {member.lastName}
 					</p>
 				) : null}
 				{member?.region ? (

@@ -23,4 +23,20 @@ export default [
       auth: false, // öffentlich - alternativer Pfad im Singular
     },
   },
+  {
+    method: 'POST',
+    path: '/breeders',
+    handler: 'breeder.create',
+    config: {
+      // auth wird weggelassen, damit Standard-Authentifizierung verwendet wird
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/breeders/:id',
+    handler: 'breeder.update',
+    config: {
+      // auth wird weggelassen, damit Standard-Authentifizierung verwendet wird
+    },
+  },
 ];

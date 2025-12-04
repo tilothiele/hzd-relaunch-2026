@@ -46,6 +46,10 @@
       "options": {
         "preset": "defaultHtml"
       }
+    },
+    "cId": {
+      "type": "integer",
+      "unique": true
     }
   }
 }

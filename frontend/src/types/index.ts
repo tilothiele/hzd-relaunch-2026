@@ -274,7 +274,8 @@ export interface Breeder {
 	kennelName?: string | null
 	breedingLicenseSince?: string | null
 	member?: {
-		fullName?: string | null
+		firstName?: string | null
+		lastName?: string | null
 		region?: string | null
 		phone?: string | null
 		adress1?: string | null
@@ -301,7 +302,8 @@ export interface Litter {
 	breeder?: {
 		kennelName?: string | null
 		member?: {
-			fullName?: string | null
+			firstName?: string | null
+			lastName?: string | null
 		} | null
 	} | null
 	mother?: {
