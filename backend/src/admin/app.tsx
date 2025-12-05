@@ -1,8 +1,14 @@
 import type { StrapiApp } from '@strapi/strapi/admin';
 
+import Logo from "./extensions/HZD-Logo.png";
+import TestLogo from "./extensions/HZD-Logo-Test.png";
+
+const isTest = process.env.TEST === 'true';
+
+
 export default {
   config: {
-    locales: [
+    //locales: [
       // 'ar',
       // 'fr',
       // 'cs',
@@ -29,9 +35,17 @@ export default {
       // 'vi',
       // 'zh-Hans',
       // 'zh',
-    ],
+    //],
+    auth: {
+      logo: isTest ? TestLogo : Logo
+    },
+    menu: {
+      logo: isTest ? TestLogo : Logo,
+    },
   },
   bootstrap(app: StrapiApp) {
-    console.log(app);
+    //console.log(app);
+    console.log('isTest', isTest);
+
   },
 };
