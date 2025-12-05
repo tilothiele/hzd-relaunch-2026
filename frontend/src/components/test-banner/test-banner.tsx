@@ -1,5 +1,3 @@
-'use client'
-
 export function TestBanner() {
 	const isTestMode = process.env.NEXT_PUBLIC_TEST === 'true'
 
