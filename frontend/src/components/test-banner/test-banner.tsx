@@ -10,6 +10,8 @@ export function TestBanner() {
 		return null
 	}
 
+	console.log('render')
+
 	return (
 		<div
 			style={{
