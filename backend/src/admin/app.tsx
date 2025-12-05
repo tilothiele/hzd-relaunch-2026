@@ -3,7 +3,7 @@ import type { StrapiApp } from '@strapi/strapi/admin';
 import Logo from "./extensions/HZD-Logo.png";
 import TestLogo from "./extensions/HZD-Logo-Test.png";
 
-const isTest = process.env.TEST === 'true';
+const isTest = process.env.STRAPI_ADMIN_TEST === 'true';
 
 
 export default {
