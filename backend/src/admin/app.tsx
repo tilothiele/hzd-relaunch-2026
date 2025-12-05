@@ -2,17 +2,18 @@ import type { StrapiApp } from '@strapi/strapi/admin';
 
 import Logo from "./extensions/HZD-Logo.png";
 import TestLogo from "./extensions/HZD-Logo-Test.png";
+import Favicon from "./extensions/favicon-32x32.png";
 
 const isTest = process.env.STRAPI_ADMIN_TEST === 'true';
 
 
 export default {
   config: {
-    //locales: [
+    locales: [
       // 'ar',
       // 'fr',
       // 'cs',
-      // 'de',
+      'de',
       // 'dk',
       // 'es',
       // 'he',
@@ -35,17 +36,20 @@ export default {
       // 'vi',
       // 'zh-Hans',
       // 'zh',
-    //],
+    ],
     auth: {
       logo: isTest ? TestLogo : Logo
     },
     menu: {
       logo: isTest ? TestLogo : Logo,
     },
+    head: {
+      favicon: Favicon,
+    },
   },
   bootstrap(app: StrapiApp) {
     //console.log(app);
-    console.log('isTest', isTest);
+    //console.log('isTest', isTest);
 
   },
 };
