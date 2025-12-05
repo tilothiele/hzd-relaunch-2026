@@ -1,6 +1,8 @@
 export function TestBanner() {
 	const isTestMode = process.env.NEXT_PUBLIC_TEST === 'true'
 
+	console.log('isTestMode', isTestMode)
+
 	if (!isTestMode) {
 		return null
 	}
