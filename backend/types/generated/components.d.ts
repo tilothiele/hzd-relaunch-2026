@@ -8,7 +8,7 @@ export interface BlocksCardItem extends Struct.ComponentSchema {
   attributes: {
     ActionButton: Schema.Attribute.Component<'links.action-button', false>;
     BackgroundImage: Schema.Attribute.Media<'images' | 'files'>;
-    ColorTheme: Schema.Attribute.Component<'layout.color-theme', true>;
+    ColorTheme: Schema.Attribute.Component<'layout.color-theme', false>;
     Headline: Schema.Attribute.String;
     Subheadline: Schema.Attribute.String;
     TeaserText: Schema.Attribute.Text;

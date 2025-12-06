@@ -35,6 +35,7 @@ export function CardSectionComponent({
 
 	const backgroundColor = section.CardColumnsOddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
 
+	console.log(cards)
 	return (
 		<Box
 			component='section'

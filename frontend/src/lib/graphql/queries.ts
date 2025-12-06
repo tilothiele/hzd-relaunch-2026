@@ -232,29 +232,30 @@ export const GET_PAGE_BY_SLUG = `
 								}
 							}
 						}
-						... on ComponentBlocksCardSection {
-							CardColumnsOddEven
-							CardItem {
-								Headline
-								Subheadline
-								ColorTheme {
-									ShortName
-								}
-								BackgroundImage {
-									url
-									alternativeText
-									width
-									height
-									caption
-									previewUrl
-								}
-								ActionButton {
-									Label
-									Link
-									Primary
-								}
+					... on ComponentBlocksCardSection {
+						CardColumnsOddEven
+						CardItem {
+							id
+							Headline
+							Subheadline
+							ColorTheme {
+								ShortName
+							}
+							BackgroundImage {
+								url
+								alternativeText
+								width
+								height
+								caption
+								previewUrl
+							}
+							ActionButton {
+								Label
+								Link
+								Primary
 							}
 						}
+					}
 						... on ComponentBlocksSupplementalDocumentGroupSection {
 							SupplementalsOddEven
 							GroupHeadline
