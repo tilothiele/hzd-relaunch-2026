@@ -348,7 +348,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 		}
 	}, [])
 
-	const resolveDocumentUrl = useCallback((calendarDocument: CalendarItem['CalendarDocument']) => {
+	const resolveDocumentUrl = useCallback((calendarDocument: NonNullable<CalendarItem['CalendarDocument']>[0]) => {
 		if (!calendarDocument?.MediaFile?.url) {
 			return null
 		}
@@ -698,7 +698,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 									sx={{
 										color: 'text.secondary',
 										whiteSpace: 'pre-wrap',
-										mb: 2,
+										mb: 3,
 										'& p': {
 											mb: 2,
 										},
@@ -717,24 +717,50 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 								/>
 							) : null}
 
-							{/* Download-Link im Modal */}
-							{selectedItemForModal.CalendarDocument?.MediaFile?.url ? (
-								<Box sx={{ mt: 2 }}>
-									<MuiLink
-										href={resolveDocumentUrl(selectedItemForModal.CalendarDocument) ?? '#'}
-										download
-										underline='hover'
+							{/* Downloads unten aufgelistet */}
+							{selectedItemForModal.CalendarDocument && selectedItemForModal.CalendarDocument.length > 0 ? (
+								<Box
+									sx={{
+										mt: 3,
+										pt: 3,
+										borderTop: '1px solid',
+										borderColor: 'divider',
+									}}
+								>
+									<Typography
+										variant='subtitle2'
 										sx={{
-											display: 'inline-flex',
-											alignItems: 'center',
-											gap: 0.5,
-											color: 'primary.main',
+											mb: 2,
+											fontWeight: 600,
+											color: 'text.primary',
 										}}
 									>
-										<DownloadIcon sx={{ fontSize: '1rem' }} />
-										Download
-										{selectedItemForModal.CalendarDocument.MediaFile.name ? ` (${selectedItemForModal.CalendarDocument.MediaFile.name})` : ''}
-									</MuiLink>
+										Downloads
+									</Typography>
+									<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+										{selectedItemForModal.CalendarDocument.map((doc, index) => {
+											if (!doc?.MediaFile?.url) {
+												return null
+											}
+											return (
+												<MuiLink
+													key={index}
+													href={resolveDocumentUrl(doc) ?? '#'}
+													download
+													underline='hover'
+													sx={{
+														display: 'inline-flex',
+														alignItems: 'center',
+														gap: 1,
+														color: 'primary.main',
+													}}
+												>
+													<DownloadIcon sx={{ fontSize: '1.25rem' }} />
+													{doc.MediaFile.name ? doc.MediaFile.name : 'Download'}
+												</MuiLink>
+											)
+										})}
+									</Box>
 								</Box>
 							) : null}
 						</Box>

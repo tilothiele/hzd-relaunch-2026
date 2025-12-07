@@ -501,10 +501,10 @@ query SearchCalendarItems($filters: CalendarEntryFiltersInput , $pagination: Pag
 			Region
 			CalendarDocument {
 				MediaFile {
-				alternativeText
-				ext
-				name
-				url
+					alternativeText
+					ext
+					name
+					url
 				}
 			}
 			calendar {

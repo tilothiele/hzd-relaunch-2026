@@ -370,7 +370,7 @@ export interface CalendarItem {
 			ext?: string | null
 			alternativeText?: string | null
 		} | null
-	} | null
+	}[] | null
 	calendar?: Calendar | null
 }
 
