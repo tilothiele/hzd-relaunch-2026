@@ -8,12 +8,13 @@ import DownloadIcon from '@mui/icons-material/Download'
 import { fetchGraphQL } from '@/lib/graphql-client'
 import { GET_CALENDARS, SEARCH_CALENDAR_ITEMS } from '@/lib/graphql/queries'
 import type { Calendar, CalendarItem, CalendarSearchResult, CalendarItemSearchResult } from '@/types'
+import type { ThemeDefinition } from '@/themes'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { renderStrapiBlocks } from '@/lib/strapi-blocks'
 
 interface CalendarSearchProps {
 	strapiBaseUrl?: string | null
-	theme?: { oddBgColor: string; evenBgColor: string }
+	theme?: ThemeDefinition
 }
 
 interface CalendarColors {
@@ -105,6 +106,28 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 	const [allCalendarItems, setAllCalendarItems] = useState<CalendarItem[]>([])
 	const [selectedCalendarIds, setSelectedCalendarIds] = useState<Set<string>>(new Set())
 	const [selectedRegion, setSelectedRegion] = useState<string>('')
+	// Berechne verfügbare Jahre und Standard-Jahr: aktuelles Jahr + 3 vorherige, ab Oktober: nächstes Jahr + 2 vorherige
+	const { availableYears, defaultYear } = useMemo(() => {
+		const now = new Date()
+		const currentMonth = now.getMonth() + 1 // 1-12
+		const currentYear = now.getFullYear()
+
+		if (currentMonth >= 10) {
+			// Ab Oktober: nächstes Jahr bis 2 vorherige Jahre
+			return {
+				availableYears: [currentYear + 1, currentYear, currentYear - 1, currentYear - 2],
+				defaultYear: currentYear + 1,
+			}
+		} else {
+			// Vor Oktober: aktuelles Jahr + 3 vorherige Jahre
+			return {
+				availableYears: [currentYear, currentYear - 1, currentYear - 2, currentYear - 3],
+				defaultYear: currentYear,
+			}
+		}
+	}, [])
+
+	const [selectedYear, setSelectedYear] = useState<number>(defaultYear)
 	const [isLoading, setIsLoading] = useState(false)
 	const [error, setError] = useState<Error | null>(null)
 	const [selectedItemForModal, setSelectedItemForModal] = useState<CalendarItem | null>(null)
@@ -209,6 +232,16 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				})
 			}
 
+			// Jahr-Filter hinzufügen
+			const yearStart = `${selectedYear}-01-01`
+			const yearEnd = `${selectedYear}-12-31`
+			filterConditions.push({
+				Date: {
+					gte: yearStart,
+					lte: yearEnd,
+				},
+			})
+
 			const variables: Record<string, unknown> = {
 				filters: {
 					and: filterConditions,
@@ -235,7 +268,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [strapiBaseUrl, selectedCalendarIds, selectedRegion])
+	}, [strapiBaseUrl, selectedCalendarIds, selectedRegion, selectedYear])
 
 	useEffect(() => {
 		void loadCalendars()
@@ -330,6 +363,45 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 
 	return (
 		<>
+			{/* Jahr-Auswahl in der obersten Zeile */}
+			<div className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em', backgroundColor }}>
+				<div className='w-full max-w-7xl'>
+					<Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+						{availableYears.map((year) => {
+							const isSelected = selectedYear === year
+							const primaryColor = theme?.buttonColor ?? '#64574E'
+							const primaryTextColor = theme?.buttonTextColor ?? '#ffffff'
+
+							return (
+								<Button
+									key={year}
+									variant={isSelected ? 'contained' : 'outlined'}
+									onClick={() => setSelectedYear(year)}
+									sx={{
+										minWidth: '80px',
+										backgroundColor: isSelected ? primaryColor : 'transparent',
+										color: isSelected ? primaryTextColor : primaryColor,
+										borderColor: primaryColor,
+										borderWidth: '2px',
+										borderStyle: 'solid',
+										fontWeight: isSelected ? 600 : 400,
+										textTransform: 'none',
+										boxShadow: isSelected ? 2 : 'none',
+										'&:hover': {
+											backgroundColor: isSelected ? primaryColor : `${primaryColor}20`,
+											borderColor: primaryColor,
+											boxShadow: isSelected ? 3 : 1,
+										},
+									}}
+								>
+									{year}
+								</Button>
+							)
+						})}
+					</Box>
+				</div>
+			</div>
+
 			{/* Multiselect im Kopfbereich */}
 			<div className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em', backgroundColor }}>
 				<div className='w-full max-w-7xl'>
@@ -426,45 +498,47 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 					</Box>
 				) : sortedItems.length > 0 ? (
 					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-						{sortedItems.map((item) => (
-							<Paper
-								key={item.documentId}
-								elevation={2}
-								sx={{
-									p: 3,
-									borderLeft: item.calendar?.ColorSchema
-										? `4px solid ${item.calendar.ColorSchema}`
-										: '4px solid #e5e7eb',
-								}}
-							>
-								<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-									<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, mb: 1, flexWrap: 'wrap' }}>
-										<Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-											<Typography
-												variant='subtitle1'
-												sx={{
-													fontWeight: 600,
-													color: 'text.primary',
-												}}
-											>
-												{formatDate(item.Date)}
-											</Typography>
-											{item.calendar?.Name ? (
+						{sortedItems.map((item) => {
+							const calendarColors = item.calendar ? getCalendarColors(item.calendar) : null
+							return (
+								<Paper
+									key={item.documentId}
+									elevation={2}
+									sx={{
+										p: 3,
+										borderLeft: calendarColors
+											? `4px solid ${calendarColors.backgroundColor}`
+											: '4px solid #e5e7eb',
+									}}
+								>
+									<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+										<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, mb: 1, flexWrap: 'wrap' }}>
+											<Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
 												<Typography
-													variant='caption'
+													variant='subtitle1'
 													sx={{
-														px: 1.5,
-														py: 0.5,
-														bgcolor: item.calendar.ColorSchema ?? 'grey.300',
-														color: 'white',
-														borderRadius: 1,
-														fontWeight: 500,
+														fontWeight: 600,
+														color: 'text.primary',
 													}}
 												>
-													{item.calendar.Name}
+													{formatDate(item.Date)}
 												</Typography>
-											) : null}
-										</Box>
+												{item.calendar?.Name ? (
+													<Typography
+														variant='caption'
+														sx={{
+															px: 1.5,
+															py: 0.5,
+															bgcolor: calendarColors?.backgroundColor ?? 'grey.300',
+															color: calendarColors?.textColor ?? 'white',
+															borderRadius: 1,
+															fontWeight: 500,
+														}}
+													>
+														{item.calendar.Name}
+													</Typography>
+												) : null}
+											</Box>
 
 										{/* Links und Aktionen am rechten Ende */}
 										<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
@@ -550,7 +624,8 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 									) : null}
 								</Box>
 							</Paper>
-						))}
+							)
+						})}
 					</Box>
 				) : !isLoading ? (
 					<Box sx={{ textAlign: 'center', py: 4 }}>
@@ -590,34 +665,41 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 						</IconButton>
 
 						<Box sx={{ p: 4 }}>
-							<Typography
-								variant='h5'
-								component='h2'
-								sx={{
-									mb: 2,
-									fontWeight: 600,
-									color: 'text.primary',
-								}}
-							>
-								{formatDate(selectedItemForModal.Date)}
-								{selectedItemForModal.calendar?.Name ? (
+							{(() => {
+								const modalCalendarColors = selectedItemForModal.calendar
+									? getCalendarColors(selectedItemForModal.calendar)
+									: null
+								return (
 									<Typography
-										component='span'
-										variant='body2'
+										variant='h5'
+										component='h2'
 										sx={{
-											ml: 2,
-											px: 1.5,
-											py: 0.5,
-											bgcolor: selectedItemForModal.calendar.ColorSchema ?? 'grey.300',
-											color: 'white',
-											borderRadius: 1,
-											fontWeight: 500,
+											mb: 2,
+											fontWeight: 600,
+											color: 'text.primary',
 										}}
 									>
-										{selectedItemForModal.calendar.Name}
+										{formatDate(selectedItemForModal.Date)}
+										{selectedItemForModal.calendar?.Name ? (
+											<Typography
+												component='span'
+												variant='body2'
+												sx={{
+													ml: 2,
+													px: 1.5,
+													py: 0.5,
+													bgcolor: modalCalendarColors?.backgroundColor ?? 'grey.300',
+													color: modalCalendarColors?.textColor ?? 'white',
+													borderRadius: 1,
+													fontWeight: 500,
+												}}
+											>
+												{selectedItemForModal.calendar.Name}
+											</Typography>
+										) : null}
 									</Typography>
-								) : null}
-							</Typography>
+								)
+							})()}
 
 							{selectedItemForModal.LongDescription ? (
 								<Typography
