@@ -21,9 +21,6 @@ export default function RootLayout({
 	const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID
 	const umamiScriptUrl = process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL
 
-	console.log('umamiWebsiteId', umamiWebsiteId)
-	console.log('umamiScriptUrl', umamiScriptUrl)
-
 	return (
 		<html lang='de'>
 			<head>
