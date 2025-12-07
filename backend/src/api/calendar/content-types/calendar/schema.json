@@ -13,6 +13,16 @@
   "attributes": {
     "Name": {
       "type": "string"
+    },
+    "ColorSchema": {
+      "type": "enumeration",
+      "enum": [
+        "Violet",
+        "Gruen",
+        "Pink",
+        "Rot",
+        "Gelb"
+      ]
     }
   }
 }

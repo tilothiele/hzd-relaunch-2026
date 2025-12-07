@@ -474,3 +474,32 @@ export const SEARCH_LITTERS = `
 	}
 `
 
+export const GET_CALENDARS = `
+	query GetCalendars {
+		calendars {
+			documentId
+			Name
+			ColorSchema
+		}
+	}
+`
+
+export const SEARCH_CALENDAR_ITEMS = `
+query SearchCalendarItems($filters: CalendarEntryFiltersInput , $pagination: PaginationArg, $sort: [String]) {
+		calendarEntries (
+			filters: $filters
+			pagination: $pagination
+			sort: $sort
+		) {
+			documentId
+      Date
+      Description
+			calendar {
+				documentId
+				Name
+				ColorSchema
+			}
+		}
+	}
+`
+

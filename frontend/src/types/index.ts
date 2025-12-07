@@ -343,3 +343,24 @@ export interface ContactsQueryResult {
 export interface HomepageSectionsQueryResult {
 	hzdPluginHomepageSections: HomepageSectionData
 }
+
+export interface Calendar {
+	documentId: string
+	Name?: string | null
+	ColorSchema?: string | null
+}
+
+export interface CalendarItem {
+	documentId: string
+	Date?: string | null
+	Description?: string | null
+	calendar?: Calendar | null
+}
+
+export interface CalendarSearchResult {
+	calendars: Calendar[]
+}
+
+export interface CalendarItemSearchResult {
+	calendarEntries: CalendarItem[]
+}

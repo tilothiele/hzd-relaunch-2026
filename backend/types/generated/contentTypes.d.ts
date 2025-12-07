@@ -442,6 +442,7 @@ export interface ApiCalendarEntryCalendarEntry
     draftAndPublish: true;
   };
   attributes: {
+    AnmeldeLink: Schema.Attribute.String;
     calendar: Schema.Attribute.Relation<'oneToOne', 'api::calendar.calendar'>;
     CalendarDocument: Schema.Attribute.Component<
       'calendar.calendar-document',
@@ -452,7 +453,11 @@ export interface ApiCalendarEntryCalendarEntry
       Schema.Attribute.Private;
     Date: Schema.Attribute.Date & Schema.Attribute.Required;
     Description: Schema.Attribute.Text;
+    ErgebnisLink: Schema.Attribute.String;
     Headline: Schema.Attribute.String & Schema.Attribute.Required;
+    Kind: Schema.Attribute.Enumeration<
+      ['HZD', 'Beurteilungen', 'Zuchttag', 'CAC', 'CACIB']
+    >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -487,6 +492,9 @@ export interface ApiCalendarCalendar extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    ColorSchema: Schema.Attribute.Enumeration<
+      ['Violet', 'Gruen', 'Pink', 'Rot', 'Gelb']
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

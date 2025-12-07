@@ -43,6 +43,22 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::calendar.calendar"
+    },
+    "Kind": {
+      "type": "enumeration",
+      "enum": [
+        "HZD",
+        "Beurteilungen",
+        "Zuchttag",
+        "CAC",
+        "CACIB"
+      ]
+    },
+    "AnmeldeLink": {
+      "type": "string"
+    },
+    "ErgebnisLink": {
+      "type": "string"
     }
   }
 }
