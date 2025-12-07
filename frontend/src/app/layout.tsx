@@ -29,8 +29,8 @@ export default function RootLayout({
 			<head>
  	 	 	 	{umamiWebsiteId && umamiScriptUrl && (
  	 	 	 	<Script
-         	 	  src="`${umamiScriptUrl}`"
-         	 	  data-website-id="`${umamiWebsiteId}`"
+         	 	  src={`${umamiScriptUrl}`}
+         	 	  data-website-id={`${umamiWebsiteId}`}
 				  defer
          	 	  strategy="afterInteractive"
          	 	/>
