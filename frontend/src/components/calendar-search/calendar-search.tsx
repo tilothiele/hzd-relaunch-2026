@@ -498,50 +498,53 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 					</Box>
 				) : sortedItems.length > 0 ? (
 					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-						{sortedItems.map((item) => {
+						{sortedItems.map((item, index) => {
 							const calendarColors = item.calendar ? getCalendarColors(item.calendar) : null
+							const isEven = index % 2 === 0
 							return (
 								<Paper
 									key={item.documentId}
 									elevation={2}
 									sx={{
-										p: 3,
+										paddingX: 3,
+										paddingY: 1,
+										backgroundColor: isEven ? '#ffffff' : '#f9fafb',
 										borderLeft: calendarColors
-											? `4px solid ${calendarColors.backgroundColor}`
-											: '4px solid #e5e7eb',
+											? `8px solid ${calendarColors.backgroundColor}`
+											: '8px solid #e5e7eb',
 									}}
 								>
-									<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-										<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, mb: 1, flexWrap: 'wrap' }}>
-											<Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-												<Typography
-													variant='subtitle1'
-													sx={{
-														fontWeight: 600,
-														color: 'text.primary',
-													}}
-												>
-													{formatDate(item.Date)}
-												</Typography>
-												{item.calendar?.Name ? (
-													<Typography
-														variant='caption'
-														sx={{
-															px: 1.5,
-															py: 0.5,
-															bgcolor: calendarColors?.backgroundColor ?? 'grey.300',
-															color: calendarColors?.textColor ?? 'white',
-															borderRadius: 1,
-															fontWeight: 500,
-														}}
-													>
-														{item.calendar.Name}
-													</Typography>
-												) : null}
-											</Box>
+									{/* Eine Zeile: Datum - Description - Links */}
+									<Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+										{/* Datum */}
+										<Typography
+											variant='subtitle1'
+											sx={{
+												fontWeight: 600,
+												color: 'text.primary',
+												flexShrink: 0,
+											}}
+										>
+											{formatDate(item.Date)}
+										</Typography>
+
+										{/* Description nimmt den verfügbaren Platz ein */}
+										{item.Description ? (
+											<Typography
+												variant='body1'
+												sx={{
+													color: 'text.secondary',
+													whiteSpace: 'pre-wrap',
+													flex: 1,
+													minWidth: 0,
+												}}
+											>
+												{item.Description}
+											</Typography>
+										) : null}
 
 										{/* Links und Aktionen am rechten Ende */}
-										<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
+										<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center', flexShrink: 0 }}>
 											{item.LongDescription ? (
 												<Button
 													variant='outlined'
@@ -590,40 +593,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 											) : null}
 										</Box>
 									</Box>
-									{item.Description ? (
-										<Typography
-											variant='body1'
-											sx={{
-												color: 'text.secondary',
-												whiteSpace: 'pre-wrap',
-											}}
-										>
-											{item.Description}
-										</Typography>
-									) : null}
-
-									{/* Download-Link bleibt separat */}
-									{item.CalendarDocument?.MediaFile?.url ? (
-										<Box sx={{ mt: 1 }}>
-											<MuiLink
-												href={resolveDocumentUrl(item.CalendarDocument) ?? '#'}
-												download
-												underline='hover'
-												sx={{
-													display: 'inline-flex',
-													alignItems: 'center',
-													gap: 0.5,
-													color: 'primary.main',
-												}}
-											>
-												<DownloadIcon sx={{ fontSize: '1rem' }} />
-												Download
-												{item.CalendarDocument.MediaFile.name ? ` (${item.CalendarDocument.MediaFile.name})` : ''}
-											</MuiLink>
-										</Box>
-									) : null}
-								</Box>
-							</Paper>
+								</Paper>
 							)
 						})}
 					</Box>
@@ -707,6 +677,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 									sx={{
 										color: 'text.secondary',
 										whiteSpace: 'pre-wrap',
+										mb: 2,
 										'& p': {
 											mb: 2,
 										},
@@ -723,6 +694,27 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 									}}
 									dangerouslySetInnerHTML={{ __html: renderStrapiBlocks(selectedItemForModal.LongDescription) }}
 								/>
+							) : null}
+
+							{/* Download-Link im Modal */}
+							{selectedItemForModal.CalendarDocument?.MediaFile?.url ? (
+								<Box sx={{ mt: 2 }}>
+									<MuiLink
+										href={resolveDocumentUrl(selectedItemForModal.CalendarDocument) ?? '#'}
+										download
+										underline='hover'
+										sx={{
+											display: 'inline-flex',
+											alignItems: 'center',
+											gap: 0.5,
+											color: 'primary.main',
+										}}
+									>
+										<DownloadIcon sx={{ fontSize: '1rem' }} />
+										Download
+										{selectedItemForModal.CalendarDocument.MediaFile.name ? ` (${selectedItemForModal.CalendarDocument.MediaFile.name})` : ''}
+									</MuiLink>
+								</Box>
 							) : null}
 						</Box>
 					</div>
