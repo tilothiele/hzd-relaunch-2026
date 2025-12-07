@@ -6,6 +6,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import type { TextColumnsSection, BulletItem } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { ActionButton } from '@/components/ui/action-button'
+import { SectionContainer } from '@/components/sections/section-container/section-container'
 
 interface TextColumnsSectionComponentProps {
 	section: TextColumnsSection
@@ -111,16 +112,11 @@ export function TextColumnsSectionComponent({
 	const backgroundColor = section.TextColumnsOddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
 
 	return (
-		<Box
-			component='section'
-			sx={{
-				width: '100%',
-				py: 2,
-				px: 2,
-				display: 'flex',
-				justifyContent: 'center',
-				backgroundColor,
-			}}
+		<SectionContainer
+			variant='max-width'
+			backgroundColor={backgroundColor}
+			paddingTop='1em'
+			paddingBottom='1em'
 		>
 			<Box sx={{ width: '100%', maxWidth: '1200px' }}>
 				{section.TextColumnsHeadline ? (
@@ -239,7 +235,7 @@ export function TextColumnsSectionComponent({
 					})}
 				</Box>
 			</Box>
-		</Box>
+		</SectionContainer>
 	)
 }
 

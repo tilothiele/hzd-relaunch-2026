@@ -11,6 +11,7 @@ import type { HeroSectionSlideShow } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { ActionButton } from '@/components/ui/action-button'
+import { SectionContainer } from '@/components/sections/section-container/section-container'
 
 interface HeroSectionSlideShowProps {
 	section: HeroSectionSlideShow
@@ -36,8 +37,12 @@ export function HeroSectionSlideShowComponent({
 	}
 
 	return (
-		<section className='relative overflow-hidden' style={{ backgroundColor }}>
-			<Swiper
+		<SectionContainer
+			variant='full-width'
+			backgroundColor={backgroundColor}
+		>
+			<div className='relative overflow-hidden'>
+				<Swiper
 				modules={[Autoplay, Pagination, A11y, Keyboard]}
 				slidesPerView={1}
 				loop={slides.length > 1}
@@ -66,7 +71,7 @@ export function HeroSectionSlideShowComponent({
 									/>
 								) : null}
 								<div
-									className='absolute inset-0 bg-no-repeat'
+									className={`absolute inset-0 bg-no-repeat ${imageUrl ? 'hero-section-image-zoom' : ''}`}
 									style={
 										imageUrl
 											? {
@@ -116,8 +121,9 @@ export function HeroSectionSlideShowComponent({
 						</SwiperSlide>
 					)
 				})}
-			</Swiper>
-		</section>
+				</Swiper>
+			</div>
+		</SectionContainer>
 	)
 }
 

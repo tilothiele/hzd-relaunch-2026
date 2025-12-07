@@ -3,6 +3,7 @@ import type { SimpleCtaSection } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { ActionButton } from '@/components/ui/action-button'
+import { SectionContainer } from '@/components/sections/section-container/section-container'
 
 interface SimpleCtaSectionComponentProps {
 	section: SimpleCtaSection
@@ -28,20 +29,22 @@ export function SimpleCtaSectionComponent({
 	}
 
 	return (
-		<Box
-			component='section'
-			sx={{
-				position: 'relative',
-				minHeight: '500px',
-				width: '100%',
-				backgroundColor: backgroundColor,
-				backgroundImage: backgroundImageUrl ? `url('${backgroundImageUrl}')` : undefined,
-				backgroundAttachment: backgroundImageUrl ? 'fixed' : undefined,
-				backgroundPosition: 'center',
-				backgroundRepeat: 'no-repeat',
-				backgroundSize: 'cover',
-			}}
+		<SectionContainer
+			variant='full-width'
+			backgroundColor={backgroundColor}
 		>
+			<Box
+				sx={{
+					position: 'relative',
+					minHeight: '500px',
+					width: '100%',
+					backgroundImage: backgroundImageUrl ? `url('${backgroundImageUrl}')` : undefined,
+					backgroundAttachment: backgroundImageUrl ? 'fixed' : undefined,
+					backgroundPosition: 'center',
+					backgroundRepeat: 'no-repeat',
+					backgroundSize: 'cover',
+				}}
+			>
 			<Box
 				sx={{
 					display: 'flex',
@@ -121,7 +124,8 @@ export function SimpleCtaSectionComponent({
 					</Paper>
 				</Container>
 			</Box>
-		</Box>
+			</Box>
+		</SectionContainer>
 	)
 }
 

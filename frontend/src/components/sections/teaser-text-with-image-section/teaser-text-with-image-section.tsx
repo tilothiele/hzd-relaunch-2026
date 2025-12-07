@@ -3,6 +3,7 @@ import type { TeaserTextWithImageSection } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { ActionButton } from '@/components/ui/action-button'
+import { SectionContainer } from '../section-container/section-container'
 
 interface TeaserTextWithImageSectionComponentProps {
 	section: TeaserTextWithImageSection
@@ -30,15 +31,12 @@ export function TeaserTextWithImageSectionComponent({
 	const backgroundColor = section.TeaserOddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
 
 	return (
-		<section 
-			className='flex w-full justify-center px-4' 
-			style={{ 
-				paddingTop: '1em', 
-				paddingBottom: '1em',
-				backgroundColor,
-			}}
+		<SectionContainer
+			variant='full-width'
+			backgroundColor={backgroundColor}
+			paddingTop='1em'
+			paddingBottom='1em'
 		>
-			<div className='w-full max-w-6xl'>
 				<div className={`grid gap-8 md:grid-cols-2 ${isImageLeft ? '' : 'md:[&>*:first-child]:order-2 md:[&>*:last-child]:order-1'}`}>
 					{imageUrl ? (
 						<div className='flex items-center justify-center'>
@@ -76,8 +74,7 @@ export function TeaserTextWithImageSectionComponent({
 						) : null}
 					</div>
 				</div>
-			</div>
-		</section>
+		</SectionContainer>
 	)
 }
 

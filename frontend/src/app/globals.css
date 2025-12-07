@@ -122,3 +122,16 @@ h1 {
 	margin: 0 auto;
 	max-width: 60ch;
 }
+
+@keyframes heroImageZoom {
+	from {
+		transform: scale(1);
+	}
+	to {
+		transform: scale(1.15);
+	}
+}
+
+.hero-section-image-zoom {
+	animation: heroImageZoom 4s ease-out forwards;
+}

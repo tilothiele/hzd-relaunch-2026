@@ -2,6 +2,7 @@ import { Container, Box, Typography, Button, Table, TableBody, TableCell, TableC
 import DownloadIcon from '@mui/icons-material/Download'
 import type { SupplementalDocumentGroupSection, SupplementalDocument } from '@/types'
 import type { ThemeDefinition } from '@/themes'
+import { SectionContainer } from '@/components/sections/section-container/section-container'
 
 // Strapi Blocks Format Types
 interface StrapiBlock {
@@ -192,13 +193,11 @@ export function SupplementalDocumentGroupSectionComponent({
 	const backgroundColor = section.SupplementalsOddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
 
 	return (
-		<Box
-			component='section'
-			sx={{
-				mb: 8,
-				px: 2,
-				backgroundColor,
-			}}
+		<SectionContainer
+			variant='max-width'
+			backgroundColor={backgroundColor}
+			paddingTop='2em'
+			paddingBottom='2em'
 		>
 			<Container maxWidth='md'>
 				{section.GroupHeadline ? (
@@ -404,7 +403,7 @@ export function SupplementalDocumentGroupSectionComponent({
 					</Table>
 				</TableContainer>
 			</Container>
-		</Box>
+		</SectionContainer>
 	)
 }
 

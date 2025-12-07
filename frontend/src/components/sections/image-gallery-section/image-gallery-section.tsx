@@ -5,6 +5,7 @@ import type { ImageGallerySection, Image } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import type { Photo } from 'react-photo-album'
+import { SectionContainer } from '@/components/sections/section-container/section-container'
 
 interface ImageGallerySectionComponentProps {
 	section: ImageGallerySection
@@ -49,13 +50,11 @@ export function ImageGallerySectionComponent({
 	const backgroundColor = theme.evenBgColor
 
 	return (
-		<section
-			className='flex w-full justify-center px-4'
-			style={{
-				paddingTop: '1em',
-				paddingBottom: '1em',
-				backgroundColor,
-			}}
+		<SectionContainer
+			variant='full-width'
+			backgroundColor={backgroundColor}
+			paddingTop='1em'
+			paddingBottom='1em'
 		>
 			<div className='w-full max-w-6xl'>
 				{section.GalleryHeadline ? (
@@ -76,7 +75,7 @@ export function ImageGallerySectionComponent({
 					padding={0}
 				/>
 			</div>
-		</section>
+		</SectionContainer>
 	)
 }
 

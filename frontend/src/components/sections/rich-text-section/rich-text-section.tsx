@@ -1,5 +1,6 @@
 import type { RichTextSection } from '@/types'
 import type { ThemeDefinition } from '@/themes'
+import { SectionContainer } from '@/components/sections/section-container/section-container'
 
 interface RichTextSectionComponentProps {
 	section: RichTextSection
@@ -18,13 +19,11 @@ export function RichTextSectionComponent({
 	const backgroundColor = section.RichTextOddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
 
 	return (
-		<section 
-			className='flex w-full justify-center px-4' 
-			style={{ 
-				paddingTop: '1em', 
-				paddingBottom: '1em',
-				backgroundColor,
-			}}
+		<SectionContainer
+			variant='max-width'
+			backgroundColor={backgroundColor}
+			paddingTop='1em'
+			paddingBottom='1em'
 		>
 			<div className='w-full max-w-4xl'>
 				<div
@@ -32,7 +31,7 @@ export function RichTextSectionComponent({
 					dangerouslySetInnerHTML={{ __html: section.RichTextContent }}
 				/>
 			</div>
-		</section>
+		</SectionContainer>
 	)
 }
 

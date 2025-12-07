@@ -4,6 +4,7 @@ import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { getThemeById, type ThemeId } from '@/themes'
 import { ActionButton } from '@/components/ui/action-button'
+import { SectionContainer } from '@/components/sections/section-container/section-container'
 
 interface CardSectionComponentProps {
 	section: CardSection
@@ -35,15 +36,11 @@ export function CardSectionComponent({
 
 	const backgroundColor = section.CardColumnsOddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
 
-	console.log(cards)
 	return (
-		<Box
-			component='section'
-			sx={{
-				width: '100%',
-				pb: 2,
-				backgroundColor,
-			}}
+		<SectionContainer
+			variant='full-width'
+			backgroundColor={backgroundColor}
+			paddingBottom='0.5em'
 		>
 			<Box
 				sx={{
@@ -189,7 +186,7 @@ export function CardSectionComponent({
 					)
 				})}
 			</Box>
-		</Box>
+		</SectionContainer>
 	)
 }
 
