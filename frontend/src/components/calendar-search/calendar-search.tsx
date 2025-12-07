@@ -528,20 +528,41 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 											{formatDate(item.Date)}
 										</Typography>
 
-										{/* Description nimmt den verfügbaren Platz ein */}
-										{item.Description ? (
-											<Typography
-												variant='body1'
-												sx={{
-													color: 'text.secondary',
-													whiteSpace: 'pre-wrap',
-													flex: 1,
-													minWidth: 0,
-												}}
-											>
-												{item.Description}
-											</Typography>
-										) : null}
+										{/* Headline und Description nehmen den verfügbaren Platz ein */}
+										<Box sx={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+											{item.Headline ? (
+												<Typography
+													variant='body1'
+													sx={{
+														fontWeight: 500,
+														color: 'text.primary',
+													}}
+												>
+													{item.Headline}
+												</Typography>
+											) : null}
+											{item.Headline && item.Description ? (
+												<Typography
+													variant='body1'
+													sx={{
+														color: 'text.secondary',
+													}}
+												>
+													-
+												</Typography>
+											) : null}
+											{item.Description ? (
+												<Typography
+													variant='body1'
+													sx={{
+														color: 'text.secondary',
+														whiteSpace: 'pre-wrap',
+													}}
+												>
+													{item.Description}
+												</Typography>
+											) : null}
+										</Box>
 
 										{/* Links und Aktionen am rechten Ende */}
 										<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center', flexShrink: 0 }}>

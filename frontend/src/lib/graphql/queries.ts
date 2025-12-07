@@ -493,6 +493,7 @@ query SearchCalendarItems($filters: CalendarEntryFiltersInput , $pagination: Pag
 		) {
 			documentId
 			Date
+			Headline
 			Description
 			LongDescription
 			AnmeldeLink

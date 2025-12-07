@@ -357,6 +357,7 @@ export type CalendarRegion = 'NORD' | 'OST' | 'MITTE' | 'SUED' | 'WEST' | 'HZD' 
 export interface CalendarItem {
 	documentId: string
 	Date?: string | null
+	Headline?: string | null
 	Description?: string | null
 	LongDescription?: string | null
 	AnmeldeLink?: string | null
