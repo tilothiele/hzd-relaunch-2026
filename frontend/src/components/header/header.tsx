@@ -1,5 +1,3 @@
-'use client'
-
 import type { MenuItem, AuthUser, GlobalLayout } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import Image from 'next/image'
