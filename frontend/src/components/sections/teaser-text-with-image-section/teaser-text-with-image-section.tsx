@@ -32,7 +32,7 @@ export function TeaserTextWithImageSectionComponent({
 
 	return (
 		<SectionContainer
-			variant='full-width'
+			variant='max-width'
 			backgroundColor={backgroundColor}
 			paddingTop='1em'
 			paddingBottom='1em'
@@ -40,13 +40,13 @@ export function TeaserTextWithImageSectionComponent({
 				<div className={`grid gap-8 md:grid-cols-2 ${isImageLeft ? '' : 'md:[&>*:first-child]:order-2 md:[&>*:last-child]:order-1'}`}>
 					{imageUrl ? (
 						<div className='flex items-center justify-center'>
-							<div className='relative w-full' style={{ minHeight: '300px' }}>
+							<div className='relative' style={{ minHeight: '300px' }}>
 								<Image
 									src={imageUrl}
 									alt={imageAlt}
-									width={600}
+									width={300}
 									height={400}
-									className='h-full w-full rounded-lg object-cover'
+									className='object-cover'
 									unoptimized
 								/>
 							</div>
