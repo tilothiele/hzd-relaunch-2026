@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from 'next/script';
 import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
 import './globals.css'
@@ -17,8 +18,21 @@ export default function RootLayout({
 }: Readonly<{
 	children: React.ReactNode
 }>) {
+	const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID
+	const umamiScriptUrl = process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL
+
 	return (
 		<html lang='de'>
+			<head>
+ 	 	 	 	{umamiWebsiteId && umamiScriptUrl && (
+ 	 	 	 	<Script
+         	 	  src="`${umamiScriptUrl}`"
+         	 	  data-website-id="`${umamiWebsiteId}`"
+				  defer
+         	 	  strategy="afterInteractive"
+         	 	/>
+				)}
+			</head>
 			<body className='antialiased'>
 				<TestBanner />
 				<Providers>
