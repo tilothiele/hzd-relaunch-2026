@@ -352,7 +352,7 @@ export interface Calendar {
 	ColorSchema?: CalendarColorSchema | null
 }
 
-export type CalendarRegion = 'NORD' | 'OST' | 'MITTE' | 'SUED' | 'WEST'
+export type CalendarRegion = 'NORD' | 'OST' | 'MITTE' | 'SUED' | 'WEST' | 'HZD' | 'VDH'
 
 export interface CalendarItem {
 	documentId: string
