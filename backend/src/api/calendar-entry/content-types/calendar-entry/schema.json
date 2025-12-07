@@ -35,16 +35,6 @@
       "relation": "oneToOne",
       "target": "api::calendar.calendar"
     },
-    "Kind": {
-      "type": "enumeration",
-      "enum": [
-        "HZD",
-        "Beurteilungen",
-        "Zuchttag",
-        "CAC",
-        "CACIB"
-      ]
-    },
     "AnmeldeLink": {
       "type": "string"
     },
@@ -53,6 +43,16 @@
     },
     "LongDescription": {
       "type": "blocks"
+    },
+    "Region": {
+      "type": "enumeration",
+      "enum": [
+        "NORD",
+        "OST",
+        "MITTE",
+        "SUED",
+        "WEST"
+      ]
     }
   }
 }

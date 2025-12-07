@@ -455,9 +455,6 @@ export interface ApiCalendarEntryCalendarEntry
     Description: Schema.Attribute.Text;
     ErgebnisLink: Schema.Attribute.String;
     Headline: Schema.Attribute.String & Schema.Attribute.Required;
-    Kind: Schema.Attribute.Enumeration<
-      ['HZD', 'Beurteilungen', 'Zuchttag', 'CAC', 'CACIB']
-    >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -466,6 +463,9 @@ export interface ApiCalendarEntryCalendarEntry
       Schema.Attribute.Private;
     LongDescription: Schema.Attribute.Blocks;
     publishedAt: Schema.Attribute.DateTime;
+    Region: Schema.Attribute.Enumeration<
+      ['NORD', 'OST', 'MITTE', 'SUED', 'WEST']
+    >;
     Time: Schema.Attribute.Time;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &

@@ -497,6 +497,7 @@ query SearchCalendarItems($filters: CalendarEntryFiltersInput , $pagination: Pag
 			LongDescription
 			AnmeldeLink
 			ErgebnisLink
+			Region
 			CalendarDocument {
 				MediaFile {
 				alternativeText

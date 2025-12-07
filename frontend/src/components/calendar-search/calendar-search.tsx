@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Box, Typography, Checkbox, FormControlLabel, FormGroup, Paper, IconButton, Button, Link as MuiLink } from '@mui/material'
+import { Box, Typography, Checkbox, FormControlLabel, FormGroup, Paper, IconButton, Button, Link as MuiLink, Select, MenuItem, FormControl, InputLabel } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import DownloadIcon from '@mui/icons-material/Download'
@@ -22,44 +22,61 @@ interface CalendarColors {
 }
 
 /**
- * Weist jedem Kalender manuell Hintergrund- und Textfarbe zu
+ * Mappt ColorSchema Enumeration-Werte (vom GraphQL Backend) auf konkrete Farben
+ * Enumeration-Werte: Gelb, Gruen, Pink, Rot, Violet
  */
-function getCalendarColors(calendar: Calendar): CalendarColors {
-	// Manuelle Zuweisung basierend auf Kalendername oder documentId
-	const calendarName = calendar.Name?.toLowerCase() ?? ''
-	const documentId = calendar.documentId
-
-	// Beispiel-Zuweisungen - anpassen nach Bedarf
-	if (calendarName.includes('zucht') || documentId.includes('zucht')) {
+function getColorBySchema(colorSchema: Calendar['ColorSchema']): { backgroundColor: string; textColor: string } {
+	if (!colorSchema) {
 		return {
-			backgroundColor: calendar.ColorSchema ?? '#A8267D',
+			backgroundColor: '#6b7280',
 			textColor: '#ffffff',
 		}
 	}
 
-	if (calendarName.includes('veranstaltung') || documentId.includes('veranstaltung')) {
-		return {
-			backgroundColor: calendar.ColorSchema ?? '#facc15',
+	// Mapping basierend auf ColorSchema Enumeration-Werten vom GraphQL Backend
+	const colorMap: Record<string, { backgroundColor: string; textColor: string }> = {
+		Gelb: {
+			backgroundColor: '#FAD857',
 			textColor: '#000000',
-		}
-	}
-
-	if (calendarName.includes('seminar') || documentId.includes('seminar')) {
-		return {
-			backgroundColor: calendar.ColorSchema ?? '#10b981',
+		},
+		Gruen: {
+			backgroundColor: '#10b981',
 			textColor: '#ffffff',
-		}
+		},
+		Pink: {
+			backgroundColor: '#ec4899',
+			textColor: '#ffffff',
+		},
+		Rot: {
+			backgroundColor: '#ef4444',
+			textColor: '#ffffff',
+		},
+		Violet: {
+			backgroundColor: '#A8267D',
+			textColor: '#ffffff',
+		},
 	}
 
-	// Standard: Verwende ColorSchema oder Fallback
-	// Textfarbe basierend auf Helligkeit der Hintergrundfarbe
-	const bgColor = calendar.ColorSchema ?? '#6b7280'
-	const textColor = getContrastTextColor(bgColor)
+	// Prüfe ob ColorSchema ein bekannter Enumeration-Wert ist
+	const normalizedSchema = colorSchema.trim()
+	if (colorMap[normalizedSchema]) {
+		return colorMap[normalizedSchema]
+	}
 
+	// Fallback: Wenn ColorSchema ein Hex-Code oder anderer Wert ist, verwende ihn direkt
+	// Textfarbe basierend auf Helligkeit der Hintergrundfarbe
+	const textColor = getContrastTextColor(colorSchema)
 	return {
-		backgroundColor: bgColor,
+		backgroundColor: colorSchema,
 		textColor,
 	}
+}
+
+/**
+ * Weist jedem Kalender Hintergrund- und Textfarbe basierend auf ColorSchema Enumeration zu
+ */
+function getCalendarColors(calendar: Calendar): CalendarColors {
+	return getColorBySchema(calendar.ColorSchema)
 }
 
 /**
@@ -85,7 +102,9 @@ function getContrastTextColor(backgroundColor: string): string {
 export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 	const [calendars, setCalendars] = useState<Calendar[]>([])
 	const [calendarItems, setCalendarItems] = useState<CalendarItem[]>([])
+	const [allCalendarItems, setAllCalendarItems] = useState<CalendarItem[]>([])
 	const [selectedCalendarIds, setSelectedCalendarIds] = useState<Set<string>>(new Set())
+	const [selectedRegion, setSelectedRegion] = useState<string>('')
 	const [isLoading, setIsLoading] = useState(false)
 	const [error, setError] = useState<Error | null>(null)
 	const [selectedItemForModal, setSelectedItemForModal] = useState<CalendarItem | null>(null)
@@ -121,14 +140,11 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 		}
 	}, [strapiBaseUrl])
 
-	const loadCalendarItems = useCallback(async () => {
+	const loadAllCalendarItems = useCallback(async () => {
 		if (!strapiBaseUrl || selectedCalendarIds.size === 0) {
-			setCalendarItems([])
+			setAllCalendarItems([])
 			return
 		}
-
-		setIsLoading(true)
-		setError(null)
 
 		try {
 			const filterConditions: Array<Record<string, unknown>> = [
@@ -157,6 +173,58 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 			)
 
 			const itemsArray = Array.isArray(data.calendarEntries) ? data.calendarEntries : []
+			setAllCalendarItems(itemsArray)
+		} catch (err) {
+			// Fehler beim Laden aller Items ignorieren
+			setAllCalendarItems([])
+		}
+	}, [strapiBaseUrl, selectedCalendarIds])
+
+	const loadCalendarItems = useCallback(async () => {
+		if (!strapiBaseUrl || selectedCalendarIds.size === 0) {
+			setCalendarItems([])
+			return
+		}
+
+		setIsLoading(true)
+		setError(null)
+
+		try {
+			const filterConditions: Array<Record<string, unknown>> = [
+				{
+					calendar: {
+						documentId: {
+							in: Array.from(selectedCalendarIds),
+						},
+					},
+				},
+			]
+
+			// Region-Filter hinzufügen, falls ausgewählt
+			if (selectedRegion) {
+				filterConditions.push({
+					Region: {
+						eq: selectedRegion,
+					},
+				})
+			}
+
+			const variables: Record<string, unknown> = {
+				filters: {
+					and: filterConditions,
+				},
+				sort: ['Date:asc'],
+			}
+
+			const data = await fetchGraphQL<CalendarItemSearchResult>(
+				SEARCH_CALENDAR_ITEMS,
+				{
+					baseUrl: strapiBaseUrl,
+					variables,
+				},
+			)
+
+			const itemsArray = Array.isArray(data.calendarEntries) ? data.calendarEntries : []
 			setCalendarItems(itemsArray)
 		} catch (err) {
 			const fetchError = err instanceof Error
@@ -167,11 +235,15 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [strapiBaseUrl, selectedCalendarIds])
+	}, [strapiBaseUrl, selectedCalendarIds, selectedRegion])
 
 	useEffect(() => {
 		void loadCalendars()
 	}, [loadCalendars])
+
+	useEffect(() => {
+		void loadAllCalendarItems()
+	}, [loadAllCalendarItems])
 
 	useEffect(() => {
 		void loadCalendarItems()
@@ -208,6 +280,16 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 			return next
 		})
 	}, [])
+
+	const availableRegions = useMemo(() => {
+		const regions = new Set<string>()
+		allCalendarItems.forEach((item) => {
+			if (item.Region) {
+				regions.add(item.Region)
+			}
+		})
+		return Array.from(regions).sort()
+	}, [allCalendarItems])
 
 	const sortedItems = useMemo(() => {
 		return [...calendarItems].sort((a, b) => {
@@ -256,42 +338,65 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 							Lade Kalender...
 						</Typography>
 					) : calendars.length > 0 ? (
-						<FormGroup>
-							<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-								{calendars.map((calendar) => {
-									const colors = getCalendarColors(calendar)
-									return (
-										<Box
-											key={calendar.documentId}
-											sx={{
-												backgroundColor: colors.backgroundColor,
-												borderRadius: 1,
-												padding: '8px 12px',
-												display: 'inline-flex',
-											}}
-										>
-											<FormControlLabel
-												control={
-													<Checkbox
-														checked={selectedCalendarIds.has(calendar.documentId)}
-														onChange={() => handleCalendarToggle(calendar.documentId)}
-													/>
-												}
-												label={calendar.Name ?? 'Unbenannter Kalender'}
+						<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
+							<FormGroup>
+								<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+									{calendars.map((calendar) => {
+										const colors = getCalendarColors(calendar)
+										return (
+											<Box
+												key={calendar.documentId}
 												sx={{
-													margin: 0,
-													'& .MuiFormControlLabel-label': {
-														fontSize: '0.875rem',
-														color: colors.textColor,
-														fontWeight: 500,
-													},
+													backgroundColor: colors.backgroundColor,
+													borderRadius: 1,
+													padding: '8px 12px',
+													display: 'inline-flex',
 												}}
-											/>
-										</Box>
-									)
-								})}
-							</Box>
-						</FormGroup>
+											>
+												<FormControlLabel
+													control={
+														<Checkbox
+															checked={selectedCalendarIds.has(calendar.documentId)}
+															onChange={() => handleCalendarToggle(calendar.documentId)}
+														/>
+													}
+													label={calendar.Name ?? 'Unbenannter Kalender'}
+													sx={{
+														margin: 0,
+														'& .MuiFormControlLabel-label': {
+															fontSize: '0.875rem',
+															color: colors.textColor,
+															fontWeight: 500,
+														},
+													}}
+												/>
+											</Box>
+										)
+									})}
+								</Box>
+							</FormGroup>
+
+							{/* Region Dropdown */}
+							<FormControl size='small' sx={{ minWidth: 200 }}>
+								<InputLabel id='region-select-label'>Region</InputLabel>
+								<Select
+									labelId='region-select-label'
+									id='region-select'
+									value={selectedRegion}
+									label='Region'
+									onChange={(e) => setSelectedRegion(e.target.value)}
+								>
+									<MenuItem value=''>
+										<em>Alle Regionen</em>
+									</MenuItem>
+									{availableRegions.map((region) => (
+										<MenuItem key={region} value={region}>
+											{region}
+										</MenuItem>
+									))}
+								</Select>
+							</FormControl>
+						</Box>
 					) : (
 						<Typography variant='body2' color='text.secondary'>
 							Keine Kalender verfügbar

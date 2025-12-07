@@ -344,11 +344,15 @@ export interface HomepageSectionsQueryResult {
 	hzdPluginHomepageSections: HomepageSectionData
 }
 
+export type CalendarColorSchema = 'Violet' | 'Gruen' | 'Pink' | 'Rot' | 'Gelb'
+
 export interface Calendar {
 	documentId: string
 	Name?: string | null
-	ColorSchema?: string | null
+	ColorSchema?: CalendarColorSchema | null
 }
+
+export type CalendarRegion = 'NORD' | 'OST' | 'MITTE' | 'SUED' | 'WEST'
 
 export interface CalendarItem {
 	documentId: string
@@ -357,6 +361,7 @@ export interface CalendarItem {
 	LongDescription?: string | null
 	AnmeldeLink?: string | null
 	ErgebnisLink?: string | null
+	Region?: CalendarRegion | null
 	CalendarDocument?: {
 		MediaFile?: {
 			url: string
