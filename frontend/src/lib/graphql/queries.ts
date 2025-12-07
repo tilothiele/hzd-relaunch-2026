@@ -492,8 +492,19 @@ query SearchCalendarItems($filters: CalendarEntryFiltersInput , $pagination: Pag
 			sort: $sort
 		) {
 			documentId
-      Date
-      Description
+			Date
+			Description
+			LongDescription
+			AnmeldeLink
+			ErgebnisLink
+			CalendarDocument {
+				MediaFile {
+				alternativeText
+				ext
+				name
+				url
+				}
+			}
 			calendar {
 				documentId
 				Name

@@ -1,15 +1,85 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Box, Typography, Checkbox, FormControlLabel, FormGroup, Paper } from '@mui/material'
+import { Box, Typography, Checkbox, FormControlLabel, FormGroup, Paper, IconButton, Button, Link as MuiLink } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import DownloadIcon from '@mui/icons-material/Download'
 import { fetchGraphQL } from '@/lib/graphql-client'
 import { GET_CALENDARS, SEARCH_CALENDAR_ITEMS } from '@/lib/graphql/queries'
 import type { Calendar, CalendarItem, CalendarSearchResult, CalendarItemSearchResult } from '@/types'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
+import { renderStrapiBlocks } from '@/lib/strapi-blocks'
 
 interface CalendarSearchProps {
 	strapiBaseUrl?: string | null
 	theme?: { oddBgColor: string; evenBgColor: string }
+}
+
+interface CalendarColors {
+	backgroundColor: string
+	textColor: string
+}
+
+/**
+ * Weist jedem Kalender manuell Hintergrund- und Textfarbe zu
+ */
+function getCalendarColors(calendar: Calendar): CalendarColors {
+	// Manuelle Zuweisung basierend auf Kalendername oder documentId
+	const calendarName = calendar.Name?.toLowerCase() ?? ''
+	const documentId = calendar.documentId
+
+	// Beispiel-Zuweisungen - anpassen nach Bedarf
+	if (calendarName.includes('zucht') || documentId.includes('zucht')) {
+		return {
+			backgroundColor: calendar.ColorSchema ?? '#A8267D',
+			textColor: '#ffffff',
+		}
+	}
+
+	if (calendarName.includes('veranstaltung') || documentId.includes('veranstaltung')) {
+		return {
+			backgroundColor: calendar.ColorSchema ?? '#facc15',
+			textColor: '#000000',
+		}
+	}
+
+	if (calendarName.includes('seminar') || documentId.includes('seminar')) {
+		return {
+			backgroundColor: calendar.ColorSchema ?? '#10b981',
+			textColor: '#ffffff',
+		}
+	}
+
+	// Standard: Verwende ColorSchema oder Fallback
+	// Textfarbe basierend auf Helligkeit der Hintergrundfarbe
+	const bgColor = calendar.ColorSchema ?? '#6b7280'
+	const textColor = getContrastTextColor(bgColor)
+
+	return {
+		backgroundColor: bgColor,
+		textColor,
+	}
+}
+
+/**
+ * Bestimmt die passende Textfarbe basierend auf der Helligkeit der Hintergrundfarbe
+ */
+function getContrastTextColor(backgroundColor: string): string {
+	// Entferne # falls vorhanden
+	const hex = backgroundColor.replace('#', '')
+
+	// Konvertiere zu RGB
+	const r = parseInt(hex.substring(0, 2), 16)
+	const g = parseInt(hex.substring(2, 4), 16)
+	const b = parseInt(hex.substring(4, 6), 16)
+
+	// Berechne relative Luminanz (Formel nach WCAG)
+	const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+
+	// Wenn Luminanz > 0.5, ist der Hintergrund hell -> dunkler Text
+	// Wenn Luminanz <= 0.5, ist der Hintergrund dunkel -> heller Text
+	return luminance > 0.5 ? '#000000' : '#ffffff'
 }
 
 export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
@@ -18,6 +88,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 	const [selectedCalendarIds, setSelectedCalendarIds] = useState<Set<string>>(new Set())
 	const [isLoading, setIsLoading] = useState(false)
 	const [error, setError] = useState<Error | null>(null)
+	const [selectedItemForModal, setSelectedItemForModal] = useState<CalendarItem | null>(null)
 
 	const loadCalendars = useCallback(async () => {
 		if (!strapiBaseUrl) {
@@ -106,6 +177,26 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 		void loadCalendarItems()
 	}, [loadCalendarItems])
 
+	useEffect(() => {
+		const handleEscape = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') {
+				setSelectedItemForModal(null)
+			}
+		}
+
+		if (selectedItemForModal) {
+			window.addEventListener('keydown', handleEscape)
+			document.body.style.overflow = 'hidden'
+		} else {
+			document.body.style.overflow = 'unset'
+		}
+
+		return () => {
+			window.removeEventListener('keydown', handleEscape)
+			document.body.style.overflow = 'unset'
+		}
+	}, [selectedItemForModal])
+
 	const handleCalendarToggle = useCallback((calendarId: string) => {
 		setSelectedCalendarIds((prev) => {
 			const next = new Set(prev)
@@ -142,6 +233,17 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 		}
 	}, [])
 
+	const resolveDocumentUrl = useCallback((calendarDocument: CalendarItem['CalendarDocument']) => {
+		if (!calendarDocument?.MediaFile?.url) {
+			return null
+		}
+		const url = calendarDocument.MediaFile.url
+		if (url.startsWith('http')) {
+			return url
+		}
+		return strapiBaseUrl ? `${strapiBaseUrl}${url}` : url
+	}, [strapiBaseUrl])
+
 	const backgroundColor = theme?.evenBgColor ?? '#f9fafb'
 
 	return (
@@ -149,9 +251,6 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 			{/* Multiselect im Kopfbereich */}
 			<div className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em', backgroundColor }}>
 				<div className='w-full max-w-7xl'>
-					<Typography variant='h6' component='h2' sx={{ mb: 2, fontWeight: 600 }}>
-						Kalender auswählen
-					</Typography>
 					{isLoading && calendars.length === 0 ? (
 						<Typography variant='body2' color='text.secondary'>
 							Lade Kalender...
@@ -159,23 +258,38 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 					) : calendars.length > 0 ? (
 						<FormGroup>
 							<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-								{calendars.map((calendar) => (
-									<FormControlLabel
-										key={calendar.documentId}
-										control={
-											<Checkbox
-												checked={selectedCalendarIds.has(calendar.documentId)}
-												onChange={() => handleCalendarToggle(calendar.documentId)}
+								{calendars.map((calendar) => {
+									const colors = getCalendarColors(calendar)
+									return (
+										<Box
+											key={calendar.documentId}
+											sx={{
+												backgroundColor: colors.backgroundColor,
+												borderRadius: 1,
+												padding: '8px 12px',
+												display: 'inline-flex',
+											}}
+										>
+											<FormControlLabel
+												control={
+													<Checkbox
+														checked={selectedCalendarIds.has(calendar.documentId)}
+														onChange={() => handleCalendarToggle(calendar.documentId)}
+													/>
+												}
+												label={calendar.Name ?? 'Unbenannter Kalender'}
+												sx={{
+													margin: 0,
+													'& .MuiFormControlLabel-label': {
+														fontSize: '0.875rem',
+														color: colors.textColor,
+														fontWeight: 500,
+													},
+												}}
 											/>
-										}
-										label={calendar.Name ?? 'Unbenannter Kalender'}
-										sx={{
-											'& .MuiFormControlLabel-label': {
-												fontSize: '0.875rem',
-											},
-										}}
-									/>
-								))}
+										</Box>
+									)
+								})}
 							</Box>
 						</FormGroup>
 					) : (
@@ -219,31 +333,83 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 								}}
 							>
 								<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-									<Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-										<Typography
-											variant='subtitle1'
-											sx={{
-												fontWeight: 600,
-												color: 'text.primary',
-											}}
-										>
-											{formatDate(item.Date)}
-										</Typography>
-										{item.calendar?.Name ? (
+									<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, mb: 1, flexWrap: 'wrap' }}>
+										<Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
 											<Typography
-												variant='caption'
+												variant='subtitle1'
 												sx={{
-													px: 1.5,
-													py: 0.5,
-													bgcolor: item.calendar.ColorSchema ?? 'grey.300',
-													color: 'white',
-													borderRadius: 1,
-													fontWeight: 500,
+													fontWeight: 600,
+													color: 'text.primary',
 												}}
 											>
-												{item.calendar.Name}
+												{formatDate(item.Date)}
 											</Typography>
-										) : null}
+											{item.calendar?.Name ? (
+												<Typography
+													variant='caption'
+													sx={{
+														px: 1.5,
+														py: 0.5,
+														bgcolor: item.calendar.ColorSchema ?? 'grey.300',
+														color: 'white',
+														borderRadius: 1,
+														fontWeight: 500,
+													}}
+												>
+													{item.calendar.Name}
+												</Typography>
+											) : null}
+										</Box>
+
+										{/* Links und Aktionen am rechten Ende */}
+										<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
+											{item.LongDescription ? (
+												<Button
+													variant='outlined'
+													size='small'
+													onClick={() => setSelectedItemForModal(item)}
+													sx={{ textTransform: 'none' }}
+												>
+													Mehr Details
+												</Button>
+											) : null}
+
+											{item.AnmeldeLink ? (
+												<MuiLink
+													href={item.AnmeldeLink}
+													target='_blank'
+													rel='noopener noreferrer'
+													underline='hover'
+													sx={{
+														display: 'inline-flex',
+														alignItems: 'center',
+														gap: 0.5,
+														color: 'primary.main',
+													}}
+												>
+													Anmeldung
+													<OpenInNewIcon sx={{ fontSize: '0.875rem' }} />
+												</MuiLink>
+											) : null}
+
+											{item.ErgebnisLink ? (
+												<MuiLink
+													href={item.ErgebnisLink}
+													target='_blank'
+													rel='noopener noreferrer'
+													underline='hover'
+													sx={{
+														display: 'inline-flex',
+														alignItems: 'center',
+														gap: 0.5,
+														color: 'primary.main',
+													}}
+												>
+													Ergebnisse
+													<OpenInNewIcon sx={{ fontSize: '0.875rem' }} />
+												</MuiLink>
+											) : null}
+										</Box>
 									</Box>
 									{item.Description ? (
 										<Typography
@@ -255,6 +421,27 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 										>
 											{item.Description}
 										</Typography>
+									) : null}
+
+									{/* Download-Link bleibt separat */}
+									{item.CalendarDocument?.MediaFile?.url ? (
+										<Box sx={{ mt: 1 }}>
+											<MuiLink
+												href={resolveDocumentUrl(item.CalendarDocument) ?? '#'}
+												download
+												underline='hover'
+												sx={{
+													display: 'inline-flex',
+													alignItems: 'center',
+													gap: 0.5,
+													color: 'primary.main',
+												}}
+											>
+												<DownloadIcon sx={{ fontSize: '1rem' }} />
+												Download
+												{item.CalendarDocument.MediaFile.name ? ` (${item.CalendarDocument.MediaFile.name})` : ''}
+											</MuiLink>
+										</Box>
 									) : null}
 								</Box>
 							</Paper>
@@ -268,6 +455,92 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 					</Box>
 				) : null}
 			</SectionContainer>
+
+			{/* Modal für LongDescription */}
+			{selectedItemForModal ? (
+				<div
+					className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'
+					onClick={() => setSelectedItemForModal(null)}
+				>
+					<div
+						className='relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white shadow-xl'
+						onClick={(e) => e.stopPropagation()}
+					>
+						<IconButton
+							onClick={() => setSelectedItemForModal(null)}
+							aria-label='Schließen'
+							sx={{
+								position: 'absolute',
+								right: 16,
+								top: 16,
+								zIndex: 10,
+								backgroundColor: 'rgba(255, 255, 255, 0.9)',
+								boxShadow: 2,
+								'&:hover': {
+									backgroundColor: 'white',
+								},
+							}}
+						>
+							<CloseIcon />
+						</IconButton>
+
+						<Box sx={{ p: 4 }}>
+							<Typography
+								variant='h5'
+								component='h2'
+								sx={{
+									mb: 2,
+									fontWeight: 600,
+									color: 'text.primary',
+								}}
+							>
+								{formatDate(selectedItemForModal.Date)}
+								{selectedItemForModal.calendar?.Name ? (
+									<Typography
+										component='span'
+										variant='body2'
+										sx={{
+											ml: 2,
+											px: 1.5,
+											py: 0.5,
+											bgcolor: selectedItemForModal.calendar.ColorSchema ?? 'grey.300',
+											color: 'white',
+											borderRadius: 1,
+											fontWeight: 500,
+										}}
+									>
+										{selectedItemForModal.calendar.Name}
+									</Typography>
+								) : null}
+							</Typography>
+
+							{selectedItemForModal.LongDescription ? (
+								<Typography
+									variant='body1'
+									sx={{
+										color: 'text.secondary',
+										whiteSpace: 'pre-wrap',
+										'& p': {
+											mb: 2,
+										},
+										'& p:last-child': {
+											mb: 0,
+										},
+										'& a': {
+											color: 'primary.main',
+											textDecoration: 'none',
+											'&:hover': {
+												textDecoration: 'underline',
+											},
+										},
+									}}
+									dangerouslySetInnerHTML={{ __html: renderStrapiBlocks(selectedItemForModal.LongDescription) }}
+								/>
+							) : null}
+						</Box>
+					</div>
+				</div>
+			) : null}
 		</>
 	)
 }

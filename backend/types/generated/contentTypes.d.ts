@@ -464,15 +464,7 @@ export interface ApiCalendarEntryCalendarEntry
       'api::calendar-entry.calendar-entry'
     > &
       Schema.Attribute.Private;
-    LongDescription: Schema.Attribute.RichText &
-      Schema.Attribute.CustomField<
-        'plugin::ckeditor.CKEditor',
-        {
-          licenseKey: 'GPL';
-          output: 'HTML';
-          preset: 'standard';
-        }
-      >;
+    LongDescription: Schema.Attribute.Blocks;
     publishedAt: Schema.Attribute.DateTime;
     Time: Schema.Attribute.Time;
     updatedAt: Schema.Attribute.DateTime;
