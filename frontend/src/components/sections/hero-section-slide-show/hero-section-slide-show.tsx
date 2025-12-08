@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Pagination, A11y, Keyboard } from 'swiper/modules'
 import 'swiper/css'
@@ -60,6 +60,15 @@ export function HeroSectionSlideShowComponent({
 			>
 				{slides.map((slide, index) => {
 					const imageUrl = resolveMediaUrl(slide?.HeroImage, strapiBaseUrl)
+					const [imageLoaded, setImageLoaded] = useState(false)
+
+					useEffect(() => {
+						if (imageUrl) {
+							const img = new Image()
+							img.onload = () => setImageLoaded(true)
+							img.src = imageUrl
+						}
+					}, [imageUrl])
 
 					return (
 						<SwiperSlide key={slide?.id ?? index}>
@@ -71,12 +80,12 @@ export function HeroSectionSlideShowComponent({
 									/>
 								) : null}
 								<div
-									className={`absolute inset-0 bg-no-repeat ${imageUrl ? 'hero-section-image-zoom' : ''}`}
+									className={`absolute inset-0 bg-no-repeat ${imageUrl && imageLoaded ? 'hero-section-image-zoom' : ''}`}
 									style={
 										imageUrl
 											? {
 													backgroundImage: `url('${imageUrl}')`,
-													backgroundSize: '100% auto',
+													backgroundSize: 'cover',
 													backgroundPosition: 'center 20%',
 													backgroundColor: '#000',
 												}
