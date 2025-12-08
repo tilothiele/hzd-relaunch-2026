@@ -75,10 +75,10 @@ export function CardSectionComponent({
 									backgroundColor: '#1f2937',
 									color: 'white',
 									boxShadow: 3,
-									transition: 'transform 0.3s ease-in-out',
-									'&:hover': {
-										transform: 'translateY(-4px)',
-									},
+									borderTopLeftRadius: 0,
+									borderTopRightRadius: 0,
+									borderBottomLeftRadius: 0,
+									borderBottomRightRadius: 0,
 								}}
 							>
 								{/* Farbiger Balken oben */}
@@ -106,10 +106,6 @@ export function CardSectionComponent({
 												backgroundImage: `url('${imageUrl}')`,
 												backgroundSize: 'cover',
 												backgroundPosition: 'center',
-												transition: 'transform 0.7s ease-in-out',
-												'&:hover': {
-													transform: 'scale(1.05)',
-												},
 											}}
 										/>
 									) : null}
