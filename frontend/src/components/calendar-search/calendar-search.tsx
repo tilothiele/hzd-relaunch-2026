@@ -421,7 +421,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 												sx={{
 													backgroundColor: colors.backgroundColor,
 													borderRadius: 1,
-													padding: '8px 12px',
+													padding: '2px 12px 2px 2px',
 													display: 'inline-flex',
 												}}
 											>
@@ -514,22 +514,111 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 											: '8px solid #e5e7eb',
 									}}
 								>
-									{/* Eine Zeile: Datum - Description - Links */}
-									<Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-										{/* Datum */}
-										<Typography
-											variant='subtitle1'
+									{/* Desktop: Eine Zeile: Datum - Description - Links */}
+									{/* Mobile/Tablet: Zeile 1: Datum - Links, Zeile 2: Headline - Description */}
+									<Box
+										sx={{
+											display: 'flex',
+											gap: 2,
+											flexWrap: 'wrap',
+											flexDirection: { xs: 'column', sm: 'column', md: 'row' },
+											alignItems: { xs: 'flex-start', sm: 'flex-start', md: 'center' },
+										}}
+									>
+										{/* Erste Zeile (Mobile/Tablet) / Erste Spalte (Desktop): Datum + Links */}
+										<Box
 											sx={{
-												fontWeight: 600,
-												color: 'text.primary',
-												flexShrink: 0,
+												display: 'flex',
+												alignItems: 'center',
+												gap: 2,
+												flexWrap: 'wrap',
+												flex: { xs: 'none', sm: 'none', md: '0 0 auto' },
+												width: { xs: '100%', sm: '100%', md: 'auto' },
 											}}
 										>
-											{formatDate(item.Date)}
-										</Typography>
+											{/* Datum */}
+											<Typography
+												variant='subtitle1'
+												sx={{
+													fontWeight: 600,
+													color: 'text.primary',
+													flexShrink: 0,
+												}}
+											>
+												{formatDate(item.Date)}
+											</Typography>
 
-										{/* Headline und Description nehmen den verfügbaren Platz ein */}
-										<Box sx={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+											{/* Links und Aktionen - auf Mobile/Tablet in derselben Zeile wie Datum */}
+											<Box
+												sx={{
+													display: { xs: 'flex', sm: 'flex', md: 'none' },
+													flexWrap: 'wrap',
+													gap: 2,
+													alignItems: 'center',
+													flexShrink: 0,
+												}}
+											>
+												{item.LongDescription ? (
+													<Button
+														variant='outlined'
+														size='small'
+														onClick={() => setSelectedItemForModal(item)}
+														sx={{ textTransform: 'none' }}
+													>
+														Mehr Details
+													</Button>
+												) : null}
+
+												{item.AnmeldeLink ? (
+													<MuiLink
+														href={item.AnmeldeLink}
+														target='_blank'
+														rel='noopener noreferrer'
+														underline='hover'
+														sx={{
+															display: 'inline-flex',
+															alignItems: 'center',
+															gap: 0.5,
+															color: 'primary.main',
+														}}
+													>
+														Anmeldung
+														<OpenInNewIcon sx={{ fontSize: '0.875rem' }} />
+													</MuiLink>
+												) : null}
+
+												{item.ErgebnisLink ? (
+													<MuiLink
+														href={item.ErgebnisLink}
+														target='_blank'
+														rel='noopener noreferrer'
+														underline='hover'
+														sx={{
+															display: 'inline-flex',
+															alignItems: 'center',
+															gap: 0.5,
+															color: 'primary.main',
+														}}
+													>
+														Ergebnisse
+														<OpenInNewIcon sx={{ fontSize: '0.875rem' }} />
+													</MuiLink>
+												) : null}
+											</Box>
+										</Box>
+
+										{/* Headline und Description - auf Mobile/Tablet in zweiter Zeile */}
+										<Box
+											sx={{
+												flex: { xs: 'none', sm: 'none', md: 1 },
+												minWidth: 0,
+												width: { xs: '100%', sm: '100%', md: 'auto' },
+												display: 'flex',
+												alignItems: 'center',
+												gap: 1,
+												flexWrap: 'wrap',
+											}}
+										>
 											{item.Headline ? (
 												<Typography
 													variant='body1'
@@ -564,8 +653,16 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 											) : null}
 										</Box>
 
-										{/* Links und Aktionen am rechten Ende */}
-										<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center', flexShrink: 0 }}>
+										{/* Links und Aktionen - nur auf Desktop sichtbar */}
+										<Box
+											sx={{
+												display: { xs: 'none', sm: 'none', md: 'flex' },
+												flexWrap: 'wrap',
+												gap: 2,
+												alignItems: 'center',
+												flexShrink: 0,
+											}}
+										>
 											{item.LongDescription ? (
 												<Button
 													variant='outlined'
