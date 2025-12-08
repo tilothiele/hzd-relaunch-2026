@@ -21,7 +21,7 @@ export function SectionContainer({
 			: 'flex w-full justify-center'
 
 	const innerContainerClasses =
-		variant === 'max-width' ? 'w-full max-w-7xl' : 'w-full'
+		variant === 'max-width' ? 'w-full max-w-5xl' : 'w-full'
 
 	return (
 		<section

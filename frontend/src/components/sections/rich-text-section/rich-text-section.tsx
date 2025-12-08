@@ -25,12 +25,10 @@ export function RichTextSectionComponent({
 			paddingTop='1em'
 			paddingBottom='1em'
 		>
-			<div className='w-full max-w-4xl'>
-				<div
-					className='prose prose-xl max-w-none dark:prose-invert'
-					dangerouslySetInnerHTML={{ __html: section.RichTextContent }}
-				/>
-			</div>
+			<div
+				className='prose prose-xl max-w-none dark:prose-invert'
+				dangerouslySetInnerHTML={{ __html: section.RichTextContent }}
+			/>
 		</SectionContainer>
 	)
 }
