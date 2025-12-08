@@ -20,6 +20,100 @@ interface HeroSectionSlideShowProps {
 	autoPlayIntervalMs?: number
 }
 
+interface HeroSlideProps {
+	slide: NonNullable<HeroSectionSlideShow['Headline']>[0]
+	imageUrl: string | null
+	theme: ThemeDefinition
+	index: number
+}
+
+function HeroSlide({ slide, imageUrl, theme, index }: HeroSlideProps) {
+	const [imageLoaded, setImageLoaded] = useState(false)
+	const [shouldAnimate, setShouldAnimate] = useState(false)
+
+	useEffect(() => {
+		if (imageUrl) {
+			const img = new Image()
+			img.onload = () => {
+				setImageLoaded(true)
+				// Kurze Verzögerung, damit das Bild vollständig gerendert ist
+				setTimeout(() => {
+					setShouldAnimate(true)
+				}, 100)
+			}
+			img.onerror = () => {
+				setImageLoaded(false)
+			}
+			img.src = imageUrl
+		} else {
+			setImageLoaded(false)
+		}
+	}, [imageUrl])
+
+	return (
+		<SwiperSlide key={slide?.id ?? index}>
+			<div className='relative flex min-h-[32rem] items-center justify-center text-white sm:min-h-[40rem] md:min-h-[48rem]'>
+				{imageUrl ? (
+					<span
+						className='absolute inset-0 block bg-black'
+						style={{ opacity: 0.4 }}
+					/>
+				) : null}
+				<div
+					className={`absolute inset-0 bg-no-repeat ${imageUrl && shouldAnimate ? 'hero-section-image-zoom' : ''}`}
+					style={
+						imageUrl
+							? {
+									backgroundImage: `url('${imageUrl}')`,
+									backgroundSize: 'cover',
+									backgroundPosition: 'center 20%',
+									backgroundColor: '#000',
+									// Stelle sicher, dass das Bild immer die volle Größe hat
+									width: '100%',
+									height: '100%',
+								}
+							: undefined
+					}
+				/>
+				<div className='hero-section-slide-content relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-24 text-center sm:px-12 md:px-24'>
+					{slide?.Headline ? (
+						<Typography
+							variant='h2'
+							className='hero-section-slide-headline'
+							sx={{
+								fontWeight: 600,
+								letterSpacing: '-0.025em',
+								textAlign: 'center',
+								width: '100%',
+							}}
+						>
+							{slide.Headline}
+						</Typography>
+					) : null}
+					{slide?.Subheadline ? (
+						<Typography
+							variant='h4'
+							className='hero-section-slide-subheadline'
+							sx={{
+								fontWeight: 500,
+								textAlign: 'center',
+								width: '100%',
+							}}
+						>
+							{slide.Subheadline}
+						</Typography>
+					) : null}
+					{slide?.ActionButton ? (
+						<div className='flex justify-center'>
+							<ActionButton actionButton={slide.ActionButton} theme={theme} />
+						</div>
+					) : null}
+				</div>
+			</div>
+		</SwiperSlide>
+	)
+}
+
 export function HeroSectionSlideShowComponent({
 	section,
 	strapiBaseUrl,
@@ -60,74 +154,14 @@ export function HeroSectionSlideShowComponent({
 			>
 				{slides.map((slide, index) => {
 					const imageUrl = resolveMediaUrl(slide?.HeroImage, strapiBaseUrl)
-					const [imageLoaded, setImageLoaded] = useState(false)
-
-					useEffect(() => {
-						if (imageUrl) {
-							const img = new Image()
-							img.onload = () => setImageLoaded(true)
-							img.src = imageUrl
-						}
-					}, [imageUrl])
-
 					return (
-						<SwiperSlide key={slide?.id ?? index}>
-							<div className='relative flex min-h-[32rem] items-center justify-center text-white sm:min-h-[40rem] md:min-h-[48rem]'>
-								{imageUrl ? (
-									<span
-										className='absolute inset-0 block bg-black'
-										style={{ opacity: 0.4 }}
-									/>
-								) : null}
-								<div
-									className={`absolute inset-0 bg-no-repeat ${imageUrl && imageLoaded ? 'hero-section-image-zoom' : ''}`}
-									style={
-										imageUrl
-											? {
-													backgroundImage: `url('${imageUrl}')`,
-													backgroundSize: 'cover',
-													backgroundPosition: 'center 20%',
-													backgroundColor: '#000',
-												}
-											: undefined
-									}
-								/>
-								<div className='hero-section-slide-content relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-24 text-center sm:px-12 md:px-24'>
-									{slide?.Headline ? (
-										<Typography
-											variant='h2'
-											className='hero-section-slide-headline'
-											sx={{
-												fontWeight: 600,
-												letterSpacing: '-0.025em',
-												textAlign: 'center',
-												width: '100%',
-											}}
-										>
-											{slide.Headline}
-										</Typography>
-									) : null}
-									{slide?.Subheadline ? (
-										<Typography
-											variant='h4'
-											className='hero-section-slide-subheadline'
-											sx={{
-												fontWeight: 500,
-												textAlign: 'center',
-												width: '100%',
-											}}
-										>
-											{slide.Subheadline}
-										</Typography>
-									) : null}
-									{slide?.ActionButton ? (
-										<div className='flex justify-center'>
-											<ActionButton actionButton={slide.ActionButton} theme={theme} />
-										</div>
-									) : null}
-								</div>
-							</div>
-						</SwiperSlide>
+						<HeroSlide
+							key={slide?.id ?? index}
+							slide={slide}
+							imageUrl={imageUrl}
+							theme={theme}
+							index={index}
+						/>
 					)
 				})}
 				</Swiper>

@@ -135,4 +135,5 @@ h1 {
 .hero-section-image-zoom {
 	animation: heroImageZoom 10s ease-out forwards;
 	transform-origin: center center;
+	will-change: transform;
 }
