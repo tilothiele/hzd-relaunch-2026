@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_form_email_adresses",
+  "info": {
+    "displayName": "EmailAdress"
+  },
+  "options": {},
+  "attributes": {
+    "EAName": {
+      "type": "string",
+      "required": true
+    },
+    "EARequired": {
+      "type": "boolean"
+    }
+  },
+  "config": {}
+}

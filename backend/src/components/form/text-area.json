@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_form_text_areas",
+  "info": {
+    "displayName": "TextArea"
+  },
+  "options": {},
+  "attributes": {
+    "TAName": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

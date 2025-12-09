@@ -245,6 +245,110 @@ export interface ColumnsTextColumn extends Struct.ComponentSchema {
   };
 }
 
+export interface FormBooleanChoice extends Struct.ComponentSchema {
+  collectionName: 'components_form_boolean_choices';
+  info: {
+    displayName: 'BooleanChoice';
+  };
+  attributes: {
+    BCDefaultValue: Schema.Attribute.Boolean;
+    BCName: Schema.Attribute.String;
+    BCRequired: Schema.Attribute.Boolean;
+    BCRequiredValue: Schema.Attribute.Boolean;
+  };
+}
+
+export interface FormChoice extends Struct.ComponentSchema {
+  collectionName: 'components_form_choices';
+  info: {
+    displayName: 'Choice';
+  };
+  attributes: {
+    CName: Schema.Attribute.String;
+    CRequired: Schema.Attribute.Boolean;
+    MultipleChoice: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
+    Options: Schema.Attribute.Text;
+  };
+}
+
+export interface FormEmailAdress extends Struct.ComponentSchema {
+  collectionName: 'components_form_email_adresses';
+  info: {
+    displayName: 'EmailAdress';
+  };
+  attributes: {
+    EAName: Schema.Attribute.String & Schema.Attribute.Required;
+    EARequired: Schema.Attribute.Boolean;
+  };
+}
+
+export interface FormFldGroupSeparator extends Struct.ComponentSchema {
+  collectionName: 'components_form_fld_group_separators';
+  info: {
+    displayName: 'FldGroupSeparator';
+  };
+  attributes: {
+    GroupName: Schema.Attribute.String;
+  };
+}
+
+export interface FormFldStaticText extends Struct.ComponentSchema {
+  collectionName: 'components_form_fld_static_texts';
+  info: {
+    displayName: 'FldStaticText';
+  };
+  attributes: {
+    StaticContent: Schema.Attribute.Blocks;
+  };
+}
+
+export interface FormFormSubmitButton extends Struct.ComponentSchema {
+  collectionName: 'components_form_form_submit_buttons';
+  info: {
+    displayName: 'FormSubmitButton';
+  };
+  attributes: {
+    FSBName: Schema.Attribute.String;
+  };
+}
+
+export interface FormNumberInput extends Struct.ComponentSchema {
+  collectionName: 'components_form_number_inputs';
+  info: {
+    displayName: 'NumberInput';
+  };
+  attributes: {
+    NIMaxValue: Schema.Attribute.Integer;
+    NIMinValue: Schema.Attribute.Integer;
+    NIName: Schema.Attribute.String;
+    NIRequired: Schema.Attribute.Boolean;
+  };
+}
+
+export interface FormShortTextInput extends Struct.ComponentSchema {
+  collectionName: 'components_form_short_text_inputs';
+  info: {
+    displayName: 'ShortTextInput';
+  };
+  attributes: {
+    MinLength: Schema.Attribute.Integer;
+    MultiLine: Schema.Attribute.Boolean;
+    STName: Schema.Attribute.String;
+  };
+}
+
+export interface FormTextArea extends Struct.ComponentSchema {
+  collectionName: 'components_form_text_areas';
+  info: {
+    displayName: 'TextArea';
+  };
+  attributes: {
+    TAName: Schema.Attribute.String;
+  };
+}
+
 export interface LayoutColorTheme extends Struct.ComponentSchema {
   collectionName: 'components_layout_color_themes';
   info: {
@@ -353,6 +457,15 @@ declare module '@strapi/strapi' {
       'calendar.calendar-document': CalendarCalendarDocument;
       'columns.column-item': ColumnsColumnItem;
       'columns.text-column': ColumnsTextColumn;
+      'form.boolean-choice': FormBooleanChoice;
+      'form.choice': FormChoice;
+      'form.email-adress': FormEmailAdress;
+      'form.fld-group-separator': FormFldGroupSeparator;
+      'form.fld-static-text': FormFldStaticText;
+      'form.form-submit-button': FormFormSubmitButton;
+      'form.number-input': FormNumberInput;
+      'form.short-text-input': FormShortTextInput;
+      'form.text-area': FormTextArea;
       'layout.color-theme': LayoutColorTheme;
       'layout.footer': LayoutFooter;
       'links.action-button': LinksActionButton;

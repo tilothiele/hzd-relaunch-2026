@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_form_form_submit_buttons",
+  "info": {
+    "displayName": "FormSubmitButton"
+  },
+  "options": {},
+  "attributes": {
+    "FSBName": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

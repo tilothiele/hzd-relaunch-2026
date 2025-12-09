@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_form_number_inputs",
+  "info": {
+    "displayName": "NumberInput"
+  },
+  "options": {},
+  "attributes": {
+    "NIName": {
+      "type": "string"
+    },
+    "NIRequired": {
+      "type": "boolean"
+    },
+    "NIMinValue": {
+      "type": "integer"
+    },
+    "NIMaxValue": {
+      "type": "integer"
+    }
+  },
+  "config": {}
+}

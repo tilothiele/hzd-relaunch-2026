@@ -1,4 +1,6 @@
 import { GraphQLClient } from 'graphql-request'
+import { GET_FORM_BY_DOCUMENT_ID } from './graphql/queries'
+import type { Form, FormQueryResult } from '@/types'
 
 let persistedAuthToken: string | null = null
 let persistedBaseUrl: string | null = null
@@ -58,5 +60,27 @@ export async function fetchGraphQL<T>(
 			throw error
 		}
 		throw new Error('GraphQL-Anfrage fehlgeschlagen')
+	}
+}
+
+export async function getFormByDocumentId(
+	documentId: string,
+	options?: { baseUrl?: string | null; token?: string | null },
+): Promise<Form | null> {
+	try {
+		const data = await fetchGraphQL<FormQueryResult>(
+			GET_FORM_BY_DOCUMENT_ID,
+			{
+				variables: { documentId },
+				token: options?.token,
+				baseUrl: options?.baseUrl,
+			},
+		)
+
+		const forms = data.forms ?? []
+		return forms.length > 0 ? forms[0] : null
+	} catch (error) {
+		console.error('Fehler beim Laden des Formulars:', error)
+		throw error
 	}
 }

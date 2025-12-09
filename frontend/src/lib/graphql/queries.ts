@@ -499,6 +499,10 @@ query SearchCalendarItems($filters: CalendarEntryFiltersInput , $pagination: Pag
 			AnmeldeLink
 			ErgebnisLink
 			Region
+		    form {
+                documentId
+            }
+
 			CalendarDocument {
 				MediaFile {
 					alternativeText
@@ -511,6 +515,65 @@ query SearchCalendarItems($filters: CalendarEntryFiltersInput , $pagination: Pag
 				documentId
 				Name
 				ColorSchema
+			}
+		}
+	}
+`
+
+export const GET_FORM_BY_DOCUMENT_ID = `
+	query GetFormByDocumentId($documentId: ID!) {
+		forms(filters: { documentId: { eq: $documentId } }, pagination: { pageSize: 1 }) {
+			documentId
+			Name
+			FormFields {
+				__typename
+				... on ComponentFormShortTextInput {
+					MinLength
+					MultiLine
+					STName
+					id
+				}
+				... on ComponentFormEmailAdress {
+					EAName
+					EARequired
+					id
+				}
+				... on ComponentFormTextArea {
+					id
+					TAName
+				}
+				... on ComponentFormNumberInput {
+					id
+					NIName
+					NIMinValue
+					NIMaxValue
+					NIRequired
+				}
+				... on ComponentFormChoice {
+					id
+					CName
+					CRequired
+					MultipleChoice
+					Options
+				}
+				... on ComponentFormBooleanChoice{
+					id
+					BCName
+					BCRequired
+					BCRequiredValue
+				}
+				... on ComponentFormFldGroupSeparator {
+					id
+					GroupName
+				}
+				... on ComponentFormFldStaticText {
+					id
+					StaticContent
+				}
+				... on ComponentFormFormSubmitButton {
+					id
+					FSBName
+				}
 			}
 		}
 	}

@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_form_fld_group_separators",
+  "info": {
+    "displayName": "FldGroupSeparator"
+  },
+  "options": {},
+  "attributes": {
+    "GroupName": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

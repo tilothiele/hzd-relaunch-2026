@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_form_fld_static_texts",
+  "info": {
+    "displayName": "FldStaticText"
+  },
+  "options": {},
+  "attributes": {
+    "StaticContent": {
+      "type": "blocks"
+    }
+  },
+  "config": {}
+}

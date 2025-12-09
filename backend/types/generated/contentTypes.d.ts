@@ -454,6 +454,7 @@ export interface ApiCalendarEntryCalendarEntry
     Date: Schema.Attribute.Date & Schema.Attribute.Required;
     Description: Schema.Attribute.Text;
     ErgebnisLink: Schema.Attribute.String;
+    form: Schema.Attribute.Relation<'oneToOne', 'api::form.form'>;
     Headline: Schema.Attribute.String & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -527,6 +528,77 @@ export interface ApiContactContact extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     member: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.member'>;
     position: Schema.Attribute.Integer;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiFormFieldFormField extends Struct.CollectionTypeSchema {
+  collectionName: 'form_fields';
+  info: {
+    displayName: 'FormInstance';
+    pluralName: 'form-fields';
+    singularName: 'form-field';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    FieldValues: Schema.Attribute.JSON;
+    formDefinition: Schema.Attribute.Relation<'oneToOne', 'api::form.form'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::form-field.form-field'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiFormForm extends Struct.CollectionTypeSchema {
+  collectionName: 'forms';
+  info: {
+    displayName: 'Form';
+    pluralName: 'forms';
+    singularName: 'form';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    EventAdmin: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::hzd-plugin.member'
+    >;
+    FormFields: Schema.Attribute.DynamicZone<
+      [
+        'form.fld-group-separator',
+        'form.fld-static-text',
+        'form.short-text-input',
+        'form.choice',
+        'form.boolean-choice',
+        'form.email-adress',
+        'form.number-input',
+        'form.form-submit-button',
+        'form.text-area',
+      ]
+    >;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::form.form'> &
+      Schema.Attribute.Private;
+    Name: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1747,6 +1819,8 @@ declare module '@strapi/strapi' {
       'api::calendar-entry.calendar-entry': ApiCalendarEntryCalendarEntry;
       'api::calendar.calendar': ApiCalendarCalendar;
       'api::contact.contact': ApiContactContact;
+      'api::form-field.form-field': ApiFormFieldFormField;
+      'api::form.form': ApiFormForm;
       'api::global-layout.global-layout': ApiGlobalLayoutGlobalLayout;
       'api::index-page.index-page': ApiIndexPageIndexPage;
       'api::local-cummunity.local-cummunity': ApiLocalCummunityLocalCummunity;

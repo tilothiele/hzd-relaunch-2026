@@ -372,6 +372,9 @@ export interface CalendarItem {
 		} | null
 	}[] | null
 	calendar?: Calendar | null
+	form?: {
+		documentId: string
+	} | null
 }
 
 export interface CalendarSearchResult {
@@ -380,4 +383,81 @@ export interface CalendarSearchResult {
 
 export interface CalendarItemSearchResult {
 	calendarEntries: CalendarItem[]
+}
+
+export interface ShortTextInput {
+	__typename: 'ComponentFormShortTextInput'
+	id?: string
+	MinLength?: number | null
+	MultiLine?: boolean | null
+	STName?: string | null
+}
+
+export interface EmailAddress {
+	__typename: 'ComponentFormEmailAdress'
+	id?: string
+	EAName?: string | null
+	EARequired?: boolean | null
+}
+
+export interface TextArea {
+	__typename: 'ComponentFormTextArea'
+	id?: string
+	TAName?: string | null
+}
+
+export interface NumberInput {
+	__typename: 'ComponentFormNumberInput'
+	id?: string
+	NIName?: string | null
+	NIMinValue?: number | null
+	NIMaxValue?: number | null
+	NIRequired?: boolean | null
+}
+
+export interface Choice {
+	__typename: 'ComponentFormChoice'
+	id?: string
+	CName?: string | null
+	CRequired?: boolean | null
+	MultipleChoice?: boolean | null
+	Options?: string[] | null
+}
+
+export interface BooleanChoice {
+	__typename: 'ComponentFormBooleanChoice'
+	id?: string
+	BCName?: string | null
+	BCRequired?: boolean | null
+	BCRequiredValue?: boolean | null
+}
+
+export interface GroupSeparator {
+	__typename: 'ComponentFormFldGroupSeparator'
+	id?: string
+	GroupName?: string | null
+}
+
+export interface StaticText {
+	__typename: 'ComponentFormFldStaticText'
+	id?: string
+	StaticContent?: string | null
+}
+
+export interface FormSubmitButton {
+	__typename: 'ComponentFormFormSubmitButton'
+	id?: string
+	FSBName?: string | null
+}
+
+export type FormField = ShortTextInput | EmailAddress | TextArea | NumberInput | Choice | BooleanChoice | GroupSeparator | StaticText | FormSubmitButton
+
+export interface Form {
+	documentId: string
+	Name?: string | null
+	FormFields?: FormField[] | null
+}
+
+export interface FormQueryResult {
+	forms: Form[]
 }

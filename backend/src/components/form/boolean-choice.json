@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_form_boolean_choices",
+  "info": {
+    "displayName": "BooleanChoice"
+  },
+  "options": {},
+  "attributes": {
+    "BCName": {
+      "type": "string"
+    },
+    "BCRequired": {
+      "type": "boolean"
+    },
+    "BCDefaultValue": {
+      "type": "boolean"
+    },
+    "BCRequiredValue": {
+      "type": "boolean"
+    }
+  },
+  "config": {}
+}

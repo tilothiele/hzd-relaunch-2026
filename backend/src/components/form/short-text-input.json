@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_form_short_text_inputs",
+  "info": {
+    "displayName": "ShortTextInput"
+  },
+  "options": {},
+  "attributes": {
+    "STName": {
+      "type": "string"
+    },
+    "MultiLine": {
+      "type": "boolean"
+    },
+    "MinLength": {
+      "type": "integer"
+    }
+  },
+  "config": {}
+}
