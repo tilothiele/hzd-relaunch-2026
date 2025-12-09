@@ -42,6 +42,7 @@ export default ({ env }) => {
     },
     postgres: {
       connection: {
+        debug: env('DATABASE_DEBUG', false),
         connectionString: env('DATABASE_URL'),
         host: env('DATABASE_HOST', 'localhost'),
         port: env.int('DATABASE_PORT', 5432),
