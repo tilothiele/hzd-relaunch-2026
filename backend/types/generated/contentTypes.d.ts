@@ -454,6 +454,7 @@ export interface ApiCalendarEntryCalendarEntry
     Date: Schema.Attribute.Date & Schema.Attribute.Required;
     Description: Schema.Attribute.Text;
     ErgebnisLink: Schema.Attribute.String;
+    form: Schema.Attribute.Relation<'oneToOne', 'api::form.form'>;
     Headline: Schema.Attribute.String & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
