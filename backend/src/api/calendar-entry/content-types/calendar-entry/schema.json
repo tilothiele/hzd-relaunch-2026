@@ -55,11 +55,6 @@
         "HZD",
         "VDH"
       ]
-    },
-    "form": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::form.form"
     }
   }
 }
