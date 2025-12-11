@@ -7,7 +7,7 @@
     "build": "strapi build",
     "console": "strapi console",
     "deploy": "strapi deploy",
-    "dev": "LOG_LEVEL=debug DATABASE_DEBUG=true strapi develop",
+    "dev": "strapi develop",
     "develop": "strapi develop",
     "start": "strapi start",
     "strapi": "strapi",
