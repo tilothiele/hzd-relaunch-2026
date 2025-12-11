@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
 import { Box, Typography, Checkbox, FormControlLabel, FormGroup, Paper, IconButton, Button, Link as MuiLink, Select, MenuItem, FormControl, InputLabel } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
@@ -587,6 +588,32 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 													</MuiLink>
 												) : null}
 
+												{item.form?.documentId ? (
+													<Link
+														href={`/anmeldung/${item.form.documentId}`}
+														style={{
+															display: 'inline-flex',
+															alignItems: 'center',
+															gap: '4px',
+															color: 'inherit',
+															textDecoration: 'none',
+														}}
+													>
+														<MuiLink
+															component='span'
+															underline='hover'
+															sx={{
+																display: 'inline-flex',
+																alignItems: 'center',
+																gap: 0.5,
+																color: 'primary.main',
+															}}
+														>
+															Anmeldung
+														</MuiLink>
+													</Link>
+												) : null}
+
 												{item.ErgebnisLink ? (
 													<MuiLink
 														href={item.ErgebnisLink}
@@ -690,6 +717,32 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 													Anmeldung
 													<OpenInNewIcon sx={{ fontSize: '0.875rem' }} />
 												</MuiLink>
+											) : null}
+
+											{item.form?.documentId ? (
+												<Link
+													href={`/anmeldung/${item.form.documentId}`}
+													style={{
+														display: 'inline-flex',
+														alignItems: 'center',
+														gap: '4px',
+														color: 'inherit',
+														textDecoration: 'none',
+													}}
+												>
+													<MuiLink
+														component='span'
+														underline='hover'
+														sx={{
+															display: 'inline-flex',
+															alignItems: 'center',
+															gap: 0.5,
+															color: 'primary.main',
+														}}
+													>
+														Anmeldung
+													</MuiLink>
+												</Link>
 											) : null}
 
 											{item.ErgebnisLink ? (
