@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { Box, Typography, Checkbox, FormControlLabel, FormGroup, Paper, IconButton, Button, Link as MuiLink, Select, MenuItem, FormControl, InputLabel } from '@mui/material'
+import { Box, Typography, Paper, IconButton, Button, Link as MuiLink, Select, MenuItem, FormControl, InputLabel } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import DownloadIcon from '@mui/icons-material/Download'
@@ -412,42 +412,39 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 						</Typography>
 					) : calendars.length > 0 ? (
 						<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
-							<FormGroup>
-								<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-									{calendars.map((calendar) => {
-										const colors = getCalendarColors(calendar)
-										return (
-											<Box
-												key={calendar.documentId}
-												sx={{
-													backgroundColor: colors.backgroundColor,
-													borderRadius: 1,
-													padding: '2px 12px 2px 2px',
-													display: 'inline-flex',
-												}}
-											>
-												<FormControlLabel
-													control={
-														<Checkbox
-															checked={selectedCalendarIds.has(calendar.documentId)}
-															onChange={() => handleCalendarToggle(calendar.documentId)}
-														/>
-													}
-													label={calendar.Name ?? 'Unbenannter Kalender'}
-													sx={{
-														margin: 0,
-														'& .MuiFormControlLabel-label': {
-															fontSize: '0.875rem',
-															color: colors.textColor,
-															fontWeight: 500,
-														},
-													}}
-												/>
-											</Box>
-										)
-									})}
-								</Box>
-							</FormGroup>
+							<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+								{calendars.map((calendar) => {
+									const colors = getCalendarColors(calendar)
+									const isSelected = selectedCalendarIds.has(calendar.documentId)
+									return (
+										<Button
+											key={calendar.documentId}
+											variant={isSelected ? 'contained' : 'outlined'}
+											onClick={() => handleCalendarToggle(calendar.documentId)}
+											sx={{
+												minWidth: 'auto',
+												backgroundColor: isSelected ? colors.backgroundColor : 'transparent',
+												color: isSelected ? colors.textColor : colors.backgroundColor,
+												borderColor: colors.backgroundColor,
+												borderWidth: '2px',
+												borderStyle: 'solid',
+												fontWeight: isSelected ? 600 : 400,
+												textTransform: 'none',
+												boxShadow: isSelected ? 2 : 'none',
+												padding: '4px 12px',
+												fontSize: '0.875rem',
+												'&:hover': {
+													backgroundColor: isSelected ? colors.backgroundColor : `${colors.backgroundColor}20`,
+													borderColor: colors.backgroundColor,
+													boxShadow: isSelected ? 3 : 1,
+												},
+											}}
+										>
+											{calendar.Name ?? 'Unbenannter Kalender'}
+										</Button>
+									)
+								})}
+							</Box>
 
 							{/* Region Dropdown */}
 							<FormControl size='small' sx={{ minWidth: 200 }}>
