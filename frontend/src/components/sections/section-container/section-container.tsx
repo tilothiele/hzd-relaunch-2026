@@ -15,21 +15,20 @@ export function SectionContainer({
 	paddingBottom,
 	children,
 }: SectionContainerProps) {
-	const containerClasses =
-		variant === 'max-width'
-			? 'flex w-full justify-center px-4'
-			: 'flex w-full justify-center'
 
 	const innerContainerClasses =
 		variant === 'max-width' ? 'w-full max-w-5xl' : 'w-full'
 
+	const paddingX = variant === 'max-width' ? '.5rem' : '0'
+
 	return (
 		<section
-			className={containerClasses}
+			className="flex w-full justify-center"
 			style={{
-				backgroundColor,
 				paddingTop,
 				paddingBottom,
+				paddingLeft: paddingX,
+				paddingRight: paddingX
 			}}
 		>
 			<div className={innerContainerClasses}>{children}</div>
