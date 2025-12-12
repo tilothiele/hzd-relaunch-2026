@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { fetchGraphQLServer, getStrapiBaseUrl } from '@/lib/server/graphql-client'
+import { extractEmailFromFormData, sendEmail } from '@/lib/server/mailer'
 import { CREATE_FORM_INSTANCE } from '@/lib/graphql/queries'
-import type { CreateFormInstanceResult } from '@/types'
 import type { FormInstance } from '@/types'
 
 /**
@@ -53,6 +53,19 @@ export async function POST(request: NextRequest) {
 				documentId: result.documentId,
 				formDocumentId: documentId,
 			})
+
+			// E-Mail-Adresse aus formData extrahieren und E-Mail senden
+			try {
+				const emailAddress = extractEmailFromFormData(formData)
+				if (emailAddress) {
+					await sendEmail(baseUrl, emailAddress, formData)
+				} else {
+					console.warn('Keine E-Mail-Adresse im Formular gefunden')
+				}
+			} catch (emailError) {
+				// E-Mail-Fehler sollte nicht das Speichern verhindern
+				console.error('Fehler beim Senden der E-Mail:', emailError)
+			}
 
 			return NextResponse.json({
 				success: true,
