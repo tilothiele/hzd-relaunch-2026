@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 /**
+ * Cache-Dauer für Geocoding-Ergebnisse: 30 Tage
+ * PLZ-Koordinaten ändern sich nicht, daher langes Caching sinnvoll
+ */
+export const revalidate = 60 * 60 * 24 * 30 // 30 Tage in Sekunden
+
+/**
  * API-Route zur Geocodierung einer PLZ zu Koordinaten
  * Verwendet Nominatim (OpenStreetMap) für kostenlose Geocoding
+ * Ergebnisse werden für 30 Tage gecacht
  */
 export async function GET(request: NextRequest) {
 	try {
@@ -18,6 +25,7 @@ export async function GET(request: NextRequest) {
 
 		// Verwende Nominatim für Geocoding (kostenlos, OpenStreetMap)
 		// Suche spezifisch nach Postleitzahl in Deutschland
+		// Caching aktiviert: Ergebnisse werden 30 Tage gecacht
 		const zipCode = zip.trim()
 		const response = await fetch(
 			`https://nominatim.openstreetmap.org/search?format=json&postalcode=${encodeURIComponent(zipCode)}&countrycodes=de&limit=1&addressdetails=1`,
@@ -25,6 +33,9 @@ export async function GET(request: NextRequest) {
 				headers: {
 					'Accept': 'application/json',
 					'User-Agent': 'HZD-Frontend/1.0',
+				},
+				next: {
+					revalidate: 60 * 60 * 24 * 30, // 30 Tage Cache
 				},
 			}
 		)
