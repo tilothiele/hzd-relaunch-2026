@@ -603,3 +603,17 @@ export const GET_FORM_BY_DOCUMENT_ID = `
 	}
 `
 
+export const CREATE_FORM_INSTANCE = `
+	mutation CreateFormInstance($data: FormInstanceInput!) {
+		createFormInstance(data: $data) {
+				documentId
+				form {
+					documentId
+				}
+				Content
+				createdAt
+				updatedAt
+		}
+	}
+`
+

@@ -465,3 +465,19 @@ export interface Form {
 export interface FormQueryResult {
 	forms: Form[]
 }
+
+export interface FormInstance {
+	documentId: string
+	form?: {
+		documentId: string
+	} | null
+	formData?: Record<string, unknown> | null
+	createdAt?: string | null
+	updatedAt?: string | null
+}
+
+export interface CreateFormInstanceResult {
+	createFormInstance: {
+		data: FormInstance
+	}
+}

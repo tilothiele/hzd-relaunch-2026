@@ -81,7 +81,9 @@ export function FormComponent({ form, privacyPolicy, strapiBaseUrl }: FormCompon
 				})
 
 				if (!response.ok) {
-					throw new Error('Fehler beim Absenden des Formulars')
+					const errorData = await response.json().catch(() => null)
+					const errorMessage = errorData?.error?.message ?? `Fehler beim Absenden des Formulars (Status: ${response.status})`
+					throw new Error(errorMessage)
 				}
 
 				// Formular erfolgreich abgesendet - Modal anzeigen
