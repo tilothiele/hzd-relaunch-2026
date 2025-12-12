@@ -74,12 +74,14 @@ export function LoginControls({
 	}, [error])
 
 	const toggleFormVisibility = useCallback(() => {
-		setIsFormVisible((previousVisible: boolean) => !previousVisible)
-		if (!previousVisible) {
-			setActiveTab('login')
-			setLocalError(null)
-			setLocalSuccess(null)
-		}
+		setIsFormVisible((previousVisible: boolean) => {
+			if (!previousVisible) {
+				setActiveTab('login')
+				setLocalError(null)
+				setLocalSuccess(null)
+			}
+			return !previousVisible
+		})
 	}, [])
 
 	const handleTabChange = useCallback((_event: React.SyntheticEvent, newValue: TabValue) => {
