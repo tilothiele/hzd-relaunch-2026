@@ -1,12 +1,20 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import Link from 'next/link'
+import { useGlobalLayout } from '@/hooks/use-global-layout'
+import { resolveMediaUrl } from '@/components/header/logo-utils'
 
 const STORAGE_KEY = 'cookie-consent'
 
 export function CookieBanner() {
+	const { globalLayout, baseUrl } = useGlobalLayout()
+	const privacyPolicyUrl = resolveMediaUrl(globalLayout?.PrivacyPolicy ?? null, baseUrl)
 	const [isVisible, setIsVisible] = useState(false)
 	const [isSaving, setIsSaving] = useState(false)
+
+	console.log(globalLayout)
+	console.log(privacyPolicyUrl)
 
 	useEffect(() => {
 		try {
@@ -50,13 +58,33 @@ export function CookieBanner() {
 
 	return (
 		<div className='fixed bottom-4 left-0 right-0 z-50 flex justify-center px-4'>
-			<div className='w-full max-w-3xl rounded-lg bg-[#64574E] p-5 text-white shadow-2xl'>
-				<h2 className='text-lg font-semibold text-yellow-300'>
+			<div
+				className='w-full max-w-3xl rounded-md bg-white shadow-lg'
+				style={{
+					padding: '1.5em',
+					border: '3px solid #e5e7eb',
+					borderRadius: '8px',
+				}}
+			>
+				<h2 className='text-lg font-semibold text-gray-900'>
 					Cookies & Datenschutz
 				</h2>
-				<p className='mt-2 text-sm leading-relaxed text-gray-100'>
-					Wir verwenden Cookies, um Funktionen zu ermöglichen und Statistiken zu erheben. 
+				<p className='mt-2 text-sm leading-relaxed text-gray-700'>
+					Wir verwenden Cookies, um Funktionen zu ermöglichen und Statistiken zu erheben.
 					Sie können Ihre Entscheidung jederzeit in den Cookie-Einstellungen anpassen.
+					{privacyPolicyUrl ? (
+						<>
+							{' '}
+							<Link
+								href={privacyPolicyUrl}
+								target='_blank'
+								rel='noopener noreferrer'
+								className='text-gray-700 underline underline-offset-4 transition-colors hover:text-gray-900'
+							>
+								Lesen Sie bitteunsere Datenschutzerklärung
+							</Link>
+						</>
+					) : null}
 				</p>
 				<div className='mt-4 flex flex-wrap gap-3'>
 					<button
@@ -72,16 +100,10 @@ export function CookieBanner() {
 						type='button'
 						onClick={handleReject}
 						disabled={isSaving}
-						className='rounded border border-white px-4 py-2 text-sm font-semibold text-white
-							transition-colors hover:bg-white hover:text-[#3d2817] disabled:cursor-not-allowed disabled:opacity-60'
+						className='rounded border border-gray-400 px-4 py-2 text-sm font-semibold text-gray-700
+							transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60'
 					>
 						{isSaving ? 'Speichern…' : 'Nur notwendige Cookies'}
-					</button>
-					<button
-						type='button'
-						className='ml-auto text-sm underline underline-offset-4 transition-colors hover:text-yellow-300'
-					>
-						Cookie-Einstellungen
 					</button>
 				</div>
 			</div>
