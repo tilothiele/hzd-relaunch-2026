@@ -535,6 +535,36 @@ export interface ApiContactContact extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiFormInstanceFormInstance
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'form_instances';
+  info: {
+    displayName: 'FormInstance';
+    pluralName: 'form-instances';
+    singularName: 'form-instance';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    Content: Schema.Attribute.JSON;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    form: Schema.Attribute.Relation<'oneToOne', 'api::form.form'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::form-instance.form-instance'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiFormForm extends Struct.CollectionTypeSchema {
   collectionName: 'forms';
   info: {
@@ -1798,6 +1828,7 @@ declare module '@strapi/strapi' {
       'api::calendar-entry.calendar-entry': ApiCalendarEntryCalendarEntry;
       'api::calendar.calendar': ApiCalendarCalendar;
       'api::contact.contact': ApiContactContact;
+      'api::form-instance.form-instance': ApiFormInstanceFormInstance;
       'api::form.form': ApiFormForm;
       'api::global-layout.global-layout': ApiGlobalLayoutGlobalLayout;
       'api::index-page.index-page': ApiIndexPageIndexPage;

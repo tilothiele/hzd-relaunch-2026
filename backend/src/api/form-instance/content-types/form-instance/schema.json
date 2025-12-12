@@ -1,0 +1,23 @@
+{
+  "kind": "collectionType",
+  "collectionName": "form_instances",
+  "info": {
+    "singularName": "form-instance",
+    "pluralName": "form-instances",
+    "displayName": "FormInstance"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "form": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::form.form"
+    },
+    "Content": {
+      "type": "json"
+    }
+  }
+}

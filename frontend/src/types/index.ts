@@ -354,10 +354,15 @@ export interface Calendar {
 export interface CalendarItem {
 	documentId: string
 	Date?: string | null
+	Headline?: string | null
 	Description?: string | null
 	LongDescription?: string | null
 	AnmeldeLink?: string | null
 	ErgebnisLink?: string | null
+	Region?: string | null
+	form?: {
+		documentId: string
+	} | null
 	CalendarDocument?: {
 		MediaFile?: {
 			url: string
