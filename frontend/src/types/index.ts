@@ -166,6 +166,7 @@ export interface GlobalLayout {
 	SocialLinkYT?: string | null
 	Sections?: StartpageSection[] | null
 	PartnerLink?: PartnerLink[] | null
+	PrivacyPolicy?: Image | null
 }
 
 export interface Contact {

@@ -63,7 +63,11 @@ export default async function AnmeldungFormIdPage({ params }: AnmeldungFormIdPag
 				paddingBottom='1em'
 			>
 				{form ? (
-					<FormComponent form={form} />
+					<FormComponent
+						form={form}
+						privacyPolicy={globalLayout?.PrivacyPolicy ?? null}
+						strapiBaseUrl={baseUrl}
+					/>
 				) : (
 					<div className='flex min-h-[50vh] items-center justify-center px-4 text-center text-sm text-gray-600'>
 						<p>Formular mit ID "{formId}" konnte nicht geladen werden.</p>
