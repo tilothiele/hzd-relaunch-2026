@@ -548,6 +548,7 @@ export const GET_FORM_BY_DOCUMENT_ID = `
 				lastName
 			}
 			InclPrivacyPolicy
+			ThankYouMessage
 			FormFields {
 				__typename
 				... on ComponentFormShortTextInput {

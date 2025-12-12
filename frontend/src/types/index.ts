@@ -453,6 +453,7 @@ export interface Form {
 		lastName?: string | null
 	} | null
 	InclPrivacyPolicy?: boolean | null
+	ThankYouMessage?: string | null
 	FormFields?: FormField[] | null
 }
 
