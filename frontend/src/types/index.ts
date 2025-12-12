@@ -470,8 +470,15 @@ export interface FormInstance {
 	documentId: string
 	form?: {
 		documentId: string
+		Name?: string | null
+		EventAdmin?: {
+			documentId: string
+			firstName?: string | null
+			lastName?: string | null
+		} | null
+		FormFields?: FormField[] | null
 	} | null
-	formData?: Record<string, unknown> | null
+	Content?: Record<string, unknown> | null
 	createdAt?: string | null
 	updatedAt?: string | null
 }

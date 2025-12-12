@@ -81,7 +81,7 @@ export function CookieBanner() {
 								rel='noopener noreferrer'
 								className='text-gray-700 underline underline-offset-4 transition-colors hover:text-gray-900'
 							>
-								Lesen Sie bitteunsere Datenschutzerklärung
+								Lesen Sie bitte unsere Datenschutzerklärung
 							</Link>
 						</>
 					) : null}

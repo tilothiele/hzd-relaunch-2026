@@ -606,13 +606,63 @@ export const GET_FORM_BY_DOCUMENT_ID = `
 export const CREATE_FORM_INSTANCE = `
 	mutation CreateFormInstance($data: FormInstanceInput!) {
 		createFormInstance(data: $data) {
+			documentId
+			form {
 				documentId
-				form {
+			}
+			Content
+			createdAt
+			updatedAt
+		}
+	}
+`
+
+export const GET_FORM_INSTANCES_BY_EVENT_ADMIN = `
+	query GetFormInstancesByEventAdmin {
+		formInstances(
+			pagination: { limit: -1 }
+			sort: ["createdAt:desc"]
+		) {
+			documentId
+			form {
+				documentId
+				Name
+				EventAdmin {
 					documentId
+					firstName
+					lastName
 				}
-				Content
-				createdAt
-				updatedAt
+				FormFields {
+					__typename
+					... on ComponentFormShortTextInput {
+						STName
+						id
+					}
+					... on ComponentFormEmailAdress {
+						EAName
+						id
+					}
+					... on ComponentFormTextArea {
+						TAName
+						id
+					}
+					... on ComponentFormNumberInput {
+						NIName
+						id
+					}
+					... on ComponentFormChoice {
+						CName
+						id
+					}
+					... on ComponentFormBooleanChoice {
+						BCName
+						id
+					}
+				}
+			}
+			Content
+			createdAt
+			updatedAt
 		}
 	}
 `
