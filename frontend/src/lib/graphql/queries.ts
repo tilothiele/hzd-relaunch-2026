@@ -617,3 +617,37 @@ export const CREATE_FORM_INSTANCE = `
 	}
 `
 
+export const REGISTER_USER = `
+	mutation RegisterUser($input: UsersPermissionsRegisterInput!) {
+		register(input: $input) {
+			jwt
+			user {
+				id
+				username
+				email
+			}
+		}
+	}
+`
+
+export const FORGOT_PASSWORD = `
+	mutation ForgotPassword($email: String!) {
+		forgotPassword(email: $email) {
+			ok
+		}
+	}
+`
+
+export const RESET_PASSWORD = `
+	mutation ResetPassword($input: UsersPermissionsLoginInput!) {
+		resetPassword(input: $input) {
+			jwt
+			user {
+				id
+				username
+				email
+			}
+		}
+	}
+`
+
