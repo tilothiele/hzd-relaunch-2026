@@ -39,6 +39,21 @@
       "type": "component",
       "component": "links.partnerl-link",
       "repeatable": true
+    },
+    "Impressum": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::page.page"
+    },
+    "PrivacyPolicy": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
     }
   }
 }

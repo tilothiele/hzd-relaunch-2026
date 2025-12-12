@@ -566,6 +566,9 @@ export interface ApiFormForm extends Struct.CollectionTypeSchema {
         'form.text-area',
       ]
     >;
+    InclPrivacyPolicy: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::form.form'> &
       Schema.Attribute.Private;
@@ -593,6 +596,7 @@ export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     Footer: Schema.Attribute.Component<'layout.footer', false>;
+    Impressum: Schema.Attribute.Relation<'oneToOne', 'api::page.page'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -602,6 +606,9 @@ export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
     Logo: Schema.Attribute.Media<'images'>;
     Menu: Schema.Attribute.JSON;
     PartnerLink: Schema.Attribute.Component<'links.partnerl-link', true>;
+    PrivacyPolicy: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
     publishedAt: Schema.Attribute.DateTime;
     SocialLinkFB: Schema.Attribute.String;
     SocialLinkYT: Schema.Attribute.String;

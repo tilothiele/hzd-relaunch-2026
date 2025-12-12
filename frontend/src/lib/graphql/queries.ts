@@ -34,6 +34,23 @@ export const GET_LAYOUT = `
 				PartnerLinkUrl
 				AltText
 			}
+			Impressum {
+				documentId
+				slug
+				title
+			}
+			PrivacyPolicy {
+				url
+				name
+				ext
+				mime
+				size
+				alternativeText
+				width
+				height
+				caption
+				previewUrl
+			}
 		}
 	}
 `
@@ -525,6 +542,12 @@ export const GET_FORM_BY_DOCUMENT_ID = `
 		forms(filters: { documentId: { eq: $documentId } }, pagination: { pageSize: 1 }) {
 			documentId
 			Name
+			EventAdmin {
+				documentId
+				firstName
+				lastName
+			}
+			InclPrivacyPolicy
 			FormFields {
 				__typename
 				... on ComponentFormShortTextInput {

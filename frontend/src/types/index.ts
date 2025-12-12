@@ -344,25 +344,19 @@ export interface HomepageSectionsQueryResult {
 	hzdPluginHomepageSections: HomepageSectionData
 }
 
-export type CalendarColorSchema = 'Violet' | 'Gruen' | 'Pink' | 'Rot' | 'Gelb'
-
 export interface Calendar {
 	documentId: string
 	Name?: string | null
-	ColorSchema?: CalendarColorSchema | null
+	ColorSchema?: string | null
 }
-
-export type CalendarRegion = 'NORD' | 'OST' | 'MITTE' | 'SUED' | 'WEST' | 'HZD' | 'VDH'
 
 export interface CalendarItem {
 	documentId: string
 	Date?: string | null
-	Headline?: string | null
 	Description?: string | null
 	LongDescription?: string | null
 	AnmeldeLink?: string | null
 	ErgebnisLink?: string | null
-	Region?: CalendarRegion | null
 	CalendarDocument?: {
 		MediaFile?: {
 			url: string
@@ -370,11 +364,8 @@ export interface CalendarItem {
 			ext?: string | null
 			alternativeText?: string | null
 		} | null
-	}[] | null
-	calendar?: Calendar | null
-	form?: {
-		documentId: string
 	} | null
+	calendar?: Calendar | null
 }
 
 export interface CalendarSearchResult {
@@ -455,6 +446,12 @@ export type FormField = ShortTextInput | EmailAddress | TextArea | NumberInput |
 export interface Form {
 	documentId: string
 	Name?: string | null
+	EventAdmin?: {
+		documentId: string
+		firstName?: string | null
+		lastName?: string | null
+	} | null
+	InclPrivacyPolicy?: boolean | null
 	FormFields?: FormField[] | null
 }
 

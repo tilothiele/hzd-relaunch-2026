@@ -32,6 +32,11 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "plugin::hzd-plugin.member"
+    },
+    "InclPrivacyPolicy": {
+      "type": "boolean",
+      "required": true,
+      "default": true
     }
   }
 }
