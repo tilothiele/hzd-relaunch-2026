@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 /**
- * Cache-Dauer für Geocoding-Ergebnisse: 30 Tage
- * PLZ-Koordinaten ändern sich nicht, daher langes Caching sinnvoll
+ * Route muss dynamisch sein, da searchParams verwendet werden
  */
-export const revalidate = 60 * 60 * 24 * 30 // 30 Tage in Sekunden
+export const dynamic = 'force-dynamic'
 
 /**
  * API-Route zur Geocodierung einer PLZ zu Koordinaten
@@ -35,7 +34,7 @@ export async function GET(request: NextRequest) {
 					'User-Agent': 'HZD-Frontend/1.0',
 				},
 				next: {
-					revalidate: 60 * 60 * 24 * 30, // 30 Tage Cache
+					revalidate: 2592000, // 30 Tage Cache (in Sekunden)
 				},
 			}
 		)
