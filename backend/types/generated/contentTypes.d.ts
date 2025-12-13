@@ -526,7 +526,10 @@ export interface ApiContactContact extends Struct.CollectionTypeSchema {
       'api::contact.contact'
     > &
       Schema.Attribute.Private;
-    member: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.member'>;
+    member: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
     position: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
@@ -580,8 +583,8 @@ export interface ApiFormForm extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     EventAdmin: Schema.Attribute.Relation<
-      'oneToOne',
-      'plugin::hzd-plugin.member'
+      'oneToMany',
+      'plugin::users-permissions.user'
     >;
     FormFields: Schema.Attribute.DynamicZone<
       [
@@ -700,8 +703,14 @@ export interface ApiLocalCummunityLocalCummunity
     draftAndPublish: true;
   };
   attributes: {
-    CEO: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.member'>;
-    CFO: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.member'>;
+    CEO: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    CFO: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
     City: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -720,7 +729,7 @@ export interface ApiLocalCummunityLocalCummunity
     >;
     Secretary: Schema.Attribute.Relation<
       'oneToOne',
-      'plugin::hzd-plugin.member'
+      'plugin::users-permissions.user'
     >;
     Street: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
@@ -871,10 +880,6 @@ export interface ApiOrderOrder extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     CustomerNotes: Schema.Attribute.Text;
-    hzd_plugin_member: Schema.Attribute.Relation<
-      'oneToOne',
-      'plugin::hzd-plugin.member'
-    >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::order.order'> &
       Schema.Attribute.Private;
@@ -944,8 +949,14 @@ export interface ApiRegionalUnitRegionalUnit
     draftAndPublish: true;
   };
   attributes: {
-    CEO: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.member'>;
-    CFO: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.member'>;
+    CEO: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    CFO: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -963,7 +974,7 @@ export interface ApiRegionalUnitRegionalUnit
     publishedAt: Schema.Attribute.DateTime;
     Secretary: Schema.Attribute.Relation<
       'oneToOne',
-      'plugin::hzd-plugin.member'
+      'plugin::users-permissions.user'
     >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1173,7 +1184,10 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
       'plugin::hzd-plugin.breeder'
     > &
       Schema.Attribute.Private;
-    member: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.member'>;
+    member: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
     MemosDraft: Schema.Attribute.RichText &
       Schema.Attribute.CustomField<
         'plugin::ckeditor5.CKEditor',
@@ -1261,7 +1275,10 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
         maxLength: 30;
       }>;
     mother: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.dog'>;
-    owner: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.member'>;
+    owner: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
     publishedAt: Schema.Attribute.DateTime;
     sex: Schema.Attribute.Enumeration<['M', 'F']>;
     SOD1: Schema.Attribute.Enumeration<['N_N', 'N_DM', 'DM_DM']>;
@@ -1315,87 +1332,6 @@ export interface PluginHzdPluginLitter extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-  };
-}
-
-export interface PluginHzdPluginMember extends Struct.CollectionTypeSchema {
-  collectionName: 'members';
-  info: {
-    displayName: 'Member';
-    pluralName: 'members';
-    singularName: 'member';
-  };
-  options: {
-    draftAndPublish: false;
-  };
-  pluginOptions: {
-    'content-manager': {
-      visible: true;
-    };
-  };
-  attributes: {
-    adress1: Schema.Attribute.String &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 100;
-      }>;
-    adress2: Schema.Attribute.String &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 100;
-      }>;
-    Avatar: Schema.Attribute.Media<'images'>;
-    cancellationDueDate: Schema.Attribute.Date;
-    cancellationOn: Schema.Attribute.Date;
-    cFlagAccess: Schema.Attribute.Boolean;
-    cFlagBreeder: Schema.Attribute.Boolean;
-    cId: Schema.Attribute.Integer & Schema.Attribute.Unique;
-    city: Schema.Attribute.String;
-    countryCode: Schema.Attribute.String &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 2;
-      }>;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    dateOfBirth: Schema.Attribute.Date;
-    dateOfDeath: Schema.Attribute.Date;
-    firstName: Schema.Attribute.String;
-    Intro: Schema.Attribute.RichText &
-      Schema.Attribute.CustomField<
-        'plugin::ckeditor5.CKEditor',
-        {
-          preset: 'defaultHtml';
-        }
-      >;
-    lastName: Schema.Attribute.String;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'plugin::hzd-plugin.member'
-    > &
-      Schema.Attribute.Private;
-    membershipNo: Schema.Attribute.Integer;
-    memberSince: Schema.Attribute.Date;
-    phone: Schema.Attribute.String &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 50;
-      }>;
-    publishedAt: Schema.Attribute.DateTime;
-    region: Schema.Attribute.Enumeration<
-      ['Nord', 'Ost', 'Mitte', 'S\u00FCd', 'West']
-    >;
-    sex: Schema.Attribute.Enumeration<['M', 'F']>;
-    title: Schema.Attribute.String;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    user: Schema.Attribute.Relation<
-      'oneToOne',
-      'plugin::users-permissions.user'
-    >;
-    zip: Schema.Attribute.String &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 10;
-      }>;
   };
 }
 
@@ -1769,32 +1705,47 @@ export interface PluginUsersPermissionsUser
   };
   options: {
     draftAndPublish: false;
-    timestamps: true;
   };
   attributes: {
+    address1: Schema.Attribute.String;
+    address2: Schema.Attribute.String;
     blocked: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    cancellationDueDate: Schema.Attribute.Date;
+    cFlagAccess: Schema.Attribute.Boolean;
+    cFlagBreeder: Schema.Attribute.Boolean;
+    cId: Schema.Attribute.Integer & Schema.Attribute.Unique;
+    city: Schema.Attribute.String;
     confirmationToken: Schema.Attribute.String & Schema.Attribute.Private;
     confirmed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    dateOfBirth: Schema.Attribute.Date;
+    dateOfDeath: Schema.Attribute.Date;
     email: Schema.Attribute.Email &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
+    firstName: Schema.Attribute.String;
+    form: Schema.Attribute.Relation<'manyToOne', 'api::form.form'>;
+    lastName: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'plugin::users-permissions.user'
     > &
       Schema.Attribute.Private;
-    member: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.member'>;
+    membershipNumber: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    memberSince: Schema.Attribute.Date;
     password: Schema.Attribute.Password &
       Schema.Attribute.Private &
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
+    phone: Schema.Attribute.String;
     provider: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     resetPasswordToken: Schema.Attribute.String & Schema.Attribute.Private;
@@ -1802,6 +1753,8 @@ export interface PluginUsersPermissionsUser
       'manyToOne',
       'plugin::users-permissions.role'
     >;
+    sex: Schema.Attribute.Enumeration<['M', 'F']>;
+    title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1810,6 +1763,10 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.Unique &
       Schema.Attribute.SetMinMaxLength<{
         minLength: 3;
+      }>;
+    zip: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 5;
       }>;
   };
 }
@@ -1846,7 +1803,6 @@ declare module '@strapi/strapi' {
       'plugin::hzd-plugin.breeder': PluginHzdPluginBreeder;
       'plugin::hzd-plugin.dog': PluginHzdPluginDog;
       'plugin::hzd-plugin.litter': PluginHzdPluginLitter;
-      'plugin::hzd-plugin.member': PluginHzdPluginMember;
       'plugin::i18n.locale': PluginI18NLocale;
       'plugin::review-workflows.workflow': PluginReviewWorkflowsWorkflow;
       'plugin::review-workflows.workflow-stage': PluginReviewWorkflowsWorkflowStage;

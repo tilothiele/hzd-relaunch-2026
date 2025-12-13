@@ -28,11 +28,6 @@
         "form.text-area"
       ]
     },
-    "EventAdmin": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "plugin::hzd-plugin.member"
-    },
     "InclPrivacyPolicy": {
       "type": "boolean",
       "required": true,
@@ -40,6 +35,12 @@
     },
     "ThankYouMessage": {
       "type": "blocks"
+    },
+    "EventAdmin": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::users-permissions.user",
+      "mappedBy": "form"
     }
   }
 }

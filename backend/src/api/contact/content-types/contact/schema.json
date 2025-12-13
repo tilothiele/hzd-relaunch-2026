@@ -11,11 +11,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "member": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "plugin::hzd-plugin.member"
-    },
     "avatar": {
       "type": "media",
       "multiple": false,
@@ -28,6 +23,11 @@
     },
     "position": {
       "type": "integer"
+    },
+    "member": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
     }
   }
 }

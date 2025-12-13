@@ -9,8 +9,9 @@
     "displayName": "User"
   },
   "options": {
-    "timestamps": true
+    "draftAndPublish": false
   },
+  "pluginOptions": {},
   "attributes": {
     "username": {
       "type": "string",
@@ -65,11 +66,70 @@
       "inversedBy": "users",
       "configurable": false
     },
-    "member": {
+    "title": {
+      "type": "string"
+    },
+    "firstName": {
+      "type": "string"
+    },
+    "lastName": {
+      "type": "string"
+    },
+    "address1": {
+      "type": "string"
+    },
+    "address2": {
+      "type": "string"
+    },
+    "zip": {
+      "type": "string",
+      "maxLength": 5
+    },
+    "city": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "sex": {
+      "type": "enumeration",
+      "enum": [
+        "M",
+        "F"
+      ]
+    },
+    "dateOfBirth": {
+      "type": "date"
+    },
+    "dateOfDeath": {
+      "type": "date"
+    },
+    "cId": {
+      "type": "integer",
+      "unique": true
+    },
+    "cFlagBreeder": {
+      "type": "boolean"
+    },
+    "cFlagAccess": {
+      "type": "boolean"
+    },
+    "memberSince": {
+      "type": "date"
+    },
+    "cancellationDueDate": {
+      "type": "date"
+    },
+    "membershipNumber": {
+      "type": "integer",
+      "required": true,
+      "unique": true
+    },
+    "form": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "plugin::hzd-plugin.member",
-      "inversedBy": "user"
+      "relation": "manyToOne",
+      "target": "api::form.form",
+      "inversedBy": "EventAdmin"
     }
   }
 }

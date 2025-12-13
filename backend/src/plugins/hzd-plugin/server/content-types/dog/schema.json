@@ -11,7 +11,7 @@
   },
   "pluginOptions": {
     "content-manager": {
-          "visible": true
+      "visible": true
     }
   },
   "attributes": {
@@ -89,49 +89,68 @@
         }
       }
     },
+    "cId": {
+      "type": "integer",
+      "unique": true
+    },
+    "cBreederId": {
+      "type": "integer"
+    },
+    "cOwnerId": {
+      "type": "integer"
+    },
+    "SOD1": {
+      "type": "enumeration",
+      "enum": [
+        "N_N",
+        "N_DM",
+        "DM_DM"
+      ]
+    },
+    "HD": {
+      "type": "enumeration",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ]
+    },
+    "Genprofil": {
+      "type": "boolean"
+    },
+    "EyesCheck": {
+      "type": "boolean"
+    },
+    "HeartCheck": {
+      "type": "boolean"
+    },
+    "ColorCheck": {
+      "type": "boolean"
+    },
+    "MemosDraft": {
+      "type": "customField",
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultHtml"
+      }
+    },
+    "MemosReleased": {
+      "type": "customField",
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultHtml"
+      }
+    },
+    "Location": {
+      "type": "component",
+      "component": "breeding.geo-location",
+      "repeatable": false
+    },
     "owner": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "plugin::hzd-plugin.member"
-    },
-    "jBreederId": {
-      "type": "integer"
-    },
-    "jId": {
-      "type": "integer"
-    },
-    "jBreeder": {
-      "type": "string"
-    },
-    "jRegion": {
-      "type": "string"
-    },
-    "jBonitation": {
-      "type": "text"
-    },
-    "jLitter": {
-      "type": "string"
-    },
-    "jMantings": {
-      "type": "string"
-    },
-    "jCategory": {
-      "type": "string"
-    },
-    "jSex": {
-      "type": "integer"
-    },
-    "jLitterKind": {
-      "type": "string"
-    },
-    "jWithersHeight": {
-      "type": "integer"
-    },
-    "jExhibitions": {
-      "type": "text"
-    },
-    "jImage": {
-      "type": "string"
+      "target": "plugin::users-permissions.user"
     }
   }
 }

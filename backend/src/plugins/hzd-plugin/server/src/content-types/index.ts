@@ -1,5 +1,4 @@
 import dog from "../../content-types/dog/schema.json"
-import member from "../../content-types/member/schema.json"
 import breeder from "../../content-types/breeder/schema.json"
 import litter from "../../content-types/litter/schema.json"
 /*
@@ -22,9 +21,6 @@ export default {
     },
     breeder: {
         schema: breeder
-    },
-    member: {
-        schema: member
     },
     litter: {
         schema: litter

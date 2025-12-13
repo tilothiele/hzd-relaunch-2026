@@ -48,7 +48,6 @@ const bootstrap = async ({ strapi }: { strapi: Core.Strapi }) => {
 		const contentTypes = [
 			{ name: 'dog', actions: ['find', 'findOne'] },
 			{ name: 'breeder', actions: ['find', 'findOne'] },
-			{ name: 'member', actions: ['find', 'findOne'] },
 			{ name: 'litter', actions: ['find', 'findOne'] },
 			{ name: 'homepage', actions: ['find'] }, // singleType hat nur find
 			{ name: 'news-article', actions: ['find', 'findOne'] },

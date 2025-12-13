@@ -11,11 +11,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "hzd_plugin_member": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "plugin::hzd-plugin.member"
-    },
     "OrderStatus": {
       "type": "enumeration",
       "enum": [

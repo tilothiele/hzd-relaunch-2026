@@ -20,20 +20,20 @@
       "target": "api::local-cummunity.local-cummunity",
       "mappedBy": "regional_unit"
     },
-    "CFO": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "plugin::hzd-plugin.member"
-    },
     "CEO": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "plugin::hzd-plugin.member"
+      "target": "plugin::users-permissions.user"
+    },
+    "CFO": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
     },
     "Secretary": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "plugin::hzd-plugin.member"
+      "target": "plugin::users-permissions.user"
     }
   }
 }

@@ -32,17 +32,17 @@
     "CEO": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "plugin::hzd-plugin.member"
+      "target": "plugin::users-permissions.user"
     },
     "CFO": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "plugin::hzd-plugin.member"
+      "target": "plugin::users-permissions.user"
     },
     "Secretary": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "plugin::hzd-plugin.member"
+      "target": "plugin::users-permissions.user"
     }
   }
 }
