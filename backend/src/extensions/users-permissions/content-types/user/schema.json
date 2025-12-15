@@ -117,6 +117,9 @@
     "memberSince": {
       "type": "date"
     },
+    "cancellationOn": {
+      "type": "date"
+    },
     "cancellationDueDate": {
       "type": "date"
     },
@@ -130,6 +133,21 @@
       "relation": "manyToOne",
       "target": "api::form.form",
       "inversedBy": "EventAdmin"
+    },
+    "region": {
+      "type": "enumeration",
+      "enum": [
+        "Nord",
+        "Ost",
+        "Mitte",
+        "West",
+        "Süd"
+      ]
+    },
+    "geoLocation": {
+      "type": "component",
+      "component": "breeding.geo-location",
+      "repeatable": false
     }
   }
 }

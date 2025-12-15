@@ -1711,6 +1711,7 @@ export interface PluginUsersPermissionsUser
     address2: Schema.Attribute.String;
     blocked: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     cancellationDueDate: Schema.Attribute.Date;
+    cancellationOn: Schema.Attribute.Date;
     cFlagAccess: Schema.Attribute.Boolean;
     cFlagBreeder: Schema.Attribute.Boolean;
     cId: Schema.Attribute.Integer & Schema.Attribute.Unique;
@@ -1729,6 +1730,7 @@ export interface PluginUsersPermissionsUser
       }>;
     firstName: Schema.Attribute.String;
     form: Schema.Attribute.Relation<'manyToOne', 'api::form.form'>;
+    geoLocation: Schema.Attribute.Component<'breeding.geo-location', false>;
     lastName: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -1748,6 +1750,9 @@ export interface PluginUsersPermissionsUser
     phone: Schema.Attribute.String;
     provider: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
+    region: Schema.Attribute.Enumeration<
+      ['Nord', 'Ost', 'Mitte', 'West', 'S\u00FCd']
+    >;
     resetPasswordToken: Schema.Attribute.String & Schema.Attribute.Private;
     role: Schema.Attribute.Relation<
       'manyToOne',

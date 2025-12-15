@@ -126,9 +126,9 @@ def map_csv_to_member(row: Dict[str, str]) -> Dict[str, Any]:
         member_data['cId'] = c_id
 
     # cFlagAccess - 0/1 access
-    access_flag = parse_boolean(row.get('0/1 access', ''))
-    if access_flag is not None:
-        member_data['cFlagAccess'] = access_flag
+#    access_flag = parse_boolean(row.get('0/1 access', ''))
+#    if access_flag is not None:
+#        member_data['cFlagAccess'] = access_flag
 
     # sex - from salutation
     sex = parse_sex(row.get('salutation', ''))
@@ -153,7 +153,11 @@ def map_csv_to_member(row: Dict[str, str]) -> Dict[str, Any]:
     # adress1 - street
     street = clean_string(row.get('street', ''), max_length=100)
     if street:
-        member_data['adress1'] = street
+        member_data['address1'] = street
+
+    email = clean_string(row.get('email', ''), max_length=100)
+    if email:
+        member_data['email'] = email
 
     # zip
     zipcode = clean_string(row.get('zipcode', ''), max_length=10)
@@ -171,9 +175,9 @@ def map_csv_to_member(row: Dict[str, str]) -> Dict[str, Any]:
         member_data['region'] = REGION_MAPPING.get(region)
 
     # countryCode
-    country_code = get_country_code(row.get('country', ''))
-    if country_code:
-        member_data['countryCode'] = country_code
+#    country_code = get_country_code(row.get('country', ''))
+#    if country_code:
+#        member_data['countryCode'] = country_code
 
     # phone - prefer mobile, fallback to phone
     phone = clean_string(row.get('mobile', ''), max_length=50)
@@ -189,8 +193,11 @@ def map_csv_to_member(row: Dict[str, str]) -> Dict[str, Any]:
 
     # membershipNo
     membership_no = parse_integer(row.get('membership number', ''))
+    if(not membership_no):
+        return None
     if membership_no:
-        member_data['membershipNo'] = membership_no
+        member_data['membershipNumber'] = membership_no
+        member_data['username'] = str(membership_no)
 
     # dateOfBirth
     dob = parse_date(row.get('date of birth', ''))
@@ -214,7 +221,7 @@ def map_csv_to_member(row: Dict[str, str]) -> Dict[str, Any]:
 
     return member_data
 
-def find_existing_member(api_url: str, api_token: Optional[str], c_id: int) -> Optional[int]:
+def find_existing_user(api_url: str, api_token: Optional[str], c_id: int) -> Optional[int]:
     """Find existing member by cId using GraphQL. Returns member ID if found, None otherwise."""
     url = f"{api_url}"
 
@@ -226,8 +233,8 @@ def find_existing_member(api_url: str, api_token: Optional[str], c_id: int) -> O
         headers['Authorization'] = f'Bearer {api_token}'
 
     query = """
-    query FindMemberByCId($cId: Int!) {
-        hzdPluginMembers(filters: { cId: { eq: $cId } }) {
+    query FindUserByCId($cId: Int!) {
+        usersPermissionsUsers(filters: { cId: { eq: $cId } }) {
             documentId
         }
     }
@@ -245,7 +252,7 @@ def find_existing_member(api_url: str, api_token: Optional[str], c_id: int) -> O
             result = response.json()
             if 'errors' in result:
                 return None
-            data = result.get('data').get('hzdPluginMembers', [])
+            data = result.get('data').get('usersPermissionsUsers', [])
             if data and len(data) > 0:
                 return data[0].get('documentId')
     except Exception as e:
@@ -259,9 +266,11 @@ def build_graphql_mutation(member_data: Dict[str, Any], is_update: bool = False,
 #    print(member_data)
     if is_update and documentId:
         mutation = """
-        mutation UpdateMember($documentId: ID!, $data: HzdPluginMemberInput!) {
-            updateHzdPluginMember(documentId: $documentId, data: $data) {
-                documentId
+        mutation UpdateUser($documentId: ID!, $data: UsersPermissionsUserInput!) {
+            updateUsersPermissionsUser(documentId: $documentId, data: $data) {
+                data {
+                    documentId
+                }
             }
         }
         """
@@ -270,10 +279,14 @@ def build_graphql_mutation(member_data: Dict[str, Any], is_update: bool = False,
             'data': member_data
         }
     else:
+        member_data['password'] = 'Startstart'
+        member_data['role'] = ''
         mutation = """
-        mutation CreateMember($data: HzdPluginMemberInput!) {
-            createHzdPluginMember(data: $data) {
-                documentId
+        mutation CreateUser($data: UsersPermissionsUserInput!) {
+            createUsersPermissionsUser(data: $data) {
+                data {
+                    documentId
+                }
             }
         }
         """
@@ -291,7 +304,7 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
     existing_id = None
 
     if c_id and not dry_run:
-        existing_id = find_existing_member(api_url, api_token, c_id)
+        existing_id = find_existing_user(api_url, api_token, c_id)
 
     is_update = existing_id is not None and update_existing
     action = 'Updated' if is_update else 'Created'
@@ -424,14 +437,17 @@ def main():
 
         if not member_data:
             print(f"⚠ Skipping row {i}: No valid data found")
-            error_count += 1
             continue
 
         # Import member
+        print(member_data)
         if import_member(endpoint, token, member_data, args.dry_run, args.update):
             success_count += 1
         else:
             error_count += 1
+
+#        if(error_count>1):
+#            return
 
     print("\n" + "=" * 60)
     print(f"Import complete!")
