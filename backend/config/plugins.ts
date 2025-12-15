@@ -1,4 +1,7 @@
 export default ({env}) => ({
+  'users-permissions': {
+    enabled: true,
+  },
   'hzd-plugin': {
     enabled: true,
     resolve: './src/plugins/hzd-plugin'

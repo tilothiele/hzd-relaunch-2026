@@ -1,7 +1,15 @@
 // Extend users-permissions plugin to inject geolocation via document service on create/update
 export default (plugin: any) => {
+	// Store original bootstrap if it exists
+	const originalBootstrap = plugin.bootstrap
+
 	// Register bootstrap hook to patch document service after Strapi is fully initialized
 	plugin.bootstrap = async ({ strapi }: { strapi: any }) => {
+		// Call original bootstrap first if it exists
+		if (originalBootstrap && typeof originalBootstrap === 'function') {
+			await originalBootstrap({ strapi })
+		}
+
 		strapi.log.info('[User Ext] Bootstrap: patching user document service')
 
 		const geolocationService = () => strapi.plugin('hzd-plugin')?.service('geolocation')
