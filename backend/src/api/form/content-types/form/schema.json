@@ -25,7 +25,8 @@
         "form.email-adress",
         "form.number-input",
         "form.form-submit-button",
-        "form.text-area"
+        "form.text-area",
+        "form.standard-identifiers"
       ]
     },
     "InclPrivacyPolicy": {

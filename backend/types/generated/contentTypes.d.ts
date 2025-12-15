@@ -597,6 +597,7 @@ export interface ApiFormForm extends Struct.CollectionTypeSchema {
         'form.number-input',
         'form.form-submit-button',
         'form.text-area',
+        'form.standard-identifiers',
       ]
     >;
     InclPrivacyPolicy: Schema.Attribute.Boolean &

@@ -339,6 +339,40 @@ export interface FormShortTextInput extends Struct.ComponentSchema {
   };
 }
 
+export interface FormStandardIdentifiers extends Struct.ComponentSchema {
+  collectionName: 'components_form_standard_identifiers';
+  info: {
+    displayName: 'StandardIdentifiers';
+  };
+  attributes: {
+    City: Schema.Attribute.Enumeration<['Nein', 'Ja', 'Erforderlich']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Ja'>;
+    EMail: Schema.Attribute.Enumeration<['Erforderlich']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Erforderlich'>;
+    FirstName: Schema.Attribute.Enumeration<['Nein', 'Ja', 'Erforderlich']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Erforderlich'>;
+    LastName: Schema.Attribute.Enumeration<['Nein', 'Ja', 'Erforderlich']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Erforderlich'>;
+    MembershipNumber: Schema.Attribute.Enumeration<
+      ['Nein', 'Ja', 'Erforderlich']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Ja'>;
+    Phone: Schema.Attribute.Enumeration<['Nein', 'Ja', 'Erforderlich']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Ja'>;
+    Street: Schema.Attribute.Enumeration<['Nein', 'Ja', 'Erforderlich']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Ja'>;
+    Zip: Schema.Attribute.Enumeration<['Nein', 'Ja', 'Erforderlich']> &
+      Schema.Attribute.DefaultTo<'Ja'>;
+  };
+}
+
 export interface FormTextArea extends Struct.ComponentSchema {
   collectionName: 'components_form_text_areas';
   info: {
@@ -465,6 +499,7 @@ declare module '@strapi/strapi' {
       'form.form-submit-button': FormFormSubmitButton;
       'form.number-input': FormNumberInput;
       'form.short-text-input': FormShortTextInput;
+      'form.standard-identifiers': FormStandardIdentifiers;
       'form.text-area': FormTextArea;
       'layout.color-theme': LayoutColorTheme;
       'layout.footer': LayoutFooter;

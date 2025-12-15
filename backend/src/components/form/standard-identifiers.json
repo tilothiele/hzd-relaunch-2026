@@ -1,0 +1,87 @@
+{
+  "collectionName": "components_form_standard_identifiers",
+  "info": {
+    "displayName": "StandardIdentifiers"
+  },
+  "options": {},
+  "attributes": {
+    "EMail": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Erforderlich",
+      "enum": [
+        "Erforderlich"
+      ]
+    },
+    "MembershipNumber": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Ja",
+      "enum": [
+        "Nein",
+        "Ja",
+        "Erforderlich"
+      ]
+    },
+    "FirstName": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Erforderlich",
+      "enum": [
+        "Nein",
+        "Ja",
+        "Erforderlich"
+      ]
+    },
+    "LastName": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Erforderlich",
+      "enum": [
+        "Nein",
+        "Ja",
+        "Erforderlich"
+      ]
+    },
+    "Street": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Ja",
+      "enum": [
+        "Nein",
+        "Ja",
+        "Erforderlich"
+      ]
+    },
+    "Zip": {
+      "type": "enumeration",
+      "default": "Ja",
+      "enum": [
+        "Nein",
+        "Ja",
+        "Erforderlich"
+      ]
+    },
+    "City": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Ja",
+      "enum": [
+        "Nein",
+        "Ja",
+        "Erforderlich"
+      ]
+    },
+    "Phone": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Ja",
+      "enum": [
+        "Nein",
+        "Ja",
+        "Erforderlich"
+      ]
+    }
+  },
+  "config": {}
+}
