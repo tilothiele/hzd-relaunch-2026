@@ -358,9 +358,10 @@ export function LoginControls({
 			</button>
 			{isFormVisible ? (
 				<div
-					className='absolute right-0 z-50 mt-3 w-96 rounded-lg text-gray-900 shadow-xl border border-gray-200'
+					className='absolute right-0 z-50 mt-3 rounded-lg text-gray-900 shadow-xl border border-gray-200'
 					style={{
 						backgroundColor: '#ffffff',
+						width: '500px',
 					}}
 				>
 					<Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -371,7 +372,7 @@ export function LoginControls({
 							sx={{
 								'& .MuiTab-root': {
 									textTransform: 'none',
-									fontSize: '0.875rem',
+									fontSize: '1rem',
 									minHeight: '48px',
 								},
 							}}
@@ -391,7 +392,7 @@ export function LoginControls({
 							<div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
 								<label className='block text-sm font-medium text-gray-700'>
 									<span className='block' style={{ marginBottom: '0.5rem' }}>
-										E-Mail oder Benutzername
+										E-Mail oder HZD-Mitgliedsnummer
 									</span>
 									<input
 										type='text'
@@ -453,103 +454,17 @@ export function LoginControls({
 					)}
 
 					{activeTab === 'register' && (
-						<form
-							id='register-form'
-							onSubmit={handleRegisterSubmit}
-							style={{ padding: '1.5rem' }}
-						>
-							<div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-								<label className='block text-sm font-medium text-gray-700'>
-									<span className='block' style={{ marginBottom: '0.5rem' }}>
-										Benutzername
-									</span>
-									<input
-										type='text'
-										name='username'
-										value={username}
-										onChange={(event: ChangeEvent<HTMLInputElement>) => setUsername(event.target.value)}
-										className='w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-colors focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1'
-										style={{ backgroundColor: '#e5e7eb' }}
-										autoComplete='username'
-										required
-									/>
-								</label>
-								<label className='block text-sm font-medium text-gray-700'>
-									<span className='block' style={{ marginBottom: '0.5rem' }}>
-										E-Mail
-									</span>
-									<input
-										type='email'
-										name='email'
-										value={email}
-										onChange={(event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
-										className='w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-colors focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1'
-										style={{ backgroundColor: '#e5e7eb' }}
-										autoComplete='email'
-										required
-									/>
-								</label>
-								<label className='block text-sm font-medium text-gray-700'>
-									<span className='block' style={{ marginBottom: '0.5rem' }}>
-										Passwort
-									</span>
-									<input
-										type='password'
-										name='password'
-										value={password}
-										onChange={(event: ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
-										className='w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-colors focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1'
-										style={{ backgroundColor: '#e5e7eb' }}
-										autoComplete='new-password'
-										required
-									/>
-								</label>
-								<label className='block text-sm font-medium text-gray-700'>
-									<span className='block' style={{ marginBottom: '0.5rem' }}>
-										Passwort bestätigen
-									</span>
-									<input
-										type='password'
-										name='confirmPassword'
-										value={confirmPassword}
-										onChange={(event: ChangeEvent<HTMLInputElement>) => setConfirmPassword(event.target.value)}
-										className='w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-colors focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1'
-										style={{ backgroundColor: '#e5e7eb' }}
-										autoComplete='new-password'
-										required
-									/>
-								</label>
-								{localError ? (
-									<div className='rounded-md bg-red-50 p-3'>
-										<p className='text-sm text-red-800'>{localError}</p>
-									</div>
-								) : null}
-								{localSuccess ? (
-									<div className='rounded-md bg-green-50 p-3'>
-										<p className='text-sm text-green-800'>{localSuccess}</p>
-									</div>
-								) : null}
-								<button
-									type='submit'
-									className='flex w-full items-center justify-center gap-2 rounded-md bg-yellow-400 px-4 py-2.5 text-sm font-semibold text-gray-900 transition-all hover:bg-yellow-500 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-yellow-400 disabled:hover:shadow-none'
-									style={{
-										backgroundColor: '#facc15',
-										color: '#111827',
-										marginTop: '0.5rem',
-									}}
-									disabled={isRegistering}
-								>
-									{isRegistering ? (
-										<>
-											<FontAwesomeIcon icon={faSpinner} spin />
-											Registrierung läuft
-										</>
-									) : (
-										'Registrieren'
-									)}
-								</button>
-							</div>
-						</form>
+						<div style={{ padding: '1.5rem' }}>
+							<h2 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#111827', marginBottom: '1rem' }}>
+								Registrieren
+							</h2>
+							<p style={{ fontSize: '0.875rem', color: '#4b5563', marginBottom: '1rem' }}>
+								Ihr Benutzerprofil wird automatisch erstellt, nachdem Ihre Mitgliedschaft bestätigt wurde.
+							</p>
+							<p style={{ fontSize: '0.875rem', color: '#4b5563' }}>
+								Sollten Sie Fragen haben oder Probleme beim Registrieren haben, wenden Sie sich bitte an unseren Support.
+							</p>
+						</div>
 					)}
 
 					{activeTab === 'forgot-password' && (

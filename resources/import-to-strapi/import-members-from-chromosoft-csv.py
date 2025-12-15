@@ -16,6 +16,7 @@ import csv
 import sys
 import argparse
 import requests
+import time
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, Optional, Any
@@ -266,8 +267,8 @@ def build_graphql_mutation(member_data: Dict[str, Any], is_update: bool = False,
 #    print(member_data)
     if is_update and documentId:
         mutation = """
-        mutation UpdateUser($documentId: ID!, $data: UsersPermissionsUserInput!) {
-            updateUsersPermissionsUser(documentId: $documentId, data: $data) {
+        mutation UpdateUser($id: ID!, $data: UsersPermissionsUserInput!) {
+            updateUsersPermissionsUser(id: $id, data: $data) {
                 data {
                     documentId
                 }
@@ -275,7 +276,7 @@ def build_graphql_mutation(member_data: Dict[str, Any], is_update: bool = False,
         }
         """
         variables = {
-            'documentId': documentId,
+            'id': documentId,
             'data': member_data
         }
     else:
@@ -448,6 +449,8 @@ def main():
 
 #        if(error_count>1):
 #            return
+
+        time.sleep(1)
 
     print("\n" + "=" * 60)
     print(f"Import complete!")

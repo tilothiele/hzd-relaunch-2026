@@ -1,15 +1,21 @@
 import { MainPageStructure } from '../main-page-structure'
-import { CalendarSearch } from '@/components/calendar-search/calendar-search'
+import { ResetPasswordForm } from '@/components/reset-password/reset-password-form'
 import { themes } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 
 export const dynamic = 'force-dynamic'
 
-export default async function CalendarPage() {
+interface ResetPasswordPageProps {
+	searchParams: Promise<{ code?: string }>
+}
+
+export default async function ResetPasswordPage({ searchParams }: ResetPasswordPageProps) {
 	const { globalLayout, baseUrl, error } = await fetchGlobalLayout()
 	const theme = themes.B
-	const pageTitle = 'Veranstaltungen'
+	const pageTitle = 'Passwort zurücksetzen'
+	const params = await searchParams
+	const code = params.code
 
 	if (error) {
 		return (
@@ -29,12 +35,13 @@ export default async function CalendarPage() {
 			pageTitle={pageTitle}
 		>
 			<SectionContainer variant='max-width'>
-				<CalendarSearch strapiBaseUrl={baseUrl} theme={theme} />
+				<div className='flex min-h-[50vh] items-center justify-center py-12'>
+					<div className='w-full max-w-md'>
+						<ResetPasswordForm code={code} strapiBaseUrl={baseUrl} />
+					</div>
+				</div>
 			</SectionContainer>
 		</MainPageStructure>
 	)
 }
-
-
-
 
