@@ -4,8 +4,6 @@ import { useCallback, useState, type ChangeEvent, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { RESET_PASSWORD } from '@/lib/graphql/queries'
 
 interface ResetPasswordFormProps {
 	code?: string
@@ -19,13 +17,11 @@ interface ResetPasswordInput {
 }
 
 interface ResetPasswordResponse {
-	resetPassword: {
-		jwt: string
-		user: {
-			id: number
-			username: string
-			email: string
-		}
+	jwt: string
+	user: {
+		id: number
+		username: string
+		email: string
 	}
 }
 
@@ -66,12 +62,25 @@ export function ResetPasswordForm({ code, strapiBaseUrl }: ResetPasswordFormProp
 					passwordConfirmation,
 				}
 
-				const data = await fetchGraphQL<ResetPasswordResponse>(RESET_PASSWORD, {
-					variables: { input },
-					baseUrl: strapiBaseUrl,
+				const response = await fetch('/api/auth/reset-password', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(input),
 				})
 
-				if (data?.resetPassword?.jwt) {
+				if (!response.ok) {
+					const errorPayload = await response.json().catch(() => null)
+					const message =
+						errorPayload?.error?.message ??
+						'Passwort konnte nicht zurückgesetzt werden. Bitte versuchen Sie es erneut.'
+					throw new Error(message)
+				}
+
+				const data = (await response.json()) as ResetPasswordResponse
+
+				if (data?.jwt) {
 					setIsSuccess(true)
 					// Nach erfolgreichem Reset zum Login weiterleiten
 					setTimeout(() => {
@@ -91,7 +100,7 @@ export function ResetPasswordForm({ code, strapiBaseUrl }: ResetPasswordFormProp
 				setIsSubmitting(false)
 			}
 		},
-		[code, password, passwordConfirmation, router, strapiBaseUrl]
+		[code, password, passwordConfirmation, router]
 	)
 
 	if (!code) {
