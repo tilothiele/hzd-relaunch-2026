@@ -1,5 +1,5 @@
 import { MainPageStructure } from '../main-page-structure'
-import { CalendarSearch } from '@/components/calendar-search/calendar-search'
+import { ResultSearch } from '@/components/result-search/result-search'
 import { themes } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 export default async function CalendarPage() {
 	const { globalLayout, baseUrl, error } = await fetchGlobalLayout()
 	const theme = themes.B
-	const pageTitle = 'Veranstaltungstermine'
+	const pageTitle = 'Veranstaltungen'
 
 	if (error) {
 		return (
@@ -29,12 +29,11 @@ export default async function CalendarPage() {
 			pageTitle={pageTitle}
 		>
 			<SectionContainer variant='max-width'>
-				<CalendarSearch strapiBaseUrl={baseUrl} theme={theme} />
+				<ResultSearch strapiBaseUrl={baseUrl} theme={theme} />
 			</SectionContainer>
 		</MainPageStructure>
 	)
 }
-
 
 
 

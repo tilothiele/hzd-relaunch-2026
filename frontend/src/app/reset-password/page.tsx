@@ -13,7 +13,7 @@ interface ResetPasswordPageProps {
 export default async function ResetPasswordPage({ searchParams }: ResetPasswordPageProps) {
 	const { globalLayout, baseUrl, error } = await fetchGlobalLayout()
 	const theme = themes.B
-	const pageTitle = 'Passwort zurücksetzen'
+	const pageTitle = 'Passwort ändern'
 	const params = await searchParams
 	const code = params.code
 
@@ -44,4 +44,5 @@ export default async function ResetPasswordPage({ searchParams }: ResetPasswordP
 		</MainPageStructure>
 	)
 }
+
 

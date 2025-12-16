@@ -209,6 +209,8 @@ export interface CalendarCalendarDocument extends Struct.ComponentSchema {
   attributes: {
     Description: Schema.Attribute.String;
     MediaFile: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    VisibleFrom: Schema.Attribute.DateTime;
+    VisibleTo: Schema.Attribute.DateTime;
   };
 }
 

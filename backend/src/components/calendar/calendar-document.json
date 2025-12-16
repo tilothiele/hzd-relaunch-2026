@@ -17,6 +17,12 @@
         "videos",
         "audios"
       ]
+    },
+    "VisibleFrom": {
+      "type": "datetime"
+    },
+    "VisibleTo": {
+      "type": "datetime"
     }
   },
   "config": {}

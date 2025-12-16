@@ -20,6 +20,7 @@ import type {
 	BooleanChoice,
 	GroupSeparator,
 	StaticText,
+	StandardIdentifier,
 } from '@/types'
 
 export function renderFormField(
@@ -187,6 +188,79 @@ export function renderFormField(
 					<Typography variant='body2' sx={{ whiteSpace: 'pre-wrap' }}>
 						{staticText.StaticContent ?? ''}
 					</Typography>
+				</Box>
+			)
+		}
+
+		case 'ComponentFormStandardIdentifiers': {
+			const identifier = field as StandardIdentifier
+
+			const inputs = {
+				membershipNumber: { label: 'Mitgliedsnummer', required: identifier.MembershipNumber },
+				firstName: { label: 'Vorname', required: identifier.FirstName },
+				lastName: { label: 'Nachname', required: identifier.LastName },
+				street: { label: 'Straße', required: identifier.Street },
+				zip: { label: 'PLZ', required: identifier.Zip },
+				city: { label: 'Ort', required: identifier.City },
+				phone: { label: 'Telefon', required: identifier.Phone },
+				email: { label: 'E-Mail', required: identifier.EMail },
+			} as const
+
+			const renderInput = (key: keyof typeof inputs) => {
+				const config = inputs[key]
+				const status = config.required
+				if (!status || status === 'Nein') {
+					return null
+				}
+				const isRequired = status === 'Erforderlich'
+				return (
+					<TextField
+						key={`${uniqueKey}-${key}`}
+						label={`${config.label}`}
+						name={key}
+						value={values[key] ?? ''}
+						onChange={(e) => onChange(key, e.target.value)}
+						fullWidth
+						required={isRequired}
+						size='small'
+						sx={{ flex: 1, minWidth: 0 }}
+					/>
+				)
+			}
+
+			return (
+				<Box key={uniqueKey} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+					{/* Mitgliedsnummer, Vorname, Nachname */}
+					{(inputs.membershipNumber.required || inputs.firstName.required || inputs.lastName.required) ? (
+						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+							{renderInput('membershipNumber')}
+							{renderInput('firstName')}
+							{renderInput('lastName')}
+						</Box>
+					) : null}
+
+					{/* Straße (eigene Zeile) */}
+					{inputs.street.required ? (
+						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+							{renderInput('street')}
+						</Box>
+					) : null}
+
+					{/* PLZ, Ort */}
+					{(inputs.zip.required || inputs.city.required) ? (
+						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+							{renderInput('zip')}
+							{renderInput('city')}
+						</Box>
+					) : null}
+
+					{/* Telefon, E-Mail */}
+					{(inputs.phone.required || inputs.email.required) ? (
+						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+							{renderInput('phone')}
+							{renderInput('email')}
+						</Box>
+					) : null}
 				</Box>
 			)
 		}

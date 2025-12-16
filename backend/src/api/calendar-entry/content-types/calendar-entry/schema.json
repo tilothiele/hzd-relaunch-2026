@@ -25,6 +25,9 @@
     "Time": {
       "type": "time"
     },
+    "DateTo": {
+      "type": "date"
+    },
     "CalendarDocument": {
       "type": "component",
       "component": "calendar.calendar-document",
@@ -40,6 +43,9 @@
     },
     "ErgebnisLink": {
       "type": "string"
+    },
+    "ErgebnisText": {
+      "type": "blocks"
     },
     "LongDescription": {
       "type": "blocks"
@@ -60,6 +66,15 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::form.form"
+    },
+    "VisibleFrom": {
+      "type": "datetime"
+    },
+    "VisibleTo": {
+      "type": "datetime"
+    },
+    "DueDate": {
+      "type": "datetime"
     }
   }
 }

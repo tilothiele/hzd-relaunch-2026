@@ -132,7 +132,7 @@ export function FormComponent({ form, privacyPolicy, strapiBaseUrl }: FormCompon
 							<Link href={privacyPolicyUrl} target='_blank' rel='noopener noreferrer' underline='hover'>
 								Datenschutzerklärung
 							</Link>{' '}
-							zu <Typography component='span' sx={{ color: 'error.main' }}>*</Typography>
+							zu
 						</>
 					}
 					sx={{ mt: 1 }}

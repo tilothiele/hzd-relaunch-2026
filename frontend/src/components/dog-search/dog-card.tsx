@@ -279,7 +279,8 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 					component='div'
 					sx={{
 						position: 'relative',
-						height: 192,
+						width: '100%',
+						aspectRatio: '4 / 3',
 						cursor: 'pointer',
 						'&:hover': {
 							opacity: 0.9,
@@ -311,7 +312,8 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 					component='div'
 					sx={{
 						position: 'relative',
-						height: 192,
+						width: '100%',
+						aspectRatio: '4 / 3',
 						cursor: 'pointer',
 						'&:hover': {
 							opacity: 0.9,

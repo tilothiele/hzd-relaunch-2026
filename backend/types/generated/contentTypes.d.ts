@@ -452,8 +452,11 @@ export interface ApiCalendarEntryCalendarEntry
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     Date: Schema.Attribute.Date & Schema.Attribute.Required;
+    DateTo: Schema.Attribute.Date;
     Description: Schema.Attribute.Text;
+    DueDate: Schema.Attribute.DateTime;
     ErgebnisLink: Schema.Attribute.String;
+    ErgebnisText: Schema.Attribute.Blocks;
     form: Schema.Attribute.Relation<'oneToOne', 'api::form.form'>;
     Headline: Schema.Attribute.String & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
@@ -471,6 +474,8 @@ export interface ApiCalendarEntryCalendarEntry
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    VisibleFrom: Schema.Attribute.DateTime;
+    VisibleTo: Schema.Attribute.DateTime;
   };
 }
 
@@ -1166,6 +1171,7 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
     };
   };
   attributes: {
+    avatar: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     breedingLicenseSince: Schema.Attribute.Date;
     cId: Schema.Attribute.Integer & Schema.Attribute.Unique;
     createdAt: Schema.Attribute.DateTime;
@@ -1227,6 +1233,7 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
   };
   attributes: {
     avatar: Schema.Attribute.Media<'images' | 'files'>;
+    BreedSurvey: Schema.Attribute.Text;
     cBreederId: Schema.Attribute.Integer;
     cId: Schema.Attribute.Integer & Schema.Attribute.Unique;
     color: Schema.Attribute.Enumeration<['S', 'SM', 'B']>;
@@ -1237,6 +1244,7 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     dateOfBirth: Schema.Attribute.Date;
     dateOfDeath: Schema.Attribute.Date;
+    Exhibitions: Schema.Attribute.Text;
     EyesCheck: Schema.Attribute.Boolean;
     father: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.dog'>;
     fullKennelName: Schema.Attribute.String &
@@ -1327,6 +1335,11 @@ export interface PluginHzdPluginLitter extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     mother: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.dog'>;
+    OrderLetter: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 1;
+      }>;
     publishedAt: Schema.Attribute.DateTime;
     StatusMessage: Schema.Attribute.Text;
     stuntDog: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.dog'>;

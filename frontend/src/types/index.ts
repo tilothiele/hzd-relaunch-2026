@@ -353,9 +353,11 @@ export interface Calendar {
 
 export interface CalendarItem {
 	documentId: string
-	Date?: string | null
-	Headline?: string | null
+	Headline: string
 	Description?: string | null
+	Date?: string | null
+	Time?: string | null
+	DateTo?: string | null
 	LongDescription?: string | null
 	AnmeldeLink?: string | null
 	ErgebnisLink?: string | null
@@ -372,6 +374,12 @@ export interface CalendarItem {
 		} | null
 	}[] | null
 	calendar?: Calendar | null
+	VisibleFrom?: string | null
+	VisibleTo?: string | null
+	DueDate?: string | null
+	createdAt?: string | null
+	updatedAt?: string | null
+	publishedAt?: string | null
 }
 
 export interface CalendarSearchResult {
@@ -441,13 +449,26 @@ export interface StaticText {
 	StaticContent?: string | null
 }
 
+export interface StandardIdentifier {
+	__typename: 'ComponentFormStandardIdentifiers'
+	id?: string
+	EMail?: 'Erforderlich' | 'Ja' | 'Nein' | null
+	MembershipNumber?: 'Erforderlich' | 'Ja' | 'Nein' | null
+	FirstName?: 'Erforderlich' | 'Ja' | 'Nein' | null
+	LastName?: 'Erforderlich' | 'Ja' | 'Nein' | null
+	Street?: 'Erforderlich' | 'Ja' | 'Nein' | null
+	Zip?: 'Erforderlich' | 'Ja' | 'Nein' | null
+	City?: 'Erforderlich' | 'Ja' | 'Nein' | null
+	Phone?: 'Erforderlich' | 'Ja' | 'Nein' | null
+}
+
 export interface FormSubmitButton {
 	__typename: 'ComponentFormFormSubmitButton'
 	id?: string
 	FSBName?: string | null
 }
 
-export type FormField = ShortTextInput | EmailAddress | TextArea | NumberInput | Choice | BooleanChoice | GroupSeparator | StaticText | FormSubmitButton
+export type FormField = ShortTextInput | EmailAddress | TextArea | NumberInput | Choice | BooleanChoice | GroupSeparator | StaticText | FormSubmitButton | StandardIdentifier
 
 export interface Form {
 	documentId: string

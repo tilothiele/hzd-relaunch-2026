@@ -510,6 +510,8 @@ query SearchCalendarItems($filters: CalendarEntryFiltersInput , $pagination: Pag
 		) {
 			documentId
 			Date
+			Time
+			DateTo
 			Headline
 			Description
 			LongDescription
@@ -519,7 +521,6 @@ query SearchCalendarItems($filters: CalendarEntryFiltersInput , $pagination: Pag
 		    form {
                 documentId
             }
-
 			CalendarDocument {
 				MediaFile {
 					alternativeText
@@ -533,6 +534,12 @@ query SearchCalendarItems($filters: CalendarEntryFiltersInput , $pagination: Pag
 				Name
 				ColorSchema
 			}
+			VisibleFrom
+			VisibleTo
+			DueDate
+			createdAt
+			updatedAt
+			publishedAt
 		}
 	}
 `
@@ -597,6 +604,17 @@ export const GET_FORM_BY_DOCUMENT_ID = `
 				... on ComponentFormFormSubmitButton {
 					id
 					FSBName
+				}
+				... on ComponentFormStandardIdentifiers {
+					id
+					EMail
+					MembershipNumber
+					FirstName
+					LastName
+					Street
+					Zip
+					City
+					Phone
 				}
 			}
 		}
