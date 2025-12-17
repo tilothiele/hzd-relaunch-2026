@@ -37,6 +37,7 @@ export default ({env}) => ({
       errorHandler: (error, strapi) => {
         console.log(error); // TODO ntfy integrieren
       },
+      pgDumpExecutable: env('PG_DUMP_EXECUTABLE', '/usr/bin/pg_dump'),
       storageService: 'aws-s3',
       awsAccessKeyId: env('AWS_ACCESS_KEY_ID'),
       awsSecretAccessKey: env('AWS_SECRET_ACCESS_KEY'),
