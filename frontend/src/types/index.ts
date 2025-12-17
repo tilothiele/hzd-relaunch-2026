@@ -460,6 +460,7 @@ export interface StandardIdentifier {
 	Street?: 'Erforderlich' | 'Ja' | 'Nein' | null
 	Zip?: 'Erforderlich' | 'Ja' | 'Nein' | null
 	City?: 'Erforderlich' | 'Ja' | 'Nein' | null
+	CountryCode?: 'Erforderlich' | 'Ja' | 'Nein' | null
 	Phone?: 'Erforderlich' | 'Ja' | 'Nein' | null
 }
 

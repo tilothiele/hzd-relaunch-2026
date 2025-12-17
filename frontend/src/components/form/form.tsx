@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import {
 	Box,
@@ -16,10 +16,13 @@ import {
 	IconButton,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import type { Form, FormSubmitButton, Image } from '@/types'
+import type { Form, FormSubmitButton, Image, StandardIdentifier } from '@/types'
 import { renderFormField } from './form-field-renderer'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { renderStrapiBlocks } from '@/lib/strapi-blocks'
+import { useAuth } from '@/hooks/use-auth'
+import { fetchGraphQL } from '@/lib/graphql-client'
+import { GET_ME } from '@/lib/graphql/queries'
 
 interface FormComponentProps {
 	form: Form
@@ -29,10 +32,135 @@ interface FormComponentProps {
 
 export function FormComponent({ form, privacyPolicy, strapiBaseUrl }: FormComponentProps) {
 	const router = useRouter()
+	const { isAuthenticated, authState } = useAuth(strapiBaseUrl)
 	const [values, setValues] = useState<Record<string, unknown>>({})
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [showThankYouModal, setShowThankYouModal] = useState(false)
 	const privacyPolicyUrl = resolveMediaUrl(privacyPolicy, strapiBaseUrl)
+
+	// Lade User-Daten und fülle StandardIdentifiers-Felder voraus
+	useEffect(() => {
+		if (!isAuthenticated || !strapiBaseUrl) {
+			return
+		}
+
+		// Hole Token aus authState oder localStorage
+		const getToken = (): string | null => {
+			if (authState?.token && typeof authState.token === 'string') {
+				return authState.token
+			}
+			// Fallback: Versuche Token aus localStorage zu holen
+			try {
+				const stored = localStorage.getItem('hzd_auth_state')
+				if (stored) {
+					const parsed = JSON.parse(stored) as { token?: string | null }
+					if (parsed.token && typeof parsed.token === 'string') {
+						return parsed.token
+					}
+				}
+			} catch {
+				// Ignore parse errors
+			}
+			return null
+		}
+
+		const token = getToken()
+		if (!token) {
+			console.warn('[Form] Kein Token gefunden, obwohl Benutzer angemeldet sein sollte')
+			return
+		}
+
+		const loadUserData = async () => {
+			try {
+				console.log('[Form] Lade User-Daten mit Token:', token ? token.substring(0, 20) + '...' : 'kein Token')
+				console.log('[Form] GET_ME Query:', GET_ME)
+				const data = await fetchGraphQL<{ me: {
+					firstName?: string | null
+					lastName?: string | null
+					email?: string | null
+					address1?: string | null
+					zip?: string | null
+					city?: string | null
+					countryCode?: string | null
+					phone?: string | null
+				} }>(
+					GET_ME,
+					{
+						baseUrl: strapiBaseUrl,
+						token,
+					},
+				)
+
+				console.log('[Form] GET_ME Response:', JSON.stringify(data, null, 2))
+				console.log('[Form] Response Keys:', Object.keys(data || {}))
+
+				if (!data?.me) {
+					console.warn('[Form] Keine me-Daten in der Response gefunden')
+					return
+				}
+
+				const user = data.me
+
+				console.log('[Form] User:', user)
+
+				// Finde StandardIdentifiers-Feld im Formular
+				const standardIdentifierField = form.FormFields?.find(
+					(field): field is StandardIdentifier => field.__typename === 'ComponentFormStandardIdentifiers',
+				)
+
+				if (!standardIdentifierField) {
+					return
+				}
+
+				// Fülle die Werte basierend auf den StandardIdentifiers-Feldern
+				const newValues: Record<string, unknown> = {}
+
+				if (standardIdentifierField.FirstName && standardIdentifierField.FirstName !== 'Nein' && user.firstName) {
+					newValues.firstName = user.firstName
+				}
+				if (standardIdentifierField.LastName && standardIdentifierField.LastName !== 'Nein' && user.lastName) {
+					newValues.lastName = user.lastName
+				}
+				if (standardIdentifierField.EMail && standardIdentifierField.EMail !== 'Nein' && user.email) {
+					newValues.email = user.email
+				}
+				if (standardIdentifierField.Street && standardIdentifierField.Street !== 'Nein' && user.address1) {
+					newValues.street = user.address1
+				}
+				if (standardIdentifierField.Zip && standardIdentifierField.Zip !== 'Nein' && user.zip) {
+					newValues.zip = user.zip
+				}
+				if (standardIdentifierField.City && standardIdentifierField.City !== 'Nein' && user.city) {
+					newValues.city = user.city
+				}
+				if (standardIdentifierField.CountryCode && standardIdentifierField.CountryCode !== 'Nein' && user.countryCode) {
+					newValues.countryCode = user.countryCode
+				}
+				if (standardIdentifierField.Phone && standardIdentifierField.Phone !== 'Nein' && user.phone) {
+					newValues.phone = user.phone
+				}
+
+				// Aktualisiere die Werte nur, wenn neue Daten vorhanden sind und die Felder noch nicht befüllt sind
+				if (Object.keys(newValues).length > 0) {
+					setValues((prev) => {
+						const updated: Record<string, unknown> = { ...prev }
+						// Nur Werte setzen, die noch nicht vorhanden sind
+						Object.entries(newValues).forEach(([key, value]) => {
+							if (!updated[key] || updated[key] === '') {
+								updated[key] = value
+							}
+						})
+						return updated
+					})
+				}
+			} catch (error) {
+				// Fehler beim Laden der User-Daten ignorieren (z.B. wenn Token abgelaufen ist)
+				console.warn('Fehler beim Laden der User-Daten:', error)
+			}
+		}
+
+		void loadUserData()
+	}, [isAuthenticated, strapiBaseUrl, form.FormFields, authState])
 
 	const handleCloseModal = useCallback(() => {
 		setShowThankYouModal(false)

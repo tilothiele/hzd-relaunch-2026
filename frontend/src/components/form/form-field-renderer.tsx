@@ -202,6 +202,7 @@ export function renderFormField(
 				street: { label: 'Straße', required: identifier.Street },
 				zip: { label: 'PLZ', required: identifier.Zip },
 				city: { label: 'Ort', required: identifier.City },
+				countryCode: { label: 'Ländercode', required: identifier.CountryCode },
 				phone: { label: 'Telefon', required: identifier.Phone },
 				email: { label: 'E-Mail', required: identifier.EMail },
 			} as const
@@ -246,9 +247,10 @@ export function renderFormField(
 						</Box>
 					) : null}
 
-					{/* PLZ, Ort */}
-					{(inputs.zip.required || inputs.city.required) ? (
+					{/* PLZ, Ort, Ländercode */}
+					{(inputs.zip.required || inputs.city.required || inputs.countryCode.required) ? (
 						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+							{renderInput('countryCode')}
 							{renderInput('zip')}
 							{renderInput('city')}
 						</Box>

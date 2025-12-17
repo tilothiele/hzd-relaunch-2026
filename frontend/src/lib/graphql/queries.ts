@@ -615,9 +615,28 @@ export const GET_FORM_BY_DOCUMENT_ID = `
 					Street
 					Zip
 					City
+					CountryCode
 					Phone
 				}
 			}
+		}
+	}
+`
+
+export const GET_ME = `
+	query GetMe {
+		me {
+			id
+			documentId
+			username
+			email
+			firstName
+			lastName
+			address1
+			zip
+			city
+			countryCode
+			phone
 		}
 	}
 `
