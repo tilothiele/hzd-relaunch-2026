@@ -1,17 +1,16 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Box, Typography, Paper, IconButton, Button, Link as MuiLink, Select, MenuItem, FormControl, InputLabel } from '@mui/material'
+import { Box, Typography, Paper, Button, Link as MuiLink, Select, MenuItem, FormControl, InputLabel, IconButton, Tooltip } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
-import CloseIcon from '@mui/icons-material/Close'
-import DownloadIcon from '@mui/icons-material/Download'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import { fetchGraphQL } from '@/lib/graphql-client'
 import { GET_CALENDARS, SEARCH_CALENDAR_ITEMS } from '@/lib/graphql/queries'
 import type { Calendar, CalendarItem, CalendarSearchResult, CalendarItemSearchResult } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { renderStrapiBlocks } from '@/lib/strapi-blocks'
-import { ExternalRegistrationLink, InternalRegistrationLink } from '@/components/calendar/registration-links'
 
 interface CalendarSearchProps {
 	strapiBaseUrl?: string | null
@@ -107,31 +106,19 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 	const [allCalendarItems, setAllCalendarItems] = useState<CalendarItem[]>([])
 	const [selectedCalendarIds, setSelectedCalendarIds] = useState<Set<string>>(new Set())
 	const [selectedRegion, setSelectedRegion] = useState<string>('')
-	// Berechne verfügbare Jahre und Standard-Jahr: aktuelles Jahr + 3 vorherige, ab Oktober: nächstes Jahr + 2 vorherige
+	// Berechne verfügbare Jahre und Standard-Jahr: aktuelles Jahr + 3 vorherige
 	const { availableYears, defaultYear } = useMemo(() => {
-		const now = new Date()
-		const currentMonth = now.getMonth() + 1 // 1-12
-		const currentYear = now.getFullYear()
-
-		if (currentMonth >= 10) {
-			// Ab Oktober: nächstes Jahr bis 2 vorherige Jahre
-			return {
-				availableYears: [currentYear + 1, currentYear, currentYear - 1, currentYear - 2],
-				defaultYear: currentYear + 1,
-			}
-		} else {
-			// Vor Oktober: aktuelles Jahr + 3 vorherige Jahre
-			return {
-				availableYears: [currentYear, currentYear - 1, currentYear - 2, currentYear - 3],
-				defaultYear: currentYear,
-			}
+		const currentYear = new Date().getFullYear()
+		return {
+			availableYears: [currentYear, currentYear - 1, currentYear - 2, currentYear - 3],
+			defaultYear: currentYear,
 		}
 	}, [])
 
 	const [selectedYear, setSelectedYear] = useState<number>(defaultYear)
 	const [isLoading, setIsLoading] = useState(false)
 	const [error, setError] = useState<Error | null>(null)
-	const [selectedItemForModal, setSelectedItemForModal] = useState<CalendarItem | null>(null)
+	const [expandedResultIds, setExpandedResultIds] = useState<Set<string>>(new Set())
 
 	const getPrimaryDate = useCallback((item: CalendarItem): string | null | undefined => {
 		return item.Date ?? item.DueDate ?? item.VisibleFrom ?? item.VisibleTo ?? item.createdAt ?? null
@@ -152,25 +139,14 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 		return fromOk && toOk
 	}, [])
 
-	const isFutureEntry = useCallback((item: CalendarItem, now: number): boolean => {
+	const isPastEntry = useCallback((item: CalendarItem, now: number): boolean => {
 		const dt = toDateTime(item.Date, item.Time)
 		if (dt) {
-			return dt.getTime() >= now
+			return dt.getTime() < now
 		}
 		const due = item.DueDate ? new Date(item.DueDate).getTime() : null
-		return due !== null && !Number.isNaN(due) ? due >= now : false
+		return due !== null && !Number.isNaN(due) ? due < now : false
 	}, [toDateTime])
-
-	const isRegistrationOpen = useCallback((item: CalendarItem): boolean => {
-		if (!item.DueDate) {
-			return true
-		}
-		const due = new Date(item.DueDate).getTime()
-		if (Number.isNaN(due)) {
-			return true
-		}
-		return Date.now() <= due
-	}, [])
 
 	const loadCalendars = useCallback(async () => {
 		if (!strapiBaseUrl) {
@@ -222,7 +198,7 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				},
 				{
 					Date: {
-						gte: todayIso,
+				lte: todayIso,
 					},
 				},
 				{
@@ -243,7 +219,7 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				filters: {
 					and: filterConditions,
 				},
-				sort: ['Date:asc'],
+		sort: ['Date:desc'],
 			}
 
 			const data = await fetchGraphQL<CalendarItemSearchResult>(
@@ -256,13 +232,13 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 
 			const itemsArray = Array.isArray(data.calendarEntries) ? data.calendarEntries : []
 			const nowTs = Date.now()
-			const visibleItems = itemsArray.filter((item) => isFutureEntry(item, nowTs) && isWithinVisibility(item, nowTs))
+			const visibleItems = itemsArray.filter((item) => isPastEntry(item, nowTs) && isWithinVisibility(item, nowTs))
 			setAllCalendarItems(visibleItems)
 		} catch (err) {
 			// Fehler beim Laden aller Items ignorieren
 			setAllCalendarItems([])
 		}
-	}, [strapiBaseUrl, selectedCalendarIds, isFutureEntry, isWithinVisibility])
+	}, [strapiBaseUrl, selectedCalendarIds, isPastEntry, isWithinVisibility])
 
 	const loadCalendarItems = useCallback(async () => {
 		if (!strapiBaseUrl || selectedCalendarIds.size === 0) {
@@ -276,6 +252,9 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 		try {
 			const todayIso = new Date().toISOString().slice(0, 10)
 			const nowIso = new Date().toISOString()
+			const endOfYearIso = `${selectedYear}-12-31`
+			const startOfYearIso = `${selectedYear}-01-01`
+			const latestAllowedDate = todayIso < endOfYearIso ? todayIso : endOfYearIso
 			const filterConditions: Array<Record<string, unknown>> = [
 				{
 					calendar: {
@@ -286,8 +265,8 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				},
 				{
 					Date: {
-						gte: todayIso,
-						lte: `${selectedYear}-12-31`,
+						gte: startOfYearIso,
+						lte: latestAllowedDate,
 					},
 				},
 				{
@@ -317,7 +296,7 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				filters: {
 					and: filterConditions,
 				},
-				sort: ['Date:asc'],
+				sort: ['Date:desc'],
 			}
 
 			const data = await fetchGraphQL<CalendarItemSearchResult>(
@@ -330,7 +309,7 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 
 			const itemsArray = Array.isArray(data.calendarEntries) ? data.calendarEntries : []
 			const nowTs = Date.now()
-			const visibleItems = itemsArray.filter((item) => isFutureEntry(item, nowTs) && isWithinVisibility(item, nowTs))
+			const visibleItems = itemsArray.filter((item) => isPastEntry(item, nowTs) && isWithinVisibility(item, nowTs))
 			setCalendarItems(visibleItems)
 		} catch (err) {
 			const fetchError = err instanceof Error
@@ -341,7 +320,7 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [strapiBaseUrl, selectedCalendarIds, selectedRegion, selectedYear, isFutureEntry, isWithinVisibility])
+	}, [strapiBaseUrl, selectedCalendarIds, selectedRegion, selectedYear, isPastEntry, isWithinVisibility])
 
 	useEffect(() => {
 		void loadCalendars()
@@ -355,26 +334,6 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 		void loadCalendarItems()
 	}, [loadCalendarItems])
 
-	useEffect(() => {
-		const handleEscape = (e: KeyboardEvent) => {
-			if (e.key === 'Escape') {
-				setSelectedItemForModal(null)
-			}
-		}
-
-		if (selectedItemForModal) {
-			window.addEventListener('keydown', handleEscape)
-			document.body.style.overflow = 'hidden'
-		} else {
-			document.body.style.overflow = 'unset'
-		}
-
-		return () => {
-			window.removeEventListener('keydown', handleEscape)
-			document.body.style.overflow = 'unset'
-		}
-	}, [selectedItemForModal])
-
 	const handleCalendarToggle = useCallback((calendarId: string) => {
 		setSelectedCalendarIds((prev) => {
 			const next = new Set(prev)
@@ -385,6 +344,22 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 			}
 			return next
 		})
+	}, [])
+
+	const handleToggleResultText = useCallback((documentId: string) => {
+		setExpandedResultIds((prev) => {
+			const next = new Set(prev)
+			if (next.has(documentId)) {
+				next.delete(documentId)
+			} else {
+				next.add(documentId)
+			}
+			return next
+		})
+	}, [])
+
+	const renderResultText = useCallback((value: CalendarItem['ErgebnisText']) => {
+		return value ?? ''
 	}, [])
 
 	const availableRegions = useMemo(() => {
@@ -403,7 +378,7 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 			const dateBValue = getPrimaryDate(b)
 			const dateA = dateAValue ? new Date(dateAValue).getTime() : 0
 			const dateB = dateBValue ? new Date(dateBValue).getTime() : 0
-			return dateA - dateB
+			return dateB - dateA
 		})
 	}, [calendarItems, getPrimaryDate])
 
@@ -422,17 +397,6 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 			return dateString
 		}
 	}, [])
-
-	const resolveDocumentUrl = useCallback((calendarDocument: NonNullable<CalendarItem['CalendarDocument']>[0]) => {
-		if (!calendarDocument?.MediaFile?.url) {
-			return null
-		}
-		const url = calendarDocument.MediaFile.url
-		if (url.startsWith('http')) {
-			return url
-		}
-		return strapiBaseUrl ? `${strapiBaseUrl}${url}` : url
-	}, [strapiBaseUrl])
 
 	const backgroundColor = theme?.evenBgColor ?? '#f9fafb'
 
@@ -571,9 +535,10 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				) : sortedItems.length > 0 ? (
 					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
 						{sortedItems.map((item, index) => {
-							const registrationOpen = isRegistrationOpen(item)
 							const calendarColors = item.calendar ? getCalendarColors(item.calendar) : null
 							const isEven = index % 2 === 0
+							const isExpanded = expandedResultIds.has(item.documentId)
+
 							return (
 								<Paper
 									key={item.documentId}
@@ -587,29 +552,23 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 											: '8px solid #e5e7eb',
 									}}
 								>
-									{/* Desktop: Eine Zeile: Datum - Description - Links */}
-									{/* Mobile/Tablet: Zeile 1: Datum - Links, Zeile 2: Headline - Description */}
 									<Box
 										sx={{
 											display: 'flex',
+											alignItems: 'center',
 											gap: 2,
-											flexWrap: 'wrap',
-											flexDirection: { xs: 'column', sm: 'column', md: 'row' },
-											alignItems: { xs: 'flex-start', sm: 'flex-start', md: 'center' },
+											flexWrap: { xs: 'wrap', md: 'nowrap' },
 										}}
 									>
-										{/* Erste Zeile (Mobile/Tablet) / Erste Spalte (Desktop): Datum + Links */}
 										<Box
 											sx={{
 												display: 'flex',
 												alignItems: 'center',
 												gap: 2,
-												flexWrap: 'wrap',
-												flex: { xs: 'none', sm: 'none', md: '0 0 auto' },
-												width: { xs: '100%', sm: '100%', md: 'auto' },
+												flexWrap: { xs: 'wrap', md: 'nowrap' },
+												flex: { xs: '1 1 100%', md: '1 1 auto' },
 											}}
 										>
-											{/* Datum */}
 											<Typography
 												variant='subtitle1'
 												sx={{
@@ -621,130 +580,67 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 												{formatDate(getPrimaryDate(item))}
 											</Typography>
 
-											{/* Links und Aktionen - auf Mobile/Tablet in derselben Zeile wie Datum */}
 											<Box
 												sx={{
-													display: { xs: 'flex', sm: 'flex', md: 'none' },
-													flexWrap: 'wrap',
-													gap: 2,
+													display: 'flex',
 													alignItems: 'center',
-													flexShrink: 0,
+													gap: 1,
+													flex: 1,
+													minWidth: 0,
+													flexWrap: 'nowrap',
+													overflow: 'hidden',
 												}}
 											>
-												{item.LongDescription ? (
-													<Button
-														variant='outlined'
-														size='small'
-														onClick={() => setSelectedItemForModal(item)}
-														sx={{ textTransform: 'none' }}
-													>
-														Mehr Details
-													</Button>
-												) : null}
-
-												{registrationOpen && item.AnmeldeLink ? (
-													<ExternalRegistrationLink href={item.AnmeldeLink} />
-												) : null}
-
-												{registrationOpen && item.form?.documentId ? (
-													<InternalRegistrationLink href={`/anmeldung/${item.form.documentId}`} />
-												) : null}
-
-												{item.ErgebnisLink ? (
-													<MuiLink
-														href={item.ErgebnisLink}
-														target='_blank'
-														rel='noopener noreferrer'
-														underline='hover'
+												{item.Headline ? (
+													<Typography
+														variant='body1'
 														sx={{
-															display: 'inline-flex',
-															alignItems: 'center',
-															gap: 0.5,
-															color: 'primary.main',
+															fontWeight: 500,
+															color: 'text.primary',
+															whiteSpace: 'nowrap',
+															overflow: 'hidden',
+															textOverflow: 'ellipsis',
 														}}
 													>
-														Ergebnisse
-														<OpenInNewIcon sx={{ fontSize: '0.875rem' }} />
-													</MuiLink>
+														{item.Headline}
+													</Typography>
+												) : null}
+												{item.Headline && item.Description ? (
+													<Typography
+														variant='body1'
+														sx={{
+															color: 'text.secondary',
+															whiteSpace: 'nowrap',
+														}}
+													>
+														-
+													</Typography>
+												) : null}
+												{item.Description ? (
+													<Typography
+														variant='body1'
+														sx={{
+															color: 'text.secondary',
+															whiteSpace: 'nowrap',
+															overflow: 'hidden',
+															textOverflow: 'ellipsis',
+														}}
+													>
+														{item.Description}
+													</Typography>
 												) : null}
 											</Box>
 										</Box>
 
-										{/* Headline und Description - auf Mobile/Tablet in zweiter Zeile */}
 										<Box
 											sx={{
-												flex: { xs: 'none', sm: 'none', md: 1 },
-												minWidth: 0,
-												width: { xs: '100%', sm: '100%', md: 'auto' },
 												display: 'flex',
-												alignItems: 'center',
-												gap: 1,
-												flexWrap: 'wrap',
-											}}
-										>
-											{item.Headline ? (
-												<Typography
-													variant='body1'
-													sx={{
-														fontWeight: 500,
-														color: 'text.primary',
-													}}
-												>
-													{item.Headline}
-												</Typography>
-											) : null}
-											{item.Headline && item.Description ? (
-												<Typography
-													variant='body1'
-													sx={{
-														color: 'text.secondary',
-													}}
-												>
-													-
-												</Typography>
-											) : null}
-											{item.Description ? (
-												<Typography
-													variant='body1'
-													sx={{
-														color: 'text.secondary',
-														whiteSpace: 'pre-wrap',
-													}}
-												>
-													{item.Description}
-												</Typography>
-											) : null}
-										</Box>
-
-										{/* Links und Aktionen - nur auf Desktop sichtbar */}
-										<Box
-											sx={{
-												display: { xs: 'none', sm: 'none', md: 'flex' },
 												flexWrap: 'wrap',
 												gap: 2,
 												alignItems: 'center',
 												flexShrink: 0,
 											}}
 										>
-											{item.LongDescription ? (
-												<Button
-													variant='outlined'
-													size='small'
-													onClick={() => setSelectedItemForModal(item)}
-													sx={{ textTransform: 'none' }}
-												>
-													Mehr Details
-												</Button>
-											) : null}
-
-											{registrationOpen && item.AnmeldeLink ? (
-												<ExternalRegistrationLink href={item.AnmeldeLink} />
-											) : null}
-
-											{registrationOpen && item.form?.documentId ? (
-												<InternalRegistrationLink href={`/anmeldung/${item.form.documentId}`} />
-											) : null}
-
 											{item.ErgebnisLink ? (
 												<MuiLink
 													href={item.ErgebnisLink}
@@ -762,8 +658,33 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 													<OpenInNewIcon sx={{ fontSize: '0.875rem' }} />
 												</MuiLink>
 											) : null}
+
+											{item.ErgebnisText ? (
+												<Tooltip title={isExpanded ? 'Einklappen' : 'Ausklappen'}>
+													<IconButton
+														size='small'
+														onClick={() => handleToggleResultText(item.documentId)}
+														aria-label='Ergebnistext ein-/ausklappen'
+													>
+														{isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+													</IconButton>
+												</Tooltip>
+											) : null}
 										</Box>
 									</Box>
+
+									{item.ErgebnisText && isExpanded ? (
+										<Box sx={{ mt: 1 }}>
+											<Typography
+												variant='body2'
+												sx={{
+													color: 'text.secondary',
+													whiteSpace: 'pre-wrap',
+												}}
+												dangerouslySetInnerHTML={{ __html: renderResultText(item.ErgebnisText) }}
+											/>
+										</Box>
+									) : null}
 								</Paper>
 							)
 						})}
@@ -777,146 +698,6 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				) : null}
 			</SectionContainer>
 
-			{/* Modal für LongDescription */}
-			{selectedItemForModal ? (
-				<div
-					className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'
-					onClick={() => setSelectedItemForModal(null)}
-				>
-					<div
-						className='relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white shadow-xl'
-						onClick={(e) => e.stopPropagation()}
-					>
-						<IconButton
-							onClick={() => setSelectedItemForModal(null)}
-							aria-label='Schließen'
-							sx={{
-								position: 'absolute',
-								right: 16,
-								top: 16,
-								zIndex: 10,
-								backgroundColor: 'rgba(255, 255, 255, 0.9)',
-								boxShadow: 2,
-								'&:hover': {
-									backgroundColor: 'white',
-								},
-							}}
-						>
-							<CloseIcon />
-						</IconButton>
-
-						<Box sx={{ p: 4 }}>
-							{(() => {
-								const modalCalendarColors = selectedItemForModal.calendar
-									? getCalendarColors(selectedItemForModal.calendar)
-									: null
-								return (
-									<Typography
-										variant='h5'
-										component='h2'
-										sx={{
-											mb: 2,
-											fontWeight: 600,
-											color: 'text.primary',
-										}}
-									>
-										{formatDate(getPrimaryDate(selectedItemForModal))}
-										{selectedItemForModal.calendar?.Name ? (
-											<Typography
-												component='span'
-												variant='body2'
-												sx={{
-													ml: 2,
-													px: 1.5,
-													py: 0.5,
-													bgcolor: modalCalendarColors?.backgroundColor ?? 'grey.300',
-													color: modalCalendarColors?.textColor ?? 'white',
-													borderRadius: 1,
-													fontWeight: 500,
-												}}
-											>
-												{selectedItemForModal.calendar.Name}
-											</Typography>
-										) : null}
-									</Typography>
-								)
-							})()}
-
-							{selectedItemForModal.LongDescription ? (
-								<Typography
-									variant='body1'
-									sx={{
-										color: 'text.secondary',
-										whiteSpace: 'pre-wrap',
-										mb: 3,
-										'& p': {
-											mb: 2,
-										},
-										'& p:last-child': {
-											mb: 0,
-										},
-										'& a': {
-											color: 'primary.main',
-											textDecoration: 'none',
-											'&:hover': {
-												textDecoration: 'underline',
-											},
-										},
-									}}
-									dangerouslySetInnerHTML={{ __html: renderStrapiBlocks(selectedItemForModal.LongDescription) }}
-								/>
-							) : null}
-
-							{/* Downloads unten aufgelistet */}
-							{selectedItemForModal.CalendarDocument && selectedItemForModal.CalendarDocument.length > 0 ? (
-								<Box
-									sx={{
-										mt: 3,
-										pt: 3,
-										borderTop: '1px solid',
-										borderColor: 'divider',
-									}}
-								>
-									<Typography
-										variant='subtitle2'
-										sx={{
-											mb: 2,
-											fontWeight: 600,
-											color: 'text.primary',
-										}}
-									>
-										Downloads
-									</Typography>
-									<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-										{selectedItemForModal.CalendarDocument.map((doc, index) => {
-											if (!doc?.MediaFile?.url) {
-												return null
-											}
-											return (
-												<MuiLink
-													key={index}
-													href={resolveDocumentUrl(doc) ?? '#'}
-													download
-													underline='hover'
-													sx={{
-														display: 'inline-flex',
-														alignItems: 'center',
-														gap: 1,
-														color: 'primary.main',
-													}}
-												>
-													<DownloadIcon sx={{ fontSize: '1.25rem' }} />
-													{doc.MediaFile.name ? doc.MediaFile.name : 'Download'}
-												</MuiLink>
-											)
-										})}
-									</Box>
-								</Box>
-							) : null}
-						</Box>
-					</div>
-				</div>
-			) : null}
 		</>
 	)
 }

@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 export default async function CalendarPage() {
 	const { globalLayout, baseUrl, error } = await fetchGlobalLayout()
 	const theme = themes.B
-	const pageTitle = 'Veranstaltungen'
+	const pageTitle = 'Ergebnisse'
 
 	if (error) {
 		return (

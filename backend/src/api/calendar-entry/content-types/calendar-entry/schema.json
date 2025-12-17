@@ -44,12 +44,6 @@
     "ErgebnisLink": {
       "type": "string"
     },
-    "ErgebnisText": {
-      "type": "blocks"
-    },
-    "LongDescription": {
-      "type": "blocks"
-    },
     "Region": {
       "type": "enumeration",
       "enum": [
@@ -75,6 +69,20 @@
     },
     "DueDate": {
       "type": "datetime"
+    },
+    "ErgebnisText": {
+      "type": "customField",
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultHtml"
+      }
+    },
+    "LongDescription": {
+      "type": "customField",
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultHtml"
+      }
     }
   }
 }

@@ -456,7 +456,13 @@ export interface ApiCalendarEntryCalendarEntry
     Description: Schema.Attribute.Text;
     DueDate: Schema.Attribute.DateTime;
     ErgebnisLink: Schema.Attribute.String;
-    ErgebnisText: Schema.Attribute.Blocks;
+    ErgebnisText: Schema.Attribute.RichText &
+      Schema.Attribute.CustomField<
+        'plugin::ckeditor5.CKEditor',
+        {
+          preset: 'defaultHtml';
+        }
+      >;
     form: Schema.Attribute.Relation<'oneToOne', 'api::form.form'>;
     Headline: Schema.Attribute.String & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
@@ -465,7 +471,13 @@ export interface ApiCalendarEntryCalendarEntry
       'api::calendar-entry.calendar-entry'
     > &
       Schema.Attribute.Private;
-    LongDescription: Schema.Attribute.Blocks;
+    LongDescription: Schema.Attribute.RichText &
+      Schema.Attribute.CustomField<
+        'plugin::ckeditor5.CKEditor',
+        {
+          preset: 'defaultHtml';
+        }
+      >;
     publishedAt: Schema.Attribute.DateTime;
     Region: Schema.Attribute.Enumeration<
       ['NORD', 'OST', 'MITTE', 'SUED', 'WEST', 'HZD', 'VDH']

@@ -517,6 +517,7 @@ query SearchCalendarItems($filters: CalendarEntryFiltersInput , $pagination: Pag
 			LongDescription
 			AnmeldeLink
 			ErgebnisLink
+			ErgebnisText
 			Region
 		    form {
                 documentId

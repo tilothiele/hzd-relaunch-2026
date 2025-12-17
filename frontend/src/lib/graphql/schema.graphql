@@ -267,6 +267,29 @@ input JSONFilterInput {
   between: [JSON]
 }
 
+input ComponentSeoSeoFiltersInput {
+  TitleTag: StringFilterInput
+  MetaDescription: StringFilterInput
+  Keywords: StringFilterInput
+  and: [ComponentSeoSeoFiltersInput]
+  or: [ComponentSeoSeoFiltersInput]
+  not: ComponentSeoSeoFiltersInput
+}
+
+input ComponentSeoSeoInput {
+  id: ID
+  TitleTag: String
+  MetaDescription: String
+  Keywords: String
+}
+
+type ComponentSeoSeo {
+  id: ID!
+  TitleTag: String
+  MetaDescription: String
+  Keywords: String
+}
+
 input ComponentPersonalShippingAddressFiltersInput {
   Name: StringFilterInput
   AdditionalName: StringFilterInput
@@ -299,35 +322,50 @@ type ComponentPersonalShippingAddress {
   City: String
 }
 
-input ComponentSeoSeoFiltersInput {
-  TitleTag: StringFilterInput
-  MetaDescription: StringFilterInput
-  Keywords: StringFilterInput
-  and: [ComponentSeoSeoFiltersInput]
-  or: [ComponentSeoSeoFiltersInput]
-  not: ComponentSeoSeoFiltersInput
-}
-
-input ComponentSeoSeoInput {
-  id: ID
-  TitleTag: String
-  MetaDescription: String
-  Keywords: String
-}
-
-type ComponentSeoSeo {
-  id: ID!
-  TitleTag: String
-  MetaDescription: String
-  Keywords: String
-}
-
 type ComponentPermissionGroups {
   id: ID!
   Any: Boolean
   Member: Boolean
   HeadOfEvent: Boolean
   BreedWarden: Boolean
+}
+
+input ComponentLinksPartnerlLinkFiltersInput {
+  PartnerLinkUrl: StringFilterInput
+  AltText: StringFilterInput
+  and: [ComponentLinksPartnerlLinkFiltersInput]
+  or: [ComponentLinksPartnerlLinkFiltersInput]
+  not: ComponentLinksPartnerlLinkFiltersInput
+}
+
+input ComponentLinksPartnerlLinkInput {
+  id: ID
+  Logo: ID
+  PartnerLinkUrl: String
+  AltText: String
+}
+
+type ComponentLinksPartnerlLink {
+  id: ID!
+  Logo: UploadFile
+  PartnerLinkUrl: String
+  AltText: String
+}
+
+input ComponentLinksActionButtonFiltersInput {
+  Label: StringFilterInput
+  Link: StringFilterInput
+  Primary: BooleanFilterInput
+  and: [ComponentLinksActionButtonFiltersInput]
+  or: [ComponentLinksActionButtonFiltersInput]
+  not: ComponentLinksActionButtonFiltersInput
+}
+
+type ComponentLinksActionButton {
+  id: ID!
+  Label: String
+  Link: String
+  Primary: Boolean
 }
 
 input ComponentLayoutFooterInput {
@@ -373,44 +411,6 @@ input ComponentLayoutColorThemeInput {
 type ComponentLayoutColorTheme {
   id: ID!
   ShortName: ENUM_COMPONENTLAYOUTCOLORTHEME_SHORTNAME
-}
-
-input ComponentLinksPartnerlLinkFiltersInput {
-  PartnerLinkUrl: StringFilterInput
-  AltText: StringFilterInput
-  and: [ComponentLinksPartnerlLinkFiltersInput]
-  or: [ComponentLinksPartnerlLinkFiltersInput]
-  not: ComponentLinksPartnerlLinkFiltersInput
-}
-
-input ComponentLinksPartnerlLinkInput {
-  id: ID
-  Logo: ID
-  PartnerLinkUrl: String
-  AltText: String
-}
-
-type ComponentLinksPartnerlLink {
-  id: ID!
-  Logo: UploadFile
-  PartnerLinkUrl: String
-  AltText: String
-}
-
-input ComponentLinksActionButtonFiltersInput {
-  Label: StringFilterInput
-  Link: StringFilterInput
-  Primary: BooleanFilterInput
-  and: [ComponentLinksActionButtonFiltersInput]
-  or: [ComponentLinksActionButtonFiltersInput]
-  not: ComponentLinksActionButtonFiltersInput
-}
-
-type ComponentLinksActionButton {
-  id: ID!
-  Label: String
-  Link: String
-  Primary: Boolean
 }
 
 type ComponentFormTextArea {
@@ -1424,13 +1424,13 @@ input CalendarEntryFiltersInput {
   calendar: CalendarFiltersInput
   AnmeldeLink: StringFilterInput
   ErgebnisLink: StringFilterInput
-  ErgebnisText: JSONFilterInput
-  LongDescription: JSONFilterInput
   Region: StringFilterInput
   form: FormFiltersInput
   VisibleFrom: DateTimeFilterInput
   VisibleTo: DateTimeFilterInput
   DueDate: DateTimeFilterInput
+  ErgebnisText: StringFilterInput
+  LongDescription: StringFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   publishedAt: DateTimeFilterInput
@@ -1449,13 +1449,13 @@ input CalendarEntryInput {
   calendar: ID
   AnmeldeLink: String
   ErgebnisLink: String
-  ErgebnisText: JSON
-  LongDescription: JSON
   Region: ENUM_CALENDARENTRY_REGION
   form: ID
   VisibleFrom: DateTime
   VisibleTo: DateTime
   DueDate: DateTime
+  ErgebnisText: String
+  LongDescription: String
   publishedAt: DateTime
 }
 
@@ -1470,13 +1470,13 @@ type CalendarEntry {
   calendar: Calendar
   AnmeldeLink: String
   ErgebnisLink: String
-  ErgebnisText: JSON
-  LongDescription: JSON
   Region: ENUM_CALENDARENTRY_REGION
   form: Form
   VisibleFrom: DateTime
   VisibleTo: DateTime
   DueDate: DateTime
+  ErgebnisText: String
+  LongDescription: String
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -2053,7 +2053,7 @@ type SupplementalDocumentGroupEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union GenericMorph = ComponentPersonalShippingAddress | ComponentSeoSeo | ComponentPermissionGroups | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | Calendar | CalendarEntry | Contact | Form | FormInstance | GlobalLayout | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
+union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | Calendar | CalendarEntry | Contact | Form | FormInstance | GlobalLayout | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
 
 input FileInfoInput {
   name: String

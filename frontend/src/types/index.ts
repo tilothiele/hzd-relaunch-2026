@@ -361,6 +361,7 @@ export interface CalendarItem {
 	LongDescription?: string | null
 	AnmeldeLink?: string | null
 	ErgebnisLink?: string | null
+	ErgebnisText?: string | null
 	Region?: string | null
 	form?: {
 		documentId: string

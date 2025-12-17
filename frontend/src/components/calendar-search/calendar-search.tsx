@@ -375,6 +375,42 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 		}
 	}, [])
 
+	const formatTime = useCallback((timeString: string | null | undefined) => {
+		if (!timeString) {
+			return ''
+		}
+		try {
+			const date = new Date(`1970-01-01T${timeString}`)
+			return Number.isNaN(date.getTime())
+				? timeString
+				: date.toLocaleTimeString('de-DE', {
+					hour: '2-digit',
+					minute: '2-digit',
+				})
+		} catch {
+			return timeString
+		}
+	}, [])
+
+	const formatDateRange = useCallback((
+		date: string | null | undefined,
+		time: string | null | undefined,
+		dateTo: string | null | undefined,
+	) => {
+		const startDate = formatDate(date)
+		const startTime = formatTime(time)
+		const endDate = dateTo ? formatDate(dateTo) : ''
+
+		let result = startDate
+		if (startTime) {
+			result = `${result}, ${startTime}`
+		}
+		if (endDate) {
+			result = `${result} – ${endDate}`
+		}
+		return result
+	}, [formatDate, formatTime])
+
 	const backgroundColor = theme?.evenBgColor ?? '#f9fafb'
 
 	return (
@@ -520,7 +556,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 													flexShrink: 0,
 												}}
 											>
-											{formatDate(getPrimaryDate(item))}
+												{formatDateRange(item.Date, item.Time, item.DateTo)}
 											</Typography>
 
 											{/* Links und Aktionen - auf Mobile/Tablet in derselben Zeile wie Datum */}
