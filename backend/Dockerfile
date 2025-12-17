@@ -19,7 +19,7 @@ RUN npm run build
 
 # Creating final production image
 FROM node:20-alpine AS production
-RUN apk add --no-cache vips-dev
+RUN apk add --no-cache vips-dev postgresql-client
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 WORKDIR /opt/

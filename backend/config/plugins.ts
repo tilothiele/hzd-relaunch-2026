@@ -30,6 +30,21 @@ export default ({env}) => ({
       landingPage: true
     }
   },
+  backup: {
+    enabled: env('BACKUP_ENABLE', false),
+    config: {
+      cronSchedule: env('BACKUP_CRON_EXPR', '0 * * * *'), // Run backup each hour
+      errorHandler: (error, strapi) => {
+        console.log(error); // TODO ntfy integrieren
+      },
+      storageService: 'aws-s3',
+      awsAccessKeyId: env('AWS_ACCESS_KEY_ID'),
+      awsSecretAccessKey: env('AWS_SECRET_ACCESS_KEY'),
+      awsRegion: env('AWS_REGION'), // Optional if awsS3Endpoint is defined
+      awsS3Endpoint: env('S3_ENDPOINT'), // Optional if awsRegion is defined (e.g. "s3.fr-par.scw.cloud")
+      awsS3Bucket: env('AWS_S3_BUCKET')
+    }
+  },
   tinymce: {
     enabled: true,
     config: {
