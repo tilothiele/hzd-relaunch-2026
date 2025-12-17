@@ -134,16 +134,47 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 		return due !== null && !Number.isNaN(due) ? due >= now : false
 	}, [toDateTime])
 
-	const isRegistrationOpen = useCallback((item: CalendarItem): boolean => {
-		if (!item.DueDate) {
-			return true
+	const parseDueDateMs = useCallback((dueDate: string | null | undefined): number | null => {
+		if (!dueDate) {
+			return null
 		}
-		const due = new Date(item.DueDate).getTime()
-		if (Number.isNaN(due)) {
-			return true
+
+		const trimmed = dueDate.trim()
+		if (!trimmed) {
+			return null
 		}
-		return Date.now() <= due
+
+		// ISO Date-Only (yyyy-mm-dd): bis Tagesende gültig, UTC
+		const isoDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(trimmed)
+		if (isoDateOnly) {
+			const parsed = Date.parse(`${trimmed}T23:59:59Z`)
+			return Number.isNaN(parsed) ? null : parsed
+		}
+
+		// ISO mit Zeit oder Offset
+		const isoParsed = Date.parse(trimmed)
+		if (!Number.isNaN(isoParsed)) {
+			return isoParsed
+		}
+
+		// Fallback: deutsches Datum dd.mm.yyyy
+		const deMatch = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(trimmed)
+		if (deMatch) {
+			const [, dd, mm, yyyy] = deMatch
+			const parsed = Date.parse(`${yyyy}-${mm}-${dd}T23:59:59Z`)
+			return Number.isNaN(parsed) ? null : parsed
+		}
+
+		return null
 	}, [])
+
+	const isRegistrationOpen = useCallback((item: CalendarItem): boolean => {
+		const dueMs = parseDueDateMs(item.DueDate)
+		if (dueMs === null) {
+			return true
+		}
+		return Date.now() <= dueMs
+	}, [parseDueDateMs])
 
 	const loadCalendars = useCallback(async () => {
 		if (!strapiBaseUrl) {
