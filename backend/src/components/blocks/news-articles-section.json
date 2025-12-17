@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_blocks_news_articles_sections",
+  "info": {
+    "displayName": "NewsArticlesSection"
+  },
+  "options": {},
+  "attributes": {
+    "news_article_category": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::news-article-category.news-article-category"
+    },
+    "MaxArticles": {
+      "type": "integer"
+    },
+    "MaxFeaturedArticles": {
+      "type": "integer"
+    }
+  },
+  "config": {}
+}

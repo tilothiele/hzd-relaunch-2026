@@ -64,6 +64,21 @@ export interface BlocksItemList extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksNewsArticlesSection extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_news_articles_sections';
+  info: {
+    displayName: 'NewsArticlesSection';
+  };
+  attributes: {
+    MaxArticles: Schema.Attribute.Integer;
+    MaxFeaturedArticles: Schema.Attribute.Integer;
+    news_article_category: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::news-article-category.news-article-category'
+    >;
+  };
+}
+
 export interface BlocksRichTextSection extends Struct.ComponentSchema {
   collectionName: 'components_blocks_rich_text_sections';
   info: {
@@ -482,6 +497,7 @@ declare module '@strapi/strapi' {
       'blocks.hero-section-slide-show': BlocksHeroSectionSlideShow;
       'blocks.image-gallery-section': BlocksImageGallerySection;
       'blocks.item-list': BlocksItemList;
+      'blocks.news-articles-section': BlocksNewsArticlesSection;
       'blocks.rich-text-section': BlocksRichTextSection;
       'blocks.simple-cta-section': BlocksSimpleCtaSection;
       'blocks.slide-item': BlocksSlideItem;

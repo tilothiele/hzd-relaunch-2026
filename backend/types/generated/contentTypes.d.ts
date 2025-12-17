@@ -800,6 +800,54 @@ export interface ApiMerchandisingProductMerchandisingProduct
   };
 }
 
+export interface ApiNewsArticleCategoryNewsArticleCategory
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'news_article_categories';
+  info: {
+    displayName: 'NewsArticleCategory';
+    pluralName: 'news-article-categories';
+    singularName: 'news-article-category';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    CategoryDescription: Schema.Attribute.RichText &
+      Schema.Attribute.CustomField<
+        'plugin::ckeditor5.CKEditor',
+        {
+          preset: 'defaultHtml';
+        }
+      >;
+    CategoryImage: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
+    CategoryName: Schema.Attribute.String;
+    CategoryTeaserText: Schema.Attribute.Text;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    FeatureTitle: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::news-article-category.news-article-category'
+    > &
+      Schema.Attribute.Private;
+    news_articles: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::news-article.news-article'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    Slug: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
   collectionName: 'news_articles';
   info: {
@@ -812,10 +860,17 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
   };
   attributes: {
     Author: Schema.Attribute.String;
+    category: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::news-article-category.news-article-category'
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     DateOfPublication: Schema.Attribute.Date;
+    FeaturedArticle: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
     Headline: Schema.Attribute.String;
     Image: Schema.Attribute.Media<'images' | 'files'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
@@ -839,6 +894,8 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    VisibleFrom: Schema.Attribute.DateTime;
+    VisibleTo: Schema.Attribute.DateTime;
   };
 }
 
@@ -944,6 +1001,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.text-columns-section',
         'blocks.image-gallery-section',
         'blocks.simple-cta-section',
+        'blocks.news-articles-section',
       ]
     >;
     SEO: Schema.Attribute.Component<'seo.seo', true>;
@@ -1822,6 +1880,7 @@ declare module '@strapi/strapi' {
       'api::index-page.index-page': ApiIndexPageIndexPage;
       'api::local-cummunity.local-cummunity': ApiLocalCummunityLocalCummunity;
       'api::merchandising-product.merchandising-product': ApiMerchandisingProductMerchandisingProduct;
+      'api::news-article-category.news-article-category': ApiNewsArticleCategoryNewsArticleCategory;
       'api::news-article.news-article': ApiNewsArticleNewsArticle;
       'api::order-item.order-item': ApiOrderItemOrderItem;
       'api::order.order': ApiOrderOrder;

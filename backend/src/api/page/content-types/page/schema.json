@@ -32,7 +32,8 @@
         "blocks.teaser-text-with-image",
         "blocks.text-columns-section",
         "blocks.image-gallery-section",
-        "blocks.simple-cta-section"
+        "blocks.simple-cta-section",
+        "blocks.news-articles-section"
       ]
     },
     "ColorTheme": {

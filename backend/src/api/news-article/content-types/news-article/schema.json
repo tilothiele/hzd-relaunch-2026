@@ -31,8 +31,19 @@
     "Author": {
       "type": "string"
     },
+    "VisibleFrom": {
+      "type": "datetime"
+    },
+    "VisibleTo": {
+      "type": "datetime"
+    },
     "DateOfPublication": {
       "type": "date"
+    },
+    "FeaturedArticle": {
+      "type": "boolean",
+      "required": true,
+      "default": false
     },
     "Slug": {
       "type": "string"
@@ -48,6 +59,12 @@
       "options": {
         "preset": "defaultHtml"
       }
+    },
+    "category": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::news-article-category.news-article-category",
+      "inversedBy": "news_articles"
     }
   }
 }

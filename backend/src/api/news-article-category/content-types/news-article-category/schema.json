@@ -1,0 +1,52 @@
+{
+  "kind": "collectionType",
+  "collectionName": "news_article_categories",
+  "info": {
+    "singularName": "news-article-category",
+    "pluralName": "news-article-categories",
+    "displayName": "NewsArticleCategory"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "CategoryName": {
+      "type": "string"
+    },
+    "Slug": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "CategoryTeaserText": {
+      "type": "text"
+    },
+    "FeatureTitle": {
+      "type": "string"
+    },
+    "news_articles": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::news-article.news-article",
+      "mappedBy": "category"
+    },
+    "CategoryImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "CategoryDescription": {
+      "type": "customField",
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultHtml"
+      }
+    }
+  }
+}
