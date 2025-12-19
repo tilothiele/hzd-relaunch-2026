@@ -504,7 +504,8 @@ export interface ApiCalendarCalendar extends Struct.CollectionTypeSchema {
   attributes: {
     ColorSchema: Schema.Attribute.Enumeration<
       ['Violet', 'Gruen', 'Pink', 'Rot', 'Gelb']
-    >;
+    > &
+      Schema.Attribute.Required;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -514,7 +515,7 @@ export interface ApiCalendarCalendar extends Struct.CollectionTypeSchema {
       'api::calendar.calendar'
     > &
       Schema.Attribute.Private;
-    Name: Schema.Attribute.String;
+    Name: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
