@@ -8,6 +8,7 @@ import { TeaserTextWithImageSectionComponent } from './teaser-text-with-image-se
 import { TextColumnsSectionComponent } from './text-columns-section/text-columns-section'
 import { ImageGallerySectionComponent } from './image-gallery-section/image-gallery-section'
 import { SimpleCtaSectionComponent } from './simple-cta-section/simple-cta-section'
+import { ContactGroupSectionComponent } from './contact-group-section/contact-group-section'
 
 interface RenderSectionParams {
 	section: StartpageSection
@@ -89,6 +90,15 @@ function renderSection({
 	case 'ComponentBlocksSimpleCtaSection':
 		return (
 			<SimpleCtaSectionComponent
+				key={key}
+				section={section}
+				strapiBaseUrl={strapiBaseUrl}
+				theme={theme}
+			/>
+		)
+	case 'ComponentBlocksContactGroupSection':
+		return (
+			<ContactGroupSectionComponent
 				key={key}
 				section={section}
 				strapiBaseUrl={strapiBaseUrl}

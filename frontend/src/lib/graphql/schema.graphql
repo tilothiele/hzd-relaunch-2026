@@ -446,6 +446,12 @@ enum ENUM_COMPONENTFORMSTANDARDIDENTIFIERS_STREET {
   Erforderlich
 }
 
+enum ENUM_COMPONENTFORMSTANDARDIDENTIFIERS_COUNTRYCODE {
+  Nein
+  Ja
+  Erforderlich
+}
+
 enum ENUM_COMPONENTFORMSTANDARDIDENTIFIERS_ZIP {
   Nein
   Ja
@@ -471,6 +477,7 @@ type ComponentFormStandardIdentifiers {
   FirstName: ENUM_COMPONENTFORMSTANDARDIDENTIFIERS_FIRSTNAME!
   LastName: ENUM_COMPONENTFORMSTANDARDIDENTIFIERS_LASTNAME!
   Street: ENUM_COMPONENTFORMSTANDARDIDENTIFIERS_STREET!
+  CountryCode: ENUM_COMPONENTFORMSTANDARDIDENTIFIERS_COUNTRYCODE!
   Zip: ENUM_COMPONENTFORMSTANDARDIDENTIFIERS_ZIP
   City: ENUM_COMPONENTFORMSTANDARDIDENTIFIERS_CITY!
   Phone: ENUM_COMPONENTFORMSTANDARDIDENTIFIERS_PHONE!
@@ -730,6 +737,11 @@ type ComponentBlocksImageGallerySection {
 type ComponentBlocksHeroSectionSlideShow {
   id: ID!
   Headline(filters: ComponentBlocksSlideItemFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [ComponentBlocksSlideItem]
+}
+
+type ComponentBlocksContactGroupSection {
+  id: ID!
+  ContactGroup: ContactGroup
 }
 
 enum ENUM_COMPONENTBLOCKSCARDSECTION_CARDCOLUMNSODDEVEN {
@@ -1399,8 +1411,8 @@ input CalendarInput {
 
 type Calendar {
   documentId: ID!
-  Name: String
-  ColorSchema: ENUM_CALENDAR_COLORSCHEMA
+  Name: String!
+  ColorSchema: ENUM_CALENDAR_COLORSCHEMA!
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -1499,6 +1511,15 @@ input ContactFiltersInput {
   documentId: IDFilterInput
   position: IntFilterInput
   member: UsersPermissionsUserFiltersInput
+  contact_group: ContactGroupFiltersInput
+  Headline: StringFilterInput
+  Name: StringFilterInput
+  Street: StringFilterInput
+  ZipCity: StringFilterInput
+  Phone: StringFilterInput
+  Email1: StringFilterInput
+  Email2: StringFilterInput
+  Introduction: StringFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   publishedAt: DateTimeFilterInput
@@ -1511,6 +1532,15 @@ input ContactInput {
   avatar: ID
   position: Int
   member: ID
+  contact_group: ID
+  Headline: String
+  Name: String
+  Street: String
+  ZipCity: String
+  Phone: String
+  Email1: String
+  Email2: String
+  Introduction: String
   publishedAt: DateTime
 }
 
@@ -1519,6 +1549,15 @@ type Contact {
   avatar: UploadFile
   position: Int
   member: UsersPermissionsUser
+  contact_group: ContactGroup
+  Headline: String
+  Name: String
+  Street: String
+  ZipCity: String
+  Phone: String
+  Email1: String
+  Email2: String
+  Introduction: String
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -1526,6 +1565,46 @@ type Contact {
 
 type ContactEntityResponseCollection {
   nodes: [Contact!]!
+  pageInfo: Pagination!
+}
+
+type ContactRelationResponseCollection {
+  nodes: [Contact!]!
+}
+
+input ContactGroupFiltersInput {
+  documentId: IDFilterInput
+  ContactGroupName: StringFilterInput
+  GroupDescription: JSONFilterInput
+  contacts: ContactFiltersInput
+  createdAt: DateTimeFilterInput
+  updatedAt: DateTimeFilterInput
+  publishedAt: DateTimeFilterInput
+  and: [ContactGroupFiltersInput]
+  or: [ContactGroupFiltersInput]
+  not: ContactGroupFiltersInput
+}
+
+input ContactGroupInput {
+  ContactGroupName: String
+  GroupDescription: JSON
+  contacts: [ID]
+  publishedAt: DateTime
+}
+
+type ContactGroup {
+  documentId: ID!
+  ContactGroupName: String
+  GroupDescription: JSON
+  contacts_connection(filters: ContactFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): ContactRelationResponseCollection
+  contacts(filters: ContactFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [Contact]!
+  createdAt: DateTime
+  updatedAt: DateTime
+  publishedAt: DateTime
+}
+
+type ContactGroupEntityResponseCollection {
+  nodes: [ContactGroup!]!
   pageInfo: Pagination!
 }
 
@@ -1948,7 +2027,7 @@ type OrderItemEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union PageSectionsDynamicZone = ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksRichTextSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTextColumnsSection | ComponentBlocksImageGallerySection | ComponentBlocksSimpleCtaSection | ComponentBlocksNewsArticlesSection | Error
+union PageSectionsDynamicZone = ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksRichTextSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTextColumnsSection | ComponentBlocksImageGallerySection | ComponentBlocksSimpleCtaSection | ComponentBlocksNewsArticlesSection | ComponentBlocksContactGroupSection | Error
 
 scalar PageSectionsDynamicZoneInput
 
@@ -2124,7 +2203,7 @@ type SupplementalDocumentGroupEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPermissionGroups | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | Calendar | CalendarEntry | Contact | Form | FormInstance | GlobalLayout | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
+union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPermissionGroups | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
 
 input FileInfoInput {
   name: String
@@ -2235,6 +2314,9 @@ type Query {
   contact(documentId: ID!, status: PublicationStatus = PUBLISHED): Contact
   contacts_connection(filters: ContactFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): ContactEntityResponseCollection
   contacts(filters: ContactFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Contact]!
+  contactGroup(documentId: ID!, status: PublicationStatus = PUBLISHED): ContactGroup
+  contactGroups_connection(filters: ContactGroupFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): ContactGroupEntityResponseCollection
+  contactGroups(filters: ContactGroupFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [ContactGroup]!
   form(documentId: ID!, status: PublicationStatus = PUBLISHED): Form
   forms_connection(filters: FormFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): FormEntityResponseCollection
   forms(filters: FormFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Form]!
@@ -2301,6 +2383,9 @@ type Mutation {
   createContact(status: PublicationStatus = PUBLISHED, data: ContactInput!): Contact
   updateContact(documentId: ID!, status: PublicationStatus = PUBLISHED, data: ContactInput!): Contact
   deleteContact(documentId: ID!): DeleteMutationResponse
+  createContactGroup(status: PublicationStatus = PUBLISHED, data: ContactGroupInput!): ContactGroup
+  updateContactGroup(documentId: ID!, status: PublicationStatus = PUBLISHED, data: ContactGroupInput!): ContactGroup
+  deleteContactGroup(documentId: ID!): DeleteMutationResponse
   createForm(status: PublicationStatus = PUBLISHED, data: FormInput!): Form
   updateForm(documentId: ID!, status: PublicationStatus = PUBLISHED, data: FormInput!): Form
   deleteForm(documentId: ID!): DeleteMutationResponse

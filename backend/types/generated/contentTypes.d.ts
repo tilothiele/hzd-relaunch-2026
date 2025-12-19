@@ -573,6 +573,16 @@ export interface ApiContactContact extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    Email1: Schema.Attribute.Email;
+    Email2: Schema.Attribute.Email;
+    Headline: Schema.Attribute.String;
+    Introduction: Schema.Attribute.RichText &
+      Schema.Attribute.CustomField<
+        'plugin::ckeditor5.CKEditor',
+        {
+          preset: 'defaultHtml';
+        }
+      >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -583,11 +593,15 @@ export interface ApiContactContact extends Struct.CollectionTypeSchema {
       'oneToOne',
       'plugin::users-permissions.user'
     >;
+    Name: Schema.Attribute.String;
+    Phone: Schema.Attribute.String;
     position: Schema.Attribute.Integer;
     publishedAt: Schema.Attribute.DateTime;
+    Street: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    ZipCity: Schema.Attribute.String;
   };
 }
 

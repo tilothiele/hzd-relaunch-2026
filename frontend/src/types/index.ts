@@ -130,7 +130,12 @@ export interface SimpleCtaSection {
 	CtaActionButton?: (ActionButton | null)[] | null
 }
 
-export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | SimpleCtaSection
+export interface ContactGroupSection {
+	__typename: 'ComponentBlocksContactGroupSection'
+	ContactGroup?: ContactGroup | null
+}
+
+export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | SimpleCtaSection | ContactGroupSection
 
 export type PageSection = StartpageSection
 
@@ -170,14 +175,36 @@ export interface GlobalLayout {
 }
 
 export interface Contact {
-	title: string
-	name: string
-	email: string
-	phone?: string | null
-	address?: string | null
-	role?: string | null
-	region?: string | null
-	topic?: string | null
+	documentId: string
+	avatar?: Image | null
+	position?: number | null
+	member?: {
+		documentId: string
+		firstName?: string | null
+		lastName?: string | null
+	} | null
+	contact_group?: ContactGroup | null
+	Headline?: string | null
+	Name?: string | null
+	Street?: string | null
+	ZipCity?: string | null
+	Phone?: string | null
+	Email1?: string | null
+	Email2?: string | null
+	Introduction?: string | null
+	createdAt?: string | null
+	updatedAt?: string | null
+	publishedAt?: string | null
+}
+
+export interface ContactGroup {
+	documentId: string
+	ContactGroupName?: string | null
+	GroupDescription?: unknown | null
+	contacts?: Contact[] | null
+	createdAt?: string | null
+	updatedAt?: string | null
+	publishedAt?: string | null
 }
 
 export interface ContactData {

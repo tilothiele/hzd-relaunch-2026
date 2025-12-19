@@ -175,6 +175,38 @@ export const GET_INDEX_PAGE = `
 						Primary
 					}
 				}
+				... on ComponentBlocksContactGroupSection {
+					ContactGroup {
+						documentId
+						ContactGroupName
+						GroupDescription
+						contacts(sort: ["position:asc"]) {
+							documentId
+							position
+							Headline
+							Name
+							Street
+							ZipCity
+							Phone
+							Email1
+							Email2
+							Introduction
+							avatar {
+								url
+								alternativeText
+								width
+								height
+								caption
+								previewUrl
+							}
+							member {
+								documentId
+								firstName
+								lastName
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -363,6 +395,38 @@ export const GET_PAGE_BY_SLUG = `
 								Label
 								Link
 								Primary
+							}
+						}
+						... on ComponentBlocksContactGroupSection {
+							ContactGroup {
+								documentId
+								ContactGroupName
+								GroupDescription
+								contacts(sort: ["position:asc"]) {
+									documentId
+									position
+									Headline
+									Name
+									Street
+									ZipCity
+									Phone
+									Email1
+									Email2
+									Introduction
+									avatar {
+										url
+										alternativeText
+										width
+										height
+										caption
+										previewUrl
+									}
+									member {
+										documentId
+										firstName
+										lastName
+									}
+								}
 							}
 						}
 					}
@@ -662,6 +726,36 @@ export const SEARCH_FORMS = `
 			Name
 			createdAt
 			updatedAt
+		}
+	}
+`
+
+export const GET_CONTACT_BY_DOCUMENT_ID = `
+	query GetContactByDocumentId($documentId: ID!) {
+		contact(documentId: $documentId) {
+			documentId
+			position
+			Headline
+			Name
+			Street
+			ZipCity
+			Phone
+			Email1
+			Email2
+			Introduction
+			avatar {
+				url
+				alternativeText
+				width
+				height
+				caption
+				previewUrl
+			}
+			member {
+				documentId
+				firstName
+				lastName
+			}
 		}
 	}
 `

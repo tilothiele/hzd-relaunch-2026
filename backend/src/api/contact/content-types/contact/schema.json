@@ -34,6 +34,34 @@
       "relation": "manyToOne",
       "target": "api::contact-group.contact-group",
       "inversedBy": "contacts"
+    },
+    "Headline": {
+      "type": "string"
+    },
+    "Name": {
+      "type": "string"
+    },
+    "Street": {
+      "type": "string"
+    },
+    "ZipCity": {
+      "type": "string"
+    },
+    "Phone": {
+      "type": "string"
+    },
+    "Email1": {
+      "type": "email"
+    },
+    "Email2": {
+      "type": "email"
+    },
+    "Introduction": {
+      "type": "customField",
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultHtml"
+      }
     }
   }
 }
