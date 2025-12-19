@@ -1,6 +1,10 @@
 export default ({env}) => ({
   'users-permissions': {
     enabled: true,
+    jwtSecret: env('JWT_SECRET') || 'your-secret-key',
+    jwt: {
+      expiresIn: '7d',
+    },
   },
   'hzd-plugin': {
     enabled: true,

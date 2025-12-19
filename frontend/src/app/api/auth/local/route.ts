@@ -20,6 +20,19 @@ export async function POST(request: NextRequest) {
 
 		const data = await response.json()
 
+		// Debug: Logge die vollständige Response-Struktur
+		console.log('[Auth Proxy] Strapi Response (vollständig):', JSON.stringify(data, null, 2))
+		console.log('[Auth Proxy] Strapi Response (Struktur):', {
+			'status': response.status,
+			'has jwt': 'jwt' in data,
+			'jwt type': typeof data.jwt,
+			'jwt value': data.jwt ? (typeof data.jwt === 'string' ? data.jwt.substring(0, 30) + '...' : JSON.stringify(data.jwt)) : null,
+			'has user': 'user' in data,
+			'has token': 'token' in data,
+			'token type': typeof data.token,
+			'data keys': Object.keys(data),
+		})
+
 		if (!response.ok) {
 			return NextResponse.json(
 				{ error: data.error || { message: 'Anmeldung fehlgeschlagen' } },

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import {
 	Box,
@@ -16,10 +16,11 @@ import {
 	IconButton,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import type { Form, FormSubmitButton, Image } from '@/types'
+import type { Form, FormSubmitButton, Image, StandardIdentifier } from '@/types'
 import { renderFormField } from './form-field-renderer'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { renderStrapiBlocks } from '@/lib/strapi-blocks'
+import { useAuth } from '@/hooks/use-auth'
 
 interface FormComponentProps {
 	form: Form
@@ -29,10 +30,71 @@ interface FormComponentProps {
 
 export function FormComponent({ form, privacyPolicy, strapiBaseUrl }: FormComponentProps) {
 	const router = useRouter()
+	const { isAuthenticated, authState } = useAuth(strapiBaseUrl)
 	const [values, setValues] = useState<Record<string, unknown>>({})
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [showThankYouModal, setShowThankYouModal] = useState(false)
 	const privacyPolicyUrl = resolveMediaUrl(privacyPolicy, strapiBaseUrl)
+
+	// Fülle StandardIdentifiers-Felder mit User-Daten aus authState
+	useEffect(() => {
+		if (!isAuthenticated || !authState?.user) {
+			return
+		}
+
+		const user = authState.user
+
+		// Finde StandardIdentifiers-Feld im Formular
+		const standardIdentifierField = form.FormFields?.find(
+			(field): field is StandardIdentifier => field.__typename === 'ComponentFormStandardIdentifiers',
+		)
+
+		if (!standardIdentifierField) {
+			return
+		}
+
+		// Fülle die Werte basierend auf den StandardIdentifiers-Feldern
+		const newValues: Record<string, unknown> = {}
+
+		if (standardIdentifierField.FirstName && standardIdentifierField.FirstName !== 'Nein' && user.firstName) {
+			newValues.firstName = user.firstName
+		}
+		if (standardIdentifierField.LastName && standardIdentifierField.LastName !== 'Nein' && user.lastName) {
+			newValues.lastName = user.lastName
+		}
+		if (standardIdentifierField.EMail && standardIdentifierField.EMail !== 'Nein' && user.email) {
+			newValues.email = user.email
+		}
+		if (standardIdentifierField.Street && standardIdentifierField.Street !== 'Nein' && user.address1) {
+			newValues.street = user.address1
+		}
+		if (standardIdentifierField.Zip && standardIdentifierField.Zip !== 'Nein' && user.zip) {
+			newValues.zip = user.zip
+		}
+		if (standardIdentifierField.City && standardIdentifierField.City !== 'Nein' && user.city) {
+			newValues.city = user.city
+		}
+		if (standardIdentifierField.CountryCode && standardIdentifierField.CountryCode !== 'Nein' && user.countryCode) {
+			newValues.countryCode = user.countryCode
+		}
+		if (standardIdentifierField.Phone && standardIdentifierField.Phone !== 'Nein' && user.phone) {
+			newValues.phone = user.phone
+		}
+
+		// Aktualisiere die Werte nur, wenn neue Daten vorhanden sind und die Felder noch nicht befüllt sind
+		if (Object.keys(newValues).length > 0) {
+			setValues((prev) => {
+				const updated: Record<string, unknown> = { ...prev }
+				// Nur Werte setzen, die noch nicht vorhanden sind
+				Object.entries(newValues).forEach(([key, value]) => {
+					if (!updated[key] || updated[key] === '') {
+						updated[key] = value
+					}
+				})
+				return updated
+			})
+		}
+	}, [isAuthenticated, authState?.user, form.FormFields])
 
 	const handleCloseModal = useCallback(() => {
 		setShowThankYouModal(false)

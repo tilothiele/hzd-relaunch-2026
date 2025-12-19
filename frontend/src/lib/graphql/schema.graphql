@@ -330,44 +330,6 @@ type ComponentPermissionGroups {
   BreedWarden: Boolean
 }
 
-input ComponentLinksPartnerlLinkFiltersInput {
-  PartnerLinkUrl: StringFilterInput
-  AltText: StringFilterInput
-  and: [ComponentLinksPartnerlLinkFiltersInput]
-  or: [ComponentLinksPartnerlLinkFiltersInput]
-  not: ComponentLinksPartnerlLinkFiltersInput
-}
-
-input ComponentLinksPartnerlLinkInput {
-  id: ID
-  Logo: ID
-  PartnerLinkUrl: String
-  AltText: String
-}
-
-type ComponentLinksPartnerlLink {
-  id: ID!
-  Logo: UploadFile
-  PartnerLinkUrl: String
-  AltText: String
-}
-
-input ComponentLinksActionButtonFiltersInput {
-  Label: StringFilterInput
-  Link: StringFilterInput
-  Primary: BooleanFilterInput
-  and: [ComponentLinksActionButtonFiltersInput]
-  or: [ComponentLinksActionButtonFiltersInput]
-  not: ComponentLinksActionButtonFiltersInput
-}
-
-type ComponentLinksActionButton {
-  id: ID!
-  Label: String
-  Link: String
-  Primary: Boolean
-}
-
 input ComponentLayoutFooterInput {
   id: ID
   PraesidiumName: String
@@ -411,6 +373,44 @@ input ComponentLayoutColorThemeInput {
 type ComponentLayoutColorTheme {
   id: ID!
   ShortName: ENUM_COMPONENTLAYOUTCOLORTHEME_SHORTNAME
+}
+
+input ComponentLinksPartnerlLinkFiltersInput {
+  PartnerLinkUrl: StringFilterInput
+  AltText: StringFilterInput
+  and: [ComponentLinksPartnerlLinkFiltersInput]
+  or: [ComponentLinksPartnerlLinkFiltersInput]
+  not: ComponentLinksPartnerlLinkFiltersInput
+}
+
+input ComponentLinksPartnerlLinkInput {
+  id: ID
+  Logo: ID
+  PartnerLinkUrl: String
+  AltText: String
+}
+
+type ComponentLinksPartnerlLink {
+  id: ID!
+  Logo: UploadFile
+  PartnerLinkUrl: String
+  AltText: String
+}
+
+input ComponentLinksActionButtonFiltersInput {
+  Label: StringFilterInput
+  Link: StringFilterInput
+  Primary: BooleanFilterInput
+  and: [ComponentLinksActionButtonFiltersInput]
+  or: [ComponentLinksActionButtonFiltersInput]
+  not: ComponentLinksActionButtonFiltersInput
+}
+
+type ComponentLinksActionButton {
+  id: ID!
+  Label: String
+  Link: String
+  Primary: Boolean
 }
 
 type ComponentFormTextArea {
@@ -706,6 +706,13 @@ type ComponentBlocksRichTextSection {
   Subtitle: String
   RichTextContent: String
   RichTextOddEven: ENUM_COMPONENTBLOCKSRICHTEXTSECTION_RICHTEXTODDEVEN
+}
+
+type ComponentBlocksNewsArticlesSection {
+  id: ID!
+  news_article_category: NewsArticleCategory
+  MaxArticles: Int
+  MaxFeaturedArticles: Int
 }
 
 type ComponentBlocksItemList {
@@ -1105,6 +1112,7 @@ type UsersPermissionsUser {
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
+  countryCode: String
 }
 
 type UsersPermissionsUserEntityResponse {
@@ -1753,10 +1761,14 @@ input NewsArticleFiltersInput {
   SubHeadline: StringFilterInput
   TeaserText: StringFilterInput
   Author: StringFilterInput
+  VisibleFrom: DateTimeFilterInput
+  VisibleTo: DateTimeFilterInput
   DateOfPublication: DateFilterInput
+  FeaturedArticle: BooleanFilterInput
   Slug: StringFilterInput
   SEO: ComponentSeoSeoFiltersInput
   NewsBody: StringFilterInput
+  category: NewsArticleCategoryFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   publishedAt: DateTimeFilterInput
@@ -1771,10 +1783,14 @@ input NewsArticleInput {
   TeaserText: String
   Image: ID
   Author: String
+  VisibleFrom: DateTime
+  VisibleTo: DateTime
   DateOfPublication: Date
+  FeaturedArticle: Boolean
   Slug: String
   SEO: ComponentSeoSeoInput
   NewsBody: String
+  category: ID
   publishedAt: DateTime
 }
 
@@ -1785,10 +1801,14 @@ type NewsArticle {
   TeaserText: String
   Image: UploadFile
   Author: String
+  VisibleFrom: DateTime
+  VisibleTo: DateTime
   DateOfPublication: Date
+  FeaturedArticle: Boolean!
   Slug: String
   SEO: ComponentSeoSeo
   NewsBody: String
+  category: NewsArticleCategory
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -1796,6 +1816,57 @@ type NewsArticle {
 
 type NewsArticleEntityResponseCollection {
   nodes: [NewsArticle!]!
+  pageInfo: Pagination!
+}
+
+type NewsArticleRelationResponseCollection {
+  nodes: [NewsArticle!]!
+}
+
+input NewsArticleCategoryFiltersInput {
+  documentId: IDFilterInput
+  CategoryName: StringFilterInput
+  Slug: StringFilterInput
+  CategoryTeaserText: StringFilterInput
+  FeatureTitle: StringFilterInput
+  news_articles: NewsArticleFiltersInput
+  CategoryDescription: StringFilterInput
+  createdAt: DateTimeFilterInput
+  updatedAt: DateTimeFilterInput
+  publishedAt: DateTimeFilterInput
+  and: [NewsArticleCategoryFiltersInput]
+  or: [NewsArticleCategoryFiltersInput]
+  not: NewsArticleCategoryFiltersInput
+}
+
+input NewsArticleCategoryInput {
+  CategoryName: String
+  Slug: String
+  CategoryTeaserText: String
+  FeatureTitle: String
+  news_articles: [ID]
+  CategoryImage: ID
+  CategoryDescription: String
+  publishedAt: DateTime
+}
+
+type NewsArticleCategory {
+  documentId: ID!
+  CategoryName: String
+  Slug: String!
+  CategoryTeaserText: String
+  FeatureTitle: String
+  news_articles_connection(filters: NewsArticleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): NewsArticleRelationResponseCollection
+  news_articles(filters: NewsArticleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [NewsArticle]!
+  CategoryImage: UploadFile
+  CategoryDescription: String
+  createdAt: DateTime
+  updatedAt: DateTime
+  publishedAt: DateTime
+}
+
+type NewsArticleCategoryEntityResponseCollection {
+  nodes: [NewsArticleCategory!]!
   pageInfo: Pagination!
 }
 
@@ -1877,7 +1948,7 @@ type OrderItemEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union PageSectionsDynamicZone = ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksRichTextSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTextColumnsSection | ComponentBlocksImageGallerySection | ComponentBlocksSimpleCtaSection | Error
+union PageSectionsDynamicZone = ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksRichTextSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTextColumnsSection | ComponentBlocksImageGallerySection | ComponentBlocksSimpleCtaSection | ComponentBlocksNewsArticlesSection | Error
 
 scalar PageSectionsDynamicZoneInput
 
@@ -2053,7 +2124,7 @@ type SupplementalDocumentGroupEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | Calendar | CalendarEntry | Contact | Form | FormInstance | GlobalLayout | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
+union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPermissionGroups | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | Calendar | CalendarEntry | Contact | Form | FormInstance | GlobalLayout | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
 
 input FileInfoInput {
   name: String
@@ -2069,6 +2140,15 @@ type UsersPermissionsMe {
   confirmed: Boolean
   blocked: Boolean
   role: UsersPermissionsMeRole
+  firstName: String
+  lastName: String
+  address1: String
+  address2: String
+  countryCode: String
+  zip: String
+  city: String
+  phone: String
+  geoLocation: ComponentBreedingGeoLocation
 }
 
 type UsersPermissionsMeRole {
@@ -2172,6 +2252,9 @@ type Query {
   newsArticle(documentId: ID!, status: PublicationStatus = PUBLISHED): NewsArticle
   newsArticles_connection(filters: NewsArticleFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): NewsArticleEntityResponseCollection
   newsArticles(filters: NewsArticleFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [NewsArticle]!
+  newsArticleCategory(documentId: ID!, status: PublicationStatus = PUBLISHED): NewsArticleCategory
+  newsArticleCategories_connection(filters: NewsArticleCategoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): NewsArticleCategoryEntityResponseCollection
+  newsArticleCategories(filters: NewsArticleCategoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [NewsArticleCategory]!
   order(documentId: ID!, status: PublicationStatus = PUBLISHED): Order
   orders_connection(filters: OrderFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): OrderEntityResponseCollection
   orders(filters: OrderFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Order]!
@@ -2237,6 +2320,9 @@ type Mutation {
   createNewsArticle(status: PublicationStatus = PUBLISHED, data: NewsArticleInput!): NewsArticle
   updateNewsArticle(documentId: ID!, status: PublicationStatus = PUBLISHED, data: NewsArticleInput!): NewsArticle
   deleteNewsArticle(documentId: ID!): DeleteMutationResponse
+  createNewsArticleCategory(status: PublicationStatus = PUBLISHED, data: NewsArticleCategoryInput!): NewsArticleCategory
+  updateNewsArticleCategory(documentId: ID!, status: PublicationStatus = PUBLISHED, data: NewsArticleCategoryInput!): NewsArticleCategory
+  deleteNewsArticleCategory(documentId: ID!): DeleteMutationResponse
   createOrder(status: PublicationStatus = PUBLISHED, data: OrderInput!): Order
   updateOrder(documentId: ID!, status: PublicationStatus = PUBLISHED, data: OrderInput!): Order
   deleteOrder(documentId: ID!): DeleteMutationResponse

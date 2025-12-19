@@ -54,6 +54,15 @@ export function LoginControls({
 			return 'Login'
 		}
 
+		// Verwende firstName + lastName falls vorhanden
+		if (user.firstName || user.lastName) {
+			const nameParts = [user.firstName, user.lastName].filter(Boolean)
+			if (nameParts.length > 0) {
+				return nameParts.join(' ')
+			}
+		}
+
+		// Fallback auf username oder email
 		return user.username ?? user.email ?? 'Account'
 	}, [user])
 

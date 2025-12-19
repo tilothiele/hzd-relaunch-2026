@@ -12,7 +12,8 @@
   "pluginOptions": {},
   "attributes": {
     "Name": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "ColorSchema": {
       "type": "enumeration",
@@ -22,7 +23,8 @@
         "Pink",
         "Rot",
         "Gelb"
-      ]
+      ],
+      "required": true
     }
   }
 }

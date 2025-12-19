@@ -13,9 +13,6 @@ export function CookieBanner() {
 	const [isVisible, setIsVisible] = useState(false)
 	const [isSaving, setIsSaving] = useState(false)
 
-	console.log(globalLayout)
-	console.log(privacyPolicyUrl)
-
 	useEffect(() => {
 		try {
 			const storedValue = localStorage.getItem(STORAGE_KEY)

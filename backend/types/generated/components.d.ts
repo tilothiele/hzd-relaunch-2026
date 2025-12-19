@@ -365,6 +365,9 @@ export interface FormStandardIdentifiers extends Struct.ComponentSchema {
     City: Schema.Attribute.Enumeration<['Nein', 'Ja', 'Erforderlich']> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'Ja'>;
+    CountryCode: Schema.Attribute.Enumeration<['Nein', 'Ja', 'Erforderlich']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Ja'>;
     EMail: Schema.Attribute.Enumeration<['Erforderlich']> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'Erforderlich'>;

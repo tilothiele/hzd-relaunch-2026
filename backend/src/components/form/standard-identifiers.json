@@ -53,6 +53,16 @@
         "Erforderlich"
       ]
     },
+    "CountryCode": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Ja",
+      "enum": [
+        "Nein",
+        "Ja",
+        "Erforderlich"
+      ]
+    },
     "Zip": {
       "type": "enumeration",
       "default": "Ja",
