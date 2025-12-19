@@ -25,7 +25,10 @@
         "blocks.teaser-text-with-image",
         "blocks.text-columns-section",
         "blocks.image-gallery-section",
-        "blocks.simple-cta-section"
+        "blocks.simple-cta-section",
+        "blocks.contact-group-section",
+        "blocks.news-articles-section",
+        "blocks.supplemental-document-group-section"
       ]
     }
   }

@@ -750,6 +750,9 @@ export interface ApiIndexPageIndexPage extends Struct.SingleTypeSchema {
         'blocks.text-columns-section',
         'blocks.image-gallery-section',
         'blocks.simple-cta-section',
+        'blocks.contact-group-section',
+        'blocks.news-articles-section',
+        'blocks.supplemental-document-group-section',
       ]
     >;
     SEO: Schema.Attribute.Component<'seo.seo', false>;
