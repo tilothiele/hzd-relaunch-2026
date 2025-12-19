@@ -523,6 +523,37 @@ export interface ApiCalendarCalendar extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiContactGroupContactGroup
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'contact_groups';
+  info: {
+    displayName: 'ContactGroup';
+    pluralName: 'contact-groups';
+    singularName: 'contact-group';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    ContactGroupName: Schema.Attribute.String;
+    contacts: Schema.Attribute.Relation<'oneToMany', 'api::contact.contact'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    GroupDescription: Schema.Attribute.Blocks;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::contact-group.contact-group'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiContactContact extends Struct.CollectionTypeSchema {
   collectionName: 'contacts';
   info: {
@@ -535,6 +566,10 @@ export interface ApiContactContact extends Struct.CollectionTypeSchema {
   };
   attributes: {
     avatar: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    contact_group: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::contact-group.contact-group'
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1003,6 +1038,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.image-gallery-section',
         'blocks.simple-cta-section',
         'blocks.news-articles-section',
+        'blocks.contact-group-section',
       ]
     >;
     SEO: Schema.Attribute.Component<'seo.seo', true>;
@@ -1874,6 +1910,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::calendar-entry.calendar-entry': ApiCalendarEntryCalendarEntry;
       'api::calendar.calendar': ApiCalendarCalendar;
+      'api::contact-group.contact-group': ApiContactGroupContactGroup;
       'api::contact.contact': ApiContactContact;
       'api::form-instance.form-instance': ApiFormInstanceFormInstance;
       'api::form.form': ApiFormForm;

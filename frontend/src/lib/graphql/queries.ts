@@ -655,6 +655,28 @@ export const GET_ME = `
 	}
 `
 
+export const SEARCH_FORMS = `
+	query SearchForms($filters: FormFiltersInput, $pagination: PaginationArg, $sort: [String]) {
+		forms(filters: $filters, pagination: $pagination, sort: $sort) {
+			documentId
+			Name
+			createdAt
+			updatedAt
+		}
+	}
+`
+
+export const COUNT_FORM_INSTANCES = `
+	query CountFormInstances($filters: FormInstanceFiltersInput) {
+		formInstances(filters: $filters) {
+			documentId
+			Content
+			createdAt
+			updatedAt
+		}
+	}
+`
+
 export const CREATE_FORM_INSTANCE = `
 	mutation CreateFormInstance($data: FormInstanceInput!) {
 		createFormInstance(data: $data) {

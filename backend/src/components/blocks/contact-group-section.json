@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_blocks_contact_group_sections",
+  "info": {
+    "displayName": "ContactGroupSection"
+  },
+  "options": {},
+  "attributes": {
+    "ContactGroup": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::contact-group.contact-group"
+    }
+  },
+  "config": {}
+}

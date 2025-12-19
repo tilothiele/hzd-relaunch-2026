@@ -33,6 +33,19 @@ export interface BlocksCardSection extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksContactGroupSection extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_contact_group_sections';
+  info: {
+    displayName: 'ContactGroupSection';
+  };
+  attributes: {
+    ContactGroup: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::contact-group.contact-group'
+    >;
+  };
+}
+
 export interface BlocksHeroSectionSlideShow extends Struct.ComponentSchema {
   collectionName: 'components_blocks_hero_section_slide_shows';
   info: {
@@ -497,6 +510,7 @@ declare module '@strapi/strapi' {
     export interface ComponentSchemas {
       'blocks.card-item': BlocksCardItem;
       'blocks.card-section': BlocksCardSection;
+      'blocks.contact-group-section': BlocksContactGroupSection;
       'blocks.hero-section-slide-show': BlocksHeroSectionSlideShow;
       'blocks.image-gallery-section': BlocksImageGallerySection;
       'blocks.item-list': BlocksItemList;

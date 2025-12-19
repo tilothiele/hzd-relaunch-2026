@@ -1,0 +1,27 @@
+{
+  "kind": "collectionType",
+  "collectionName": "contact_groups",
+  "info": {
+    "singularName": "contact-group",
+    "pluralName": "contact-groups",
+    "displayName": "ContactGroup"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "ContactGroupName": {
+      "type": "string"
+    },
+    "GroupDescription": {
+      "type": "blocks"
+    },
+    "contacts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::contact.contact",
+      "mappedBy": "contact_group"
+    }
+  }
+}

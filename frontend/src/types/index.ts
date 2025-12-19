@@ -503,6 +503,8 @@ export interface Form {
 	InclPrivacyPolicy?: boolean | null
 	ThankYouMessage?: string | null
 	FormFields?: FormField[] | null
+	createdAt?: string | null
+	updatedAt?: string | null
 }
 
 export interface FormQueryResult {
@@ -513,10 +515,19 @@ export interface FormInstance {
 	documentId: string
 	form?: {
 		documentId: string
+		Name?: string | null
 	} | null
-	formData?: Record<string, unknown> | null
+	Content?: Record<string, unknown> | null
 	createdAt?: string | null
 	updatedAt?: string | null
+}
+
+export interface FormSearchResult {
+	forms: Form[]
+}
+
+export interface FormInstanceSearchResult {
+	formInstances: FormInstance[]
 }
 
 export interface CreateFormInstanceResult {

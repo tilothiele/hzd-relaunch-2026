@@ -28,6 +28,12 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "plugin::users-permissions.user"
+    },
+    "contact_group": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::contact-group.contact-group",
+      "inversedBy": "contacts"
     }
   }
 }
