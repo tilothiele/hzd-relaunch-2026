@@ -630,13 +630,27 @@ export const GET_ME = `
 			documentId
 			username
 			email
+			confirmed
+			blocked
+			role {
+				id
+				name
+				description
+				type
+			}
 			firstName
 			lastName
 			address1
+			address2
+			countryCode
 			zip
 			city
-			countryCode
 			phone
+			geoLocation {
+				id
+				lat
+				lng
+			}
 		}
 	}
 `

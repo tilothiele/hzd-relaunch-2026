@@ -1,7 +1,8 @@
 'use client'
 
 import { createContext, useContext, useCallback, useEffect, useState, type ReactNode } from 'react'
-import { setGraphQLAuthToken } from '@/lib/graphql-client'
+import { setGraphQLAuthToken, fetchGraphQL } from '@/lib/graphql-client'
+import { GET_ME } from '@/lib/graphql/queries'
 import type { AuthUser } from '@/types'
 
 interface AuthState {
@@ -15,8 +16,14 @@ interface LoginCredentials {
 }
 
 interface StrapiAuthResponse {
-	jwt: string
-	user: AuthUser
+	jwt: string | { jwt?: string; token?: string } | unknown
+	user: {
+		id: number | string
+		username?: string | null
+		email?: string | null
+		// Weitere Felder können vorhanden sein, werden aber durch GET_ME überschrieben
+		[key: string]: unknown
+	}
 }
 
 interface AuthContextValue {
@@ -127,6 +134,10 @@ interface AuthProviderProps {
 	strapiBaseUrl?: string | null
 }
 
+interface GetMeResponse {
+	me: AuthUser
+}
+
 export function AuthProvider({ children, strapiBaseUrl }: AuthProviderProps) {
 	// Initialisiere immer mit null, um Hydration-Fehler zu vermeiden
 	// Der tatsächliche Wert wird nach dem Mount geladen
@@ -181,28 +192,100 @@ export function AuthProvider({ children, strapiBaseUrl }: AuthProviderProps) {
 
 			const result = (await response.json()) as StrapiAuthResponse
 
-			const newState: AuthState = {
-				token: result.jwt,
-				user: result.user,
+			// Normalisiere Token: Prüfe verschiedene mögliche Stellen
+			let jwtToken: string | null = null
+
+			// 1. Prüfe result.jwt (Standard-Strapi)
+			if (typeof result.jwt === 'string' && result.jwt.length > 0) {
+				jwtToken = result.jwt
+			} else if (result.jwt && typeof result.jwt === 'object') {
+				const jwtObj = result.jwt as Record<string, unknown>
+				if (typeof jwtObj.jwt === 'string') {
+					jwtToken = jwtObj.jwt
+				} else if (typeof jwtObj.token === 'string') {
+					jwtToken = jwtObj.token
+				}
+			}
+
+			// 2. Prüfe result.token (Alternative)
+			if (!jwtToken && 'token' in result && typeof (result as { token?: unknown }).token === 'string') {
+				jwtToken = (result as { token: string }).token
+			}
+
+			// 3. Prüfe result.data.token (falls verschachtelt)
+			if (!jwtToken && 'data' in result) {
+				const data = (result as { data?: { token?: string; jwt?: string } }).data
+				if (data?.token && typeof data.token === 'string') {
+					jwtToken = data.token
+				} else if (data?.jwt && typeof data.jwt === 'string') {
+					jwtToken = data.jwt
+				}
+			}
+
+			if (!jwtToken) {
+				console.error('[Auth] Kein gültiger JWT-Token in Response gefunden. Vollständige Response:', JSON.stringify(result, null, 2))
+				throw new Error('Ungültige Login-Response: Kein Token gefunden. Bitte JWT-Konfiguration in Strapi prüfen.')
 			}
 
 			// Dekodiere und logge den JWT-Token
-			const decodedToken = decodeJWT(result.jwt)
+			const decodedToken = decodeJWT(jwtToken)
 			if (decodedToken) {
 				console.log('=== JWT Token Dekodiert ===')
 				console.log('Header:', decodedToken.header)
 				console.log('Payload:', decodedToken.payload)
 				console.log('Vollständiger Token:', decodedToken.fullToken)
 				console.log('Token Länge:', decodedToken.fullToken.length, 'Zeichen')
-				
+
 				// Zeige auch die User-Daten aus der Response
 				console.log('User-Daten (aus Response):', result.user)
 			} else {
 				console.warn('JWT-Token konnte nicht dekodiert werden')
 			}
 
+			// Setze Token für GraphQL-Requests
+			setGraphQLAuthToken(jwtToken)
+
+			// Hole vollständiges User-Profil mit GET_ME
+			let fullUserProfile: AuthUser | null = null
+			try {
+				const meData = await fetchGraphQL<GetMeResponse>(
+					GET_ME,
+					{
+						token: jwtToken,
+					},
+				)
+
+				if (meData?.me) {
+					fullUserProfile = meData.me
+					console.log('[Auth] Vollständiges User-Profil geladen:', fullUserProfile)
+				} else {
+					console.warn('[Auth] GET_ME hat keine Daten zurückgegeben, verwende User aus Login-Response')
+					// Fallback: Konvertiere Login-Response zu AuthUser
+					fullUserProfile = {
+						id: String(result.user.id),
+						documentId: String(result.user.id),
+						username: result.user.username || '',
+						email: result.user.email || null,
+					}
+				}
+			} catch (error) {
+				console.error('[Auth] Fehler beim Laden des User-Profils:', error)
+				console.warn('[Auth] Verwende User-Daten aus Login-Response als Fallback')
+				// Fallback: Konvertiere Login-Response zu AuthUser
+				fullUserProfile = {
+					id: String(result.user.id),
+					documentId: String(result.user.id),
+					username: result.user.username || '',
+					email: result.user.email || null,
+				}
+			}
+
+			const newState: AuthState = {
+				token: jwtToken,
+				user: fullUserProfile,
+			}
+
 			setAuthState(newState)
-			setGraphQLAuthToken(result.jwt)
 			saveAuthState(newState)
 
 			// Dispatch custom event für Cross-Component-Synchronisation

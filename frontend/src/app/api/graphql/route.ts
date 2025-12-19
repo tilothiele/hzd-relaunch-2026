@@ -12,6 +12,16 @@ export async function POST(request: NextRequest) {
 		const body = await request.json()
 		const { query, variables, token } = body
 
+		console.log('[GraphQL Proxy] Request Body:', {
+			'has query': !!query,
+			'query length': query?.length ?? 0,
+			'has variables': !!variables,
+			'has token': !!token,
+			'token type': typeof token,
+			'token length': token?.length ?? 0,
+			'token preview': token ? (typeof token === 'string' ? token.substring(0, 30) + '...' : String(token)) : null,
+		})
+
 		if (!query) {
 			return NextResponse.json(
 				{ error: 'GraphQL query is required' },
@@ -19,35 +29,20 @@ export async function POST(request: NextRequest) {
 			)
 		}
 
-		// Debug: Logge die Query
-		if (query.includes('GetMe') || query.includes('me')) {
-			console.log('[GraphQL Proxy] Query:', query.substring(0, 200))
-		}
-
 		const effectiveBaseUrl = strapiBaseUrl.replace(/\/$/, '')
 		const endpoint = `${effectiveBaseUrl}/graphql`
 		const client = new GraphQLClient(endpoint)
 
-		// Normalisiere Token: Falls es ein Objekt ist, versuche token.token oder token.jwt
-		let effectiveToken: string | null = null
-		if (typeof token === 'string' && token.length > 0) {
-			effectiveToken = token
-		} else if (token && typeof token === 'object') {
-			// Versuche verschiedene mögliche Eigenschaften
-			if ('token' in token && typeof token.token === 'string') {
-				effectiveToken = token.token
-			} else if ('jwt' in token && typeof token.jwt === 'string') {
-				effectiveToken = token.jwt
-			} else if ('Token' in token && typeof token.Token === 'string') {
-				effectiveToken = token.Token
-			}
-		}
-
-		if (effectiveToken) {
-			client.setHeader('Authorization', `Bearer ${effectiveToken}`)
-			console.log('[GraphQL Proxy] Token wird übergeben:', effectiveToken.substring(0, 20) + '...')
+		if (token && typeof token === 'string' && token.length > 0) {
+			client.setHeader('Authorization', `Bearer ${token}`)
+			console.log('[GraphQL Proxy] Token wird übergeben:', token.substring(0, 30) + '...')
 		} else {
-			console.log('[GraphQL Proxy] Token-Daten:', token)
+			console.log('[GraphQL Proxy] Token-Daten:', {
+				'token': token,
+				'type': typeof token,
+				'is string': typeof token === 'string',
+				'length': token?.length ?? 0,
+			})
 			console.warn('[GraphQL Proxy] Kein gültiger Token gefunden. Typ:', typeof token)
 		}
 

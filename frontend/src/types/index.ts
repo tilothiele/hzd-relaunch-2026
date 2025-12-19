@@ -208,10 +208,30 @@ export interface MenuItem {
 	children?: MenuItem[]
 }
 
+export interface UsersPermissionsMeRole {
+	id: string
+	name: string
+	description?: string | null
+	type?: string | null
+}
+
 export interface AuthUser {
-	id: number
-	username?: string | null
+	id: string
+	documentId: string
+	username: string
 	email?: string | null
+	confirmed?: boolean | null
+	blocked?: boolean | null
+	role?: UsersPermissionsMeRole | null
+	firstName?: string | null
+	lastName?: string | null
+	address1?: string | null
+	address2?: string | null
+	countryCode?: string | null
+	zip?: string | null
+	city?: string | null
+	phone?: string | null
+	geoLocation?: GeoLocation | null
 }
 
 export interface PuppyAmount {
