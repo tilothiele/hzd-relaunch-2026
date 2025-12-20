@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import {
 	Box,
 	Menu,
@@ -107,13 +107,67 @@ function DesktopMenuItem({
 											fontSize: '1.125rem',
 											fontWeight: 600,
 											padding: '8px 16px',
-											color: theme.textColor,
+											color: '#565757',
 										}}
 									>
 										{child.name}
 									</Typography>
 									{child.children?.map((grandchild) => {
 										const grandchildKey = grandchild.url ?? grandchild.name
+										const hasGreatGrandchildren = Boolean(grandchild.children?.length)
+
+										if (hasGreatGrandchildren) {
+											return (
+												<React.Fragment key={grandchildKey}>
+													<MenuItem
+														disabled
+														sx={{
+															padding: '6px 12px',
+															color: '#565757',
+															fontWeight: 600,
+															opacity: 1,
+															cursor: 'default',
+															'&.Mui-disabled': {
+																opacity: 1,
+															},
+														}}
+													>
+														<Typography
+															variant='body2'
+															sx={{
+																fontSize: '1rem',
+																fontWeight: 600,
+																color: '#565757',
+															}}
+														>
+															{grandchild.name}
+														</Typography>
+													</MenuItem>
+													{grandchild.children?.map((greatGrandchild) => {
+														const greatGrandchildKey = greatGrandchild.url ?? greatGrandchild.name
+														return (
+															<MenuItem
+																key={greatGrandchildKey}
+																component={Link}
+																href={greatGrandchild.url ?? '#'}
+																onClick={handleClose}
+																sx={{
+																	paddingLeft: 6,
+																	color: '#565757',
+																	'&:hover': {
+																		backgroundColor: 'rgba(252, 211, 77, 0.1)',
+																		color: '#FCD34D',
+																	},
+																}}
+															>
+																{greatGrandchild.name}
+															</MenuItem>
+														)
+													})}
+												</React.Fragment>
+											)
+										}
+
 										return (
 											<MenuItem
 												key={grandchildKey}
@@ -122,7 +176,7 @@ function DesktopMenuItem({
 												onClick={handleClose}
 												sx={{
 													paddingLeft: 4,
-													color: theme.textColor,
+													color: '#565757',
 													'&:hover': {
 														backgroundColor: 'rgba(252, 211, 77, 0.1)',
 														color: '#FCD34D',
@@ -144,7 +198,7 @@ function DesktopMenuItem({
 								href={child.url ?? '#'}
 								onClick={handleClose}
 								sx={{
-									color: theme.textColor,
+									color: '#565757',
 									'&:hover': {
 										backgroundColor: 'rgba(252, 211, 77, 0.1)',
 										color: '#FCD34D',
@@ -219,7 +273,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 				<IconButton
 					onClick={handleMobileToggle}
 					sx={{
-						color: theme.headerFooterTextColor,
+						color: '#565757',
 					}}
 					aria-label='Menü öffnen'
 				>
@@ -256,7 +310,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 													<ListItemButton
 														onClick={() => handleSubmenuToggle(itemKey)}
 														sx={{
-															color: theme.textColor,
+															color: '#565757',
 															'&:hover': {
 																backgroundColor: 'rgba(0, 0, 0, 0.04)',
 															},
@@ -291,7 +345,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 																			<ListItemButton
 																				sx={{
 																					pl: 4,
-																					color: theme.textColor,
+																					color: '#565757',
 																					'&:hover': {
 																						backgroundColor: 'rgba(0, 0, 0, 0.04)',
 																					},
@@ -314,6 +368,67 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 																		</ListItem>
 																		{child.children?.map((grandchild) => {
 																			const grandchildKey = grandchild.url ?? grandchild.name
+																			const hasGreatGrandchildren = Boolean(grandchild.children?.length)
+
+																			if (hasGreatGrandchildren) {
+																				return (
+																					<Box key={grandchildKey}>
+																						<ListItem disablePadding>
+																							<ListItemButton
+																								sx={{
+																									pl: 6,
+																									color: '#565757',
+																									'&:hover': {
+																										backgroundColor: 'rgba(0, 0, 0, 0.04)',
+																									},
+																								}}
+																							>
+																								<ListItemText
+																									primary={
+																										<Typography
+																											variant='body2'
+																											sx={{
+																												fontSize: '0.9rem',
+																												fontWeight: 600,
+																											}}
+																										>
+																											{grandchild.name}
+																										</Typography>
+																									}
+																								/>
+																							</ListItemButton>
+																						</ListItem>
+																						{grandchild.children?.map((greatGrandchild) => {
+																							const greatGrandchildKey = greatGrandchild.url ?? greatGrandchild.name
+																							return (
+																								<ListItem key={greatGrandchildKey} disablePadding>
+																									<ListItemButton
+																										component={Link}
+																										href={greatGrandchild.url ?? '#'}
+																										onClick={handleMobileToggle}
+																										sx={{
+																											pl: 8,
+																											color: '#565757',
+																											'&:hover': {
+																												backgroundColor: 'rgba(0, 0, 0, 0.04)',
+																											},
+																										}}
+																									>
+																										<ListItemText
+																											primary={
+																												<Typography variant='body2'>
+																													{greatGrandchild.name}
+																												</Typography>
+																											}
+																										/>
+																									</ListItemButton>
+																								</ListItem>
+																							)
+																						})}
+																					</Box>
+																				)
+																			}
+
 																			return (
 																				<ListItem key={grandchildKey} disablePadding>
 																					<ListItemButton
@@ -322,7 +437,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 																						onClick={handleMobileToggle}
 																						sx={{
 																							pl: 6,
-																							color: theme.textColor,
+																							color: '#565757',
 																							'&:hover': {
 																								backgroundColor: 'rgba(0, 0, 0, 0.04)',
 																							},
@@ -351,7 +466,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 																		onClick={handleMobileToggle}
 																		sx={{
 																			pl: 4,
-																			color: theme.textColor,
+																			color: '#565757',
 																			'&:hover': {
 																				backgroundColor: 'rgba(0, 0, 0, 0.04)',
 																			},
@@ -378,7 +493,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 													href={item.url}
 													onClick={handleMobileToggle}
 													sx={{
-														color: theme.textColor,
+														color: '#565757',
 														'&:hover': {
 															backgroundColor: 'rgba(0, 0, 0, 0.04)',
 														},
@@ -408,7 +523,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 															sx={{
 																fontSize: '1.125rem',
 																fontWeight: 500,
-																color: theme.textColor,
+																color: '#565757',
 															}}
 														>
 															{item.name}
