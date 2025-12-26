@@ -152,6 +152,11 @@
       "relation": "oneToOne",
       "target": "plugin::users-permissions.user"
     },
+    "breeder": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::hzd-plugin.breeder"
+    },
     "Exhibitions": {
       "type": "text"
     },

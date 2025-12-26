@@ -16,7 +16,7 @@ export default (plugin: any) => {
 		// Extend JWT Service
 		try {
 			const jwtService = strapi.plugin('users-permissions')?.service('jwt')
-			
+
 			if (jwtService) {
 				// Speichere die originale issue-Methode
 				const originalIssue = jwtService.issue.bind(jwtService)
@@ -24,7 +24,7 @@ export default (plugin: any) => {
 				// Erweitere die issue-Methode
 				jwtService.issue = function(payload: any, jwtOptions: any = {}) {
 					strapi.log.info('[User Ext] JWT issue called', { hasId: !!payload?.id, payloadKeys: Object.keys(payload || {}) })
-					
+
 					// Wenn payload bereits member enthält, verwende es direkt
 					if (payload.member) {
 						strapi.log.info('[User Ext] Payload already has member, using original issue')
@@ -33,12 +33,12 @@ export default (plugin: any) => {
 
 					// Prüfe, ob die originale Methode ein Promise zurückgibt (refresh mode)
 					const originalResult = originalIssue(payload, jwtOptions)
-					strapi.log.info('[User Ext] Original issue result type', { 
-						isPromise: originalResult instanceof Promise, 
+					strapi.log.info('[User Ext] Original issue result type', {
+						isPromise: originalResult instanceof Promise,
 						type: typeof originalResult,
 						hasValue: !!originalResult
 					})
-					
+
 					if (originalResult instanceof Promise) {
 						// Asynchroner Modus (refresh mode)
 						return originalResult.then(async (token: string) => {
@@ -90,14 +90,14 @@ export default (plugin: any) => {
 								const extendedTokenResult = originalIssue(extendedPayload, jwtOptions)
 								if (extendedTokenResult instanceof Promise) {
 									const extendedToken = await extendedTokenResult
-									strapi.log.info('[User Ext] Extended JWT token generated', { 
-										hasToken: !!extendedToken, 
+									strapi.log.info('[User Ext] Extended JWT token generated', {
+										hasToken: !!extendedToken,
 										tokenType: typeof extendedToken
 									})
 									return extendedToken
 								} else {
-									strapi.log.info('[User Ext] Extended JWT token generated (sync)', { 
-										hasToken: !!extendedTokenResult, 
+									strapi.log.info('[User Ext] Extended JWT token generated (sync)', {
+										hasToken: !!extendedTokenResult,
 										tokenType: typeof extendedTokenResult
 									})
 									return extendedTokenResult
@@ -126,6 +126,27 @@ export default (plugin: any) => {
 		strapi.log.info('[User Ext] Bootstrap: patching user document service')
 
 		const geolocationService = () => strapi.plugin('hzd-plugin')?.service('geolocation')
+
+		const setDisplayName = (data: any) => {
+			if (!data) {
+				return
+			}
+
+			const firstName = data.firstName?.trim() || ''
+			const lastName = data.lastName?.trim() || ''
+
+			if (firstName || lastName) {
+				const displayName = `${firstName} ${lastName}`.trim()
+				data.DisplayName = displayName
+				strapi.log.info('[User Ext] DisplayName set', {
+					firstName,
+					lastName,
+					DisplayName: displayName,
+				})
+			} else {
+				strapi.log.debug('[User Ext] No firstName or lastName provided, skipping DisplayName')
+			}
+		}
 
 		const enrichWithGeo = async (data: any) => {
 			if (!data || typeof data.zip !== 'string' || data.zip.trim() === '') {
@@ -166,6 +187,8 @@ export default (plugin: any) => {
 				if (originalCreate) {
 					userDocService.create = async (params: any, opts?: any) => {
 						strapi.log.info('[User Ext] create intercepted', { hasData: !!params?.data, zip: params?.data?.zip })
+						// Set DisplayName before other operations
+						setDisplayName(params?.data)
 						await enrichWithGeo(params?.data)
 						return originalCreate(params, opts)
 					}
@@ -175,6 +198,8 @@ export default (plugin: any) => {
 				if (originalUpdate) {
 					userDocService.update = async (params: any, opts?: any) => {
 						strapi.log.info('[User Ext] update intercepted', { hasData: !!params?.data, zip: params?.data?.zip })
+						// Set DisplayName before other operations
+						setDisplayName(params?.data)
 						await enrichWithGeo(params?.data)
 						return originalUpdate(params, opts)
 					}

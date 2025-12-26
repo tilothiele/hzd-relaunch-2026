@@ -23,7 +23,6 @@ from typing import Dict, Optional, Any
 import re
 from dotenv import load_dotenv
 import os
-import requests
 
 load_dotenv()
 
@@ -41,6 +40,7 @@ COUNTRY_CODES = {
 REGION_MAPPING = {
     'Nord': 'Nord',
     'Süd': 'Sued',
+    'Ost': 'Ost',
     'West': 'West',
     'Mitte': 'Mitte'
 }
@@ -173,7 +173,9 @@ def map_csv_to_member(row: Dict[str, str]) -> Dict[str, Any]:
     # region - oblast
     region = clean_string(row.get('oblast', ''))
     if region and region in ['Nord', 'Ost', 'Mitte', 'Süd', 'West']:
-        member_data['region'] = REGION_MAPPING.get(region)
+        mapped_region = REGION_MAPPING.get(region)
+        if mapped_region:
+            member_data['region'] = mapped_region
 
     # countryCode
 #    country_code = get_country_code(row.get('country', ''))
@@ -253,7 +255,7 @@ def find_existing_user(api_url: str, api_token: Optional[str], c_id: int) -> Opt
             result = response.json()
             if 'errors' in result:
                 return None
-            data = result.get('data').get('usersPermissionsUsers', [])
+            data = result.get('data', {}).get('usersPermissionsUsers', [])
             if data and len(data) > 0:
                 return data[0].get('documentId')
     except Exception as e:
@@ -262,43 +264,29 @@ def find_existing_user(api_url: str, api_token: Optional[str], c_id: int) -> Opt
 
     return None
 
-def build_graphql_mutation(member_data: Dict[str, Any], is_update: bool = False, documentId: str = None) -> tuple[str, Dict[str, Any]]:
-    """Build GraphQL mutation string and variables for creating or updating a member."""
-#    print(member_data)
-    if is_update and documentId:
-        mutation = """
-        mutation UpdateUser($id: ID!, $data: UsersPermissionsUserInput!) {
-            updateUsersPermissionsUser(id: $id, data: $data) {
-                data {
-                    documentId
-                }
+def build_graphql_mutation(member_data: Dict[str, Any]) -> tuple[str, Dict[str, Any]]:
+    """Build GraphQL mutation string and variables for creating a member."""
+    member_data['password'] = 'Startstart'
+    mutation = """
+    mutation CreateUser($data: UsersPermissionsUserInput!) {
+        createUsersPermissionsUser(data: $data) {
+            data {
+                documentId
+                firstName
+                lastName
+                cId
             }
         }
-        """
-        variables = {
-            'id': documentId,
-            'data': member_data
-        }
-    else:
-        member_data['password'] = 'Startstart'
-        member_data['role'] = ''
-        mutation = """
-        mutation CreateUser($data: UsersPermissionsUserInput!) {
-            createUsersPermissionsUser(data: $data) {
-                data {
-                    documentId
-                }
-            }
-        }
-        """
-        variables = {
-            'data': member_data
-        }
+    }
+    """
+    variables = {
+        'data': member_data
+    }
 
     return mutation, variables
 
 def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str, Any],
-                  dry_run: bool = False, update_existing: bool = False) -> bool:
+                  dry_run: bool = False) -> bool:
     """Import a single member via Strapi GraphQL API."""
     # Check if member with this cId already exists
     c_id = member_data.get('cId')
@@ -306,11 +294,6 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
 
     if c_id and not dry_run:
         existing_id = find_existing_user(api_url, api_token, c_id)
-
-    is_update = existing_id is not None and update_existing
-    action = 'Updated' if is_update else 'Created'
-
-#    print(c_id, existing_id, action)
 
     url = f"{api_url}"
 
@@ -323,18 +306,18 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
 
     if dry_run:
         if existing_id:
-            print(f"[DRY RUN] Would update member (ID: {existing_id}): {member_data}")
+            print(f"[DRY RUN] Would skip member (ID: {existing_id}): Already exists")
         else:
             print(f"[DRY RUN] Would create member: {member_data}")
         return True
 
-    if existing_id and not update_existing:
-        print(f"⚠ Skipping member (cId: {c_id}): Already exists (ID: {existing_id}). Use --update to update existing members.")
+    if existing_id:
+        print(f"⚠ Skipping member (cId: {c_id}): Already exists (ID: {existing_id})")
         return False
 
     try:
         # Build GraphQL mutation
-        mutation, variables = build_graphql_mutation(member_data, is_update=is_update, documentId=existing_id)
+        mutation, variables = build_graphql_mutation(member_data)
 
         response = requests.post(
             url,
@@ -348,28 +331,27 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
 
             if 'errors' in result:
                 error_msg = '; '.join([err.get('message', str(err)) for err in result['errors']])
-                print(f"✗ Failed to {action.lower()} member (cId: {member_data.get('cId', 'N/A')}): {error_msg}")
+                print(f"✗ Failed to create member (cId: {member_data.get('cId', 'N/A')}): {error_msg}")
                 return False
 
-            if is_update:
-                data = result.get('data', {}).get('updateHzdPluginMember', {})
-            else:
-                data = result.get('data', {}).get('createHzdPluginMember', {})
+            data = result.get('data', {}).get('createUsersPermissionsUser', {}).get('data')
 
             if data:
-                member_id = data.get('id', existing_id or 'N/A')
-                attrs = data.get('attributes', {})
-                print(f"✓ {action} member: {attrs.get('firstName', '')} {attrs.get('lastName', '')} (cId: {attrs.get('cId', member_data.get('cId', 'N/A'))}, ID: {member_id})")
+                member_id = data.get('documentId', 'N/A')
+                first_name = data.get('firstName', '')
+                last_name = data.get('lastName', '')
+                member_c_id = data.get('cId', member_data.get('cId', 'N/A'))
+                print(f"✓ Created member: {first_name} {last_name} (cId: {member_c_id}, ID: {member_id})")
                 return True
             else:
-                print(f"✗ Failed to {action.lower()} member (cId: {member_data.get('cId', 'N/A')}): No data returned")
+                print(f"✗ Failed to create member (cId: {member_data.get('cId', 'N/A')}): No data returned")
                 return False
         else:
             error_msg = response.text
-            print(f"✗ Failed to {action.lower()} member (cId: {member_data.get('cId', 'N/A')}): {response.status_code} - {error_msg}")
+            print(f"✗ Failed to create member (cId: {member_data.get('cId', 'N/A')}): {response.status_code} - {error_msg}")
             return False
     except requests.exceptions.RequestException as e:
-        print(f"✗ Error {action.lower()}ing member (cId: {member_data.get('cId', 'N/A')}): {e}")
+        print(f"✗ Error creating member (cId: {member_data.get('cId', 'N/A')}): {e}")
         return False
 
 def main():
@@ -382,8 +364,6 @@ def main():
     parser.add_argument('csv_file', help='Path to CSV file')
     parser.add_argument('--dry-run', action='store_true',
                        help='Perform a dry run without actually creating members')
-    parser.add_argument('--update', action='store_true',
-                       help='Update existing members if they already exist (based on cId)')
 
     args = parser.parse_args()
 
@@ -442,7 +422,7 @@ def main():
 
         # Import member
         print(member_data)
-        if import_member(endpoint, token, member_data, args.dry_run, args.update):
+        if import_member(endpoint, token, member_data, args.dry_run):
             success_count += 1
         else:
             error_count += 1

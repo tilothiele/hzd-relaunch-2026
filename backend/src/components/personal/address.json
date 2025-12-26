@@ -1,0 +1,32 @@
+{
+  "collectionName": "components_personal_addresses",
+  "info": {
+    "displayName": "Address"
+  },
+  "options": {},
+  "attributes": {
+    "FullName": {
+      "type": "string"
+    },
+    "Address1": {
+      "type": "string"
+    },
+    "Address2": {
+      "type": "string"
+    },
+    "CountryCode": {
+      "type": "string",
+      "default": "D",
+      "maxLength": 2,
+      "required": true
+    },
+    "Zip": {
+      "type": "string",
+      "maxLength": 5
+    },
+    "City": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

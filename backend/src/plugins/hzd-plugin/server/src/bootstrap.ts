@@ -1,4 +1,5 @@
 import type { Core } from '@strapi/strapi';
+import cron from 'node-cron';
 import { extendJWT } from './extend-jwt';
 import { setupRoles } from './setup-roles';
 
@@ -95,6 +96,39 @@ const bootstrap = async ({ strapi }: { strapi: Core.Strapi }) => {
 			*/
 
 		console.log('[HZD Plugin] Permission setup completed')
+
+		// Setup Geolocation Sync Cronjob
+		// Default: Run every hour at minute 0 (e.g., 1:00, 2:00, 3:00)
+		// Can be configured via GEOLOCATION_SYNC_CRON env variable
+		const cronSchedule = process.env.GEOLOCATION_SYNC_CRON || '0 * * * *'
+		
+		const geolocationSyncService = strapi.plugin('hzd-plugin')?.service('geolocation-sync')
+		if (geolocationSyncService) {
+			// Schedule the cronjob
+			// scheduled: true is the default, so we only need to set timezone
+			const task = cron.schedule(
+				cronSchedule,
+				async () => {
+					try {
+						await geolocationSyncService.syncGeolocations()
+					} catch (error) {
+						strapi.log.error('[HZD Plugin] Error in geolocation sync cronjob:', error)
+					}
+				},
+				{
+					timezone: 'Europe/Berlin', // Adjust to your timezone
+				}
+			)
+
+			strapi.log.info(`[HZD Plugin] ✓ Geolocation sync cronjob scheduled: ${cronSchedule}`)
+			strapi.log.info('[HZD Plugin]   Use GEOLOCATION_SYNC_CRON env variable to customize schedule')
+			strapi.log.info('[HZD Plugin]   Example: GEOLOCATION_SYNC_CRON="0 */2 * * *" (every 2 hours)')
+			
+			// Store task reference for potential cleanup
+			;(strapi as any).geolocationSyncTask = task
+		} else {
+			strapi.log.warn('[HZD Plugin] Geolocation sync service not found, cronjob not scheduled')
+		}
 	} catch (error) {
 		console.error('[HZD Plugin] Error in bootstrap:', error)
 	}

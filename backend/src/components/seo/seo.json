@@ -13,6 +13,9 @@
     },
     "Keywords": {
       "type": "string"
+    },
+    "ExcludeFromSitemap": {
+      "type": "boolean"
     }
   },
   "config": {}

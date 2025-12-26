@@ -148,6 +148,9 @@
       "type": "component",
       "component": "breeding.geo-location",
       "repeatable": false
+    },
+    "DisplayName": {
+      "type": "string"
     }
   }
 }

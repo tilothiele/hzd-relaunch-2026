@@ -367,10 +367,12 @@ export function LoginControls({
 			</button>
 			{isFormVisible ? (
 				<div
-					className='absolute right-0 z-50 mt-3 rounded-lg text-gray-900 shadow-xl border border-gray-200'
+					className='absolute z-50 mt-3 rounded-lg text-gray-900 shadow-xl border border-gray-200'
 					style={{
 						backgroundColor: '#ffffff',
-						width: '500px',
+						width: 'min(400px, calc(100vw - 32px))',
+						maxWidth: '400px',
+						right: '16px',
 					}}
 				>
 					<Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -378,6 +380,8 @@ export function LoginControls({
 							value={activeTab}
 							onChange={handleTabChange}
 							aria-label='Login-Register-Tabs'
+							variant='scrollable'
+							scrollButtons='auto'
 							sx={{
 								'& .MuiTab-root': {
 									textTransform: 'none',

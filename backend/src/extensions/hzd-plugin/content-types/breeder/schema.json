@@ -22,20 +22,16 @@
     "breedingLicenseSince": {
       "type": "date"
     },
+    "IsActive": {
+      "type": "boolean"
+    },
     "litters": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "plugin::hzd-plugin.litter",
       "mappedBy": "breeder"
     },
-    "MemosDraft": {
-      "type": "customField",
-      "customField": "plugin::ckeditor5.CKEditor",
-      "options": {
-        "preset": "defaultHtml"
-      }
-    },
-    "MemosReleased": {
+    "BreedersIntroduction": {
       "type": "customField",
       "customField": "plugin::ckeditor5.CKEditor",
       "options": {
@@ -60,6 +56,25 @@
         "videos",
         "audios"
       ]
+    },
+    "WebsiteUrl": {
+      "type": "string"
+    },
+    "WebsiteUrlDraft": {
+      "type": "string"
+    },
+    "Address": {
+      "type": "component",
+      "component": "personal.address",
+      "repeatable": false
+    },
+    "InternalNotes": {
+      "type": "text"
+    },
+    "GeoLocation": {
+      "type": "component",
+      "component": "breeding.geo-location",
+      "repeatable": false
     }
   }
 }

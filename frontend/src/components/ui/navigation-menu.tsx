@@ -54,22 +54,43 @@ function DesktopMenuItem({
 	if (hasChildren) {
 		return (
 			<>
-				<Button
-					onClick={handleClick}
-					endIcon={<ExpandMoreIcon />}
-					sx={{
-						color: theme.headerFooterTextColor,
-						fontSize: '1.25rem',
-						fontWeight: 500,
-						textTransform: 'none',
-						'&:hover': {
-							color: '#FCD34D',
-							backgroundColor: 'transparent',
-						},
-					}}
-				>
-					{item.name}
-				</Button>
+				{item.url ? (
+					<Button
+						component={Link}
+						href={item.url}
+						onClick={handleClick}
+						endIcon={<ExpandMoreIcon />}
+						sx={{
+							color: theme.headerFooterTextColor,
+							fontSize: '1.25rem',
+							fontWeight: 500,
+							textTransform: 'none',
+							'&:hover': {
+								color: '#FCD34D',
+								backgroundColor: 'transparent',
+							},
+						}}
+					>
+						{item.name}
+					</Button>
+				) : (
+					<Button
+						onClick={handleClick}
+						endIcon={<ExpandMoreIcon />}
+						sx={{
+							color: theme.headerFooterTextColor,
+							fontSize: '1.25rem',
+							fontWeight: 500,
+							textTransform: 'none',
+							'&:hover': {
+								color: '#FCD34D',
+								backgroundColor: 'transparent',
+							},
+						}}
+					>
+						{item.name}
+					</Button>
+				)}
 				<Menu
 					anchorEl={anchorEl}
 					open={open}
@@ -101,17 +122,37 @@ function DesktopMenuItem({
 						if (hasGrandchildren) {
 							return (
 								<Box key={childKey} sx={{ mb: 2 }}>
-									<Typography
-										variant='body1'
-										sx={{
-											fontSize: '1.125rem',
-											fontWeight: 600,
-											padding: '8px 16px',
-											color: '#565757',
-										}}
-									>
-										{child.name}
-									</Typography>
+									{child.url ? (
+										<MenuItem
+											component={Link}
+											href={child.url}
+											onClick={handleClose}
+											sx={{
+												fontSize: '1.125rem',
+												fontWeight: 600,
+												padding: '8px 16px',
+												color: '#565757',
+												'&:hover': {
+													backgroundColor: 'rgba(252, 211, 77, 0.1)',
+													color: '#FCD34D',
+												},
+											}}
+										>
+											{child.name}
+										</MenuItem>
+									) : (
+										<Typography
+											variant='body1'
+											sx={{
+												fontSize: '1.125rem',
+												fontWeight: 600,
+												padding: '8px 16px',
+												color: '#565757',
+											}}
+										>
+											{child.name}
+										</Typography>
+									)}
 									{child.children?.map((grandchild) => {
 										const grandchildKey = grandchild.url ?? grandchild.name
 										const hasGreatGrandchildren = Boolean(grandchild.children?.length)
@@ -119,30 +160,49 @@ function DesktopMenuItem({
 										if (hasGreatGrandchildren) {
 											return (
 												<React.Fragment key={grandchildKey}>
-													<MenuItem
-														disabled
-														sx={{
-															padding: '6px 12px',
-															color: '#565757',
-															fontWeight: 600,
-															opacity: 1,
-															cursor: 'default',
-															'&.Mui-disabled': {
-																opacity: 1,
-															},
-														}}
-													>
-														<Typography
-															variant='body2'
+													{grandchild.url ? (
+														<MenuItem
+															component={Link}
+															href={grandchild.url}
+															onClick={handleClose}
 															sx={{
-																fontSize: '1rem',
-																fontWeight: 600,
+																padding: '6px 12px',
 																color: '#565757',
+																fontWeight: 600,
+																'&:hover': {
+																	backgroundColor: 'rgba(252, 211, 77, 0.1)',
+																	color: '#FCD34D',
+																},
 															}}
 														>
 															{grandchild.name}
-														</Typography>
-													</MenuItem>
+														</MenuItem>
+													) : (
+														<MenuItem
+															disabled
+															sx={{
+																padding: '6px 12px',
+																color: '#565757',
+																fontWeight: 600,
+																opacity: 1,
+																cursor: 'default',
+																'&.Mui-disabled': {
+																	opacity: 1,
+																},
+															}}
+														>
+															<Typography
+																variant='body2'
+																sx={{
+																	fontSize: '1rem',
+																	fontWeight: 600,
+																	color: '#565757',
+																}}
+															>
+																{grandchild.name}
+															</Typography>
+														</MenuItem>
+													)}
 													{grandchild.children?.map((greatGrandchild) => {
 														const greatGrandchildKey = greatGrandchild.url ?? greatGrandchild.name
 														return (
@@ -307,30 +367,59 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 										{hasChildren ? (
 											<>
 												<ListItem disablePadding>
-													<ListItemButton
-														onClick={() => handleSubmenuToggle(itemKey)}
-														sx={{
-															color: '#565757',
-															'&:hover': {
-																backgroundColor: 'rgba(0, 0, 0, 0.04)',
-															},
-														}}
-													>
-														<ListItemText
-															primary={
-																<Typography
-																	variant='body1'
-																	sx={{
-																		fontSize: '1.125rem',
-																		fontWeight: 500,
-																	}}
-																>
-																	{item.name}
-																</Typography>
-															}
-														/>
-														{isSubmenuOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-													</ListItemButton>
+													{item.url ? (
+														<ListItemButton
+															component={Link}
+															href={item.url}
+															onClick={() => handleSubmenuToggle(itemKey)}
+															sx={{
+																color: '#565757',
+																'&:hover': {
+																	backgroundColor: 'rgba(0, 0, 0, 0.04)',
+																},
+															}}
+														>
+															<ListItemText
+																primary={
+																	<Typography
+																		variant='body1'
+																		sx={{
+																			fontSize: '1.125rem',
+																			fontWeight: 500,
+																		}}
+																	>
+																		{item.name}
+																	</Typography>
+																}
+															/>
+															{isSubmenuOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+														</ListItemButton>
+													) : (
+														<ListItemButton
+															onClick={() => handleSubmenuToggle(itemKey)}
+															sx={{
+																color: '#565757',
+																'&:hover': {
+																	backgroundColor: 'rgba(0, 0, 0, 0.04)',
+																},
+															}}
+														>
+															<ListItemText
+																primary={
+																	<Typography
+																		variant='body1'
+																		sx={{
+																			fontSize: '1.125rem',
+																			fontWeight: 500,
+																		}}
+																	>
+																		{item.name}
+																	</Typography>
+																}
+															/>
+															{isSubmenuOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+														</ListItemButton>
+													)}
 												</ListItem>
 												<Collapse in={isSubmenuOpen} timeout='auto' unmountOnExit>
 													<List component='div' disablePadding>
@@ -342,29 +431,58 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 																return (
 																	<Box key={childKey}>
 																		<ListItem disablePadding>
-																			<ListItemButton
-																				sx={{
-																					pl: 4,
-																					color: '#565757',
-																					'&:hover': {
-																						backgroundColor: 'rgba(0, 0, 0, 0.04)',
-																					},
-																				}}
-																			>
-																				<ListItemText
-																					primary={
-																						<Typography
-																							variant='body2'
-																							sx={{
-																								fontSize: '1rem',
-																								fontWeight: 600,
-																							}}
-																						>
-																							{child.name}
-																						</Typography>
-																					}
-																				/>
-																			</ListItemButton>
+																			{child.url ? (
+																				<ListItemButton
+																					component={Link}
+																					href={child.url}
+																					onClick={handleMobileToggle}
+																					sx={{
+																						pl: 4,
+																						color: '#565757',
+																						'&:hover': {
+																							backgroundColor: 'rgba(0, 0, 0, 0.04)',
+																						},
+																					}}
+																				>
+																					<ListItemText
+																						primary={
+																							<Typography
+																								variant='body2'
+																								sx={{
+																									fontSize: '1rem',
+																									fontWeight: 600,
+																								}}
+																							>
+																								{child.name}
+																							</Typography>
+																						}
+																					/>
+																				</ListItemButton>
+																			) : (
+																				<ListItemButton
+																					sx={{
+																						pl: 4,
+																						color: '#565757',
+																						'&:hover': {
+																							backgroundColor: 'rgba(0, 0, 0, 0.04)',
+																						},
+																					}}
+																				>
+																					<ListItemText
+																						primary={
+																							<Typography
+																								variant='body2'
+																								sx={{
+																									fontSize: '1rem',
+																									fontWeight: 600,
+																								}}
+																							>
+																								{child.name}
+																							</Typography>
+																						}
+																					/>
+																				</ListItemButton>
+																			)}
 																		</ListItem>
 																		{child.children?.map((grandchild) => {
 																			const grandchildKey = grandchild.url ?? grandchild.name
@@ -374,29 +492,58 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 																				return (
 																					<Box key={grandchildKey}>
 																						<ListItem disablePadding>
-																							<ListItemButton
-																								sx={{
-																									pl: 6,
-																									color: '#565757',
-																									'&:hover': {
-																										backgroundColor: 'rgba(0, 0, 0, 0.04)',
-																									},
-																								}}
-																							>
-																								<ListItemText
-																									primary={
-																										<Typography
-																											variant='body2'
-																											sx={{
-																												fontSize: '0.9rem',
-																												fontWeight: 600,
-																											}}
-																										>
-																											{grandchild.name}
-																										</Typography>
-																									}
-																								/>
-																							</ListItemButton>
+																							{grandchild.url ? (
+																								<ListItemButton
+																									component={Link}
+																									href={grandchild.url}
+																									onClick={handleMobileToggle}
+																									sx={{
+																										pl: 6,
+																										color: '#565757',
+																										'&:hover': {
+																											backgroundColor: 'rgba(0, 0, 0, 0.04)',
+																										},
+																									}}
+																								>
+																									<ListItemText
+																										primary={
+																											<Typography
+																												variant='body2'
+																												sx={{
+																													fontSize: '0.9rem',
+																													fontWeight: 600,
+																												}}
+																											>
+																												{grandchild.name}
+																											</Typography>
+																										}
+																									/>
+																								</ListItemButton>
+																							) : (
+																								<ListItemButton
+																									sx={{
+																										pl: 6,
+																										color: '#565757',
+																										'&:hover': {
+																											backgroundColor: 'rgba(0, 0, 0, 0.04)',
+																										},
+																									}}
+																								>
+																									<ListItemText
+																										primary={
+																											<Typography
+																												variant='body2'
+																												sx={{
+																													fontSize: '0.9rem',
+																													fontWeight: 600,
+																												}}
+																											>
+																												{grandchild.name}
+																											</Typography>
+																										}
+																									/>
+																								</ListItemButton>
+																							)}
 																						</ListItem>
 																						{grandchild.children?.map((greatGrandchild) => {
 																							const greatGrandchildKey = greatGrandchild.url ?? greatGrandchild.name

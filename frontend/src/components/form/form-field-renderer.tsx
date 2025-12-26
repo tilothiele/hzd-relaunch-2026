@@ -22,6 +22,7 @@ import type {
 	StaticText,
 	StandardIdentifier,
 } from '@/types'
+import { CountryCodeInput } from './country-code-input'
 
 export function renderFormField(
 	field: FormField,
@@ -214,6 +215,19 @@ export function renderFormField(
 					return null
 				}
 				const isRequired = status === 'Erforderlich'
+
+				if (key === 'countryCode') {
+					return (
+						<CountryCodeInput
+							key={`${uniqueKey}-${key}`}
+							label={config.label}
+							value={(values[key] as string) ?? ''}
+							onChange={(val: string) => onChange(key, val)}
+							required={isRequired}
+						/>
+					)
+				}
+
 				return (
 					<TextField
 						key={`${uniqueKey}-${key}`}

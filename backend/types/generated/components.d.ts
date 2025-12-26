@@ -478,6 +478,29 @@ export interface PermissionGroups extends Struct.ComponentSchema {
   };
 }
 
+export interface PersonalAddress extends Struct.ComponentSchema {
+  collectionName: 'components_personal_addresses';
+  info: {
+    displayName: 'Address';
+  };
+  attributes: {
+    Address1: Schema.Attribute.String;
+    Address2: Schema.Attribute.String;
+    City: Schema.Attribute.String;
+    CountryCode: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 2;
+      }> &
+      Schema.Attribute.DefaultTo<'D'>;
+    FullName: Schema.Attribute.String;
+    Zip: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 5;
+      }>;
+  };
+}
+
 export interface PersonalShippingAddress extends Struct.ComponentSchema {
   collectionName: 'components_personal_shipping_addresses';
   info: {
@@ -499,6 +522,7 @@ export interface SeoSeo extends Struct.ComponentSchema {
     displayName: 'SEO';
   };
   attributes: {
+    ExcludeFromSitemap: Schema.Attribute.Boolean;
     Keywords: Schema.Attribute.String;
     MetaDescription: Schema.Attribute.String;
     TitleTag: Schema.Attribute.String;
@@ -541,6 +565,7 @@ declare module '@strapi/strapi' {
       'links.action-button': LinksActionButton;
       'links.partnerl-link': LinksPartnerlLink;
       'permission.groups': PermissionGroups;
+      'personal.address': PersonalAddress;
       'personal.shipping-address': PersonalShippingAddress;
       'seo.seo': SeoSeo;
     }

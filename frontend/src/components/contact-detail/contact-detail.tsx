@@ -132,3 +132,6 @@ export function ContactDetail({ contact, strapiBaseUrl }: ContactDetailProps) {
 	)
 }
 
+
+
+

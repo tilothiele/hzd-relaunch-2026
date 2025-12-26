@@ -932,13 +932,18 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
       'api::news-article.news-article'
     > &
       Schema.Attribute.Private;
-    NewsBody: Schema.Attribute.RichText &
-      Schema.Attribute.CustomField<
-        'plugin::ckeditor5.CKEditor',
-        {
-          preset: 'defaultHtml';
-        }
-      >;
+    NewsContentSections: Schema.Attribute.DynamicZone<
+      [
+        'blocks.text-columns-section',
+        'blocks.teaser-text-with-image',
+        'blocks.supplemental-document-group-section',
+        'blocks.simple-cta-section',
+        'blocks.rich-text-section',
+        'blocks.image-gallery-section',
+        'blocks.contact-group-section',
+        'blocks.card-section',
+      ]
+    >;
     publishedAt: Schema.Attribute.DateTime;
     SEO: Schema.Attribute.Component<'seo.seo', false>;
     Slug: Schema.Attribute.String;
@@ -1295,12 +1300,23 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
     };
   };
   attributes: {
+    Address: Schema.Attribute.Component<'personal.address', false>;
     avatar: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    BreedersIntroduction: Schema.Attribute.RichText &
+      Schema.Attribute.CustomField<
+        'plugin::ckeditor5.CKEditor',
+        {
+          preset: 'defaultHtml';
+        }
+      >;
     breedingLicenseSince: Schema.Attribute.Date;
     cId: Schema.Attribute.Integer & Schema.Attribute.Unique;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    GeoLocation: Schema.Attribute.Component<'breeding.geo-location', false>;
+    InternalNotes: Schema.Attribute.Text;
+    IsActive: Schema.Attribute.Boolean;
     kennelName: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 200;
@@ -1319,24 +1335,12 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
       'oneToOne',
       'plugin::users-permissions.user'
     >;
-    MemosDraft: Schema.Attribute.RichText &
-      Schema.Attribute.CustomField<
-        'plugin::ckeditor5.CKEditor',
-        {
-          preset: 'defaultHtml';
-        }
-      >;
-    MemosReleased: Schema.Attribute.RichText &
-      Schema.Attribute.CustomField<
-        'plugin::ckeditor5.CKEditor',
-        {
-          preset: 'defaultHtml';
-        }
-      >;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    WebsiteUrl: Schema.Attribute.String;
+    WebsiteUrlDraft: Schema.Attribute.String;
   };
 }
 
@@ -1357,6 +1361,10 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
   };
   attributes: {
     avatar: Schema.Attribute.Media<'images' | 'files'>;
+    breeder: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::hzd-plugin.breeder'
+    >;
     BreedSurvey: Schema.Attribute.Text;
     cBreederId: Schema.Attribute.Integer;
     cId: Schema.Attribute.Integer & Schema.Attribute.Unique;
@@ -1416,6 +1424,39 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
     sex: Schema.Attribute.Enumeration<['M', 'F']>;
     SOD1: Schema.Attribute.Enumeration<['N_N', 'N_DM', 'DM_DM']>;
     stuntLicenseSince: Schema.Attribute.Date;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface PluginHzdPluginGeoLocation
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'geo_locations';
+  info: {
+    displayName: 'GeoLocation';
+    pluralName: 'geo-locations';
+    singularName: 'geo-location';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    Key: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    lat: Schema.Attribute.Decimal & Schema.Attribute.Required;
+    lng: Schema.Attribute.Decimal & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'plugin::hzd-plugin.geo-location'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1861,6 +1902,7 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.Private;
     dateOfBirth: Schema.Attribute.Date;
     dateOfDeath: Schema.Attribute.Date;
+    DisplayName: Schema.Attribute.String;
     email: Schema.Attribute.Email &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMaxLength<{
@@ -1947,6 +1989,7 @@ declare module '@strapi/strapi' {
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::hzd-plugin.breeder': PluginHzdPluginBreeder;
       'plugin::hzd-plugin.dog': PluginHzdPluginDog;
+      'plugin::hzd-plugin.geo-location': PluginHzdPluginGeoLocation;
       'plugin::hzd-plugin.litter': PluginHzdPluginLitter;
       'plugin::i18n.locale': PluginI18NLocale;
       'plugin::review-workflows.workflow': PluginReviewWorkflowsWorkflow;

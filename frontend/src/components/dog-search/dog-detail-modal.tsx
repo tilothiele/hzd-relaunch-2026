@@ -69,11 +69,14 @@ export function DogDetailModal({
 
 	return (
 		<div
-			className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'
+			className='fixed inset-0 z-50 flex items-center justify-end bg-black/50 p-4'
 			onClick={onClose}
 		>
 			<div
-				className='relative min-h-[600px] max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-lg bg-white shadow-xl'
+				className='relative min-h-[600px] max-h-[90vh] min-w-[100vw] max-w-[500px] overflow-y-auto rounded-lg bg-white shadow-xl'
+				style={{
+					marginRight: 'min(100px, max(10vw, 0px))',
+				}}
 				onClick={(e) => e.stopPropagation()}
 			>
 				{/* Close Button */}

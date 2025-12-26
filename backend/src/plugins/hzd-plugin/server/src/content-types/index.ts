@@ -1,6 +1,7 @@
 import dog from "../../content-types/dog/schema.json"
 import breeder from "../../content-types/breeder/schema.json"
 import litter from "../../content-types/litter/schema.json"
+import geoLocation from "../../content-types/geo-location/schema.json"
 /*
 import homepage from "../../content-types/homepage/schema.json"
 import newsArticle from "../../content-types/news-article/schema.json"
@@ -24,5 +25,8 @@ export default {
     },
     litter: {
         schema: litter
+    },
+    'geo-location': {
+        schema: geoLocation
     }
 };

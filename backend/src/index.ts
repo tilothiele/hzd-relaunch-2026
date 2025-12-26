@@ -167,6 +167,31 @@ export default {
    * run jobs, or perform some special logic.
    */
   bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    const uid = 'api::form-instance.form-instance';
 
+    try {
+      const docService = strapi.documents(uid);
+
+      if (docService) {
+        const originalCreate = docService.create.bind(docService);
+
+        docService.create = async (params: any) => {
+          const result = await originalCreate(params);
+
+          try {
+            if (result && result.documentId) {
+              await strapi.service(uid).sendConfirmationEmail(result.documentId);
+            }
+          } catch (err) {
+            strapi.log.error('Error sending confirmation email in document service extension', err);
+          }
+
+          return result;
+        };
+        strapi.log.info('[Bootstrap] Extended form-instance document service with email logic');
+      }
+    } catch (error) {
+      strapi.log.error('Failed to extend form-instance document service', error);
+    }
   },
 };

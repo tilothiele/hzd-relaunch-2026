@@ -142,14 +142,14 @@ function calculateAge(dateOfBirth: string | null | undefined): string | null {
 		const monthsText = months === 1 ? 'Monat' : 'Monate'
 
 		if (years === 0) {
-			return `(${months} ${monthsText})`
+			return `(${months} ${monthsText} alt)`
 		}
 
 		if (months === 0) {
 			return `(${years} ${yearsText})`
 		}
 
-		return `(${years} ${yearsText} ${months} ${monthsText})`
+		return `(${years} ${yearsText} ${months} ${monthsText} alt)`
 	} catch {
 		return null
 	}

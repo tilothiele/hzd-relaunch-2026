@@ -111,10 +111,10 @@ function calculateAge(dateOfBirth: string | null | undefined): string | null {
 		}
 
 		if (months === 0) {
-			return `(${years} ${yearsText})`
+			return `(${years} ${yearsText} alt)`
 		}
 
-		return `(${years} ${yearsText} ${months} ${monthsText})`
+		return `(${years} ${yearsText} ${months} ${monthsText} alt)`
 	} catch {
 		return null
 	}

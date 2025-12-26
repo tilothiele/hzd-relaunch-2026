@@ -53,18 +53,24 @@
       "component": "seo.seo",
       "repeatable": false
     },
-    "NewsBody": {
-      "type": "customField",
-      "customField": "plugin::ckeditor5.CKEditor",
-      "options": {
-        "preset": "defaultHtml"
-      }
-    },
     "category": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::news-article-category.news-article-category",
       "inversedBy": "news_articles"
+    },
+    "NewsContentSections": {
+      "type": "dynamiczone",
+      "components": [
+        "blocks.text-columns-section",
+        "blocks.teaser-text-with-image",
+        "blocks.supplemental-document-group-section",
+        "blocks.simple-cta-section",
+        "blocks.rich-text-section",
+        "blocks.image-gallery-section",
+        "blocks.contact-group-section",
+        "blocks.card-section"
+      ]
     }
   }
 }
