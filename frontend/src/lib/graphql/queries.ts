@@ -175,6 +175,12 @@ export const GET_INDEX_PAGE = `
 						Primary
 					}
 				}
+				... on ComponentBlocksNewsArticlesSection {
+				MaxArticles
+							news_article_category {
+								documentId
+							}
+				}
 				... on ComponentBlocksContactGroupSection {
 					ContactGroup {
 						documentId
@@ -206,12 +212,6 @@ export const GET_INDEX_PAGE = `
 							}
 						}
 						}
-					}
-				}
-				... on ComponentBlocksNewsArticlesSection {
-					MaxArticles
-					news_article_category {
-						documentId
 					}
 				}
 			}
