@@ -11,6 +11,7 @@ import { TextColumnsSectionComponent } from './text-columns-section/text-columns
 import { ImageGallerySectionComponent } from './image-gallery-section/image-gallery-section'
 import { SimpleCtaSectionComponent } from './simple-cta-section/simple-cta-section'
 import { ContactGroupSectionComponent } from './contact-group-section/contact-group-section'
+import { NewsArticlesSectionComponent } from './news-articles-section/news-articles-section'
 
 interface RenderStartpageSectionsParams {
 	sections: StartpageSection[] | null | undefined
@@ -32,89 +33,98 @@ function renderStartpageSection({
 	key,
 }: RenderSectionParams) {
 	switch (section.__typename) {
-	case 'ComponentBlocksHeroSectionSlideShow':
-		return (
-			<HeroSectionSlideShowComponent
-				key={key}
-				section={section}
-				strapiBaseUrl={strapiBaseUrl}
-				theme={theme}
-			/>
-		)
-	case 'ComponentBlocksCardSection':
-		return (
-			<CardSectionComponent
-				key={key}
-				section={section}
-				strapiBaseUrl={strapiBaseUrl}
-				theme={theme}
-			/>
-		)
-	case 'ComponentBlocksRichTextSection':
-		return (
-			<RichTextSectionComponent
-				key={key}
-				section={section}
-				strapiBaseUrl={strapiBaseUrl}
-				theme={theme}
-			/>
-		)
-	case 'ComponentBlocksSupplementalDocumentGroupSection':
-		return (
-			<SupplementalDocumentGroupSectionComponent
-				key={key}
-				section={section}
-				strapiBaseUrl={strapiBaseUrl}
-				theme={theme}
-			/>
-		)
-	case 'ComponentBlocksTeaserTextWithImage':
-		return (
-			<TeaserTextWithImageSectionComponent
-				key={key}
-				section={section}
-				strapiBaseUrl={strapiBaseUrl}
-				theme={theme}
-			/>
-		)
-	case 'ComponentBlocksTextColumnsSection':
-		return (
-			<TextColumnsSectionComponent
-				key={key}
-				section={section}
-				strapiBaseUrl={strapiBaseUrl}
-				theme={theme}
-			/>
-		)
-	case 'ComponentBlocksImageGallerySection':
-		return (
-			<ImageGallerySectionComponent
-				key={key}
-				section={section}
-				strapiBaseUrl={strapiBaseUrl}
-				theme={theme}
-			/>
-		)
-	case 'ComponentBlocksSimpleCtaSection':
-		return (
-			<SimpleCtaSectionComponent
-				key={key}
-				section={section}
-				strapiBaseUrl={strapiBaseUrl}
-				theme={theme}
-			/>
-		)
-	case 'ComponentBlocksContactGroupSection':
-		return (
-			<ContactGroupSectionComponent
-				key={key}
-				section={section}
-				strapiBaseUrl={strapiBaseUrl}
-				theme={theme}
-			/>
-		)
-	default:
-		return null
+		case 'ComponentBlocksHeroSectionSlideShow':
+			return (
+				<HeroSectionSlideShowComponent
+					key={key}
+					section={section}
+					strapiBaseUrl={strapiBaseUrl}
+					theme={theme}
+				/>
+			)
+		case 'ComponentBlocksCardSection':
+			return (
+				<CardSectionComponent
+					key={key}
+					section={section}
+					strapiBaseUrl={strapiBaseUrl}
+					theme={theme}
+				/>
+			)
+		case 'ComponentBlocksRichTextSection':
+			return (
+				<RichTextSectionComponent
+					key={key}
+					section={section}
+					strapiBaseUrl={strapiBaseUrl}
+					theme={theme}
+				/>
+			)
+		case 'ComponentBlocksSupplementalDocumentGroupSection':
+			return (
+				<SupplementalDocumentGroupSectionComponent
+					key={key}
+					section={section}
+					strapiBaseUrl={strapiBaseUrl}
+					theme={theme}
+				/>
+			)
+		case 'ComponentBlocksTeaserTextWithImage':
+			return (
+				<TeaserTextWithImageSectionComponent
+					key={key}
+					section={section}
+					strapiBaseUrl={strapiBaseUrl}
+					theme={theme}
+				/>
+			)
+		case 'ComponentBlocksTextColumnsSection':
+			return (
+				<TextColumnsSectionComponent
+					key={key}
+					section={section}
+					strapiBaseUrl={strapiBaseUrl}
+					theme={theme}
+				/>
+			)
+		case 'ComponentBlocksImageGallerySection':
+			return (
+				<ImageGallerySectionComponent
+					key={key}
+					section={section}
+					strapiBaseUrl={strapiBaseUrl}
+					theme={theme}
+				/>
+			)
+		case 'ComponentBlocksSimpleCtaSection':
+			return (
+				<SimpleCtaSectionComponent
+					key={key}
+					section={section}
+					strapiBaseUrl={strapiBaseUrl}
+					theme={theme}
+				/>
+			)
+		case 'ComponentBlocksContactGroupSection':
+			return (
+				<ContactGroupSectionComponent
+					key={key}
+					section={section}
+					strapiBaseUrl={strapiBaseUrl}
+					theme={theme}
+				/>
+			)
+		case 'ComponentBlocksNewsArticlesSection':
+			return (
+				<NewsArticlesSectionComponent
+					key={key}
+					section={section as any}
+					strapiBaseUrl={strapiBaseUrl}
+					theme={theme}
+				/>
+			)
+		default:
+			return null
 	}
 }
 

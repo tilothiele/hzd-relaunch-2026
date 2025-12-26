@@ -205,6 +205,13 @@ export const GET_INDEX_PAGE = `
 								lastName
 							}
 						}
+						}
+					}
+				}
+				... on ComponentBlocksNewsArticlesSection {
+					MaxArticles
+					news_article_category {
+						documentId
 					}
 				}
 			}
@@ -427,6 +434,12 @@ export const GET_PAGE_BY_SLUG = `
 										lastName
 									}
 								}
+							}
+						}
+						... on ComponentBlocksNewsArticlesSection {
+							MaxArticles
+							news_article_category {
+								documentId
 							}
 						}
 					}
@@ -798,6 +811,212 @@ export const REGISTER_USER = `
 	}
 `
 
+export const GET_NEWS_ARTICLES = `
+	query GetNewsArticles($filters: NewsArticleFiltersInput, $pagination: PaginationArg, $sort: [String]) {
+		newsArticles(filters: $filters, pagination: $pagination, sort: $sort) {
+			documentId
+			Headline
+			SubHeadline
+			TeaserText
+			Slug
+			publishedAt
+			Image {
+				url
+				alternativeText
+				width
+				height
+				caption
+				previewUrl
+			}
+		}
+	}
+`
+
+export const GET_NEWS_ARTICLE_BY_SLUG = `
+	query GetNewsArticleBySlug($slug: String!) {
+		newsArticles(filters: { Slug: { eq: $slug } }, pagination: { pageSize: 1 }) {
+			documentId
+			Headline
+			SubHeadline
+			TeaserText
+			Slug
+			Author
+			DateOfPublication
+			publishedAt
+			Image {
+				url
+				alternativeText
+				width
+				height
+				caption
+				previewUrl
+			}
+			SEO {
+				MetaDescription
+			}
+			category {
+				documentId
+				CategoryName
+			}
+			NewsContentSections {
+				__typename
+				... on ComponentBlocksRichTextSection {
+					RichTextContent
+					RichTextOddEven
+				}
+				... on ComponentBlocksCardSection {
+					CardColumnsOddEven
+					CardItem {
+						id
+						Headline
+						Subheadline
+						ColorTheme {
+							ShortName
+						}
+						BackgroundImage {
+							url
+							alternativeText
+							width
+							height
+							caption
+							previewUrl
+						}
+						ActionButton {
+							Label
+							Link
+							Primary
+						}
+					}
+				}
+				... on ComponentBlocksSupplementalDocumentGroupSection {
+					SupplementalsOddEven
+					GroupHeadline
+					supplemental_document_group {
+						documentId
+						Name
+						SortOrd
+						supplemental_documents {
+							documentId
+							Name
+							Description
+							ShortId
+							SortOrd
+							DownloadDocument {
+								url
+								name
+								ext
+								mime
+								size
+							}
+							VisibilityStart
+							VisibilityEnd
+						}
+					}
+				}
+				... on ComponentBlocksTeaserTextWithImage {
+					TeaserOddEven
+					TeaserHeadline
+					TeaserText
+					ImagePosition
+					Image {
+						url
+						alternativeText
+						width
+						height
+						caption
+						previewUrl
+					}
+					ActionButton {
+						Label
+						Link
+						Primary
+					}
+				}
+				... on ComponentBlocksTextColumnsSection {
+					TextColumnsOddEven
+					TextColumnsHeadline
+					TextColumnsSubHeadline
+					TextColumn {
+						id
+						ColumnHeadline
+						ColumnText
+						ColumnActionButton {
+							Label
+							Link
+							Primary
+						}
+						BulletItems {
+							id
+							Headline
+							ItemBody
+						}
+					}
+				}
+				... on ComponentBlocksImageGallerySection {
+					GalleryHeadline
+					GalleryImages {
+						url
+						alternativeText
+						width
+						height
+						caption
+						previewUrl
+					}
+				}
+				... on ComponentBlocksSimpleCtaSection {
+					CtaHeadline
+					CtaInfoText
+					CtaBackgroundImage {
+						url
+						alternativeText
+						width
+						height
+						caption
+						previewUrl
+					}
+					CtaActionButton {
+						Label
+						Link
+						Primary
+					}
+				}
+				... on ComponentBlocksContactGroupSection {
+					ContactGroup {
+						documentId
+						ContactGroupName
+						GroupDescription
+						contacts(sort: ["position:asc"]) {
+							documentId
+							position
+							Headline
+							Name
+							Street
+							ZipCity
+							Phone
+							Email1
+							Email2
+							Introduction
+							avatar {
+								url
+								alternativeText
+								width
+								height
+								caption
+								previewUrl
+							}
+							member {
+								documentId
+								firstName
+								lastName
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+`
+
 export const FORGOT_PASSWORD = `
 	mutation ForgotPassword($email: String!) {
 		forgotPassword(email: $email) {
@@ -814,6 +1033,56 @@ export const RESET_PASSWORD = `
 				id
 				username
 				email
+			}
+		}
+	}
+`
+
+export const GET_NEWS_ARTICLE_CATEGORY_BY_SLUG = `
+	query GetNewsArticleCategoryBySlug($slug: String!) {
+		newsArticleCategories(filters: { Slug: { eq: $slug } }, pagination: { pageSize: 1 }) {
+			documentId
+			CategoryName
+			Slug
+			CategoryTeaserText
+			FeatureTitle
+			CategoryDescription
+			CategoryImage {
+				url
+				alternativeText
+				width
+				height
+				caption
+				previewUrl
+			}
+		}
+	}
+`
+
+export const GET_NEWS_ARTICLES_BY_CATEGORY = `
+	query GetNewsArticlesByCategory($categoryId: ID!, $pagination: PaginationArg, $featuredFilter: Boolean) {
+		newsArticleCategories(filters: { documentId: { eq: $categoryId } }, pagination: { pageSize: 1 }) {
+			documentId
+			news_articles(
+				filters: { FeaturedArticle: { eq: $featuredFilter } }
+				pagination: $pagination
+				sort: ["publishedAt:desc"]
+			) {
+				documentId
+				Headline
+				SubHeadline
+				TeaserText
+				Slug
+				publishedAt
+				FeaturedArticle
+				Image {
+					url
+					alternativeText
+					width
+					height
+					caption
+					previewUrl
+				}
 			}
 		}
 	}

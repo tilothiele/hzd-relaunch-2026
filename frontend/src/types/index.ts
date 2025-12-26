@@ -41,6 +41,8 @@ export interface CardItem {
 
 export interface CardSection {
 	__typename: 'ComponentBlocksCardSection'
+	id?: string
+	Headline?: string | null
 	CardColumnsOddEven?: 'Odd' | 'Even' | null
 	CardItem?: CardItem[] | null
 }
@@ -135,7 +137,16 @@ export interface ContactGroupSection {
 	ContactGroup?: ContactGroup | null
 }
 
-export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | SimpleCtaSection | ContactGroupSection
+export interface NewsArticlesSection {
+	__typename: 'ComponentBlocksNewsArticlesSection'
+	id: string
+	MaxArticles?: number | null
+	news_article_category?: {
+		documentId: string
+	} | null
+}
+
+export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | SimpleCtaSection | ContactGroupSection | NewsArticlesSection
 
 export type PageSection = StartpageSection
 
@@ -561,4 +572,47 @@ export interface CreateFormInstanceResult {
 	createFormInstance: {
 		data: FormInstance
 	}
+}
+
+export interface SEO {
+	MetaTitle?: string | null
+	MetaDescription?: string | null
+	MetaKeywords?: string | null
+	CanonicalURL?: string | null
+	MetaRobots?: string | null
+	StructuredData?: unknown | null
+	MetaSocial?: MetaSocial[] | null
+}
+
+export interface MetaSocial {
+	SocialNetwork?: string | null
+	Title?: string | null
+	Description?: string | null
+	Image?: Image | null
+}
+
+export interface NewsArticleCategory {
+	documentId: string
+	CategoryName?: string | null
+	Slug?: string | null
+	CategoryTeaserText?: string | null
+	FeatureTitle?: string | null
+	CategoryDescription?: string | null
+	CategoryImage?: Image | null
+}
+
+export interface NewsArticle {
+	documentId: string
+	Headline?: string | null
+	SubHeadline?: string | null
+	TeaserText?: string | null
+	Slug?: string | null
+	Author?: string | null
+	DateOfPublication?: string | null
+	publishedAt?: string | null
+	FeaturedArticle?: boolean | null
+	Image?: Image | null
+	SEO?: SEO | null
+	category?: NewsArticleCategory | null
+	NewsContentSections?: PageSection[] | null
 }

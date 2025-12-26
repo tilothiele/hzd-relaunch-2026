@@ -114,10 +114,10 @@ export async function fetchGraphQL<T>(
 
 	// Debug-Logging
 	if (!effectiveToken) {
-		console.warn('[GraphQL Client] Kein Token gefunden für Query:', query.substring(0, 50))
-		console.warn('[GraphQL Client] Vollständiger Query:', query)
-	// } else {
-	// 	console.log('[GraphQL Client] Token wird verwendet:', effectiveToken.substring(0, 20) + '...')
+		// console.warn('[GraphQL Client] Kein Token gefunden für Query:', query.substring(0, 50))
+		// console.warn('[GraphQL Client] Vollständiger Query:', query)
+		// } else {
+		// 	console.log('[GraphQL Client] Token wird verwendet:', effectiveToken.substring(0, 20) + '...')
 	}
 
 	// Verwende Next.js API-Route als Proxy, um CORS-Probleme zu vermeiden
