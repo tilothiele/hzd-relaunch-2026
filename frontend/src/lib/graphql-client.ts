@@ -120,6 +120,8 @@ export async function fetchGraphQL<T>(
 		// 	console.log('[GraphQL Client] Token wird verwendet:', effectiveToken.substring(0, 20) + '...')
 	}
 
+	//console.log('[GraphQL Client] query:', query)
+
 	// Verwende Next.js API-Route als Proxy, um CORS-Probleme zu vermeiden
 	try {
 		const response = await fetch('/api/graphql', {

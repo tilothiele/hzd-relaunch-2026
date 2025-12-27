@@ -211,7 +211,6 @@ export const GET_INDEX_PAGE = `
 								lastName
 							}
 						}
-						}
 					}
 				}
 			}
