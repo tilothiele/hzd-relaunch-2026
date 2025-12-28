@@ -32,12 +32,12 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 			style={{
 				backgroundColor: theme.footerBackground,
 				color: theme.headerFooterTextColor,
-				paddingTop: '1em',
+				paddingTop: '1.5em',
 			}}
 			className='w-full'
 		>
-			<div className='mx-auto w-full max-w-screen-xl px-4 pb-8'>
-				<div className='mb-8 grid gap-4 md:grid-cols-[1.5fr_2fr_1fr_0.5fr]'>
+			<div className='mx-auto w-full max-w-screen-xl px-4 py-8'>
+				<div className='mb-8 grid gap-4 md:grid-cols-[1.5fr_2fr_1fr_1fr]'>
 					<div>
 						{logoSrc ? (
 							<Image
@@ -52,26 +52,26 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 									margin: 'auto',
 								}}
 							/>
-							) : (
-								<span className='text-lg font-semibold tracking-wide'>
-									HZD
-								</span>
-							)}
+						) : (
+							<span className='text-lg font-semibold tracking-wide'>
+								HZD
+							</span>
+						)}
 					</div>
 					<div>
 						<div>
 							<div className='grid grid-cols-2 gap-2'>
 								<div>
-									<h3 className='mb-2 font-bold'>Präsidium</h3>
-									<p className='text-sm'>{globalLayout?.Footer?.PraesidiumName}</p>
-									<p className='text-sm'>{globalLayout?.Footer?.PraesidiumOrt}</p>
-									<p className='text-sm'>{globalLayout?.Footer?.PraesidiumTelefon}</p>
+									<p className='font-bold'>Präsidium</p>
+									<div className='text-sm'>{globalLayout?.Footer?.PraesidiumName}</div>
+									<div className='text-sm'>{globalLayout?.Footer?.PraesidiumOrt}</div>
+									<div className='text-sm'>{globalLayout?.Footer?.PraesidiumTelefon}</div>
 								</div>
 								<div>
-									<h3 className='mb-2 font-bold'>IT-Projektleitung</h3>
-									<p className='text-sm'>{globalLayout?.Footer?.ItProjektleitungName}</p>
-									<p className='text-sm'>{globalLayout?.Footer?.ItProjektleitungOrt}</p>
-									<p className='text-sm'>{globalLayout?.Footer?.ItProjektleitungTelefon}</p>
+									<p className='font-bold'>IT-Projektleitung</p>
+									<div className='text-sm'>{globalLayout?.Footer?.ItProjektleitungName}</div>
+									<div className='text-sm'>{globalLayout?.Footer?.ItProjektleitungOrt}</div>
+									<div className='text-sm'>{globalLayout?.Footer?.ItProjektleitungTelefon}</div>
 								</div>
 							</div>
 							<hr
@@ -148,12 +148,9 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 						) : null}
 					</div>
 					<div>
-						<h3
-							className='text-center font-semibold'
-							style={{ marginBottom: '0.5rem' }}
-						>
+						<p className='text-center font-semibold'>
 							Unsere Partner
-						</h3>
+						</p>
 						<div className='flex flex-col items-center' style={{ gap: '1rem' }}>
 							{remainingPartnerLinks.map((partnerLink, index) => {
 								if (!partnerLink.Logo) return null
@@ -206,13 +203,16 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 				className='w-full text-center'
 				style={{
 					backgroundColor: '#FAD857',
-					color: '#0A0A0A',
-					paddingTop: '.5em',
-					paddingBottom: '.5em',
-					fontSize: '0.875em',
 				}}
 			>
-				<p>
+				<p
+					style={{
+						color: '#0A0A0A',
+						paddingTop: '.5em',
+						paddingBottom: '.5em',
+						fontSize: '0.875em',
+					}}
+				>
 					©
 					{' '}
 					{currentYear}
