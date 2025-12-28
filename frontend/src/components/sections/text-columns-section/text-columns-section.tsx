@@ -44,8 +44,9 @@ function BulletItemAccordion({
 			<AccordionSummary
 				expandIcon={<ExpandMoreIcon />}
 				sx={{
-					px: 0,
-					py: 2,
+					mx: 1,
+					mt: 1,
+					py: 0,
 					'& .MuiAccordionSummary-content': {
 						margin: 0,
 					},
@@ -55,28 +56,31 @@ function BulletItemAccordion({
 					<p>{headline}</p>
 				) : null}
 			</AccordionSummary>
-			{itemBody ? (
-				<AccordionDetails
-					sx={{
-						px: 4,
-						pb: 2,
-						'& p': {
-							fontSize: '0.875rem',
-							color: 'text.secondary',
-							lineHeight: 1.75,
-						},
-						'& a': {
-							color: 'primary.main',
-							textDecoration: 'none',
-							'&:hover': {
-								textDecoration: 'underline',
+			{
+				itemBody ? (
+					<AccordionDetails
+						sx={{
+							px: 4,
+							pb: 2,
+							'& p': {
+								color: 'text.secondary',
 							},
-						},
-					}}
-					dangerouslySetInnerHTML={{ __html: itemBody }}
-				/>
-			) : null}
-		</Accordion>
+							'& a': {
+								color: 'primary.main',
+								textDecoration: 'none',
+								'&:hover': {
+									textDecoration: 'underline',
+								},
+							},
+						}}
+
+					>
+						<p dangerouslySetInnerHTML={{ __html: itemBody }}>
+						</p>
+					</AccordionDetails>
+				) : null
+			}
+		</Accordion >
 	)
 }
 
@@ -163,21 +167,6 @@ export function TextColumnsSectionComponent({
 
 									{columnText ? (
 										<Box
-											sx={{
-												color: 'text.secondary',
-												'& p': {
-													fontSize: '1.125rem',
-													lineHeight: 1.75,
-													mb: 2,
-												},
-												'& a': {
-													color: 'primary.main',
-													textDecoration: 'none',
-													'&:hover': {
-														textDecoration: 'underline',
-													},
-												},
-											}}
 											dangerouslySetInnerHTML={{ __html: columnText }}
 										/>
 									) : null}

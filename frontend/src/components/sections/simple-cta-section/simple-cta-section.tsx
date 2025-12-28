@@ -45,85 +45,61 @@ export function SimpleCtaSectionComponent({
 					backgroundSize: 'cover',
 				}}
 			>
-			<Box
-				sx={{
-					display: 'flex',
-					minHeight: '500px',
-					width: '100%',
-					alignItems: 'center',
-					justifyContent: 'center',
-					px: 2,
-					py: 4,
-				}}
-			>
-				<Container maxWidth='md'>
-					<Paper
-						elevation={3}
-						sx={{
-							width: '100%',
-							borderRadius: 2,
-							backgroundColor: 'rgba(255, 255, 255, 0.9)',
-							px: 4,
-							py: 6,
-						}}
-					>
-						{headline ? (
-							<Typography
-								variant='h3'
-								component='h2'
-								sx={{
-									mb: 3,
-									fontWeight: 'bold',
-									color: '#A8267D',
-								}}
-							>
-								{headline}
-							</Typography>
-						) : null}
+				<Box
+					sx={{
+						display: 'flex',
+						minHeight: '500px',
+						width: '100%',
+						alignItems: 'center',
+						justifyContent: 'center',
+						px: 2,
+						py: 4,
+					}}
+				>
+					<Container maxWidth='md'>
+						<Paper
+							elevation={3}
+							sx={{
+								width: '100%',
+								borderRadius: 2,
+								backgroundColor: 'rgba(255, 255, 255, 0.9)',
+								px: 4,
+								py: 6,
+							}}
+						>
+							{headline ? (
+								<h2>
+									{headline}
+								</h2>
+							) : null}
 
-						{text ? (
-							<Box
-								sx={{
-									mb: 4,
-									textAlign: 'justify',
-									color: 'text.secondary',
-									'& p': {
-										fontSize: '1.125rem',
-										lineHeight: 1.75,
-									},
-									'& a': {
-										color: 'primary.main',
-										textDecoration: 'none',
-										'&:hover': {
-											textDecoration: 'underline',
-										},
-									},
-								}}
-								dangerouslySetInnerHTML={{ __html: text }}
-							/>
-						) : null}
+							{text ? (
+								<Box
+									dangerouslySetInnerHTML={{ __html: text }}
+								/>
+							) : null}
 
-						{actionButtons.length > 0 ? (
-							<Box
-								sx={{
-									display: 'flex',
-									justifyContent: 'center',
-									gap: 2,
-									flexWrap: 'wrap',
-								}}
-							>
-								{actionButtons.map((actionButton, index) => (
-									<ActionButton
-										key={actionButton.Link ?? index}
-										actionButton={actionButton}
-										theme={theme}
-									/>
-								))}
-							</Box>
-						) : null}
-					</Paper>
-				</Container>
-			</Box>
+							{actionButtons.length > 0 ? (
+								<Box
+									sx={{
+										display: 'flex',
+										justifyContent: 'center',
+										gap: 2,
+										flexWrap: 'wrap',
+									}}
+								>
+									{actionButtons.map((actionButton, index) => (
+										<ActionButton
+											key={actionButton.Link ?? index}
+											actionButton={actionButton}
+											theme={theme}
+										/>
+									))}
+								</Box>
+							) : null}
+						</Paper>
+					</Container>
+				</Box>
 			</Box>
 		</SectionContainer>
 	)

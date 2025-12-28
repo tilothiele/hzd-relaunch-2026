@@ -26,7 +26,7 @@ export function ActionButton({ actionButton, theme }: ActionButtonProps) {
 	const isExternalLink = actionButton.Link.startsWith('http://') || actionButton.Link.startsWith('https://')
 
 	const commonSx = {
-		borderRadius: '4px',
+		borderRadius: '12px',
 		px: 3,
 		py: 1.5,
 		fontSize: '0.875rem',
