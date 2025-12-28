@@ -26,7 +26,8 @@
         "form.number-input",
         "form.form-submit-button",
         "form.text-area",
-        "form.standard-identifiers"
+        "form.standard-identifiers",
+        "form.dog-standard-identifier"
       ]
     },
     "InclPrivacyPolicy": {

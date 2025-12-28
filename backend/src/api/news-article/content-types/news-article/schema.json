@@ -46,7 +46,10 @@
       "default": false
     },
     "Slug": {
-      "type": "string"
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "regex": "^\\/.*"
     },
     "SEO": {
       "type": "component",

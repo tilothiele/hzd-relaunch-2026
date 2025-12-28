@@ -303,6 +303,32 @@ export interface FormChoice extends Struct.ComponentSchema {
   };
 }
 
+export interface FormDogStandardIdentifier extends Struct.ComponentSchema {
+  collectionName: 'components_form_dog_standard_identifiers';
+  info: {
+    displayName: 'DogStandardIdentifier';
+  };
+  attributes: {
+    ChipNo: Schema.Attribute.Enumeration<['Nein', 'Ja', 'Erforderlich']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Erforderlich'>;
+    DateOfBirth: Schema.Attribute.Enumeration<['Nein', 'Ja', 'Erforderlich']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Nein'>;
+    GivenName: Schema.Attribute.Enumeration<['Nein', 'Ja', 'Erforderlich']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Erforderlich'>;
+    KennelName: Schema.Attribute.Enumeration<['Nein', 'Ja', 'Erforderlich']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Erforderlich'>;
+    Zuchtbuchnummer: Schema.Attribute.Enumeration<
+      ['Nein', 'Ja', 'Erforderlich']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Ja'>;
+  };
+}
+
 export interface FormEmailAdress extends Struct.ComponentSchema {
   collectionName: 'components_form_email_adresses';
   info: {
@@ -552,6 +578,7 @@ declare module '@strapi/strapi' {
       'columns.text-column': ColumnsTextColumn;
       'form.boolean-choice': FormBooleanChoice;
       'form.choice': FormChoice;
+      'form.dog-standard-identifier': FormDogStandardIdentifier;
       'form.email-adress': FormEmailAdress;
       'form.fld-group-separator': FormFldGroupSeparator;
       'form.fld-static-text': FormFldStaticText;

@@ -1,0 +1,60 @@
+{
+  "collectionName": "components_form_dog_standard_identifiers",
+  "info": {
+    "displayName": "DogStandardIdentifier"
+  },
+  "options": {},
+  "attributes": {
+    "GivenName": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Erforderlich",
+      "enum": [
+        "Nein",
+        "Ja",
+        "Erforderlich"
+      ]
+    },
+    "KennelName": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Erforderlich",
+      "enum": [
+        "Nein",
+        "Ja",
+        "Erforderlich"
+      ]
+    },
+    "ChipNo": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Erforderlich",
+      "enum": [
+        "Nein",
+        "Ja",
+        "Erforderlich"
+      ]
+    },
+    "Zuchtbuchnummer": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Ja",
+      "enum": [
+        "Nein",
+        "Ja",
+        "Erforderlich"
+      ]
+    },
+    "DateOfBirth": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Nein",
+      "enum": [
+        "Nein",
+        "Ja",
+        "Erforderlich"
+      ]
+    }
+  },
+  "config": {}
+}

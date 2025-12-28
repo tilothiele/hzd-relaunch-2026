@@ -17,7 +17,8 @@
     "Slug": {
       "type": "string",
       "required": true,
-      "unique": true
+      "unique": true,
+      "regex": "^\\/.*"
     },
     "CategoryTeaserText": {
       "type": "text"

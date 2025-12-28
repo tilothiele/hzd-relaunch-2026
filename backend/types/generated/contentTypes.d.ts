@@ -665,6 +665,7 @@ export interface ApiFormForm extends Struct.CollectionTypeSchema {
         'form.form-submit-button',
         'form.text-area',
         'form.standard-identifiers',
+        'form.dog-standard-identifier',
       ]
     >;
     InclPrivacyPolicy: Schema.Attribute.Boolean &
@@ -946,7 +947,9 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
     >;
     publishedAt: Schema.Attribute.DateTime;
     SEO: Schema.Attribute.Component<'seo.seo', false>;
-    Slug: Schema.Attribute.String;
+    Slug: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
     SubHeadline: Schema.Attribute.String;
     TeaserText: Schema.Attribute.Text;
     updatedAt: Schema.Attribute.DateTime;
