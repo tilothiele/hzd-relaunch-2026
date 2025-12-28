@@ -9,6 +9,9 @@ import type { ThemeDefinition } from '@/themes'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { ExternalRegistrationLink, InternalRegistrationLink } from '@/components/calendar/registration-links'
 
+import { getColorBySchema, getCalendarColors, formatDateRange } from './calendar-utils'
+import { CalendarItemCard } from './calendar-item-card'
+
 interface CalendarSearchProps {
 	strapiBaseUrl?: string | null
 	theme?: ThemeDefinition
@@ -17,84 +20,6 @@ interface CalendarSearchProps {
 interface CalendarColors {
 	backgroundColor: string
 	textColor: string
-}
-
-/**
- * Mappt ColorSchema Enumeration-Werte (vom GraphQL Backend) auf konkrete Farben
- * Enumeration-Werte: Gelb, Gruen, Pink, Rot, Violet
- */
-function getColorBySchema(colorSchema: Calendar['ColorSchema']): { backgroundColor: string; textColor: string } {
-	if (!colorSchema) {
-		return {
-			backgroundColor: '#6b7280',
-			textColor: '#ffffff',
-		}
-	}
-
-	// Mapping basierend auf ColorSchema Enumeration-Werten vom GraphQL Backend
-	const colorMap: Record<string, { backgroundColor: string; textColor: string }> = {
-		Gelb: {
-			backgroundColor: '#FAD857',
-			textColor: '#000000',
-		},
-		Gruen: {
-			backgroundColor: '#10b981',
-			textColor: '#ffffff',
-		},
-		Pink: {
-			backgroundColor: '#ec4899',
-			textColor: '#ffffff',
-		},
-		Rot: {
-			backgroundColor: '#ef4444',
-			textColor: '#ffffff',
-		},
-		Violet: {
-			backgroundColor: '#A8267D',
-			textColor: '#ffffff',
-		},
-	}
-
-	// Prüfe ob ColorSchema ein bekannter Enumeration-Wert ist
-	const normalizedSchema = colorSchema.trim()
-	if (colorMap[normalizedSchema]) {
-		return colorMap[normalizedSchema]
-	}
-
-	// Fallback: Wenn ColorSchema ein Hex-Code oder anderer Wert ist, verwende ihn direkt
-	// Textfarbe basierend auf Helligkeit der Hintergrundfarbe
-	const textColor = getContrastTextColor(colorSchema)
-	return {
-		backgroundColor: colorSchema,
-		textColor,
-	}
-}
-
-/**
- * Weist jedem Kalender Hintergrund- und Textfarbe basierend auf ColorSchema Enumeration zu
- */
-function getCalendarColors(calendar: Calendar): CalendarColors {
-	return getColorBySchema(calendar.ColorSchema)
-}
-
-/**
- * Bestimmt die passende Textfarbe basierend auf der Helligkeit der Hintergrundfarbe
- */
-function getContrastTextColor(backgroundColor: string): string {
-	// Entferne # falls vorhanden
-	const hex = backgroundColor.replace('#', '')
-
-	// Konvertiere zu RGB
-	const r = parseInt(hex.substring(0, 2), 16)
-	const g = parseInt(hex.substring(2, 4), 16)
-	const b = parseInt(hex.substring(4, 6), 16)
-
-	// Berechne relative Luminanz (Formel nach WCAG)
-	const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
-
-	// Wenn Luminanz > 0.5, ist der Hintergrund hell -> dunkler Text
-	// Wenn Luminanz <= 0.5, ist der Hintergrund dunkel -> heller Text
-	return luminance > 0.5 ? '#000000' : '#ffffff'
 }
 
 export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
@@ -390,58 +315,6 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 		})
 	}, [calendarItems, getPrimaryDate])
 
-	const formatDate = useCallback((dateString: string | null | undefined) => {
-		if (!dateString) {
-			return 'Kein Datum'
-		}
-		try {
-			const date = new Date(dateString)
-			return date.toLocaleDateString('de-DE', {
-				year: 'numeric',
-				month: 'long',
-				day: 'numeric',
-			})
-		} catch {
-			return dateString
-		}
-	}, [])
-
-	const formatTime = useCallback((timeString: string | null | undefined) => {
-		if (!timeString) {
-			return ''
-		}
-		try {
-			const date = new Date(`1970-01-01T${timeString}`)
-			return Number.isNaN(date.getTime())
-				? timeString
-				: date.toLocaleTimeString('de-DE', {
-					hour: '2-digit',
-					minute: '2-digit',
-				})
-		} catch {
-			return timeString
-		}
-	}, [])
-
-	const formatDateRange = useCallback((
-		date: string | null | undefined,
-		time: string | null | undefined,
-		dateTo: string | null | undefined,
-	) => {
-		const startDate = formatDate(date)
-		const startTime = formatTime(time)
-		const endDate = dateTo ? formatDate(dateTo) : ''
-
-		let result = startDate
-		if (startTime) {
-			result = `${result}, ${startTime}`
-		}
-		if (endDate) {
-			result = `${result} – ${endDate}`
-		}
-		return result
-	}, [formatDate, formatTime])
-
 	const backgroundColor = theme?.evenBgColor ?? '#f9fafb'
 
 	return (
@@ -539,143 +412,14 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 					</Box>
 				) : sortedItems.length > 0 ? (
 					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-						{sortedItems.map((item, index) => {
-							const registrationOpen = isRegistrationOpen(item)
-							const calendarColors = item.calendar ? getCalendarColors(item.calendar) : null
-							const isEven = index % 2 === 0
-							return (
-								<Paper
-									key={item.documentId}
-									elevation={2}
-									sx={{
-										paddingX: 3,
-										paddingY: 1,
-										backgroundColor: isEven ? '#ffffff' : '#f9fafb',
-										borderLeft: calendarColors
-											? `8px solid ${calendarColors.backgroundColor}`
-											: '8px solid #e5e7eb',
-									}}
-								>
-									{/* Desktop: Eine Zeile: Datum - Description - Links */}
-									{/* Mobile/Tablet: Zeile 1: Datum - Links, Zeile 2: Headline - Description */}
-									<Box
-										sx={{
-											display: 'flex',
-											gap: 2,
-											flexWrap: 'wrap',
-											flexDirection: { xs: 'column', sm: 'column', md: 'row' },
-											alignItems: { xs: 'flex-start', sm: 'flex-start', md: 'center' },
-										}}
-									>
-										{/* Erste Zeile (Mobile/Tablet) / Erste Spalte (Desktop): Datum + Links */}
-										<Box
-											sx={{
-												display: 'flex',
-												alignItems: 'center',
-												gap: 2,
-												flexWrap: 'wrap',
-												flex: { xs: 'none', sm: 'none', md: '0 0 auto' },
-												width: { xs: '100%', sm: '100%', md: 'auto' },
-											}}
-										>
-											{/* Datum */}
-											<Typography
-												variant='subtitle1'
-												sx={{
-													fontWeight: 600,
-													color: 'text.primary',
-													flexShrink: 0,
-												}}
-											>
-												{formatDateRange(item.Date, item.Time, item.DateTo)}
-											</Typography>
-
-											{/* Links und Aktionen - auf Mobile/Tablet in derselben Zeile wie Datum */}
-											<Box
-												sx={{
-													display: { xs: 'flex', sm: 'flex', md: 'none' },
-													flexWrap: 'wrap',
-													gap: 2,
-													alignItems: 'center',
-													flexShrink: 0,
-												}}
-											>
-												{registrationOpen && item.AnmeldeLink ? (
-													<ExternalRegistrationLink href={item.AnmeldeLink} />
-												) : null}
-												{registrationOpen && item.form?.documentId ? (
-													<InternalRegistrationLink href={`/anmeldung/${item.form.documentId}`} />
-												) : null}
-											</Box>
-										</Box>
-
-										{/* Headline und Description - auf Mobile/Tablet in zweiter Zeile */}
-										<Box
-											sx={{
-												flex: { xs: 'none', sm: 'none', md: 1 },
-												minWidth: 0,
-												width: { xs: '100%', sm: '100%', md: 'auto' },
-												display: 'flex',
-												alignItems: 'center',
-												gap: 1,
-												flexWrap: 'wrap',
-											}}
-										>
-											{item.Headline ? (
-												<Typography
-													variant='body1'
-													sx={{
-														fontWeight: 500,
-														color: 'text.primary',
-													}}
-												>
-													{item.Headline}
-												</Typography>
-											) : null}
-											{item.Headline && item.Description ? (
-												<Typography
-													variant='body1'
-													sx={{
-														color: 'text.secondary',
-													}}
-												>
-													-
-												</Typography>
-											) : null}
-											{item.Description ? (
-												<Typography
-													variant='body1'
-													sx={{
-														color: 'text.secondary',
-														whiteSpace: 'pre-wrap',
-													}}
-												>
-													{item.Description}
-												</Typography>
-											) : null}
-										</Box>
-
-										{/* Links und Aktionen - nur auf Desktop sichtbar */}
-										<Box
-											sx={{
-												display: { xs: 'none', sm: 'none', md: 'flex' },
-												flexWrap: 'wrap',
-												gap: 2,
-												alignItems: 'center',
-												flexShrink: 0,
-											}}
-										>
-											{registrationOpen && item.AnmeldeLink ? (
-												<ExternalRegistrationLink href={item.AnmeldeLink} />
-											) : null}
-											{registrationOpen && item.form?.documentId ? (
-												<InternalRegistrationLink href={`/anmeldung/${item.form.documentId}`} />
-											) : null}
-										</Box>
-									</Box>
-								</Paper>
-							)
-						})}
+						{sortedItems.map((item, index) => (
+							<CalendarItemCard
+								key={item.documentId}
+								item={item}
+								index={index}
+								registrationOpen={isRegistrationOpen(item)}
+							/>
+						))}
 					</Box>
 				) : !isLoading ? (
 					<Box sx={{ textAlign: 'center', py: 4 }}>
@@ -685,8 +429,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 					</Box>
 				) : null}
 			</SectionContainer>
-
-			{/* Keine Modal-Ansicht mehr, Daten werden direkt in der Liste gezeigt */}
 		</>
+
 	)
 }

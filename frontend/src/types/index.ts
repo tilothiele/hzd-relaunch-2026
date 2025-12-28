@@ -1,3 +1,5 @@
+import type { BlocksContent } from '@strapi/blocks-react-renderer'
+
 export interface Image {
 	url: string
 	alternativeText?: string | null
@@ -412,7 +414,7 @@ export interface Calendar {
 export interface CalendarItem {
 	documentId: string
 	Headline: string
-	Description?: string | null
+	Description?: BlocksContent | any | null
 	Date?: string | null
 	Time?: string | null
 	DateTo?: string | null
