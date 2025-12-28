@@ -54,43 +54,65 @@ function DesktopMenuItem({
 	if (hasChildren) {
 		return (
 			<>
-				{item.url ? (
-					<Button
-						component={Link}
-						href={item.url}
+				<Box
+					sx={{
+						display: 'flex',
+						alignItems: 'center',
+						gap: 0.5,
+					}}
+				>
+					{item.url ? (
+						<Button
+							component={Link}
+							href={item.url}
+							sx={{
+								color: theme.headerFooterTextColor,
+								fontSize: '1.25rem',
+								fontWeight: 500,
+								textTransform: 'none',
+								paddingRight: 0.5,
+								'&:hover': {
+									color: '#FCD34D',
+									backgroundColor: 'transparent',
+								},
+							}}
+						>
+							{item.name}
+						</Button>
+					) : (
+						<Typography
+							variant='body1'
+							sx={{
+								color: theme.headerFooterTextColor,
+								fontSize: '1.25rem',
+								fontWeight: 500,
+								paddingLeft: '16px',
+							}}
+						>
+							{item.name}
+						</Typography>
+					)}
+					<IconButton
 						onClick={handleClick}
-						endIcon={<ExpandMoreIcon />}
+						size='small'
+						aria-label={`${item.name} Untermenü ${open ? 'schließen' : 'öffnen'}`}
 						sx={{
 							color: theme.headerFooterTextColor,
-							fontSize: '1.25rem',
-							fontWeight: 500,
-							textTransform: 'none',
+							padding: '4px',
 							'&:hover': {
 								color: '#FCD34D',
-								backgroundColor: 'transparent',
+								backgroundColor: 'rgba(252, 211, 77, 0.1)',
 							},
 						}}
 					>
-						{item.name}
-					</Button>
-				) : (
-					<Button
-						onClick={handleClick}
-						endIcon={<ExpandMoreIcon />}
-						sx={{
-							color: theme.headerFooterTextColor,
-							fontSize: '1.25rem',
-							fontWeight: 500,
-							textTransform: 'none',
-							'&:hover': {
-								color: '#FCD34D',
-								backgroundColor: 'transparent',
-							},
-						}}
-					>
-						{item.name}
-					</Button>
-				)}
+						<ExpandMoreIcon
+							sx={{
+								transition: 'transform 0.2s',
+								transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+							}}
+						/>
+					</IconButton>
+				</Box>
 				<Menu
 					anchorEl={anchorEl}
 					open={open}

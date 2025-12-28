@@ -337,8 +337,8 @@ export interface Breeder {
 		lastName?: string | null
 		region?: string | null
 		phone?: string | null
-		adress1?: string | null
-		adress2?: string | null
+		address1?: string | null
+		address2?: string | null
 		zip?: string | null
 		countryCode?: string | null
 	} | null

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { Box, Typography, Accordion, AccordionSummary, AccordionDetails } from '@mui/material'
+import { Box, Accordion, AccordionSummary, AccordionDetails } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import type { TextColumnsSection, BulletItem } from '@/types'
 import type { ThemeDefinition } from '@/themes'
@@ -52,9 +52,7 @@ function BulletItemAccordion({
 				}}
 			>
 				{headline ? (
-					<Typography variant='body1' sx={{ fontWeight: 500 }}>
-						{headline}
-					</Typography>
+					<p>{headline}</p>
 				) : null}
 			</AccordionSummary>
 			{itemBody ? (
@@ -120,29 +118,14 @@ export function TextColumnsSectionComponent({
 		>
 			<Box sx={{ width: '100%', maxWidth: '1200px' }}>
 				{section.TextColumnsHeadline ? (
-					<Typography
-						variant='h3'
-						component='h2'
-						sx={{
-							mb: 4,
-							fontWeight: 600,
-							color: 'text.primary',
-						}}
-					>
+					<h2>
 						{section.TextColumnsHeadline}
-					</Typography>
+					</h2>
 				) : null}
 				{section.TextColumnsSubHeadline ? (
-					<Typography
-						variant='h6'
-						component='p'
-						sx={{
-							mb: 4,
-							color: 'text.secondary',
-						}}
-					>
+					<p>
 						{section.TextColumnsSubHeadline}
-					</Typography>
+					</p>
 				) : null}
 
 				<Box
@@ -173,16 +156,9 @@ export function TextColumnsSectionComponent({
 							>
 								<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
 									{columnHeadline ? (
-										<Typography
-											variant='h5'
-											component='h3'
-											sx={{
-												fontWeight: 600,
-												color: 'text.primary',
-											}}
-										>
+										<h5>
 											{columnHeadline}
-										</Typography>
+										</h5>
 									) : null}
 
 									{columnText ? (

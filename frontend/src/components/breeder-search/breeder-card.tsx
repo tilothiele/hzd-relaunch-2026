@@ -61,10 +61,10 @@ export function BreederCard({ breeder }: BreederCardProps) {
 						<strong>Telefon:</strong> {member.phone}
 					</p>
 				) : null}
-				{member?.adress1 || member?.adress2 ? (
+				{member?.address1 || member?.address2 ? (
 					<p>
 						<strong>Adresse:</strong>{' '}
-						{[member.adress1, member.adress2].filter(Boolean).join(', ')}
+						{[member.address1, member.address2].filter(Boolean).join(', ')}
 					</p>
 				) : null}
 				{member?.zip || member?.countryCode ? (

@@ -1,4 +1,4 @@
-import type { MenuItem, AuthUser, GlobalLayout } from '@/types'
+import type { AuthUser, GlobalLayout } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -41,8 +41,8 @@ export function Header({
 	const logoSrc = resolveMediaUrl(globalLayout?.Logo, strapiBaseUrl ?? '')
 	const logoAlt = globalLayout?.Logo?.alternativeText ?? 'HZD Logo'
 	const menuItems = globalLayout?.Menu?.items ?? []
-	const logoWidth = 150
-	const logoHeight = 150
+	const logoWidth = 90
+	const logoHeight = 90
 
 	return (
 		<header
@@ -52,7 +52,7 @@ export function Header({
 			}}
 			className='w-full'
 		>
-			<nav className='flex w-full items-center px-6 py-3'>
+			<nav className='header-nav-padding flex w-full items-center px-6'>
 				<div className='flex flex-1 justify-center'>
 					<Link
 						href='/'
@@ -68,7 +68,6 @@ export function Header({
 								className='object-contain'
 								unoptimized
 								priority
-								style={{ margin: 'auto' }}
 							/>
 						) : (
 							<span className='text-lg font-semibold tracking-wide text-center'>
@@ -103,9 +102,9 @@ export function Header({
 				</div>
 			</nav>
 			{pageTitle ? (
-			<div className='flex w-full justify-end'>
-				<span style={{ marginRight: '20vw', fontSize: '2em' }}>{pageTitle}</span>
-			</div>) : null}
+				<div className='flex w-full justify-end'>
+					<span style={{ marginRight: '20vw', fontSize: '2em' }}>{pageTitle}</span>
+				</div>) : null}
 		</header>
 	)
 }

@@ -514,8 +514,8 @@ export const SEARCH_BREEDERS = `
 				lastName
 				region
 				phone
-				adress1
-				adress2
+				address1
+				address2
 				zip
 				countryCode
 			}

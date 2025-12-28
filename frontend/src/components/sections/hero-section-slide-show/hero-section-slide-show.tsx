@@ -5,7 +5,6 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Pagination, A11y, Keyboard } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/pagination'
-import { Typography } from '@mui/material'
 
 import type { HeroSectionSlideShow } from '@/types'
 import type { ThemeDefinition } from '@/themes'
@@ -44,9 +43,9 @@ export function HeroSectionSlideShowComponent({
 				autoplay={
 					slides.length > 1
 						? {
-								delay: autoPlayIntervalMs,
-								disableOnInteraction: false,
-							}
+							delay: autoPlayIntervalMs,
+							disableOnInteraction: false,
+						}
 						: false
 				}
 				pagination={slides.length > 1 ? { clickable: true } : false}
@@ -70,41 +69,28 @@ export function HeroSectionSlideShowComponent({
 									style={
 										imageUrl
 											? {
-													backgroundImage: `url('${imageUrl}')`,
-													backgroundSize: '100% auto',
-													backgroundPosition: 'center 20%',
-													backgroundColor: '#000',
-												}
+												backgroundImage: `url('${imageUrl}')`,
+												backgroundSize: '100% auto',
+												backgroundPosition: 'center 20%',
+												backgroundColor: '#000',
+											}
 											: undefined
 									}
 								/>
 								<div className='hero-section-slide-content relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-24 text-center sm:px-12 md:px-24'>
 									{slide?.Headline ? (
-										<Typography
-											variant='h2'
+										<h2
 											className='hero-section-slide-headline'
-											sx={{
-												fontWeight: 600,
-												letterSpacing: '-0.025em',
-												textAlign: 'center',
-												width: '100%',
-											}}
 										>
 											{slide.Headline}
-										</Typography>
+										</h2>
 									) : null}
 									{slide?.Subheadline ? (
-										<Typography
-											variant='h4'
+										<h4
 											className='hero-section-slide-subheadline'
-											sx={{
-												fontWeight: 500,
-												textAlign: 'center',
-												width: '100%',
-											}}
 										>
 											{slide.Subheadline}
-										</Typography>
+										</h4>
 									) : null}
 									{slide?.ActionButton ? (
 										<div className='flex justify-center'>

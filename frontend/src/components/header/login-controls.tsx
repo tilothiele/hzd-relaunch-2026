@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState, useRef, type ChangeEvent, type FormEvent } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser, faRightFromBracket, faSpinner } from '@fortawesome/free-solid-svg-icons'
-import { Menu, MenuItem, IconButton, Box, Tabs, Tab } from '@mui/material'
 import Link from 'next/link'
 import type { AuthUser } from '@/types'
 import type { ThemeDefinition } from '@/themes'
@@ -45,9 +44,12 @@ export function LoginControls({
 	const [confirmPassword, setConfirmPassword] = useState('')
 	const [localError, setLocalError] = useState<string | null>(null)
 	const [localSuccess, setLocalSuccess] = useState<string | null>(null)
-	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+	const [isMenuOpen, setIsMenuOpen] = useState(false)
 	const [isRegistering, setIsRegistering] = useState(false)
 	const [isSendingReset, setIsSendingReset] = useState(false)
+
+	const menuRef = useRef<HTMLDivElement>(null)
+	const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
 	const userLabel = useMemo(() => {
 		if (!user) {
@@ -82,6 +84,20 @@ export function LoginControls({
 		setLocalError(error ?? null)
 	}, [error])
 
+	// Close menu when clicking outside
+	useEffect(() => {
+		function handleClickOutside(event: MouseEvent) {
+			if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+				setIsMenuOpen(false)
+			}
+		}
+
+		if (isMenuOpen) {
+			document.addEventListener('mousedown', handleClickOutside)
+			return () => document.removeEventListener('mousedown', handleClickOutside)
+		}
+	}, [isMenuOpen])
+
 	const toggleFormVisibility = useCallback(() => {
 		setIsFormVisible((previousVisible: boolean) => {
 			if (!previousVisible) {
@@ -93,7 +109,7 @@ export function LoginControls({
 		})
 	}, [])
 
-	const handleTabChange = useCallback((_event: React.SyntheticEvent, newValue: TabValue) => {
+	const handleTabChange = useCallback((newValue: TabValue) => {
 		setActiveTab(newValue)
 		setLocalError(null)
 		setLocalSuccess(null)
@@ -106,6 +122,7 @@ export function LoginControls({
 
 	const handleLogout = useCallback(() => {
 		setIsFormVisible(false)
+		setIsMenuOpen(false)
 		onLogout()
 	}, [onLogout])
 
@@ -213,9 +230,6 @@ export function LoginControls({
 		}
 	}, [email])
 
-	const open = Boolean(anchorEl)
-	const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-
 	const clearCloseTimeout = useCallback(() => {
 		if (closeTimeoutRef.current) {
 			clearTimeout(closeTimeoutRef.current)
@@ -223,126 +237,65 @@ export function LoginControls({
 		}
 	}, [])
 
-	const handleMouseEnter = useCallback((event: React.MouseEvent<HTMLElement>) => {
+	const handleMouseEnter = useCallback(() => {
 		clearCloseTimeout()
-		setAnchorEl(event.currentTarget)
+		setIsMenuOpen(true)
 	}, [clearCloseTimeout])
 
 	const handleMouseLeave = useCallback(() => {
-		// Verzögerung, damit der Benutzer zum Menü navigieren kann
 		clearCloseTimeout()
 		closeTimeoutRef.current = setTimeout(() => {
-			setAnchorEl(null)
+			setIsMenuOpen(false)
 			closeTimeoutRef.current = null
 		}, 300)
 	}, [clearCloseTimeout])
 
-	const handleMenuMouseEnter = useCallback(() => {
-		clearCloseTimeout()
-	}, [clearCloseTimeout])
-
-	const handleMenuMouseLeave = useCallback(() => {
-		clearCloseTimeout()
-		setAnchorEl(null)
-	}, [clearCloseTimeout])
-
-	const handleLogoutClick = useCallback(() => {
-		setAnchorEl(null)
-		handleLogout()
-	}, [handleLogout])
-
 	if (isAuthenticated) {
-
 		return (
-			<Box>
-				<Box
+			<div className='relative' ref={menuRef}>
+				<div
 					onMouseEnter={handleMouseEnter}
 					onMouseLeave={handleMouseLeave}
-					sx={{
-						display: 'flex',
-						alignItems: 'center',
-						gap: 1,
-						cursor: 'pointer',
-						padding: '4px 8px',
-						borderRadius: 1,
-						transition: 'background-color 0.2s',
-						'&:hover': {
-							backgroundColor: 'rgba(255, 255, 255, 0.1)',
-						},
-					}}
+					className='flex cursor-pointer items-center gap-2 rounded px-2 py-1 transition-colors hover:bg-white/10'
 					aria-label='Benutzermenü'
-					aria-controls={open ? 'user-menu' : undefined}
+					aria-controls='user-menu'
 					aria-haspopup='true'
-					aria-expanded={open ? 'true' : undefined}
+					aria-expanded={isMenuOpen}
 				>
 					<FontAwesomeIcon
 						icon={faUser}
-						style={{ color: '#22c55e', fontSize: '2rem' }}
+						className='text-green-500'
+						style={{ fontSize: '2rem' }}
 					/>
-					<span style={{ fontSize: '1.4rem', color: theme.headerFooterTextColor }}>{userLabel}</span>
-				</Box>
-				<Menu
-					id='user-menu'
-					anchorEl={anchorEl}
-					open={open}
-					onClose={handleMenuMouseLeave}
-					onMouseEnter={handleMenuMouseEnter}
-					onMouseLeave={handleMenuMouseLeave}
-					MenuListProps={{
-						onMouseEnter: handleMenuMouseEnter,
-						onMouseLeave: handleMenuMouseLeave,
-					}}
-					anchorOrigin={{
-						vertical: 'bottom',
-						horizontal: 'right',
-					}}
-					transformOrigin={{
-						vertical: 'top',
-						horizontal: 'right',
-					}}
-					sx={{
-						'& .MuiPaper-root': {
-							backgroundColor: '#ffffff',
-							color: theme.textColor,
-							mt: 1,
-							minWidth: 180,
-							borderRadius: 2,
-							border: '1px solid rgba(0, 0, 0, 0.08)',
-							boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-						},
-					}}
-				>
-					<MenuItem
-						component={Link}
-						href='/mein-hzd'
-						onClick={() => setAnchorEl(null)}
-						sx={{
-							color: theme.textColor,
-							'&:hover': {
-								backgroundColor: 'rgba(252, 211, 77, 0.1)',
-								color: '#FCD34D',
-							},
-						}}
+					<span style={{ fontSize: '1.4rem', color: theme.headerFooterTextColor }}>
+						{userLabel}
+					</span>
+				</div>
+
+				{isMenuOpen && (
+					<div
+						id='user-menu'
+						className='absolute right-0 z-50 mt-2 min-w-[180px] rounded-lg border border-gray-200 bg-white shadow-lg'
+						onMouseEnter={handleMouseEnter}
+						onMouseLeave={handleMouseLeave}
 					>
-						Mein HZD
-					</MenuItem>
-					<MenuItem
-						onClick={handleLogoutClick}
-						sx={{
-							color: theme.textColor,
-							'&:hover': {
-								backgroundColor: 'rgba(252, 211, 77, 0.1)',
-								color: '#FCD34D',
-							},
-						}}
-					>
-						<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-							<FontAwesomeIcon icon={faRightFromBracket} style={{ fontSize: '0.875rem' }} />
+						<Link
+							href='/mein-hzd'
+							className='block px-4 py-3 text-gray-900 transition-colors hover:bg-yellow-50 hover:text-yellow-500'
+							onClick={() => setIsMenuOpen(false)}
+						>
+							Mein HZD
+						</Link>
+						<button
+							onClick={handleLogout}
+							className='flex w-full items-center gap-2 px-4 py-3 text-left text-gray-900 transition-colors hover:bg-yellow-50 hover:text-yellow-500'
+						>
+							<FontAwesomeIcon icon={faRightFromBracket} className='text-sm' />
 							Logout
-						</Box>
-					</MenuItem>
-				</Menu>
-			</Box>
+						</button>
+					</div>
+				)}
+			</div>
 		)
 	}
 
@@ -365,92 +318,94 @@ export function LoginControls({
 					<span>{userLabel}</span>
 				)}
 			</button>
-			{isFormVisible ? (
-				<div
-					className='absolute z-50 mt-3 rounded-lg text-gray-900 shadow-xl border border-gray-200'
-					style={{
-						backgroundColor: '#ffffff',
-						width: 'min(400px, calc(100vw - 32px))',
-						maxWidth: '400px',
-						right: '16px',
-					}}
-				>
-					<Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-						<Tabs
-							value={activeTab}
-							onChange={handleTabChange}
-							aria-label='Login-Register-Tabs'
-							variant='scrollable'
-							scrollButtons='auto'
-							sx={{
-								'& .MuiTab-root': {
-									textTransform: 'none',
-									fontSize: '1rem',
-									minHeight: '48px',
-								},
-							}}
-						>
-							<Tab label='Anmeldung' value='login' />
-							<Tab label='Registrieren' value='register' />
-							<Tab label='Passwort vergessen' value='forgot-password' />
-						</Tabs>
-					</Box>
 
+			{isFormVisible && (
+				<div
+					className='absolute right-4 z-50 mt-3 w-full max-w-[400px] rounded-lg border border-gray-200 bg-white text-gray-900 shadow-xl'
+					style={{ width: 'min(400px, calc(100vw - 32px))' }}
+				>
+					{/* Tabs */}
+					<div className='border-b border-gray-200'>
+						<div className='flex'>
+							<button
+								onClick={() => handleTabChange('login')}
+								className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'login'
+										? 'border-b-2 border-yellow-400 text-yellow-600'
+										: 'text-gray-600 hover:text-gray-900'
+									}`}
+							>
+								Anmeldung
+							</button>
+							<button
+								onClick={() => handleTabChange('register')}
+								className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'register'
+										? 'border-b-2 border-yellow-400 text-yellow-600'
+										: 'text-gray-600 hover:text-gray-900'
+									}`}
+							>
+								Registrieren
+							</button>
+							<button
+								onClick={() => handleTabChange('forgot-password')}
+								className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'forgot-password'
+										? 'border-b-2 border-yellow-400 text-yellow-600'
+										: 'text-gray-600 hover:text-gray-900'
+									}`}
+							>
+								Passwort vergessen
+							</button>
+						</div>
+					</div>
+
+					{/* Login Tab */}
 					{activeTab === 'login' && (
-						<form
-							id='login-form'
-							onSubmit={handleLoginSubmit}
-							style={{ padding: '1.5rem' }}
-						>
-							<div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+						<form id='login-form' onSubmit={handleLoginSubmit} className='p-6'>
+							<div className='flex flex-col gap-5'>
 								<label className='block text-sm font-medium text-gray-700'>
-									<span className='block' style={{ marginBottom: '0.5rem' }}>
-										E-Mail oder HZD-Mitgliedsnummer
-									</span>
+									<span className='mb-2 block'>E-Mail oder HZD-Mitgliedsnummer</span>
 									<input
 										type='text'
 										name='identifier'
 										value={identifier}
-										onChange={(event: ChangeEvent<HTMLInputElement>) => setIdentifier(event.target.value)}
-										className='w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-colors focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1'
-										style={{ backgroundColor: '#e5e7eb' }}
+										onChange={(event: ChangeEvent<HTMLInputElement>) =>
+											setIdentifier(event.target.value)
+										}
+										className='w-full rounded-md border border-gray-300 bg-gray-200 px-3 py-2.5 text-sm transition-colors focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1'
 										autoComplete='username'
 										required
 									/>
 								</label>
+
 								<label className='block text-sm font-medium text-gray-700'>
-									<span className='block' style={{ marginBottom: '0.5rem' }}>
-										Passwort
-									</span>
+									<span className='mb-2 block'>Passwort</span>
 									<input
 										type='password'
 										name='password'
 										value={password}
-										onChange={(event: ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
-										className='w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-colors focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1'
-										style={{ backgroundColor: '#e5e7eb' }}
+										onChange={(event: ChangeEvent<HTMLInputElement>) =>
+											setPassword(event.target.value)
+										}
+										className='w-full rounded-md border border-gray-300 bg-gray-200 px-3 py-2.5 text-sm transition-colors focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1'
 										autoComplete='current-password'
 										required
 									/>
 								</label>
-								{localError ? (
+
+								{localError && (
 									<div className='rounded-md bg-red-50 p-3'>
 										<p className='text-sm text-red-800'>{localError}</p>
 									</div>
-								) : null}
-								{localSuccess ? (
+								)}
+
+								{localSuccess && (
 									<div className='rounded-md bg-green-50 p-3'>
 										<p className='text-sm text-green-800'>{localSuccess}</p>
 									</div>
-								) : null}
+								)}
+
 								<button
 									type='submit'
-									className='flex w-full items-center justify-center gap-2 rounded-md bg-yellow-400 px-4 py-2.5 text-sm font-semibold text-gray-900 transition-all hover:bg-yellow-500 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-yellow-400 disabled:hover:shadow-none'
-									style={{
-										backgroundColor: '#facc15',
-										color: '#111827',
-										marginTop: '0.5rem',
-									}}
+									className='mt-2 flex w-full items-center justify-center gap-2 rounded-md bg-yellow-400 px-4 py-2.5 text-sm font-semibold text-gray-900 transition-all hover:bg-yellow-500 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60'
 									disabled={isAuthenticating}
 								>
 									{isAuthenticating ? (
@@ -466,63 +421,64 @@ export function LoginControls({
 						</form>
 					)}
 
+					{/* Register Tab */}
 					{activeTab === 'register' && (
-						<div style={{ padding: '1.5rem' }}>
-							<h2 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#111827', marginBottom: '1rem' }}>
-								Registrieren
-							</h2>
-							<p style={{ fontSize: '0.875rem', color: '#4b5563', marginBottom: '1rem' }}>
-								Ihr Benutzerprofil wird automatisch erstellt, nachdem Ihre Mitgliedschaft bestätigt wurde.
+						<div className='p-6'>
+							<h2 className='mb-4 text-lg font-bold text-gray-900'>Registrieren</h2>
+							<p className='mb-4 text-sm text-gray-600'>
+								Ihr Benutzerprofil wird automatisch erstellt, nachdem Ihre Mitgliedschaft
+								bestätigt wurde.
 							</p>
-							<p style={{ fontSize: '0.875rem', color: '#4b5563' }}>
-								Sollten Sie Fragen haben oder Probleme beim Registrieren haben, wenden Sie sich bitte an unseren Support.
+							<p className='text-sm text-gray-600'>
+								Sollten Sie Fragen haben oder Probleme beim Registrieren haben, wenden Sie
+								sich bitte an unseren Support.
 							</p>
 						</div>
 					)}
 
+					{/* Forgot Password Tab */}
 					{activeTab === 'forgot-password' && (
 						<form
 							id='forgot-password-form'
 							onSubmit={handleForgotPasswordSubmit}
-							style={{ padding: '1.5rem' }}
+							className='p-6'
 						>
-							<div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-								<p className='text-sm text-gray-600 mb-2'>
-									Geben Sie Ihre E-Mail-Adresse ein. Wir senden Ihnen einen Link zum Zurücksetzen Ihres Passworts.
+							<div className='flex flex-col gap-5'>
+								<p className='mb-2 text-sm text-gray-600'>
+									Geben Sie Ihre E-Mail-Adresse ein. Wir senden Ihnen einen Link zum
+									Zurücksetzen Ihres Passworts.
 								</p>
+
 								<label className='block text-sm font-medium text-gray-700'>
-									<span className='block' style={{ marginBottom: '0.5rem' }}>
-										E-Mail
-									</span>
+									<span className='mb-2 block'>E-Mail</span>
 									<input
 										type='email'
 										name='email'
 										value={email}
-										onChange={(event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
-										className='w-full rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-colors focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1'
-										style={{ backgroundColor: '#e5e7eb' }}
+										onChange={(event: ChangeEvent<HTMLInputElement>) =>
+											setEmail(event.target.value)
+										}
+										className='w-full rounded-md border border-gray-300 bg-gray-200 px-3 py-2.5 text-sm transition-colors focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1'
 										autoComplete='email'
 										required
 									/>
 								</label>
-								{localError ? (
+
+								{localError && (
 									<div className='rounded-md bg-red-50 p-3'>
 										<p className='text-sm text-red-800'>{localError}</p>
 									</div>
-								) : null}
-								{localSuccess ? (
+								)}
+
+								{localSuccess && (
 									<div className='rounded-md bg-green-50 p-3'>
 										<p className='text-sm text-green-800'>{localSuccess}</p>
 									</div>
-								) : null}
+								)}
+
 								<button
 									type='submit'
-									className='flex w-full items-center justify-center gap-2 rounded-md bg-yellow-400 px-4 py-2.5 text-sm font-semibold text-gray-900 transition-all hover:bg-yellow-500 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-yellow-400 disabled:hover:shadow-none'
-									style={{
-										backgroundColor: '#facc15',
-										color: '#111827',
-										marginTop: '0.5rem',
-									}}
+									className='mt-2 flex w-full items-center justify-center gap-2 rounded-md bg-yellow-400 px-4 py-2.5 text-sm font-semibold text-gray-900 transition-all hover:bg-yellow-500 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60'
 									disabled={isSendingReset}
 								>
 									{isSendingReset ? (
@@ -538,8 +494,7 @@ export function LoginControls({
 						</form>
 					)}
 				</div>
-			) : null}
+			)}
 		</div>
 	)
 }
-

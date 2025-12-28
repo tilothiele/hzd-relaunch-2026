@@ -1,4 +1,11 @@
 @import 'tailwindcss';
+@source '..';
+
+/* Dedicated utility to override any 'reset' layers from other libraries */
+.header-nav-padding {
+	padding-top: 0.5rem;
+	padding-bottom: 0.5rem;
+}
 
 @font-face {
 	font-family: 'Roboto';
