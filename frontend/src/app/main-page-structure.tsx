@@ -77,7 +77,7 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 		color: themex.textColor,
 	}) as CSSProperties, [theme])
 
-	if (!!loading|| !homepage) {
+	if (!!loading || !homepage) {
 		return <MainPageSkeleton />
 	}
 
@@ -100,7 +100,10 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 				isAuthenticating={isAuthenticating}
 				error={authError}
 			/>
-			<main className='flex flex-col'>
+			<main className='flex flex-col' style={{
+				color: '#000000',
+				backgroundColor: '#ffffff',
+			}}>
 				{content}
 			</main>
 			<Footer
