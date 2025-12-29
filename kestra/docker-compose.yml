@@ -17,7 +17,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/kestra-wd:/tmp/kestra-wd
     environment:
-        KESTRA_KONFIGURATION: |
+        KESTRA_CONFIGURATION: |
           datasources:
             postgres:
               url: "$DATABASE_URL"
