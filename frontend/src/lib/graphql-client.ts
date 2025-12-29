@@ -1,5 +1,4 @@
 import { GraphQLClient } from 'graphql-request'
-import { draftMode } from "next/headers";
 
 let persistedAuthToken: string | null = null
 let persistedBaseUrl: string | null = null
@@ -59,30 +58,12 @@ export async function fetchGraphQL<T>(
 	// Versuche Token aus verschiedenen Quellen zu holen
 	let effectiveToken = token ?? persistedAuthToken
 
-	// Debug: Logge den aktuellen Zustand
-	// console.log('[GraphQL Client] Token-Quellen:', {
-	// 	'options.token': token ? token.substring(0, 20) + '...' : null,
-	// 	'persistedAuthToken': persistedAuthToken ? persistedAuthToken.substring(0, 20) + '...' : null,
-	// 	'effectiveToken (vor Fallback)': effectiveToken ? effectiveToken.substring(0, 20) + '...' : null,
-	// })
-
 	// Fallback: Versuche Token aus localStorage zu holen, falls noch nicht gesetzt
 	if (!effectiveToken && typeof window !== 'undefined') {
 		try {
 			const stored = localStorage.getItem('hzd_auth_state')
-			console.log('[GraphQL Client] localStorage Check:', {
-				'stored exists': !!stored,
-				'stored length': stored?.length ?? 0,
-			})
-
 			if (stored) {
 				const parsed = JSON.parse(stored) as { token?: string | null | unknown; user?: unknown }
-				console.log('[GraphQL Client] Parsed localStorage:', {
-					'has token': !!parsed.token,
-					'token type': typeof parsed.token,
-					'token value': parsed.token,
-					'has user': !!parsed.user,
-				})
 
 				// Normalisiere Token: Falls es ein Objekt ist, versuche token.token oder token.jwt
 				let normalizedToken: string | null = null
@@ -101,28 +82,13 @@ export async function fetchGraphQL<T>(
 
 				if (normalizedToken) {
 					effectiveToken = normalizedToken
-					// Aktualisiere auch den persistierten Token für zukünftige Aufrufe
 					persistedAuthToken = normalizedToken
-					console.log('[GraphQL Client] Token aus localStorage geladen:', effectiveToken.substring(0, 20) + '...')
-				} else {
-					console.warn('[GraphQL Client] Token in localStorage hat falsches Format:', parsed.token)
 				}
 			}
 		} catch (error) {
 			console.error('[GraphQL Client] Fehler beim Laden aus localStorage:', error)
 		}
 	}
-
-	// Debug-Logging
-	if (!effectiveToken) {
-		// console.warn('[GraphQL Client] Kein Token gefunden für Query:', query.substring(0, 50))
-		// console.warn('[GraphQL Client] Vollständiger Query:', query)
-		// } else {
-		// 	console.log('[GraphQL Client] Token wird verwendet:', effectiveToken.substring(0, 20) + '...')
-	}
-
-	//console.log('[GraphQL Client] query:', query)
-	const isDraft = (await draftMode()).isEnabled;
 
 	// Verwende Next.js API-Route als Proxy, um CORS-Probleme zu vermeiden
 	try {
@@ -133,11 +99,8 @@ export async function fetchGraphQL<T>(
 			},
 			body: JSON.stringify({
 				query,
-				variables: {
-					...variables,
-					publicationState: isDraft ? 'PREVIEW' : 'LIVE',
-				},
-				cache: isDraft ? 'no-store' : 'force-cache',
+				variables,
+				token: effectiveToken,
 			}),
 		})
 
@@ -152,7 +115,6 @@ export async function fetchGraphQL<T>(
 	} catch (error) {
 		console.error('GraphQL Error:', error)
 		if (error instanceof Error) {
-			console.error('Error message:', error.message)
 			throw error
 		}
 		throw new Error('GraphQL-Anfrage fehlgeschlagen')

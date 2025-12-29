@@ -9,7 +9,7 @@ const getPreviewPathname = (uid, { locale, document }): string => {
   // Handle different content types with their specific URL patterns
   switch (uid) {
     // Handle pages with predefined routes
-    case "api::page.page": return `/${slug}`;
+    case "api::page.page": return `${slug}`;
     default: return null;
   }
 };

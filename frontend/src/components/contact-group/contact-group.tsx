@@ -79,21 +79,18 @@ function ContactCard({ contact, strapiBaseUrl }: ContactCardProps) {
 				) : null}
 
 				{contact.Name ? (
-					contactLink ? (
-						<Link href={contactLink} style={{ textDecoration: 'none', color: 'inherit' }}>
-							<Typography
-								variant='body1'
-								className='font-medium text-gray-900'
-								sx={{ mb: 1, '&:hover': { textDecoration: 'underline' } }}
-							>
-								{contact.Name}
-							</Typography>
-						</Link>
-					) : (
-						<Typography variant='body1' className='font-medium text-gray-900' sx={{ mb: 1 }}>
-							{contact.Name}
-						</Typography>
-					)
+					<Typography
+						variant='body1'
+						className='font-medium text-gray-900'
+						sx={{
+							mb: 1,
+							'&:hover': {
+								textDecoration: contactLink ? 'underline' : 'none',
+							},
+						}}
+					>
+						{contact.Name}
+					</Typography>
 				) : null}
 
 				<Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
