@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { GraphQLClient } from 'graphql-request'
+import { draftMode } from 'next/headers'
 
 const strapiBaseUrl = process.env.STRAPI_BASE_URL || process.env.NEXT_PUBLIC_STRAPI_BASE_URL || 'http://localhost:1337'
 
@@ -11,6 +12,11 @@ export async function POST(request: NextRequest) {
 	try {
 		const body = await request.json()
 		const { query, variables, token } = body
+
+		const isDraft = (await draftMode()).isEnabled
+		const effectiveVariables = isDraft
+			? { ...variables, publicationState: 'PREVIEW' }
+			: variables
 
 		// console.log('[GraphQL Proxy] Request Body:', {
 		// 	'has query': !!query,
@@ -46,7 +52,7 @@ export async function POST(request: NextRequest) {
 			// console.warn('[GraphQL Proxy] Kein gültiger Token gefunden. Typ:', typeof token)
 		}
 
-		const data = await client.request(query, variables)
+		const data = await client.request(query, effectiveVariables)
 
 		return NextResponse.json(data)
 	} catch (error) {
