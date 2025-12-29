@@ -1,6 +1,7 @@
 volumes:
   kestra-data:
     driver: local
+networks:
   coolify:
     external: true
 
