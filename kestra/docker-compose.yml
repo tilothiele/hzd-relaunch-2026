@@ -16,7 +16,7 @@ services:
       - kestra-data:/app/storage
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/kestra-wd:/tmp/kestra-wd
-      - ./application.yml:/etc/config/application.yaml
+      - $PWD/application.yml:/etc/config/application.yaml
 #    environment:
 #    ports:
 #      - "8080:8080"
