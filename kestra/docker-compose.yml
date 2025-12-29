@@ -17,7 +17,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/kestra-wd:/tmp/kestra-wd
       - type: bind
-        source: ./application.yml
+        source: ./application.yaml
         target: /etc/config/application.yaml
         content: |
           kestra:
