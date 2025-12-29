@@ -1,4 +1,5 @@
 import { GraphQLClient } from 'graphql-request'
+import { draftMode } from "next/headers";
 
 let persistedAuthToken: string | null = null
 let persistedBaseUrl: string | null = null
@@ -121,6 +122,7 @@ export async function fetchGraphQL<T>(
 	}
 
 	//console.log('[GraphQL Client] query:', query)
+	const isDraft = (await draftMode()).isEnabled;
 
 	// Verwende Next.js API-Route als Proxy, um CORS-Probleme zu vermeiden
 	try {
@@ -131,8 +133,11 @@ export async function fetchGraphQL<T>(
 			},
 			body: JSON.stringify({
 				query,
-				variables,
-				token: effectiveToken,
+				variables: {
+					...variables,
+					publicationState: isDraft ? 'PREVIEW' : 'LIVE',
+				},
+				cache: isDraft ? 'no-store' : 'force-cache',
 			}),
 		})
 
