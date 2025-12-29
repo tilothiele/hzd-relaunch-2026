@@ -26,6 +26,9 @@ services:
       - traefik.enable=true
       - traefik.http.routers.kestra-prod.rule=Host(`kestra.app.tilothiele.de`) && PathPrefix(`/`)"
       - traefik.http.routers.kestra-prod.entryPoints=https
+      - traefik.http.routers.kestra.tls=true
+      - traefik.http.services.kestra.loadbalancer.server.port=8080
+
     environment:
         KESTRA_CONFIGURATION: |
           datasources:
