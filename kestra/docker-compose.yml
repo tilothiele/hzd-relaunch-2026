@@ -22,6 +22,10 @@ services:
       - kestra-data:/app/storage
       - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/kestra-wd:/tmp/kestra-wd
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.kestra-prod.rule=Host(`kestra.app.tilothiele.de`) && PathPrefix(`/`)"
+      - traefik.http.routers.kestra-prod.entryPoints=https
     environment:
         KESTRA_CONFIGURATION: |
           datasources:
