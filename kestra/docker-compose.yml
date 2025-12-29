@@ -18,6 +18,12 @@ services:
       - /tmp/kestra-wd:/tmp/kestra-wd
     environment:
         KESTRA_KONFIGURATION: |
+          datasources:
+            postgres:
+              url: "$DATABASE_URL"
+              driverClassName: org.postgresql.Driver
+              username: "$DATABASE_USER"
+              password: "$DATABASE_PASSWD"
           kestra:
             server:
               basic-auth:
