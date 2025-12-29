@@ -40,9 +40,6 @@ services:
               tmp-dir:
                 path: "/tmp/kestra-wd/tmp"
             url: "https://kestra.app.tilothiele.de/"
-
-
-      - $PWD/application.yml:/etc/config/application.yaml
 #    environment:
 #    ports:
 #      - "8080:8080"
