@@ -1087,3 +1087,23 @@ export const GET_NEWS_ARTICLES_BY_CATEGORY = `
 	}
 `
 
+export const GET_SITEMAP_DATA = `
+	query GetSitemapData {
+		indexPage {
+			updatedAt
+		}
+		pages(pagination: { limit: -1 }) {
+			slug
+			updatedAt
+		}
+		newsArticles(pagination: { limit: -1 }) {
+			Slug
+			updatedAt
+		}
+		newsArticleCategories(pagination: { limit: -1 }) {
+			Slug
+			updatedAt
+		}
+	}
+`
+
