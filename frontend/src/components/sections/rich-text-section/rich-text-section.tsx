@@ -22,8 +22,8 @@ export function RichTextSectionComponent({
 		<SectionContainer
 			variant='max-width'
 			backgroundColor={backgroundColor}
-			paddingTop='1em'
-			paddingBottom='1em'
+			marginTop='1em'
+			marginBottom='1em'
 		>
 			<div
 				className='prose prose-xl max-w-none dark:prose-invert'

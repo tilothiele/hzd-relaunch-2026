@@ -28,13 +28,12 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 	const remainingPartnerLinks = partnerLinks.slice(1, 4) // Nimm die nächsten 3 Partner-Links
 
 	return (
-		<div
+		<footer
 			style={{
 				backgroundColor: theme.footerBackground,
 				color: theme.headerFooterTextColor,
-				paddingTop: '1.5em',
 			}}
-			className='w-full'
+			className='w-full pt-1'
 		>
 			<div className='mx-auto w-full max-w-screen-xl px-4 py-8'>
 				<div className='mb-8 grid gap-4 md:grid-cols-[1.5fr_2fr_1fr_1fr]'>
@@ -48,9 +47,6 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 								className='object-contain'
 								unoptimized
 								priority
-								style={{
-									margin: 'auto',
-								}}
 							/>
 						) : (
 							<span className='text-lg font-semibold tracking-wide'>
@@ -59,8 +55,8 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 						)}
 					</div>
 					<div>
-						<div style={{ padding: '0 .5rem' }}>
-							<div className='grid grid-cols-2 gap-2'>
+						<div>
+							<div className='grid grid-cols-2 gap-2 px-2'>
 								<div>
 									<p className='font-bold'>Präsidium</p>
 									<div className='text-sm'>{globalLayout?.Footer?.PraesidiumName}</div>
@@ -86,23 +82,15 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 									<SocialLinks socialLinkFB={globalLayout?.SocialLinkFB} socialLinkYT={globalLayout?.SocialLinkYT} />
 								</div>
 								<div>
-									<ul className='space-y-2'>
-										<li>
-											<Link href='/impressum' className='text-sm transition-colors hover:text-yellow-400'>
-												Impressum
-											</Link>
-										</li>
-										<li>
-											<Link href='/datenschutz' className='text-sm transition-colors hover:text-yellow-400'>
-												Datenschutz
-											</Link>
-										</li>
-										<li>
-											<Link href='/cookie-einstellungen' className='text-sm transition-colors hover:text-yellow-400'>
-												Cookie-Einstellungen
-											</Link>
-										</li>
-									</ul>
+									<div><Link href='/impressum' className='text-sm transition-colors hover:text-yellow-400 underline'>
+										Impressum
+									</Link></div>
+									<div><Link href='/datenschutz' className='text-sm transition-colors hover:text-yellow-400 underline'>
+										Datenschutz
+									</Link></div>
+									<div><Link href='/cookie-einstellungen' className='text-sm transition-colors hover:text-yellow-400 underline'>
+										Cookie-Einstellungen
+									</Link></div>
 								</div>
 							</div>
 						</div>
@@ -122,7 +110,7 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 										src={resolveMediaUrl(firstPartnerLink.Logo, strapiBaseUrl) ?? ''}
 										alt={firstPartnerLink.Logo.alternativeText ?? firstPartnerLink.AltText ?? 'Partner Logo'}
 										width={200}
-										height={100}
+										height={300}
 										className='object-contain'
 										unoptimized
 										priority
@@ -136,7 +124,7 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 									src={resolveMediaUrl(firstPartnerLink.Logo, strapiBaseUrl) ?? ''}
 									alt={firstPartnerLink.Logo.alternativeText ?? firstPartnerLink.AltText ?? 'Partner Logo'}
 									width={200}
-									height={100}
+									height={300}
 									className='object-contain'
 									unoptimized
 									priority
@@ -220,6 +208,6 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 					{globalLayout?.Copyright}
 				</p>
 			</div>
-		</div>
+		</footer>
 	)
 }

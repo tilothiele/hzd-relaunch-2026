@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Script from 'next/script';
 import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
-import './globals.css'
+import './globals.scss'
 import { Providers } from './providers'
 import { TestBanner } from '@/components/test-banner/test-banner'
 

@@ -5,10 +5,8 @@ import type { GlobalLayout, StartpageSection } from '@/types'
 import { Header } from '@/components/header/header'
 import { Footer } from '@/components/footer/footer'
 import { CookieBanner } from '@/components/cookie-banner/cookie-banner'
-import { themes } from '@/themes'
 import { useAuth } from '@/hooks/use-auth'
-import { Skeleton } from '@chakra-ui/react'
-import { DEFAULT_THEME_ID, ThemeDefinition } from '@/themes'
+import { DEFAULT_THEME_ID, themes, type ThemeDefinition } from '@/themes'
 import { renderStartpageSections } from '@/components/sections/section-factory'
 
 const textSkeletonKeys = [
@@ -25,22 +23,21 @@ function MainPageSkeleton() {
 			aria-busy='true'
 			aria-live='polite'
 		>
-			<Skeleton height='5rem' borderRadius='md' />
+			<div className='h-20 w-full animate-pulse rounded-md bg-gray-200' />
 			<div className='grid gap-6 lg:grid-cols-[2fr_1fr]'>
-				<Skeleton height='20rem' borderRadius='md' />
+				<div className='h-80 w-full animate-pulse rounded-md bg-gray-200' />
 				<div className='flex flex-col gap-4'>
-					<Skeleton height='3.5rem' borderRadius='md' />
-					<Skeleton height='3.5rem' borderRadius='md' />
-					<Skeleton height='3.5rem' borderRadius='md' />
+					<div className='h-14 w-full animate-pulse rounded-md bg-gray-200' />
+					<div className='h-14 w-full animate-pulse rounded-md bg-gray-200' />
+					<div className='h-14 w-full animate-pulse rounded-md bg-gray-200' />
 				</div>
 			</div>
-			<Skeleton height='12rem' borderRadius='md' />
+			<div className='h-48 w-full animate-pulse rounded-md bg-gray-200' />
 			<div className='flex flex-col gap-4'>
 				{textSkeletonKeys.map((key) => (
-					<Skeleton
+					<div
 						key={key}
-						height='1.25rem'
-						borderRadius='md'
+						className='h-5 w-full animate-pulse rounded-md bg-gray-200'
 					/>
 				))}
 			</div>

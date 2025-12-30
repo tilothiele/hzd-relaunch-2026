@@ -62,15 +62,13 @@ export function SimpleCtaSectionComponent({
 							sx={{
 								width: '100%',
 								borderRadius: 2,
-								backgroundColor: 'rgba(255, 255, 255, 0.9)',
+								backgroundColor: 'rgba(255, 255, 255, 0.7)',
 								px: 4,
-								py: 6,
+								py: 2,
 							}}
 						>
 							{headline ? (
-								<h2>
-									{headline}
-								</h2>
+								<h2>{headline}</h2>
 							) : null}
 
 							{text ? (

@@ -1,7 +1,6 @@
 'use client'
 
 import { useMemo, type CSSProperties } from 'react'
-import { Skeleton } from '@chakra-ui/react'
 import { useGlobalLayout } from '@/hooks/use-global-layout'
 import { Header } from '@/components/header/header'
 import { Footer } from '@/components/footer/footer'
@@ -19,9 +18,9 @@ function LittersPageSkeleton() {
 			aria-busy='true'
 			aria-live='polite'
 		>
-			<Skeleton height='5rem' borderRadius='md' />
-			<Skeleton height='20rem' borderRadius='md' />
-			<Skeleton height='12rem' borderRadius='md' />
+			<div className='h-20 w-full animate-pulse rounded-md bg-gray-200' />
+			<div className='h-80 w-full animate-pulse rounded-md bg-gray-200' />
+			<div className='h-48 w-full animate-pulse rounded-md bg-gray-200' />
 		</div>
 	)
 }

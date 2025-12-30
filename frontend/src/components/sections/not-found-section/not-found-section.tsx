@@ -10,7 +10,7 @@ export default function NotFoundSection() {
                         alt='404 - Seite nicht gefunden'
                         width={300}
                         height={300}
-                        className='rounded-lg object-cover'
+                        className='rounded-lg object-contain'
                         unoptimized
                     />
                 </div>

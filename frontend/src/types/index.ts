@@ -244,6 +244,7 @@ export interface Menu {
 
 export interface MenuItem {
 	name: string
+	faIcon?: string
 	url?: string
 	children?: MenuItem[]
 }

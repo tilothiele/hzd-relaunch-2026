@@ -117,19 +117,19 @@ export function TextColumnsSectionComponent({
 		<SectionContainer
 			variant='max-width'
 			backgroundColor={backgroundColor}
-			paddingTop='1em'
-			paddingBottom='1em'
+			marginTop='1.2em'
+			marginBottom='1.5em'
 		>
 			<Box sx={{ width: '100%', maxWidth: '1200px' }}>
 				{section.TextColumnsHeadline ? (
-					<h2>
+					<h2 className='mb-3'>
 						{section.TextColumnsHeadline}
 					</h2>
 				) : null}
 				{section.TextColumnsSubHeadline ? (
-					<p>
+					<h3 className='mb-4'>
 						{section.TextColumnsSubHeadline}
-					</p>
+					</h3>
 				) : null}
 
 				<Box
@@ -154,25 +154,21 @@ export function TextColumnsSectionComponent({
 								key={key}
 								sx={{
 									width: { xs: '100%', md: 'calc(50% - 20px)' },
-									flexGrow: 0,
-									flexShrink: 0,
 								}}
 							>
-								<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+								<Box sx={{ display: 'flex', flexDirection: 'column' }}>
 									{columnHeadline ? (
-										<h5>
-											{columnHeadline}
-										</h5>
+										<h5 className='mt-3 mb-2'>{columnHeadline}</h5>
 									) : null}
 
 									{columnText ? (
-										<Box
+										<div
 											dangerouslySetInnerHTML={{ __html: columnText }}
 										/>
 									) : null}
 
 									{bulletItems.length > 0 ? (
-										<Box>
+										<div>
 											{bulletItems.map((item, itemIndex) => {
 												const itemKey = item.id ?? `${key}-item-${itemIndex}`
 												const isOpen = openItems.has(itemKey)
@@ -186,7 +182,7 @@ export function TextColumnsSectionComponent({
 													/>
 												)
 											})}
-										</Box>
+										</div>
 									) : null}
 
 									{columnActionButton ? (

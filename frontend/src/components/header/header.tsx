@@ -41,8 +41,8 @@ export function Header({
 	const logoSrc = resolveMediaUrl(globalLayout?.Logo, strapiBaseUrl ?? '')
 	const logoAlt = globalLayout?.Logo?.alternativeText ?? 'HZD Logo'
 	const menuItems = globalLayout?.Menu?.items ?? []
-	const logoWidth = 90
-	const logoHeight = 90
+	const logoWidth = 80
+	const logoHeight = 80
 
 	return (
 		<header
@@ -65,7 +65,7 @@ export function Header({
 								alt={logoAlt}
 								width={logoWidth}
 								height={logoHeight}
-								className='h-[63px] w-[63px] object-contain md:h-[90px] md:w-[90px]'
+								className='mb-1 h-[63px] w-[63px] object-contain md:h-[90px] md:w-[90px]'
 								unoptimized
 								priority
 							/>
@@ -103,7 +103,7 @@ export function Header({
 			</nav>
 			{pageTitle ? (
 				<div className='flex w-full justify-end'>
-					<span style={{ marginRight: '20vw', fontSize: '2em' }}>{pageTitle}</span>
+					<span style={{ marginRight: '20vw', fontSize: '1.5em' }}>{pageTitle}</span>
 				</div>) : null}
 		</header>
 	)

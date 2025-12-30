@@ -35,7 +35,7 @@ export function HeroSectionSlideShowComponent({
 	}
 
 	return (
-		<section className='relative overflow-hidden' style={{ backgroundColor }}>
+		<section className='relative overflow-hidden'>
 			<Swiper
 				modules={[Autoplay, Pagination, A11y, Keyboard]}
 				slidesPerView={1}
@@ -57,30 +57,30 @@ export function HeroSectionSlideShowComponent({
 
 					return (
 						<SwiperSlide key={slide?.id ?? index}>
-							<div className='relative flex min-h-[32rem] items-center justify-center text-white sm:min-h-[40rem] md:min-h-[48rem]'>
+							<div className='relative flex min-h-[32rem] items-end justify-center sm:min-h-[40rem] md:min-h-[48rem]'>
 								{imageUrl ? (
 									<span
 										className='absolute inset-0 block bg-black'
-										style={{ opacity: 0.4 }}
+										style={{ opacity: 0.2 }}
 									/>
 								) : null}
 								<div
-									className='absolute inset-0 bg-no-repeat'
+									className='hero-section-slide-image absolute inset-0 bg-no-repeat'
 									style={
 										imageUrl
 											? {
 												backgroundImage: `url('${imageUrl}')`,
 												backgroundSize: '100% auto',
-												backgroundPosition: 'center 20%',
-												backgroundColor: '#000',
+												backgroundPosition: 'center 20%'
 											}
 											: undefined
 									}
 								/>
-								<div className='hero-section-slide-content relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-24 text-center sm:px-12 md:px-24'>
+								<div className='hero-section-slide-content relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 pb-20 pt-24 text-center sm:px-12 md:px-24'>
 									{slide?.Headline ? (
 										<h2
 											className='hero-section-slide-headline'
+											style={{ color: theme.headerFooterTextColor }}
 										>
 											{slide.Headline}
 										</h2>
@@ -88,6 +88,7 @@ export function HeroSectionSlideShowComponent({
 									{slide?.Subheadline ? (
 										<h4
 											className='hero-section-slide-subheadline'
+											style={{ color: theme.headerFooterTextColor }}
 										>
 											{slide.Subheadline}
 										</h4>

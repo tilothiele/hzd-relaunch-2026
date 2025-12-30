@@ -5,6 +5,8 @@ interface SectionContainerProps {
 	backgroundColor?: string
 	paddingTop?: string
 	paddingBottom?: string
+	marginTop?: string
+	marginBottom?: string
 	children: ReactNode
 }
 
@@ -13,6 +15,8 @@ export function SectionContainer({
 	backgroundColor,
 	paddingTop,
 	paddingBottom,
+	marginTop,
+	marginBottom,
 	children,
 }: SectionContainerProps) {
 
@@ -28,7 +32,9 @@ export function SectionContainer({
 				paddingTop,
 				paddingBottom,
 				paddingLeft: paddingX,
-				paddingRight: paddingX
+				paddingRight: paddingX,
+				marginTop,
+				marginBottom,
 			}}
 		>
 			<div className={innerContainerClasses}>{children}</div>
