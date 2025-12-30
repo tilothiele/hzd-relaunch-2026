@@ -28,7 +28,7 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 	const remainingPartnerLinks = partnerLinks.slice(1, 4) // Nimm die nächsten 3 Partner-Links
 
 	return (
-		<footer
+		<div
 			style={{
 				backgroundColor: theme.footerBackground,
 				color: theme.headerFooterTextColor,
@@ -59,7 +59,7 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 						)}
 					</div>
 					<div>
-						<div>
+						<div style={{ padding: '0 .5rem' }}>
 							<div className='grid grid-cols-2 gap-2'>
 								<div>
 									<p className='font-bold'>Präsidium</p>
@@ -220,8 +220,6 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 					{globalLayout?.Copyright}
 				</p>
 			</div>
-		</footer>
+		</div>
 	)
 }
-
-

@@ -43,6 +43,8 @@ export function useTheme(options: UseThemeOptions = {}): UseThemeResult {
 		if (persist) {
 			try {
 				localStorage.setItem(STORAGE_KEY, id)
+				// Cookie für SSR setzen
+				document.cookie = `${STORAGE_KEY}=${id}; path=/; max-age=31536000; SameSite=Lax`
 			} catch (error) {
 				console.error('Theme konnte nicht gespeichert werden.', error)
 			}

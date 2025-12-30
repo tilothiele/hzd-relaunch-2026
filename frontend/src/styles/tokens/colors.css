@@ -1,0 +1,28 @@
+:root {
+    /*	
+    --background: #ffffff;
+	--foreground: #333333;
+	--brown-dark: #64574E;
+	--brown-light: #5a3d2a;
+	--gray-light: #f5f5f5;
+	--gray-dark: #333333;
+	--yellow: #f4d03f;
+	--purple: #8e44ad;
+	--green-dark: #1e8449;
+	--green-light: #27ae60;
+	*/
+
+    --theme-text-color: #565757;
+    --theme-heading-color: #64574E;
+    --theme-heading-text-color: #444444;
+
+    /* LQ (Lawrenz Qualitäter) Theme Colors */
+    --lq-white: #ffffff;
+    --lq-text-gray: #565757;
+    --lq-bg-gray: #f2f2f2;
+    --lq-theme-a-primary: #64574E;
+    --lq-theme-b-primary: #90C6BF;
+    --lq-theme-c-primary: #FAD857;
+    --lq-theme-d-primary: #A8267D;
+    --lq-theme-e-primary: #46605C;
+}

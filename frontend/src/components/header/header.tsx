@@ -65,7 +65,7 @@ export function Header({
 								alt={logoAlt}
 								width={logoWidth}
 								height={logoHeight}
-								className='object-contain'
+								className='h-[63px] w-[63px] object-contain md:h-[90px] md:w-[90px]'
 								unoptimized
 								priority
 							/>

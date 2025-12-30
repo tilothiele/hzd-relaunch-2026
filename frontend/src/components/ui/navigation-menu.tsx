@@ -355,7 +355,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 				<IconButton
 					onClick={handleMobileToggle}
 					sx={{
-						color: '#565757',
+						color: theme.headerFooterTextColor,
 					}}
 					aria-label='Menü öffnen'
 				>

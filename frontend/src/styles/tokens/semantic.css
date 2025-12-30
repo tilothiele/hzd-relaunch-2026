@@ -1,0 +1,34 @@
+/* 
+   Semantic variables mapping to theme primitives.
+   This allows components to use --lq-action-primary regardless of the active theme.
+*/
+
+[data-theme='A'] {
+    --lq-action-primary: var(--lq-theme-a-primary);
+    --lq-action-text: var(--lq-white);
+    --lq-surface-bg: var(--lq-bg-gray);
+}
+
+[data-theme='B'] {
+    --lq-action-primary: var(--lq-theme-b-primary);
+    --lq-action-text: var(--lq-white);
+    --lq-surface-bg: var(--lq-bg-gray);
+}
+
+[data-theme='C'] {
+    --lq-action-primary: var(--lq-theme-c-primary);
+    --lq-action-text: var(--lq-white);
+    --lq-surface-bg: var(--lq-bg-gray);
+}
+
+[data-theme='D'] {
+    --lq-action-primary: var(--lq-theme-d-primary);
+    --lq-action-text: var(--lq-white);
+    --lq-surface-bg: var(--lq-bg-gray);
+}
+
+[data-theme='E'] {
+    --lq-action-primary: var(--lq-theme-e-primary);
+    --lq-action-text: var(--lq-white);
+    --lq-surface-bg: var(--lq-bg-gray);
+}
