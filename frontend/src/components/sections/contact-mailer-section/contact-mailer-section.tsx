@@ -24,6 +24,9 @@ export function ContactMailerSectionComponent({
         subject: '',
         message: '',
     })
+
+    const subjectLimit = parseInt(process.env.NEXT_PUBLIC_CONTACT_FORM_SUBJECT_MAX_LENGTH || '200')
+    const messageLimit = parseInt(process.env.NEXT_PUBLIC_CONTACT_FORM_MESSAGE_MAX_LENGTH || '2000')
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
     const [errorMessage, setErrorMessage] = useState('')
 
@@ -146,6 +149,8 @@ export function ContactMailerSectionComponent({
                                     onChange={handleChange}
                                     required
                                     fullWidth
+                                    inputProps={{ maxLength: subjectLimit }}
+                                    helperText={`${formData.subject.length} / ${subjectLimit}`}
                                 />
                             </Box>
 
@@ -159,6 +164,8 @@ export function ContactMailerSectionComponent({
                                     fullWidth
                                     multiline
                                     rows={6}
+                                    inputProps={{ maxLength: messageLimit }}
+                                    helperText={`${formData.message.length} / ${messageLimit}`}
                                 />
                             </Box>
 

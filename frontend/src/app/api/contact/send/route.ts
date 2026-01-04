@@ -6,11 +6,27 @@ export async function POST(request: Request) {
     try {
         const body = await request.json()
         const { from, to, subject, message } = body
+        const subjectLimit = parseInt(process.env.NEXT_PUBLIC_CONTACT_FORM_SUBJECT_MAX_LENGTH || '200')
+        const messageLimit = parseInt(process.env.NEXT_PUBLIC_CONTACT_FORM_MESSAGE_MAX_LENGTH || '2000')
 
         // Validation
         if (!from || !to || !subject || !message) {
             return NextResponse.json(
                 { message: 'Alle Pflichtfelder müssen ausgefüllt sein.' },
+                { status: 400 }
+            )
+        }
+
+        if (subject.length > subjectLimit) {
+            return NextResponse.json(
+                { message: `Der Betreff darf maximal ${subjectLimit} Zeichen lang sein.` },
+                { status: 400 }
+            )
+        }
+
+        if (message.length > messageLimit) {
+            return NextResponse.json(
+                { message: `Die Nachricht darf maximal ${messageLimit} Zeichen lang sein.` },
                 { status: 400 }
             )
         }
