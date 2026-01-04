@@ -52,7 +52,7 @@ export function ContactDetail({ contact, strapiBaseUrl }: ContactDetailProps) {
 					) : null}
 
 					{contact.Name ? (
-						<Typography variant='h5' component='h2' className='font-medium text-gray-900' sx={{ mb: 2 }}>
+						<Typography variant='h5' component='h2' className='font-medium text-gray-900' sx={{ mb: 1 }}>
 							{contact.Name}
 						</Typography>
 					) : null}

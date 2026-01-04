@@ -83,7 +83,7 @@ function ContactCard({ contact, strapiBaseUrl }: ContactCardProps) {
 						variant='body1'
 						className='font-medium text-gray-900'
 						sx={{
-							mb: 1,
+							mb: .5,
 							'&:hover': {
 								textDecoration: contactLink ? 'underline' : 'none',
 							},
