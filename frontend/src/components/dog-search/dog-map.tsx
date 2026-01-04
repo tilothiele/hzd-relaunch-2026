@@ -2,13 +2,18 @@
 
 import { useMemo, useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import 'leaflet/dist/leaflet.css'
 import type { Dog } from '@/types'
 import type L from 'leaflet'
+import { useCookieConsent } from '@/hooks/use-cookie-consent'
+import { resolveMediaUrl } from '@/components/header/logo-utils'
+import { useGlobalLayout } from '@/hooks/use-global-layout'
 
 type LeafletIcon = InstanceType<typeof L.Icon>
 
 // Dynamischer Import der Karte für SSR-Kompatibilität
+// Diese werden erst geladen, wenn sie tatsächlich gerendert werden (dank Next.js dynamic)
 const MapContainer = dynamic(
 	() => import('react-leaflet').then((mod) => mod.MapContainer),
 	{ ssr: false }
@@ -29,18 +34,6 @@ const Tooltip = dynamic(
 	() => import('react-leaflet').then((mod) => mod.Tooltip),
 	{ ssr: false }
 )
-
-// Fix für Leaflet-Icons in Next.js
-if (typeof window !== 'undefined') {
-	import('leaflet').then((L) => {
-		delete (L.default.Icon.Default.prototype as { _getIconUrl?: unknown })._getIconUrl
-		L.default.Icon.Default.mergeOptions({
-			iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-			iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-			shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-		})
-	})
-}
 
 interface DogMapProps {
 	isVisible: boolean
@@ -74,19 +67,13 @@ function generateRandomLocationInGermany(): [number, number] {
  */
 function createMarkersFromDogs(dogs: Dog[]): Array<{ id: string; position: [number, number]; name: string; dog: Dog }> {
 	return dogs.map((dog) => {
-		// Verwende die Location aus dem Dog-Objekt (kann echte oder Fake-Koordinaten sein)
 		let position: [number, number]
-
 		if (dog.Location?.lat && dog.Location?.lng) {
 			position = [dog.Location.lat, dog.Location.lng]
 		} else {
-			// Fallback: Generiere zufällige Position in Deutschland, wenn keine Location vorhanden
-			// (sollte nicht mehr vorkommen, da Fake-Koordinaten im Dog-Objekt gespeichert werden)
 			position = generateRandomLocationInGermany()
 		}
-
 		const fullName = dog.fullKennelName ?? dog.givenName ?? 'Unbekannt'
-
 		return {
 			id: dog.documentId,
 			position,
@@ -108,7 +95,6 @@ function UserLocationMarker({ position, icon }: { position: [number, number]; ic
 // Komponente, die prüft, ob die Map bereit ist
 function MapReady({ onReady }: { onReady: () => void }) {
 	useEffect(() => {
-		// Warte, bis die Map vollständig initialisiert ist
 		const timer = setTimeout(() => {
 			onReady()
 		}, 200)
@@ -121,41 +107,92 @@ export function DogMap({ isVisible, dogs, userLocation }: DogMapProps) {
 	const [isMounted, setIsMounted] = useState(false)
 	const [isMapReady, setIsMapReady] = useState(false)
 	const [grayIcon, setGrayIcon] = useState<LeafletIcon | null>(null)
+	const { isAccepted, accept } = useCookieConsent()
+	const { globalLayout, baseUrl: globalBaseUrl } = useGlobalLayout()
 	const markers = useMemo(() => createMarkersFromDogs(dogs), [dogs])
+
+	const privacyPolicyUrl = resolveMediaUrl(globalLayout?.PrivacyPolicy ?? null, globalBaseUrl)
 
 	useEffect(() => {
 		setIsMounted(true)
 	}, [])
 
-	// Lade graues Icon, wenn userLocation vorhanden ist
+	// Leaflet Icons fixen - erst NACH Consent und nur auf Client
 	useEffect(() => {
-		if (!userLocation || typeof window === 'undefined') {
-			return
-		}
+		if (!isAccepted || typeof window === 'undefined') return
 
-		const initGrayIcon = async () => {
-			try {
-				const L = await import('leaflet')
-				const icon = L.default.icon({
-					iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png',
-					iconRetinaUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-grey.png',
-					shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+		const fixLeafletIcons = async () => {
+			const LModule = await import('leaflet')
+			const L = LModule.default
+
+			// Fix für Default-Icons
+			delete (L.Icon.Default.prototype as { _getIconUrl?: unknown })._getIconUrl
+			L.Icon.Default.mergeOptions({
+				iconUrl: '/static-images/map/marker-icon.png',
+				iconRetinaUrl: '/static-images/map/marker-icon-2x.png',
+				shadowUrl: '/static-images/map/marker-shadow.png',
+			})
+
+			// Graues Icon für User-Location laden
+			if (userLocation) {
+				const icon = L.icon({
+					iconUrl: '/static-images/map/marker-icon-grey.png',
+					iconRetinaUrl: '/static-images/map/marker-icon-2x-grey.png',
+					shadowUrl: '/static-images/map/marker-shadow.png',
 					iconSize: [25, 41],
 					iconAnchor: [12, 41],
 					popupAnchor: [1, -34],
 					shadowSize: [41, 41],
 				})
 				setGrayIcon(icon)
-			} catch (error) {
-				console.error('Fehler beim Laden des grauen Icons:', error)
 			}
 		}
 
-		void initGrayIcon()
-	}, [userLocation])
+		void fixLeafletIcons()
+	}, [isAccepted, userLocation])
 
 	if (!isVisible || !isMounted) {
 		return null
+	}
+
+	if (!isAccepted) {
+		return (
+			<div className='relative mb-6 h-96 w-full overflow-hidden rounded-lg border border-gray-200 shadow-md'>
+				<div
+					className='absolute inset-0 bg-gray-100'
+					style={{
+						backgroundImage: 'url("/static-images/map/blurred-map.png")',
+						backgroundSize: 'cover',
+						backgroundPosition: 'center',
+						filter: 'blur(1px)'
+					}}
+				/>
+				<div className='absolute inset-0 flex flex-col items-center justify-center bg-white/60 p-6 text-center backdrop-blur-sm'>
+					<h3 className='mb-2 text-xl font-bold text-gray-900'>Interaktive Karte</h3>
+					<p className='mb-6 max-w-md text-sm text-gray-700'>
+						Um die Karte anzuzeigen, akzeptieren Sie bitte die Cookies und Datenschutzbestimmungen.
+						Dabei werden Daten von OpenStreetMap geladen.
+					</p>
+					<div className='flex flex-wrap items-center justify-center gap-4'>
+						<button
+							onClick={accept}
+							className='rounded bg-yellow-400 px-6 py-2 text-sm font-semibold text-[#3d2817] transition-colors hover:bg-yellow-300'
+						>
+							Karte aktivieren & Cookies akzeptieren
+						</button>
+						{privacyPolicyUrl && (
+							<Link
+								href={privacyPolicyUrl}
+								target='_blank'
+								className='text-sm text-gray-600 underline hover:text-gray-900'
+							>
+								Datenschutzerklärung lesen
+							</Link>
+						)}
+					</div>
+				</div>
+			</div>
+		)
 	}
 
 	const userPosition: [number, number] | null = userLocation
@@ -197,4 +234,3 @@ export function DogMap({ isVisible, dogs, userLocation }: DogMapProps) {
 		</div>
 	)
 }
-

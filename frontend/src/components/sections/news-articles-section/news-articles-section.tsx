@@ -49,13 +49,10 @@ export async function NewsArticlesSectionComponent({
     const syntheticCardSection: CardSection = {
         __typename: 'ComponentBlocksCardSection',
         id: `news-section-${section.id}`,
-        Headline: 'Aktuelles', // Could optionally come from somewhere, but component doesn't seem to have a headline field in schema?
-        // Wait, schema for ComponentBlocksNewsArticlesSection doesn't have a Headline field!
-        // It's common to want one. Maybe hardcode "Aktuelles"? Or just omit.
-        // If I omit, CardSectionComponent handles it (displays nothing).
-        // I will omit for now.
+        Headline: 'Aktuelles',
         CardItem: cardItems,
-        CardColumnsOddEven: 'Odd', // Default or make configurable? Not in schema.
+        CardColumnsOddEven: 'Odd',
+        CardsAnchor: section.NewsArticlesAnchor
     }
 
     return (

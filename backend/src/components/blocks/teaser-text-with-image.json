@@ -43,6 +43,9 @@
         "Odd",
         "Even"
       ]
+    },
+    "TeaserAnchor": {
+      "type": "string"
     }
   },
   "config": {}

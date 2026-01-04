@@ -31,6 +31,7 @@ export function SimpleCtaSectionComponent({
 	return (
 		<SectionContainer
 			variant='full-width'
+			id={section.SimpleCtaAnchor || undefined}
 			backgroundColor={backgroundColor}
 		>
 			<Box

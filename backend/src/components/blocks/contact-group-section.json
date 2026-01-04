@@ -9,6 +9,9 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::contact-group.contact-group"
+    },
+    "ContactGroupAnchor": {
+      "type": "string"
     }
   },
   "config": {}

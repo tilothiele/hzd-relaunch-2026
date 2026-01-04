@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_blocks_email_addresses",
+  "info": {
+    "displayName": "EmailAddresses"
+  },
+  "options": {},
+  "attributes": {
+    "Email": {
+      "type": "email",
+      "required": true
+    },
+    "DisplayName": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

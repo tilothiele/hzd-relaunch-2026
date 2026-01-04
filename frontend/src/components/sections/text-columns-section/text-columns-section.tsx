@@ -116,6 +116,7 @@ export function TextColumnsSectionComponent({
 	return (
 		<SectionContainer
 			variant='max-width'
+			id={section.TextColumnsAnchor || undefined}
 			backgroundColor={backgroundColor}
 			marginTop='1.2em'
 			marginBottom='1.5em'

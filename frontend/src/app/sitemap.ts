@@ -18,25 +18,47 @@ interface SitemapData {
         Slug: string
         updatedAt: string
     }[]
+    hzdPluginDogs: { updatedAt: string }[]
+    hzdPluginBreeders: { updatedAt: string }[]
+    hzdPluginLitters: { updatedAt: string }[]
+    calendarEntries: { updatedAt: string }[]
 }
 
 const noLeadingSlash = (route: string) => route.startsWith('/') ? route.slice(1) : route
 
+export const revalidate = 0
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = getStrapiBaseUrl()
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hzd-hovawart.de' // Fallback to production URL if not set
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hzd-hovawart.de'
 
     try {
         const data = await fetchGraphQLServer<SitemapData>(GET_SITEMAP_DATA, { baseUrl })
 
-        const staticRoutes = [
-            '',
-            '/contact'
+        const now = new Date().toISOString()
+        const indexUpdated = data?.indexPage?.updatedAt || now
+        const dogsUpdated = data?.hzdPluginDogs?.[0]?.updatedAt || indexUpdated
+        const breedersUpdated = data?.hzdPluginBreeders?.[0]?.updatedAt || indexUpdated
+        const littersUpdated = data?.hzdPluginLitters?.[0]?.updatedAt || indexUpdated
+        const calendarUpdated = data?.calendarEntries?.[0]?.updatedAt || indexUpdated
+
+        // Listing Pages with dynamic timestamps
+        const listingRoutes = [
+            { path: '', lastMod: indexUpdated, priority: 1, freq: 'daily' as const },
+            { path: '/dogs', lastMod: dogsUpdated, priority: 0.9, freq: 'daily' as const },
+            { path: '/stunt-dogs', lastMod: dogsUpdated, priority: 0.8, freq: 'weekly' as const },
+            { path: '/breeders', lastMod: breedersUpdated, priority: 0.9, freq: 'daily' as const },
+            { path: '/litters', lastMod: littersUpdated, priority: 0.9, freq: 'daily' as const },
+            { path: '/calendar', lastMod: calendarUpdated, priority: 0.8, freq: 'daily' as const },
+            { path: '/results', lastMod: calendarUpdated, priority: 0.7, freq: 'weekly' as const }, // Often tied to calendar
+            { path: '/contact', lastMod: indexUpdated, priority: 0.8, freq: 'monthly' as const },
+            { path: '/mein-hzd', lastMod: indexUpdated, priority: 0.6, freq: 'monthly' as const },
+            { path: '/anmeldung', lastMod: indexUpdated, priority: 0.6, freq: 'monthly' as const },
         ].map((route) => ({
-            url: `${siteUrl}${route}`,
-            lastModified: data?.indexPage?.updatedAt || new Date().toISOString(),
-            changeFrequency: 'daily' as const,
-            priority: route === '' ? 1 : 0.8,
+            url: `${siteUrl}${route.path}`,
+            lastModified: route.lastMod,
+            changeFrequency: route.freq,
+            priority: route.priority,
         }))
 
         const dynamicPages = (data?.pages || []).map((page) => ({
@@ -60,10 +82,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.5,
         }))
 
-        return [...staticRoutes, ...dynamicPages, ...newsArticles, ...articleCategories]
+        return [...listingRoutes, ...dynamicPages, ...newsArticles, ...articleCategories]
     } catch (error) {
         console.error('Error generating sitemap:', error)
-        // Return at least the static routes if fetch fails
         return [
             {
                 url: siteUrl,

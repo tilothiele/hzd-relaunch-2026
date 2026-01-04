@@ -754,6 +754,7 @@ export interface ApiIndexPageIndexPage extends Struct.SingleTypeSchema {
         'blocks.contact-group-section',
         'blocks.news-articles-section',
         'blocks.supplemental-document-group-section',
+        'blocks.contact-mailer-section',
       ]
     >;
     SEO: Schema.Attribute.Component<'seo.seo', false>;
@@ -1064,6 +1065,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.simple-cta-section',
         'blocks.news-articles-section',
         'blocks.contact-group-section',
+        'blocks.contact-mailer-section',
       ]
     >;
     SEO: Schema.Attribute.Component<'seo.seo', true>;

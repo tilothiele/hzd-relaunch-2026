@@ -47,12 +47,14 @@ export interface CardSection {
 	Headline?: string | null
 	CardColumnsOddEven?: 'Odd' | 'Even' | null
 	CardItem?: CardItem[] | null
+	CardsAnchor?: string | null
 }
 
 export interface RichTextSection {
 	__typename: 'ComponentBlocksRichTextSection'
 	RichTextOddEven?: 'Odd' | 'Even' | null
 	RichTextContent?: string | null
+	RichTextAnchor?: string | null
 }
 
 export interface File {
@@ -86,6 +88,7 @@ export interface SupplementalDocumentGroupSection {
 	SupplementalsOddEven?: 'Odd' | 'Even' | null
 	GroupHeadline?: string | null
 	supplemental_document_group?: SupplementalDocumentGroup | null
+	GroupAnchor?: string | null
 }
 
 export interface TeaserTextWithImageSection {
@@ -96,6 +99,7 @@ export interface TeaserTextWithImageSection {
 	Image?: Image | null
 	ImagePosition?: 'left' | 'right' | null
 	ActionButton?: ActionButton | null
+	TeaserAnchor?: string | null
 }
 
 export interface BulletItem {
@@ -118,12 +122,14 @@ export interface TextColumnsSection {
 	TextColumnsHeadline?: string | null
 	TextColumnsSubHeadline?: string | null
 	TextColumn?: TextColumn[] | null
+	TextColumnsAnchor?: string | null
 }
 
 export interface ImageGallerySection {
 	__typename: 'ComponentBlocksImageGallerySection'
 	GalleryHeadline?: string | null
 	GalleryImages?: Image[] | null
+	ImageGalleryAnchor?: string | null
 }
 
 export interface SimpleCtaSection {
@@ -132,11 +138,28 @@ export interface SimpleCtaSection {
 	CtaInfoText?: string | null
 	CtaBackgroundImage?: Image | null
 	CtaActionButton?: (ActionButton | null)[] | null
+	SimpleCtaAnchor?: string | null
 }
 
 export interface ContactGroupSection {
 	__typename: 'ComponentBlocksContactGroupSection'
 	ContactGroup?: ContactGroup | null
+	ContactGroupAnchor?: string | null
+}
+
+export interface EmailAddressOption {
+	id: string
+	Email: string
+	DisplayName?: string | null
+}
+
+export interface ContactMailerSection {
+	__typename: 'ComponentBlocksContactMailerSection'
+	id?: string
+	ContactMailerAnchor?: string | null
+	ContactMailerHeadline?: string | null
+	ContactMailerInfotext?: string | null
+	ReceipientOptions?: EmailAddressOption[] | null
 }
 
 export interface NewsArticlesSection {
@@ -146,9 +169,10 @@ export interface NewsArticlesSection {
 	news_article_category?: {
 		documentId: string
 	} | null
+	NewsArticlesAnchor?: string | null
 }
 
-export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | SimpleCtaSection | ContactGroupSection | NewsArticlesSection
+export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | SimpleCtaSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection
 
 export type PageSection = StartpageSection
 

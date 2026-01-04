@@ -24,6 +24,9 @@
         "Odd",
         "Even"
       ]
+    },
+    "RichTextAnchor": {
+      "type": "string"
     }
   },
   "config": {}

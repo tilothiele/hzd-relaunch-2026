@@ -89,6 +89,7 @@ export function SupplementalDocumentGroupSectionComponent({
 	return (
 		<SectionContainer
 			variant='max-width'
+			id={section.GroupAnchor || undefined}
 			backgroundColor={backgroundColor}
 			paddingTop='2em'
 			paddingBottom='2em'

@@ -5,51 +5,27 @@ import Link from 'next/link'
 import { useGlobalLayout } from '@/hooks/use-global-layout'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 
-const STORAGE_KEY = 'cookie-consent'
+import { useCookieConsent } from '@/hooks/use-cookie-consent'
 
 export function CookieBanner() {
 	const { globalLayout, baseUrl } = useGlobalLayout()
+	const { status, accept, reject, isUndecided } = useCookieConsent()
 	const privacyPolicyUrl = resolveMediaUrl(globalLayout?.PrivacyPolicy ?? null, baseUrl)
-	const [isVisible, setIsVisible] = useState(false)
 	const [isSaving, setIsSaving] = useState(false)
 
-	useEffect(() => {
-		try {
-			const storedValue = localStorage.getItem(STORAGE_KEY)
-			if (!storedValue) {
-				setIsVisible(true)
-			}
-		} catch (error) {
-			console.error('Cookie consent Lesen fehlgeschlagen:', error)
-			setIsVisible(true)
-		}
-	}, [])
-
 	const handleAccept = useCallback(() => {
-		try {
-			setIsSaving(true)
-			localStorage.setItem(STORAGE_KEY, 'accepted')
-			setIsVisible(false)
-		} catch (error) {
-			console.error('Cookie consent Speichern fehlgeschlagen:', error)
-		} finally {
-			setIsSaving(false)
-		}
-	}, [])
+		setIsSaving(true)
+		accept()
+		setIsSaving(false)
+	}, [accept])
 
 	const handleReject = useCallback(() => {
-		try {
-			setIsSaving(true)
-			localStorage.setItem(STORAGE_KEY, 'rejected')
-			setIsVisible(false)
-		} catch (error) {
-			console.error('Cookie Ablehnung Speichern fehlgeschlagen:', error)
-		} finally {
-			setIsSaving(false)
-		}
-	}, [])
+		setIsSaving(true)
+		reject()
+		setIsSaving(false)
+	}, [reject])
 
-	if (!isVisible) {
+	if (!isUndecided) {
 		return null
 	}
 

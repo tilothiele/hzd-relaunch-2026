@@ -22,6 +22,9 @@
         "Odd",
         "Even"
       ]
+    },
+    "TextColumnsAnchor": {
+      "type": "string"
     }
   },
   "config": {}

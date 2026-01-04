@@ -12,6 +12,7 @@ import { ImageGallerySectionComponent } from './image-gallery-section/image-gall
 import { SimpleCtaSectionComponent } from './simple-cta-section/simple-cta-section'
 import { ContactGroupSectionComponent } from './contact-group-section/contact-group-section'
 import { NewsArticlesSectionComponent } from './news-articles-section/news-articles-section'
+import { ContactMailerSectionComponent } from './contact-mailer-section/contact-mailer-section'
 
 interface RenderStartpageSectionsParams {
 	sections: StartpageSection[] | null | undefined
@@ -117,6 +118,15 @@ function renderStartpageSection({
 		case 'ComponentBlocksNewsArticlesSection':
 			return (
 				<NewsArticlesSectionComponent
+					key={key}
+					section={section as any}
+					strapiBaseUrl={strapiBaseUrl}
+					theme={theme}
+				/>
+			)
+		case 'ComponentBlocksContactMailerSection':
+			return (
+				<ContactMailerSectionComponent
 					key={key}
 					section={section as any}
 					strapiBaseUrl={strapiBaseUrl}

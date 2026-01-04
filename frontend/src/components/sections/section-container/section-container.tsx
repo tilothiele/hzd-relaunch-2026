@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 
 interface SectionContainerProps {
 	variant?: 'max-width' | 'full-width'
+	id?: string
 	backgroundColor?: string
 	paddingTop?: string
 	paddingBottom?: string
@@ -12,6 +13,7 @@ interface SectionContainerProps {
 
 export function SectionContainer({
 	variant = 'max-width',
+	id,
 	backgroundColor,
 	paddingTop,
 	paddingBottom,
@@ -27,6 +29,7 @@ export function SectionContainer({
 
 	return (
 		<section
+			id={id}
 			className="flex w-full justify-center"
 			style={{
 				paddingTop,

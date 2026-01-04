@@ -63,6 +63,7 @@ export const GET_INDEX_PAGE = `
 			    ... on ComponentBlocksRichTextSection {
 					RichTextContent
 					RichTextOddEven
+					RichTextAnchor
 				}
 				... on ComponentBlocksHeroSectionSlideShow {
 					Headline {
@@ -107,6 +108,7 @@ export const GET_INDEX_PAGE = `
 							Primary
 						}
 					}
+					CardsAnchor
 				}
 				... on ComponentBlocksTeaserTextWithImage {
 					TeaserOddEven
@@ -126,6 +128,7 @@ export const GET_INDEX_PAGE = `
 						Link
 						Primary
 					}
+					TeaserAnchor
 				}
 				... on ComponentBlocksTextColumnsSection {
 					TextColumnsOddEven
@@ -146,6 +149,7 @@ export const GET_INDEX_PAGE = `
 							ItemBody
 						}
 					}
+					TextColumnsAnchor
 				}
 				... on ComponentBlocksImageGallerySection {
 					GalleryHeadline
@@ -157,6 +161,7 @@ export const GET_INDEX_PAGE = `
 						caption
 						previewUrl
 					}
+					ImageGalleryAnchor
 				}
 				... on ComponentBlocksSimpleCtaSection {
 					CtaHeadline
@@ -174,12 +179,14 @@ export const GET_INDEX_PAGE = `
 						Link
 						Primary
 					}
+					SimpleCtaAnchor
 				}
 				... on ComponentBlocksNewsArticlesSection {
 				MaxArticles
 							news_article_category {
 								documentId
 							}
+					NewsArticlesAnchor
 				}
 				... on ComponentBlocksContactGroupSection {
 					ContactGroup {
@@ -211,6 +218,17 @@ export const GET_INDEX_PAGE = `
 								lastName
 							}
 						}
+					}
+					ContactGroupAnchor
+				}
+				... on ComponentBlocksContactMailerSection {
+					ContactMailerAnchor
+					ContactMailerHeadline
+					ContactMailerInfotext
+					ReceipientOptions {
+						id
+						Email
+						DisplayName
 					}
 				}
 			}
@@ -267,6 +285,7 @@ export const GET_PAGE_BY_SLUG = `
 						... on ComponentBlocksRichTextSection {
 							RichTextContent
 							RichTextOddEven
+							RichTextAnchor
 						}
 						... on ComponentBlocksHeroSectionSlideShow {
 							Headline {
@@ -310,6 +329,7 @@ export const GET_PAGE_BY_SLUG = `
 								Primary
 							}
 						}
+						CardsAnchor
 					}
 						... on ComponentBlocksSupplementalDocumentGroupSection {
 							SupplementalsOddEven
@@ -335,6 +355,7 @@ export const GET_PAGE_BY_SLUG = `
 									VisibilityEnd
 								}
 							}
+							GroupAnchor
 						}
 						... on ComponentBlocksTeaserTextWithImage {
 							TeaserOddEven
@@ -354,6 +375,7 @@ export const GET_PAGE_BY_SLUG = `
 								Link
 								Primary
 							}
+							TeaserAnchor
 						}
 						... on ComponentBlocksTextColumnsSection {
 							TextColumnsOddEven
@@ -374,6 +396,7 @@ export const GET_PAGE_BY_SLUG = `
 									ItemBody
 								}
 							}
+							TextColumnsAnchor
 						}
 						... on ComponentBlocksImageGallerySection {
 							GalleryHeadline
@@ -385,6 +408,7 @@ export const GET_PAGE_BY_SLUG = `
 								caption
 								previewUrl
 							}
+							ImageGalleryAnchor
 						}
 						... on ComponentBlocksSimpleCtaSection {
 							CtaHeadline
@@ -402,6 +426,7 @@ export const GET_PAGE_BY_SLUG = `
 								Link
 								Primary
 							}
+							SimpleCtaAnchor
 						}
 						... on ComponentBlocksContactGroupSection {
 							ContactGroup {
@@ -434,12 +459,24 @@ export const GET_PAGE_BY_SLUG = `
 									}
 								}
 							}
+							ContactGroupAnchor
+						}
+						... on ComponentBlocksContactMailerSection {
+							ContactMailerAnchor
+							ContactMailerHeadline
+							ContactMailerInfotext
+							ReceipientOptions {
+								id
+								Email
+								DisplayName
+							}
 						}
 						... on ComponentBlocksNewsArticlesSection {
 							MaxArticles
 							news_article_category {
 								documentId
 							}
+							NewsArticlesAnchor
 						}
 					}
 				}
@@ -862,6 +899,7 @@ export const GET_NEWS_ARTICLE_BY_SLUG = `
 				... on ComponentBlocksRichTextSection {
 					RichTextContent
 					RichTextOddEven
+					RichTextAnchor
 				}
 				... on ComponentBlocksCardSection {
 					CardColumnsOddEven
@@ -1102,6 +1140,18 @@ export const GET_SITEMAP_DATA = `
 		}
 		newsArticleCategories(pagination: { limit: -1 }) {
 			Slug
+			updatedAt
+		}
+		hzdPluginDogs(sort: "updatedAt:desc", pagination: { limit: 1 }) {
+			updatedAt
+		}
+		hzdPluginBreeders(sort: "updatedAt:desc", pagination: { limit: 1 }) {
+			updatedAt
+		}
+		hzdPluginLitters(sort: "updatedAt:desc", pagination: { limit: 1 }) {
+			updatedAt
+		}
+		calendarEntries(sort: "updatedAt:desc", pagination: { limit: 1 }) {
 			updatedAt
 		}
 	}

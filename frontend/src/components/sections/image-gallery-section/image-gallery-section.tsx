@@ -52,6 +52,7 @@ export function ImageGallerySectionComponent({
 	return (
 		<SectionContainer
 			variant='full-width'
+			id={section.ImageGalleryAnchor || undefined}
 			backgroundColor={backgroundColor}
 			paddingTop='1em'
 			paddingBottom='1em'

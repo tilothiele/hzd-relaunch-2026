@@ -29,6 +29,7 @@ export interface BlocksCardSection extends Struct.ComponentSchema {
         },
         number
       >;
+    CardsAnchor: Schema.Attribute.String;
     Headline: Schema.Attribute.String;
   };
 }
@@ -43,6 +44,34 @@ export interface BlocksContactGroupSection extends Struct.ComponentSchema {
       'oneToOne',
       'api::contact-group.contact-group'
     >;
+    ContactGroupAnchor: Schema.Attribute.String;
+  };
+}
+
+export interface BlocksContactMailerSection extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_contact_mailer_sections';
+  info: {
+    displayName: 'ContactMailerSection';
+  };
+  attributes: {
+    ContactMailerAnchor: Schema.Attribute.String;
+    ContactMailerHeadline: Schema.Attribute.String;
+    ContactMailerInfotext: Schema.Attribute.Text;
+    ReceipientOptions: Schema.Attribute.Component<
+      'blocks.email-addresses',
+      true
+    >;
+  };
+}
+
+export interface BlocksEmailAddresses extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_email_addresses';
+  info: {
+    displayName: 'EmailAddresses';
+  };
+  attributes: {
+    DisplayName: Schema.Attribute.String;
+    Email: Schema.Attribute.Email & Schema.Attribute.Required;
   };
 }
 
@@ -64,6 +93,7 @@ export interface BlocksImageGallerySection extends Struct.ComponentSchema {
   attributes: {
     GalleryHeadline: Schema.Attribute.String;
     GalleryImages: Schema.Attribute.Media<'images', true>;
+    ImageGalleryAnchor: Schema.Attribute.String;
   };
 }
 
@@ -89,6 +119,7 @@ export interface BlocksNewsArticlesSection extends Struct.ComponentSchema {
       'oneToOne',
       'api::news-article-category.news-article-category'
     >;
+    NewsArticlesAnchor: Schema.Attribute.String;
   };
 }
 
@@ -98,6 +129,7 @@ export interface BlocksRichTextSection extends Struct.ComponentSchema {
     displayName: 'RichTextSection';
   };
   attributes: {
+    RichTextAnchor: Schema.Attribute.String;
     RichTextContent: Schema.Attribute.RichText &
       Schema.Attribute.CustomField<
         'plugin::ckeditor5.CKEditor',
@@ -129,6 +161,7 @@ export interface BlocksSimpleCtaSection extends Struct.ComponentSchema {
           preset: 'defaultHtml';
         }
       >;
+    SimpleCtaAnchor: Schema.Attribute.String;
   };
 }
 
@@ -152,6 +185,7 @@ export interface BlocksSupplementalDocumentGroupSection
     displayName: 'SupplementalDocumentGroupSection';
   };
   attributes: {
+    GroupAnchor: Schema.Attribute.String;
     GroupHeadline: Schema.Attribute.String;
     supplemental_document_group: Schema.Attribute.Relation<
       'oneToOne',
@@ -170,6 +204,7 @@ export interface BlocksTeaserTextWithImage extends Struct.ComponentSchema {
     ActionButton: Schema.Attribute.Component<'links.action-button', false>;
     Image: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     ImagePosition: Schema.Attribute.Enumeration<['Left', 'Right']>;
+    TeaserAnchor: Schema.Attribute.String;
     TeaserHeadline: Schema.Attribute.String;
     TeaserOddEven: Schema.Attribute.Enumeration<['Odd', 'Even']>;
     TeaserText: Schema.Attribute.RichText &
@@ -189,6 +224,7 @@ export interface BlocksTextColumnsSection extends Struct.ComponentSchema {
   };
   attributes: {
     TextColumn: Schema.Attribute.Component<'columns.text-column', true>;
+    TextColumnsAnchor: Schema.Attribute.String;
     TextColumnsHeadline: Schema.Attribute.String;
     TextColumnsOddEven: Schema.Attribute.Enumeration<['Odd', 'Even']>;
     TextColumnsSubHeadline: Schema.Attribute.String;
@@ -561,6 +597,8 @@ declare module '@strapi/strapi' {
       'blocks.card-item': BlocksCardItem;
       'blocks.card-section': BlocksCardSection;
       'blocks.contact-group-section': BlocksContactGroupSection;
+      'blocks.contact-mailer-section': BlocksContactMailerSection;
+      'blocks.email-addresses': BlocksEmailAddresses;
       'blocks.hero-section-slide-show': BlocksHeroSectionSlideShow;
       'blocks.image-gallery-section': BlocksImageGallerySection;
       'blocks.item-list': BlocksItemList;

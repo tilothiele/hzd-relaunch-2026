@@ -29,6 +29,9 @@
         "videos",
         "audios"
       ]
+    },
+    "SimpleCtaAnchor": {
+      "type": "string"
     }
   },
   "config": {}

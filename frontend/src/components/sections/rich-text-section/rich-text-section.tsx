@@ -21,6 +21,7 @@ export function RichTextSectionComponent({
 	return (
 		<SectionContainer
 			variant='max-width'
+			id={section.RichTextAnchor || undefined}
 			backgroundColor={backgroundColor}
 			marginTop='1em'
 			marginBottom='1em'

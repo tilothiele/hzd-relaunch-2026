@@ -39,6 +39,7 @@ export function CardSectionComponent({
 	return (
 		<SectionContainer
 			variant='full-width'
+			id={section.CardsAnchor || undefined}
 			backgroundColor={backgroundColor}
 			paddingBottom='0.5em'
 		>

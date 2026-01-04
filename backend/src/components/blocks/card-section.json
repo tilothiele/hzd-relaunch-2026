@@ -20,6 +20,9 @@
         "Odd",
         "Even"
       ]
+    },
+    "CardsAnchor": {
+      "type": "string"
     }
   },
   "config": {}

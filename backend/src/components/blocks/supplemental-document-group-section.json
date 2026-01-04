@@ -19,6 +19,9 @@
         "Odd",
         "Even"
       ]
+    },
+    "GroupAnchor": {
+      "type": "string"
     }
   },
   "config": {}

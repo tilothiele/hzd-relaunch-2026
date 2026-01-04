@@ -21,6 +21,7 @@ export function ContactGroupSectionComponent({
 	return (
 		<SectionContainer
 			variant='max-width'
+			id={section.ContactGroupAnchor || undefined}
 			backgroundColor={theme.evenBgColor}
 			paddingTop='2em'
 			paddingBottom='2em'

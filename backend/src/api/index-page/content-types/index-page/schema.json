@@ -28,7 +28,8 @@
         "blocks.simple-cta-section",
         "blocks.contact-group-section",
         "blocks.news-articles-section",
-        "blocks.supplemental-document-group-section"
+        "blocks.supplemental-document-group-section",
+        "blocks.contact-mailer-section"
       ]
     }
   }

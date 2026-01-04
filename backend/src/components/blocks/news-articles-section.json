@@ -15,6 +15,9 @@
     },
     "MaxFeaturedArticles": {
       "type": "integer"
+    },
+    "NewsArticlesAnchor": {
+      "type": "string"
     }
   },
   "config": {}
