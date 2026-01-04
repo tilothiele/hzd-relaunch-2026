@@ -465,7 +465,7 @@ export const GET_PAGE_BY_SLUG = `
 							ContactMailerAnchor
 							ContactMailerHeadline
 							ContactMailerInfotext
-							ReceipientOptions {
+							ReceipientOptions(pagination: { limit: 100 }) {
 								id
 								Email
 								DisplayName
