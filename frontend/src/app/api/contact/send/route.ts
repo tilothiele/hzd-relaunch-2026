@@ -17,7 +17,7 @@ export async function POST(request: Request) {
 
         // Forward to Strapi sendmail API
         // We assuming the endpoint is /api/hzd-plugin/send-mail as per user request context
-        const strapiResponse = await fetch(`${strapiBaseUrl}/api/hzd-plugin/send-mail`, {
+        const strapiResponse = await fetch(`${strapiBaseUrl}/api/email`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
