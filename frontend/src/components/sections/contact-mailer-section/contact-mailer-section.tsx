@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { TextField, Button, MenuItem, Select, FormControl, InputLabel, Box, Alert, CircularProgress, Typography } from '@mui/material'
+import { TextField, Button, MenuItem, Select, FormControl, InputLabel, Box, Alert, CircularProgress, Typography, Checkbox, FormControlLabel } from '@mui/material'
 import type { ContactMailerSection } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
@@ -23,6 +23,7 @@ export function ContactMailerSectionComponent({
         to: '',
         subject: '',
         message: '',
+        sendCopy: false,
     })
 
     const subjectLimit = parseInt(process.env.NEXT_PUBLIC_CONTACT_FORM_SUBJECT_MAX_LENGTH || '200')
@@ -40,8 +41,8 @@ export function ContactMailerSectionComponent({
     }, [user])
 
     const handleChange = (e: any) => {
-        const { name, value } = e.target
-        setFormData((prev) => ({ ...prev, [name]: value }))
+        const { name, value, type, checked } = e.target
+        setFormData((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }))
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -166,6 +167,25 @@ export function ContactMailerSectionComponent({
                                     rows={6}
                                     inputProps={{ maxLength: messageLimit }}
                                     helperText={`${formData.message.length} / ${messageLimit}`}
+                                />
+                            </Box>
+
+                            <Box sx={{ gridColumn: { md: 'span 2' } }}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            name="sendCopy"
+                                            checked={formData.sendCopy}
+                                            onChange={handleChange}
+                                            sx={{
+                                                color: '#facc15',
+                                                '&.Mui-checked': {
+                                                    color: '#eab308',
+                                                },
+                                            }}
+                                        />
+                                    }
+                                    label="Mir eine Kopie senden"
                                 />
                             </Box>
 

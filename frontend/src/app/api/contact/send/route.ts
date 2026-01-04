@@ -5,9 +5,12 @@ const strapiBaseUrl = process.env.STRAPI_BASE_URL || process.env.NEXT_PUBLIC_STR
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { from, to, subject, message } = body
+        const { from, to, subject, message, sendCopy } = body
         const subjectLimit = parseInt(process.env.NEXT_PUBLIC_CONTACT_FORM_SUBJECT_MAX_LENGTH || '200')
         const messageLimit = parseInt(process.env.NEXT_PUBLIC_CONTACT_FORM_MESSAGE_MAX_LENGTH || '2000')
+
+        const cc = sendCopy ? from : undefined
+
 
         // Validation
         if (!from || !to || !subject || !message) {
@@ -42,6 +45,7 @@ export async function POST(request: Request) {
             body: JSON.stringify({
                 from,
                 to,
+                cc,
                 subject,
                 text: message, // Strapi often expects 'text' or 'html'
             }),
