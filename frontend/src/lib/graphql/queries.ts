@@ -226,11 +226,33 @@ export const GET_INDEX_PAGE = `
 					ContactMailerHeadline
 					ContactMailerInfotext
 					ReceipientOptions {
-						id
-						Email
-						DisplayName
-					}
-				}
+ 						id
+ 						Email
+ 						DisplayName
+ 					}
+ 				}
+ 				... on ComponentBlocksSimpleHeroSection {
+ 					HeroAnchor
+ 					HeroHeadline
+ 					HeroTeaser
+ 					HeroImage {
+ 						url
+ 						alternativeText
+ 						width
+ 						height
+ 						caption
+ 						previewUrl
+ 					}
+ 					HeroLayout
+ 					HeroCta {
+ 						Label
+ 						Link
+ 						Primary
+ 					}
+ 					FullWidth
+ 					ShowLog
+					FadingBorder
+ 				}
 			}
 		}
 	}
@@ -466,11 +488,33 @@ export const GET_PAGE_BY_SLUG = `
 							ContactMailerHeadline
 							ContactMailerInfotext
 							ReceipientOptions(pagination: { limit: 100 }) {
-								id
-								Email
-								DisplayName
-							}
-						}
+ 								id
+ 								Email
+ 								DisplayName
+ 							}
+ 						}
+ 						... on ComponentBlocksSimpleHeroSection {
+ 							HeroAnchor
+ 							HeroHeadline
+ 							HeroTeaser
+ 							HeroImage {
+ 								url
+ 								alternativeText
+ 								width
+ 								height
+ 								caption
+ 								previewUrl
+ 							}
+ 							HeroLayout
+ 							HeroCta {
+ 								Label
+ 								Link
+ 								Primary
+ 							}
+ 							FullWidth
+ 							ShowLog
+							FadingBorder
+ 						}
 						... on ComponentBlocksNewsArticlesSection {
 							MaxArticles
 							news_article_category {

@@ -365,44 +365,6 @@ type ComponentPermissionGroups {
   BreedWarden: Boolean
 }
 
-input ComponentLinksPartnerlLinkFiltersInput {
-  PartnerLinkUrl: StringFilterInput
-  AltText: StringFilterInput
-  and: [ComponentLinksPartnerlLinkFiltersInput]
-  or: [ComponentLinksPartnerlLinkFiltersInput]
-  not: ComponentLinksPartnerlLinkFiltersInput
-}
-
-input ComponentLinksPartnerlLinkInput {
-  id: ID
-  Logo: ID
-  PartnerLinkUrl: String
-  AltText: String
-}
-
-type ComponentLinksPartnerlLink {
-  id: ID!
-  Logo: UploadFile
-  PartnerLinkUrl: String
-  AltText: String
-}
-
-input ComponentLinksActionButtonFiltersInput {
-  Label: StringFilterInput
-  Link: StringFilterInput
-  Primary: BooleanFilterInput
-  and: [ComponentLinksActionButtonFiltersInput]
-  or: [ComponentLinksActionButtonFiltersInput]
-  not: ComponentLinksActionButtonFiltersInput
-}
-
-type ComponentLinksActionButton {
-  id: ID!
-  Label: String
-  Link: String
-  Primary: Boolean
-}
-
 input ComponentLayoutFooterInput {
   id: ID
   PraesidiumName: String
@@ -448,36 +410,42 @@ type ComponentLayoutColorTheme {
   ShortName: ENUM_COMPONENTLAYOUTCOLORTHEME_SHORTNAME
 }
 
-input ComponentColumnsTextColumnFiltersInput {
-  ColumnHeadline: StringFilterInput
-  ColumnText: StringFilterInput
-  BulletItems: ComponentColumnsColumnItemFiltersInput
-  ColumnActionButton: ComponentLinksActionButtonFiltersInput
-  and: [ComponentColumnsTextColumnFiltersInput]
-  or: [ComponentColumnsTextColumnFiltersInput]
-  not: ComponentColumnsTextColumnFiltersInput
+input ComponentLinksPartnerlLinkFiltersInput {
+  PartnerLinkUrl: StringFilterInput
+  AltText: StringFilterInput
+  and: [ComponentLinksPartnerlLinkFiltersInput]
+  or: [ComponentLinksPartnerlLinkFiltersInput]
+  not: ComponentLinksPartnerlLinkFiltersInput
 }
 
-type ComponentColumnsTextColumn {
+input ComponentLinksPartnerlLinkInput {
+  id: ID
+  Logo: ID
+  PartnerLinkUrl: String
+  AltText: String
+}
+
+type ComponentLinksPartnerlLink {
   id: ID!
-  ColumnHeadline: String
-  ColumnText: String
-  BulletItems(filters: ComponentColumnsColumnItemFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [ComponentColumnsColumnItem]
-  ColumnActionButton: ComponentLinksActionButton
+  Logo: UploadFile
+  PartnerLinkUrl: String
+  AltText: String
 }
 
-input ComponentColumnsColumnItemFiltersInput {
-  Headline: StringFilterInput
-  ItemBody: StringFilterInput
-  and: [ComponentColumnsColumnItemFiltersInput]
-  or: [ComponentColumnsColumnItemFiltersInput]
-  not: ComponentColumnsColumnItemFiltersInput
+input ComponentLinksActionButtonFiltersInput {
+  Label: StringFilterInput
+  Link: StringFilterInput
+  Primary: BooleanFilterInput
+  and: [ComponentLinksActionButtonFiltersInput]
+  or: [ComponentLinksActionButtonFiltersInput]
+  not: ComponentLinksActionButtonFiltersInput
 }
 
-type ComponentColumnsColumnItem {
+type ComponentLinksActionButton {
   id: ID!
-  Headline: String
-  ItemBody: String
+  Label: String
+  Link: String
+  Primary: Boolean
 }
 
 type ComponentFormTextArea {
@@ -641,6 +609,38 @@ type ComponentFormBooleanChoice {
   BCRequiredValue: Boolean
 }
 
+input ComponentColumnsTextColumnFiltersInput {
+  ColumnHeadline: StringFilterInput
+  ColumnText: StringFilterInput
+  BulletItems: ComponentColumnsColumnItemFiltersInput
+  ColumnActionButton: ComponentLinksActionButtonFiltersInput
+  and: [ComponentColumnsTextColumnFiltersInput]
+  or: [ComponentColumnsTextColumnFiltersInput]
+  not: ComponentColumnsTextColumnFiltersInput
+}
+
+type ComponentColumnsTextColumn {
+  id: ID!
+  ColumnHeadline: String
+  ColumnText: String
+  BulletItems(filters: ComponentColumnsColumnItemFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [ComponentColumnsColumnItem]
+  ColumnActionButton: ComponentLinksActionButton
+}
+
+input ComponentColumnsColumnItemFiltersInput {
+  Headline: StringFilterInput
+  ItemBody: StringFilterInput
+  and: [ComponentColumnsColumnItemFiltersInput]
+  or: [ComponentColumnsColumnItemFiltersInput]
+  not: ComponentColumnsColumnItemFiltersInput
+}
+
+type ComponentColumnsColumnItem {
+  id: ID!
+  Headline: String
+  ItemBody: String
+}
+
 input ComponentCalendarCalendarDocumentFiltersInput {
   Description: StringFilterInput
   VisibleFrom: DateTimeFilterInput
@@ -771,6 +771,23 @@ type ComponentBlocksSlideItem {
   ActionButton: ComponentLinksActionButton
 }
 
+enum ENUM_COMPONENTBLOCKSSIMPLEHEROSECTION_HEROLAYOUT {
+  Image_left
+  Image_right
+}
+
+type ComponentBlocksSimpleHeroSection {
+  id: ID!
+  HeroAnchor: String
+  HeroHeadline: String!
+  HeroTeaser: String
+  HeroImage: UploadFile
+  HeroLayout: ENUM_COMPONENTBLOCKSSIMPLEHEROSECTION_HEROLAYOUT!
+  HeroCta: ComponentLinksActionButton
+  FullWidth: Boolean!
+  ShowLog: Boolean!
+}
+
 type ComponentBlocksSimpleCtaSection {
   id: ID!
   CtaHeadline: String
@@ -787,7 +804,7 @@ enum ENUM_COMPONENTBLOCKSRICHTEXTSECTION_RICHTEXTODDEVEN {
 
 type ComponentBlocksRichTextSection {
   id: ID!
-  Title: String
+  Title: String!
   Subtitle: String
   RichTextContent: String
   RichTextOddEven: ENUM_COMPONENTBLOCKSRICHTEXTSECTION_RICHTEXTODDEVEN
@@ -1875,7 +1892,7 @@ type GlobalLayout {
   publishedAt: DateTime
 }
 
-union IndexPageSectionsDynamicZone = ComponentBlocksRichTextSection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTextColumnsSection | ComponentBlocksImageGallerySection | ComponentBlocksSimpleCtaSection | ComponentBlocksContactGroupSection | ComponentBlocksNewsArticlesSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksContactMailerSection | Error
+union IndexPageSectionsDynamicZone = ComponentBlocksRichTextSection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTextColumnsSection | ComponentBlocksImageGallerySection | ComponentBlocksSimpleCtaSection | ComponentBlocksContactGroupSection | ComponentBlocksNewsArticlesSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksContactMailerSection | ComponentBlocksSimpleHeroSection | Error
 
 scalar IndexPageSectionsDynamicZoneInput
 
@@ -2191,7 +2208,7 @@ type OrderItemEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union PageSectionsDynamicZone = ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksRichTextSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTextColumnsSection | ComponentBlocksImageGallerySection | ComponentBlocksSimpleCtaSection | ComponentBlocksNewsArticlesSection | ComponentBlocksContactGroupSection | ComponentBlocksContactMailerSection | Error
+union PageSectionsDynamicZone = ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksRichTextSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTextColumnsSection | ComponentBlocksImageGallerySection | ComponentBlocksSimpleCtaSection | ComponentBlocksNewsArticlesSection | ComponentBlocksContactGroupSection | ComponentBlocksContactMailerSection | ComponentBlocksSimpleHeroSection | Error
 
 scalar PageSectionsDynamicZoneInput
 
@@ -2367,7 +2384,7 @@ type SupplementalDocumentGroupEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
+union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionGroups | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
 
 input FileInfoInput {
   name: String

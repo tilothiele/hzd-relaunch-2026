@@ -26,7 +26,12 @@ export default async function Home() {
 	}
 
 	const theme = themes.A
-	const renderedSections = renderServerSections({ sections, strapiBaseUrl: baseUrl, theme })
+	const renderedSections = renderServerSections({
+		sections,
+		strapiBaseUrl: baseUrl,
+		theme,
+		logo: globalLayout?.Logo
+	})
 
 	return (
 		<MainPageStructure

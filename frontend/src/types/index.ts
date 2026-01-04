@@ -141,6 +141,19 @@ export interface SimpleCtaSection {
 	SimpleCtaAnchor?: string | null
 }
 
+export interface SimpleHeroSection {
+	__typename: 'ComponentBlocksSimpleHeroSection'
+	HeroAnchor?: string | null
+	HeroHeadline?: string | null
+	HeroTeaser?: string | null
+	HeroImage?: Image | null
+	HeroLayout?: 'Image_left' | 'Image_right' | null
+	HeroCta?: ActionButton | null
+	FullWidth?: boolean | null
+	ShowLog?: boolean | null
+	FadingBorder?: boolean | null
+}
+
 export interface ContactGroupSection {
 	__typename: 'ComponentBlocksContactGroupSection'
 	ContactGroup?: ContactGroup | null
@@ -172,7 +185,7 @@ export interface NewsArticlesSection {
 	NewsArticlesAnchor?: string | null
 }
 
-export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | SimpleCtaSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection
+export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | SimpleCtaSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection
 
 export type PageSection = StartpageSection
 

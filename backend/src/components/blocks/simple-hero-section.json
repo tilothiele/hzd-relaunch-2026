@@ -1,0 +1,59 @@
+{
+  "collectionName": "components_blocks_simple_hero_sections",
+  "info": {
+    "displayName": "SimpleHeroSection"
+  },
+  "options": {},
+  "attributes": {
+    "HeroAnchor": {
+      "type": "string"
+    },
+    "HeroHeadline": {
+      "type": "string",
+      "required": true
+    },
+    "HeroTeaser": {
+      "type": "text"
+    },
+    "HeroImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "HeroLayout": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Image right",
+      "enum": [
+        "Image left",
+        "Image right"
+      ]
+    },
+    "HeroCta": {
+      "type": "component",
+      "component": "links.action-button",
+      "repeatable": false
+    },
+    "FullWidth": {
+      "type": "boolean",
+      "required": true,
+      "default": true
+    },
+    "ShowLog": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    },
+    "FadingBorder": {
+      "type": "boolean",
+      "required": true,
+      "default": true
+    }
+  },
+  "config": {}
+}

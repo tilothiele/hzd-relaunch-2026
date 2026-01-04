@@ -35,7 +35,8 @@
         "blocks.simple-cta-section",
         "blocks.news-articles-section",
         "blocks.contact-group-section",
-        "blocks.contact-mailer-section"
+        "blocks.contact-mailer-section",
+        "blocks.simple-hero-section"
       ]
     },
     "ColorTheme": {

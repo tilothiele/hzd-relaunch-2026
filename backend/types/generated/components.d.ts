@@ -139,7 +139,7 @@ export interface BlocksRichTextSection extends Struct.ComponentSchema {
       >;
     RichTextOddEven: Schema.Attribute.Enumeration<['Odd', 'Even']>;
     Subtitle: Schema.Attribute.String;
-    Title: Schema.Attribute.String;
+    Title: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
 
@@ -162,6 +162,32 @@ export interface BlocksSimpleCtaSection extends Struct.ComponentSchema {
         }
       >;
     SimpleCtaAnchor: Schema.Attribute.String;
+  };
+}
+
+export interface BlocksSimpleHeroSection extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_simple_hero_sections';
+  info: {
+    displayName: 'SimpleHeroSection';
+  };
+  attributes: {
+    FadingBorder: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    FullWidth: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    HeroAnchor: Schema.Attribute.String;
+    HeroCta: Schema.Attribute.Component<'links.action-button', false>;
+    HeroHeadline: Schema.Attribute.String & Schema.Attribute.Required;
+    HeroImage: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    HeroLayout: Schema.Attribute.Enumeration<['Image left', 'Image right']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Image right'>;
+    HeroTeaser: Schema.Attribute.Text;
+    ShowLog: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
   };
 }
 
@@ -605,6 +631,7 @@ declare module '@strapi/strapi' {
       'blocks.news-articles-section': BlocksNewsArticlesSection;
       'blocks.rich-text-section': BlocksRichTextSection;
       'blocks.simple-cta-section': BlocksSimpleCtaSection;
+      'blocks.simple-hero-section': BlocksSimpleHeroSection;
       'blocks.slide-item': BlocksSlideItem;
       'blocks.supplemental-document-group-section': BlocksSupplementalDocumentGroupSection;
       'blocks.teaser-text-with-image': BlocksTeaserTextWithImage;

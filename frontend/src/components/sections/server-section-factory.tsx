@@ -11,12 +11,14 @@ import { SimpleCtaSectionComponent } from './simple-cta-section/simple-cta-secti
 import { ContactGroupSectionComponent } from './contact-group-section/contact-group-section'
 import { NewsArticlesSectionComponent } from './news-articles-section/news-articles-section'
 import { ContactMailerSectionComponent } from './contact-mailer-section/contact-mailer-section'
+import { SimpleHeroSectionComponent } from './simple-hero-section/simple-hero-section'
 
 interface RenderSectionParams {
 	section: StartpageSection
 	strapiBaseUrl: string
 	theme: ThemeDefinition
 	key: string
+	logo?: any // Add logo prop
 }
 
 function renderSection({
@@ -24,6 +26,7 @@ function renderSection({
 	strapiBaseUrl,
 	theme,
 	key,
+	logo,
 }: RenderSectionParams) {
 	switch (section.__typename) {
 		case 'ComponentBlocksNewsArticlesSection':
@@ -125,6 +128,16 @@ function renderSection({
 					theme={theme}
 				/>
 			)
+		case 'ComponentBlocksSimpleHeroSection':
+			return (
+				<SimpleHeroSectionComponent
+					key={key}
+					section={section as any}
+					strapiBaseUrl={strapiBaseUrl}
+					theme={theme}
+					logo={logo}
+				/>
+			)
 		default:
 			return null
 	}
@@ -134,10 +147,12 @@ export function renderServerSections({
 	sections,
 	strapiBaseUrl,
 	theme,
+	logo,
 }: {
 	sections: StartpageSection[] | null | undefined
 	strapiBaseUrl: string
 	theme: ThemeDefinition
+	logo?: any // Add logo prop
 }) {
 	if (!sections?.length) {
 		return null
@@ -146,8 +161,7 @@ export function renderServerSections({
 	return sections
 		.map((section, index) => {
 			const key = `${section.__typename}-${index}`
-			return renderSection({ section, strapiBaseUrl, theme, key })
+			return renderSection({ section, strapiBaseUrl, theme, key, logo })
 		})
 		.filter((node) => node !== null)
 }
-

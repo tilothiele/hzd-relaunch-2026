@@ -6,7 +6,8 @@
   "options": {},
   "attributes": {
     "Title": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "Subtitle": {
       "type": "string"

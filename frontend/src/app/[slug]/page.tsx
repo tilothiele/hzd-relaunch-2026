@@ -66,7 +66,12 @@ export default async function Page({ params }: PageProps) {
 
 	const sections = page.Sections || []
 	const theme = themes[page.ColorTheme?.ShortName ?? 'A']
-	const renderedSections = renderServerSections({ sections, strapiBaseUrl: baseUrl, theme })
+	const renderedSections = renderServerSections({
+		sections,
+		strapiBaseUrl: baseUrl,
+		theme,
+		logo: globalLayout?.Logo
+	})
 
 	return (
 		<MainPageStructure

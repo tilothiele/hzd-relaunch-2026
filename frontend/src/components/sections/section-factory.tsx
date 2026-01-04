@@ -13,11 +13,13 @@ import { SimpleCtaSectionComponent } from './simple-cta-section/simple-cta-secti
 import { ContactGroupSectionComponent } from './contact-group-section/contact-group-section'
 import { NewsArticlesSectionComponent } from './news-articles-section/news-articles-section'
 import { ContactMailerSectionComponent } from './contact-mailer-section/contact-mailer-section'
+import { SimpleHeroSectionComponent } from './simple-hero-section/simple-hero-section'
 
 interface RenderStartpageSectionsParams {
 	sections: StartpageSection[] | null | undefined
 	strapiBaseUrl: string
 	theme: ThemeDefinition
+	logo?: any // Add logo prop
 }
 
 interface RenderSectionParams {
@@ -25,6 +27,7 @@ interface RenderSectionParams {
 	strapiBaseUrl: string
 	theme: ThemeDefinition
 	key: string
+	logo?: any // Add logo prop
 }
 
 function renderStartpageSection({
@@ -32,6 +35,7 @@ function renderStartpageSection({
 	strapiBaseUrl,
 	theme,
 	key,
+	logo,
 }: RenderSectionParams) {
 	switch (section.__typename) {
 		case 'ComponentBlocksHeroSectionSlideShow':
@@ -133,6 +137,16 @@ function renderStartpageSection({
 					theme={theme}
 				/>
 			)
+		case 'ComponentBlocksSimpleHeroSection':
+			return (
+				<SimpleHeroSectionComponent
+					key={key}
+					section={section as any}
+					strapiBaseUrl={strapiBaseUrl}
+					theme={theme}
+					logo={logo}
+				/>
+			)
 		default:
 			return null
 	}
@@ -142,6 +156,7 @@ export function renderStartpageSections({
 	sections,
 	strapiBaseUrl,
 	theme,
+	logo,
 }: RenderStartpageSectionsParams) {
 
 	if (!sections?.length) {
@@ -151,8 +166,7 @@ export function renderStartpageSections({
 	return sections
 		.map((section, index) => {
 			const key = `${section.__typename}-${index}`
-			return renderStartpageSection({ section, strapiBaseUrl, theme, key })
+			return renderStartpageSection({ section, strapiBaseUrl, theme, key, logo })
 		})
 		.filter((node) => node !== null)
 }
-
