@@ -2,13 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
-import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, ToggleButtonGroup, ToggleButton, Tooltip } from '@mui/material'
+import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, ToggleButtonGroup, ToggleButton, Tooltip, FormControlLabel } from '@mui/material'
 import GridViewIcon from '@mui/icons-material/GridView'
 import TableRowsIcon from '@mui/icons-material/TableRows'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { fetchGraphQL } from '@/lib/graphql-client'
 import { SEARCH_LITTERS } from '@/lib/graphql/queries'
-import type { Litter, LitterSearchResult, HzdSetting } from '@/types'
+import type { Litter, LitterSearchResult, HzdSetting, GeoLocation } from '@/types'
+import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
+import { MeinePlz } from '@/components/hzd-map/meine-plz'
 
 interface LitterSearchProps {
 	strapiBaseUrl: string
@@ -17,14 +19,41 @@ interface LitterSearchProps {
 
 type PageSize = 5 | 10 | 20
 
+// Deutschland grobe Grenzen: Lat 47-55, Lon 5-15
+const GERMANY_BOUNDS = {
+	minLat: 47.0,
+	maxLat: 55.0,
+	minLng: 5.0,
+	maxLng: 15.0,
+}
+
+/**
+ * Generiert deterministische Fake-Koordinaten basierend auf der documentId
+ * Dies stellt sicher, dass jeder Wurf immer die gleichen Koordinaten hat
+ */
+function generateFakeLocationForLitter(documentId: string): GeoLocation {
+	let hash = 0
+	for (let i = 0; i < documentId.length; i++) {
+		const char = documentId.charCodeAt(i)
+		hash = ((hash << 5) - hash) + char
+		hash = hash & hash // Convert to 32bit integer
+	}
+	const normalizedHash = Math.abs(hash) / 2147483647
+	const lat = GERMANY_BOUNDS.minLat + normalizedHash * (GERMANY_BOUNDS.maxLat - GERMANY_BOUNDS.minLat)
+	const lng = GERMANY_BOUNDS.minLng + (1 - normalizedHash) * (GERMANY_BOUNDS.maxLng - GERMANY_BOUNDS.minLng)
+	return { lat, lng }
+}
+
 export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 	const [breederFilter, setBreederFilter] = useState('')
 	const [motherFilter, setMotherFilter] = useState('')
 	const [closedFilter, setClosedFilter] = useState<'' | 'true' | 'false'>('')
-	const [selectedColors, setSelectedColors] = useState<string[]>([])
+	const [selectedColors, setSelectedColors] = useState<string[]>(['S', 'SM', 'B'])
 	const [page, setPage] = useState(1)
 	const [pageSize, setPageSize] = useState<PageSize>(10)
 	const [litters, setLitters] = useState<Litter[]>([])
+	const [showMap, setShowMap] = useState(false)
+	const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
 	const [isLoading, setIsLoading] = useState(false)
 	const [error, setError] = useState<Error | null>(null)
 	const [totalLitters, setTotalLitters] = useState(0)
@@ -162,13 +191,77 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 		}
 	}, [])
 
+	// Konvertiere Würfe in MapItems
+	const mapItems = useMemo<MapItem[]>(() => litters.map((litter) => {
+		const breeder = litter.breeder
+		let location = breeder?.GeoLocation
+
+		if (!location || !location.lat || !location.lng) {
+			location = generateFakeLocationForLitter(litter.documentId)
+		}
+
+		const orderLetter = litter.OrderLetter ?? ''
+		const kennelName = breeder?.kennelName ?? 'Unbekannt'
+		const title = `${orderLetter}-Wurf: ${kennelName}`
+
+		return {
+			id: litter.documentId,
+			position: [location.lat!, location.lng!],
+			title,
+			popupContent: (
+				<div>
+					<strong>{title}</strong>
+					{litter.dateOfBirth ? (
+						<div>Geboren: {formatDate(litter.dateOfBirth)}</div>
+					) : litter.expectedDateOfBirth ? (
+						<div>Erwartet: {formatDate(litter.expectedDateOfBirth)}</div>
+					) : null}
+					{breeder?.member?.zip && (
+						<div>PLZ: {breeder.member.zip}</div>
+					)}
+				</div>
+			)
+		}
+	}), [litters, formatDate])
+
 	return (
 		<div className='container mx-auto px-4 py-8'>
 			<Box className='mb-8 rounded-lg bg-white p-6 shadow-md'>
 				<h2 className='mb-6 text-2xl font-bold text-gray-900'>
 					Würfe suchen
 				</h2>
+
+				<Box className='mb-6 rounded border border-gray-100 bg-gray-50/50 p-2'>
+					<FormControlLabel
+						control={
+							<Switch
+								checked={showMap}
+								onChange={(e) => setShowMap(e.target.checked)}
+								sx={{
+									'& .MuiSwitch-switchBase.Mui-checked': {
+										color: '#facc15',
+									},
+									'& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+										backgroundColor: '#facc15',
+									},
+								}}
+							/>
+						}
+						label='Kartenansicht'
+					/>
+				</Box>
+
+				{showMap && (
+					<Box sx={{ mb: 4 }}>
+						<HzdMap isVisible={showMap} items={mapItems} userLocation={userLocation} height="400px" />
+					</Box>
+				)}
+
 				<Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 2 }}>
+					<MeinePlz
+						onLocationChange={setUserLocation}
+						fullWidth={true}
+					/>
 					<TextField
 						label='Züchter'
 						value={breederFilter}

@@ -412,14 +412,7 @@ export interface Litter {
 	AmountSM?: PuppyAmount | null
 	AmountB?: PuppyAmount | null
 	OrderLetter: string
-	breeder?: {
-		documentId: string
-		kennelName?: string | null
-		member?: {
-			firstName?: string | null
-			lastName?: string | null
-		} | null
-	} | null
+	breeder?: Breeder | null
 	mother?: {
 		documentId: string
 		fullKennelName?: string | null
