@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
-import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
+import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, ToggleButtonGroup, ToggleButton, Tooltip } from '@mui/material'
 import GridViewIcon from '@mui/icons-material/GridView'
 import TableRowsIcon from '@mui/icons-material/TableRows'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
@@ -21,6 +21,7 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 	const [breederFilter, setBreederFilter] = useState('')
 	const [motherFilter, setMotherFilter] = useState('')
 	const [closedFilter, setClosedFilter] = useState<'' | 'true' | 'false'>('')
+	const [selectedColors, setSelectedColors] = useState<string[]>([])
 	const [page, setPage] = useState(1)
 	const [pageSize, setPageSize] = useState<PageSize>(10)
 	const [litters, setLitters] = useState<Litter[]>([])
@@ -62,6 +63,13 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 				filterConditions.push({
 					closed: closedFilter === 'true' ? { eq: true } : { ne: true },
 				})
+			}
+
+			if (selectedColors.length > 0) {
+				const colorFilters = selectedColors.map(color => ({
+					[`Amount${color}`]: { Available: { gt: 0 } }
+				}))
+				filterConditions.push({ or: colorFilters })
 			}
 
 			const variables: Record<string, unknown> = {
@@ -114,7 +122,7 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [strapiBaseUrl, breederFilter, motherFilter, closedFilter, page, pageSize])
+	}, [strapiBaseUrl, breederFilter, motherFilter, closedFilter, selectedColors, page, pageSize])
 
 	useEffect(() => {
 		void searchLitters()
@@ -202,7 +210,44 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 						</Select>
 					</FormControl>
 				</Box>
-				<Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+
+				<Box sx={{ mt: 3, display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'center', justifyContent: 'space-between' }}>
+					<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
+						<Typography variant="body2" sx={{ fontWeight: 500, mr: 1 }}>Verfügbare Welpen in den Farbschlägen:</Typography>
+						<ToggleButtonGroup
+							value={selectedColors}
+							onChange={(_e, newColors: string[]) => {
+								setSelectedColors(newColors)
+								setPage(1)
+							}}
+							aria-label="Filter nach Welpenfarbe"
+							size="small"
+							sx={{
+								"& .MuiToggleButton-root": {
+									px: 3,
+									fontWeight: 'bold',
+									"&.Mui-selected": {
+										backgroundColor: '#facc15',
+										color: '#565757',
+										"&:hover": {
+											backgroundColor: '#e6b800',
+										}
+									}
+								}
+							}}
+						>
+							<Tooltip title="Schwarz" arrow>
+								<ToggleButton value="S" aria-label="Schwarz">S</ToggleButton>
+							</Tooltip>
+							<Tooltip title="Schwarzmarken" arrow>
+								<ToggleButton value="SM" aria-label="Schwarzmarken">SM</ToggleButton>
+							</Tooltip>
+							<Tooltip title="Blond" arrow>
+								<ToggleButton value="B" aria-label="Blond">B</ToggleButton>
+							</Tooltip>
+						</ToggleButtonGroup>
+					</Box>
+
 					<Button
 						variant='contained'
 						onClick={handleSearch}
