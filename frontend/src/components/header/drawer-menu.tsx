@@ -24,7 +24,8 @@ import {
     faVenusMars,
     faBullhorn,
     faPoll,
-    faFileLines,
+    faFile,
+    faComment,
     faBone,
     faCircle,
     faHouse,
@@ -40,11 +41,15 @@ import type { Menu as MenuType, MenuItem as MenuItemType } from '@/types'
 // Map icon strings from JSON to FontAwesome icons
 const iconMap: Record<string, any> = {
     'fa-calendar': faCalendar,
-    'fa-prawn': faPaw, // "Welpen/Würfe" -> Paw
+    'fa-paw': faPaw, // "Welpen/Würfe" -> Paw
     'fa-venus-mars': faVenusMars,
     'fa-speaker': faBullhorn,
     'fa-result': faPoll,
     'fa-letter': faEnvelope,
+    'fa-bone': faBone,
+    'fa-comment': faComment,
+    'fa-report': faReport,
+    'fa-file': faFile,
     'fa-user': faUser,
     'fa-home': faHouse,
     'fa-newspaper': faNewspaper,
@@ -245,7 +250,7 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                         }}
                     >
                         <Typography variant='h6' sx={{ fontWeight: 800, color: '#1a3673', letterSpacing: '-0.02em' }}>
-                            Menü
+                            Kurzmenü
                         </Typography>
                         <IconButton onClick={toggleDrawer(false)} size='small'>
                             <CloseIcon />
