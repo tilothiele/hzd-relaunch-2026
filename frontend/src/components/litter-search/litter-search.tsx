@@ -58,6 +58,17 @@ function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: numbe
 	return R * c
 }
 
+/**
+ * Ermittelt die Position eines Wurfs (real oder fake)
+ */
+function getLitterLocation(litter: Litter): { lat: number; lng: number } {
+	const breederLocation = litter.breeder?.GeoLocation
+	if (breederLocation && breederLocation.lat && breederLocation.lng) {
+		return { lat: breederLocation.lat, lng: breederLocation.lng }
+	}
+	return generateFakeLocationForLitter(litter.documentId)
+}
+
 export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 	const [breederFilter, setBreederFilter] = useState('')
 	const [motherFilter, setMotherFilter] = useState('')
@@ -208,11 +219,7 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 	// Konvertiere Würfe in MapItems
 	const mapItems = useMemo<MapItem[]>(() => litters.map((litter) => {
 		const breeder = litter.breeder
-		let location = breeder?.GeoLocation
-
-		if (!location || !location.lat || !location.lng) {
-			location = generateFakeLocationForLitter(litter.documentId)
-		}
+		const location = getLitterLocation(litter)
 
 		const orderLetter = litter.OrderLetter ?? ''
 		const kennelName = breeder?.kennelName ?? 'Unbekannt'
@@ -220,7 +227,7 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 
 		return {
 			id: litter.documentId,
-			position: [location.lat!, location.lng!],
+			position: [location.lat, location.lng],
 			title,
 			popupContent: (
 				<div>
@@ -448,13 +455,16 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 								const stuntDogName = litter.stuntDog?.fullKennelName ?? litter.stuntDog?.givenName
 
 								let distance: number | null = null
-								if (userLocation && litter.breeder?.GeoLocation?.lat && litter.breeder?.GeoLocation?.lng) {
-									distance = calculateDistance(
-										userLocation.lat,
-										userLocation.lng,
-										litter.breeder.GeoLocation.lat,
-										litter.breeder.GeoLocation.lng
-									)
+								if (userLocation) {
+									const location = getLitterLocation(litter)
+									if (location) {
+										distance = calculateDistance(
+											userLocation.lat,
+											userLocation.lng,
+											location.lat,
+											location.lng
+										)
+									}
 								}
 
 								return (
@@ -613,12 +623,13 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 										const stuntDogName = litter.stuntDog?.fullKennelName ?? litter.stuntDog?.givenName ?? '-'
 
 										let distance: number | null = null
-										if (userLocation && litter.breeder?.GeoLocation?.lat && litter.breeder?.GeoLocation?.lng) {
+										if (userLocation) {
+											const location = getLitterLocation(litter)
 											distance = calculateDistance(
 												userLocation.lat,
 												userLocation.lng,
-												litter.breeder.GeoLocation.lat,
-												litter.breeder.GeoLocation.lng
+												location.lat,
+												location.lng
 											)
 										}
 
