@@ -44,6 +44,20 @@ function generateFakeLocationForLitter(documentId: string): GeoLocation {
 	return { lat, lng }
 }
 
+/**
+ * Berechnet die Entfernung zwischen zwei Koordinaten in Kilometern (Haversine-Formel)
+ */
+function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+	const R = 6371 // Erdradius in Kilometern
+	const dLat = (lat2 - lat1) * Math.PI / 180
+	const dLng = (lng2 - lng1) * Math.PI / 180
+	const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+		Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+		Math.sin(dLng / 2) * Math.sin(dLng / 2)
+	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+	return R * c
+}
+
 export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 	const [breederFilter, setBreederFilter] = useState('')
 	const [motherFilter, setMotherFilter] = useState('')
@@ -433,6 +447,16 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 								const motherName = litter.mother?.fullKennelName ?? litter.mother?.givenName ?? 'Unbekannt'
 								const stuntDogName = litter.stuntDog?.fullKennelName ?? litter.stuntDog?.givenName
 
+								let distance: number | null = null
+								if (userLocation && litter.breeder?.GeoLocation?.lat && litter.breeder?.GeoLocation?.lng) {
+									distance = calculateDistance(
+										userLocation.lat,
+										userLocation.lng,
+										litter.breeder.GeoLocation.lat,
+										litter.breeder.GeoLocation.lng
+									)
+								}
+
 								return (
 									<div
 										key={litter.documentId}
@@ -503,6 +527,11 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 											<p>
 												<strong>Züchter:</strong> {breederMember}
 											</p>
+											{distance !== null && (
+												<p>
+													<strong>Entfernung:</strong> ~{Math.round(distance)} km
+												</p>
+											)}
 											<p>
 												<strong>Mutter:</strong> {motherName}
 											</p>
@@ -565,6 +594,7 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 										<TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
 										<TableCell sx={{ fontWeight: 'bold' }}>Wurf-Nr.</TableCell>
 										<TableCell sx={{ fontWeight: 'bold' }}>Züchter</TableCell>
+										<TableCell sx={{ fontWeight: 'bold' }}>Entfernung</TableCell>
 										<TableCell sx={{ fontWeight: 'bold' }}>Mutter</TableCell>
 										<TableCell sx={{ fontWeight: 'bold' }}>Deckrüde</TableCell>
 										<TableCell sx={{ fontWeight: 'bold' }}>Erw. Geb. Datum</TableCell>
@@ -582,6 +612,16 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 										const motherName = litter.mother?.fullKennelName ?? litter.mother?.givenName ?? 'Unbekannt'
 										const stuntDogName = litter.stuntDog?.fullKennelName ?? litter.stuntDog?.givenName ?? '-'
 
+										let distance: number | null = null
+										if (userLocation && litter.breeder?.GeoLocation?.lat && litter.breeder?.GeoLocation?.lng) {
+											distance = calculateDistance(
+												userLocation.lat,
+												userLocation.lng,
+												litter.breeder.GeoLocation.lat,
+												litter.breeder.GeoLocation.lng
+											)
+										}
+
 										return (
 											<TableRow key={litter.documentId} hover>
 												<TableCell>
@@ -595,6 +635,9 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 												<TableCell>
 													<div className="font-medium text-gray-900">{kennelName}</div>
 													<div className="text-xs text-gray-500">{breederMember}</div>
+												</TableCell>
+												<TableCell>
+													{distance !== null ? `~${Math.round(distance)} km` : '-'}
 												</TableCell>
 												<TableCell>{motherName}</TableCell>
 												<TableCell>{stuntDogName}</TableCell>
