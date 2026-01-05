@@ -1895,6 +1895,23 @@ type GlobalLayout {
   publishedAt: DateTime
 }
 
+input HzdSettingInput {
+  DefaultAvatarB: ID
+  DefaultAvatarSM: ID
+  DefaultAvatarS: ID
+  publishedAt: DateTime
+}
+
+type HzdSetting {
+  documentId: ID!
+  DefaultAvatarB: UploadFile
+  DefaultAvatarSM: UploadFile
+  DefaultAvatarS: UploadFile
+  createdAt: DateTime
+  updatedAt: DateTime
+  publishedAt: DateTime
+}
+
 union IndexPageSectionsDynamicZone = ComponentBlocksRichTextSection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTextColumnsSection | ComponentBlocksImageGallerySection | ComponentBlocksSimpleCtaSection | ComponentBlocksContactGroupSection | ComponentBlocksNewsArticlesSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksContactMailerSection | ComponentBlocksSimpleHeroSection | Error
 
 scalar IndexPageSectionsDynamicZoneInput
@@ -2387,7 +2404,7 @@ type SupplementalDocumentGroupEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
+union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
 
 input FileInfoInput {
   name: String
@@ -2511,6 +2528,7 @@ type Query {
   formInstances_connection(filters: FormInstanceFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): FormInstanceEntityResponseCollection
   formInstances(filters: FormInstanceFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [FormInstance]!
   globalLayout(status: PublicationStatus = PUBLISHED): GlobalLayout
+  hzdSetting(status: PublicationStatus = PUBLISHED): HzdSetting
   indexPage(status: PublicationStatus = PUBLISHED): IndexPage
   localCummunity(documentId: ID!, status: PublicationStatus = PUBLISHED): LocalCummunity
   localCummunities_connection(filters: LocalCummunityFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): LocalCummunityEntityResponseCollection
@@ -2585,6 +2603,8 @@ type Mutation {
   deleteFormInstance(documentId: ID!): DeleteMutationResponse
   updateGlobalLayout(status: PublicationStatus = PUBLISHED, data: GlobalLayoutInput!): GlobalLayout
   deleteGlobalLayout: DeleteMutationResponse
+  updateHzdSetting(status: PublicationStatus = PUBLISHED, data: HzdSettingInput!): HzdSetting
+  deleteHzdSetting: DeleteMutationResponse
   updateIndexPage(status: PublicationStatus = PUBLISHED, data: IndexPageInput!): IndexPage
   deleteIndexPage: DeleteMutationResponse
   createLocalCummunity(status: PublicationStatus = PUBLISHED, data: LocalCummunityInput!): LocalCummunity

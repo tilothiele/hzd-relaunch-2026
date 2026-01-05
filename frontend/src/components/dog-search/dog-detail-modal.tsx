@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Tabs, Tab, Box, IconButton } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import type { Dog } from '@/types'
+import type { Dog, HzdSetting } from '@/types'
 import { DogDataTab } from './dog-detail-modal/dog-data-tab'
 import { DogPedigreeTab } from './dog-detail-modal/dog-pedigree-tab'
 import { DogPersonalWordsTab } from './dog-detail-modal/dog-personal-words-tab'
@@ -16,6 +16,7 @@ interface DogDetailModalProps {
 	strapiBaseUrl: string | null | undefined
 	isOpen: boolean
 	onClose: () => void
+	hzdSetting?: HzdSetting | null
 }
 
 type TabId = 0 | 1 | 2 | 3 | 4 | 5
@@ -25,6 +26,7 @@ export function DogDetailModal({
 	strapiBaseUrl,
 	isOpen,
 	onClose,
+	hzdSetting,
 }: DogDetailModalProps) {
 	const [activeTab, setActiveTab] = useState<TabId>(0)
 
@@ -137,7 +139,7 @@ export function DogDetailModal({
 					{/* Tab Panels */}
 					<Box sx={{ mt: 3, minHeight: '400px', height: activeTab === 5 ? '500px' : 'auto' }}>
 						{activeTab === 0 && (
-							<DogDataTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
+							<DogDataTab dog={dog} strapiBaseUrl={strapiBaseUrl} hzdSetting={hzdSetting} />
 						)}
 
 						{activeTab === 1 && (

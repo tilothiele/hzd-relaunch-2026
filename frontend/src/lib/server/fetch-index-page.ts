@@ -10,6 +10,7 @@ interface IndexPageData {
 
 interface LayoutData {
 	globalLayout: GlobalLayout
+	hzdSetting?: GlobalLayout['HzdSetting']
 }
 
 export interface IndexPageResult {
@@ -34,6 +35,7 @@ export async function fetchIndexPage(): Promise<IndexPageResult> {
 		// Kombiniere Layout-Daten mit Sections aus indexPage
 		const combinedLayout: GlobalLayout = {
 			...layoutData.globalLayout,
+			HzdSetting: layoutData.hzdSetting ?? null,
 			Sections: indexPageData.indexPage.Sections ?? null,
 		}
 

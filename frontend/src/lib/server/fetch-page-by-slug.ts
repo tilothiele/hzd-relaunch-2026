@@ -8,6 +8,7 @@ interface PageQueryResult {
 
 interface LayoutData {
 	globalLayout: GlobalLayout
+	hzdSetting?: GlobalLayout['HzdSetting']
 }
 
 export interface PageBySlugResult {
@@ -25,6 +26,10 @@ export async function fetchGlobalLayout(): Promise<{ globalLayout: GlobalLayout 
 	try {
 		const baseUrl = getStrapiBaseUrl()
 		const layoutData = await fetchGraphQLServer<LayoutData>(GET_LAYOUT, { baseUrl })
+
+		if (layoutData.globalLayout) {
+			layoutData.globalLayout.HzdSetting = layoutData.hzdSetting ?? null
+		}
 
 		return {
 			globalLayout: layoutData.globalLayout,
@@ -69,6 +74,10 @@ export async function fetchPageBySlug(slug: string): Promise<PageBySlugResult> {
 			const entitySlug = entity?.slug
 			return entitySlug?.toLowerCase() === normalizedSlug.toLowerCase()
 		}) ?? null
+
+		if (layoutData.globalLayout) {
+			layoutData.globalLayout.HzdSetting = layoutData.hzdSetting ?? null
+		}
 
 		return {
 			page: matchingPage,

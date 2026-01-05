@@ -2,34 +2,36 @@
 
 import Image from 'next/image'
 import { Checkbox, Tooltip } from '@mui/material'
-import type { Dog } from '@/types'
+import type { Dog, HzdSetting } from '@/types'
+import { resolveMediaUrl } from '@/components/header/logo-utils'
 
 interface DogDataTabProps {
 	dog: Dog
 	strapiBaseUrl: string | null | undefined
+	hzdSetting?: HzdSetting | null
 }
 
 function getColorLabel(color: string | null | undefined): string {
 	switch (color) {
-	case 'S':
-		return 'Schwarz'
-	case 'SM':
-		return 'Schwarzmarken'
-	case 'B':
-		return 'Blond'
-	default:
-		return '-'
+		case 'S':
+			return 'Schwarz'
+		case 'SM':
+			return 'Schwarzmarken'
+		case 'B':
+			return 'Blond'
+		default:
+			return '-'
 	}
 }
 
 function getSexLabel(sex: string | null | undefined): string {
 	switch (sex) {
-	case 'M':
-		return 'Rüde'
-	case 'F':
-		return 'Hündin'
-	default:
-		return '-'
+		case 'M':
+			return 'Rüde'
+		case 'F':
+			return 'Hündin'
+		default:
+			return '-'
 	}
 }
 
@@ -52,12 +54,12 @@ function formatDate(dateString: string | null | undefined): string {
 
 function getGivenNameIcon(sex: string | null | undefined): string {
 	switch (sex) {
-	case 'M':
-		return '/icons/zucht-icon-vater-hzd-hovawart-zuchtgemeinschaft.png'
-	case 'F':
-		return '/icons/zucht-icon-mutter-hzd-hovawart-zuchtgemeinschaft.png'
-	default:
-		return '/icons/zucht-icon-zwinger-hzd-hovawart-zuchtgemeinschaft.png'
+		case 'M':
+			return '/icons/zucht-icon-vater-hzd-hovawart-zuchtgemeinschaft.png'
+		case 'F':
+			return '/icons/zucht-icon-mutter-hzd-hovawart-zuchtgemeinschaft.png'
+		default:
+			return '/icons/zucht-icon-zwinger-hzd-hovawart-zuchtgemeinschaft.png'
 	}
 }
 
@@ -120,7 +122,7 @@ function calculateAge(dateOfBirth: string | null | undefined): string | null {
 	}
 }
 
-export function DogDataTab({ dog, strapiBaseUrl }: DogDataTabProps) {
+export function DogDataTab({ dog, strapiBaseUrl, hzdSetting }: DogDataTabProps) {
 	const avatarUrl = dog.avatar?.url
 	const avatarAlt = dog.avatar?.alternativeText ?? 'Hund'
 	const baseUrl = strapiBaseUrl ?? ''
@@ -129,22 +131,22 @@ export function DogDataTab({ dog, strapiBaseUrl }: DogDataTabProps) {
 	return (
 		<div>
 			{/* Image */}
-			{avatarUrl ? (
-				<div className='mb-6 h-96 w-full overflow-hidden rounded-lg'>
-					<Image
-						src={`${baseUrl}${avatarUrl}`}
-						alt={avatarAlt}
-						width={800}
-						height={384}
-						className='h-full w-full object-cover object-center'
-						unoptimized
-					/>
-				</div>
-			) : (
-				<div className='mb-6 flex h-96 w-full items-center justify-center rounded-lg bg-gray-100 text-gray-400'>
-					Kein Bild verfügbar
-				</div>
-			)}
+			<div className='mb-6 h-96 w-full overflow-hidden rounded-lg bg-gray-100'>
+				<Image
+					src={resolveMediaUrl(
+						dog.avatar ||
+						(dog.color === 'SM' ? hzdSetting?.DefaultAvatarSM :
+							dog.color === 'B' ? hzdSetting?.DefaultAvatarB :
+								hzdSetting?.DefaultAvatarS) || null,
+						strapiBaseUrl
+					) || '/static-images/hovis/hovi-schwarz.png'}
+					alt={avatarAlt}
+					width={800}
+					height={384}
+					className='h-full w-full object-cover object-center'
+					unoptimized
+				/>
+			</div>
 
 			{/* Details Grid */}
 			<div className='grid gap-6 md:grid-cols-2'>
@@ -423,9 +425,8 @@ export function DogDataTab({ dog, strapiBaseUrl }: DogDataTabProps) {
 							</div>
 							<div>
 								<p
-									className={`text-base text-gray-900 ${
-										dog.ColorCheck !== true ? 'line-through' : ''
-									}`}
+									className={`text-base text-gray-900 ${dog.ColorCheck !== true ? 'line-through' : ''
+										}`}
 								>
 									Farbverdünnung
 								</p>

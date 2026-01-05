@@ -212,6 +212,12 @@ export interface PartnerLink {
 	AltText?: string | null
 }
 
+export interface HzdSetting {
+	DefaultAvatarS?: Image | null
+	DefaultAvatarSM?: Image | null
+	DefaultAvatarB?: Image | null
+}
+
 export interface GlobalLayout {
 	Logo?: Image | null
 	Footer?: Footer | null
@@ -220,6 +226,7 @@ export interface GlobalLayout {
 	Copyright?: string | null
 	SocialLinkFB?: string | null
 	SocialLinkYT?: string | null
+	HzdSetting?: HzdSetting | null
 	Sections?: StartpageSection[] | null
 	PartnerLink?: PartnerLink[] | null
 	PrivacyPolicy?: Image | null
@@ -361,12 +368,7 @@ export interface Dog {
 	Location?: GeoLocation | null
 	Exhibitions?: string | null
 	BreedSurvey?: string | null
-	avatar?: {
-		url?: string | null
-		alternativeText?: string | null
-		width?: number | null
-		height?: number | null
-	} | null
+	avatar?: Image | null
 }
 
 export interface DogSearchResult {
@@ -422,11 +424,15 @@ export interface Litter {
 		documentId: string
 		fullKennelName?: string | null
 		givenName?: string | null
+		avatar?: Image | null
+		color?: 'S' | 'SM' | 'B' | null
 	} | null
 	stuntDog?: {
 		documentId: string
 		fullKennelName?: string | null
 		givenName?: string | null
+		avatar?: Image | null
+		color?: 'S' | 'SM' | 'B' | null
 	} | null
 }
 
@@ -448,6 +454,7 @@ export interface IndexPageQueryResult {
 
 export interface GlobalLayoutQueryResult {
 	globalLayout: GlobalLayout
+	hzdSetting?: HzdSetting | null
 }
 
 export interface ContactsQueryResult {

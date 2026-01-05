@@ -53,6 +53,26 @@ export const GET_LAYOUT = `
 				previewUrl
 			}
 		}
+		hzdSetting {
+			DefaultAvatarS {
+				url
+				alternativeText
+				width
+				height
+			}
+			DefaultAvatarSM {
+				url
+				alternativeText
+				width
+				height
+			}
+			DefaultAvatarB {
+				url
+				alternativeText
+				width
+				height
+			}
+		}
 	}
 `
 

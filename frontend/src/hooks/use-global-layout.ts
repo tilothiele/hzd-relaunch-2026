@@ -8,6 +8,7 @@ import type { GlobalLayout } from '@/types'
 
 interface LayoutData {
 	globalLayout: GlobalLayout
+	hzdSetting?: GlobalLayout['HzdSetting']
 }
 
 export function useGlobalLayout() {
@@ -25,6 +26,9 @@ export function useGlobalLayout() {
 				GET_LAYOUT,
 				{ baseUrl: resolvedBaseUrl ?? baseUrl },
 			)
+			if (data.globalLayout) {
+				data.globalLayout.HzdSetting = data.hzdSetting ?? null
+			}
 			setGlobalLayout(data.globalLayout)
 			setError(null)
 		} catch (err) {

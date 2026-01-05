@@ -722,6 +722,42 @@ export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiHzdSettingHzdSetting extends Struct.SingleTypeSchema {
+  collectionName: 'hzd_settings';
+  info: {
+    displayName: 'HZD Settings';
+    pluralName: 'hzd-settings';
+    singularName: 'hzd-setting';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    DefaultAvatarB: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
+    DefaultAvatarS: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
+    DefaultAvatarSM: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::hzd-setting.hzd-setting'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiIndexPageIndexPage extends Struct.SingleTypeSchema {
   collectionName: 'index_pages';
   info: {
@@ -1982,6 +2018,7 @@ declare module '@strapi/strapi' {
       'api::form-instance.form-instance': ApiFormInstanceFormInstance;
       'api::form.form': ApiFormForm;
       'api::global-layout.global-layout': ApiGlobalLayoutGlobalLayout;
+      'api::hzd-setting.hzd-setting': ApiHzdSettingHzdSetting;
       'api::index-page.index-page': ApiIndexPageIndexPage;
       'api::local-cummunity.local-cummunity': ApiLocalCummunityLocalCummunity;
       'api::merchandising-product.merchandising-product': ApiMerchandisingProductMerchandisingProduct;

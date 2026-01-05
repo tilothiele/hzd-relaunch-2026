@@ -9,7 +9,7 @@ type ExaminationFilter = 'HD' | 'HeartCheck' | 'Genprofil' | 'EyesCheck' | 'Colo
 import { DogCard } from './dog-card'
 import { DogMap } from './dog-map'
 import { DogDetailModal } from './dog-detail-modal'
-import type { Dog, GeoLocation } from '@/types'
+import type { Dog, GeoLocation, HzdSetting } from '@/types'
 
 // Deutschland grobe Grenzen: Lat 47-55, Lon 5-15
 const GERMANY_BOUNDS = {
@@ -70,9 +70,10 @@ function enrichDogsWithFakeLocations(dogs: Dog[]): Dog[] {
 interface DogSearchProps {
 	strapiBaseUrl?: string | null
 	sexFilter: SexFilter
+	hzdSetting?: HzdSetting | null
 }
 
-export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
+export function DogSearch({ strapiBaseUrl, sexFilter, hzdSetting }: DogSearchProps) {
 	const [nameFilter, setNameFilter] = useState('')
 	const [colorFilter, setColorFilter] = useState<ColorFilter>('')
 	const [chipNoFilter, setChipNoFilter] = useState('')
@@ -259,341 +260,342 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 
 				{/* Karte */}
 				<DogMap isVisible={showMap} dogs={enrichedDogs} userLocation={zipLocation} />
-			<Box className='rounded-lg bg-white p-4 shadow-md'>
-				{/* Erste Zeile: Name, Farbe, Chipnummer */}
-				<Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: 3 }}>
-					<TextField
-						label='Name'
-						value={nameFilter}
-						onChange={(e) => setNameFilter(e.target.value)}
-						onKeyDown={(e) => {
-							if (e.key === 'Enter') {
-								handleSearch()
-							}
-						}}
-						placeholder='Name oder Zuchtname'
-						fullWidth
-						size='small'
-					/>
-
-					<FormControl fullWidth size='small'>
-						<InputLabel>Farbe</InputLabel>
-						<Select
-							value={colorFilter}
-							label='Farbe'
-							onChange={(e) => setColorFilter(e.target.value as ColorFilter)}
-						>
-							<MenuItem value=''>Alle</MenuItem>
-							<MenuItem value='S'>Schwarz</MenuItem>
-							<MenuItem value='SM'>Schwarzmarken</MenuItem>
-							<MenuItem value='B'>Blond</MenuItem>
-						</Select>
-					</FormControl>
-
-					<TextField
-						label='Chipnummer'
-						value={chipNoFilter}
-						onChange={(e) => setChipNoFilter(e.target.value)}
-						onKeyDown={(e) => {
-							if (e.key === 'Enter') {
-								handleSearch()
-							}
-						}}
-						placeholder='Chipnummer'
-						fullWidth
-						size='small'
-					/>
-				</Box>
-
-				{/* Zweite Zeile: SOD1, HD, Untersuchungen (rechts neben HD, unter Chipnummer) */}
-				<Box sx={{ mt: 3, display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 3, alignItems: 'start' }}>
-					<FormControl fullWidth size='small'>
-						<InputLabel>SOD1</InputLabel>
-						<Select
-							multiple
-							value={sod1Filters}
-							label='SOD1'
-							onChange={(e) => {
-								const value = e.target.value
-								setSod1Filters(typeof value === 'string' ? value.split(',') as Sod1Filter[] : value as Sod1Filter[])
-							}}
-							input={<OutlinedInput label='SOD1' />}
-							renderValue={(selected) => (
-								<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-									{selected.map((value) => (
-										<Chip key={value} label={formatSod1ForDisplay(value)} size='small' />
-									))}
-								</Box>
-							)}
-						>
-							<MenuItem value='N_N'>N/N</MenuItem>
-							<MenuItem value='N_DM'>N/DM</MenuItem>
-							<MenuItem value='DM_DM'>DM/DM</MenuItem>
-						</Select>
-					</FormControl>
-
-					<FormControl fullWidth size='small'>
-						<InputLabel>HD</InputLabel>
-						<Select
-							multiple
-							value={hdFilters}
-							label='HD'
-							onChange={(e) => {
-								const value = e.target.value
-								setHdFilters(typeof value === 'string' ? value.split(',') as HDFilter[] : value as HDFilter[])
-							}}
-							input={<OutlinedInput label='HD' />}
-							renderValue={(selected) => (
-								<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-									{selected.map((value) => (
-										<Chip key={value} label={value} size='small' />
-									))}
-								</Box>
-							)}
-						>
-							<MenuItem value='A1'>A1</MenuItem>
-							<MenuItem value='A2'>A2</MenuItem>
-							<MenuItem value='B1'>B1</MenuItem>
-							<MenuItem value='B2'>B2</MenuItem>
-						</Select>
-					</FormControl>
-
-					<FormControl fullWidth size='small'>
-						<InputLabel>Untersuchungen</InputLabel>
-						<Select
-							multiple
-							value={examinationFilters}
-							label='Untersuchungen'
-							onChange={(e) => {
-								const value = e.target.value
-								setExaminationFilters(typeof value === 'string' ? value.split(',') as ExaminationFilter[] : value as ExaminationFilter[])
-							}}
-							input={<OutlinedInput label='Untersuchungen' />}
-							renderValue={(selected) => (
-								<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-									{selected.map((value) => {
-										const labels: Record<ExaminationFilter, string> = {
-											HD: 'Nur HD',
-											HeartCheck: 'Nur mit Herzuntersuchung',
-											Genprofil: 'Nur mit Genprofil',
-											EyesCheck: 'Nur mit Augenuntersuchung',
-											ColorCheck: 'Nur mit Farbverdünnung',
-										}
-										return (
-											<Chip key={value} label={labels[value]} size='small' />
-										)
-									})}
-								</Box>
-							)}
-						>
-							<MenuItem value='HD'>Nur HD</MenuItem>
-							<MenuItem value='HeartCheck'>Nur mit Herzuntersuchung</MenuItem>
-							<MenuItem value='Genprofil'>Nur mit Genprofil</MenuItem>
-							<MenuItem value='EyesCheck'>Nur mit Augenuntersuchung</MenuItem>
-							<MenuItem value='ColorCheck'>Nur mit Farbverdünnung</MenuItem>
-						</Select>
-					</FormControl>
-				</Box>
-
-				{/* PLZ und Maximale Entfernung */}
-				<Box sx={{ mt: 2, display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 2 }}>
-					<TextField
-						label='MeinePLZ'
-						value={zipCode}
-						onChange={(e) => {
-							const value = e.target.value.replace(/\D/g, '').slice(0, 5) // Nur Zahlen, max. 5 Zeichen
-							setZipCode(value)
-						}}
-						onKeyDown={(e) => {
-							if (e.key === 'Enter') {
-								handleSearch()
-							}
-						}}
-						placeholder='Postleitzahl'
-						fullWidth
-						size='small'
-						helperText={isGeocodingZip ? 'Suche Koordinaten...' : zipLocation ? 'Koordinaten gefunden' : zipCode && zipCode.length === 5 ? 'Koordinaten werden gesucht...' : ''}
-					/>
-					<FormControl fullWidth size='small' disabled={!isLocationAvailable || isGeocodingZip}>
-						<InputLabel>Maximale Entfernung</InputLabel>
-						<Select
-							value={maxDistance === '' ? '' : String(maxDistance)}
-							label='Maximale Entfernung'
-							onChange={(e) => {
-								const value = e.target.value
-								if (value === '') {
-									setMaxDistance('')
-								} else {
-									const numValue = Number(value)
-									if (!isNaN(numValue) && (numValue === 50 || numValue === 100 || numValue === 300 || numValue === 800)) {
-										setMaxDistance(numValue as DistanceFilter)
-									}
+				<Box className='rounded-lg bg-white p-4 shadow-md'>
+					{/* Erste Zeile: Name, Farbe, Chipnummer */}
+					<Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: 3 }}>
+						<TextField
+							label='Name'
+							value={nameFilter}
+							onChange={(e) => setNameFilter(e.target.value)}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter') {
+									handleSearch()
 								}
 							}}
-						>
-							<MenuItem value=''>-</MenuItem>
-							<MenuItem value='50'>50 km</MenuItem>
-							<MenuItem value='100'>100 km</MenuItem>
-							<MenuItem value='300'>300 km</MenuItem>
-							<MenuItem value='800'>800 km</MenuItem>
-						</Select>
-					</FormControl>
-				</Box>
+							placeholder='Name oder Zuchtname'
+							fullWidth
+							size='small'
+						/>
 
-				<Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-					<Button
-						variant='contained'
-						onClick={handleSearch}
-						disabled={isLoading}
-						sx={{
-							backgroundColor: '#facc15',
-							color: '#565757',
-							'&:hover': {
-								backgroundColor: '#e6b800',
-							},
-							'&:disabled': {
-								backgroundColor: '#d1d5db',
-								color: '#9ca3af',
-							},
-						}}
-					>
-						{isLoading ? 'Suche...' : 'Suchen'}
-					</Button>
-				</Box>
-			</Box>
+						<FormControl fullWidth size='small'>
+							<InputLabel>Farbe</InputLabel>
+							<Select
+								value={colorFilter}
+								label='Farbe'
+								onChange={(e) => setColorFilter(e.target.value as ColorFilter)}
+							>
+								<MenuItem value=''>Alle</MenuItem>
+								<MenuItem value='S'>Schwarz</MenuItem>
+								<MenuItem value='SM'>Schwarzmarken</MenuItem>
+								<MenuItem value='B'>Blond</MenuItem>
+							</Select>
+						</FormControl>
 
-			{error ? (
-				<div className='rounded bg-red-50 p-4 text-sm text-red-800'>
-					{error.message}
-				</div>
-			) : null}
+						<TextField
+							label='Chipnummer'
+							value={chipNoFilter}
+							onChange={(e) => setChipNoFilter(e.target.value)}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter') {
+									handleSearch()
+								}
+							}}
+							placeholder='Chipnummer'
+							fullWidth
+							size='small'
+						/>
+					</Box>
 
-			<div className='flex items-center justify-between'>
-				<div className='text-sm text-gray-600'>
-					{totalDogs > 0 ? (
-						<>
-							Zeige {((currentPage - 1) * pageSize) + 1} bis{' '}
-							{Math.min(currentPage * pageSize, totalDogs)} von {totalDogs} Hunden
-						</>
-					) : (
-						'Keine Hunde gefunden'
-					)}
-				</div>
-				<div className='flex items-center gap-2'>
-					<label
-						htmlFor='page-size'
-						className='text-sm text-gray-600'
-					>
-						Pro Seite:
-					</label>
-					<select
-						id='page-size'
-						value={pageSize}
-						onChange={(e) => handlePageSizeChange(Number(e.target.value) as PageSize)}
-						className='rounded border border-gray-300 px-2 py-1 text-sm focus:border-yellow-400 focus:outline-none'
-					>
-						<option value={5}>5</option>
-						<option value={10}>10</option>
-						<option value={20}>20</option>
-					</select>
-				</div>
-			</div>
-
-			{isLoading ? (
-				<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-					{Array.from({ length: pageSize }).map((_, index) => (
-						<div
-							key={`skeleton-${index}`}
-							className='rounded-lg border border-gray-200 bg-white p-4 shadow-sm'
-						>
-							<div className='mb-3 h-48 w-full animate-pulse rounded bg-gray-200' />
-							<div className='space-y-3'>
-								<div className='h-4 w-3/4 animate-pulse rounded bg-gray-200' />
-								<div className='h-4 w-1/2 animate-pulse rounded bg-gray-200' />
-								<div className='h-4 w-2/3 animate-pulse rounded bg-gray-200' />
-								<div className='h-4 w-1/3 animate-pulse rounded bg-gray-200' />
-								<div className='h-4 w-1/2 animate-pulse rounded bg-gray-200' />
-							</div>
-						</div>
-					))}
-				</div>
-			) : enrichedDogs.length > 0 ? (
-				<>
-					{totalPages > 1 ? (
-						<Box className='mb-6 flex items-center justify-center'>
-							<Pagination
-								count={totalPages}
-								page={currentPage}
-								onChange={(_, value) => handlePageChange(value)}
-								disabled={isLoading}
-								color='primary'
-								showFirstButton
-								showLastButton
-								sx={{
-									'& .MuiPaginationItem-root': {
-										fontSize: '0.875rem',
-									},
-									'& .MuiPaginationItem-page.Mui-selected': {
-										backgroundColor: '#facc15',
-										color: '#565757',
-										'&:hover': {
-											backgroundColor: '#e6b800',
-										},
-									},
-									'& .MuiPaginationItem-root.Mui-disabled': {
-										opacity: 0.5,
-									},
+					{/* Zweite Zeile: SOD1, HD, Untersuchungen (rechts neben HD, unter Chipnummer) */}
+					<Box sx={{ mt: 3, display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 3, alignItems: 'start' }}>
+						<FormControl fullWidth size='small'>
+							<InputLabel>SOD1</InputLabel>
+							<Select
+								multiple
+								value={sod1Filters}
+								label='SOD1'
+								onChange={(e) => {
+									const value = e.target.value
+									setSod1Filters(typeof value === 'string' ? value.split(',') as Sod1Filter[] : value as Sod1Filter[])
 								}}
-							/>
-						</Box>
-					) : null}
+								input={<OutlinedInput label='SOD1' />}
+								renderValue={(selected) => (
+									<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+										{selected.map((value) => (
+											<Chip key={value} label={formatSod1ForDisplay(value)} size='small' />
+										))}
+									</Box>
+								)}
+							>
+								<MenuItem value='N_N'>N/N</MenuItem>
+								<MenuItem value='N_DM'>N/DM</MenuItem>
+								<MenuItem value='DM_DM'>DM/DM</MenuItem>
+							</Select>
+						</FormControl>
+
+						<FormControl fullWidth size='small'>
+							<InputLabel>HD</InputLabel>
+							<Select
+								multiple
+								value={hdFilters}
+								label='HD'
+								onChange={(e) => {
+									const value = e.target.value
+									setHdFilters(typeof value === 'string' ? value.split(',') as HDFilter[] : value as HDFilter[])
+								}}
+								input={<OutlinedInput label='HD' />}
+								renderValue={(selected) => (
+									<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+										{selected.map((value) => (
+											<Chip key={value} label={value} size='small' />
+										))}
+									</Box>
+								)}
+							>
+								<MenuItem value='A1'>A1</MenuItem>
+								<MenuItem value='A2'>A2</MenuItem>
+								<MenuItem value='B1'>B1</MenuItem>
+								<MenuItem value='B2'>B2</MenuItem>
+							</Select>
+						</FormControl>
+
+						<FormControl fullWidth size='small'>
+							<InputLabel>Untersuchungen</InputLabel>
+							<Select
+								multiple
+								value={examinationFilters}
+								label='Untersuchungen'
+								onChange={(e) => {
+									const value = e.target.value
+									setExaminationFilters(typeof value === 'string' ? value.split(',') as ExaminationFilter[] : value as ExaminationFilter[])
+								}}
+								input={<OutlinedInput label='Untersuchungen' />}
+								renderValue={(selected) => (
+									<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+										{selected.map((value) => {
+											const labels: Record<ExaminationFilter, string> = {
+												HD: 'Nur HD',
+												HeartCheck: 'Nur mit Herzuntersuchung',
+												Genprofil: 'Nur mit Genprofil',
+												EyesCheck: 'Nur mit Augenuntersuchung',
+												ColorCheck: 'Nur mit Farbverdünnung',
+											}
+											return (
+												<Chip key={value} label={labels[value]} size='small' />
+											)
+										})}
+									</Box>
+								)}
+							>
+								<MenuItem value='HD'>Nur HD</MenuItem>
+								<MenuItem value='HeartCheck'>Nur mit Herzuntersuchung</MenuItem>
+								<MenuItem value='Genprofil'>Nur mit Genprofil</MenuItem>
+								<MenuItem value='EyesCheck'>Nur mit Augenuntersuchung</MenuItem>
+								<MenuItem value='ColorCheck'>Nur mit Farbverdünnung</MenuItem>
+							</Select>
+						</FormControl>
+					</Box>
+
+					{/* PLZ und Maximale Entfernung */}
+					<Box sx={{ mt: 2, display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 2 }}>
+						<TextField
+							label='MeinePLZ'
+							value={zipCode}
+							onChange={(e) => {
+								const value = e.target.value.replace(/\D/g, '').slice(0, 5) // Nur Zahlen, max. 5 Zeichen
+								setZipCode(value)
+							}}
+							onKeyDown={(e) => {
+								if (e.key === 'Enter') {
+									handleSearch()
+								}
+							}}
+							placeholder='Postleitzahl'
+							fullWidth
+							size='small'
+							helperText={isGeocodingZip ? 'Suche Koordinaten...' : zipLocation ? 'Koordinaten gefunden' : zipCode && zipCode.length === 5 ? 'Koordinaten werden gesucht...' : ''}
+						/>
+						<FormControl fullWidth size='small' disabled={!isLocationAvailable || isGeocodingZip}>
+							<InputLabel>Maximale Entfernung</InputLabel>
+							<Select
+								value={maxDistance === '' ? '' : String(maxDistance)}
+								label='Maximale Entfernung'
+								onChange={(e) => {
+									const value = e.target.value
+									if (value === '') {
+										setMaxDistance('')
+									} else {
+										const numValue = Number(value)
+										if (!isNaN(numValue) && (numValue === 50 || numValue === 100 || numValue === 300 || numValue === 800)) {
+											setMaxDistance(numValue as DistanceFilter)
+										}
+									}
+								}}
+							>
+								<MenuItem value=''>-</MenuItem>
+								<MenuItem value='50'>50 km</MenuItem>
+								<MenuItem value='100'>100 km</MenuItem>
+								<MenuItem value='300'>300 km</MenuItem>
+								<MenuItem value='800'>800 km</MenuItem>
+							</Select>
+						</FormControl>
+					</Box>
+
+					<Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+						<Button
+							variant='contained'
+							onClick={handleSearch}
+							disabled={isLoading}
+							sx={{
+								backgroundColor: '#facc15',
+								color: '#565757',
+								'&:hover': {
+									backgroundColor: '#e6b800',
+								},
+								'&:disabled': {
+									backgroundColor: '#d1d5db',
+									color: '#9ca3af',
+								},
+							}}
+						>
+							{isLoading ? 'Suche...' : 'Suchen'}
+						</Button>
+					</Box>
+				</Box>
+
+				{error ? (
+					<div className='rounded bg-red-50 p-4 text-sm text-red-800'>
+						{error.message}
+					</div>
+				) : null}
+
+				<div className='flex items-center justify-between'>
+					<div className='text-sm text-gray-600'>
+						{totalDogs > 0 ? (
+							<>
+								Zeige {((currentPage - 1) * pageSize) + 1} bis{' '}
+								{Math.min(currentPage * pageSize, totalDogs)} von {totalDogs} Hunden
+							</>
+						) : (
+							'Keine Hunde gefunden'
+						)}
+					</div>
+					<div className='flex items-center gap-2'>
+						<label
+							htmlFor='page-size'
+							className='text-sm text-gray-600'
+						>
+							Pro Seite:
+						</label>
+						<select
+							id='page-size'
+							value={pageSize}
+							onChange={(e) => handlePageSizeChange(Number(e.target.value) as PageSize)}
+							className='rounded border border-gray-300 px-2 py-1 text-sm focus:border-yellow-400 focus:outline-none'
+						>
+							<option value={5}>5</option>
+							<option value={10}>10</option>
+							<option value={20}>20</option>
+						</select>
+					</div>
+				</div>
+
+				{isLoading ? (
 					<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-						{enrichedDogs.map((dog) => (
-							<DogCard
-								key={dog.documentId}
-								dog={dog}
-								strapiBaseUrl={strapiBaseUrl}
-								onImageClick={() => handleDogImageClick(dog)}
-								userLocation={userLocation}
-								maxDistance={maxDistance === '' ? undefined : maxDistance}
-							/>
+						{Array.from({ length: pageSize }).map((_, index) => (
+							<div
+								key={`skeleton-${index}`}
+								className='rounded-lg border border-gray-200 bg-white p-4 shadow-sm'
+							>
+								<div className='mb-3 h-48 w-full animate-pulse rounded bg-gray-200' />
+								<div className='space-y-3'>
+									<div className='h-4 w-3/4 animate-pulse rounded bg-gray-200' />
+									<div className='h-4 w-1/2 animate-pulse rounded bg-gray-200' />
+									<div className='h-4 w-2/3 animate-pulse rounded bg-gray-200' />
+									<div className='h-4 w-1/3 animate-pulse rounded bg-gray-200' />
+									<div className='h-4 w-1/2 animate-pulse rounded bg-gray-200' />
+								</div>
+							</div>
 						))}
 					</div>
-
-					{totalPages > 1 ? (
-						<Box className='mt-6 flex items-center justify-center'>
-							<Pagination
-								count={totalPages}
-								page={currentPage}
-								onChange={(_, value) => handlePageChange(value)}
-								disabled={isLoading}
-								color='primary'
-								showFirstButton
-								showLastButton
-								sx={{
-									'& .MuiPaginationItem-root': {
-										fontSize: '0.875rem',
-									},
-									'& .MuiPaginationItem-page.Mui-selected': {
-										backgroundColor: '#facc15',
-										color: '#565757',
-										'&:hover': {
-											backgroundColor: '#e6b800',
+				) : enrichedDogs.length > 0 ? (
+					<>
+						{totalPages > 1 ? (
+							<Box className='mb-6 flex items-center justify-center'>
+								<Pagination
+									count={totalPages}
+									page={currentPage}
+									onChange={(_, value) => handlePageChange(value)}
+									disabled={isLoading}
+									color='primary'
+									showFirstButton
+									showLastButton
+									sx={{
+										'& .MuiPaginationItem-root': {
+											fontSize: '0.875rem',
 										},
-									},
-									'& .MuiPaginationItem-root.Mui-disabled': {
-										opacity: 0.5,
-									},
-								}}
-							/>
-						</Box>
-					) : null}
-				</>
-			) : !isLoading ? (
-				<div className='rounded-lg border border-gray-200 bg-gray-50 p-8 text-center text-gray-600'>
-					Keine Hunde gefunden. Bitte passen Sie Ihre Suchkriterien an.
-				</div>
-			) : null}
+										'& .MuiPaginationItem-page.Mui-selected': {
+											backgroundColor: '#facc15',
+											color: '#565757',
+											'&:hover': {
+												backgroundColor: '#e6b800',
+											},
+										},
+										'& .MuiPaginationItem-root.Mui-disabled': {
+											opacity: 0.5,
+										},
+									}}
+								/>
+							</Box>
+						) : null}
+						<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+							{enrichedDogs.map((dog) => (
+								<DogCard
+									key={dog.documentId}
+									dog={dog}
+									strapiBaseUrl={strapiBaseUrl}
+									onImageClick={() => handleDogImageClick(dog)}
+									userLocation={userLocation}
+									maxDistance={maxDistance === '' ? undefined : maxDistance}
+									hzdSetting={hzdSetting}
+								/>
+							))}
+						</div>
+
+						{totalPages > 1 ? (
+							<Box className='mt-6 flex items-center justify-center'>
+								<Pagination
+									count={totalPages}
+									page={currentPage}
+									onChange={(_, value) => handlePageChange(value)}
+									disabled={isLoading}
+									color='primary'
+									showFirstButton
+									showLastButton
+									sx={{
+										'& .MuiPaginationItem-root': {
+											fontSize: '0.875rem',
+										},
+										'& .MuiPaginationItem-page.Mui-selected': {
+											backgroundColor: '#facc15',
+											color: '#565757',
+											'&:hover': {
+												backgroundColor: '#e6b800',
+											},
+										},
+										'& .MuiPaginationItem-root.Mui-disabled': {
+											opacity: 0.5,
+										},
+									}}
+								/>
+							</Box>
+						) : null}
+					</>
+				) : !isLoading ? (
+					<div className='rounded-lg border border-gray-200 bg-gray-50 p-8 text-center text-gray-600'>
+						Keine Hunde gefunden. Bitte passen Sie Ihre Suchkriterien an.
+					</div>
+				) : null}
 			</div>
 
 			{/* Dog Detail Modal */}
@@ -602,6 +604,7 @@ export function DogSearch({ strapiBaseUrl, sexFilter }: DogSearchProps) {
 				strapiBaseUrl={strapiBaseUrl}
 				isOpen={isModalOpen}
 				onClose={handleCloseModal}
+				hzdSetting={hzdSetting}
 			/>
 		</div>
 	)

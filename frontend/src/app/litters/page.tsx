@@ -77,7 +77,10 @@ export default function LittersPage() {
 				error={authError}
 			/>
 			<main>
-				<LitterSearch strapiBaseUrl={baseUrl} />
+				<LitterSearch
+					strapiBaseUrl={baseUrl}
+					hzdSetting={globalLayout.HzdSetting}
+				/>
 			</main>
 			<Footer
 				globalLayout={globalLayout}

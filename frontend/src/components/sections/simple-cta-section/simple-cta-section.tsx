@@ -65,7 +65,7 @@ export function SimpleCtaSectionComponent({
 								borderRadius: 2,
 								backgroundColor: 'rgba(255, 255, 255, 0.7)',
 								px: 4,
-								py: 2,
+								py: 4,
 							}}
 						>
 							{headline ? (
@@ -85,6 +85,7 @@ export function SimpleCtaSectionComponent({
 										justifyContent: 'center',
 										gap: 2,
 										flexWrap: 'wrap',
+										my: 2,
 									}}
 								>
 									{actionButtons.map((actionButton, index) => (

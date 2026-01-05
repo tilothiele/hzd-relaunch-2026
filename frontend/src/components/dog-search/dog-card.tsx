@@ -3,7 +3,8 @@
 import { useId } from 'react'
 import Image from 'next/image'
 import { Card, CardMedia, CardContent, Table, TableBody, TableRow, TableCell, Box, Tooltip } from '@mui/material'
-import type { Dog } from '@/types'
+import type { Dog, HzdSetting } from '@/types'
+import { resolveMediaUrl } from '@/components/header/logo-utils'
 import type { DistanceFilter } from '@/hooks/use-dogs'
 
 interface DogCardProps {
@@ -12,6 +13,7 @@ interface DogCardProps {
 	onImageClick?: () => void
 	userLocation?: { lat: number; lng: number } | null
 	maxDistance?: DistanceFilter
+	hzdSetting?: HzdSetting | null
 }
 
 /**
@@ -30,25 +32,25 @@ function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: numbe
 
 function getColorLabel(color: string | null | undefined): string {
 	switch (color) {
-	case 'S':
-		return 'Schwarz'
-	case 'SM':
-		return 'Schwarzmarken'
-	case 'B':
-		return 'Blond'
-	default:
-		return '-'
+		case 'S':
+			return 'Schwarz'
+		case 'SM':
+			return 'Schwarzmarken'
+		case 'B':
+			return 'Blond'
+		default:
+			return '-'
 	}
 }
 
 function getSexLabel(sex: string | null | undefined): string {
 	switch (sex) {
-	case 'M':
-		return 'Rüde'
-	case 'F':
-		return 'Hündin'
-	default:
-		return '-'
+		case 'M':
+			return 'Rüde'
+		case 'F':
+			return 'Hündin'
+		default:
+			return '-'
 	}
 }
 
@@ -71,12 +73,12 @@ function formatDate(dateString: string | null | undefined): string {
 
 function getGivenNameIcon(sex: string | null | undefined): string {
 	switch (sex) {
-	case 'M':
-		return '/icons/zucht-icon-vater-hzd-hovawart-zuchtgemeinschaft.png'
-	case 'F':
-		return '/icons/zucht-icon-mutter-hzd-hovawart-zuchtgemeinschaft.png'
-	default:
-		return '/icons/zucht-icon-zwinger-hzd-hovawart-zuchtgemeinschaft.png'
+		case 'M':
+			return '/icons/zucht-icon-vater-hzd-hovawart-zuchtgemeinschaft.png'
+		case 'F':
+			return '/icons/zucht-icon-mutter-hzd-hovawart-zuchtgemeinschaft.png'
+		default:
+			return '/icons/zucht-icon-zwinger-hzd-hovawart-zuchtgemeinschaft.png'
 	}
 }
 
@@ -95,14 +97,14 @@ function formatSod1ForDisplay(sod1: string | null | undefined): string {
  */
 function getDefaultImageForColor(color: string | null | undefined): string {
 	switch (color) {
-	case 'S':
-		return '/static-images/hovis/hovi-schwarz.png'
-	case 'SM':
-		return '/static-images/hovis/hovi-schwarzmarken.png'
-	case 'B':
-		return '/static-images/hovis/hovi-blond.png'
-	default:
-		return '/static-images/hovis/hovi-schwarz.png'
+		case 'S':
+			return '/static-images/hovis/hovi-schwarz.png'
+		case 'SM':
+			return '/static-images/hovis/hovi-schwarzmarken.png'
+		case 'B':
+			return '/static-images/hovis/hovi-blond.png'
+		default:
+			return '/static-images/hovis/hovi-schwarz.png'
 	}
 }
 
@@ -241,7 +243,7 @@ function FemaleSexSymbol() {
 }
 
 
-export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDistance }: DogCardProps) {
+export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDistance, hzdSetting }: DogCardProps) {
 	const avatarUrl = dog.avatar?.url
 	const avatarAlt = dog.avatar?.alternativeText ?? 'Hund'
 	const fullName = dog.fullKennelName ?? dog.givenName ?? 'Unbekannt'
@@ -298,7 +300,7 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 					aria-label='Hundedetails anzeigen'
 				>
 					<Image
-						src={`${baseUrl}${avatarUrl}`}
+						src={resolveMediaUrl(dog.avatar, strapiBaseUrl) || ''}
 						alt={avatarAlt}
 						fill
 						style={{ objectFit: 'cover' }}
@@ -331,7 +333,12 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 					aria-label='Hundedetails anzeigen'
 				>
 					<Image
-						src={getDefaultImageForColor(dog.color)}
+						src={resolveMediaUrl(
+							(dog.color === 'SM' ? hzdSetting?.DefaultAvatarSM :
+								dog.color === 'B' ? hzdSetting?.DefaultAvatarB :
+									hzdSetting?.DefaultAvatarS) || null,
+							strapiBaseUrl
+						) || getDefaultImageForColor(dog.color)}
 						alt={avatarAlt}
 						fill
 						style={{ objectFit: 'cover' }}

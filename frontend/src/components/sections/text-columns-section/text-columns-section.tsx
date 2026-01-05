@@ -118,17 +118,17 @@ export function TextColumnsSectionComponent({
 			variant='max-width'
 			id={section.TextColumnsAnchor || undefined}
 			backgroundColor={backgroundColor}
-			marginTop='1.2em'
-			marginBottom='1.5em'
+			marginTop='1.2rem'
+			marginBottom='1.5rem'
 		>
 			<Box sx={{ width: '100%', maxWidth: '1200px' }}>
 				{section.TextColumnsHeadline ? (
-					<h2 className='mb-3'>
+					<h2 className='mb-3 text-3xl'>
 						{section.TextColumnsHeadline}
 					</h2>
 				) : null}
 				{section.TextColumnsSubHeadline ? (
-					<h3 className='mb-4'>
+					<h3 className='mb-4 text-2xl'>
 						{section.TextColumnsSubHeadline}
 					</h3>
 				) : null}

@@ -1,20 +1,23 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import Image from 'next/image'
 import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
 import GridViewIcon from '@mui/icons-material/GridView'
 import TableRowsIcon from '@mui/icons-material/TableRows'
+import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { fetchGraphQL } from '@/lib/graphql-client'
 import { SEARCH_LITTERS } from '@/lib/graphql/queries'
-import type { Litter, LitterSearchResult } from '@/types'
+import type { Litter, LitterSearchResult, HzdSetting } from '@/types'
 
 interface LitterSearchProps {
 	strapiBaseUrl: string
+	hzdSetting?: HzdSetting | null
 }
 
 type PageSize = 5 | 10 | 20
 
-export function LitterSearch({ strapiBaseUrl }: LitterSearchProps) {
+export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 	const [breederFilter, setBreederFilter] = useState('')
 	const [motherFilter, setMotherFilter] = useState('')
 	const [closedFilter, setClosedFilter] = useState<'' | 'true' | 'false'>('')
@@ -311,6 +314,53 @@ export function LitterSearch({ strapiBaseUrl }: LitterSearchProps) {
 												</span>
 											)}
 										</div>
+
+										{/* Parent Images */}
+										<div className='mb-4 grid grid-cols-2 gap-2'>
+											<div className='relative aspect-square overflow-hidden rounded-md bg-gray-100'>
+												{litter.mother?.avatar || hzdSetting ? (
+													<Image
+														src={resolveMediaUrl(
+															litter.mother?.avatar ||
+															(litter.mother?.color === 'SM' ? hzdSetting?.DefaultAvatarSM :
+																litter.mother?.color === 'B' ? hzdSetting?.DefaultAvatarB :
+																	hzdSetting?.DefaultAvatarS),
+															strapiBaseUrl
+														) || ''}
+														alt={litter.mother?.fullKennelName || 'Mutter'}
+														fill
+														className='object-cover'
+														unoptimized
+													/>
+												) : (
+													<div className='flex h-full items-center justify-center text-[10px] text-gray-400'>
+														Kein Bild (Mutter)
+													</div>
+												)}
+											</div>
+											<div className='relative aspect-square overflow-hidden rounded-md bg-gray-100'>
+												{litter.stuntDog?.avatar || hzdSetting ? (
+													<Image
+														src={resolveMediaUrl(
+															litter.stuntDog?.avatar ||
+															(litter.stuntDog?.color === 'SM' ? hzdSetting?.DefaultAvatarSM :
+																litter.stuntDog?.color === 'B' ? hzdSetting?.DefaultAvatarB :
+																	hzdSetting?.DefaultAvatarS),
+															strapiBaseUrl
+														) || ''}
+														alt={litter.stuntDog?.fullKennelName || 'Deckrüde'}
+														fill
+														className='object-cover'
+														unoptimized
+													/>
+												) : (
+													<div className='flex h-full items-center justify-center text-[10px] text-gray-400'>
+														Kein Bild (Deckrüde)
+													</div>
+												)}
+											</div>
+										</div>
+
 										<div className='space-y-2 text-sm text-gray-600'>
 											<p>
 												<strong>Züchter:</strong> {breederMember}

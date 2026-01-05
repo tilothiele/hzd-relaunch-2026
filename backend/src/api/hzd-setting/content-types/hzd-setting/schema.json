@@ -1,0 +1,45 @@
+{
+  "kind": "singleType",
+  "collectionName": "hzd_settings",
+  "info": {
+    "singularName": "hzd-setting",
+    "pluralName": "hzd-settings",
+    "displayName": "HZD Settings"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "DefaultAvatarB": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "DefaultAvatarSM": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "DefaultAvatarS": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  }
+}

@@ -26,7 +26,11 @@ export default async function StuntDogsPage() {
 			theme={theme}
 			pageTitle='Deckrüden'
 		>
-			<DogSearch strapiBaseUrl={baseUrl} sexFilter='M' />
+			<DogSearch
+				strapiBaseUrl={baseUrl}
+				sexFilter='M'
+				hzdSetting={globalLayout?.HzdSetting}
+			/>
 		</MainPageStructure>
 	)
 }
