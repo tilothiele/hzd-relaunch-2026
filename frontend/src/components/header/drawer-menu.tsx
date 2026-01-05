@@ -117,7 +117,7 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                             primary={item.name}
                             primaryTypographyProps={{
                                 fontWeight: level === 0 ? 600 : 400,
-                                fontSize: level === 0 ? '1.1rem' : '1rem',
+                                fontSize: level === 0 ? '1rem' : '0.8rem',
                                 color: level === 0 ? '#1a3673' : '#565757',
                             }}
                         />
