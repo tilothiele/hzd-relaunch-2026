@@ -57,7 +57,7 @@ export function LitterSearch({ strapiBaseUrl }: LitterSearchProps) {
 
 			if (closedFilter) {
 				filterConditions.push({
-					closed: { eq: closedFilter === 'true' },
+					closed: closedFilter === 'true' ? { eq: true } : { ne: true },
 				})
 			}
 
