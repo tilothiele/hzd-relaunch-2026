@@ -618,32 +618,101 @@ export const SEARCH_LITTERS = `
 			dateOfBirth
 			closed
 			StatusMessage
+			OrderLetter
 			AmountS {
+				id
 				Total
 				Available
 			}
 			AmountSM {
+				id
 				Total
 				Available
 			}
 			AmountB {
+				id
 				Total
 				Available
 			}
 			breeder {
+				documentId
 				kennelName
+				breedingLicenseSince
+				IsActive
+				BreedersIntroduction
+				WebsiteUrl
+				WebsiteUrlDraft
+				InternalNotes
 				member {
 					firstName
 					lastName
+					region
+					phone
+					address1
+					address2
+					zip
+					countryCode
+				}
+				GeoLocation {
+					lat
+					lng
 				}
 			}
 			mother {
+				documentId
 				fullKennelName
 				givenName
+				sex
+				color
+				dateOfBirth
+				dateOfDeath
+				microchipNo
+				SOD1
+				HD
+				Genprofil
+				EyesCheck
+				HeartCheck
+				ColorCheck
+				Exhibitions
+				BreedSurvey
+				Location {
+					lat
+					lng
+				}
+				avatar {
+					url
+					alternativeText
+					width
+					height
+				}
 			}
 			stuntDog {
+				documentId
 				fullKennelName
 				givenName
+				sex
+				color
+				dateOfBirth
+				dateOfDeath
+				microchipNo
+				SOD1
+				HD
+				Genprofil
+				EyesCheck
+				HeartCheck
+				ColorCheck
+				Exhibitions
+				BreedSurvey
+				Location {
+					lat
+					lng
+				}
+				avatar {
+					url
+					alternativeText
+					width
+					height
+				}
 			}
 		}
 	}

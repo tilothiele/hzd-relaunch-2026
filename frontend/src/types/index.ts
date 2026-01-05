@@ -315,6 +315,7 @@ export interface AuthUser {
 }
 
 export interface PuppyAmount {
+	id?: string
 	Total?: number | null
 	Available?: number | null
 }
@@ -358,6 +359,8 @@ export interface Dog {
 	MemosDraft?: string | null
 	MemosReleased?: string | null
 	Location?: GeoLocation | null
+	Exhibitions?: string | null
+	BreedSurvey?: string | null
 	avatar?: {
 		url?: string | null
 		alternativeText?: string | null
@@ -384,6 +387,12 @@ export interface Breeder {
 		zip?: string | null
 		countryCode?: string | null
 	} | null
+	IsActive?: boolean | null
+	BreedersIntroduction?: string | null
+	WebsiteUrl?: string | null
+	WebsiteUrlDraft?: string | null
+	InternalNotes?: string | null
+	GeoLocation?: GeoLocation | null
 }
 
 export interface BreederSearchResult {
@@ -400,7 +409,9 @@ export interface Litter {
 	AmountS?: PuppyAmount | null
 	AmountSM?: PuppyAmount | null
 	AmountB?: PuppyAmount | null
+	OrderLetter: string
 	breeder?: {
+		documentId: string
 		kennelName?: string | null
 		member?: {
 			firstName?: string | null
@@ -408,10 +419,12 @@ export interface Litter {
 		} | null
 	} | null
 	mother?: {
+		documentId: string
 		fullKennelName?: string | null
 		givenName?: string | null
 	} | null
 	stuntDog?: {
+		documentId: string
 		fullKennelName?: string | null
 		givenName?: string | null
 	} | null

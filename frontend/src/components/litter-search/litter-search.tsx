@@ -263,8 +263,9 @@ export function LitterSearch({ strapiBaseUrl }: LitterSearchProps) {
 				<>
 					<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
 						{litters.map((litter) => {
-							const breederName = litter.breeder?.kennelName ?? 'Kein Zwingername bekannt'
-							const breederMember = `{(litter.breeder?.member?.firstName || '') (litter.breeder?.member?.lastName || '')}`
+							const orderLetter = litter.OrderLetter ?? ''
+							const kennelName = litter.breeder?.kennelName ?? 'Kein Zwingername bekannt'
+							const breederMember = (litter.breeder?.member?.firstName || '') + ' ' + (litter.breeder?.member?.lastName || '')
 							const motherName = litter.mother?.fullKennelName ?? litter.mother?.givenName ?? 'Unbekannt'
 							const stuntDogName = litter.stuntDog?.fullKennelName ?? litter.stuntDog?.givenName
 
@@ -275,7 +276,7 @@ export function LitterSearch({ strapiBaseUrl }: LitterSearchProps) {
 								>
 									<div className='mb-3 flex items-center justify-between'>
 										<h3 className='text-lg font-semibold text-gray-900'>
-											Wurf
+											{orderLetter}-Wurf {kennelName}
 										</h3>
 										{litter.closed ? (
 											<span className='rounded bg-gray-200 px-2 py-1 text-xs font-medium text-gray-700'>
@@ -289,8 +290,7 @@ export function LitterSearch({ strapiBaseUrl }: LitterSearchProps) {
 									</div>
 									<div className='space-y-2 text-sm text-gray-600'>
 										<p>
-											<strong>Züchter:</strong> {breederName}
-											{breederMember ? ` (${breederMember})` : ''}
+											<strong>Züchter:</strong> {breederMember}
 										</p>
 										<p>
 											<strong>Mutter:</strong> {motherName}
@@ -320,17 +320,17 @@ export function LitterSearch({ strapiBaseUrl }: LitterSearchProps) {
 												<p className='font-medium text-gray-700'>Welpen:</p>
 												{litter.AmountS ? (
 													<p className='pl-2'>
-														<strong>Schwarz:</strong> {litter.AmountS.Available ?? 0} / {litter.AmountS.Total ?? 0} verfügbar
+														<strong>Schwarz:</strong> {litter.AmountS.Available ?? 0}/{litter.AmountS.Total ?? 0} verfügbar
 													</p>
 												) : null}
 												{litter.AmountSM ? (
 													<p className='pl-2'>
-														<strong>Schwarzmarken:</strong> {litter.AmountSM.Available ?? 0} / {litter.AmountSM.Total ?? 0} verfügbar
+														<strong>Schwarzmarken:</strong> {litter.AmountSM.Available ?? 0}/{litter.AmountSM.Total ?? 0} verfügbar
 													</p>
 												) : null}
 												{litter.AmountB ? (
 													<p className='pl-2'>
-														<strong>Blond:</strong> {litter.AmountB.Available ?? 0} / {litter.AmountB.Total ?? 0} verfügbar
+														<strong>Blond:</strong> {litter.AmountB.Available ?? 0}/{litter.AmountB.Total ?? 0} verfügbar
 													</p>
 												) : null}
 											</div>
