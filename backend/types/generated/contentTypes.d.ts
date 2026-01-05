@@ -698,6 +698,7 @@ export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    DrawerMenu: Schema.Attribute.JSON;
     Footer: Schema.Attribute.Component<'layout.footer', false>;
     Impressum: Schema.Attribute.Relation<'oneToOne', 'api::page.page'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;

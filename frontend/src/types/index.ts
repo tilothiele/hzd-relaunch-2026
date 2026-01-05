@@ -213,9 +213,10 @@ export interface PartnerLink {
 }
 
 export interface GlobalLayout {
-	Menu?: Menu | null
 	Logo?: Image | null
 	Footer?: Footer | null
+	Menu?: Menu | null
+	DrawerMenu?: Menu | null
 	Copyright?: string | null
 	SocialLinkFB?: string | null
 	SocialLinkYT?: string | null
@@ -283,6 +284,7 @@ export interface MenuItem {
 	name: string
 	faIcon?: string
 	url?: string
+	icon?: string // Added icon for DrawerMenu
 	children?: MenuItem[]
 }
 

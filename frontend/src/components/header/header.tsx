@@ -6,6 +6,7 @@ import { NavigationMenu } from '@/components/ui/navigation-menu'
 import { SocialLinks } from './social-links'
 import { LoginControls } from './login-controls'
 import { resolveMediaUrl } from './logo-utils'
+import { DrawerMenuComponent } from './drawer-menu'
 
 interface LoginCredentials {
 	identifier: string
@@ -53,7 +54,12 @@ export function Header({
 			className='w-full'
 		>
 			<nav className='header-nav-padding flex w-full items-center px-6'>
-				<div className='flex flex-1 justify-center'>
+				{/* Left Section: Drawer + Logo */}
+				<div className='flex flex-1 items-center justify-start gap-4'>
+					<DrawerMenuComponent
+						drawerMenu={globalLayout?.DrawerMenu}
+						theme={theme}
+					/>
 					<Link
 						href='/'
 						className='flex items-center justify-center transition-opacity hover:opacity-80'
@@ -76,6 +82,8 @@ export function Header({
 						)}
 					</Link>
 				</div>
+
+				{/* Center Section: Navigation Menu */}
 				<div className='flex flex-1 justify-center'>
 					<NavigationMenu
 						menuItems={menuItems}
@@ -85,7 +93,9 @@ export function Header({
 						}}
 					/>
 				</div>
-				<div className='flex flex-1 items-center justify-center gap-4'>
+
+				{/* Right Section: Social Links + Login */}
+				<div className='flex flex-1 items-center justify-end gap-4'>
 					<SocialLinks
 						socialLinkFB={globalLayout?.SocialLinkFB}
 						socialLinkYT={globalLayout?.SocialLinkYT}
@@ -101,10 +111,12 @@ export function Header({
 					/>
 				</div>
 			</nav>
+
 			{pageTitle ? (
 				<div className='flex w-full justify-end'>
 					<span style={{ marginRight: '20vw', fontSize: '1.5em' }}>{pageTitle}</span>
-				</div>) : null}
+				</div>
+			) : null}
 		</header>
 	)
 }

@@ -2,6 +2,7 @@ export const GET_LAYOUT = `
 	query GetLayout {
 		globalLayout {
 			Menu
+			DrawerMenu
 			Logo {
 				url
 				alternativeText

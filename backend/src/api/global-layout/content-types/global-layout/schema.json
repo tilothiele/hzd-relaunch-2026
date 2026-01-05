@@ -14,6 +14,9 @@
     "Menu": {
       "type": "json"
     },
+    "DrawerMenu": {
+      "type": "json"
+    },
     "Logo": {
       "type": "media",
       "multiple": false,
