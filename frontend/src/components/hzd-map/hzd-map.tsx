@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, useEffect, ReactNode } from 'react'
+import { useMemo, useState, useEffect, ReactNode, useCallback, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import 'leaflet/dist/leaflet.css'
@@ -8,6 +8,7 @@ import type L from 'leaflet'
 import { useCookieConsent } from '@/hooks/use-cookie-consent'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { useGlobalLayout } from '@/hooks/use-global-layout'
+import OpenWithIcon from '@mui/icons-material/OpenWith'
 
 type LeafletIcon = InstanceType<typeof L.Icon>
 
@@ -32,6 +33,10 @@ const Tooltip = dynamic(
     () => import('react-leaflet').then((mod) => mod.Tooltip),
     { ssr: false }
 )
+
+// Wir importieren useMap normal, da es nur innerhalb von MapContainer verwendet wird,
+// welcher selbst ssr: false ist.
+import { useMap } from 'react-leaflet'
 
 export interface MapItem {
     id: string
@@ -71,10 +76,27 @@ function MapReady({ onReady }: { onReady: () => void }) {
     return null
 }
 
+// Komponente zum Aktualisieren der Kartengröße bei Höhenänderung
+function ResizeTrigger({ height }: { height: number }) {
+    const map = useMap()
+    useEffect(() => {
+        if (map) {
+            map.invalidateSize()
+        }
+    }, [height, map])
+    return null
+}
+
 export function HzdMap({ isVisible, items, userLocation, height = '400px' }: HzdMapProps) {
     const [isMounted, setIsMounted] = useState(false)
     const [isMapReady, setIsMapReady] = useState(false)
     const [grayIcon, setGrayIcon] = useState<LeafletIcon | null>(null)
+    const [mapHeight, setMapHeight] = useState<number>(
+        typeof height === 'string' ? parseInt(height) : height
+    )
+    const [isResizing, setIsResizing] = useState(false)
+    const resizeStartRef = useRef<{ y: number; height: number } | null>(null)
+
     const { isAccepted, accept } = useCookieConsent()
     const { globalLayout, baseUrl: globalBaseUrl } = useGlobalLayout()
 
@@ -84,7 +106,39 @@ export function HzdMap({ isVisible, items, userLocation, height = '400px' }: Hzd
         setIsMounted(true)
     }, [])
 
-    // Leaflet Icons fixen - erst NACH Consent und nur auf Client
+    useEffect(() => {
+        if (!isResizing) return
+
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!resizeStartRef.current) return
+            const deltaY = e.pageY - resizeStartRef.current.y
+            const newHeight = Math.max(200, resizeStartRef.current.height + deltaY)
+            setMapHeight(newHeight)
+        }
+
+        const handleMouseUp = () => {
+            setIsResizing(false)
+            resizeStartRef.current = null
+        }
+
+        window.addEventListener('mousemove', handleMouseMove)
+        window.addEventListener('mouseup', handleMouseUp)
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove)
+            window.removeEventListener('mouseup', handleMouseUp)
+        }
+    }, [isResizing])
+
+    const startResizing = useCallback((e: React.MouseEvent) => {
+        e.preventDefault()
+        setIsResizing(true)
+        resizeStartRef.current = {
+            y: e.pageY,
+            height: mapHeight
+        }
+    }, [mapHeight])
+
     useEffect(() => {
         if (!isAccepted || typeof window === 'undefined') return
 
@@ -126,7 +180,7 @@ export function HzdMap({ isVisible, items, userLocation, height = '400px' }: Hzd
         return (
             <div
                 className='relative mb-6 w-full overflow-hidden rounded-lg border border-gray-200 shadow-md'
-                style={{ height }}
+                style={{ height: mapHeight }}
             >
                 <div
                     className='absolute inset-0 bg-gray-100'
@@ -161,6 +215,14 @@ export function HzdMap({ isVisible, items, userLocation, height = '400px' }: Hzd
                         )}
                     </div>
                 </div>
+                {/* Resize Handle auch im Blur-Modus */}
+                <div
+                    onMouseDown={startResizing}
+                    className='absolute bottom-0 right-0 z-[1001] flex h-6 w-6 cursor-ns-resize items-center justify-center rounded-tl bg-white/80 shadow-sm transition-colors hover:bg-yellow-400'
+                    title='Höhe ändern'
+                >
+                    <OpenWithIcon sx={{ fontSize: 14, transform: 'rotate(45deg)', color: '#3d2817' }} />
+                </div>
             </div>
         )
     }
@@ -171,8 +233,8 @@ export function HzdMap({ isVisible, items, userLocation, height = '400px' }: Hzd
 
     return (
         <div
-            className='mb-6 w-full overflow-hidden rounded-lg border border-gray-200 shadow-md'
-            style={{ height }}
+            className='relative mb-6 w-full overflow-hidden rounded-lg border border-gray-200 shadow-md'
+            style={{ height: mapHeight }}
         >
             <MapContainer
                 center={userPosition || GERMANY_CENTER}
@@ -185,6 +247,7 @@ export function HzdMap({ isVisible, items, userLocation, height = '400px' }: Hzd
                     url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
                 />
                 <MapReady onReady={() => setIsMapReady(true)} />
+                <ResizeTrigger height={mapHeight} />
                 {userPosition && isMapReady && grayIcon && (
                     <UserLocationMarker position={userPosition} icon={grayIcon} />
                 )}
@@ -201,6 +264,15 @@ export function HzdMap({ isVisible, items, userLocation, height = '400px' }: Hzd
                     </Marker>
                 ))}
             </MapContainer>
+
+            {/* Resize Handle */}
+            <div
+                onMouseDown={startResizing}
+                className='absolute bottom-0 right-0 z-[1001] flex h-6 w-6 cursor-ns-resize items-center justify-center rounded-tl bg-white/80 shadow-sm transition-colors hover:bg-yellow-400'
+                title='Höhe ändern'
+            >
+                <OpenWithIcon sx={{ fontSize: 14, transform: 'rotate(45deg)', color: '#3d2817' }} />
+            </div>
         </div>
     )
 }
