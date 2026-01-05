@@ -1,7 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box } from '@mui/material'
+import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
+import GridViewIcon from '@mui/icons-material/GridView'
+import TableRowsIcon from '@mui/icons-material/TableRows'
 import { fetchGraphQL } from '@/lib/graphql-client'
 import { SEARCH_LITTERS } from '@/lib/graphql/queries'
 import type { Litter, LitterSearchResult } from '@/types'
@@ -23,6 +25,7 @@ export function LitterSearch({ strapiBaseUrl }: LitterSearchProps) {
 	const [error, setError] = useState<Error | null>(null)
 	const [totalLitters, setTotalLitters] = useState(0)
 	const [pageCount, setPageCount] = useState(0)
+	const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
 
 	const searchLitters = useCallback(async () => {
 		if (!strapiBaseUrl) {
@@ -225,15 +228,34 @@ export function LitterSearch({ strapiBaseUrl }: LitterSearchProps) {
 			) : null}
 
 			<div className='mb-4 flex items-center justify-between'>
-				<div className='text-sm text-gray-600'>
-					{totalLitters > 0 ? (
-						<>
-							Zeige {((currentPage - 1) * pageSize) + 1} bis{' '}
-							{Math.min(currentPage * pageSize, totalLitters)} von {totalLitters} Würfen
-						</>
-					) : (
-						'Keine Würfe gefunden'
-					)}
+				<div className='flex items-center gap-6'>
+					<div className='text-sm text-gray-600'>
+						{totalLitters > 0 ? (
+							<>
+								Zeige {((currentPage - 1) * pageSize) + 1} bis{' '}
+								{Math.min(currentPage * pageSize, totalLitters)} von {totalLitters} Würfen
+							</>
+						) : (
+							'Keine Würfe gefunden'
+						)}
+					</div>
+					<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+						<GridViewIcon sx={{ fontSize: 20, color: viewMode === 'cards' ? '#facc15' : 'text.disabled' }} />
+						<Switch
+							size='small'
+							checked={viewMode === 'table'}
+							onChange={(e) => setViewMode(e.target.checked ? 'table' : 'cards')}
+							sx={{
+								'& .MuiSwitch-switchBase.Mui-checked': {
+									color: '#facc15',
+								},
+								'& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+									backgroundColor: '#facc15',
+								},
+							}}
+						/>
+						<TableRowsIcon sx={{ fontSize: 20, color: viewMode === 'table' ? '#facc15' : 'text.disabled' }} />
+					</Box>
 				</div>
 				<div className='flex items-center gap-2'>
 					<label
@@ -261,91 +283,151 @@ export function LitterSearch({ strapiBaseUrl }: LitterSearchProps) {
 				</div>
 			) : litters.length > 0 ? (
 				<>
-					<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-						{litters.map((litter) => {
-							const orderLetter = litter.OrderLetter ?? ''
-							const kennelName = litter.breeder?.kennelName ?? 'Kein Zwingername bekannt'
-							const breederMember = (litter.breeder?.member?.firstName || '') + ' ' + (litter.breeder?.member?.lastName || '')
-							const motherName = litter.mother?.fullKennelName ?? litter.mother?.givenName ?? 'Unbekannt'
-							const stuntDogName = litter.stuntDog?.fullKennelName ?? litter.stuntDog?.givenName
+					{viewMode === 'cards' ? (
+						<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+							{litters.map((litter) => {
+								const orderLetter = litter.OrderLetter ?? ''
+								const kennelName = litter.breeder?.kennelName ?? 'Kein Zwingername bekannt'
+								const breederMember = (litter.breeder?.member?.firstName || '') + ' ' + (litter.breeder?.member?.lastName || '')
+								const motherName = litter.mother?.fullKennelName ?? litter.mother?.givenName ?? 'Unbekannt'
+								const stuntDogName = litter.stuntDog?.fullKennelName ?? litter.stuntDog?.givenName
 
-							return (
-								<div
-									key={litter.documentId}
-									className='rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md'
-								>
-									<div className='mb-3 flex items-center justify-between'>
-										<h3 className='text-lg font-semibold text-gray-900'>
-											{orderLetter}-Wurf {kennelName}
-										</h3>
-										{litter.closed ? (
-											<span className='rounded bg-gray-200 px-2 py-1 text-xs font-medium text-gray-700'>
-												Geschlossen
-											</span>
-										) : (
-											<span className='rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-800'>
-												Offen
-											</span>
-										)}
+								return (
+									<div
+										key={litter.documentId}
+										className='rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md'
+									>
+										<div className='mb-3 flex items-center justify-between'>
+											<h3 className='text-lg font-semibold text-gray-900'>
+												{orderLetter}-Wurf: {kennelName}
+											</h3>
+											{litter.closed ? (
+												<span className='rounded bg-gray-200 px-2 py-1 text-xs font-medium text-gray-700'>
+													Geschlossen
+												</span>
+											) : (
+												<span className='rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-800'>
+													Offen
+												</span>
+											)}
+										</div>
+										<div className='space-y-2 text-sm text-gray-600'>
+											<p>
+												<strong>Züchter:</strong> {breederMember}
+											</p>
+											<p>
+												<strong>Mutter:</strong> {motherName}
+											</p>
+											{stuntDogName ? (
+												<p>
+													<strong>Deckrüde:</strong> {stuntDogName}
+												</p>
+											) : null}
+											{litter.dateOfManting ? (
+												<p>
+													<strong>Deckdatum:</strong> {formatDate(litter.dateOfManting)}
+												</p>
+											) : null}
+											{litter.expectedDateOfBirth ? (
+												<p>
+													<strong>Erwartetes Geburtsdatum:</strong> {formatDate(litter.expectedDateOfBirth)}
+												</p>
+											) : null}
+											{litter.dateOfBirth ? (
+												<p>
+													<strong>Geburtsdatum:</strong> {formatDate(litter.dateOfBirth)}
+												</p>
+											) : null}
+											{(litter.AmountS || litter.AmountSM || litter.AmountB) ? (
+												<div className='mt-3 space-y-1 border-t border-gray-200 pt-2'>
+													<p className='font-medium text-gray-700'>Welpen:</p>
+													{litter.AmountS ? (
+														<p className='pl-2'>
+															<strong>Schwarz:</strong> {litter.AmountS.Available ?? 0}/{litter.AmountS.Total ?? 0} verfügbar
+														</p>
+													) : null}
+													{litter.AmountSM ? (
+														<p className='pl-2'>
+															<strong>Schwarzmarken:</strong> {litter.AmountSM.Available ?? 0}/{litter.AmountSM.Total ?? 0} verfügbar
+														</p>
+													) : null}
+													{litter.AmountB ? (
+														<p className='pl-2'>
+															<strong>Blond:</strong> {litter.AmountB.Available ?? 0}/{litter.AmountB.Total ?? 0} verfügbar
+														</p>
+													) : null}
+												</div>
+											) : null}
+											{litter.StatusMessage ? (
+												<div className='mt-3 rounded bg-blue-50 p-2'>
+													<p className='text-xs font-medium text-blue-800'>Status:</p>
+													<p className='text-xs text-blue-700'>{litter.StatusMessage}</p>
+												</div>
+											) : null}
+										</div>
 									</div>
-									<div className='space-y-2 text-sm text-gray-600'>
-										<p>
-											<strong>Züchter:</strong> {breederMember}
-										</p>
-										<p>
-											<strong>Mutter:</strong> {motherName}
-										</p>
-										{stuntDogName ? (
-											<p>
-												<strong>Deckrüde:</strong> {stuntDogName}
-											</p>
-										) : null}
-										{litter.dateOfManting ? (
-											<p>
-												<strong>Deckdatum:</strong> {formatDate(litter.dateOfManting)}
-											</p>
-										) : null}
-										{litter.expectedDateOfBirth ? (
-											<p>
-												<strong>Erwartetes Geburtsdatum:</strong> {formatDate(litter.expectedDateOfBirth)}
-											</p>
-										) : null}
-										{litter.dateOfBirth ? (
-											<p>
-												<strong>Geburtsdatum:</strong> {formatDate(litter.dateOfBirth)}
-											</p>
-										) : null}
-										{(litter.AmountS || litter.AmountSM || litter.AmountB) ? (
-											<div className='mt-3 space-y-1 border-t border-gray-200 pt-2'>
-												<p className='font-medium text-gray-700'>Welpen:</p>
-												{litter.AmountS ? (
-													<p className='pl-2'>
-														<strong>Schwarz:</strong> {litter.AmountS.Available ?? 0}/{litter.AmountS.Total ?? 0} verfügbar
-													</p>
-												) : null}
-												{litter.AmountSM ? (
-													<p className='pl-2'>
-														<strong>Schwarzmarken:</strong> {litter.AmountSM.Available ?? 0}/{litter.AmountSM.Total ?? 0} verfügbar
-													</p>
-												) : null}
-												{litter.AmountB ? (
-													<p className='pl-2'>
-														<strong>Blond:</strong> {litter.AmountB.Available ?? 0}/{litter.AmountB.Total ?? 0} verfügbar
-													</p>
-												) : null}
-											</div>
-										) : null}
-										{litter.StatusMessage ? (
-											<div className='mt-3 rounded bg-blue-50 p-2'>
-												<p className='text-xs font-medium text-blue-800'>Status:</p>
-												<p className='text-xs text-blue-700'>{litter.StatusMessage}</p>
-											</div>
-										) : null}
-									</div>
-								</div>
-							)
-						})}
-					</div>
+								)
+							})}
+						</div>
+					) : (
+						<TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden' }}>
+							<Table size="small">
+								<TableHead sx={{ backgroundColor: '#f9fafb' }}>
+									<TableRow>
+										<TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
+										<TableCell sx={{ fontWeight: 'bold' }}>Wurf-Nr.</TableCell>
+										<TableCell sx={{ fontWeight: 'bold' }}>Züchter</TableCell>
+										<TableCell sx={{ fontWeight: 'bold' }}>Mutter</TableCell>
+										<TableCell sx={{ fontWeight: 'bold' }}>Deckrüde</TableCell>
+										<TableCell sx={{ fontWeight: 'bold' }}>Erw. Geb. Datum</TableCell>
+										<TableCell sx={{ fontWeight: 'bold' }}>Geburtsdatum</TableCell>
+										<TableCell sx={{ fontWeight: 'bold' }} align="center">S (V/T)</TableCell>
+										<TableCell sx={{ fontWeight: 'bold' }} align="center">SM (V/T)</TableCell>
+										<TableCell sx={{ fontWeight: 'bold' }} align="center">B (V/T)</TableCell>
+									</TableRow>
+								</TableHead>
+								<TableBody>
+									{litters.map((litter) => {
+										const orderLetter = litter.OrderLetter ?? ''
+										const kennelName = litter.breeder?.kennelName ?? 'Kein Zwingername bekannt'
+										const breederMember = (litter.breeder?.member?.firstName || '') + ' ' + (litter.breeder?.member?.lastName || '')
+										const motherName = litter.mother?.fullKennelName ?? litter.mother?.givenName ?? 'Unbekannt'
+										const stuntDogName = litter.stuntDog?.fullKennelName ?? litter.stuntDog?.givenName ?? '-'
+
+										return (
+											<TableRow key={litter.documentId} hover>
+												<TableCell>
+													{litter.closed ? (
+														<span className='rounded bg-gray-200 px-2 py-0.5 text-[10px] font-medium text-gray-700 uppercase'>Geschl.</span>
+													) : (
+														<span className='rounded bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-800 uppercase'>Offen</span>
+													)}
+												</TableCell>
+												<TableCell>{orderLetter}</TableCell>
+												<TableCell>
+													<div className="font-medium text-gray-900">{kennelName}</div>
+													<div className="text-xs text-gray-500">{breederMember}</div>
+												</TableCell>
+												<TableCell>{motherName}</TableCell>
+												<TableCell>{stuntDogName}</TableCell>
+												<TableCell>{formatDate(litter.expectedDateOfBirth)}</TableCell>
+												<TableCell>{formatDate(litter.dateOfBirth)}</TableCell>
+												<TableCell align="center">
+													{litter.AmountS ? `${litter.AmountS.Available ?? 0}/${litter.AmountS.Total ?? 0}` : '-'}
+												</TableCell>
+												<TableCell align="center">
+													{litter.AmountSM ? `${litter.AmountSM.Available ?? 0}/${litter.AmountSM.Total ?? 0}` : '-'}
+												</TableCell>
+												<TableCell align="center">
+													{litter.AmountB ? `${litter.AmountB.Available ?? 0}/${litter.AmountB.Total ?? 0}` : '-'}
+												</TableCell>
+											</TableRow>
+										)
+									})}
+								</TableBody>
+							</Table>
+						</TableContainer>
+					)}
 
 					{totalPages > 1 ? (
 						<div className='mt-6 flex items-center justify-center gap-2'>
