@@ -1562,6 +1562,8 @@ export interface PluginHzdPluginLitter extends Struct.CollectionTypeSchema {
       'images' | 'files' | 'videos' | 'audios'
     >;
     StatusMessage: Schema.Attribute.Text;
+    StatusMessageDirtyFlag: Schema.Attribute.Boolean;
+    StatusMessageDraft: Schema.Attribute.Text;
     stuntDog: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.dog'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &

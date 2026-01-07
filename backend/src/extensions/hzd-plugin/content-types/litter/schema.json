@@ -84,6 +84,12 @@
     "StatusMessage": {
       "type": "text"
     },
+    "StatusMessageDraft": {
+      "type": "text"
+    },
+    "StatusMessageDirtyFlag": {
+      "type": "boolean"
+    },
     "OrderLetter": {
       "type": "string",
       "maxLength": 1,
