@@ -1,7 +1,7 @@
 import { MainPageStructure } from '../main-page-structure'
 import { themes } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
-import { MeinHzdContent } from '@/components/mein-hzd/mein-hzd-content'
+import { MeinHzdContent } from '@/components/meine-hzd/meine-hzd-content'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,7 +24,7 @@ export default async function MeinHzdPage() {
 			homepage={globalLayout}
 			strapiBaseUrl={baseUrl}
 			theme={theme}
-			pageTitle='Mein HZD'
+			pageTitle='Meine HZD'
 		>
 			<MeinHzdContent strapiBaseUrl={baseUrl} />
 		</MainPageStructure>

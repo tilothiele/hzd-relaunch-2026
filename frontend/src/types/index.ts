@@ -406,7 +406,7 @@ export interface Litter {
 	dateOfManting?: string | null
 	expectedDateOfBirth?: string | null
 	dateOfBirth?: string | null
-	closed?: boolean | null
+	LitterStatus: 'Planned' | 'Manted' | 'Littered' | 'Closed'
 	StatusMessage?: string | null
 	AmountRS?: PuppyAmount | null
 	AmountRSM?: PuppyAmount | null
@@ -430,6 +430,7 @@ export interface Litter {
 		avatar?: Image | null
 		color?: 'S' | 'SM' | 'B' | null
 	} | null
+	PuppyImage?: Image | null
 }
 
 export interface LitterSearchResult {

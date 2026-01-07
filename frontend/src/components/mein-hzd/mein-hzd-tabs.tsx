@@ -18,7 +18,7 @@ export function MeinHzdTabs() {
 				<Tabs
 					value={activeTab}
 					onChange={handleTabChange}
-					aria-label='Mein HZD Tabs'
+					aria-label='Meine HZD Tabs'
 					sx={{
 						'& .MuiTab-root': {
 							textTransform: 'none',

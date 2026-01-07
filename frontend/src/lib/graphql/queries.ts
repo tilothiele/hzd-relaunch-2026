@@ -636,9 +636,15 @@ export const SEARCH_LITTERS = `
 			dateOfManting
 			expectedDateOfBirth
 			dateOfBirth
-			closed
+			LitterStatus
 			StatusMessage
 			OrderLetter
+			PuppyImage {
+				url
+				alternativeText
+				width
+				height
+			}
 			AmountRS {
 				id
 				Total

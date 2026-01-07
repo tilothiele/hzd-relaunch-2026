@@ -40,8 +40,16 @@
     "dateOfBirth": {
       "type": "date"
     },
-    "closed": {
-      "type": "boolean"
+    "LitterStatus": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Planned",
+      "enum": [
+        "Planned",
+        "Manted",
+        "Littered",
+        "Closed"
+      ]
     },
     "AmountRS": {
       "type": "component",
@@ -81,6 +89,16 @@
       "maxLength": 1,
       "required": true,
       "regex": "[A-Z]"
+    },
+    "PuppyImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
     }
   }
 }

@@ -2,7 +2,7 @@
 
 import { Typography, Container, Box, CircularProgress } from '@mui/material'
 import { useAuth } from '@/hooks/use-auth'
-import { MeinHzdTabs } from './mein-hzd-tabs'
+import { MeinHzdTabs } from './meine-hzd-tabs'
 
 interface MeinHzdContentProps {
 	strapiBaseUrl?: string | null
@@ -61,7 +61,7 @@ export function MeinHzdContent({ strapiBaseUrl }: MeinHzdContentProps) {
 					}}
 				>
 					<Typography variant='h3' sx={{ mb: 2, textAlign: 'center' }}>
-						Mein HZD
+						Meine HZD
 					</Typography>
 					<Typography variant='body1' color='text.secondary' sx={{ textAlign: 'center' }}>
 						Sie müssen angemeldet sein, um diese Seite zu sehen.
@@ -87,7 +87,7 @@ export function MeinHzdContent({ strapiBaseUrl }: MeinHzdContentProps) {
 					flexDirection: 'column',
 				}}
 			>
-				<Typography variant='h3'>Mein HZD</Typography>
+				<Typography variant='h3'>Meine HZD</Typography>
 				<MeinHzdTabs />
 			</Container>
 		</Box>

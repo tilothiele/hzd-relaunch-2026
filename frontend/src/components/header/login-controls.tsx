@@ -280,11 +280,11 @@ export function LoginControls({
 						onMouseLeave={handleMouseLeave}
 					>
 						<Link
-							href='/mein-hzd'
+							href='/meine-hzd'
 							className='block px-4 py-3 text-gray-900 transition-colors hover:bg-yellow-50 hover:text-yellow-500'
 							onClick={() => setIsMenuOpen(false)}
 						>
-							Mein HZD
+							Meine HZD
 						</Link>
 						<button
 							onClick={handleLogout}
@@ -330,8 +330,8 @@ export function LoginControls({
 							<button
 								onClick={() => handleTabChange('login')}
 								className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'login'
-										? 'border-b-2 border-yellow-400 text-yellow-600'
-										: 'text-gray-600 hover:text-gray-900'
+									? 'border-b-2 border-yellow-400 text-yellow-600'
+									: 'text-gray-600 hover:text-gray-900'
 									}`}
 							>
 								Anmeldung
@@ -339,8 +339,8 @@ export function LoginControls({
 							<button
 								onClick={() => handleTabChange('register')}
 								className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'register'
-										? 'border-b-2 border-yellow-400 text-yellow-600'
-										: 'text-gray-600 hover:text-gray-900'
+									? 'border-b-2 border-yellow-400 text-yellow-600'
+									: 'text-gray-600 hover:text-gray-900'
 									}`}
 							>
 								Registrieren
@@ -348,8 +348,8 @@ export function LoginControls({
 							<button
 								onClick={() => handleTabChange('forgot-password')}
 								className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'forgot-password'
-										? 'border-b-2 border-yellow-400 text-yellow-600'
-										: 'text-gray-600 hover:text-gray-900'
+									? 'border-b-2 border-yellow-400 text-yellow-600'
+									: 'text-gray-600 hover:text-gray-900'
 									}`}
 							>
 								Passwort vergessen

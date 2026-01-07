@@ -59,6 +59,9 @@
         "B"
       ]
     },
+    "withersHeight": {
+      "type": "integer"
+    },
     "father": {
       "type": "relation",
       "relation": "oneToOne",

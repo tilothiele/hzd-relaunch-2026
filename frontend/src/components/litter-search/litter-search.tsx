@@ -71,10 +71,46 @@ function getLitterLocation(litter: Litter): { lat: number; lng: number } {
 	return generateFakeLocationForLitter(litter.documentId)
 }
 
+const getStatusLabel = (status: Litter['LitterStatus']) => {
+	switch (status) {
+		case 'Planned': return 'Geplant'
+		case 'Manted': return 'Gedeckt'
+		case 'Littered': return 'Geworfen'
+		case 'Closed': return 'Geschlossen'
+		default: return status
+	}
+}
+
+const renderStatusBadge = (status: Litter['LitterStatus'], small = false) => {
+	const label = getStatusLabel(status)
+	let colorClasses = 'bg-gray-100 text-gray-800'
+
+	switch (status) {
+		case 'Planned':
+			colorClasses = 'bg-blue-100 text-blue-800'
+			break
+		case 'Manted':
+			colorClasses = 'bg-yellow-100 text-yellow-800'
+			break
+		case 'Littered':
+			colorClasses = 'bg-green-100 text-green-800'
+			break
+		case 'Closed':
+			colorClasses = 'bg-gray-200 text-gray-700'
+			break
+	}
+
+	return (
+		<span className={`rounded font-medium uppercase ${colorClasses} ${small ? 'px-2 py-0.5 text-[10px]' : 'px-2 py-1 text-xs'}`}>
+			{label}
+		</span>
+	)
+}
+
 export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 	const [breederFilter, setBreederFilter] = useState('')
 	const [motherFilter, setMotherFilter] = useState('')
-	const [closedFilter, setClosedFilter] = useState<'' | 'true' | 'false'>('')
+	const [statusFilter, setStatusFilter] = useState<'' | 'Planned' | 'Manted' | 'Littered' | 'Closed'>('')
 	const [selectedMaleColors, setSelectedMaleColors] = useState<string[]>(['S', 'SM', 'B'])
 	const [selectedFemaleColors, setSelectedFemaleColors] = useState<string[]>(['S', 'SM', 'B'])
 	const [page, setPage] = useState(1)
@@ -116,9 +152,9 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 				})
 			}
 
-			if (closedFilter) {
+			if (statusFilter) {
 				filterConditions.push({
-					closed: closedFilter === 'true' ? { eq: true } : { ne: true },
+					LitterStatus: { eq: statusFilter },
 				})
 			}
 
@@ -186,7 +222,7 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [strapiBaseUrl, breederFilter, motherFilter, closedFilter, selectedMaleColors, selectedFemaleColors, page, pageSize])
+	}, [strapiBaseUrl, breederFilter, motherFilter, statusFilter, selectedMaleColors, selectedFemaleColors, page, pageSize])
 
 	useEffect(() => {
 		void searchLitters()
@@ -247,6 +283,7 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 					) : litter.expectedDateOfBirth ? (
 						<div>Erwartet: {formatDate(litter.expectedDateOfBirth)}</div>
 					) : null}
+					<div>Status: {getStatusLabel(litter.LitterStatus)}</div>
 					{breeder?.member?.zip && (
 						<div>PLZ: {breeder.member.zip}</div>
 					)}
@@ -324,13 +361,15 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 					<FormControl fullWidth size='small'>
 						<InputLabel>Status</InputLabel>
 						<Select
-							value={closedFilter}
+							value={statusFilter}
 							label='Status'
-							onChange={(e) => setClosedFilter(e.target.value as '' | 'true' | 'false')}
+							onChange={(e) => setStatusFilter(e.target.value as any)}
 						>
 							<MenuItem value=''>Alle</MenuItem>
-							<MenuItem value='false'>Offen</MenuItem>
-							<MenuItem value='true'>Geschlossen</MenuItem>
+							<MenuItem value='Planned'>Geplant</MenuItem>
+							<MenuItem value='Manted'>Gedeckt</MenuItem>
+							<MenuItem value='Littered'>Geworfen</MenuItem>
+							<MenuItem value='Closed'>Geschlossen</MenuItem>
 						</Select>
 					</FormControl>
 				</Box>
@@ -528,80 +567,66 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 											<h3 className='text-lg font-semibold text-gray-900'>
 												{orderLetter}-Wurf: {kennelName}
 											</h3>
-											{litter.closed ? (
-												<span className='rounded bg-gray-200 px-2 py-1 text-xs font-medium text-gray-700'>
-													Geschlossen
-												</span>
-											) : (
-												<span className='rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-800'>
-													Offen
-												</span>
-											)}
+											{renderStatusBadge(litter.LitterStatus)}
 										</div>
 
-										{/* Parent Images */}
-										<div className='mb-4 grid grid-cols-2 gap-2'>
-											<div className='relative aspect-square overflow-hidden rounded-md bg-gray-100'>
-												{litter.mother?.avatar || hzdSetting ? (
+										{/* Content Preview */}
+										<div className='mb-4 flex gap-4'>
+											{/* Main Image (PuppyImage or Parent Combo) */}
+											<div className='relative w-1/3 aspect-[4/3] overflow-hidden rounded-md bg-gray-100 flex-shrink-0'>
+												{litter.PuppyImage ? (
 													<Image
-														src={resolveMediaUrl(
-															litter.mother?.avatar ||
-															(litter.mother?.color === 'SM' ? hzdSetting?.DefaultAvatarSM :
-																litter.mother?.color === 'B' ? hzdSetting?.DefaultAvatarB :
-																	hzdSetting?.DefaultAvatarS),
-															strapiBaseUrl
-														) || ''}
-														alt={litter.mother?.fullKennelName || 'Mutter'}
+														src={resolveMediaUrl(litter.PuppyImage, strapiBaseUrl) || ''}
+														alt="Welpen"
 														fill
 														className='object-cover'
 														unoptimized
 													/>
 												) : (
-													<div className='flex h-full items-center justify-center text-[10px] text-gray-400'>
-														Kein Bild (Mutter)
+													<div className='grid grid-cols-2 h-full'>
+														<div className='relative h-full border-r border-white'>
+															<Image
+																src={resolveMediaUrl(
+																	litter.mother?.avatar ||
+																	(litter.mother?.color === 'SM' ? hzdSetting?.DefaultAvatarSM :
+																		litter.mother?.color === 'B' ? hzdSetting?.DefaultAvatarB :
+																			hzdSetting?.DefaultAvatarS),
+																	strapiBaseUrl
+																) || ''}
+																alt="Mutter"
+																fill
+																className='object-cover'
+																unoptimized
+															/>
+														</div>
+														<div className='relative h-full'>
+															<Image
+																src={resolveMediaUrl(
+																	litter.stuntDog?.avatar ||
+																	(litter.stuntDog?.color === 'SM' ? hzdSetting?.DefaultAvatarSM :
+																		litter.stuntDog?.color === 'B' ? hzdSetting?.DefaultAvatarB :
+																			hzdSetting?.DefaultAvatarS),
+																	strapiBaseUrl
+																) || ''}
+																alt="Vater"
+																fill
+																className='object-cover'
+																unoptimized
+															/>
+														</div>
 													</div>
 												)}
 											</div>
-											<div className='relative aspect-square overflow-hidden rounded-md bg-gray-100'>
-												{litter.stuntDog?.avatar || hzdSetting ? (
-													<Image
-														src={resolveMediaUrl(
-															litter.stuntDog?.avatar ||
-															(litter.stuntDog?.color === 'SM' ? hzdSetting?.DefaultAvatarSM :
-																litter.stuntDog?.color === 'B' ? hzdSetting?.DefaultAvatarB :
-																	hzdSetting?.DefaultAvatarS),
-															strapiBaseUrl
-														) || ''}
-														alt={litter.stuntDog?.fullKennelName || 'Deckrüde'}
-														fill
-														className='object-cover'
-														unoptimized
-													/>
-												) : (
-													<div className='flex h-full items-center justify-center text-[10px] text-gray-400'>
-														Kein Bild (Deckrüde)
-													</div>
-												)}
+
+											<div className='flex-1 space-y-1 text-xs text-gray-600 border-l pl-4'>
+												<p><strong>Züchter:</strong> {breederMember}</p>
+												{distance !== null && <p><strong>Entfernung:</strong> ~{Math.round(distance)} km</p>}
+												<p><strong>Mutter:</strong> {motherName}</p>
+												{stuntDogName && <p><strong>Deckrüde:</strong> {stuntDogName}</p>}
 											</div>
 										</div>
 
 										<div className='space-y-2 text-sm text-gray-600'>
-											<p>
-												<strong>Züchter:</strong> {breederMember}
-											</p>
-											{distance !== null && (
-												<p>
-													<strong>Entfernung:</strong> ~{Math.round(distance)} km
-												</p>
-											)}
-											<p>
-												<strong>Mutter:</strong> {motherName}
-											</p>
-											{stuntDogName ? (
-												<p>
-													<strong>Deckrüde:</strong> {stuntDogName}
-												</p>
-											) : null}
 											{litter.dateOfManting ? (
 												<p>
 													<strong>Deckdatum:</strong> {formatDate(litter.dateOfManting)}
@@ -703,11 +728,7 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 										return (
 											<TableRow key={litter.documentId} hover>
 												<TableCell>
-													{litter.closed ? (
-														<span className='rounded bg-gray-200 px-2 py-0.5 text-[10px] font-medium text-gray-700 uppercase'>Geschl.</span>
-													) : (
-														<span className='rounded bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-800 uppercase'>Offen</span>
-													)}
+													{renderStatusBadge(litter.LitterStatus, true)}
 												</TableCell>
 												<TableCell>{orderLetter}</TableCell>
 												<TableCell>

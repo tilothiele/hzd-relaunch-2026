@@ -52,7 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             { path: '/calendar', lastMod: calendarUpdated, priority: 0.8, freq: 'daily' as const },
             { path: '/results', lastMod: calendarUpdated, priority: 0.7, freq: 'weekly' as const }, // Often tied to calendar
             { path: '/contact', lastMod: indexUpdated, priority: 0.8, freq: 'monthly' as const },
-            { path: '/mein-hzd', lastMod: indexUpdated, priority: 0.6, freq: 'monthly' as const },
+            { path: '/meine-hzd', lastMod: indexUpdated, priority: 0.6, freq: 'monthly' as const },
             { path: '/anmeldung', lastMod: indexUpdated, priority: 0.6, freq: 'monthly' as const },
         ].map((route) => ({
             url: `${siteUrl}${route.path}`,

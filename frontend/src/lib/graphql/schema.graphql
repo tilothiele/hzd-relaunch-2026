@@ -1300,6 +1300,7 @@ input HzdPluginDogFiltersInput {
   dateOfDeath: DateFilterInput
   sex: StringFilterInput
   color: StringFilterInput
+  withersHeight: IntFilterInput
   father: HzdPluginDogFiltersInput
   mother: HzdPluginDogFiltersInput
   cId: IntFilterInput
@@ -1336,6 +1337,7 @@ input HzdPluginDogInput {
   dateOfDeath: Date
   sex: ENUM_HZDPLUGINDOG_SEX
   color: ENUM_HZDPLUGINDOG_COLOR
+  withersHeight: Int
   father: ID
   mother: ID
   cId: Int
@@ -1368,6 +1370,7 @@ type HzdPluginDog {
   dateOfDeath: Date
   sex: ENUM_HZDPLUGINDOG_SEX
   color: ENUM_HZDPLUGINDOG_COLOR
+  withersHeight: Int
   father: HzdPluginDog
   mother: HzdPluginDog
   cId: Int
@@ -1461,6 +1464,13 @@ type HzdPluginBreederEntityResponseCollection {
   pageInfo: Pagination!
 }
 
+enum ENUM_HZDPLUGINLITTER_LITTERSTATUS {
+  Planned
+  Manted
+  Littered
+  Closed
+}
+
 input HzdPluginLitterFiltersInput {
   documentId: IDFilterInput
   breeder: HzdPluginBreederFiltersInput
@@ -1469,7 +1479,7 @@ input HzdPluginLitterFiltersInput {
   dateOfManting: DateFilterInput
   expectedDateOfBirth: DateFilterInput
   dateOfBirth: DateFilterInput
-  closed: BooleanFilterInput
+  LitterStatus: StringFilterInput
   AmountRS: ComponentBreedingPuppyAmountFiltersInput
   AmountRSM: ComponentBreedingPuppyAmountFiltersInput
   AmountRB: ComponentBreedingPuppyAmountFiltersInput
@@ -1493,7 +1503,7 @@ input HzdPluginLitterInput {
   dateOfManting: Date
   expectedDateOfBirth: Date
   dateOfBirth: Date
-  closed: Boolean
+  LitterStatus: ENUM_HZDPLUGINLITTER_LITTERSTATUS
   AmountRS: ComponentBreedingPuppyAmountInput
   AmountRSM: ComponentBreedingPuppyAmountInput
   AmountRB: ComponentBreedingPuppyAmountInput
@@ -1502,6 +1512,7 @@ input HzdPluginLitterInput {
   AmountHB: ComponentBreedingPuppyAmountInput
   StatusMessage: String
   OrderLetter: String
+  PuppyImage: ID
   publishedAt: DateTime
 }
 
@@ -1513,7 +1524,7 @@ type HzdPluginLitter {
   dateOfManting: Date
   expectedDateOfBirth: Date
   dateOfBirth: Date
-  closed: Boolean
+  LitterStatus: ENUM_HZDPLUGINLITTER_LITTERSTATUS!
   AmountRS: ComponentBreedingPuppyAmount
   AmountRSM: ComponentBreedingPuppyAmount
   AmountRB: ComponentBreedingPuppyAmount
@@ -1522,6 +1533,7 @@ type HzdPluginLitter {
   AmountHB: ComponentBreedingPuppyAmount
   StatusMessage: String
   OrderLetter: String!
+  PuppyImage: UploadFile
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime

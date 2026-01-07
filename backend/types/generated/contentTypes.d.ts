@@ -1471,6 +1471,7 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    withersHeight: Schema.Attribute.Integer;
   };
 }
 
@@ -1533,13 +1534,17 @@ export interface PluginHzdPluginLitter extends Struct.CollectionTypeSchema {
       'manyToOne',
       'plugin::hzd-plugin.breeder'
     >;
-    closed: Schema.Attribute.Boolean;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     dateOfBirth: Schema.Attribute.Date;
     dateOfManting: Schema.Attribute.Date;
     expectedDateOfBirth: Schema.Attribute.Date;
+    LitterStatus: Schema.Attribute.Enumeration<
+      ['Planned', 'Manted', 'Littered', 'Closed']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Planned'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -1553,6 +1558,9 @@ export interface PluginHzdPluginLitter extends Struct.CollectionTypeSchema {
         maxLength: 1;
       }>;
     publishedAt: Schema.Attribute.DateTime;
+    PuppyImage: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
     StatusMessage: Schema.Attribute.Text;
     stuntDog: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.dog'>;
     updatedAt: Schema.Attribute.DateTime;
