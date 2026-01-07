@@ -1470,9 +1470,12 @@ input HzdPluginLitterFiltersInput {
   expectedDateOfBirth: DateFilterInput
   dateOfBirth: DateFilterInput
   closed: BooleanFilterInput
-  AmountS: ComponentBreedingPuppyAmountFiltersInput
-  AmountSM: ComponentBreedingPuppyAmountFiltersInput
-  AmountB: ComponentBreedingPuppyAmountFiltersInput
+  AmountRS: ComponentBreedingPuppyAmountFiltersInput
+  AmountRSM: ComponentBreedingPuppyAmountFiltersInput
+  AmountRB: ComponentBreedingPuppyAmountFiltersInput
+  AmountHS: ComponentBreedingPuppyAmountFiltersInput
+  AmountHSM: ComponentBreedingPuppyAmountFiltersInput
+  AmountHB: ComponentBreedingPuppyAmountFiltersInput
   StatusMessage: StringFilterInput
   OrderLetter: StringFilterInput
   createdAt: DateTimeFilterInput
@@ -1491,9 +1494,12 @@ input HzdPluginLitterInput {
   expectedDateOfBirth: Date
   dateOfBirth: Date
   closed: Boolean
-  AmountS: ComponentBreedingPuppyAmountInput
-  AmountSM: ComponentBreedingPuppyAmountInput
-  AmountB: ComponentBreedingPuppyAmountInput
+  AmountRS: ComponentBreedingPuppyAmountInput
+  AmountRSM: ComponentBreedingPuppyAmountInput
+  AmountRB: ComponentBreedingPuppyAmountInput
+  AmountHS: ComponentBreedingPuppyAmountInput
+  AmountHSM: ComponentBreedingPuppyAmountInput
+  AmountHB: ComponentBreedingPuppyAmountInput
   StatusMessage: String
   OrderLetter: String
   publishedAt: DateTime
@@ -1508,9 +1514,12 @@ type HzdPluginLitter {
   expectedDateOfBirth: Date
   dateOfBirth: Date
   closed: Boolean
-  AmountS: ComponentBreedingPuppyAmount
-  AmountSM: ComponentBreedingPuppyAmount
-  AmountB: ComponentBreedingPuppyAmount
+  AmountRS: ComponentBreedingPuppyAmount
+  AmountRSM: ComponentBreedingPuppyAmount
+  AmountRB: ComponentBreedingPuppyAmount
+  AmountHS: ComponentBreedingPuppyAmount
+  AmountHSM: ComponentBreedingPuppyAmount
+  AmountHB: ComponentBreedingPuppyAmount
   StatusMessage: String
   OrderLetter: String!
   createdAt: DateTime

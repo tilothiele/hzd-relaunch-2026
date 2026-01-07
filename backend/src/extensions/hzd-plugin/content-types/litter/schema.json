@@ -43,17 +43,32 @@
     "closed": {
       "type": "boolean"
     },
-    "AmountS": {
+    "AmountRS": {
       "type": "component",
       "component": "breeding.puppy-amount",
       "repeatable": false
     },
-    "AmountSM": {
+    "AmountRSM": {
       "type": "component",
       "component": "breeding.puppy-amount",
       "repeatable": false
     },
-    "AmountB": {
+    "AmountRB": {
+      "type": "component",
+      "component": "breeding.puppy-amount",
+      "repeatable": false
+    },
+    "AmountHS": {
+      "type": "component",
+      "component": "breeding.puppy-amount",
+      "repeatable": false
+    },
+    "AmountHSM": {
+      "type": "component",
+      "component": "breeding.puppy-amount",
+      "repeatable": false
+    },
+    "AmountHB": {
       "type": "component",
       "component": "breeding.puppy-amount",
       "repeatable": false

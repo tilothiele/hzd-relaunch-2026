@@ -1523,9 +1523,12 @@ export interface PluginHzdPluginLitter extends Struct.CollectionTypeSchema {
     };
   };
   attributes: {
-    AmountB: Schema.Attribute.Component<'breeding.puppy-amount', false>;
-    AmountS: Schema.Attribute.Component<'breeding.puppy-amount', false>;
-    AmountSM: Schema.Attribute.Component<'breeding.puppy-amount', false>;
+    AmountHB: Schema.Attribute.Component<'breeding.puppy-amount', false>;
+    AmountHS: Schema.Attribute.Component<'breeding.puppy-amount', false>;
+    AmountHSM: Schema.Attribute.Component<'breeding.puppy-amount', false>;
+    AmountRB: Schema.Attribute.Component<'breeding.puppy-amount', false>;
+    AmountRS: Schema.Attribute.Component<'breeding.puppy-amount', false>;
+    AmountRSM: Schema.Attribute.Component<'breeding.puppy-amount', false>;
     breeder: Schema.Attribute.Relation<
       'manyToOne',
       'plugin::hzd-plugin.breeder'

@@ -5,6 +5,8 @@ import Image from 'next/image'
 import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, ToggleButtonGroup, ToggleButton, Tooltip, FormControlLabel } from '@mui/material'
 import GridViewIcon from '@mui/icons-material/GridView'
 import TableRowsIcon from '@mui/icons-material/TableRows'
+import MaleIcon from '@mui/icons-material/Male'
+import FemaleIcon from '@mui/icons-material/Female'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { fetchGraphQL } from '@/lib/graphql-client'
 import { SEARCH_LITTERS } from '@/lib/graphql/queries'
@@ -73,7 +75,8 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 	const [breederFilter, setBreederFilter] = useState('')
 	const [motherFilter, setMotherFilter] = useState('')
 	const [closedFilter, setClosedFilter] = useState<'' | 'true' | 'false'>('')
-	const [selectedColors, setSelectedColors] = useState<string[]>(['S', 'SM', 'B'])
+	const [selectedMaleColors, setSelectedMaleColors] = useState<string[]>(['S', 'SM', 'B'])
+	const [selectedFemaleColors, setSelectedFemaleColors] = useState<string[]>(['S', 'SM', 'B'])
 	const [page, setPage] = useState(1)
 	const [pageSize, setPageSize] = useState<PageSize>(10)
 	const [litters, setLitters] = useState<Litter[]>([])
@@ -119,9 +122,16 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 				})
 			}
 
-			if (selectedColors.length > 0) {
-				const colorFilters = selectedColors.map(color => ({
-					[`Amount${color}`]: { Available: { gt: 0 } }
+			if (selectedMaleColors.length > 0) {
+				const colorFilters = selectedMaleColors.map((color: string) => ({
+					[`AmountR${color}`]: { Available: { gt: 0 } }
+				}))
+				filterConditions.push({ or: colorFilters })
+			}
+
+			if (selectedFemaleColors.length > 0) {
+				const colorFilters = selectedFemaleColors.map((color: string) => ({
+					[`AmountH${color}`]: { Available: { gt: 0 } }
 				}))
 				filterConditions.push({ or: colorFilters })
 			}
@@ -176,7 +186,7 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [strapiBaseUrl, breederFilter, motherFilter, closedFilter, selectedColors, page, pageSize])
+	}, [strapiBaseUrl, breederFilter, motherFilter, closedFilter, selectedMaleColors, selectedFemaleColors, page, pageSize])
 
 	useEffect(() => {
 		void searchLitters()
@@ -326,40 +336,82 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 				</Box>
 
 				<Box sx={{ mt: 3, display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'center', justifyContent: 'space-between' }}>
-					<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
-						<Typography variant="body2" sx={{ fontWeight: 500, mr: 1 }}>Verfügbare Welpen in den Farbschlägen:</Typography>
-						<ToggleButtonGroup
-							value={selectedColors}
-							onChange={(_e, newColors: string[]) => {
-								setSelectedColors(newColors)
-								setPage(1)
-							}}
-							aria-label="Filter nach Welpenfarbe"
-							size="small"
-							sx={{
-								"& .MuiToggleButton-root": {
-									px: 3,
-									fontWeight: 'bold',
-									"&.Mui-selected": {
-										backgroundColor: '#facc15',
-										color: '#565757',
-										"&:hover": {
-											backgroundColor: '#e6b800',
+					<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center' }}>
+						<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+							<Tooltip title="Rüden (♂)" arrow>
+								<MaleIcon sx={{ color: '#0ea5e9', fontSize: 28 }} />
+							</Tooltip>
+							<ToggleButtonGroup
+								value={selectedMaleColors}
+								onChange={(_e, newColors: string[]) => {
+									setSelectedMaleColors(newColors)
+									setPage(1)
+								}}
+								aria-label="Filter nach Rüden-Welpenfarbe"
+								size="small"
+								sx={{
+									"& .MuiToggleButton-root": {
+										px: 2,
+										fontWeight: 'bold',
+										"&.Mui-selected": {
+											backgroundColor: '#facc15',
+											color: '#565757',
+											"&:hover": {
+												backgroundColor: '#e6b800',
+											}
 										}
 									}
-								}
-							}}
-						>
-							<Tooltip title="Schwarz" arrow>
-								<ToggleButton value="S" aria-label="Schwarz">S</ToggleButton>
+								}}
+							>
+								<Tooltip title="Schwarz" arrow>
+									<ToggleButton value="S">S</ToggleButton>
+								</Tooltip>
+								<Tooltip title="Schwarzmarken" arrow>
+									<ToggleButton value="SM">SM</ToggleButton>
+								</Tooltip>
+								<Tooltip title="Blond" arrow>
+									<ToggleButton value="B">B</ToggleButton>
+								</Tooltip>
+							</ToggleButtonGroup>
+						</Box>
+
+						<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+							<Tooltip title="Hündinnen (♀)" arrow>
+								<FemaleIcon sx={{ color: '#ec4899', fontSize: 28 }} />
 							</Tooltip>
-							<Tooltip title="Schwarzmarken" arrow>
-								<ToggleButton value="SM" aria-label="Schwarzmarken">SM</ToggleButton>
-							</Tooltip>
-							<Tooltip title="Blond" arrow>
-								<ToggleButton value="B" aria-label="Blond">B</ToggleButton>
-							</Tooltip>
-						</ToggleButtonGroup>
+							<ToggleButtonGroup
+								value={selectedFemaleColors}
+								onChange={(_e, newColors: string[]) => {
+									setSelectedFemaleColors(newColors)
+									setPage(1)
+								}}
+								aria-label="Filter nach Hündinnen-Welpenfarbe"
+								size="small"
+								sx={{
+									"& .MuiToggleButton-root": {
+										px: 2,
+										fontWeight: 'bold',
+										"&.Mui-selected": {
+											backgroundColor: '#facc15',
+											color: '#565757',
+											"&:hover": {
+												backgroundColor: '#e6b800',
+											}
+										}
+									}
+								}}
+							>
+								<Tooltip title="Schwarz" arrow>
+									<ToggleButton value="S">S</ToggleButton>
+								</Tooltip>
+								<Tooltip title="Schwarzmarken" arrow>
+									<ToggleButton value="SM">SM</ToggleButton>
+								</Tooltip>
+								<Tooltip title="Blond" arrow>
+									<ToggleButton value="B">B</ToggleButton>
+								</Tooltip>
+							</ToggleButtonGroup>
+						</Box>
 					</Box>
 
 					<Button
@@ -565,24 +617,39 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 													<strong>Geburtsdatum:</strong> {formatDate(litter.dateOfBirth)}
 												</p>
 											) : null}
-											{(litter.AmountS || litter.AmountSM || litter.AmountB) ? (
+											{(litter.AmountRS || litter.AmountRSM || litter.AmountRB || litter.AmountHS || litter.AmountHSM || litter.AmountHB) ? (
 												<div className='mt-3 space-y-1 border-t border-gray-200 pt-2'>
-													<p className='font-medium text-gray-700'>Welpen:</p>
-													{litter.AmountS ? (
-														<p className='pl-2'>
-															<strong>Schwarz:</strong> {litter.AmountS.Available ?? 0}/{litter.AmountS.Total ?? 0} verfügbar
-														</p>
-													) : null}
-													{litter.AmountSM ? (
-														<p className='pl-2'>
-															<strong>Schwarzmarken:</strong> {litter.AmountSM.Available ?? 0}/{litter.AmountSM.Total ?? 0} verfügbar
-														</p>
-													) : null}
-													{litter.AmountB ? (
-														<p className='pl-2'>
-															<strong>Blond:</strong> {litter.AmountB.Available ?? 0}/{litter.AmountB.Total ?? 0} verfügbar
-														</p>
-													) : null}
+													<div className="flex justify-between items-center mb-1">
+														<p className='font-medium text-gray-700'>Welpen:</p>
+														<div className="flex gap-4 text-[10px] text-gray-500 font-bold">
+															<span>RUDEN (R)</span>
+															<span>HÜNDINNEN (H)</span>
+														</div>
+													</div>
+
+													{[
+														{ key: 'S', label: 'Schwarz' },
+														{ key: 'SM', label: 'Schwarzmarken' },
+														{ key: 'B', label: 'Blond' }
+													].map(({ key, label }) => {
+														const male = (litter as any)[`AmountR${key}`]
+														const female = (litter as any)[`AmountH${key}`]
+														if (!male && !female) return null
+
+														return (
+															<div key={key} className="flex justify-between items-center pl-2">
+																<span className="text-sm"><strong>{label}:</strong></span>
+																<div className="flex gap-4 font-mono text-sm">
+																	<span className={male?.Available > 0 ? 'text-green-700 font-bold' : 'text-gray-400'}>
+																		{male?.Available ?? 0}/{male?.Total ?? 0}
+																	</span>
+																	<span className={female?.Available > 0 ? 'text-green-700 font-bold' : 'text-gray-400'}>
+																		{female?.Available ?? 0}/{female?.Total ?? 0}
+																	</span>
+																</div>
+															</div>
+														)
+													})}
 												</div>
 											) : null}
 											{litter.StatusMessage ? (
@@ -609,9 +676,9 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 										<TableCell sx={{ fontWeight: 'bold' }}>Deckrüde</TableCell>
 										<TableCell sx={{ fontWeight: 'bold' }}>Erw. Geb. Datum</TableCell>
 										<TableCell sx={{ fontWeight: 'bold' }}>Geburtsdatum</TableCell>
-										<TableCell sx={{ fontWeight: 'bold' }} align="center">S (V/T)</TableCell>
-										<TableCell sx={{ fontWeight: 'bold' }} align="center">SM (V/T)</TableCell>
-										<TableCell sx={{ fontWeight: 'bold' }} align="center">B (V/T)</TableCell>
+										<TableCell sx={{ fontWeight: 'bold' }} align="center">S (R / H)</TableCell>
+										<TableCell sx={{ fontWeight: 'bold' }} align="center">SM (R / H)</TableCell>
+										<TableCell sx={{ fontWeight: 'bold' }} align="center">B (R / H)</TableCell>
 									</TableRow>
 								</TableHead>
 								<TableBody>
@@ -655,13 +722,25 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 												<TableCell>{formatDate(litter.expectedDateOfBirth)}</TableCell>
 												<TableCell>{formatDate(litter.dateOfBirth)}</TableCell>
 												<TableCell align="center">
-													{litter.AmountS ? `${litter.AmountS.Available ?? 0}/${litter.AmountS.Total ?? 0}` : '-'}
+													<div className="flex justify-center gap-2 text-xs">
+														<span className={litter.AmountRS?.Available ?? 0 > 0 ? 'font-bold' : ''}>{litter.AmountRS ? `${litter.AmountRS.Available ?? 0}/${litter.AmountRS.Total ?? 0}` : '-'}</span>
+														<span className="text-gray-300">|</span>
+														<span className={litter.AmountHS?.Available ?? 0 > 0 ? 'font-bold' : ''}>{litter.AmountHS ? `${litter.AmountHS.Available ?? 0}/${litter.AmountHS.Total ?? 0}` : '-'}</span>
+													</div>
 												</TableCell>
 												<TableCell align="center">
-													{litter.AmountSM ? `${litter.AmountSM.Available ?? 0}/${litter.AmountSM.Total ?? 0}` : '-'}
+													<div className="flex justify-center gap-2 text-xs">
+														<span className={litter.AmountRSM?.Available ?? 0 > 0 ? 'font-bold' : ''}>{litter.AmountRSM ? `${litter.AmountRSM.Available ?? 0}/${litter.AmountRSM.Total ?? 0}` : '-'}</span>
+														<span className="text-gray-300">|</span>
+														<span className={litter.AmountHSM?.Available ?? 0 > 0 ? 'font-bold' : ''}>{litter.AmountHSM ? `${litter.AmountHSM.Available ?? 0}/${litter.AmountHSM.Total ?? 0}` : '-'}</span>
+													</div>
 												</TableCell>
 												<TableCell align="center">
-													{litter.AmountB ? `${litter.AmountB.Available ?? 0}/${litter.AmountB.Total ?? 0}` : '-'}
+													<div className="flex justify-center gap-2 text-xs">
+														<span className={litter.AmountRB?.Available ?? 0 > 0 ? 'font-bold' : ''}>{litter.AmountRB ? `${litter.AmountRB.Available ?? 0}/${litter.AmountRB.Total ?? 0}` : '-'}</span>
+														<span className="text-gray-300">|</span>
+														<span className={litter.AmountHB?.Available ?? 0 > 0 ? 'font-bold' : ''}>{litter.AmountHB ? `${litter.AmountHB.Available ?? 0}/${litter.AmountHB.Total ?? 0}` : '-'}</span>
+													</div>
 												</TableCell>
 											</TableRow>
 										)

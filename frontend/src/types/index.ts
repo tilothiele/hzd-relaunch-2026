@@ -408,9 +408,12 @@ export interface Litter {
 	dateOfBirth?: string | null
 	closed?: boolean | null
 	StatusMessage?: string | null
-	AmountS?: PuppyAmount | null
-	AmountSM?: PuppyAmount | null
-	AmountB?: PuppyAmount | null
+	AmountRS?: PuppyAmount | null
+	AmountRSM?: PuppyAmount | null
+	AmountRB?: PuppyAmount | null
+	AmountHS?: PuppyAmount | null
+	AmountHSM?: PuppyAmount | null
+	AmountHB?: PuppyAmount | null
 	OrderLetter: string
 	breeder?: Breeder | null
 	mother?: {

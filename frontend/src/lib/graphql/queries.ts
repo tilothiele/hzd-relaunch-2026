@@ -639,17 +639,32 @@ export const SEARCH_LITTERS = `
 			closed
 			StatusMessage
 			OrderLetter
-			AmountS {
+			AmountRS {
 				id
 				Total
 				Available
 			}
-			AmountSM {
+			AmountRSM {
 				id
 				Total
 				Available
 			}
-			AmountB {
+			AmountRB {
+				id
+				Total
+				Available
+			}
+			AmountHS {
+				id
+				Total
+				Available
+			}
+			AmountHSM {
+				id
+				Total
+				Available
+			}
+			AmountHB {
 				id
 				Total
 				Available
