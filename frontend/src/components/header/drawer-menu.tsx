@@ -166,7 +166,7 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                         cursor: 'pointer',
                         '&:hover': {
                             '& .drawer-handle': {
-                                transform: 'translateY(-50%) scaleX(1.1)',
+                                transform: 'scaleX(1.1)',
                                 backgroundColor: '#1a3673',
                                 left: '4px',
                             },
@@ -196,7 +196,7 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                         className="drawer-handle"
                         sx={{
                             position: 'absolute',
-                            top: '30%', // Positioned slightly above center
+                            top: '7rem',
                             left: '2px',
                             width: '24px',
                             height: '80px',
@@ -206,7 +206,6 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                             alignItems: 'center',
                             justifyContent: 'center',
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            transform: 'translateY(-50%)',
                             boxShadow: '2px 0 8px rgba(0,0,0,0.2)',
                             zIndex: 2001,
                         }}

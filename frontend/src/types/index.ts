@@ -222,6 +222,7 @@ export interface GlobalLayout {
 	Logo?: Image | null
 	Footer?: Footer | null
 	Menu?: Menu | null
+	MenuStyle: 'Classic' | 'StickyTransparent'
 	DrawerMenu?: Menu | null
 	Copyright?: string | null
 	SocialLinkFB?: string | null

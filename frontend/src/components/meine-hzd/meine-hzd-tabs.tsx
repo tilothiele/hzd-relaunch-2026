@@ -5,7 +5,7 @@ import { Tabs, Tab, Box, Typography } from '@mui/material'
 
 type TabId = 0 | 1 | 2 | 3
 
-export function MeinHzdTabs() {
+export function MeineHzdTabs() {
 	const [activeTab, setActiveTab] = useState<TabId>(0)
 
 	const handleTabChange = (_event: React.SyntheticEvent, newValue: TabId) => {

@@ -14,6 +14,15 @@
     "Menu": {
       "type": "json"
     },
+    "MenuStyle": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Classic",
+      "enum": [
+        "Classic",
+        "StickyTransparent"
+      ]
+    },
     "DrawerMenu": {
       "type": "json"
     },

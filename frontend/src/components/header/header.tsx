@@ -7,6 +7,7 @@ import { SocialLinks } from './social-links'
 import { LoginControls } from './login-controls'
 import { resolveMediaUrl } from './logo-utils'
 import { DrawerMenuComponent } from './drawer-menu'
+import { cn } from '@/lib/utils'
 
 interface LoginCredentials {
 	identifier: string
@@ -45,13 +46,21 @@ export function Header({
 	const logoWidth = 80
 	const logoHeight = 80
 
+	const isStickyTransparent = globalLayout?.MenuStyle === 'StickyTransparent'
+	const headerBg = isStickyTransparent
+		? `color-mix(in srgb, ${theme.headerBackground}, transparent 20%)`
+		: theme.headerBackground
+
 	return (
 		<header
 			style={{
-				backgroundColor: theme.headerBackground,
+				backgroundColor: headerBg,
 				color: theme.headerFooterTextColor,
 			}}
-			className='w-full'
+			className={cn(
+				'w-full transition-all duration-300',
+				isStickyTransparent && 'sticky top-0 z-[100] backdrop-blur-md shadow-sm'
+			)}
 		>
 			<nav className='header-nav-padding flex w-full items-center px-6'>
 				{/* Left Section: Drawer + Logo */}

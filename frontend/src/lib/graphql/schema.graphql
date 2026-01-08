@@ -448,6 +448,38 @@ type ComponentLayoutColorTheme {
   ShortName: ENUM_COMPONENTLAYOUTCOLORTHEME_SHORTNAME
 }
 
+input ComponentColumnsTextColumnFiltersInput {
+  ColumnHeadline: StringFilterInput
+  ColumnText: StringFilterInput
+  BulletItems: ComponentColumnsColumnItemFiltersInput
+  ColumnActionButton: ComponentLinksActionButtonFiltersInput
+  and: [ComponentColumnsTextColumnFiltersInput]
+  or: [ComponentColumnsTextColumnFiltersInput]
+  not: ComponentColumnsTextColumnFiltersInput
+}
+
+type ComponentColumnsTextColumn {
+  id: ID!
+  ColumnHeadline: String
+  ColumnText: String
+  BulletItems(filters: ComponentColumnsColumnItemFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [ComponentColumnsColumnItem]
+  ColumnActionButton: ComponentLinksActionButton
+}
+
+input ComponentColumnsColumnItemFiltersInput {
+  Headline: StringFilterInput
+  ItemBody: StringFilterInput
+  and: [ComponentColumnsColumnItemFiltersInput]
+  or: [ComponentColumnsColumnItemFiltersInput]
+  not: ComponentColumnsColumnItemFiltersInput
+}
+
+type ComponentColumnsColumnItem {
+  id: ID!
+  Headline: String
+  ItemBody: String
+}
+
 type ComponentFormTextArea {
   id: ID!
   TAName: String
@@ -607,38 +639,6 @@ type ComponentFormBooleanChoice {
   BCRequired: Boolean
   BCDefaultValue: Boolean
   BCRequiredValue: Boolean
-}
-
-input ComponentColumnsTextColumnFiltersInput {
-  ColumnHeadline: StringFilterInput
-  ColumnText: StringFilterInput
-  BulletItems: ComponentColumnsColumnItemFiltersInput
-  ColumnActionButton: ComponentLinksActionButtonFiltersInput
-  and: [ComponentColumnsTextColumnFiltersInput]
-  or: [ComponentColumnsTextColumnFiltersInput]
-  not: ComponentColumnsTextColumnFiltersInput
-}
-
-type ComponentColumnsTextColumn {
-  id: ID!
-  ColumnHeadline: String
-  ColumnText: String
-  BulletItems(filters: ComponentColumnsColumnItemFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [ComponentColumnsColumnItem]
-  ColumnActionButton: ComponentLinksActionButton
-}
-
-input ComponentColumnsColumnItemFiltersInput {
-  Headline: StringFilterInput
-  ItemBody: StringFilterInput
-  and: [ComponentColumnsColumnItemFiltersInput]
-  or: [ComponentColumnsColumnItemFiltersInput]
-  not: ComponentColumnsColumnItemFiltersInput
-}
-
-type ComponentColumnsColumnItem {
-  id: ID!
-  Headline: String
-  ItemBody: String
 }
 
 input ComponentCalendarCalendarDocumentFiltersInput {
@@ -1487,6 +1487,8 @@ input HzdPluginLitterFiltersInput {
   AmountHSM: ComponentBreedingPuppyAmountFiltersInput
   AmountHB: ComponentBreedingPuppyAmountFiltersInput
   StatusMessage: StringFilterInput
+  StatusMessageDraft: StringFilterInput
+  StatusMessageDirtyFlag: BooleanFilterInput
   OrderLetter: StringFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
@@ -1511,6 +1513,8 @@ input HzdPluginLitterInput {
   AmountHSM: ComponentBreedingPuppyAmountInput
   AmountHB: ComponentBreedingPuppyAmountInput
   StatusMessage: String
+  StatusMessageDraft: String
+  StatusMessageDirtyFlag: Boolean
   OrderLetter: String
   PuppyImage: ID
   publishedAt: DateTime
@@ -1532,6 +1536,8 @@ type HzdPluginLitter {
   AmountHSM: ComponentBreedingPuppyAmount
   AmountHB: ComponentBreedingPuppyAmount
   StatusMessage: String
+  StatusMessageDraft: String
+  StatusMessageDirtyFlag: Boolean
   OrderLetter: String!
   PuppyImage: UploadFile
   createdAt: DateTime
@@ -1885,8 +1891,14 @@ type FormInstanceEntityResponseCollection {
   pageInfo: Pagination!
 }
 
+enum ENUM_GLOBALLAYOUT_MENUSTYLE {
+  Classic
+  StickyTransparent
+}
+
 input GlobalLayoutInput {
   Menu: JSON
+  MenuStyle: ENUM_GLOBALLAYOUT_MENUSTYLE
   DrawerMenu: JSON
   Logo: ID
   Footer: ComponentLayoutFooterInput
@@ -1902,6 +1914,7 @@ input GlobalLayoutInput {
 type GlobalLayout {
   documentId: ID!
   Menu: JSON
+  MenuStyle: ENUM_GLOBALLAYOUT_MENUSTYLE!
   DrawerMenu: JSON
   Logo: UploadFile
   Footer: ComponentLayoutFooter
@@ -2425,7 +2438,7 @@ type SupplementalDocumentGroupEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
+union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
 
 input FileInfoInput {
   name: String

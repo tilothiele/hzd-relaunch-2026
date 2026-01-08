@@ -709,6 +709,9 @@ export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
       Schema.Attribute.Private;
     Logo: Schema.Attribute.Media<'images'>;
     Menu: Schema.Attribute.JSON;
+    MenuStyle: Schema.Attribute.Enumeration<['Classic', 'StickyTransparent']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Classic'>;
     PartnerLink: Schema.Attribute.Component<'links.partnerl-link', true>;
     PrivacyPolicy: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios'
