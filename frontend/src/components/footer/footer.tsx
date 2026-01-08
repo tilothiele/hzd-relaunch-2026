@@ -58,13 +58,13 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 						<div>
 							<div className='grid grid-cols-2 gap-2 px-2'>
 								<div>
-									<p className='font-bold'>Präsidium</p>
+									<p className='font-bold' style={{ color: theme.headerFooterTextColor }}>Präsidium</p>
 									<div className='text-sm'>{globalLayout?.Footer?.PraesidiumName}</div>
 									<div className='text-sm'>{globalLayout?.Footer?.PraesidiumOrt}</div>
 									<div className='text-sm'>{globalLayout?.Footer?.PraesidiumTelefon}</div>
 								</div>
 								<div>
-									<p className='font-bold'>IT-Projektleitung</p>
+									<p className='font-bold' style={{ color: theme.headerFooterTextColor }}>IT-Projektleitung</p>
 									<div className='text-sm'>{globalLayout?.Footer?.ItProjektleitungName}</div>
 									<div className='text-sm'>{globalLayout?.Footer?.ItProjektleitungOrt}</div>
 									<div className='text-sm'>{globalLayout?.Footer?.ItProjektleitungTelefon}</div>
@@ -136,7 +136,7 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 						) : null}
 					</div>
 					<div>
-						<p className='text-center font-semibold'>
+						<p className='text-center font-semibold' style={{ color: theme.headerFooterTextColor }}>
 							Unsere Partner
 						</p>
 						<div className='flex flex-col items-center' style={{ gap: '1rem' }}>

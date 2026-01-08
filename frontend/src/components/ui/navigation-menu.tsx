@@ -72,7 +72,7 @@ function DesktopMenuItem({
 								textTransform: 'none',
 								paddingRight: 0.5,
 								'&:hover': {
-									color: '#FCD34D',
+									color: 'var(--color-secondary)',
 									backgroundColor: 'transparent',
 								},
 							}}
@@ -100,7 +100,7 @@ function DesktopMenuItem({
 							color: theme.headerFooterTextColor,
 							padding: '4px',
 							'&:hover': {
-								color: '#FCD34D',
+								color: 'var(--color-secondary)',
 								backgroundColor: 'rgba(252, 211, 77, 0.1)',
 							},
 						}}
@@ -127,8 +127,8 @@ function DesktopMenuItem({
 					}}
 					sx={{
 						'& .MuiPaper-root': {
-							backgroundColor: '#F2F5F7',
-							color: theme.textColor,
+							backgroundColor: 'var(--color-white)',
+							color: 'var(--color-text)',
 							mt: 1,
 							padding: 2,
 							borderRadius: 2,
@@ -153,10 +153,10 @@ function DesktopMenuItem({
 												fontSize: '1.125rem',
 												fontWeight: 600,
 												padding: '8px 16px',
-												color: '#565757',
+												color: 'var(--color-text)',
 												'&:hover': {
 													backgroundColor: 'rgba(252, 211, 77, 0.1)',
-													color: '#FCD34D',
+													color: 'var(--color-secondary)',
 												},
 											}}
 										>
@@ -169,7 +169,7 @@ function DesktopMenuItem({
 												fontSize: '1.125rem',
 												fontWeight: 600,
 												padding: '8px 16px',
-												color: '#565757',
+												color: 'var(--color-text)',
 											}}
 										>
 											{child.name}
@@ -189,11 +189,11 @@ function DesktopMenuItem({
 															onClick={handleClose}
 															sx={{
 																padding: '6px 12px',
-																color: '#565757',
+																color: 'var(--color-text)',
 																fontWeight: 600,
 																'&:hover': {
 																	backgroundColor: 'rgba(252, 211, 77, 0.1)',
-																	color: '#FCD34D',
+																	color: 'var(--color-secondary)',
 																},
 															}}
 														>
@@ -204,7 +204,7 @@ function DesktopMenuItem({
 															disabled
 															sx={{
 																padding: '6px 12px',
-																color: '#565757',
+																color: 'var(--color-text)',
 																fontWeight: 600,
 																opacity: 1,
 																cursor: 'default',
@@ -218,7 +218,7 @@ function DesktopMenuItem({
 																sx={{
 																	fontSize: '1rem',
 																	fontWeight: 600,
-																	color: '#565757',
+																	color: 'var(--color-text)',
 																}}
 															>
 																{grandchild.name}
@@ -235,10 +235,10 @@ function DesktopMenuItem({
 																onClick={handleClose}
 																sx={{
 																	paddingLeft: 6,
-																	color: '#565757',
+																	color: 'var(--color-text)',
 																	'&:hover': {
 																		backgroundColor: 'rgba(252, 211, 77, 0.1)',
-																		color: '#FCD34D',
+																		color: 'var(--color-secondary)',
 																	},
 																}}
 															>
@@ -258,10 +258,10 @@ function DesktopMenuItem({
 												onClick={handleClose}
 												sx={{
 													paddingLeft: 4,
-													color: '#565757',
+													color: 'var(--color-text)',
 													'&:hover': {
 														backgroundColor: 'rgba(252, 211, 77, 0.1)',
-														color: '#FCD34D',
+														color: 'var(--color-secondary)',
 													},
 												}}
 											>
@@ -283,7 +283,7 @@ function DesktopMenuItem({
 									color: '#565757',
 									'&:hover': {
 										backgroundColor: 'rgba(252, 211, 77, 0.1)',
-										color: '#FCD34D',
+										color: 'var(--color-secondary)',
 									},
 								}}
 							>
@@ -307,7 +307,7 @@ function DesktopMenuItem({
 					fontWeight: 500,
 					textTransform: 'none',
 					'&:hover': {
-						color: '#FCD34D',
+						color: 'var(--color-secondary)',
 						backgroundColor: 'transparent',
 					},
 				}}
@@ -395,7 +395,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 															href={item.url}
 															onClick={() => handleSubmenuToggle(itemKey)}
 															sx={{
-																color: '#565757',
+																color: 'var(--color-text)',
 																'&:hover': {
 																	backgroundColor: 'rgba(0, 0, 0, 0.04)',
 																},
@@ -420,7 +420,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 														<ListItemButton
 															onClick={() => handleSubmenuToggle(itemKey)}
 															sx={{
-																color: '#565757',
+																color: 'var(--color-text)',
 																'&:hover': {
 																	backgroundColor: 'rgba(0, 0, 0, 0.04)',
 																},
@@ -460,7 +460,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 																					onClick={handleMobileToggle}
 																					sx={{
 																						pl: 4,
-																						color: '#565757',
+																						color: 'var(--color-text)',
 																						'&:hover': {
 																							backgroundColor: 'rgba(0, 0, 0, 0.04)',
 																						},
@@ -484,7 +484,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 																				<ListItemButton
 																					sx={{
 																						pl: 4,
-																						color: '#565757',
+																						color: 'var(--color-text)',
 																						'&:hover': {
 																							backgroundColor: 'rgba(0, 0, 0, 0.04)',
 																						},
@@ -521,7 +521,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 																									onClick={handleMobileToggle}
 																									sx={{
 																										pl: 6,
-																										color: '#565757',
+																										color: 'var(--color-text)',
 																										'&:hover': {
 																											backgroundColor: 'rgba(0, 0, 0, 0.04)',
 																										},
@@ -545,7 +545,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 																								<ListItemButton
 																									sx={{
 																										pl: 6,
-																										color: '#565757',
+																										color: 'var(--color-text)',
 																										'&:hover': {
 																											backgroundColor: 'rgba(0, 0, 0, 0.04)',
 																										},
@@ -577,7 +577,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 																										onClick={handleMobileToggle}
 																										sx={{
 																											pl: 8,
-																											color: '#565757',
+																											color: 'var(--color-text)',
 																											'&:hover': {
 																												backgroundColor: 'rgba(0, 0, 0, 0.04)',
 																											},
@@ -606,7 +606,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 																						onClick={handleMobileToggle}
 																						sx={{
 																							pl: 6,
-																							color: '#565757',
+																							color: 'var(--color-text)',
 																							'&:hover': {
 																								backgroundColor: 'rgba(0, 0, 0, 0.04)',
 																							},
@@ -635,7 +635,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 																		onClick={handleMobileToggle}
 																		sx={{
 																			pl: 4,
-																			color: '#565757',
+																			color: 'var(--color-text)',
 																			'&:hover': {
 																				backgroundColor: 'rgba(0, 0, 0, 0.04)',
 																			},
@@ -662,7 +662,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 													href={item.url}
 													onClick={handleMobileToggle}
 													sx={{
-														color: '#565757',
+														color: 'var(--color-text)',
 														'&:hover': {
 															backgroundColor: 'rgba(0, 0, 0, 0.04)',
 														},
@@ -692,7 +692,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 															sx={{
 																fontSize: '1.125rem',
 																fontWeight: 500,
-																color: '#565757',
+																color: 'var(--color-text)',
 															}}
 														>
 															{item.name}

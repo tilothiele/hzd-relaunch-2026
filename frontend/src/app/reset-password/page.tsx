@@ -1,6 +1,6 @@
 import { MainPageStructure } from '../main-page-structure'
 import { ResetPasswordForm } from '@/components/reset-password/reset-password-form'
-import { themes } from '@/themes'
+import { theme as globalTheme } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 
@@ -12,7 +12,7 @@ interface ResetPasswordPageProps {
 
 export default async function ResetPasswordPage({ searchParams }: ResetPasswordPageProps) {
 	const { globalLayout, baseUrl, error } = await fetchGlobalLayout()
-	const theme = themes.B
+	const theme = globalTheme
 	const pageTitle = 'Passwort ändern'
 	const params = await searchParams
 	const code = params.code

@@ -6,18 +6,21 @@ import { Box, Typography, Card, CardMedia, CardContent } from '@mui/material'
 import type { ContactGroup, Contact } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { renderStrapiBlocks } from '@/lib/strapi-blocks'
+import { theme as globalTheme, type ThemeDefinition } from '@/themes'
 
 interface ContactGroupProps {
 	contactGroup: ContactGroup
 	strapiBaseUrl: string
+	theme: ThemeDefinition
 }
 
 interface ContactCardProps {
 	contact: Contact
 	strapiBaseUrl: string
+	theme: ThemeDefinition
 }
 
-function ContactCard({ contact, strapiBaseUrl }: ContactCardProps) {
+function ContactCard({ contact, strapiBaseUrl, theme }: ContactCardProps) {
 	const avatarUrl = resolveMediaUrl(contact.avatar, strapiBaseUrl)
 	const avatarAlt = contact.avatar?.alternativeText || contact.Name || 'Kontakt'
 	const hasIntroduction = !!contact.Introduction
@@ -33,6 +36,8 @@ function ContactCard({ contact, strapiBaseUrl }: ContactCardProps) {
 					boxShadow: 3,
 				},
 				cursor: hasIntroduction ? 'pointer' : 'default',
+				backgroundColor: theme.cardsBackground,
+				color: theme.cardsText,
 			}}
 		>
 			{avatarUrl ? (
@@ -65,7 +70,7 @@ function ContactCard({ contact, strapiBaseUrl }: ContactCardProps) {
 						justifyContent: 'center',
 					}}
 				>
-					<Typography variant='body2' className='text-gray-400'>
+					<Typography variant='body2' sx={{ color: theme.cardsText, opacity: 0.7 }}>
 						Kein Bild
 					</Typography>
 				</CardMedia>
@@ -73,7 +78,7 @@ function ContactCard({ contact, strapiBaseUrl }: ContactCardProps) {
 
 			<CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
 				{contact.Headline ? (
-					<Typography variant='h6' component='h3' className='font-semibold text-gray-900' sx={{ mb: 1 }}>
+					<Typography variant='h6' component='h3' className='font-semibold' sx={{ mb: 1, color: theme.cardsText }}>
 						{contact.Headline}
 					</Typography>
 				) : null}
@@ -81,9 +86,10 @@ function ContactCard({ contact, strapiBaseUrl }: ContactCardProps) {
 				{contact.Name ? (
 					<Typography
 						variant='body1'
-						className='font-medium text-gray-900'
+						className='font-medium'
 						sx={{
 							mb: .5,
+							color: theme.cardsText,
 							'&:hover': {
 								textDecoration: contactLink ? 'underline' : 'none',
 							},
@@ -95,19 +101,19 @@ function ContactCard({ contact, strapiBaseUrl }: ContactCardProps) {
 
 				<Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
 					{contact.Street ? (
-						<Typography variant='body2' className='text-gray-600'>
+						<Typography variant='body2' sx={{ color: theme.cardsText, opacity: 0.9 }}>
 							{contact.Street}
 						</Typography>
 					) : null}
 
 					{contact.ZipCity ? (
-						<Typography variant='body2' className='text-gray-600'>
+						<Typography variant='body2' sx={{ color: theme.cardsText, opacity: 0.9 }}>
 							{contact.ZipCity}
 						</Typography>
 					) : null}
 
 					{contact.Phone ? (
-						<Typography variant='body2' className='text-gray-600'>
+						<Typography variant='body2' sx={{ color: theme.cardsText, opacity: 0.9 }}>
 							{contact.Phone.startsWith('Tel.') || contact.Phone.startsWith('Mobil')
 								? contact.Phone
 								: `Tel.: ${contact.Phone}`}
@@ -115,13 +121,13 @@ function ContactCard({ contact, strapiBaseUrl }: ContactCardProps) {
 					) : null}
 
 					{contact.Email1 ? (
-						<Typography variant='body2' className='text-gray-600'>
+						<Typography variant='body2' sx={{ color: theme.cardsText, opacity: 0.9 }}>
 							{contact.Email1}
 						</Typography>
 					) : null}
 
 					{contact.Email2 ? (
-						<Typography variant='body2' className='text-gray-600'>
+						<Typography variant='body2' sx={{ color: theme.cardsText, opacity: 0.9 }}>
 							{contact.Email2}
 						</Typography>
 					) : null}
@@ -143,7 +149,7 @@ function ContactCard({ contact, strapiBaseUrl }: ContactCardProps) {
 	return <Box sx={{ height: '100%' }}>{cardContent}</Box>
 }
 
-export function ContactGroupComponent({ contactGroup, strapiBaseUrl }: ContactGroupProps) {
+export function ContactGroupComponent({ contactGroup, strapiBaseUrl, theme }: ContactGroupProps) {
 	const contacts = contactGroup.contacts || []
 
 	// Sortiere Contacts nach position, falls vorhanden
@@ -156,7 +162,7 @@ export function ContactGroupComponent({ contactGroup, strapiBaseUrl }: ContactGr
 	return (
 		<Box sx={{ padding: 4 }}>
 			{contactGroup.ContactGroupName ? (
-				<Typography variant='h4' component='h2' className='mb-6 font-bold text-gray-900' sx={{ marginBottom: 4 }}>
+				<Typography variant='h4' component='h2' className='mb-6 font-bold' sx={{ marginBottom: 4, color: theme.headlineColor }}>
 					{contactGroup.ContactGroupName}
 				</Typography>
 			) : null}
@@ -193,7 +199,7 @@ export function ContactGroupComponent({ contactGroup, strapiBaseUrl }: ContactGr
 					}}
 				>
 					{sortedContacts.map((contact) => (
-						<ContactCard key={contact.documentId} contact={contact} strapiBaseUrl={strapiBaseUrl} />
+						<ContactCard key={contact.documentId} contact={contact} strapiBaseUrl={strapiBaseUrl} theme={theme} />
 					))}
 				</Box>
 			)}

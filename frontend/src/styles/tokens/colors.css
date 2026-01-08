@@ -12,17 +12,53 @@
 	--green-light: #27ae60;
 	*/
 
-    --theme-text-color: #565757;
-    --theme-heading-color: #64574E;
-    --theme-heading-text-color: #444444;
+
+    --color-astronaut-100: #0A152E;
+    /* 10% Lightness */
+    --color-astronaut-200: #152B5C;
+    /* 22% Lightness */
+    --color-astronaut-300: #1A3673;
+    /* 28% Lightness (Base) */
+    --color-astronaut-400: #2950A3;
+    /* 40% Lightness */
+    --color-astronaut-500: #527AD1;
+    /* 57% Lightness */
+    --color-astronaut-600: #7FA0E0;
+    /* 69% Lightness */
+    --color-astronaut-700: #A8C0F0;
+    /* 80% Lightness */
+    --color-astronaut-800: #D4DFF7;
+    /* 90% Lightness */
+    --color-astronaut-900: #F2F5FD;
+    /* 97% Lightness */
+
+    --color-pine-cone-100: #1C1917;
+    /* 10% Lightness */
+    --color-pine-cone-200: #3F3934;
+    /* 22% Lightness */
+    --color-pine-cone-300: #64574E;
+    /* 35% Lightness (Base) */
+    --color-pine-cone-400: #857569;
+    /* 46% Lightness */
+    --color-pine-cone-500: #A89A8F;
+    /* 58% Lightness */
+    --color-pine-cone-600: #C6BDB5;
+    /* 70% Lightness */
+    --color-pine-cone-700: #E0DBD7;
+    /* 81% Lightness */
+    --color-pine-cone-800: #F2F0EE;
+    /* 91% Lightness */
+    --color-pine-cone-900: #FAF9F9;
+    /* 97% Lightness */
 
     /* LQ (Lawrenz Qualitäter) Theme Colors */
-    --lq-white: #ffffff;
-    --lq-text-gray: #565757;
-    --lq-bg-gray: #f2f2f2;
-    --lq-theme-a-primary: #64574E;
-    --lq-theme-b-primary: #90C6BF;
-    --lq-theme-c-primary: #FAD857;
-    --lq-theme-d-primary: #A8267D;
-    --lq-theme-e-primary: #46605C;
+    --color-white: #ffffff;
+    --color-text-gray: #565757;
+    --color-bg-gray: #f2f2f2;
+    --color-theme-a-primary: #64574E;
+    --color-theme-b-primary: #90C6BF;
+    --color-theme-c-primary: #FAD857;
+    --color-theme-d-primary: #A8267D;
+    --color-theme-e-primary: #46605C;
+    --color-theme-primary: var(--color-theme-a-primary);
 }

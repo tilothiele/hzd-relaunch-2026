@@ -188,7 +188,7 @@ export function TextColumnsSectionComponent({
 
 									{columnActionButton ? (
 										<Box sx={{ mt: 2 }}>
-											<ActionButton actionButton={columnActionButton} />
+											<ActionButton actionButton={columnActionButton} theme={theme} />
 										</Box>
 									) : null}
 								</Box>

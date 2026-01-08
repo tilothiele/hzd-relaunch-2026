@@ -15,9 +15,6 @@ export interface ActionButton {
 	Primary?: boolean | null
 }
 
-export interface ColorTheme {
-	ShortName?: 'A' | 'B' | 'C' | 'D' | 'E' | null
-}
 
 export interface SlideItem {
 	id?: string
@@ -37,7 +34,6 @@ export interface CardItem {
 	Headline?: string | null
 	Subheadline?: string | null
 	BackgroundImage?: Image | null
-	ColorTheme?: ColorTheme | null
 	ActionButton?: ActionButton | null
 }
 
@@ -192,7 +188,6 @@ export type PageSection = StartpageSection
 export interface Page {
 	slug?: string | null
 	title?: string | null
-	ColorTheme?: ColorTheme | null
 	Sections?: PageSection[] | null
 }
 

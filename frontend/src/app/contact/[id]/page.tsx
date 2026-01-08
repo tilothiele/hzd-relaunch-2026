@@ -1,5 +1,5 @@
 import { MainPageStructure } from '../../main-page-structure'
-import { themes } from '@/themes'
+import { theme as globalTheme } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { fetchGraphQLServer } from '@/lib/server/graphql-client'
 import { GET_CONTACT_BY_DOCUMENT_ID } from '@/lib/graphql/queries'
@@ -44,11 +44,11 @@ interface ContactQueryResult {
 
 export default async function ContactIdPage({ params }: ContactIdPageProps) {
 	const { globalLayout, baseUrl, error } = await fetchGlobalLayout()
-	const theme = themes.B
+	const theme = globalTheme
 	const pageTitle = 'Kontakt'
 	const resolvedParams = await params
 	const contactId = resolvedParams.id
-	const backgroundColor = theme.evenBgColor
+	const backgroundColor = theme.cardsBackground
 
 	let contact = null
 	if (contactId) {
@@ -90,7 +90,7 @@ export default async function ContactIdPage({ params }: ContactIdPageProps) {
 				paddingBottom='1em'
 			>
 				{contact ? (
-					<ContactDetail contact={contact} strapiBaseUrl={baseUrl || ''} />
+					<ContactDetail contact={contact} strapiBaseUrl={baseUrl || ''} theme={theme} />
 				) : (
 					<div className='flex min-h-[50vh] items-center justify-center px-4 text-center text-sm text-gray-600'>
 						<p>Kontakt mit ID "{contactId}" konnte nicht geladen werden.</p>

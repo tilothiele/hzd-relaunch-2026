@@ -1,14 +1,14 @@
 import { MainPageStructure } from '../main-page-structure'
 import { ResultSearch } from '@/components/result-search/result-search'
-import { themes } from '@/themes'
+import { theme as globalTheme } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 
 export const dynamic = 'force-dynamic'
 
-export default async function CalendarPage() {
+export default async function ResultsPage() {
 	const { globalLayout, baseUrl, error } = await fetchGlobalLayout()
-	const theme = themes.B
+	const theme = globalTheme
 	const pageTitle = 'Ergebnisse'
 
 	if (error) {

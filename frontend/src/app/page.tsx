@@ -1,5 +1,5 @@
 import { MainPageStructure } from './main-page-structure'
-import { themes } from '@/themes'
+import { theme as globalTheme } from '@/themes'
 import { fetchIndexPage } from '@/lib/server/fetch-index-page'
 import { renderServerSections } from '@/components/sections/server-section-factory'
 
@@ -25,7 +25,7 @@ export default async function Home() {
 		)
 	}
 
-	const theme = themes.A
+	const theme = globalTheme
 	const renderedSections = renderServerSections({
 		sections,
 		strapiBaseUrl: baseUrl,

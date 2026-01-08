@@ -1,13 +1,13 @@
 import { MainPageStructure } from '../main-page-structure'
 import { DogSearch } from '@/components/dog-search/dog-search'
-import { themes } from '@/themes'
+import { theme as globalTheme } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 
 export const dynamic = 'force-dynamic'
 
 export default async function DogsPage() {
 	const { globalLayout, baseUrl, error } = await fetchGlobalLayout()
-	const theme = themes.B
+	const theme = globalTheme
 
 	if (error) {
 		return (

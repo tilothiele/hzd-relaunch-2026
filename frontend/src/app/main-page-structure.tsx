@@ -6,7 +6,8 @@ import { Header } from '@/components/header/header'
 import { Footer } from '@/components/footer/footer'
 import { CookieBanner } from '@/components/cookie-banner/cookie-banner'
 import { useAuth } from '@/hooks/use-auth'
-import { DEFAULT_THEME_ID, themes, type ThemeDefinition } from '@/themes'
+import { theme as globalTheme } from '@/themes'
+import type { ThemeDefinition } from '@/themes'
 import { renderStartpageSections } from '@/components/sections/section-factory'
 
 const textSkeletonKeys = [
@@ -66,13 +67,14 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 		handleLogout,
 	} = useAuth(strapiBaseUrl)
 
-	const themex = theme || themes[DEFAULT_THEME_ID]
+	// theme prop is kept for backward compatibility but ignored in favor of the global theme
+	const currentTheme = globalTheme
 
 	const themeStyles = useMemo(() => ({
-		'--theme-text-color': themex.textColor,
-		'--theme-heading-color': themex.headerBackground,
-		color: themex.textColor,
-	}) as CSSProperties, [theme])
+		'--theme-text-color': currentTheme.textColor,
+		'--theme-heading-color': currentTheme.headlineColor,
+		color: currentTheme.textColor,
+	}) as CSSProperties, [])
 
 	if (!!loading || !homepage) {
 		return <MainPageSkeleton />
@@ -80,7 +82,7 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 
 	// Bevorzuge children (Server Components), falls vorhanden, sonst rendere sections (Client Components)
 	const content = children ?? (sections && strapiBaseUrl
-		? renderStartpageSections({ sections, strapiBaseUrl, theme: themex })
+		? renderStartpageSections({ sections, strapiBaseUrl, theme: currentTheme })
 		: null)
 
 	return (
@@ -89,7 +91,7 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 				globalLayout={homepage}
 				pageTitle={pageTitle}
 				strapiBaseUrl={strapiBaseUrl}
-				theme={themex}
+				theme={currentTheme}
 				isAuthenticated={isAuthenticated}
 				user={user}
 				onLogin={handleLogin}
@@ -106,7 +108,7 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 			<Footer
 				globalLayout={homepage}
 				strapiBaseUrl={strapiBaseUrl}
-				theme={themex}
+				theme={currentTheme}
 			/>
 			<CookieBanner />
 		</div>

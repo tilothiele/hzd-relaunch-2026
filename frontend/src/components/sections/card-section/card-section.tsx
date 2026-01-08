@@ -1,8 +1,7 @@
 import { Box, Card, CardContent, Typography } from '@mui/material'
 import type { CardItem, CardSection } from '@/types'
-import type { ThemeDefinition } from '@/themes'
+import { theme as globalTheme, type ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
-import { getThemeById, type ThemeId } from '@/themes'
 import { ActionButton } from '@/components/ui/action-button'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 
@@ -12,12 +11,8 @@ interface CardSectionComponentProps {
 	theme: ThemeDefinition
 }
 
-function getThemeColor(themeId: ThemeId | null | undefined): string {
-	if (!themeId) {
-		return '#64574E'
-	}
-	const theme = getThemeById(themeId)
-	return theme.headerBackground
+function getThemeColor(): string {
+	return globalTheme.headerBackground
 }
 
 export function CardSectionComponent({
@@ -53,8 +48,8 @@ export function CardSectionComponent({
 				{cards.map((card, index) => {
 					const key = card.id ?? card.Headline ?? `card-${index}`
 					const imageUrl = resolveMediaUrl(card.BackgroundImage, strapiBaseUrl)
-					const themeColor = getThemeColor(card.ColorTheme?.ShortName)
-					const theme = card.ColorTheme?.ShortName ? getThemeById(card.ColorTheme.ShortName) : null
+					const themeColor = getThemeColor()
+					const currentCardTheme = globalTheme
 
 					return (
 						<Box
@@ -72,8 +67,8 @@ export function CardSectionComponent({
 									display: 'flex',
 									flexDirection: 'column',
 									overflow: 'hidden',
-									backgroundColor: '#1f2937',
-									color: 'white',
+									backgroundColor: theme.cardsBackground,
+									color: theme.cardsText,
 									boxShadow: 3,
 									borderTopLeftRadius: 0,
 									borderTopRightRadius: 0,
@@ -81,15 +76,6 @@ export function CardSectionComponent({
 									borderBottomRightRadius: 0,
 								}}
 							>
-								{/* Farbiger Balken oben */}
-								<Box
-									sx={{
-										height: 12,
-										width: '100%',
-										backgroundColor: themeColor,
-									}}
-								/>
-
 								{/* Bild-Container mit Backdrop */}
 								<Box
 									sx={{
@@ -141,7 +127,7 @@ export function CardSectionComponent({
 												component='h3'
 												sx={{
 													fontWeight: 600,
-													color: 'white',
+													color: theme.cardsText,
 													textAlign: 'center',
 													mb: 2,
 												}}
@@ -153,7 +139,8 @@ export function CardSectionComponent({
 											<Typography
 												variant='body2'
 												sx={{
-													color: 'rgba(255, 255, 255, 0.9)',
+													color: theme.cardsText,
+													opacity: 0.9,
 													textAlign: 'center',
 													mb: 2,
 												}}
@@ -171,7 +158,7 @@ export function CardSectionComponent({
 											>
 												<ActionButton
 													actionButton={card.ActionButton}
-													theme={theme}
+													theme={currentCardTheme}
 												/>
 											</Box>
 										) : null}

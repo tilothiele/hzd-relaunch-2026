@@ -304,18 +304,19 @@ export function LoginControls({
 			<button
 				type='button'
 				onClick={toggleFormVisibility}
-				className='flex items-center gap-2 text-sm transition-colors hover:text-yellow-400'
+				className='flex items-center gap-2 transition-colors hover:text-yellow-400'
+				style={{ color: theme.headerFooterTextColor, fontSize: '1.4rem' }}
 				aria-expanded={isFormVisible}
 				aria-controls='login-form'
 			>
-				<FontAwesomeIcon icon={faUser} />
+				<FontAwesomeIcon icon={faUser} style={{ color: theme.headerFooterTextColor, fontSize: '1.4rem' }} />
 				{isAuthenticating ? (
 					<span className='flex items-center gap-2'>
 						<FontAwesomeIcon icon={faSpinner} spin />
 						Laden
 					</span>
 				) : (
-					<span>{userLabel}</span>
+					<span style={{ color: theme.headerFooterTextColor }}>{userLabel}</span>
 				)}
 			</button>
 

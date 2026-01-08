@@ -3,32 +3,24 @@
    This allows components to use --lq-action-primary regardless of the active theme.
 */
 
-[data-theme='A'] {
-    --lq-action-primary: var(--lq-theme-a-primary);
-    --lq-action-text: var(--lq-white);
-    --lq-surface-bg: var(--lq-bg-gray);
-}
+:root {
 
-[data-theme='B'] {
-    --lq-action-primary: var(--lq-theme-b-primary);
-    --lq-action-text: var(--lq-white);
-    --lq-surface-bg: var(--lq-bg-gray);
-}
+    --color-primary: var(--color-astronaut-300);
+    --color-secondary: var(--color-pine-cone-300);
 
-[data-theme='C'] {
-    --lq-action-primary: var(--lq-theme-c-primary);
-    --lq-action-text: var(--lq-white);
-    --lq-surface-bg: var(--lq-bg-gray);
-}
+    --color-background: var(--color-pine-cone-100);
+    --color-action-primary: var(--color-primary);
 
-[data-theme='D'] {
-    --lq-action-primary: var(--lq-theme-d-primary);
-    --lq-action-text: var(--lq-white);
-    --lq-surface-bg: var(--lq-bg-gray);
-}
+    --color-text: var(--color-astronaut-100);
+    --color-text-headline: var(--color-astronaut-200);
+    --color-text-subheadline: var(--color-pine-cone-100);
 
-[data-theme='E'] {
-    --lq-action-primary: var(--lq-theme-e-primary);
-    --lq-action-text: var(--lq-white);
-    --lq-surface-bg: var(--lq-bg-gray);
+    --color-negative-text: var(--color-astronaut-800);
+    --color-negative-text-headline: var(--color-astronaut-900);
+    --color-negative-text-subheadline: var(--color-pine-cone-800);
+
+    --color-cards-background: var(--color-pine-cone-900);
+    --color-cards-text: var(--color-astronaut-200);
+
+
 }

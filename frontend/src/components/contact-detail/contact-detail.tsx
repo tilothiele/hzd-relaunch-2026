@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Box, Typography } from '@mui/material'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { renderStrapiBlocks } from '@/lib/strapi-blocks'
+import type { ThemeDefinition } from '@/themes'
 
 interface ContactDetailProps {
 	contact: {
@@ -33,9 +34,10 @@ interface ContactDetailProps {
 		} | null
 	}
 	strapiBaseUrl: string
+	theme: ThemeDefinition
 }
 
-export function ContactDetail({ contact, strapiBaseUrl }: ContactDetailProps) {
+export function ContactDetail({ contact, strapiBaseUrl, theme }: ContactDetailProps) {
 	const avatarUrl = resolveMediaUrl(contact.avatar, strapiBaseUrl)
 	const avatarAlt = contact.avatar?.alternativeText || contact.Name || 'Kontakt'
 
@@ -46,32 +48,32 @@ export function ContactDetail({ contact, strapiBaseUrl }: ContactDetailProps) {
 				{/* Text-Bereich links */}
 				<Box sx={{ flex: 1 }}>
 					{contact.Headline ? (
-						<Typography variant='h4' component='h1' className='font-bold text-gray-900' sx={{ mb: 2 }}>
+						<Typography variant='h4' component='h1' className='font-bold' sx={{ mb: 2, color: theme.cardsText }}>
 							{contact.Headline}
 						</Typography>
 					) : null}
 
 					{contact.Name ? (
-						<Typography variant='h5' component='h2' className='font-medium text-gray-900' sx={{ mb: 1 }}>
+						<Typography variant='h5' component='h2' className='font-medium' sx={{ mb: 1, color: theme.cardsText }}>
 							{contact.Name}
 						</Typography>
 					) : null}
 
 					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
 						{contact.Street ? (
-							<Typography variant='body1' className='text-gray-600'>
+							<Typography variant='body1' sx={{ color: theme.cardsText, opacity: 0.9 }}>
 								{contact.Street}
 							</Typography>
 						) : null}
 
 						{contact.ZipCity ? (
-							<Typography variant='body1' className='text-gray-600'>
+							<Typography variant='body1' sx={{ color: theme.cardsText, opacity: 0.9 }}>
 								{contact.ZipCity}
 							</Typography>
 						) : null}
 
 						{contact.Phone ? (
-							<Typography variant='body1' className='text-gray-600'>
+							<Typography variant='body1' sx={{ color: theme.cardsText, opacity: 0.9 }}>
 								{contact.Phone.startsWith('Tel.') || contact.Phone.startsWith('Mobil')
 									? contact.Phone
 									: `Tel.: ${contact.Phone}`}
@@ -79,13 +81,13 @@ export function ContactDetail({ contact, strapiBaseUrl }: ContactDetailProps) {
 						) : null}
 
 						{contact.Email1 ? (
-							<Typography variant='body1' className='text-gray-600'>
+							<Typography variant='body1' sx={{ color: theme.cardsText, opacity: 0.9 }}>
 								{contact.Email1}
 							</Typography>
 						) : null}
 
 						{contact.Email2 ? (
-							<Typography variant='body1' className='text-gray-600'>
+							<Typography variant='body1' sx={{ color: theme.cardsText, opacity: 0.9 }}>
 								{contact.Email2}
 							</Typography>
 						) : null}
@@ -118,7 +120,7 @@ export function ContactDetail({ contact, strapiBaseUrl }: ContactDetailProps) {
 				<Box
 					sx={{
 						mt: 2,
-						'& p': { mb: 2 },
+						'& p': { mb: 2, color: theme.cardsText },
 						'& p:last-child': { mb: 0 },
 					}}
 					dangerouslySetInnerHTML={{

@@ -28,6 +28,11 @@ export function RichTextSectionComponent({
 		>
 			<div
 				className='prose prose-xl max-w-none dark:prose-invert'
+				style={{
+					color: theme.textColor,
+					'--tw-prose-body': theme.textColor,
+					'--tw-prose-headings': theme.headlineColor,
+				} as React.CSSProperties}
 				dangerouslySetInnerHTML={{ __html: section.RichTextContent }}
 			/>
 		</SectionContainer>

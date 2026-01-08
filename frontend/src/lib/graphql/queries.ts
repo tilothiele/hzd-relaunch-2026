@@ -113,9 +113,6 @@ export const GET_INDEX_PAGE = `
 						id
 						Headline
 						Subheadline
-						ColorTheme {
-							ShortName
-						}
 						BackgroundImage {
 							url
 							alternativeText
@@ -321,9 +318,6 @@ export const GET_PAGE_BY_SLUG = `
 		pages(filters: { slug: { eq: $slug } }, pagination: { pageSize: 1 }) {
 					slug
 					title
-					ColorTheme {
-						ShortName
-					}
 					Sections {
 						__typename
 						... on ComponentBlocksRichTextSection {
@@ -356,9 +350,6 @@ export const GET_PAGE_BY_SLUG = `
 							id
 							Headline
 							Subheadline
-							ColorTheme {
-								ShortName
-							}
 							BackgroundImage {
 								url
 								alternativeText
@@ -1063,9 +1054,6 @@ export const GET_NEWS_ARTICLE_BY_SLUG = `
 						id
 						Headline
 						Subheadline
-						ColorTheme {
-							ShortName
-						}
 						BackgroundImage {
 							url
 							alternativeText

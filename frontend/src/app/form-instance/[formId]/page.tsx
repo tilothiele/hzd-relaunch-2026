@@ -1,5 +1,5 @@
 import { MainPageStructure } from '../../main-page-structure'
-import { themes } from '@/themes'
+import { theme as globalTheme } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { fetchGraphQLServer } from '@/lib/server/graphql-client'
 import { GET_FORM_BY_DOCUMENT_ID } from '@/lib/graphql/queries'
@@ -17,7 +17,7 @@ interface FormInstanceFormIdPageProps {
 
 export default async function FormInstanceFormIdPage({ params }: FormInstanceFormIdPageProps) {
 	const { globalLayout, baseUrl, error } = await fetchGlobalLayout()
-	const theme = themes.B
+	const theme = globalTheme
 	const pageTitle = 'Eingegangene Anmeldungen'
 	const resolvedParams = await params
 	const formId = resolvedParams.formId

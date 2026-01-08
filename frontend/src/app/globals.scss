@@ -4,13 +4,13 @@
 
 */
 
-@forward "tailwindcss";
+@import "tailwindcss";
 
-@forward '../styles/tokens/colors.css';
-@forward '../styles/tokens/spacing.css';
-@forward '../styles/tokens/radius.css';
-@forward '../styles/tokens/typography.css';
-@forward '../styles/tokens/semantic.css';
+@import '../styles/tokens/colors.css';
+@import '../styles/tokens/spacing.css';
+@import '../styles/tokens/radius.css';
+@import '../styles/tokens/typography.css';
+@import '../styles/tokens/semantic.css';
 
 
 @font-face {
@@ -66,7 +66,7 @@
 		font-family: var(--font-heading);
 		font-weight: 600;
 		letter-spacing: 0.02em;
-		color: var(--color-text);
+		color: var(--color-text-headline);
 	}
 
 	h1 {

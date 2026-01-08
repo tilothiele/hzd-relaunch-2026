@@ -109,7 +109,7 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                         }}
                     >
                         {level === 0 && (
-                            <ListItemIcon sx={{ minWidth: 40, color: '#1a3673' }}>
+                            <ListItemIcon sx={{ minWidth: 40, color: 'var(--color-primary)' }}>
                                 <FontAwesomeIcon icon={getIcon(icon)} />
                             </ListItemIcon>
                         )}
@@ -118,10 +118,10 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                             primaryTypographyProps={{
                                 fontWeight: level === 0 ? 600 : 400,
                                 fontSize: level === 0 ? '1rem' : '0.8rem',
-                                color: level === 0 ? '#1a3673' : '#565757',
+                                color: level === 0 ? 'var(--color-primary)' : 'var(--color-text)',
                             }}
                         />
-                        {hasChildren && (isSubOpen ? <ExpandLessIcon sx={{ color: '#1a3673' }} /> : <ExpandMoreIcon sx={{ color: '#1a3673' }} />)}
+                        {hasChildren && (isSubOpen ? <ExpandLessIcon sx={{ color: 'var(--color-primary)' }} /> : <ExpandMoreIcon sx={{ color: 'var(--color-primary)' }} />)}
                     </ListItemButton>
                 </ListItem>
                 {hasChildren && (
@@ -167,7 +167,7 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                         '&:hover': {
                             '& .drawer-handle': {
                                 transform: 'scaleX(1.1)',
-                                backgroundColor: '#1a3673',
+                                backgroundColor: 'var(--color-primary)',
                                 left: '4px',
                             },
                             '& .drawer-bar': {
@@ -200,7 +200,7 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                             left: '2px',
                             width: '24px',
                             height: '80px',
-                            backgroundColor: '#1a3673', // HZD Blue
+                            backgroundColor: 'var(--color-primary)', // HZD Blue
                             borderRadius: '0 12px 12px 0',
                             display: 'flex',
                             alignItems: 'center',
@@ -231,7 +231,7 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                 sx={{
                     '& .MuiDrawer-paper': {
                         width: 320,
-                        backgroundColor: '#F2F5F7',
+                        backgroundColor: 'var(--color-white)',
                         borderRight: 'none',
                         boxShadow: '4px 0 10px rgba(0,0,0,0.1)',
                     },
@@ -248,7 +248,7 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                             mb: 1
                         }}
                     >
-                        <Typography variant='h6' sx={{ fontWeight: 800, color: '#1a3673', letterSpacing: '-0.02em' }}>
+                        <Typography variant='h6' sx={{ fontWeight: 800, color: 'var(--color-primary)', letterSpacing: '-0.02em' }}>
                             Kurzmenü
                         </Typography>
                         <IconButton onClick={toggleDrawer(false)} size='small'>

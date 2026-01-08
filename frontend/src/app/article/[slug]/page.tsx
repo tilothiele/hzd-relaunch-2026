@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { MainPageStructure } from '../../main-page-structure'
-import { themes } from '@/themes'
+import { theme as globalTheme } from '@/themes'
 import { fetchNewsArticleBySlug, fetchGlobalLayout } from '@/lib/server/fetch-news-article-by-slug'
 import { renderServerSections } from '@/components/sections/server-section-factory'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
@@ -134,7 +134,7 @@ export default async function ArticlePage({ params }: PageProps) {
     }
 
     const sections = article.NewsContentSections || []
-    const theme = themes['A'] // Default theme for articles, could be made configurable
+    const theme = globalTheme
     const renderedSections = renderServerSections({ sections, strapiBaseUrl: baseUrl, theme })
 
     const pageTitle = article.SEO?.MetaTitle || article.Headline || 'Artikel'

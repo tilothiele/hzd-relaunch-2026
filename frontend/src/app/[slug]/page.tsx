@@ -1,5 +1,5 @@
 import { MainPageStructure } from '../main-page-structure'
-import { themes } from '@/themes'
+import { theme as globalTheme } from '@/themes'
 import { fetchPageBySlug, fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { renderServerSections } from '@/components/sections/server-section-factory'
 import NotFoundSection from '@/components/sections/not-found-section/not-found-section'
@@ -65,7 +65,7 @@ export default async function Page({ params }: PageProps) {
 	}
 
 	const sections = page.Sections || []
-	const theme = themes[page.ColorTheme?.ShortName ?? 'A']
+	const theme = globalTheme
 	const renderedSections = renderServerSections({
 		sections,
 		strapiBaseUrl: baseUrl,

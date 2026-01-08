@@ -1,5 +1,5 @@
 import { MainPageStructure } from '../main-page-structure'
-import { themes } from '@/themes'
+import { theme as globalTheme } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { MeinHzdContent } from '@/components/meine-hzd/meine-hzd-content'
 
@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'
 
 export default async function MeinHzdPage() {
 	const { globalLayout, baseUrl, error } = await fetchGlobalLayout()
-	const theme = themes.A
+	const theme = globalTheme
 
 	if (error) {
 		return (

@@ -41,27 +41,31 @@ export function SimpleHeroSectionComponent({
             paddingBottom='0'
         >
             <div className="relative flex min-h-[500px] flex-col overflow-hidden md:flex-row">
+                {/* Logo - precisely 2rem from top */}
+                {section.ShowLog && logo ? (
+                    <div
+                        className={`absolute top-[2rem] z-20 flex w-full px-6 md:w-1/2 md:px-12 lg:px-24 ${isImageLeft ? 'md:right-0' : 'md:left-0'
+                            }`}
+                    >
+                        <Image
+                            src={resolveMediaUrl(logo, strapiBaseUrl) || ''}
+                            alt={logo.alternativeText ?? 'Logo'}
+                            width={200}
+                            height={200}
+                            className="h-[4.5rem] w-auto object-contain md:h-[6rem] lg:h-[7.5rem]"
+                            unoptimized
+                        />
+                    </div>
+                ) : null}
                 {/* Content Side */}
                 <div
-                    className={`z-10 flex flex-1 flex-col justify-end px-6 pb-6 pt-12 md:px-12 md:pb-12 md:pt-24 lg:px-24 lg:pb-24 lg:pt-32 ${isImageLeft ? 'md:order-2' : 'md:order-1'
+                    className={`z-10 flex flex-1 flex-col justify-end px-6 pb-8 pt-12 md:px-12 md:pt-24 lg:px-24 lg:pt-32 ${isImageLeft ? 'md:order-2' : 'md:order-1'
                         }`}
                 >
                     <div className="max-w-xl">
-                        {section.ShowLog && logo ? (
-                            <div className="mb-8">
-                                <Image
-                                    src={resolveMediaUrl(logo, strapiBaseUrl) || ''}
-                                    alt={logo.alternativeText ?? 'Logo'}
-                                    width={200}
-                                    height={200}
-                                    className="h-[4.5rem] w-auto object-contain md:h-[6rem] lg:h-[7.5rem]"
-                                    unoptimized
-                                />
-                            </div>
-                        ) : null}
 
                         {headline ? (
-                            <h1 className="mb-6 text-4xl font-bold leading-tight text-[#1a3673] md:text-5xl lg:text-6xl">
+                            <h1 className="mb-6 text-4xl font-bold leading-tight md:text-5xl lg:text-6xl" style={{ color: theme.headlineColor }}>
                                 {headline}
                             </h1>
                         ) : null}
@@ -74,8 +78,8 @@ export function SimpleHeroSectionComponent({
                         ) : null}
 
                         {actionButton ? (
-                            <div className="mb-2">
-                                <ActionButton actionButton={actionButton} />
+                            <div>
+                                <ActionButton actionButton={actionButton} theme={theme} />
                             </div>
                         ) : null}
                     </div>

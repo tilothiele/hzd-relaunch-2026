@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { MainPageStructure } from '../../main-page-structure'
-import { themes } from '@/themes'
+import { theme as globalTheme } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { fetchCategoryBySlug, fetchArticlesByCategory } from '@/lib/server/fetch-articles-by-category'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
@@ -146,7 +146,7 @@ export default async function ArticlesCategoryPage({ params, searchParams }: Pag
 	const pageSize = 12
 
 	const { globalLayout, baseUrl, error: layoutError } = await fetchGlobalLayout()
-	const theme = themes.A
+	const theme = globalTheme
 
 	// Ensure slug starts with /
 	const categorySlug = slug.startsWith('/') ? slug : `/${slug}`

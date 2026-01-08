@@ -26,7 +26,7 @@ export function ContactGroupSectionComponent({
 			paddingTop='2em'
 			paddingBottom='2em'
 		>
-			<ContactGroupComponent contactGroup={section.ContactGroup} strapiBaseUrl={strapiBaseUrl} />
+			<ContactGroupComponent contactGroup={section.ContactGroup} strapiBaseUrl={strapiBaseUrl} theme={theme} />
 		</SectionContainer>
 	)
 }
