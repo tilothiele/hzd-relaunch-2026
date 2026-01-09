@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useGlobalLayout } from '@/hooks/use-global-layout'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
+import { theme } from '@/themes'
 
 import { useCookieConsent } from '@/hooks/use-cookie-consent'
 
@@ -12,6 +13,7 @@ export function CookieBanner() {
 	const { status, accept, reject, isUndecided } = useCookieConsent()
 	const privacyPolicyUrl = resolveMediaUrl(globalLayout?.PrivacyPolicy ?? null, baseUrl)
 	const [isSaving, setIsSaving] = useState(false)
+	const [isHovered, setIsHovered] = useState(false)
 
 	const handleAccept = useCallback(() => {
 		setIsSaving(true)
@@ -64,8 +66,15 @@ export function CookieBanner() {
 						type='button'
 						onClick={handleAccept}
 						disabled={isSaving}
-						className='rounded bg-yellow-400 px-4 py-2 text-sm font-semibold text-[#3d2817]
-							transition-colors hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-60'
+						className='rounded px-4 py-2 text-sm font-semibold
+							transition-colors disabled:cursor-not-allowed disabled:opacity-60'
+						style={{
+							backgroundColor: theme.submitButtonColor,
+							color: theme.submitButtonTextColor,
+							filter: isHovered ? 'brightness(90%)' : 'none',
+						}}
+						onMouseEnter={() => setIsHovered(true)}
+						onMouseLeave={() => setIsHovered(false)}
 					>
 						{isSaving ? 'Speichern…' : 'Alle akzeptieren'}
 					</button>

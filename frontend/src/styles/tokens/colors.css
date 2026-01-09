@@ -51,6 +51,68 @@
     --color-pine-cone-900: #FAF9F9;
     /* 97% Lightness */
 
+    --color-putty-100: #1D190F;
+    /* 10% Lightness */
+    --color-putty-200: #4E4329;
+    /* 25% Lightness */
+    --color-putty-300: #7F6D43;
+    /* 40% Lightness */
+    --color-putty-400: #B0975D;
+    /* 55% Lightness */
+    --color-putty-500: #E0C68B;
+    /* 71% Lightness (Base) */
+    --color-putty-600: #E8D5A8;
+    /* 78% Lightness */
+    --color-putty-700: #EFE3C5;
+    /* 85% Lightness */
+    --color-putty-800: #F7F1E2;
+    /* 92% Lightness */
+    --color-putty-900: #FDFBF7;
+    /* 98% Lightness */
+
+    --color-tree-poppy-100: #1C1001;
+    /* 10% Lightness */
+    --color-tree-poppy-200: #4D2D06;
+    /* 25% Lightness */
+    --color-tree-poppy-300: #7F490A;
+    /* 40% Lightness */
+    --color-tree-poppy-400: #B96A0E;
+    /* 55% Lightness */
+    --color-tree-poppy-500: #F29C2A;
+    /* 56% Lightness (Base) */
+    --color-tree-poppy-600: #F5B35C;
+    /* 67% Lightness */
+    --color-tree-poppy-700: #F8CB8E;
+    /* 78% Lightness */
+    --color-tree-poppy-800: #FBE2C0;
+    /* 89% Lightness */
+    --color-tree-poppy-900: #FEF6EA;
+    /* 97% Lightness */
+
+    --color-regent-gray-100: #121920;
+    /* 10% Lightness */
+    --color-regent-gray-200: #283340;
+    /* 22% Lightness */
+    --color-regent-gray-300: #405063;
+    /* 35% Lightness */
+    --color-regent-gray-400: #667B94;
+    /* 48% Lightness */
+    --color-regent-gray-500: #8F9BAA;
+    /* 61% Lightness (Base) */
+    --color-regent-gray-600: #A8B2BD;
+    /* 70% Lightness */
+    --color-regent-gray-700: #C4CBD3;
+    /* 80% Lightness */
+    --color-regent-gray-800: #E0E4E8;
+    /* 90% Lightness */
+    --color-regent-gray-900: #F6F7F9;
+    /* 97% Lightness */
+
+
+
+
+
+
     /* LQ (Lawrenz Qualitäter) Theme Colors */
     --color-white: #ffffff;
     --color-text-gray: #565757;

@@ -4,10 +4,12 @@ import { useCallback, useState, type ChangeEvent, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import type { ThemeDefinition } from '@/themes'
 
 interface ResetPasswordFormProps {
 	code?: string
 	strapiBaseUrl?: string | null
+	theme: ThemeDefinition
 }
 
 interface ResetPasswordInput {
@@ -25,13 +27,14 @@ interface ResetPasswordResponse {
 	}
 }
 
-export function ResetPasswordForm({ code, strapiBaseUrl }: ResetPasswordFormProps) {
+export function ResetPasswordForm({ code, strapiBaseUrl, theme }: ResetPasswordFormProps) {
 	const router = useRouter()
 	const [password, setPassword] = useState('')
 	const [passwordConfirmation, setPasswordConfirmation] = useState('')
 	const [error, setError] = useState<string | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [isSuccess, setIsSuccess] = useState(false)
+	const [isHovered, setIsHovered] = useState(false)
 
 	const handleSubmit = useCallback(
 		async (event: FormEvent<HTMLFormElement>) => {
@@ -173,12 +176,15 @@ export function ResetPasswordForm({ code, strapiBaseUrl }: ResetPasswordFormProp
 				) : null}
 				<button
 					type='submit'
-					className='flex w-full items-center justify-center gap-2 rounded-md bg-yellow-400 px-4 py-2.5 text-sm font-semibold text-gray-900 transition-all hover:bg-yellow-500 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-yellow-400 disabled:hover:shadow-none'
+					className='flex w-full items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-all hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:shadow-none'
 					style={{
-						backgroundColor: '#facc15',
-						color: '#111827',
+						backgroundColor: theme.submitButtonColor,
+						color: theme.submitButtonTextColor,
 						marginTop: '0.5rem',
+						filter: isHovered ? 'brightness(90%)' : 'none',
 					}}
+					onMouseEnter={() => setIsHovered(true)}
+					onMouseLeave={() => setIsHovered(false)}
 					disabled={isSubmitting}
 				>
 					{isSubmitting ? (

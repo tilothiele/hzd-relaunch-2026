@@ -80,7 +80,7 @@ export function HeroSectionSlideShowComponent({
 									{slide?.Headline ? (
 										<h2
 											className='hero-section-slide-headline'
-											style={{ color: theme.headerFooterTextColor }}
+											style={{ color: theme.heroSlideShowText }}
 										>
 											{slide.Headline}
 										</h2>
@@ -88,7 +88,7 @@ export function HeroSectionSlideShowComponent({
 									{slide?.Subheadline ? (
 										<h4
 											className='hero-section-slide-subheadline'
-											style={{ color: theme.headerFooterTextColor }}
+											style={{ color: theme.heroSlideShowText }}
 										>
 											{slide.Subheadline}
 										</h4>

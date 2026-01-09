@@ -79,7 +79,7 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 							/>
 							<div className='mt-4 grid grid-cols-2 gap-2'>
 								<div className='flex justify-center gap-4'>
-									<SocialLinks socialLinkFB={globalLayout?.SocialLinkFB} socialLinkYT={globalLayout?.SocialLinkYT} />
+									<SocialLinks socialLinkFB={globalLayout?.SocialLinkFB} socialLinkYT={globalLayout?.SocialLinkYT} theme={theme} />
 								</div>
 								<div>
 									<div><Link href='/impressum' className='text-sm transition-colors hover:text-yellow-400 underline'>

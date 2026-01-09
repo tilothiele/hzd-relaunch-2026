@@ -37,7 +37,7 @@ export default async function ResetPasswordPage({ searchParams }: ResetPasswordP
 			<SectionContainer variant='max-width'>
 				<div className='flex min-h-[50vh] items-center justify-center py-12'>
 					<div className='w-full max-w-md'>
-						<ResetPasswordForm code={code} strapiBaseUrl={baseUrl} />
+						<ResetPasswordForm code={code} strapiBaseUrl={baseUrl} theme={theme} />
 					</div>
 				</div>
 			</SectionContainer>

@@ -8,6 +8,7 @@ import type L from 'leaflet'
 import { useCookieConsent } from '@/hooks/use-cookie-consent'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { useGlobalLayout } from '@/hooks/use-global-layout'
+import { theme } from '@/themes'
 import OpenWithIcon from '@mui/icons-material/OpenWith'
 
 type LeafletIcon = InstanceType<typeof L.Icon>
@@ -95,6 +96,7 @@ export function HzdMap({ isVisible, items, userLocation, height = '400px' }: Hzd
         typeof height === 'string' ? parseInt(height) : height
     )
     const [isResizing, setIsResizing] = useState(false)
+    const [isButtonHovered, setIsButtonHovered] = useState(false)
     const resizeStartRef = useRef<{ y: number; height: number } | null>(null)
 
     const { isAccepted, accept } = useCookieConsent()
@@ -200,7 +202,14 @@ export function HzdMap({ isVisible, items, userLocation, height = '400px' }: Hzd
                     <div className='flex flex-wrap items-center justify-center gap-4'>
                         <button
                             onClick={accept}
-                            className='rounded bg-yellow-400 px-6 py-2 text-sm font-semibold text-[#3d2817] transition-colors hover:bg-yellow-300'
+                            className='rounded px-6 py-2 text-sm font-semibold transition-colors'
+                            style={{
+                                backgroundColor: theme.submitButtonColor,
+                                color: theme.submitButtonTextColor,
+                                filter: isButtonHovered ? 'brightness(90%)' : 'none',
+                            }}
+                            onMouseEnter={() => setIsButtonHovered(true)}
+                            onMouseLeave={() => setIsButtonHovered(false)}
                         >
                             Karte aktivieren & Cookies akzeptieren
                         </button>

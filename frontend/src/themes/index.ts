@@ -1,6 +1,12 @@
 export interface ThemeDefinition {
 	headerBackground: string
 	footerBackground: string
+
+	drawerText: string
+	drawerBackground: string
+
+	imageCardSectionText: string
+
 	headlineColor: string
 	textColor: string
 	buttonColor: string
@@ -10,16 +16,37 @@ export interface ThemeDefinition {
 	evenBgColor: string
 	cardsBackground: string
 	cardsText: string
+	heroSlideShowText: string
+
+	submitButtonColor: string
+	submitButtonTextColor: string
+
+	socialIcon: string
 }
 
 export const theme: ThemeDefinition = {
-	headerBackground: 'var(--color-primary)',
-	footerBackground: 'var(--color-primary)',
-	headerFooterTextColor: 'var(--color-negative-text)',
+	drawerText: 'var(--color-drawer-text)',
+	drawerBackground: 'var(--color-drawer-background)',
+
+	submitButtonColor: 'var(--color-submit-button)',
+	submitButtonTextColor: 'var(--color-submit-button-text)',
+
+	headerBackground: 'var(--color-header-footer-background)',
+	footerBackground: 'var(--color-header-footer-background)',
+	headerFooterTextColor: 'var(--color-header-footer-text)',
+
+	imageCardSectionText: 'var(--color-image-card-section-text)',
+
+	heroSlideShowText: 'var(--color-hero-slide-show-text)',
+
+	socialIcon: 'var(--color-social-icon)',
+
 	headlineColor: 'var(--color-text-headline)',
 	textColor: 'var(--color-text)',
-	buttonColor: 'var(--color-primary)',
-	buttonTextColor: 'var(--color-negative-text)',
+
+	buttonColor: 'var(--color-action-primary)',
+	buttonTextColor: 'var(--color-action-primary-text)',
+
 	oddBgColor: 'var(--color-bg-gray)',
 	evenBgColor: 'var(--color-white)',
 	cardsBackground: 'var(--color-cards-background)',

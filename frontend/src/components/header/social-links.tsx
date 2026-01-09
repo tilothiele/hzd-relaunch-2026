@@ -4,13 +4,15 @@
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFacebookF, faYoutube } from '@fortawesome/free-brands-svg-icons'
+import type { ThemeDefinition } from '@/themes'
 
 interface SocialLinksProps {
 	socialLinkFB?: string | null
 	socialLinkYT?: string | null
+	theme: ThemeDefinition
 }
 
-export function SocialLinks({ socialLinkFB, socialLinkYT }: SocialLinksProps) {
+export function SocialLinks({ socialLinkFB, socialLinkYT, theme }: SocialLinksProps) {
 	const facebookHref = socialLinkFB ?? '#'
 	const youtubeHref = socialLinkYT ?? '#'
 
@@ -20,19 +22,15 @@ export function SocialLinks({ socialLinkFB, socialLinkYT }: SocialLinksProps) {
 				href={facebookHref}
 				target='_blank'
 				rel='noopener noreferrer'
-				className='transition-colors hover:text-yellow-400'
-				aria-label='Facebook'
 			>
-				<FontAwesomeIcon icon={faFacebookF} size='xl' style={{ color: '#FAD857' }} />
+				<FontAwesomeIcon icon={faFacebookF} size='xl' style={{ color: theme.socialIcon }} />
 			</a>
 			<a
 				href={youtubeHref}
 				target='_blank'
 				rel='noopener noreferrer'
-				className='transition-colors hover:text-yellow-400'
-				aria-label='YouTube'
 			>
-				<FontAwesomeIcon icon={faYoutube} size='xl' style={{ color: '#FAD857' }} />
+				<FontAwesomeIcon icon={faYoutube} size='xl' style={{ color: theme.socialIcon }} />
 			</a>
 		</>
 	)

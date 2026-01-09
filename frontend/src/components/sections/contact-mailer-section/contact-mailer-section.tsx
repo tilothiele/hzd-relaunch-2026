@@ -178,9 +178,9 @@ export function ContactMailerSectionComponent({
                                             checked={formData.sendCopy}
                                             onChange={handleChange}
                                             sx={{
-                                                color: '#facc15',
+                                                color: theme.submitButtonColor,
                                                 '&.Mui-checked': {
-                                                    color: '#eab308',
+                                                    color: theme.submitButtonColor,
                                                 },
                                             }}
                                         />
@@ -197,11 +197,12 @@ export function ContactMailerSectionComponent({
                                     sx={{
                                         px: 10,
                                         py: 1.5,
-                                        bgcolor: '#facc15',
-                                        color: 'text.primary',
+                                        bgcolor: theme.submitButtonColor,
+                                        color: theme.submitButtonTextColor,
                                         fontWeight: 700,
                                         '&:hover': {
-                                            bgcolor: '#eab308',
+                                            bgcolor: theme.submitButtonColor,
+                                            filter: 'brightness(90%)',
                                         },
                                     }}
                                 >

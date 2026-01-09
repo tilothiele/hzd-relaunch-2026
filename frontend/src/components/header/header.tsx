@@ -62,16 +62,16 @@ export function Header({
 				isStickyTransparent && 'sticky top-0 z-[100] backdrop-blur-md shadow-sm'
 			)}
 		>
-			<nav className='header-nav-padding flex w-full items-center px-6'>
+			<nav className='header-nav-padding flex w-full items-center px-6 py-3'>
 				{/* Left Section: Drawer + Logo */}
-				<div className='flex flex-1 items-center justify-start gap-4'>
+				<div className='flex flex-1 items-center justify-start gap-4 relative'>
 					<DrawerMenuComponent
 						drawerMenu={globalLayout?.DrawerMenu}
 						theme={theme}
 					/>
 					<Link
 						href='/'
-						className='flex items-center justify-center transition-opacity hover:opacity-80'
+						className='absolute -top-8 left-12 z-[110] flex items-center justify-center transition-opacity hover:opacity-80'
 						aria-label='Zur Startseite'
 					>
 						{logoSrc ? (
@@ -80,7 +80,7 @@ export function Header({
 								alt={logoAlt}
 								width={logoWidth}
 								height={logoHeight}
-								className='mb-1 h-[63px] w-[63px] object-contain md:h-[90px] md:w-[90px]'
+								className='mb-1 h-[111px] w-[111px] object-contain md:h-[158px] md:w-[158px]'
 								unoptimized
 								priority
 							/>
@@ -108,6 +108,7 @@ export function Header({
 					<SocialLinks
 						socialLinkFB={globalLayout?.SocialLinkFB}
 						socialLinkYT={globalLayout?.SocialLinkYT}
+						theme={theme}
 					/>
 					<LoginControls
 						isAuthenticated={isAuthenticated}

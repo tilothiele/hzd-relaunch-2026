@@ -5,18 +5,45 @@
 
 :root {
 
-    --color-primary: var(--color-astronaut-300);
+    --color-primary: var(--color-putty-700);
     --color-secondary: var(--color-pine-cone-300);
 
     --color-background: var(--color-pine-cone-100);
-    --color-action-primary: var(--color-primary);
+    --color-action-primary: var(--color-putty-500);
 
-    --color-text: var(--color-astronaut-100);
+    /* call-to-action button - ok */
+    --color-action-primary-text: var(--color-putty-100);
+    --color-action-primary-background: var(--color-putty-500);
+
+    /* submit button */
+    --color-submit-button: var(--color-tree-poppy-500);
+    --color-submit-button-text: var(--color-astronaut-100);
+
+    /* image-card-section - ok */
+    --color-image-card-section-text: var(--color-pine-cone-700);
+
+    /* drawer-menu - ok */
+    --color-drawer-text: var(--color-astronaut-200);
+    --color-drawer-background: var(--color-putty-800);
+
+    /* header/footer - ok */
+    --color-header-footer-text: var(--color-astronaut-200);
+    --color-header-footer-background: var(--color-putty-500);
+
+    /* hero slide show */
+    --color-hero-slide-show-text: var(--color-pine-cone-700);
+
+    /* fb, yt, ... */
+    --color-social-icon: var(--color-tree-poppy-500);
+
+    /* sonstiges */
+
+    --color-text: var(--color-pine-cone-300);
     --color-text-headline: var(--color-astronaut-200);
-    --color-text-subheadline: var(--color-pine-cone-100);
+    --color-text-subheadline: var(--color-astronaut-100);
 
-    --color-negative-text: var(--color-astronaut-800);
-    --color-negative-text-headline: var(--color-astronaut-900);
+    --color-negative-text: var(--color-pine-cone-300);
+    --color-negative-text-headline: var(--color-pine-cone-300);
     --color-negative-text-subheadline: var(--color-pine-cone-800);
 
     --color-cards-background: var(--color-pine-cone-900);

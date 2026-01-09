@@ -127,7 +127,7 @@ export function CardSectionComponent({
 												component='h3'
 												sx={{
 													fontWeight: 600,
-													color: theme.cardsText,
+													color: theme.imageCardSectionText,
 													textAlign: 'center',
 													mb: 2,
 												}}

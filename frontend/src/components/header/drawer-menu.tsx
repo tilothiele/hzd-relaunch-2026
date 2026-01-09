@@ -13,7 +13,6 @@ import {
     Collapse,
     Typography,
 } from '@mui/material'
-import MenuIcon from '@mui/icons-material/Menu'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import CloseIcon from '@mui/icons-material/Close'
@@ -37,6 +36,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import type { Menu as MenuType, MenuItem as MenuItemType } from '@/types'
+import type { ThemeDefinition } from '@/themes'
 
 // Map icon strings from JSON to FontAwesome icons
 const iconMap: Record<string, any> = {
@@ -63,10 +63,7 @@ const getIcon = (iconName?: string) => {
 
 interface DrawerMenuProps {
     drawerMenu: MenuType | null | undefined
-    theme: {
-        headerBackground: string
-        headerFooterTextColor: string
-    }
+    theme: ThemeDefinition
 }
 
 export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
@@ -109,7 +106,7 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                         }}
                     >
                         {level === 0 && (
-                            <ListItemIcon sx={{ minWidth: 40, color: 'var(--color-primary)' }}>
+                            <ListItemIcon sx={{ minWidth: 40, color: theme.drawerText }}>
                                 <FontAwesomeIcon icon={getIcon(icon)} />
                             </ListItemIcon>
                         )}
@@ -118,10 +115,10 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                             primaryTypographyProps={{
                                 fontWeight: level === 0 ? 600 : 400,
                                 fontSize: level === 0 ? '1rem' : '0.8rem',
-                                color: level === 0 ? 'var(--color-primary)' : 'var(--color-text)',
+                                color: level === 0 ? theme.drawerText : 'var(--color-text)',
                             }}
                         />
-                        {hasChildren && (isSubOpen ? <ExpandLessIcon sx={{ color: 'var(--color-primary)' }} /> : <ExpandMoreIcon sx={{ color: 'var(--color-primary)' }} />)}
+                        {hasChildren && (isSubOpen ? <ExpandLessIcon sx={{ color: theme.drawerText }} /> : <ExpandMoreIcon sx={{ color: theme.drawerText }} />)}
                     </ListItemButton>
                 </ListItem>
                 {hasChildren && (
@@ -200,7 +197,7 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                             left: '2px',
                             width: '24px',
                             height: '80px',
-                            backgroundColor: 'var(--color-primary)', // HZD Blue
+                            backgroundColor: theme.drawerBackground, // HZD Blue
                             borderRadius: '0 12px 12px 0',
                             display: 'flex',
                             alignItems: 'center',
@@ -231,7 +228,7 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                 sx={{
                     '& .MuiDrawer-paper': {
                         width: 320,
-                        backgroundColor: 'var(--color-white)',
+                        backgroundColor: theme.drawerBackground,
                         borderRight: 'none',
                         boxShadow: '4px 0 10px rgba(0,0,0,0.1)',
                     },
@@ -248,7 +245,7 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                             mb: 1
                         }}
                     >
-                        <Typography variant='h6' sx={{ fontWeight: 800, color: 'var(--color-primary)', letterSpacing: '-0.02em' }}>
+                        <Typography variant='h6' sx={{ fontWeight: 800, color: theme.drawerText, letterSpacing: '-0.02em' }}>
                             Kurzmenü
                         </Typography>
                         <IconButton onClick={toggleDrawer(false)} size='small'>

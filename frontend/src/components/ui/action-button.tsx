@@ -19,8 +19,12 @@ export function ActionButton({ actionButton, theme }: ActionButtonProps) {
 	const label = actionButton.Label ?? 'Mehr erfahren'
 
 	// Theme-Farben oder Fallback
-	const buttonColor = theme?.buttonColor ?? '#64574E'
-	const buttonTextColor = theme?.buttonTextColor ?? '#ffffff'
+	const buttonColor = theme?.buttonColor ?? 'var(--color-action-primary)'
+	const buttonTextColor = theme?.buttonTextColor ?? 'var(--color-action-primary-text)'
+
+	// --color-action-primary-text: var(--color-putty-200);
+	// --color-action-primary-background: var(--color-putty-200);
+
 
 	// Prüfe ob es ein interner oder externer Link ist
 	const isExternalLink = actionButton.Link.startsWith('http://') || actionButton.Link.startsWith('https://')

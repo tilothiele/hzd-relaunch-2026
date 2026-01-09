@@ -47,6 +47,7 @@ export function LoginControls({
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
 	const [isRegistering, setIsRegistering] = useState(false)
 	const [isSendingReset, setIsSendingReset] = useState(false)
+	const [hoveredButton, setHoveredButton] = useState<string | null>(null)
 
 	const menuRef = useRef<HTMLDivElement>(null)
 	const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -406,7 +407,14 @@ export function LoginControls({
 
 								<button
 									type='submit'
-									className='mt-2 flex w-full items-center justify-center gap-2 rounded-md bg-yellow-400 px-4 py-2.5 text-sm font-semibold text-gray-900 transition-all hover:bg-yellow-500 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60'
+									className='mt-2 flex w-full items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-all hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60'
+									style={{
+										backgroundColor: theme.submitButtonColor,
+										color: theme.submitButtonTextColor,
+										filter: hoveredButton === 'login' ? 'brightness(90%)' : 'none',
+									}}
+									onMouseEnter={() => setHoveredButton('login')}
+									onMouseLeave={() => setHoveredButton(null)}
 									disabled={isAuthenticating}
 								>
 									{isAuthenticating ? (
@@ -479,7 +487,14 @@ export function LoginControls({
 
 								<button
 									type='submit'
-									className='mt-2 flex w-full items-center justify-center gap-2 rounded-md bg-yellow-400 px-4 py-2.5 text-sm font-semibold text-gray-900 transition-all hover:bg-yellow-500 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60'
+									className='mt-2 flex w-full items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-all hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60'
+									style={{
+										backgroundColor: theme.submitButtonColor,
+										color: theme.submitButtonTextColor,
+										filter: hoveredButton === 'forgot-password' ? 'brightness(90%)' : 'none',
+									}}
+									onMouseEnter={() => setHoveredButton('forgot-password')}
+									onMouseLeave={() => setHoveredButton(null)}
 									disabled={isSendingReset}
 								>
 									{isSendingReset ? (
