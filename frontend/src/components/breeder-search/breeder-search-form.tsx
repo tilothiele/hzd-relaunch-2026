@@ -1,6 +1,8 @@
 'use client'
 
 import { TextField, Button, Box, Typography } from '@mui/material'
+import { useState } from 'react'
+import { theme } from '@/themes'
 
 interface BreederSearchFormProps {
 	nameFilter: string
@@ -15,6 +17,8 @@ export function BreederSearchForm({
 	onSearch,
 	isLoading,
 }: BreederSearchFormProps) {
+	const [isHovered, setIsHovered] = useState(false)
+
 	return (
 		<Box className='mb-8 rounded-lg bg-white p-6 shadow-md'>
 			<Typography variant='h5' className='mb-6 font-bold text-gray-900'>
@@ -41,16 +45,19 @@ export function BreederSearchForm({
 					onClick={onSearch}
 					disabled={isLoading}
 					sx={{
-						backgroundColor: '#facc15',
-						color: '#565757',
+						backgroundColor: theme.submitButtonColor,
+						color: theme.submitButtonTextColor,
+						filter: isHovered ? 'brightness(90%)' : 'none',
 						'&:hover': {
-							backgroundColor: '#e6b800',
+							backgroundColor: theme.submitButtonColor,
 						},
 						'&:disabled': {
 							backgroundColor: '#d1d5db',
 							color: '#9ca3af',
 						},
 					}}
+					onMouseEnter={() => setIsHovered(true)}
+					onMouseLeave={() => setIsHovered(false)}
 				>
 					{isLoading ? 'Suche...' : 'Suchen'}
 				</Button>

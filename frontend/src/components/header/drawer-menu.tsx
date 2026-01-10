@@ -197,7 +197,7 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                             left: '2px',
                             width: '24px',
                             height: '80px',
-                            backgroundColor: theme.drawerBackground, // HZD Blue
+                            backgroundColor: theme.drawerHandle, // Theme Handle Color
                             borderRadius: '0 12px 12px 0',
                             display: 'flex',
                             alignItems: 'center',

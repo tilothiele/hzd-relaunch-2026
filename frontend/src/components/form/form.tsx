@@ -21,6 +21,7 @@ import { renderFormField } from './form-field-renderer'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { renderStrapiBlocks } from '@/lib/strapi-blocks'
 import { useAuth } from '@/hooks/use-auth'
+import { theme } from '@/themes'
 
 interface FormComponentProps {
 	form: Form
@@ -34,6 +35,7 @@ export function FormComponent({ form, privacyPolicy, strapiBaseUrl }: FormCompon
 	const [values, setValues] = useState<Record<string, unknown>>({})
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [showThankYouModal, setShowThankYouModal] = useState(false)
+	const [isHovered, setIsHovered] = useState(false)
 	const privacyPolicyUrl = resolveMediaUrl(privacyPolicy, strapiBaseUrl)
 
 	// Fülle StandardIdentifiers-Felder mit User-Daten aus authState
@@ -206,7 +208,18 @@ export function FormComponent({ form, privacyPolicy, strapiBaseUrl }: FormCompon
 					type='submit'
 					variant='contained'
 					disabled={isSubmitting || !canSubmit}
-					sx={{ mt: 2, alignSelf: 'flex-start' }}
+					sx={{
+						mt: 2,
+						alignSelf: 'flex-start',
+						bgcolor: theme.submitButtonColor,
+						color: theme.submitButtonTextColor,
+						filter: isHovered ? 'brightness(90%)' : 'none',
+						'&:hover': {
+							bgcolor: theme.submitButtonColor,
+						},
+					}}
+					onMouseEnter={() => setIsHovered(true)}
+					onMouseLeave={() => setIsHovered(false)}
 				>
 					{isSubmitting ? 'Wird gesendet...' : submitButton.FSBName ?? 'Absenden'}
 				</Button>
@@ -215,7 +228,18 @@ export function FormComponent({ form, privacyPolicy, strapiBaseUrl }: FormCompon
 					type='submit'
 					variant='contained'
 					disabled={isSubmitting || !canSubmit}
-					sx={{ mt: 2, alignSelf: 'flex-start' }}
+					sx={{
+						mt: 2,
+						alignSelf: 'flex-start',
+						bgcolor: theme.submitButtonColor,
+						color: theme.submitButtonTextColor,
+						filter: isHovered ? 'brightness(90%)' : 'none',
+						'&:hover': {
+							bgcolor: theme.submitButtonColor,
+						},
+					}}
+					onMouseEnter={() => setIsHovered(true)}
+					onMouseLeave={() => setIsHovered(false)}
 				>
 					{isSubmitting ? 'Wird gesendet...' : 'Absenden'}
 				</Button>
@@ -260,7 +284,18 @@ export function FormComponent({ form, privacyPolicy, strapiBaseUrl }: FormCompon
 					)}
 				</DialogContent>
 				<DialogActions>
-					<Button onClick={handleCloseModal} variant='contained'>
+					<Button
+						onClick={handleCloseModal}
+						variant='contained'
+						sx={{
+							bgcolor: theme.submitButtonColor,
+							color: theme.submitButtonTextColor,
+							'&:hover': {
+								bgcolor: theme.submitButtonColor,
+								filter: 'brightness(90%)',
+							},
+						}}
+					>
 						Schließen
 					</Button>
 				</DialogActions>

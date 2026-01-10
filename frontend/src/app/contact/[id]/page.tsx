@@ -86,8 +86,8 @@ export default async function ContactIdPage({ params }: ContactIdPageProps) {
 			<SectionContainer
 				variant='max-width'
 				backgroundColor={backgroundColor}
-				paddingTop='1em'
-				paddingBottom='1em'
+				paddingTop='2em'
+				paddingBottom='2em'
 			>
 				{contact ? (
 					<ContactDetail contact={contact} strapiBaseUrl={baseUrl || ''} theme={theme} />

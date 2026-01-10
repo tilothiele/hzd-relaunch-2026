@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Box, TextField, IconButton, Paper, Typography } from '@mui/material'
 import SendIcon from '@mui/icons-material/Send'
 import type { Dog } from '@/types'
+import { theme } from '@/themes'
 
 interface DogChatTabProps {
 	dog: Dog
@@ -98,8 +99,8 @@ export function DogChatTab({ dog, strapiBaseUrl }: DogChatTabProps) {
 									padding: 1.5,
 									maxWidth: '70%',
 									backgroundColor:
-										message.sender === 'user' ? '#facc15' : 'white',
-									color: message.sender === 'user' ? '#565757' : 'text.primary',
+										message.sender === 'user' ? theme.submitButtonColor : 'white',
+									color: message.sender === 'user' ? theme.submitButtonTextColor : 'text.primary',
 								}}
 							>
 								<Typography variant='body2'>{message.text}</Typography>
@@ -156,10 +157,11 @@ export function DogChatTab({ dog, strapiBaseUrl }: DogChatTabProps) {
 					onClick={handleSend}
 					disabled={!inputValue.trim()}
 					sx={{
-						backgroundColor: '#facc15',
-						color: '#565757',
+						backgroundColor: theme.submitButtonColor,
+						color: theme.submitButtonTextColor,
 						'&:hover': {
-							backgroundColor: '#e6b800',
+							backgroundColor: theme.submitButtonColor,
+							filter: 'brightness(90%)',
 						},
 						'&:disabled': {
 							backgroundColor: '#d1d5db',

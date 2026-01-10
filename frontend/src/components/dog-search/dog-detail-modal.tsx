@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Tabs, Tab, Box, IconButton } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import type { Dog, HzdSetting } from '@/types'
+import { theme } from '@/themes'
 import { DogDataTab } from './dog-detail-modal/dog-data-tab'
 import { DogPedigreeTab } from './dog-detail-modal/dog-pedigree-tab'
 import { DogPersonalWordsTab } from './dog-detail-modal/dog-personal-words-tab'
@@ -120,10 +121,10 @@ export function DogDetailModal({
 									fontWeight: 500,
 								},
 								'& .Mui-selected': {
-									color: '#facc15',
+									color: theme.submitButtonColor,
 								},
 								'& .MuiTabs-indicator': {
-									backgroundColor: '#facc15',
+									backgroundColor: theme.submitButtonColor,
 								},
 							}}
 						>

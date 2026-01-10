@@ -4,6 +4,7 @@ export interface ThemeDefinition {
 
 	drawerText: string
 	drawerBackground: string
+	drawerHandle: string
 
 	imageCardSectionText: string
 
@@ -22,11 +23,14 @@ export interface ThemeDefinition {
 	submitButtonTextColor: string
 
 	socialIcon: string
+
+	loginIcon: string
 }
 
 export const theme: ThemeDefinition = {
 	drawerText: 'var(--color-drawer-text)',
 	drawerBackground: 'var(--color-drawer-background)',
+	drawerHandle: 'var(--color-drawer-handle)',
 
 	submitButtonColor: 'var(--color-submit-button)',
 	submitButtonTextColor: 'var(--color-submit-button-text)',
@@ -41,6 +45,8 @@ export const theme: ThemeDefinition = {
 
 	socialIcon: 'var(--color-social-icon)',
 
+	loginIcon: 'var(--color-login-icon)',
+
 	headlineColor: 'var(--color-text-headline)',
 	textColor: 'var(--color-text)',
 
@@ -49,6 +55,7 @@ export const theme: ThemeDefinition = {
 
 	oddBgColor: 'var(--color-bg-gray)',
 	evenBgColor: 'var(--color-white)',
+
 	cardsBackground: 'var(--color-cards-background)',
 	cardsText: 'var(--color-cards-text)',
 }

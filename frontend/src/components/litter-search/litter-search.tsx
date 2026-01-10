@@ -13,6 +13,7 @@ import { SEARCH_LITTERS } from '@/lib/graphql/queries'
 import type { Litter, LitterSearchResult, HzdSetting, GeoLocation } from '@/types'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
+import { theme } from '@/themes'
 
 interface LitterSearchProps {
 	strapiBaseUrl: string
@@ -123,6 +124,7 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 	const [totalLitters, setTotalLitters] = useState(0)
 	const [pageCount, setPageCount] = useState(0)
 	const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
+	const [isButtonHovered, setIsButtonHovered] = useState(false)
 
 	const searchLitters = useCallback(async () => {
 		if (!strapiBaseUrl) {
@@ -307,10 +309,10 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 								onChange={(e) => setShowMap(e.target.checked)}
 								sx={{
 									'& .MuiSwitch-switchBase.Mui-checked': {
-										color: '#facc15',
+										color: theme.submitButtonColor,
 									},
 									'& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-										backgroundColor: '#facc15',
+										backgroundColor: theme.submitButtonColor,
 									},
 								}}
 							/>
@@ -393,10 +395,11 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 										px: 2,
 										fontWeight: 'bold',
 										"&.Mui-selected": {
-											backgroundColor: '#facc15',
-											color: '#565757',
+											backgroundColor: theme.submitButtonColor,
+											color: theme.submitButtonTextColor,
 											"&:hover": {
-												backgroundColor: '#e6b800',
+												backgroundColor: theme.submitButtonColor,
+												filter: 'brightness(90%)',
 											}
 										}
 									}
@@ -431,10 +434,11 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 										px: 2,
 										fontWeight: 'bold',
 										"&.Mui-selected": {
-											backgroundColor: '#facc15',
-											color: '#565757',
+											backgroundColor: theme.submitButtonColor,
+											color: theme.submitButtonTextColor,
 											"&:hover": {
-												backgroundColor: '#e6b800',
+												backgroundColor: theme.submitButtonColor,
+												filter: 'brightness(90%)',
 											}
 										}
 									}
@@ -458,16 +462,19 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 						onClick={handleSearch}
 						disabled={isLoading}
 						sx={{
-							backgroundColor: '#facc15',
-							color: '#565757',
+							backgroundColor: theme.submitButtonColor,
+							color: theme.submitButtonTextColor,
+							filter: isButtonHovered ? 'brightness(90%)' : 'none',
 							'&:hover': {
-								backgroundColor: '#e6b800',
+								backgroundColor: theme.submitButtonColor,
 							},
 							'&:disabled': {
 								backgroundColor: '#d1d5db',
 								color: '#9ca3af',
 							},
 						}}
+						onMouseEnter={() => setIsButtonHovered(true)}
+						onMouseLeave={() => setIsButtonHovered(false)}
 					>
 						{isLoading ? 'Suche...' : 'Suchen'}
 					</Button>
@@ -493,21 +500,21 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 						)}
 					</div>
 					<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-						<GridViewIcon sx={{ fontSize: 20, color: viewMode === 'cards' ? '#facc15' : 'text.disabled' }} />
+						<GridViewIcon sx={{ fontSize: 20, color: viewMode === 'cards' ? theme.submitButtonColor : 'text.disabled' }} />
 						<Switch
 							size='small'
 							checked={viewMode === 'table'}
 							onChange={(e) => setViewMode(e.target.checked ? 'table' : 'cards')}
 							sx={{
 								'& .MuiSwitch-switchBase.Mui-checked': {
-									color: '#facc15',
+									color: theme.submitButtonColor,
 								},
 								'& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-									backgroundColor: '#facc15',
+									backgroundColor: theme.submitButtonColor,
 								},
 							}}
 						/>
-						<TableRowsIcon sx={{ fontSize: 20, color: viewMode === 'table' ? '#facc15' : 'text.disabled' }} />
+						<TableRowsIcon sx={{ fontSize: 20, color: viewMode === 'table' ? theme.submitButtonColor : 'text.disabled' }} />
 					</Box>
 				</div>
 				<div className='flex items-center gap-2'>
@@ -521,7 +528,8 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 						id='page-size'
 						value={pageSize}
 						onChange={(e) => handlePageSizeChange(Number(e.target.value) as PageSize)}
-						className='rounded border border-gray-300 px-2 py-1 text-sm focus:border-yellow-400 focus:outline-none'
+						className='rounded border border-gray-300 px-2 py-1 text-sm focus:outline-none'
+						style={{ borderColor: 'transparent', outlineColor: theme.submitButtonColor }}
 					>
 						<option value={5}>5</option>
 						<option value={10}>10</option>

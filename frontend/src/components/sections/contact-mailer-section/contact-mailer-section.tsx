@@ -83,13 +83,13 @@ export function ContactMailerSectionComponent({
         >
             <Box sx={{ width: '100%', mx: 'auto' }}>
                 {section.ContactMailerHeadline && (
-                    <h2 className='text-4xl font-bold mb-4 text-center'>{section.ContactMailerHeadline}</h2>
+                    <h2 className='text-4xl font-bold mb-4 text-center' style={{ color: theme.textColor }}>{section.ContactMailerHeadline}</h2>
                 )}
 
                 {section.ContactMailerInfotext && (
                     <Typography
                         variant="body1"
-                        sx={{ mb: 4, textAlign: 'center', color: 'text.secondary', maxWidth: 800, mx: 'auto' }}
+                        sx={{ mb: 4, textAlign: 'center', color: theme.textColor, maxWidth: 800, mx: 'auto' }}
                         dangerouslySetInnerHTML={{ __html: section.ContactMailerInfotext }}
                     />
                 )}
@@ -123,9 +123,20 @@ export function ContactMailerSectionComponent({
                                 onChange={handleChange}
                                 required
                                 fullWidth
+                                sx={{
+                                    '& .MuiInputBase-root': { color: theme.textColor },
+                                    '& .MuiInputLabel-root': { color: theme.textColor },
+                                    '& .MuiOutlinedInput-notchedOutline': { borderColor: theme.textColor },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: theme.textColor },
+                                }}
                             />
 
-                            <FormControl fullWidth required>
+                            <FormControl fullWidth required sx={{
+                                '& .MuiInputBase-root': { color: theme.textColor },
+                                '& .MuiInputLabel-root': { color: theme.textColor },
+                                '& .MuiOutlinedInput-notchedOutline': { borderColor: theme.textColor },
+                                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: theme.textColor },
+                            }}>
                                 <InputLabel id="recipient-label">Empfänger</InputLabel>
                                 <Select
                                     labelId="recipient-label"
@@ -152,6 +163,13 @@ export function ContactMailerSectionComponent({
                                     fullWidth
                                     inputProps={{ maxLength: subjectLimit }}
                                     helperText={`${formData.subject.length} / ${subjectLimit}`}
+                                    sx={{
+                                        '& .MuiInputBase-root': { color: theme.textColor },
+                                        '& .MuiInputLabel-root': { color: theme.textColor },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: theme.textColor },
+                                        '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: theme.textColor },
+                                        '& .MuiFormHelperText-root': { color: theme.textColor },
+                                    }}
                                 />
                             </Box>
 
@@ -167,6 +185,13 @@ export function ContactMailerSectionComponent({
                                     rows={6}
                                     inputProps={{ maxLength: messageLimit }}
                                     helperText={`${formData.message.length} / ${messageLimit}`}
+                                    sx={{
+                                        '& .MuiInputBase-root': { color: theme.textColor },
+                                        '& .MuiInputLabel-root': { color: theme.textColor },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: theme.textColor },
+                                        '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: theme.textColor },
+                                        '& .MuiFormHelperText-root': { color: theme.textColor },
+                                    }}
                                 />
                             </Box>
 
@@ -186,6 +211,7 @@ export function ContactMailerSectionComponent({
                                         />
                                     }
                                     label="Mir eine Kopie senden"
+                                    sx={{ color: theme.textColor }}
                                 />
                             </Box>
 

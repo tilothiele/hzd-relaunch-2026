@@ -62,7 +62,7 @@ export function Header({
 				isStickyTransparent && 'sticky top-0 z-[100] backdrop-blur-md shadow-sm'
 			)}
 		>
-			<nav className='header-nav-padding flex w-full items-center px-6 py-3'>
+			<nav className='header-nav-padding flex w-full items-center px-6 py-2'>
 				{/* Left Section: Drawer + Logo */}
 				<div className='flex flex-1 items-center justify-start gap-4 relative'>
 					<DrawerMenuComponent
@@ -124,7 +124,7 @@ export function Header({
 
 			{pageTitle ? (
 				<div className='flex w-full justify-end'>
-					<span style={{ marginRight: '20vw', fontSize: '1.5em' }}>{pageTitle}</span>
+					<span style={{ marginRight: '20vw', fontSize: '1.2em' }}>{pageTitle}</span>
 				</div>
 			) : null}
 		</header>

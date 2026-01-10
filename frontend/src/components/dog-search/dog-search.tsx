@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, FormControlLabel, Chip, OutlinedInput, Pagination } from '@mui/material'
 import { useDogs, type ColorFilter, type PageSize, type SexFilter, type Sod1Filter, type HDFilter, type DistanceFilter } from '@/hooks/use-dogs'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
+import { theme } from '@/themes'
 
 type ExaminationFilter = 'HD' | 'HeartCheck' | 'Genprofil' | 'EyesCheck' | 'ColorCheck'
 import { DogCard } from './dog-card'
@@ -89,6 +90,7 @@ export function DogSearch({ strapiBaseUrl, sexFilter, hzdSetting }: DogSearchPro
 	const [selectedDog, setSelectedDog] = useState<Dog | null>(null)
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [hasSearched, setHasSearched] = useState(false)
+	const [isButtonHovered, setIsButtonHovered] = useState(false)
 
 	const userLocation = zipLocation || null
 	const isLocationAvailable = !!userLocation
@@ -201,10 +203,10 @@ export function DogSearch({ strapiBaseUrl, sexFilter, hzdSetting }: DogSearchPro
 								onChange={(e) => setShowMap(e.target.checked)}
 								sx={{
 									'& .MuiSwitch-switchBase.Mui-checked': {
-										color: '#facc15',
+										color: theme.submitButtonColor,
 									},
 									'& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-										backgroundColor: '#facc15',
+										backgroundColor: theme.submitButtonColor,
 									},
 								}}
 							/>
@@ -390,16 +392,19 @@ export function DogSearch({ strapiBaseUrl, sexFilter, hzdSetting }: DogSearchPro
 							onClick={handleSearch}
 							disabled={isLoading}
 							sx={{
-								backgroundColor: '#facc15',
-								color: '#565757',
+								backgroundColor: theme.submitButtonColor,
+								color: theme.submitButtonTextColor,
+								filter: isButtonHovered ? 'brightness(90%)' : 'none',
 								'&:hover': {
-									backgroundColor: '#e6b800',
+									backgroundColor: theme.submitButtonColor,
 								},
 								'&:disabled': {
 									backgroundColor: '#d1d5db',
 									color: '#9ca3af',
 								},
 							}}
+							onMouseEnter={() => setIsButtonHovered(true)}
+							onMouseLeave={() => setIsButtonHovered(false)}
 						>
 							{isLoading ? 'Suche...' : 'Suchen'}
 						</Button>
@@ -478,10 +483,11 @@ export function DogSearch({ strapiBaseUrl, sexFilter, hzdSetting }: DogSearchPro
 											fontSize: '0.875rem',
 										},
 										'& .MuiPaginationItem-page.Mui-selected': {
-											backgroundColor: '#facc15',
-											color: '#565757',
+											backgroundColor: theme.submitButtonColor,
+											color: theme.submitButtonTextColor,
 											'&:hover': {
-												backgroundColor: '#e6b800',
+												backgroundColor: theme.submitButtonColor,
+												filter: 'brightness(90%)',
 											},
 										},
 										'& .MuiPaginationItem-root.Mui-disabled': {
@@ -520,10 +526,11 @@ export function DogSearch({ strapiBaseUrl, sexFilter, hzdSetting }: DogSearchPro
 											fontSize: '0.875rem',
 										},
 										'& .MuiPaginationItem-page.Mui-selected': {
-											backgroundColor: '#facc15',
-											color: '#565757',
+											backgroundColor: theme.submitButtonColor,
+											color: theme.submitButtonTextColor,
 											'&:hover': {
-												backgroundColor: '#e6b800',
+												backgroundColor: theme.submitButtonColor,
+												filter: 'brightness(90%)',
 											},
 										},
 										'& .MuiPaginationItem-root.Mui-disabled': {

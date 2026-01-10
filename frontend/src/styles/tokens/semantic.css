@@ -25,6 +25,7 @@
     /* drawer-menu - ok */
     --color-drawer-text: var(--color-astronaut-200);
     --color-drawer-background: var(--color-putty-800);
+    --color-drawer-handle: var(--color-putty-600);
 
     /* header/footer - ok */
     --color-header-footer-text: var(--color-astronaut-200);
@@ -36,9 +37,11 @@
     /* fb, yt, ... */
     --color-social-icon: var(--color-tree-poppy-500);
 
+    --color-login-icon: var(--color-tree-poppy-400);
+
     /* sonstiges */
 
-    --color-text: var(--color-pine-cone-300);
+    --color-text: var(--color-astronaut-300);
     --color-text-headline: var(--color-astronaut-200);
     --color-text-subheadline: var(--color-astronaut-100);
 

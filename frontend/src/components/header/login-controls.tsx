@@ -145,54 +145,7 @@ export function LoginControls({
 		}
 	}, [identifier, onLogin, password])
 
-	const handleRegisterSubmit = useCallback(async (event: FormEvent<HTMLFormElement>) => {
-		event.preventDefault()
-		setLocalError(null)
-		setLocalSuccess(null)
 
-		if (password !== confirmPassword) {
-			setLocalError('Die Passwörter stimmen nicht überein.')
-			return
-		}
-
-		if (password.length < 6) {
-			setLocalError('Das Passwort muss mindestens 6 Zeichen lang sein.')
-			return
-		}
-
-		setIsRegistering(true)
-
-		try {
-			const result = await fetchGraphQL<{ register: { jwt: string; user: AuthUser } }>(
-				REGISTER_USER,
-				{
-					variables: {
-						input: {
-							username,
-							email,
-							password,
-						},
-					},
-				},
-			)
-
-			if (result.register?.jwt) {
-				// Automatisch einloggen nach erfolgreicher Registrierung
-				await onLogin({ identifier: email || username, password })
-				setLocalSuccess('Registrierung erfolgreich! Sie sind jetzt angemeldet.')
-			}
-		} catch (submissionError) {
-			if (submissionError instanceof Error && submissionError.message) {
-				setLocalError(submissionError.message)
-			} else {
-				setLocalError('Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.')
-			}
-		} finally {
-			setIsRegistering(false)
-			setPassword('')
-			setConfirmPassword('')
-		}
-	}, [username, email, password, confirmPassword, onLogin])
 
 	const handleForgotPasswordSubmit = useCallback(async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
@@ -265,10 +218,9 @@ export function LoginControls({
 				>
 					<FontAwesomeIcon
 						icon={faUser}
-						className='text-green-500'
-						style={{ fontSize: '2rem' }}
+						style={{ fontSize: '1.3rem', color: theme.loginIcon }}
 					/>
-					<span style={{ fontSize: '1.4rem', color: theme.headerFooterTextColor }}>
+					<span style={{ fontSize: '1.2rem', color: theme.headerFooterTextColor }}>
 						{userLabel}
 					</span>
 				</div>
