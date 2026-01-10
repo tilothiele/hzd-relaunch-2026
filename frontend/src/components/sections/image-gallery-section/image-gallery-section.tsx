@@ -36,9 +36,12 @@ export function ImageGallerySectionComponent({
 			paddingTop='2em'
 			paddingBottom='2em'
 		>
-			<div className='w-full max-w-6xl'>
+			<div className='w-full max-w-6xl mx-auto'>
 				{section.GalleryHeadline ? (
-					<h2 className='mb-12 text-center text-4xl font-bold text-gray-900'>
+					<h2
+						className='mb-10 mt-8 text-center text-4xl font-bold'
+						style={{ color: theme.headlineColor }}
+					>
 						{section.GalleryHeadline}
 					</h2>
 				) : null}
