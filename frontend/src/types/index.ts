@@ -40,10 +40,11 @@ export interface CardItem {
 export interface CardSection {
 	__typename: 'ComponentBlocksCardSection'
 	id?: string
-	Headline?: string | null
+	CardHeadline?: string | null
 	CardColumnsOddEven?: 'Odd' | 'Even' | null
 	CardItem?: CardItem[] | null
 	CardsAnchor?: string | null
+	CardLayout?: 'Full_Cover' | 'Bordered_Box' | null
 }
 
 export interface RichTextSection {

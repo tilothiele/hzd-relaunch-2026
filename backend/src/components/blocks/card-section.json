@@ -5,7 +5,7 @@
   },
   "options": {},
   "attributes": {
-    "Headline": {
+    "CardHeadline": {
       "type": "string"
     },
     "CardItem": {
@@ -23,6 +23,15 @@
     },
     "CardsAnchor": {
       "type": "string"
+    },
+    "CardLayout": {
+      "type": "enumeration",
+      "required": true,
+      "default": "Full Cover",
+      "enum": [
+        "Full Cover",
+        "Bordered Box"
+      ]
     }
   },
   "config": {}

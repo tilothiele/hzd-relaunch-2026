@@ -22,6 +22,7 @@ export interface BlocksCardSection extends Struct.ComponentSchema {
   };
   attributes: {
     CardColumnsOddEven: Schema.Attribute.Enumeration<['Odd', 'Even']>;
+    CardHeadline: Schema.Attribute.String;
     CardItem: Schema.Attribute.Component<'blocks.card-item', true> &
       Schema.Attribute.SetMinMax<
         {
@@ -29,8 +30,10 @@ export interface BlocksCardSection extends Struct.ComponentSchema {
         },
         number
       >;
+    CardLayout: Schema.Attribute.Enumeration<['Full Cover', 'Bordered Box']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'Full Cover'>;
     CardsAnchor: Schema.Attribute.String;
-    Headline: Schema.Attribute.String;
   };
 }
 

@@ -89,6 +89,7 @@ export function ContactMailerSectionComponent({
                 {section.ContactMailerInfotext && (
                     <Typography
                         variant="body1"
+                        component="div"
                         sx={{ mb: 4, textAlign: 'center', color: theme.textColor, maxWidth: 800, mx: 'auto' }}
                         dangerouslySetInnerHTML={{ __html: section.ContactMailerInfotext }}
                     />

@@ -108,7 +108,9 @@ export const GET_INDEX_PAGE = `
 					}
 				}
 				... on ComponentBlocksCardSection {
+					CardHeadline
 					CardColumnsOddEven
+					CardLayout
 					CardItem {
 						id
 						Headline
@@ -345,7 +347,9 @@ export const GET_PAGE_BY_SLUG = `
 							}
 						}
 					... on ComponentBlocksCardSection {
+						CardHeadline
 						CardColumnsOddEven
+						CardLayout
 						CardItem {
 							id
 							Headline
@@ -1049,7 +1053,9 @@ export const GET_NEWS_ARTICLE_BY_SLUG = `
 					RichTextAnchor
 				}
 				... on ComponentBlocksCardSection {
+					CardHeadline
 					CardColumnsOddEven
+					CardLayout
 					CardItem {
 						id
 						Headline

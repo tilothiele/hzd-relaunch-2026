@@ -4,6 +4,7 @@ import { theme as globalTheme, type ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { ActionButton } from '@/components/ui/action-button'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
+import { BorderedCardItem } from './bordered-card-item'
 
 interface CardSectionComponentProps {
 	section: CardSection
@@ -30,6 +31,58 @@ export function CardSectionComponent({
 	}
 
 	const backgroundColor = section.CardColumnsOddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
+	const isBorderedBox = section.CardLayout === 'Bordered_Box'
+
+	if (isBorderedBox) {
+		return (
+			<SectionContainer
+				variant='max-width'
+				id={section.CardsAnchor || undefined}
+				backgroundColor={backgroundColor}
+				paddingTop='3em'
+				paddingBottom='3em'
+			>
+				{section.CardHeadline && (
+					<Typography
+						variant='h4'
+						component='h2'
+						sx={{
+							textAlign: 'center',
+							fontWeight: 700,
+							mb: 6,
+							color: theme.headlineColor
+						}}
+					>
+						{section.CardHeadline}
+					</Typography>
+				)}
+
+				<Box
+					sx={{
+						display: 'grid',
+						gridTemplateColumns: {
+							xs: '1fr',
+							md: 'repeat(2, 1fr)',
+							lg: 'repeat(3, 1fr)',
+						},
+						gap: 4,
+					}}
+				>
+					{cards.map((card, index) => {
+						const key = card.id ?? card.Headline ?? `card-${index}`
+						return (
+							<BorderedCardItem
+								key={key}
+								card={card}
+								strapiBaseUrl={strapiBaseUrl}
+								theme={theme}
+							/>
+						)
+					})}
+				</Box>
+			</SectionContainer>
+		)
+	}
 
 	return (
 		<SectionContainer
