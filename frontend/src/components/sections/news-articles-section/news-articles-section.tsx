@@ -49,7 +49,7 @@ export async function NewsArticlesSectionComponent({
     const syntheticCardSection: CardSection = {
         __typename: 'ComponentBlocksCardSection',
         id: `news-section-${section.id}`,
-        Headline: 'Aktuelles',
+        CardHeadline: 'Aktuelles',
         CardItem: cardItems,
         CardColumnsOddEven: 'Odd',
         CardsAnchor: section.NewsArticlesAnchor
