@@ -1,3 +1,5 @@
+'use client'
+
 import { Box, Card, CardContent, Typography } from '@mui/material'
 import type { CardItem, CardSection } from '@/types'
 import { theme as globalTheme, type ThemeDefinition } from '@/themes'
@@ -5,6 +7,7 @@ import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { ActionButton } from '@/components/ui/action-button'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { BorderedCardItem } from './bordered-card-item'
+import { useScrollAnimation } from '@/hooks/use-scroll-animation'
 
 interface CardSectionComponentProps {
 	section: CardSection
@@ -21,6 +24,11 @@ export function CardSectionComponent({
 	strapiBaseUrl,
 	theme,
 }: CardSectionComponentProps) {
+	const { elementRef, isVisible } = useScrollAnimation({
+		threshold: 0.1,
+		triggerOnce: false,
+	})
+
 	const cards =
 		section.CardItem?.filter(
 			(card): card is CardItem => Boolean(card),
@@ -58,6 +66,7 @@ export function CardSectionComponent({
 				)}
 
 				<Box
+					ref={elementRef}
 					sx={{
 						display: 'grid',
 						gridTemplateColumns: {
@@ -66,6 +75,9 @@ export function CardSectionComponent({
 							lg: 'repeat(3, 1fr)',
 						},
 						gap: 4,
+						opacity: isVisible ? 1 : 0,
+						transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+						transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
 					}}
 				>
 					{cards.map((card, index) => {
@@ -91,11 +103,15 @@ export function CardSectionComponent({
 			backgroundColor={backgroundColor}
 		>
 			<Box
+				ref={elementRef}
 				sx={{
 					display: 'flex',
 					flexWrap: 'wrap',
 					width: '100%',
 					margin: 0,
+					opacity: isVisible ? 1 : 0,
+					transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+					transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
 				}}
 			>
 				{cards.map((card, index) => {

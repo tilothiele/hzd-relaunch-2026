@@ -6,6 +6,7 @@ import type { ImageGallerySection, Image as ImageType } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
+import { useScrollAnimation } from '@/hooks/use-scroll-animation'
 
 interface ImageGallerySectionComponentProps {
 	section: ImageGallerySection
@@ -18,6 +19,11 @@ export function ImageGallerySectionComponent({
 	strapiBaseUrl,
 	theme,
 }: ImageGallerySectionComponentProps) {
+	const { elementRef, isVisible } = useScrollAnimation({
+		threshold: 0.1,
+		triggerOnce: false,
+	})
+
 	const images = section.GalleryImages?.filter(
 		(image): image is ImageType => Boolean(image),
 	) ?? []
@@ -36,7 +42,15 @@ export function ImageGallerySectionComponent({
 			paddingTop='2em'
 			paddingBottom='2em'
 		>
-			<div className='w-full max-w-6xl mx-auto'>
+			<div
+				ref={elementRef}
+				className='w-full max-w-6xl mx-auto'
+				style={{
+					opacity: isVisible ? 1 : 0,
+					transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+					transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
+				}}
+			>
 				{section.GalleryHeadline ? (
 					<h2
 						className='mb-10 mt-8 text-center text-4xl font-bold'

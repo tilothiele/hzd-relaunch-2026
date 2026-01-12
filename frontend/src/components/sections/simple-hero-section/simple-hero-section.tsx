@@ -1,9 +1,12 @@
+'use client'
+
 import Image from 'next/image'
 import type { SimpleHeroSection } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { ActionButton } from '@/components/ui/action-button'
 import { SectionContainer } from '../section-container/section-container'
+import { useScrollAnimation } from '@/hooks/use-scroll-animation'
 
 interface SimpleHeroSectionComponentProps {
     section: SimpleHeroSection
@@ -18,6 +21,11 @@ export function SimpleHeroSectionComponent({
     theme,
     logo,
 }: SimpleHeroSectionComponentProps) {
+    const { elementRef, isVisible } = useScrollAnimation({
+        threshold: 0.1,
+        triggerOnce: false,
+    })
+
     const imageUrl = resolveMediaUrl(section.HeroImage, strapiBaseUrl)
     const imageAlt = section.HeroImage?.alternativeText ?? 'Hero Bild'
     const layout = section.HeroLayout ?? 'Image_right'
@@ -40,7 +48,15 @@ export function SimpleHeroSectionComponent({
             paddingTop='0'
             paddingBottom='0'
         >
-            <div className="relative flex min-h-[500px] flex-col overflow-hidden md:flex-row">
+            <div
+                ref={elementRef}
+                className="relative flex min-h-[500px] flex-col overflow-hidden md:flex-row"
+                style={{
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+                    transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
+                }}
+            >
                 {/* Logo - precisely 2rem from top */}
                 {section.ShowLog && logo ? (
                     <div
