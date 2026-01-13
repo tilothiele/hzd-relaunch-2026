@@ -1,9 +1,12 @@
+'use client'
+
 import { Box, Paper, Typography, Container } from '@mui/material'
 import type { SimpleCtaSection } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { ActionButton } from '@/components/ui/action-button'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
+import { useScrollAnimation } from '@/hooks/use-scroll-animation'
 
 interface SimpleCtaSectionComponentProps {
 	section: SimpleCtaSection
@@ -16,6 +19,11 @@ export function SimpleCtaSectionComponent({
 	strapiBaseUrl,
 	theme,
 }: SimpleCtaSectionComponentProps) {
+	const { elementRef, isVisible } = useScrollAnimation({
+		threshold: 0.1,
+		triggerOnce: false,
+	})
+
 	const backgroundColor = theme.evenBgColor
 	const backgroundImageUrl = resolveMediaUrl(section.CtaBackgroundImage, strapiBaseUrl)
 	const headline = section.CtaHeadline
@@ -47,6 +55,7 @@ export function SimpleCtaSectionComponent({
 				}}
 			>
 				<Box
+					ref={elementRef}
 					sx={{
 						display: 'flex',
 						minHeight: '500px',
@@ -55,6 +64,9 @@ export function SimpleCtaSectionComponent({
 						justifyContent: 'center',
 						px: 2,
 						py: 4,
+						opacity: isVisible ? 1 : 0,
+						transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+						transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
 					}}
 				>
 					<Container maxWidth='md'>

@@ -7,6 +7,7 @@ import type { TextColumnsSection, BulletItem } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { ActionButton } from '@/components/ui/action-button'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
+import { useScrollAnimation } from '@/hooks/use-scroll-animation'
 
 interface TextColumnsSectionComponentProps {
 	section: TextColumnsSection
@@ -89,6 +90,11 @@ export function TextColumnsSectionComponent({
 	strapiBaseUrl,
 	theme,
 }: TextColumnsSectionComponentProps) {
+	const { elementRef, isVisible } = useScrollAnimation({
+		threshold: 0.1,
+		triggerOnce: false,
+	})
+
 	const [openItems, setOpenItems] = useState<Set<string>>(new Set())
 
 	const toggleItem = useCallback((itemId: string) => {
@@ -134,11 +140,15 @@ export function TextColumnsSectionComponent({
 				) : null}
 
 				<Box
+					ref={elementRef}
 					sx={{
 						display: 'flex',
 						flexWrap: 'wrap',
 						gap: 5,
 						width: '100%',
+						opacity: isVisible ? 1 : 0,
+						transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+						transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
 					}}
 				>
 					{columns.map((column, columnIndex) => {
