@@ -32,8 +32,10 @@ function ContactCard({ contact, strapiBaseUrl, theme }: ContactCardProps) {
 				height: '100%',
 				display: 'flex',
 				flexDirection: 'column',
+				transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
 				'&:hover': {
-					boxShadow: 3,
+					boxShadow: hasIntroduction ? 6 : 3,
+					transform: hasIntroduction ? 'scale(1.02)' : 'none',
 				},
 				cursor: hasIntroduction ? 'pointer' : 'default',
 				backgroundColor: theme.cardsBackground,

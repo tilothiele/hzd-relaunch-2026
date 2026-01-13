@@ -98,17 +98,20 @@ export function ContactDetail({ contact, strapiBaseUrl, theme }: ContactDetailPr
 				{avatarUrl ? (
 					<Box
 						sx={{
-							position: 'relative',
-							width: { xs: '100%', md: '300px' },
-							aspectRatio: '4 / 3',
+							width: { xs: '100%', md: '360px' },
 							flexShrink: 0,
 						}}
 					>
 						<Image
 							src={avatarUrl}
 							alt={avatarAlt}
-							fill
-							style={{ objectFit: 'cover', borderRadius: '8px' }}
+							width={contact.avatar?.width ?? 800}
+							height={contact.avatar?.height ?? 600}
+							style={{
+								width: '100%',
+								height: 'auto',
+								borderRadius: '8px'
+							}}
 							unoptimized
 						/>
 					</Box>
