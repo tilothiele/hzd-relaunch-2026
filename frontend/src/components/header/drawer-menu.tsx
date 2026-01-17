@@ -37,6 +37,13 @@ import {
 import Link from 'next/link'
 import type { Menu as MenuType, MenuItem as MenuItemType } from '@/types'
 import type { ThemeDefinition } from '@/themes'
+import {
+    getMenuItemUrl,
+    getMenuItemLabel,
+    getMenuItemIcon,
+    getMenuItemFaIcon,
+    getMenuItemBadgeText
+} from '@/lib/menu-helper'
 
 // Map icon strings from JSON to FontAwesome icons
 const iconMap: Record<string, any> = {
@@ -88,16 +95,19 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
 
     const renderMenuItem = (item: MenuItemType, level = 0) => {
         const hasChildren = item.children && item.children.length > 0
-        const isSubOpen = openSubmenus[item.name]
-        const icon = item.icon || item.faIcon
+        const label = getMenuItemLabel(item)
+        const isSubOpen = openSubmenus[label]
+        const icon = getMenuItemIcon(item) || getMenuItemFaIcon(item)
+        const url = getMenuItemUrl(item)
+        const badgeText = getMenuItemBadgeText(item)
 
         return (
-            <React.Fragment key={item.name}>
+            <React.Fragment key={label}>
                 <ListItem disablePadding>
                     <ListItemButton
-                        component={item.url ? Link : 'div'}
-                        href={item.url || undefined}
-                        onClick={hasChildren ? (e: React.MouseEvent<unknown>) => handleSubmenuToggle(e, item.name) : toggleDrawer(false)}
+                        component={url ? Link : 'div'}
+                        href={url || undefined}
+                        onClick={hasChildren ? (e: React.MouseEvent<unknown>) => handleSubmenuToggle(e, label) : toggleDrawer(false)}
                         sx={{
                             pl: level * 3 + 2,
                             '&:hover': {
@@ -111,7 +121,30 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                             </ListItemIcon>
                         )}
                         <ListItemText
-                            primary={item.name}
+                            primary={
+                                <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    {label}
+                                    {badgeText && (
+                                        <Box
+                                            component="span"
+                                            sx={{
+                                                backgroundColor: theme.buttonColor,
+                                                color: theme.buttonTextColor,
+                                                borderRadius: '12px',
+                                                padding: '2px 8px',
+                                                fontSize: '0.75rem',
+                                                fontWeight: 'bold',
+                                                lineHeight: 1,
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                            }}
+                                        >
+                                            {badgeText}
+                                        </Box>
+                                    )}
+                                </Box>
+                            }
                             primaryTypographyProps={{
                                 fontWeight: level === 0 ? 600 : 400,
                                 fontSize: level === 0 ? '1rem' : '0.8rem',
