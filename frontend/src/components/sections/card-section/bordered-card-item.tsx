@@ -9,9 +9,10 @@ interface BorderedCardItemProps {
     card: CardItem
     strapiBaseUrl: string
     theme: ThemeDefinition
+    isUnread?: boolean
 }
 
-export function BorderedCardItem({ card, strapiBaseUrl, theme }: BorderedCardItemProps) {
+export function BorderedCardItem({ card, strapiBaseUrl, theme, isUnread }: BorderedCardItemProps) {
     const imageUrl = resolveMediaUrl(card.BackgroundImage, strapiBaseUrl)
 
     return (
@@ -58,7 +59,7 @@ export function BorderedCardItem({ card, strapiBaseUrl, theme }: BorderedCardIte
                         component='h3'
                         sx={{
                             color: theme.headerBackground, // Use primary/header color for headline
-                            fontWeight: 700,
+                            fontWeight: isUnread ? 900 : 700,
                             textTransform: 'uppercase',
                             lineHeight: 1.2,
                         }}

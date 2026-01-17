@@ -102,6 +102,7 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 			<main className='flex flex-col' style={{
 				color: '#000000',
 				backgroundColor: '#ffffff',
+				minHeight: 'calc(100vh - 200px)'
 			}}>
 				{content}
 			</main>

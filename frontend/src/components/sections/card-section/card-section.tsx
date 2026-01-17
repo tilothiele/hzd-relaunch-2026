@@ -82,6 +82,7 @@ export function CardSectionComponent({
 				>
 					{cards.map((card, index) => {
 						const key = card.id ?? card.Headline ?? `card-${index}`
+
 						return (
 							<BorderedCardItem
 								key={key}

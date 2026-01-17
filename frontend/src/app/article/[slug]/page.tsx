@@ -1,10 +1,11 @@
 import Image from 'next/image'
 import { MainPageStructure } from '../../main-page-structure'
-import { theme as globalTheme } from '@/themes'
+import { theme as globalTheme, type ThemeDefinition } from '@/themes'
 import { fetchNewsArticleBySlug, fetchGlobalLayout } from '@/lib/server/fetch-news-article-by-slug'
 import { renderServerSections } from '@/components/sections/server-section-factory'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import NotFoundSection from '@/components/sections/not-found-section/not-found-section'
+import { MarkAsRead } from '@/components/news/mark-as-read'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,13 +15,16 @@ interface PageProps {
     }>
 }
 
+
+
 function ArticleHeader({
     headline,
     subHeadline,
     author,
     publishedAt,
     image,
-    strapiBaseUrl
+    strapiBaseUrl,
+    theme
 }: {
     headline?: string | null
     subHeadline?: string | null
@@ -28,6 +32,7 @@ function ArticleHeader({
     publishedAt?: string | null
     image?: { url: string; alternativeText?: string | null; width?: number | null; height?: number | null } | null
     strapiBaseUrl: string
+    theme: ThemeDefinition
 }) {
     const formattedDate = publishedAt
         ? new Date(publishedAt).toLocaleDateString('de-DE', {
@@ -41,22 +46,22 @@ function ArticleHeader({
         <div className='flex w-full justify-center px-6 py-12'>
             <article className='w-full max-w-4xl'>
                 {/* Article Metadata */}
-                <div className='mb-8 space-y-2'>
+                <div className='mb-8 space-y-2' style={{ color: theme.textColor }}>
                     {formattedDate && (
-                        <time className='text-sm text-neutral-500' dateTime={publishedAt || undefined}>
+                        <time className='text-sm opacity-80' dateTime={publishedAt || undefined} style={{ color: 'inherit' }}>
                             {formattedDate}
                         </time>
                     )}
-                    <h1 className='text-4xl font-bold tracking-tight text-neutral-900 md:text-5xl'>
+                    <h1 className='text-4xl font-bold tracking-tight md:text-5xl' style={{ color: 'inherit' }}>
                         {headline}
                     </h1>
                     {subHeadline && (
-                        <p className='text-xl text-neutral-600'>
+                        <p className='text-xl opacity-90' style={{ color: 'inherit' }}>
                             {subHeadline}
                         </p>
                     )}
                     {author && (
-                        <p className='text-sm text-neutral-500'>
+                        <p className='text-sm opacity-80' style={{ color: 'inherit' }}>
                             von {author}
                         </p>
                     )}
@@ -146,6 +151,7 @@ export default async function ArticlePage({ params }: PageProps) {
             strapiBaseUrl={baseUrl}
             pageTitle={pageTitle}
         >
+            <MarkAsRead documentId={article.documentId} />
             <SectionContainer
                 variant='max-width'
                 backgroundColor={theme.evenBgColor}
@@ -159,6 +165,7 @@ export default async function ArticlePage({ params }: PageProps) {
                     publishedAt={article.publishedAt}
                     image={article.Image}
                     strapiBaseUrl={baseUrl}
+                    theme={theme}
                 />
                 {renderedSections}
             </SectionContainer>

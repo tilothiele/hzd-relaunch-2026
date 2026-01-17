@@ -63,7 +63,7 @@ function BulletItemAccordion({
 						sx={{
 							px: 4,
 							pb: 2,
-							'& p': {
+							'& .MuiAccordionDetails-root p': {
 								color: 'text.secondary',
 							},
 							'& a': {
@@ -76,8 +76,10 @@ function BulletItemAccordion({
 						}}
 
 					>
-						<p dangerouslySetInnerHTML={{ __html: itemBody }}>
-						</p>
+						<div
+							className="prose prose-sm max-w-none dark:prose-invert [&_p]:my-2"
+							dangerouslySetInnerHTML={{ __html: itemBody }}
+						/>
 					</AccordionDetails>
 				) : null
 			}
@@ -174,6 +176,8 @@ export function TextColumnsSectionComponent({
 
 									{columnText ? (
 										<div
+											className="prose max-w-none dark:prose-invert [&_p]:my-2"
+											style={{ color: 'inherit' }}
 											dangerouslySetInnerHTML={{ __html: columnText }}
 										/>
 									) : null}

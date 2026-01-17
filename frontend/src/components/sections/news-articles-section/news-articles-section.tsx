@@ -1,7 +1,9 @@
 import { fetchNewsArticles } from '@/lib/server/news-utils'
-import { CardSectionComponent } from '../card-section/card-section'
 import type { ThemeDefinition } from '@/themes'
-import type { CardItem, CardSection, NewsArticlesSection } from '@/types'
+import type { NewsArticlesSection } from '@/types'
+import { SectionContainer } from '../section-container/section-container'
+import { NewsArticleList } from './news-article-list'
+import { Typography, Box } from '@mui/material'
 
 interface NewsArticlesSectionComponentProps {
     section: NewsArticlesSection
@@ -23,52 +25,38 @@ export async function NewsArticlesSectionComponent({
         return null
     }
 
-    // Map NewsArticle to CardItem structure for reuse
-    // CardItem has: Headline, Subheadline, TeaserText, BackgroundImage, ActionButton, ColorTheme
-    const cardItems: CardItem[] = articles.map((article) => ({
-        id: article.documentId,
-        Headline: article.Headline,
-        Subheadline: formatDate(article.publishedAt), // Display date as subheadline? Or actual Subheadline?
-        // Let's use Subheadline if available, else date. Or both? 
-        // Card layout might not support unlimited text.
-        // Let's try: Subheadline = published date. TeaserText = article teaser.
-        // Or if article has subheadline, combine?
-        // "dd.MM.yyyy - Subheadline"
-        TeaserText: article.TeaserText,
-        BackgroundImage: article.Image,
-        ActionButton: article.Slug ? {
-            Label: 'Mehr lesen',
-            Link: `/aktuelles/${article.Slug}`, // Assuming route structure
-            Primary: true
-        } as any : undefined, // Type cast for ActionButton structure if needed
-        // We don't have per-card color theme in news, so we leave it empty or use defaults.
-        __typename: 'ComponentBlocksCardItem' as const
-    }))
-
-    // Create a synthetic CardSection object to reuse CardSectionComponent
-    const syntheticCardSection: CardSection = {
-        __typename: 'ComponentBlocksCardSection',
-        id: `news-section-${section.id}`,
-        CardHeadline: 'Aktuelles',
-        CardItem: cardItems,
-        CardColumnsOddEven: 'Odd',
-        CardsAnchor: section.NewsArticlesAnchor
-    }
+    const backgroundColor = section.NewsArticlesAnchor && section.NewsArticlesAnchor.includes('odd') ? theme.oddBgColor : theme.evenBgColor
+    // Note: We don't have an Odd/Even field in NewsArticlesSection schema but can deduce or default
 
     return (
-        <CardSectionComponent
-            section={syntheticCardSection}
-            strapiBaseUrl={strapiBaseUrl}
-            theme={theme}
-        />
-    )
-}
+        <SectionContainer
+            variant='max-width'
+            id={section.NewsArticlesAnchor || undefined}
+            backgroundColor={backgroundColor}
 
-function formatDate(dateString?: string | null): string {
-    if (!dateString) return ''
-    return new Date(dateString).toLocaleDateString('de-DE', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    })
+            paddingTop='3em'
+            paddingBottom='3em'
+        >
+            <Box sx={{ width: '100%' }}>
+                <Typography
+                    variant='h4'
+                    component='h2'
+                    sx={{
+                        textAlign: 'center',
+                        fontWeight: 700,
+                        mb: 6,
+                        color: theme.headlineColor
+                    }}
+                >
+                    Aktuelles
+                </Typography>
+
+                <NewsArticleList
+                    articles={articles}
+                    strapiBaseUrl={strapiBaseUrl}
+                    theme={theme}
+                />
+            </Box>
+        </SectionContainer>
+    )
 }

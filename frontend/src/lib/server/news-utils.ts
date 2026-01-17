@@ -10,6 +10,9 @@ export interface NewsArticle {
     Slug?: string | null
     publishedAt?: string | null
     Image?: Image | null
+    category?: {
+        CategoryName?: string | null
+    } | null
 }
 
 interface NewsArticlesResponse {

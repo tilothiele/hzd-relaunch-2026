@@ -88,6 +88,8 @@ export const GET_INDEX_PAGE = `
 			Sections {
 				__typename
 			    ... on ComponentBlocksRichTextSection {
+					Title
+					Subtitle
 					RichTextContent
 					RichTextOddEven
 					RichTextAnchor
@@ -328,6 +330,8 @@ export const GET_PAGE_BY_SLUG = `
 					Sections {
 						__typename
 						... on ComponentBlocksRichTextSection {
+							Title
+							Subtitle
 							RichTextContent
 							RichTextOddEven
 							RichTextAnchor
@@ -1019,6 +1023,9 @@ export const GET_NEWS_ARTICLES = `
 				height
 				caption
 				previewUrl
+			}
+			category {
+				CategoryName
 			}
 		}
 	}

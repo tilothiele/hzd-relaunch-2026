@@ -49,6 +49,8 @@ export interface CardSection {
 
 export interface RichTextSection {
 	__typename: 'ComponentBlocksRichTextSection'
+	Title?: string | null
+	Subtitle?: string | null
 	RichTextOddEven?: 'Odd' | 'Even' | null
 	RichTextContent?: string | null
 	RichTextAnchor?: string | null
