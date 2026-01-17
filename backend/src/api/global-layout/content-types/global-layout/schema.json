@@ -66,6 +66,11 @@
         "videos",
         "audios"
       ]
+    },
+    "SOS": {
+      "type": "component",
+      "component": "layout.sos",
+      "repeatable": false
     }
   }
 }

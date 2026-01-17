@@ -4,6 +4,11 @@ export const GET_LAYOUT = `
 			Menu
 			MenuStyle
 			DrawerMenu
+			SOS {
+				ShowSOS
+				SosTitle
+				SosLink
+			}
 			Logo {
 				url
 				alternativeText

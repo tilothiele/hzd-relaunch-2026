@@ -224,9 +224,16 @@ export interface GlobalLayout {
 	SocialLinkFB?: string | null
 	SocialLinkYT?: string | null
 	HzdSetting?: HzdSetting | null
+	SOS?: ComponentLayoutSOS | null
 	Sections?: StartpageSection[] | null
 	PartnerLink?: PartnerLink[] | null
 	PrivacyPolicy?: Image | null
+}
+
+export interface ComponentLayoutSOS {
+	ShowSOS: boolean
+	SosTitle?: string | null
+	SosLink?: string | null
 }
 
 export interface Contact {

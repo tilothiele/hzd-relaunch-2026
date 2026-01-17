@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_layout_sos",
+  "info": {
+    "displayName": "SOS"
+  },
+  "options": {},
+  "attributes": {
+    "ShowSOS": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    },
+    "SosTitle": {
+      "type": "string"
+    },
+    "SosLink": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

@@ -532,6 +532,20 @@ export interface LayoutFooter extends Struct.ComponentSchema {
   };
 }
 
+export interface LayoutSos extends Struct.ComponentSchema {
+  collectionName: 'components_layout_sos';
+  info: {
+    displayName: 'SOS';
+  };
+  attributes: {
+    ShowSOS: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
+    SosLink: Schema.Attribute.String;
+    SosTitle: Schema.Attribute.String;
+  };
+}
+
 export interface LinksActionButton extends Struct.ComponentSchema {
   collectionName: 'components_links_action_buttons';
   info: {
@@ -657,6 +671,7 @@ declare module '@strapi/strapi' {
       'form.text-area': FormTextArea;
       'layout.color-theme': LayoutColorTheme;
       'layout.footer': LayoutFooter;
+      'layout.sos': LayoutSos;
       'links.action-button': LinksActionButton;
       'links.partnerl-link': LinksPartnerlLink;
       'permission.groups': PermissionGroups;

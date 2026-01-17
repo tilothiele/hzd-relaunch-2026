@@ -110,6 +110,19 @@ export function Header({
 						socialLinkYT={globalLayout?.SocialLinkYT}
 						theme={theme}
 					/>
+					{globalLayout?.SOS?.ShowSOS && (
+						<Link
+							href={globalLayout.SOS.SosLink ?? '#'}
+							title={globalLayout.SOS.SosTitle ?? 'SOS'}
+							className='flex items-center justify-center rounded-[16px] px-3 h-6 text-sm font-bold shadow-sm animate-pulse'
+							style={{
+								backgroundColor: theme.submitButtonColor,
+								color: theme.submitButtonTextColor,
+							}}
+						>
+							SOS
+						</Link>
+					)}
 					<LoginControls
 						isAuthenticated={isAuthenticated}
 						user={user}
