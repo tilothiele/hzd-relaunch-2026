@@ -1415,6 +1415,7 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
     >;
     BreedSurvey: Schema.Attribute.Text;
     cBreederId: Schema.Attribute.Integer;
+    cFertile: Schema.Attribute.Boolean;
     cId: Schema.Attribute.Integer & Schema.Attribute.Unique;
     color: Schema.Attribute.Enumeration<['S', 'SM', 'B']>;
     ColorCheck: Schema.Attribute.Boolean;
@@ -1471,7 +1472,6 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
     publishedAt: Schema.Attribute.DateTime;
     sex: Schema.Attribute.Enumeration<['M', 'F']>;
     SOD1: Schema.Attribute.Enumeration<['N_N', 'N_DM', 'DM_DM']>;
-    stuntLicenseSince: Schema.Attribute.Date;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1952,12 +1952,20 @@ export interface PluginUsersPermissionsUser
     blocked: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     cancellationDueDate: Schema.Attribute.Date;
     cancellationOn: Schema.Attribute.Date;
+    cEmail: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
     cFlagAccess: Schema.Attribute.Boolean;
     cFlagBreeder: Schema.Attribute.Boolean;
     cId: Schema.Attribute.Integer & Schema.Attribute.Unique;
     city: Schema.Attribute.String;
     confirmationToken: Schema.Attribute.String & Schema.Attribute.Private;
     confirmed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    countryCode: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 2;
+      }>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

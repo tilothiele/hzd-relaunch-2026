@@ -105,7 +105,8 @@
         "N_N",
         "N_DM",
         "DM_DM"
-      ]
+      ],
+      "private": true
     },
     "HD": {
       "type": "enumeration",
@@ -114,19 +115,24 @@
         "A2",
         "B1",
         "B2"
-      ]
+      ],
+      "private": true
     },
     "Genprofil": {
-      "type": "boolean"
+      "type": "boolean",
+      "private": true
     },
     "EyesCheck": {
-      "type": "boolean"
+      "type": "boolean",
+      "private": true
     },
     "HeartCheck": {
-      "type": "boolean"
+      "type": "boolean",
+      "private": true
     },
     "ColorCheck": {
-      "type": "boolean"
+      "type": "boolean",
+      "private": true
     },
     "MemosDraft": {
       "type": "customField",

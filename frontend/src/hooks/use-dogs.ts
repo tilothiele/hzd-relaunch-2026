@@ -114,7 +114,9 @@ export function useDogs(options: UseDogsOptions = {}) {
 		setError(null)
 
 		try {
-			const filterConditions: Array<Record<string, unknown>> = []
+			const filterConditions: Array<Record<string, unknown>> = [
+				{ cFertile: { eq: true } },
+			]
 
 			if (nameFilter.trim()) {
 				filterConditions.push({

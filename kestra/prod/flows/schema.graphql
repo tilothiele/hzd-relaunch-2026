@@ -293,6 +293,14 @@ type ComponentSeoSeo {
   ExcludeFromSitemap: Boolean
 }
 
+type ComponentPermissionGroups {
+  id: ID!
+  Any: Boolean
+  Member: Boolean
+  HeadOfEvent: Boolean
+  BreedWarden: Boolean
+}
+
 input ComponentPersonalShippingAddressFiltersInput {
   Name: StringFilterInput
   AdditionalName: StringFilterInput
@@ -355,14 +363,6 @@ type ComponentPersonalAddress {
   CountryCode: String!
   Zip: String
   City: String
-}
-
-type ComponentPermissionGroups {
-  id: ID!
-  Any: Boolean
-  Member: Boolean
-  HeadOfEvent: Boolean
-  BreedWarden: Boolean
 }
 
 input ComponentLinksPartnerlLinkFiltersInput {
@@ -1180,7 +1180,6 @@ input UsersPermissionsUserFiltersInput {
   address1: StringFilterInput
   address2: StringFilterInput
   zip: StringFilterInput
-  countryCode: StringFilterInput
   city: StringFilterInput
   phone: StringFilterInput
   sex: StringFilterInput
@@ -1188,7 +1187,6 @@ input UsersPermissionsUserFiltersInput {
   dateOfDeath: DateFilterInput
   cId: IntFilterInput
   cFlagBreeder: BooleanFilterInput
-  cEmail: StringFilterInput
   cFlagAccess: BooleanFilterInput
   memberSince: DateFilterInput
   cancellationOn: DateFilterInput
@@ -1219,7 +1217,6 @@ input UsersPermissionsUserInput {
   address1: String
   address2: String
   zip: String
-  countryCode: String
   city: String
   phone: String
   sex: ENUM_USERSPERMISSIONSUSER_SEX
@@ -1227,7 +1224,6 @@ input UsersPermissionsUserInput {
   dateOfDeath: Date
   cId: Int
   cFlagBreeder: Boolean
-  cEmail: String
   cFlagAccess: Boolean
   memberSince: Date
   cancellationOn: Date
@@ -1255,7 +1251,6 @@ type UsersPermissionsUser {
   address1: String
   address2: String
   zip: String
-  countryCode: String
   city: String
   phone: String
   sex: ENUM_USERSPERMISSIONSUSER_SEX
@@ -1263,7 +1258,6 @@ type UsersPermissionsUser {
   dateOfDeath: Date
   cId: Int
   cFlagBreeder: Boolean
-  cEmail: String
   cFlagAccess: Boolean
   memberSince: Date
   cancellationOn: Date
@@ -1276,6 +1270,7 @@ type UsersPermissionsUser {
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
+  countryCode: String
 }
 
 type UsersPermissionsUserEntityResponse {
@@ -2465,7 +2460,7 @@ type SupplementalDocumentGroupEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
+union GenericMorph = ComponentSeoSeo | ComponentPermissionGroups | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
 
 input FileInfoInput {
   name: String

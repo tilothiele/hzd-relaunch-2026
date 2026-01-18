@@ -35,9 +35,6 @@
       "type": "string",
       "maxLength": 30
     },
-    "stuntLicenseSince": {
-      "type": "date"
-    },
     "dateOfBirth": {
       "type": "date"
     },
@@ -165,6 +162,9 @@
     },
     "BreedSurvey": {
       "type": "text"
+    },
+    "cFertile": {
+      "type": "boolean"
     }
   }
 }

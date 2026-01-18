@@ -1,6 +1,6 @@
 const DB_NAME = 'hzd_news_db'
 const STORE_NAME = 'read_articles'
-const DB_VERSION = 1
+const DB_VERSION = 2
 
 export async function openDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
@@ -13,6 +13,9 @@ export async function openDB(): Promise<IDBDatabase> {
             const db = (event.target as IDBOpenDBRequest).result
             if (!db.objectStoreNames.contains(STORE_NAME)) {
                 db.createObjectStore(STORE_NAME, { keyPath: 'id' })
+            }
+            if (!db.objectStoreNames.contains('badgeNumbers')) {
+                db.createObjectStore('badgeNumbers', { keyPath: 'id' })
             }
         }
     })

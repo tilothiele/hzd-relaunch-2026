@@ -22,7 +22,7 @@ export default (plugin: any) => {
 				const originalIssue = jwtService.issue.bind(jwtService)
 
 				// Erweitere die issue-Methode
-				jwtService.issue = function(payload: any, jwtOptions: any = {}) {
+				jwtService.issue = function (payload: any, jwtOptions: any = {}) {
 					strapi.log.info('[User Ext] JWT issue called', { hasId: !!payload?.id, payloadKeys: Object.keys(payload || {}) })
 
 					// Wenn payload bereits member enthält, verwende es direkt
@@ -78,10 +78,10 @@ export default (plugin: any) => {
 										region: user.member.region,
 										officer_roles: user.member.officer_roles
 											? user.member.officer_roles.map((role: any) => ({
-													id: role.id,
-													Name: role.Name,
-													RegionalUnit: role.RegionalUnit,
-												}))
+												id: role.id,
+												Name: role.Name,
+												RegionalUnit: role.RegionalUnit,
+											}))
 											: [],
 									},
 								}
@@ -123,94 +123,7 @@ export default (plugin: any) => {
 			strapi.log.error('[User Ext] Error extending JWT Service:', error)
 		}
 
-		strapi.log.info('[User Ext] Bootstrap: patching user document service')
-
-		const geolocationService = () => strapi.plugin('hzd-plugin')?.service('geolocation')
-
-		const setDisplayName = (data: any) => {
-			if (!data) {
-				return
-			}
-
-			const firstName = data.firstName?.trim() || ''
-			const lastName = data.lastName?.trim() || ''
-
-			if (firstName || lastName) {
-				const displayName = `${firstName} ${lastName}`.trim()
-				data.DisplayName = displayName
-				strapi.log.info('[User Ext] DisplayName set', {
-					firstName,
-					lastName,
-					DisplayName: displayName,
-				})
-			} else {
-				strapi.log.debug('[User Ext] No firstName or lastName provided, skipping DisplayName')
-			}
-		}
-
-		const enrichWithGeo = async (data: any) => {
-			if (!data || typeof data.zip !== 'string' || data.zip.trim() === '') {
-				return
-			}
-
-			const geo = geolocationService()
-			if (!geo) {
-				strapi.log.warn('[User Ext] Geolocation service not available')
-				return
-			}
-
-			strapi.log.info('[User Ext] fetching geolocation for zip', { zip: data.zip })
-			const result = await geo.getGeoLocationByZip(data.zip)
-			if (result) {
-				data.geoLocation = { lat: result.lat, lng: result.lng }
-				strapi.log.info('[User Ext] geolocation set via document override', {
-					zip: data.zip,
-					geo: data.geoLocation,
-				})
-			} else {
-				strapi.log.warn('[User Ext] geolocation lookup failed; leaving geoLocation unchanged', {
-					zip: data.zip,
-				})
-			}
-		}
-
-		// Wait a bit for document service to be ready
-		await new Promise((resolve) => setTimeout(resolve, 1000))
-
-		// Patch document service for users-permissions user
-		try {
-			const userDocService = strapi.documents?.('plugin::users-permissions.user')
-			if (userDocService) {
-				const originalCreate = userDocService.create?.bind(userDocService)
-				const originalUpdate = userDocService.update?.bind(userDocService)
-
-				if (originalCreate) {
-					userDocService.create = async (params: any, opts?: any) => {
-						strapi.log.info('[User Ext] create intercepted', { hasData: !!params?.data, zip: params?.data?.zip })
-						// Set DisplayName before other operations
-						setDisplayName(params?.data)
-						await enrichWithGeo(params?.data)
-						return originalCreate(params, opts)
-					}
-					strapi.log.info('[User Ext] patched user document service create')
-				}
-
-				if (originalUpdate) {
-					userDocService.update = async (params: any, opts?: any) => {
-						strapi.log.info('[User Ext] update intercepted', { hasData: !!params?.data, zip: params?.data?.zip })
-						// Set DisplayName before other operations
-						setDisplayName(params?.data)
-						await enrichWithGeo(params?.data)
-						return originalUpdate(params, opts)
-					}
-					strapi.log.info('[User Ext] patched user document service update')
-				}
-			} else {
-				strapi.log.warn('[User Ext] user document service not available in bootstrap')
-			}
-		} catch (error) {
-			strapi.log.error('[User Ext] failed to patch user document service', error)
-		}
+		strapi.log.info('[User Ext] Bootstrap: JWT service extension complete');
 	}
 
 	return plugin

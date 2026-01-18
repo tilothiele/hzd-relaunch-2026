@@ -350,7 +350,6 @@ export interface Dog {
 	microchipNo?: string | null
 	SOD1?: 'N_N' | 'N_DM' | 'DM_DM' | null
 	HD?: 'A1' | 'A2' | 'B1' | 'B2' | null
-	stuntLicenseSince?: string | null
 	father?: {
 		documentId: string
 		fullKennelName?: string | null
@@ -370,9 +369,8 @@ export interface Dog {
 	EyesCheck?: boolean | null
 	HeartCheck?: boolean | null
 	ColorCheck?: boolean | null
-	MemosDraft?: string | null
-	MemosReleased?: string | null
 	Location?: GeoLocation | null
+	cFertile?: boolean | null
 	Exhibitions?: string | null
 	BreedSurvey?: string | null
 	avatar?: Image | null

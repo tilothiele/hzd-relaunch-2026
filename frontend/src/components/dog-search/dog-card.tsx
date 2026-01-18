@@ -83,16 +83,6 @@ function getGivenNameIcon(sex: string | null | undefined): string {
 }
 
 /**
- * Konvertiert SOD1-Wert von Schema-Format (N_N) zu Anzeige-Format (N/N)
- */
-function formatSod1ForDisplay(sod1: string | null | undefined): string {
-	if (!sod1) {
-		return ''
-	}
-	return sod1.replace(/_/g, '/')
-}
-
-/**
  * Gibt das passende Standardbild basierend auf der Farbe zurück
  */
 function getDefaultImageForColor(color: string | null | undefined): string {
@@ -430,60 +420,7 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 								</TableCell>
 							</TableRow>
 						) : null}
-						{dog.SOD1 ? (
-							<TableRow>
-								<TableCell
-									sx={{
-										width: 48,
-										paddingLeft: '1em',
-										paddingRight: '1em',
-										verticalAlign: 'middle',
-									}}
-								>
-									<Tooltip title='SOD1' arrow>
-										<Box sx={{ width: 20, height: 20, position: 'relative', cursor: 'help' }}>
-											<Image
-												src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
-												alt='SOD1'
-												fill
-												className='object-contain'
-												unoptimized
-											/>
-										</Box>
-									</Tooltip>
-								</TableCell>
-								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-									SOD1: {formatSod1ForDisplay(dog.SOD1)}
-								</TableCell>
-							</TableRow>
-						) : null}
-						{dog.HD ? (
-							<TableRow>
-								<TableCell
-									sx={{
-										width: 48,
-										paddingLeft: '1em',
-										paddingRight: '1em',
-										verticalAlign: 'middle',
-									}}
-								>
-									<Tooltip title='HD' arrow>
-										<Box sx={{ width: 20, height: 20, position: 'relative', cursor: 'help' }}>
-											<Image
-												src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
-												alt='HD'
-												fill
-												className='object-contain'
-												unoptimized
-											/>
-										</Box>
-									</Tooltip>
-								</TableCell>
-								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-									HD: {dog.HD}
-								</TableCell>
-							</TableRow>
-						) : null}
+
 						{distance !== null ? (
 							<TableRow>
 								<TableCell

@@ -21,16 +21,6 @@ const GERMANY_BOUNDS = {
 }
 
 /**
- * Konvertiert SOD1-Wert von Schema-Format (N_N) zu Anzeige-Format (N/N)
- */
-function formatSod1ForDisplay(sod1: string | null | undefined): string {
-	if (!sod1) {
-		return ''
-	}
-	return sod1.replace(/_/g, '/')
-}
-
-/**
  * Generiert deterministische Fake-Koordinaten basierend auf der documentId
  * Dies stellt sicher, dass jeder Hund immer die gleichen Koordinaten hat
  */
@@ -78,9 +68,6 @@ export function DogSearch({ strapiBaseUrl, sexFilter, hzdSetting }: DogSearchPro
 	const [nameFilter, setNameFilter] = useState('')
 	const [colorFilter, setColorFilter] = useState<ColorFilter>('')
 	const [chipNoFilter, setChipNoFilter] = useState('')
-	const [sod1Filters, setSod1Filters] = useState<Sod1Filter[]>([])
-	const [hdFilters, setHdFilters] = useState<HDFilter[]>([])
-	const [examinationFilters, setExaminationFilters] = useState<ExaminationFilter[]>([])
 	const [zipCode, setZipCode] = useState('')
 	const [zipLocation, setZipLocation] = useState<{ lat: number; lng: number } | null>(null)
 	const [maxDistance, setMaxDistance] = useState<DistanceFilter>('')
@@ -95,33 +82,15 @@ export function DogSearch({ strapiBaseUrl, sexFilter, hzdSetting }: DogSearchPro
 	const userLocation = zipLocation || null
 	const isLocationAvailable = !!userLocation
 
-	// Stabilisiere Arrays für stabile Dependencies
-	const sod1FiltersKey = useMemo(() => JSON.stringify([...sod1Filters].sort()), [sod1Filters])
-	const hdFiltersKey = useMemo(() => JSON.stringify([...hdFilters].sort()), [hdFilters])
-	const examinationFiltersKey = useMemo(() => JSON.stringify([...examinationFilters].sort()), [examinationFilters])
-
-	// Mappe ExaminationFilter auf die entsprechenden Filter
-	const onlyHD = examinationFilters.includes('HD')
-	const onlyHeartCheck = examinationFilters.includes('HeartCheck')
-	const onlyGenprofil = examinationFilters.includes('Genprofil')
-	const onlyEyesCheck = examinationFilters.includes('EyesCheck')
-	const onlyColorCheck = examinationFilters.includes('ColorCheck')
 
 	const filters = useMemo(() => ({
 		nameFilter,
 		sexFilter,
 		colorFilter,
 		chipNoFilter,
-		sod1Filters: sod1Filters.length > 0 ? sod1Filters : undefined,
-		hdFilters: hdFilters.length > 0 ? hdFilters : undefined,
-		onlyHD: onlyHD || undefined,
-		onlyHeartCheck: onlyHeartCheck || undefined,
-		onlyGenprofil: onlyGenprofil || undefined,
-		onlyEyesCheck: onlyEyesCheck || undefined,
-		onlyColorCheck: onlyColorCheck || undefined,
 		maxDistance: maxDistance === '' ? undefined : maxDistance,
 		userLocation: userLocation || undefined,
-	}), [nameFilter, sexFilter, colorFilter, chipNoFilter, sod1FiltersKey, hdFiltersKey, examinationFiltersKey, maxDistance, userLocation])
+	}), [nameFilter, sexFilter, colorFilter, chipNoFilter, maxDistance, userLocation])
 
 	const {
 		dogs,
@@ -261,96 +230,6 @@ export function DogSearch({ strapiBaseUrl, sexFilter, hzdSetting }: DogSearchPro
 							fullWidth
 							size='small'
 						/>
-					</Box>
-
-					{/* Zweite Zeile: SOD1, HD, Untersuchungen (rechts neben HD, unter Chipnummer) */}
-					<Box sx={{ mt: 3, display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 3, alignItems: 'start' }}>
-						<FormControl fullWidth size='small'>
-							<InputLabel>SOD1</InputLabel>
-							<Select
-								multiple
-								value={sod1Filters}
-								label='SOD1'
-								onChange={(e) => {
-									const value = e.target.value
-									setSod1Filters(typeof value === 'string' ? value.split(',') as Sod1Filter[] : value as Sod1Filter[])
-								}}
-								input={<OutlinedInput label='SOD1' />}
-								renderValue={(selected) => (
-									<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-										{selected.map((value) => (
-											<Chip key={value} label={formatSod1ForDisplay(value)} size='small' />
-										))}
-									</Box>
-								)}
-							>
-								<MenuItem value='N_N'>N/N</MenuItem>
-								<MenuItem value='N_DM'>N/DM</MenuItem>
-								<MenuItem value='DM_DM'>DM/DM</MenuItem>
-							</Select>
-						</FormControl>
-
-						<FormControl fullWidth size='small'>
-							<InputLabel>HD</InputLabel>
-							<Select
-								multiple
-								value={hdFilters}
-								label='HD'
-								onChange={(e) => {
-									const value = e.target.value
-									setHdFilters(typeof value === 'string' ? value.split(',') as HDFilter[] : value as HDFilter[])
-								}}
-								input={<OutlinedInput label='HD' />}
-								renderValue={(selected) => (
-									<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-										{selected.map((value) => (
-											<Chip key={value} label={value} size='small' />
-										))}
-									</Box>
-								)}
-							>
-								<MenuItem value='A1'>A1</MenuItem>
-								<MenuItem value='A2'>A2</MenuItem>
-								<MenuItem value='B1'>B1</MenuItem>
-								<MenuItem value='B2'>B2</MenuItem>
-							</Select>
-						</FormControl>
-
-						<FormControl fullWidth size='small'>
-							<InputLabel>Untersuchungen</InputLabel>
-							<Select
-								multiple
-								value={examinationFilters}
-								label='Untersuchungen'
-								onChange={(e) => {
-									const value = e.target.value
-									setExaminationFilters(typeof value === 'string' ? value.split(',') as ExaminationFilter[] : value as ExaminationFilter[])
-								}}
-								input={<OutlinedInput label='Untersuchungen' />}
-								renderValue={(selected) => (
-									<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-										{selected.map((value) => {
-											const labels: Record<ExaminationFilter, string> = {
-												HD: 'Nur HD',
-												HeartCheck: 'Nur mit Herzuntersuchung',
-												Genprofil: 'Nur mit Genprofil',
-												EyesCheck: 'Nur mit Augenuntersuchung',
-												ColorCheck: 'Nur mit Farbverdünnung',
-											}
-											return (
-												<Chip key={value} label={labels[value]} size='small' />
-											)
-										})}
-									</Box>
-								)}
-							>
-								<MenuItem value='HD'>Nur HD</MenuItem>
-								<MenuItem value='HeartCheck'>Nur mit Herzuntersuchung</MenuItem>
-								<MenuItem value='Genprofil'>Nur mit Genprofil</MenuItem>
-								<MenuItem value='EyesCheck'>Nur mit Augenuntersuchung</MenuItem>
-								<MenuItem value='ColorCheck'>Nur mit Farbverdünnung</MenuItem>
-							</Select>
-						</FormControl>
 					</Box>
 
 					{/* PLZ und Maximale Entfernung */}

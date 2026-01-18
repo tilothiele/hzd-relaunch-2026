@@ -33,7 +33,9 @@ def run(playwright: Playwright) -> None:
     download = download_info.value
 
     # vom Server vorgeschlagener Name
-    filename = download.suggested_filename
+    #filename = download.suggested_filename
+    
+    filename = "alle_hzd_mitglieder.csv"
 
     download.save_as(f"./{filename}")
     print(f"Datei gespeichert unter: {filename}")

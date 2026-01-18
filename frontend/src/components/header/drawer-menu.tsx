@@ -42,8 +42,35 @@ import {
     getMenuItemLabel,
     getMenuItemIcon,
     getMenuItemFaIcon,
-    getMenuItemBadgeText
+    getMenuItemBadgeCategory
 } from '@/lib/menu-helper'
+import { useBadgeNumber } from '@/lib/badge-numbers'
+
+function MenuItemBadge({ category, theme }: { category: string, theme: ThemeDefinition }) {
+    const { badgeNumber, loading } = useBadgeNumber(category)
+
+    if (loading || !badgeNumber || badgeNumber === 0) return null
+
+    return (
+        <Box
+            component="span"
+            sx={{
+                backgroundColor: theme.buttonColor,
+                color: theme.buttonTextColor,
+                borderRadius: '12px',
+                padding: '2px 8px',
+                fontSize: '0.75rem',
+                fontWeight: 'bold',
+                lineHeight: 1,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}
+        >
+            {badgeNumber}
+        </Box>
+    )
+}
 
 // Map icon strings from JSON to FontAwesome icons
 const iconMap: Record<string, any> = {
@@ -99,7 +126,7 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
         const isSubOpen = openSubmenus[label]
         const icon = getMenuItemIcon(item) || getMenuItemFaIcon(item)
         const url = getMenuItemUrl(item)
-        const badgeText = getMenuItemBadgeText(item)
+        const badgeCategory = getMenuItemBadgeCategory(item)
 
         return (
             <React.Fragment key={label}>
@@ -124,24 +151,8 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                             primary={
                                 <Box component="span" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     {label}
-                                    {badgeText && (
-                                        <Box
-                                            component="span"
-                                            sx={{
-                                                backgroundColor: theme.buttonColor,
-                                                color: theme.buttonTextColor,
-                                                borderRadius: '12px',
-                                                padding: '2px 8px',
-                                                fontSize: '0.75rem',
-                                                fontWeight: 'bold',
-                                                lineHeight: 1,
-                                                display: 'inline-flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                            }}
-                                        >
-                                            {badgeText}
-                                        </Box>
+                                    {badgeCategory && (
+                                        <MenuItemBadge category={badgeCategory} theme={theme} />
                                     )}
                                 </Box>
                             }

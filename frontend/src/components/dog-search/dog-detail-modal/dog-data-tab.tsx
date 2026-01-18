@@ -64,16 +64,6 @@ function getGivenNameIcon(sex: string | null | undefined): string {
 }
 
 /**
- * Konvertiert SOD1-Wert von Schema-Format (N_N) zu Anzeige-Format (N/N)
- */
-function formatSod1ForDisplay(sod1: string | null | undefined): string {
-	if (!sod1) {
-		return ''
-	}
-	return sod1.replace(/_/g, '/')
-}
-
-/**
  * Berechnet das Alter basierend auf dem Geburtsdatum und gibt es als "Jahre Monate" zurück
  */
 function calculateAge(dateOfBirth: string | null | undefined): string | null {
@@ -297,144 +287,9 @@ export function DogDataTab({ dog, strapiBaseUrl, hzdSetting }: DogDataTabProps) 
 						</div>
 					) : null}
 
-					<div className='flex items-center gap-4'>
-						<Tooltip title='SOD1' arrow>
-							<div className='flex h-10 w-10 cursor-help items-center justify-center'>
-								<Image
-									src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
-									alt='SOD1'
-									width={24}
-									height={24}
-									className='object-contain'
-									unoptimized
-								/>
-							</div>
-						</Tooltip>
-						<div>
-							<p className='text-base text-gray-900'>{dog.SOD1 ? formatSod1ForDisplay(dog.SOD1) : 'Nicht verfügbar'}</p>
-						</div>
-					</div>
-
-					<div className='flex items-center gap-4'>
-						<Tooltip title='HD' arrow>
-							<div className='flex h-10 w-10 cursor-help items-center justify-center'>
-								<Image
-									src='/icons/zucht-icon-pokal-hzd-hovawart-zuchtgemeinschaft.png'
-									alt='HD'
-									width={24}
-									height={24}
-									className='object-contain'
-									unoptimized
-								/>
-							</div>
-						</Tooltip>
-						<div>
-							<p className='text-base text-gray-900'>{dog.HD ?? 'Nicht verfügbar'}</p>
-						</div>
-					</div>
 				</div>
 			</div>
 
-			{/* Untersuchungen */}
-			<div className='mt-8 border-t border-gray-200 pt-8 pb-8'>
-				<div className='grid gap-6 md:grid-cols-2'>
-					<div className='space-y-4'>
-						<div className='flex items-center gap-4'>
-							<div className='flex h-10 w-10 items-center justify-center'>
-								<Checkbox
-									checked={dog.Genprofil === true}
-									disabled
-									sx={{
-										color: dog.Genprofil === true ? '#10b981' : '#d1d5db',
-										'&.Mui-checked': {
-											color: '#10b981',
-										},
-										'&.Mui-disabled': {
-											color: dog.Genprofil === true ? '#10b981' : '#d1d5db',
-										},
-									}}
-								/>
-							</div>
-							<div>
-								<p className={`text-base text-gray-900 ${dog.Genprofil !== true ? 'line-through' : ''}`}>
-									Genprofil
-								</p>
-							</div>
-						</div>
-						<div className='flex items-center gap-4'>
-							<div className='flex h-10 w-10 items-center justify-center'>
-								<Checkbox
-									checked={dog.HeartCheck === true}
-									disabled
-									sx={{
-										color: dog.HeartCheck === true ? '#10b981' : '#d1d5db',
-										'&.Mui-checked': {
-											color: '#10b981',
-										},
-										'&.Mui-disabled': {
-											color: dog.HeartCheck === true ? '#10b981' : '#d1d5db',
-										},
-									}}
-								/>
-							</div>
-							<div>
-								<p className={`text-base text-gray-900 ${dog.HeartCheck !== true ? 'line-through' : ''}`}>
-									Herzuntersuchung
-								</p>
-							</div>
-						</div>
-					</div>
-					<div className='space-y-4'>
-						<div className='flex items-center gap-4'>
-							<div className='flex h-10 w-10 items-center justify-center'>
-								<Checkbox
-									checked={dog.EyesCheck === true}
-									disabled
-									sx={{
-										color: dog.EyesCheck === true ? '#10b981' : '#d1d5db',
-										'&.Mui-checked': {
-											color: '#10b981',
-										},
-										'&.Mui-disabled': {
-											color: dog.EyesCheck === true ? '#10b981' : '#d1d5db',
-										},
-									}}
-								/>
-							</div>
-							<div>
-								<p className={`text-base text-gray-900 ${dog.EyesCheck !== true ? 'line-through' : ''}`}>
-									Augenuntersuchung
-								</p>
-							</div>
-						</div>
-						<div className='flex items-center gap-4'>
-							<div className='flex h-10 w-10 items-center justify-center'>
-								<Checkbox
-									checked={dog.ColorCheck === true}
-									disabled
-									sx={{
-										color: dog.ColorCheck === true ? '#10b981' : '#d1d5db',
-										'&.Mui-checked': {
-											color: '#10b981',
-										},
-										'&.Mui-disabled': {
-											color: dog.ColorCheck === true ? '#10b981' : '#d1d5db',
-										},
-									}}
-								/>
-							</div>
-							<div>
-								<p
-									className={`text-base text-gray-900 ${dog.ColorCheck !== true ? 'line-through' : ''
-										}`}
-								>
-									Farbverdünnung
-								</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
 		</div>
 	)
 }

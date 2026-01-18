@@ -1,4 +1,6 @@
 import type { Core } from '@strapi/strapi';
+import userAdminSchema from './extensions/graphql/config/schema.graphql';
+
 
 export default {
   /**
@@ -12,6 +14,7 @@ export default {
 
     extensionService.use({
       typeDefs: `
+        ${userAdminSchema.typeDefs}
         extend type UsersPermissionsMe {
           firstName: String
           lastName: String
@@ -36,7 +39,9 @@ export default {
           geoLocation: ComponentBreedingGeoLocation
         }
       `,
+
       resolvers: {
+        ...userAdminSchema.resolvers,
         UsersPermissionsMe: {
           firstName: {
             resolve: (parent: any) => parent.firstName || null,
@@ -97,6 +102,7 @@ export default {
         },
       },
       resolversConfig: {
+        ...userAdminSchema.resolversConfig,
         // The me query itself requires authentication (handled by the original resolver)
         // Extended fields inherit auth from parent query
         'UsersPermissionsMe.firstName': {
@@ -153,10 +159,43 @@ export default {
         'UsersPermissionsUser.geoLocation': {
           auth: false,
         },
+
       },
     });
 
     strapi.log.info('[GraphQL Extension] Registered UsersPermissionsMe/User extensions');
+
+    // Document Service Middleware to manipulate user data
+    strapi.documents.use(async (context, next) => {
+      if (context.uid === 'plugin::users-permissions.user' && (context.action === 'create' || context.action === 'update')) {
+        const data = (context.params as any).data;
+
+        console.log('[Document Middleware] User data manipulation middleware', { uid: context.uid, action: context.action, data });
+        if (data) {
+          // Set DisplayName
+          const firstName = data.firstName?.trim() || '';
+          const lastName = data.lastName?.trim() || '';
+          const memberId = data.membershipNumber || '';
+          if (firstName || lastName) {
+            data.DisplayName = `${firstName} ${lastName}(${memberId})`.trim();
+          }
+
+          // Enrich with Geolocation
+          if (typeof data.zip === 'string' && data.zip.trim() !== '') {
+            const geo = strapi.plugin('hzd-plugin')?.service('geolocation');
+            if (geo) {
+              const result = await geo.getGeoLocationByZip(data.zip);
+              if (result) {
+                data.geoLocation = { lat: result.lat, lng: result.lng };
+              }
+            }
+          }
+        }
+      }
+
+      return next();
+    });
+    strapi.log.info('[Document Middleware] Registered User data manipulation middleware');
   },
 
   /**

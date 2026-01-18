@@ -39,7 +39,7 @@ COUNTRY_CODES = {
 
 REGION_MAPPING = {
     'Nord': 'Nord',
-    'Süd': 'Sued',
+    'Süd': 'Süd',
     'Ost': 'Ost',
     'West': 'West',
     'Mitte': 'Mitte'
@@ -158,10 +158,10 @@ def map_csv_to_member(row: Dict[str, str]) -> Dict[str, Any]:
 
     email = clean_string(row.get('email', ''), max_length=100)
     if email:
-        member_data['email'] = email
+        member_data['cEmail'] = email
 
     # zip
-    zipcode = clean_string(row.get('zipcode', ''), max_length=10)
+    zipcode = clean_string(row.get('zipcode', ''), max_length=5)
     if zipcode:
         member_data['zip'] = zipcode
 
@@ -222,12 +222,10 @@ def map_csv_to_member(row: Dict[str, str]) -> Dict[str, Any]:
     if cancellation_on:
         member_data['cancellationOn'] = cancellation_on
 
-    print(member_data)
-    
     return member_data
 
-def find_existing_user(api_url: str, api_token: Optional[str], c_id: int) -> Optional[int]:
-    """Find existing member by cId using GraphQL. Returns member ID if found, None otherwise."""
+def find_existing_user(api_url: str, api_token: Optional[str], username: str) -> Optional[str]:
+    """Find existing member by username using GraphQL. Returns documentId if found, None otherwise."""
     url = f"{api_url}"
 
     headers = {
@@ -238,8 +236,8 @@ def find_existing_user(api_url: str, api_token: Optional[str], c_id: int) -> Opt
         headers['Authorization'] = f'Bearer {api_token}'
 
     query = """
-    query FindUserByCId($cId: Int!) {
-        usersPermissionsUsers(filters: { cId: { eq: $cId } }) {
+    query FindUserByUsername($username: String!) {
+        usersPermissionsUsers(filters: { username: { eq: $username } }) {
             documentId
         }
     }
@@ -248,7 +246,7 @@ def find_existing_user(api_url: str, api_token: Optional[str], c_id: int) -> Opt
     try:
         response = requests.post(
             url,
-            json={'query': query, 'variables': {'cId': c_id}},
+            json={'query': query, 'variables': {'username': username}},
             headers=headers,
             timeout=30
         )
@@ -266,95 +264,143 @@ def find_existing_user(api_url: str, api_token: Optional[str], c_id: int) -> Opt
 
     return None
 
-def build_graphql_mutation(member_data: Dict[str, Any]) -> tuple[str, Dict[str, Any]]:
-    """Build GraphQL mutation string and variables for creating a member."""
-    member_data['password'] = 'Startstart'
+def register_user(api_url: str, api_token: Optional[str], username: str, email: str) -> Optional[str]:
+    """Register a new user via GraphQL. Returns documentId if successful."""
+    url = f"{api_url}"
+    headers = {
+        'Content-Type': 'application/json',
+    }
+    if api_token:
+        headers['Authorization'] = f'Bearer {api_token}'
+
     mutation = """
-    mutation CreateUser($data: UsersPermissionsUserInput!) {
-        createUsersPermissionsUser(data: $data) {
-            data {
+    mutation Register($input: UsersPermissionsRegisterInput!) {
+        register(input: $input) {
+            user {
                 documentId
-                firstName
-                lastName
-                cId
+                username
             }
         }
     }
     """
+    
+    # Use a default password for registration
     variables = {
-        'data': member_data
+        'input': {
+            'username': username,
+#            'email': email if email else f"{username}@hzd-mitglieder.de", # Fallback email if missing
+            'password': 'Startstart123!'
+        }
     }
-
-    return mutation, variables
-
-def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str, Any],
-                  dry_run: bool = False) -> bool:
-    """Import a single member via Strapi GraphQL API."""
-    # Check if member with this cId already exists
-    c_id = member_data.get('cId')
-    existing_id = None
-
-    if c_id and not dry_run:
-        existing_id = find_existing_user(api_url, api_token, c_id)
-
-    url = f"{api_url}"
-
-    headers = {
-        'Content-Type': 'application/json',
-    }
-
-    if api_token:
-        headers['Authorization'] = f'Bearer {api_token}'
-
-    if dry_run:
-        if existing_id:
-            print(f"[DRY RUN] Would skip member (ID: {existing_id}): Already exists")
-        else:
-            print(f"[DRY RUN] Would create member: {member_data}")
-        return True
-
-    if existing_id:
-        print(f"⚠ Skipping member (cId: {c_id}): Already exists (ID: {existing_id})")
-        return False
 
     try:
-        # Build GraphQL mutation
-        mutation, variables = build_graphql_mutation(member_data)
-
         response = requests.post(
             url,
             json={'query': mutation, 'variables': variables},
             headers=headers,
             timeout=30
         )
-
         if response.status_code == 200:
             result = response.json()
-
             if 'errors' in result:
                 error_msg = '; '.join([err.get('message', str(err)) for err in result['errors']])
-                print(f"✗ Failed to create member (cId: {member_data.get('cId', 'N/A')}): {error_msg}")
-                return False
+                print(f"✗ Failed to register user {username}: {error_msg}")
+                return None
+            return result.get('data', {}).get('register', {}).get('user', {}).get('documentId')
+    except Exception as e:
+        print(f"✗ Error registering user {username}: {e}")
+    return None
 
-            data = result.get('data', {}).get('createUsersPermissionsUser', {}).get('data')
+def update_user_admin(api_url: str, api_token: Optional[str], document_id: str, member_data: Dict[str, Any]) -> bool:
+    """Update user attributes via updateUserAdmin mutation."""
+    url = f"{api_url}"
+    headers = {
+        'Content-Type': 'application/json',
+    }
+    if api_token:
+        headers['Authorization'] = f'Bearer {api_token}'
 
-            if data:
-                member_id = data.get('documentId', 'N/A')
-                first_name = data.get('firstName', '')
-                last_name = data.get('lastName', '')
-                member_c_id = data.get('cId', member_data.get('cId', 'N/A'))
-                print(f"✓ Created member: {first_name} {last_name} (cId: {member_c_id}, ID: {member_id})")
-                return True
-            else:
-                print(f"✗ Failed to create member (cId: {member_data.get('cId', 'N/A')}): No data returned")
+    mutation = """
+    mutation UpdateUserAdmin($id: ID!, $data: UsersPermissionsUserInput!) {
+        updateUserAdmin(id: $id, data: $data) {
+            data {
+                documentId
+                username
+            }
+        }
+    }
+    """
+    
+    # Remove fields that shouldn't be in the update data if they are not allowed or redundant
+    # For now, we keep them as they are in UsersPermissionsUserInput
+    
+    variables = {
+        'id': document_id,
+        'data': member_data
+    }
+
+    try:
+        response = requests.post(
+            url,
+            json={'query': mutation, 'variables': variables},
+            headers=headers,
+            timeout=30
+        )
+        if response.status_code == 200:
+            result = response.json()
+            if 'errors' in result:
+                error_msg = '; '.join([err.get('message', str(err)) for err in result['errors']])
+                print(f"✗ Failed to update user {document_id}: {error_msg}")
                 return False
+            return True
+    except Exception as e:
+        print(f"✗ Error updating user {document_id}: {e}")
+    return False
+
+def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str, Any],
+                  dry_run: bool = False) -> bool:
+    """Import a single member by searching, registering if needed, and then updating."""
+    username = member_data.get('username')
+    if not username:
+        cId = member_data["cId"]
+        username = f"user-{cId}"
+
+    # 1. Search for existing user
+    existing_document_id = None
+    if not dry_run:
+        existing_document_id = find_existing_user(api_url, api_token, username)
+    
+    if dry_run:
+        if existing_document_id:
+            print(f"[DRY RUN] Found existing user: {username} ({existing_document_id}) - Would update")
         else:
-            error_msg = response.text
-            print(f"✗ Failed to create member (cId: {member_data.get('cId', 'N/A')}): {response.status_code} - {error_msg}")
+            print(f"[DRY RUN] User not found: {username} - Would register and update")
+        return True
+
+    # 2. Register if not exists
+    document_id = existing_document_id
+    if not document_id:
+        email = member_data.get('email')
+        if not email:
+            email = f"{username}@hovawarte.com"
+        document_id = register_user(api_url, api_token, username, email)
+        if document_id:
+            print(f"✓ Registered new user: {username} (ID: {document_id})")
+        else:
             return False
-    except requests.exceptions.RequestException as e:
-        print(f"✗ Error creating member (cId: {member_data.get('cId', 'N/A')}): {e}")
-        return False
+    else:
+        print(f"ℹ Found existing user: {username} (ID: {document_id})")
+
+    # 3. Update via updateUserAdmin
+    if document_id:
+        if update_user_admin(api_url, api_token, document_id, member_data):
+            print(f"✓ Updated user: {username} (ID: {document_id})")
+            return True
+        else:
+            print(f"✗ Failed to update user: {username}")
+            return False
+    
+    return False
 
 def main():
 
@@ -423,7 +469,7 @@ def main():
             continue
 
         # Import member
-        print(member_data)
+        # print(member_data)
         if import_member(endpoint, token, member_data, args.dry_run):
             success_count += 1
         else:

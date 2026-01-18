@@ -67,72 +67,101 @@
       "configurable": false
     },
     "title": {
-      "type": "string"
+      "type": "string",
+      "configurable": false
     },
     "firstName": {
-      "type": "string"
+      "type": "string",
+      "configurable": false
     },
     "lastName": {
-      "type": "string"
+      "type": "string",
+      "configurable": false
     },
     "address1": {
-      "type": "string"
+      "type": "string",
+      "configurable": false
     },
     "address2": {
-      "type": "string"
+      "type": "string",
+      "configurable": false
     },
     "zip": {
       "type": "string",
-      "maxLength": 5
+      "maxLength": 5,
+      "configurable": false
+    },
+    "countryCode": {
+      "type": "string",
+      "maxLength": 2,
+      "configurable": false
     },
     "city": {
-      "type": "string"
+      "type": "string",
+      "configurable": false
     },
     "phone": {
-      "type": "string"
+      "type": "string",
+      "configurable": false
     },
     "sex": {
       "type": "enumeration",
       "enum": [
         "M",
         "F"
-      ]
+      ],
+      "configurable": false
     },
     "dateOfBirth": {
-      "type": "date"
+      "type": "date",
+      "configurable": false
     },
     "dateOfDeath": {
-      "type": "date"
+      "type": "date",
+      "configurable": false
     },
     "cId": {
       "type": "integer",
-      "unique": true
+      "unique": true,
+      "configurable": false
     },
     "cFlagBreeder": {
-      "type": "boolean"
+      "type": "boolean",
+      "configurable": false
+    },
+    "cEmail": {
+      "type": "string",
+      "maxLength": 255,
+      "configurable": false
     },
     "cFlagAccess": {
-      "type": "boolean"
+      "type": "boolean",
+      "configurable": false
     },
     "memberSince": {
-      "type": "date"
+      "type": "date",
+      "configurable": false
     },
     "cancellationOn": {
-      "type": "date"
+      "type": "date",
+      "configurable": false
     },
     "cancellationDueDate": {
-      "type": "date"
+      "type": "date",
+      "configurable": false
     },
     "membershipNumber": {
       "type": "integer",
       "required": true,
-      "unique": true
+      "unique": true,
+      "configurable": false
     },
     "form": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::form.form",
-      "inversedBy": "EventAdmin"
+      "inversedBy": "EventAdmin",
+      "configurable": false
     },
     "region": {
       "type": "enumeration",
@@ -142,15 +171,18 @@
         "Mitte",
         "West",
         "Süd"
-      ]
+      ],
+      "configurable": false
     },
     "geoLocation": {
       "type": "component",
       "component": "breeding.geo-location",
-      "repeatable": false
+      "repeatable": false,
+      "configurable": false
     },
     "DisplayName": {
-      "type": "string"
+      "type": "string",
+      "configurable": false
     }
   }
 }

@@ -570,7 +570,6 @@ export const SEARCH_DOGS = `
 			microchipNo
 			SOD1
 			HD
-			stuntLicenseSince
 			father {
 				documentId
 				fullKennelName
@@ -590,8 +589,7 @@ export const SEARCH_DOGS = `
 			EyesCheck
 			HeartCheck
 			ColorCheck
-			MemosDraft
-			MemosReleased
+			cFertile
 			Location {
 				lat
 				lng
