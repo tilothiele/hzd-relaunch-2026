@@ -39,7 +39,7 @@ COUNTRY_CODES = {
 
 REGION_MAPPING = {
     'Nord': 'Nord',
-    'Süd': 'Süd',
+    'Süd': 'Sued',
     'Ost': 'Ost',
     'West': 'West',
     'Mitte': 'Mitte'
@@ -224,6 +224,46 @@ def map_csv_to_member(row: Dict[str, str]) -> Dict[str, Any]:
 
     return member_data
 
+def find_existing_user_by_email(api_url: str, api_token: Optional[str], email: str) -> Optional[str]:
+    """Find existing member by username using GraphQL. Returns documentId if found, None otherwise."""
+    url = f"{api_url}"
+
+    headers = {
+        'Content-Type': 'application/json',
+    }
+
+    if api_token:
+        headers['Authorization'] = f'Bearer {api_token}'
+
+    query = """
+    query FindUserByEmail($email: String!) {
+        usersPermissionsUsers(filters: { email: { eq: $email } }) {
+            documentId
+        }
+    }
+    """
+
+    try:
+        response = requests.post(
+            url,
+            json={'query': query, 'variables': {'email': email}},
+            headers=headers,
+            timeout=30
+        )
+
+        if response.status_code == 200:
+            result = response.json()
+            if 'errors' in result:
+                return None
+            data = result.get('data', {}).get('usersPermissionsUsers', [])
+            if data and len(data) > 0:
+                return data[0].get('documentId')
+    except Exception as e:
+        print(f"Warning: Error finding existing member: {e}")
+        pass
+
+    return None
+
 def find_existing_user(api_url: str, api_token: Optional[str], username: str) -> Optional[str]:
     """Find existing member by username using GraphQL. Returns documentId if found, None otherwise."""
     url = f"{api_url}"
@@ -288,7 +328,7 @@ def register_user(api_url: str, api_token: Optional[str], username: str, email: 
     variables = {
         'input': {
             'username': username,
-#            'email': email if email else f"{username}@hzd-mitglieder.de", # Fallback email if missing
+            'email': email if email else f"{username}@hzd-mitglieder.de", # Fallback email if missing
             'password': 'Startstart123!'
         }
     }
@@ -351,8 +391,11 @@ def update_user_admin(api_url: str, api_token: Optional[str], document_id: str, 
             if 'errors' in result:
                 error_msg = '; '.join([err.get('message', str(err)) for err in result['errors']])
                 print(f"✗ Failed to update user {document_id}: {error_msg}")
+                printf(result)
                 return False
             return True
+        else:
+            print(response.json())
     except Exception as e:
         print(f"✗ Error updating user {document_id}: {e}")
     return False
@@ -365,10 +408,18 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
         cId = member_data["cId"]
         username = f"user-{cId}"
 
+    email = member_data.get('email')
+    if not email:
+        email = f"{username}@hovawarte.com"
+
     # 1. Search for existing user
     existing_document_id = None
     if not dry_run:
         existing_document_id = find_existing_user(api_url, api_token, username)
+        if not existing_document_id:
+            h = find_existing_user_by_email(api_url, api_token, email)
+            if h:
+                email = f"{username}@hovawarte.com"
     
     if dry_run:
         if existing_document_id:
@@ -380,13 +431,11 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
     # 2. Register if not exists
     document_id = existing_document_id
     if not document_id:
-        email = member_data.get('email')
-        if not email:
-            email = f"{username}@hovawarte.com"
         document_id = register_user(api_url, api_token, username, email)
         if document_id:
             print(f"✓ Registered new user: {username} (ID: {document_id})")
         else:
+            print(f"x not Registered new user: {username} (email: {email})")
             return False
     else:
         print(f"ℹ Found existing user: {username} (ID: {document_id})")
