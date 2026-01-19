@@ -76,36 +76,7 @@ restore_stage() {
     docker run --rm -it -e PGPASSWORD="$PG_PASSWORD" --network "$PG_NETWORK" \
       -v ./transfer:/transfer \
       pgvector/pgvector:pg17 \
-      psql -h "$PG_HOST" -U "$PG_USER" -d "$PG_STAGE_DB" -f "/transfer/$DUMP_FILE"
-
-    cat <<'EOF' > ./transfer/chg-owner-staging.plsql
-DO $$
-DECLARE
-    obj RECORD;
-BEGIN
-    FOR obj IN
-        SELECT 'table' AS typ, tablename AS name FROM pg_tables WHERE schemaname='public'
-        UNION ALL
-        SELECT 'sequence', sequencename FROM pg_sequences WHERE schemaname='public'
-        UNION ALL
-        SELECT 'view', table_name FROM information_schema.views WHERE table_schema='public'
-    LOOP
-        EXECUTE format(
-            CASE obj.typ
-                WHEN 'table' THEN 'ALTER TABLE public.%I OWNER TO hzd_website_test;'
-                WHEN 'sequence' THEN 'ALTER SEQUENCE public.%I OWNER TO hzd_website_test;'
-                WHEN 'view' THEN 'ALTER VIEW public.%I OWNER TO hzd_website_test;'
-            END,
-            obj.name
-        );
-    END LOOP;
-END$$;
-EOF
-
-    docker run --rm -it -e PGPASSWORD="$PG_PASSWORD" --network "$PG_NETWORK" \
-      -v ./transfer:/transfer \
-      pgvector/pgvector:pg17 \
-      psql -h "$PG_HOST" -U "$PG_USER" -d "$PG_STAGE_DB" -f "/transfer/chg-owner-staging.plsql"
+      pg_restore -h "$PG_HOST" -U "$PG_USER" -d "$PG_STAGE_DB" --no-owner --role="$PG_STAGE_USER"  "/transfer/$DUMP_FILE"
 
 }
 

@@ -1422,6 +1422,9 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    cStudBookNumber: Schema.Attribute.String;
+    cStudBookNumberFather: Schema.Attribute.String;
+    cStudBookNumberMother: Schema.Attribute.String;
     dateOfBirth: Schema.Attribute.Date;
     dateOfDeath: Schema.Attribute.Date;
     Exhibitions: Schema.Attribute.Text;

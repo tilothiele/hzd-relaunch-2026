@@ -35,6 +35,14 @@ query DogByCId($cId: Int) {
 }
 """
 
+DOG_BY_STUDBOOK_NUMBER_QUERY = """
+query DogByStudBookNumber($studBookNumber: String) {
+  hzdPluginDogs(filters: { cStudBookNumber: { eq: $studBookNumber } }) {
+    documentId
+  }
+}
+"""
+
 CREATE_DOG_MUTATION = """
 mutation CreateDog($data: HzdPluginDogInput!) {
   createHzdPluginDog(data: $data) {
@@ -97,34 +105,14 @@ SEX_ENUM_MAP = {
 	'0': 'M',
 }
 
-HD_ENUM_MAP = {
-	'A1': 'A1',
-	'A2': 'A2',
-	'B1': 'B1',
-	'B2': 'B2',
-	'A1(G)': 'A1',
-	'A2(G)': 'A2',
-	'B1(G)': 'B1',
-	'B2(G)': 'B2',
-	'-': None,
-	'': None,
-}
-
-SOD1_ENUM_MAP = {
-	'N/N': 'N_N',
-	'N/DM': 'N_DM',
-	'DM/DM': 'DM_DM',
-	'-': None,
-	'': None,
-}
-
 COLOR_ENUM_MAP = {
-	'': None,
-	'-': None,
-	'schwarz': 'S',
-	'schwarzmarken': 'SM',
-	'blond': 'B',
+       '': None,
+       '-': None,
+       'schwarz': 'S',
+       'schwarzmarken': 'SM',
+       'blond': 'B',
 }
+
 @dataclass
 class ChromosoftDogRecord:
 	c_id: int
@@ -136,16 +124,14 @@ class ChromosoftDogRecord:
 	sex: str
 	date_of_birth: str
 	date_of_death: str
-	hd_g: str
-	hd: str
-	sod1: str
-	herzuntersuchung: str
-	augenuntersuchung: str
 	color: str
 	richterbericht: str
 	breed_survey: str
 	breeder_kennel_name: str
 	fertile: str
+	studbook_number: str
+	sire_studbook_number: str
+	dam_studbook_number: str
 
 
 class GraphQLClient:
@@ -182,6 +168,8 @@ class GraphQLClient:
 					json={'query': query, 'variables': variables},
 					timeout=self.timeout,
 				)
+				if(response.status_code != 200):
+					print(response.json())
 				response.raise_for_status()
 				payload = response.json()
 				errors = payload.get('errors', [])
@@ -210,6 +198,16 @@ class GraphQLClient:
 		if last_exception:
 			raise last_exception
 		raise RuntimeError(f'Unerwarteter Fehler bei der Ausführung nach {max_attempts} Versuchen')
+
+	def find_by_studbook_number(self, studbook_number: Optional[str]) -> Optional[str]:
+		if not studbook_number:
+			return None
+		data = self.execute(DOG_BY_STUDBOOK_NUMBER_QUERY, {"studBookNumber": studbook_number})
+		d = data.get('data') or {}
+		items = d.get('hzdPluginDogs') or []
+		if not items:
+			return None
+		return items[0].get('documentId')
 
 	def find_by_cid(self, c_id: Optional[int]) -> Optional[str]:
 		if c_id is None:
@@ -314,28 +312,12 @@ def map_sex_enum(raw: str) -> Optional[str]:
 	key = raw.strip().lower()
 	return SEX_ENUM_MAP.get(key)
 
-
-def map_hd_enum(raw: str) -> Optional[str]:
-	value = raw.strip()
-	if not value or value == '-':
-		return None
-	# Entferne (G) falls vorhanden
-	value = value.replace('(G)', '').strip()
-	return HD_ENUM_MAP.get(value) or HD_ENUM_MAP.get(value.upper())
-
-
-def map_sod1_enum(raw: str) -> Optional[str]:
-	value = raw.strip()
-	if not value or value == '-':
-		return None
-	return SOD1_ENUM_MAP.get(value) or SOD1_ENUM_MAP.get(value.upper())
-
-
 def map_color_enum(raw: str) -> Optional[str]:
-	value = raw.strip()
-	if not value or value == '-':
-		return None
-	return COLOR_ENUM_MAP.get(value) or COLOR_ENUM_MAP.get(value.upper())
+       value = raw.strip()
+       if not value or value == '-':
+               return None
+       return COLOR_ENUM_MAP.get(value) or COLOR_ENUM_MAP.get(value.upper())
+
 
 
 def parse_bool_check(value: str) -> Optional[bool]:
@@ -402,16 +384,14 @@ def row_to_record(row: dict[str, str]) -> ChromosoftDogRecord:
 		sex=row.get('sex', '').strip(),
 		date_of_birth=row.get('date of birth', '').strip(),
 		date_of_death=row.get('date of death', '').strip(),
-		hd_g=row.get('HD(G)', '').strip(),
-		hd=row.get('HD', '').strip(),
-		sod1=row.get('Gentest SOD1', '').strip(),
-		herzuntersuchung=row.get('Herzuntersuchung', '').strip(),
-		augenuntersuchung=row.get('Augenuntersuchung', '').strip(),
-		color=row.get('color', '').strip(),
 		richterbericht=row.get('Richterbericht', '').strip(),
 		breed_survey=breed_survey,
 		breeder_kennel_name=kennel_name,
-		fertile=row.get('fertile')
+		color=row.get('color', '').strip(),
+		fertile=row.get('fertile'),
+		studbook_number=row.get('studbook number', '').strip(),
+		sire_studbook_number=row.get('studbook number (sire)', '').strip(),
+		dam_studbook_number=row.get('studbook number (dam)', '').strip(),
 	)
 
 
@@ -427,7 +407,10 @@ def read_chromosoft_csv(file_path: Path) -> list[ChromosoftDogRecord]:
 		return records
 
 
-def build_graphql_payload(record: ChromosoftDogRecord, breeder_id: Optional[str] = None) -> dict[str, Any]:
+def build_graphql_payload(
+	record: ChromosoftDogRecord, 
+	breeder_id: Optional[str] = None
+) -> dict[str, Any]:
 	payload: dict[str, Any] = {}
 
 	def assign(key: str, value: Any) -> None:
@@ -454,6 +437,11 @@ def build_graphql_payload(record: ChromosoftDogRecord, breeder_id: Optional[str]
 	# Breeder-Verknüpfung über breeder: ID (Relation zu HzdPluginBreeder)
 	if breeder_id:
 		assign('breeder', breeder_id)
+	
+	# Studbook Number
+	assign('cStudBookNumber', record.studbook_number)
+	assign('cStudBookNumberFather', record.sire_studbook_number)
+	assign('cStudBookNumberMother', record.dam_studbook_number)
 
 	# Geschlecht
 	sex_enum = map_sex_enum(record.sex)
@@ -463,27 +451,6 @@ def build_graphql_payload(record: ChromosoftDogRecord, breeder_id: Optional[str]
 	assign('dateOfBirth', parse_iso_date(record.date_of_birth))
 	assign('dateOfDeath', parse_iso_date(record.date_of_death))
 
-	# HD: Verwende HD(G) falls vorhanden, sonst HD
-	hd_value = record.hd_g if record.hd_g and record.hd_g != '-' else record.hd
-	hd_enum = map_hd_enum(hd_value)
-	assign('HD', hd_enum)
-
-	# SOD1
-	sod1_enum = map_sod1_enum(record.sod1)
-	assign('SOD1', sod1_enum)
-
-	# Boolean Checks
-	heart_check = parse_bool_check(record.herzuntersuchung)
-	if heart_check is not None:
-		assign('HeartCheck', heart_check)
-
-	eyes_check = parse_bool_check(record.augenuntersuchung)
-	if eyes_check is not None:
-		assign('EyesCheck', eyes_check)
-
-	# Color
-	color_enum = map_color_enum(record.color)
-	assign('color', color_enum)
 
 	# Exhibitions - Richterbericht
 	if record.richterbericht and record.richterbericht.strip() and record.richterbericht.strip() != '-':
@@ -571,17 +538,17 @@ def import_records(
 				breeder_map[breeder_c_id] = existing_breeder_id
 				# Aktualisiere kennelName falls vorhanden
 				kennel_info = f', kennelName: {kennel_name}' if kennel_name else ', kennelName: (nicht gefunden)'
-				if kennel_name:
-					update_payload: dict[str, Any] = {
-						'kennelName': kennel_name
-					}
-					client.update_breeder(existing_breeder_id, update_payload)
-					print(f'Breeder mit cId={breeder_c_id} aktualisiert (ID: {existing_breeder_id}{kennel_info})')
-				else:
-					print(f'Breeder mit cId={breeder_c_id} bereits vorhanden (ID: {existing_breeder_id}{kennel_info})')
+				#if kennel_name:
+				#	update_payload: dict[str, Any] = {
+				#		'kennelName': kennel_name
+				#	}
+				#	client.update_breeder(existing_breeder_id, update_payload)
+				#	print(f'Breeder mit cId={breeder_c_id} aktualisiert (ID: {existing_breeder_id}{kennel_info})')
+				#else:
+				#	print(f'Breeder mit cId={breeder_c_id} bereits vorhanden (ID: {existing_breeder_id}{kennel_info})')
 			else:
 				# Erstelle neuen Breeder
-				breeder_id = ensure_breeder_exists(client, breeder_c_id, kennel_name, verbose)
+				#breeder_id = ensure_breeder_exists(client, breeder_c_id, kennel_name, verbose)
 				breeder_map[breeder_c_id] = breeder_id
 				if breeder_id:
 					stats['breeders_created'] += 1
@@ -628,10 +595,11 @@ def import_records(
 			# Die Verknüpfung Dog -> Owner erfolgt über cOwnerId (gemappt auf user.cId)
 			# Die Verknüpfung Dog -> Breeder erfolgt über breeder: ID (Relation)
 			breeder_id = breeder_map.get(record.breeder_id) if record.breeder_id else None
-			payload = build_graphql_payload(record, breeder_id=breeder_id)
+			payload = build_graphql_payload(
+				record, 
+				breeder_id=breeder_id
+			)
 
-#			print(payload)
-			
 			existing_id = client.find_by_cid(record.c_id)
 			if existing_id:
 				if verbose:

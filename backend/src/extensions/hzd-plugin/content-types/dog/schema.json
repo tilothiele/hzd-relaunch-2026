@@ -69,7 +69,7 @@
             {
               "var": "sex"
             },
-            "F"
+            "M"
           ]
         }
       }
@@ -136,6 +136,15 @@
     },
     "cFertile": {
       "type": "boolean"
+    },
+    "cStudBookNumber": {
+      "type": "string"
+    },
+    "cStudBookNumberFather": {
+      "type": "string"
+    },
+    "cStudBookNumberMother": {
+      "type": "string"
     }
   }
 }

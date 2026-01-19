@@ -293,14 +293,6 @@ type ComponentSeoSeo {
   ExcludeFromSitemap: Boolean
 }
 
-type ComponentPermissionGroups {
-  id: ID!
-  Any: Boolean
-  Member: Boolean
-  HeadOfEvent: Boolean
-  BreedWarden: Boolean
-}
-
 input ComponentPersonalShippingAddressFiltersInput {
   Name: StringFilterInput
   AdditionalName: StringFilterInput
@@ -363,6 +355,14 @@ type ComponentPersonalAddress {
   CountryCode: String!
   Zip: String
   City: String
+}
+
+type ComponentPermissionGroups {
+  id: ID!
+  Any: Boolean
+  Member: Boolean
+  HeadOfEvent: Boolean
+  BreedWarden: Boolean
 }
 
 input ComponentLinksPartnerlLinkFiltersInput {
@@ -1180,6 +1180,7 @@ input UsersPermissionsUserFiltersInput {
   address1: StringFilterInput
   address2: StringFilterInput
   zip: StringFilterInput
+  countryCode: StringFilterInput
   city: StringFilterInput
   phone: StringFilterInput
   sex: StringFilterInput
@@ -1187,6 +1188,7 @@ input UsersPermissionsUserFiltersInput {
   dateOfDeath: DateFilterInput
   cId: IntFilterInput
   cFlagBreeder: BooleanFilterInput
+  cEmail: StringFilterInput
   cFlagAccess: BooleanFilterInput
   memberSince: DateFilterInput
   cancellationOn: DateFilterInput
@@ -1217,6 +1219,7 @@ input UsersPermissionsUserInput {
   address1: String
   address2: String
   zip: String
+  countryCode: String
   city: String
   phone: String
   sex: ENUM_USERSPERMISSIONSUSER_SEX
@@ -1224,6 +1227,7 @@ input UsersPermissionsUserInput {
   dateOfDeath: Date
   cId: Int
   cFlagBreeder: Boolean
+  cEmail: String
   cFlagAccess: Boolean
   memberSince: Date
   cancellationOn: Date
@@ -1251,6 +1255,7 @@ type UsersPermissionsUser {
   address1: String
   address2: String
   zip: String
+  countryCode: String
   city: String
   phone: String
   sex: ENUM_USERSPERMISSIONSUSER_SEX
@@ -1258,6 +1263,7 @@ type UsersPermissionsUser {
   dateOfDeath: Date
   cId: Int
   cFlagBreeder: Boolean
+  cEmail: String
   cFlagAccess: Boolean
   memberSince: Date
   cancellationOn: Date
@@ -1270,7 +1276,6 @@ type UsersPermissionsUser {
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
-  countryCode: String
 }
 
 type UsersPermissionsUserEntityResponse {
@@ -1297,19 +1302,6 @@ enum ENUM_HZDPLUGINDOG_COLOR {
   B
 }
 
-enum ENUM_HZDPLUGINDOG_SOD1 {
-  N_N
-  N_DM
-  DM_DM
-}
-
-enum ENUM_HZDPLUGINDOG_HD {
-  A1
-  A2
-  B1
-  B2
-}
-
 input HzdPluginDogFiltersInput {
   documentId: IDFilterInput
   givenName: StringFilterInput
@@ -1325,12 +1317,6 @@ input HzdPluginDogFiltersInput {
   cId: IntFilterInput
   cBreederId: IntFilterInput
   cOwnerId: IntFilterInput
-  SOD1: StringFilterInput
-  HD: StringFilterInput
-  Genprofil: BooleanFilterInput
-  EyesCheck: BooleanFilterInput
-  HeartCheck: BooleanFilterInput
-  ColorCheck: BooleanFilterInput
   MemosDraft: StringFilterInput
   MemosReleased: StringFilterInput
   Location: ComponentBreedingGeoLocationFiltersInput
@@ -1339,6 +1325,9 @@ input HzdPluginDogFiltersInput {
   Exhibitions: StringFilterInput
   BreedSurvey: StringFilterInput
   cFertile: BooleanFilterInput
+  cStudBookNumber: StringFilterInput
+  cStudBookNumberFather: StringFilterInput
+  cStudBookNumberMother: StringFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   publishedAt: DateTimeFilterInput
@@ -1362,12 +1351,6 @@ input HzdPluginDogInput {
   cId: Int
   cBreederId: Int
   cOwnerId: Int
-  SOD1: ENUM_HZDPLUGINDOG_SOD1
-  HD: ENUM_HZDPLUGINDOG_HD
-  Genprofil: Boolean
-  EyesCheck: Boolean
-  HeartCheck: Boolean
-  ColorCheck: Boolean
   MemosDraft: String
   MemosReleased: String
   Location: ComponentBreedingGeoLocationInput
@@ -1376,6 +1359,9 @@ input HzdPluginDogInput {
   Exhibitions: String
   BreedSurvey: String
   cFertile: Boolean
+  cStudBookNumber: String
+  cStudBookNumberFather: String
+  cStudBookNumberMother: String
   publishedAt: DateTime
 }
 
@@ -1395,12 +1381,6 @@ type HzdPluginDog {
   cId: Int
   cBreederId: Int
   cOwnerId: Int
-  SOD1: ENUM_HZDPLUGINDOG_SOD1
-  HD: ENUM_HZDPLUGINDOG_HD
-  Genprofil: Boolean
-  EyesCheck: Boolean
-  HeartCheck: Boolean
-  ColorCheck: Boolean
   MemosDraft: String
   MemosReleased: String
   Location: ComponentBreedingGeoLocation
@@ -1409,6 +1389,9 @@ type HzdPluginDog {
   Exhibitions: String
   BreedSurvey: String
   cFertile: Boolean
+  cStudBookNumber: String
+  cStudBookNumberFather: String
+  cStudBookNumberMother: String
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -2460,7 +2443,7 @@ type SupplementalDocumentGroupEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union GenericMorph = ComponentSeoSeo | ComponentPermissionGroups | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
+union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
 
 input FileInfoInput {
   name: String
