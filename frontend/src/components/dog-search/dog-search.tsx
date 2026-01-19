@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, FormControlLabel, Chip, OutlinedInput, Pagination } from '@mui/material'
-import { useDogs, type ColorFilter, type PageSize, type SexFilter, type Sod1Filter, type HDFilter, type DistanceFilter } from '@/hooks/use-dogs'
+import { useDogs, type ColorFilter, type PageSize, type SexFilter, type DistanceFilter } from '@/hooks/use-dogs'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
 import { theme } from '@/themes'
 
