@@ -1302,19 +1302,6 @@ enum ENUM_HZDPLUGINDOG_COLOR {
   B
 }
 
-enum ENUM_HZDPLUGINDOG_SOD1 {
-  N_N
-  N_DM
-  DM_DM
-}
-
-enum ENUM_HZDPLUGINDOG_HD {
-  A1
-  A2
-  B1
-  B2
-}
-
 input HzdPluginDogFiltersInput {
   documentId: IDFilterInput
   givenName: StringFilterInput
@@ -1330,12 +1317,6 @@ input HzdPluginDogFiltersInput {
   cId: IntFilterInput
   cBreederId: IntFilterInput
   cOwnerId: IntFilterInput
-  SOD1: StringFilterInput
-  HD: StringFilterInput
-  Genprofil: BooleanFilterInput
-  EyesCheck: BooleanFilterInput
-  HeartCheck: BooleanFilterInput
-  ColorCheck: BooleanFilterInput
   MemosDraft: StringFilterInput
   MemosReleased: StringFilterInput
   Location: ComponentBreedingGeoLocationFiltersInput
@@ -1367,12 +1348,6 @@ input HzdPluginDogInput {
   cId: Int
   cBreederId: Int
   cOwnerId: Int
-  SOD1: ENUM_HZDPLUGINDOG_SOD1
-  HD: ENUM_HZDPLUGINDOG_HD
-  Genprofil: Boolean
-  EyesCheck: Boolean
-  HeartCheck: Boolean
-  ColorCheck: Boolean
   MemosDraft: String
   MemosReleased: String
   Location: ComponentBreedingGeoLocationInput
@@ -1400,12 +1375,6 @@ type HzdPluginDog {
   cId: Int
   cBreederId: Int
   cOwnerId: Int
-  SOD1: ENUM_HZDPLUGINDOG_SOD1
-  HD: ENUM_HZDPLUGINDOG_HD
-  Genprofil: Boolean
-  EyesCheck: Boolean
-  HeartCheck: Boolean
-  ColorCheck: Boolean
   MemosDraft: String
   MemosReleased: String
   Location: ComponentBreedingGeoLocation

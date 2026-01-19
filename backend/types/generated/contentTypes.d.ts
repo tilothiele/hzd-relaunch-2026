@@ -1418,7 +1418,6 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
     cFertile: Schema.Attribute.Boolean;
     cId: Schema.Attribute.Integer & Schema.Attribute.Unique;
     color: Schema.Attribute.Enumeration<['S', 'SM', 'B']>;
-    ColorCheck: Schema.Attribute.Boolean;
     cOwnerId: Schema.Attribute.Integer;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1426,19 +1425,15 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
     dateOfBirth: Schema.Attribute.Date;
     dateOfDeath: Schema.Attribute.Date;
     Exhibitions: Schema.Attribute.Text;
-    EyesCheck: Schema.Attribute.Boolean;
     father: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.dog'>;
     fullKennelName: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 500;
       }>;
-    Genprofil: Schema.Attribute.Boolean;
     givenName: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 100;
       }>;
-    HD: Schema.Attribute.Enumeration<['A1', 'A2', 'B1', 'B2']>;
-    HeartCheck: Schema.Attribute.Boolean;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -1471,7 +1466,6 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
     >;
     publishedAt: Schema.Attribute.DateTime;
     sex: Schema.Attribute.Enumeration<['M', 'F']>;
-    SOD1: Schema.Attribute.Enumeration<['N_N', 'N_DM', 'DM_DM']>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

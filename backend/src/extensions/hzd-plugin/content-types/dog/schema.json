@@ -99,35 +99,6 @@
     "cOwnerId": {
       "type": "integer"
     },
-    "SOD1": {
-      "type": "enumeration",
-      "enum": [
-        "N_N",
-        "N_DM",
-        "DM_DM"
-      ]
-    },
-    "HD": {
-      "type": "enumeration",
-      "enum": [
-        "A1",
-        "A2",
-        "B1",
-        "B2"
-      ]
-    },
-    "Genprofil": {
-      "type": "boolean"
-    },
-    "EyesCheck": {
-      "type": "boolean"
-    },
-    "HeartCheck": {
-      "type": "boolean"
-    },
-    "ColorCheck": {
-      "type": "boolean"
-    },
     "MemosDraft": {
       "type": "customField",
       "customField": "plugin::ckeditor5.CKEditor",

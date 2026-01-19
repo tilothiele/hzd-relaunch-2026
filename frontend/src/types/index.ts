@@ -348,8 +348,6 @@ export interface Dog {
 	dateOfBirth?: string | null
 	dateOfDeath?: string | null
 	microchipNo?: string | null
-	SOD1?: 'N_N' | 'N_DM' | 'DM_DM' | null
-	HD?: 'A1' | 'A2' | 'B1' | 'B2' | null
 	father?: {
 		documentId: string
 		fullKennelName?: string | null
@@ -365,10 +363,6 @@ export interface Dog {
 		firstName?: string | null
 		lastName?: string | null
 	} | null
-	Genprofil?: boolean | null
-	EyesCheck?: boolean | null
-	HeartCheck?: boolean | null
-	ColorCheck?: boolean | null
 	Location?: GeoLocation | null
 	cFertile?: boolean | null
 	Exhibitions?: string | null

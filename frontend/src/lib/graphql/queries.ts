@@ -568,8 +568,7 @@ export const SEARCH_DOGS = `
 			dateOfBirth
 			dateOfDeath
 			microchipNo
-			SOD1
-			HD
+			microchipNo
 			father {
 				documentId
 				fullKennelName
@@ -585,10 +584,6 @@ export const SEARCH_DOGS = `
 				firstName
 				lastName
 			}
-			Genprofil
-			EyesCheck
-			HeartCheck
-			ColorCheck
 			cFertile
 			Location {
 				lat
@@ -711,12 +706,6 @@ export const SEARCH_LITTERS = `
 				dateOfBirth
 				dateOfDeath
 				microchipNo
-				SOD1
-				HD
-				Genprofil
-				EyesCheck
-				HeartCheck
-				ColorCheck
 				Exhibitions
 				BreedSurvey
 				Location {
@@ -739,12 +728,6 @@ export const SEARCH_LITTERS = `
 				dateOfBirth
 				dateOfDeath
 				microchipNo
-				SOD1
-				HD
-				Genprofil
-				EyesCheck
-				HeartCheck
-				ColorCheck
 				Exhibitions
 				BreedSurvey
 				Location {
