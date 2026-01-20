@@ -43,6 +43,11 @@
       "type": "component",
       "component": "layout.color-theme",
       "repeatable": false
+    },
+    "Restriction": {
+      "type": "component",
+      "component": "permission.restriction",
+      "repeatable": false
     }
   }
 }

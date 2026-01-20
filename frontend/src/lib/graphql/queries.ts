@@ -327,6 +327,9 @@ export const GET_PAGE_BY_SLUG = `
 		pages(filters: { slug: { eq: $slug } }, pagination: { pageSize: 1 }) {
 					slug
 					title
+					Restriction {
+						Public
+					}
 					Sections {
 						__typename
 						... on ComponentBlocksRichTextSection {

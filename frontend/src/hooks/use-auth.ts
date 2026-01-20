@@ -74,12 +74,14 @@ export function useAuth(strapiBaseUrl?: string | null) {
 	const [authState, setAuthState] = useState<AuthState>({ token: null, user: null })
 	const [authError, setAuthError] = useState<string | null>(null)
 	const [isAuthenticating, setIsAuthenticating] = useState(false)
+	const [isInitialized, setIsInitialized] = useState(false)
 
 	useEffect(() => {
 		const loaded = loadAuthState()
 		if (loaded.token && loaded.user) {
 			setAuthState(loaded)
 		}
+		setIsInitialized(true)
 	}, [])
 
 	const handleLogin = useCallback(async ({ identifier, password }: LoginCredentials) => {
@@ -144,6 +146,7 @@ export function useAuth(strapiBaseUrl?: string | null) {
 		isAuthenticating,
 		handleLogin,
 		handleLogout,
+		isInitialized,
 	}
 }
 

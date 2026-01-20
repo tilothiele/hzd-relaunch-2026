@@ -1,0 +1,20 @@
+{
+  "collectionName": "components_permission_restrictions",
+  "info": {
+    "displayName": "Restriction"
+  },
+  "options": {},
+  "attributes": {
+    "Public": {
+      "type": "boolean",
+      "required": true,
+      "default": true
+    },
+    "Authenticated": {
+      "type": "boolean",
+      "required": true,
+      "default": true
+    }
+  },
+  "config": {}
+}

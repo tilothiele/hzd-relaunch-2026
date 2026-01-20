@@ -142,7 +142,7 @@ export interface BlocksRichTextSection extends Struct.ComponentSchema {
       >;
     RichTextOddEven: Schema.Attribute.Enumeration<['Odd', 'Even']>;
     Subtitle: Schema.Attribute.String;
-    Title: Schema.Attribute.String & Schema.Attribute.Required;
+    Title: Schema.Attribute.String;
   };
 }
 
@@ -583,6 +583,21 @@ export interface PermissionGroups extends Struct.ComponentSchema {
   };
 }
 
+export interface PermissionRestriction extends Struct.ComponentSchema {
+  collectionName: 'components_permission_restrictions';
+  info: {
+    displayName: 'Restriction';
+  };
+  attributes: {
+    Authenticated: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    Public: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+  };
+}
+
 export interface PersonalAddress extends Struct.ComponentSchema {
   collectionName: 'components_personal_addresses';
   info: {
@@ -675,6 +690,7 @@ declare module '@strapi/strapi' {
       'links.action-button': LinksActionButton;
       'links.partnerl-link': LinksPartnerlLink;
       'permission.groups': PermissionGroups;
+      'permission.restriction': PermissionRestriction;
       'personal.address': PersonalAddress;
       'personal.shipping-address': PersonalShippingAddress;
       'seo.seo': SeoSeo;

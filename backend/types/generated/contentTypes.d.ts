@@ -1095,6 +1095,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::page.page'> &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
+    Restriction: Schema.Attribute.Component<'permission.restriction', false>;
     Sections: Schema.Attribute.DynamicZone<
       [
         'blocks.hero-section-slide-show',

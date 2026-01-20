@@ -150,7 +150,7 @@ class GraphQLClient:
 		"""Führt eine GraphQL-Query/Mutation aus mit deterministischer Retry-Logik."""
 		max_attempts = max(1, min(self.max_retries, 10))  # Begrenze auf 1-10 Versuche
 		last_exception = None
-		
+
 		for attempt in range(max_attempts):
 			try:
 				if attempt > 0:
@@ -356,14 +356,14 @@ def row_to_record(row: dict[str, str]) -> ChromosoftDogRecord:
 	kennel_name = ''
 	# Mögliche Spaltennamen: "Name of Breeding Station" (korrekt) oder "name of breeder station"
 	possible_keys = ['Name of Breeding Station', 'name of breeding station', 'Name of breeder station', 'name of breeder station']
-	
+
 	# Zuerst versuche exakte Übereinstimmungen
 	for key in possible_keys:
 		if key in row:
 			kennel_name = row.get(key, '').strip()
 			if kennel_name:
 				break
-	
+
 	# Falls nicht gefunden, suche case-insensitive
 	if not kennel_name:
 		for key, value in row.items():
@@ -408,7 +408,7 @@ def read_chromosoft_csv(file_path: Path) -> list[ChromosoftDogRecord]:
 
 
 def build_graphql_payload(
-	record: ChromosoftDogRecord, 
+	record: ChromosoftDogRecord,
 	breeder_id: Optional[str] = None
 ) -> dict[str, Any]:
 	payload: dict[str, Any] = {}
@@ -437,7 +437,7 @@ def build_graphql_payload(
 	# Breeder-Verknüpfung über breeder: ID (Relation zu HzdPluginBreeder)
 	if breeder_id:
 		assign('breeder', breeder_id)
-	
+
 	# Studbook Number
 	assign('cStudBookNumber', record.studbook_number)
 	assign('cStudBookNumberFather', record.sire_studbook_number)
@@ -538,17 +538,17 @@ def import_records(
 				breeder_map[breeder_c_id] = existing_breeder_id
 				# Aktualisiere kennelName falls vorhanden
 				kennel_info = f', kennelName: {kennel_name}' if kennel_name else ', kennelName: (nicht gefunden)'
-				#if kennel_name:
-				#	update_payload: dict[str, Any] = {
-				#		'kennelName': kennel_name
-				#	}
-				#	client.update_breeder(existing_breeder_id, update_payload)
-				#	print(f'Breeder mit cId={breeder_c_id} aktualisiert (ID: {existing_breeder_id}{kennel_info})')
-				#else:
-				#	print(f'Breeder mit cId={breeder_c_id} bereits vorhanden (ID: {existing_breeder_id}{kennel_info})')
+				if kennel_name:
+					update_payload: dict[str, Any] = {
+						'kennelName': kennel_name
+					}
+					client.update_breeder(existing_breeder_id, update_payload)
+					print(f'Breeder mit cId={breeder_c_id} aktualisiert (ID: {existing_breeder_id}{kennel_info})')
+				else:
+					print(f'Breeder mit cId={breeder_c_id} bereits vorhanden (ID: {existing_breeder_id}{kennel_info})')
 			else:
 				# Erstelle neuen Breeder
-				#breeder_id = ensure_breeder_exists(client, breeder_c_id, kennel_name, verbose)
+				breeder_id = ensure_breeder_exists(client, breeder_c_id, kennel_name, verbose)
 				breeder_map[breeder_c_id] = breeder_id
 				if breeder_id:
 					stats['breeders_created'] += 1
@@ -596,7 +596,7 @@ def import_records(
 			# Die Verknüpfung Dog -> Breeder erfolgt über breeder: ID (Relation)
 			breeder_id = breeder_map.get(record.breeder_id) if record.breeder_id else None
 			payload = build_graphql_payload(
-				record, 
+				record,
 				breeder_id=breeder_id
 			)
 

@@ -34,6 +34,7 @@ interface AuthContextValue {
 	isAuthenticating: boolean
 	handleLogin: (credentials: LoginCredentials) => Promise<void>
 	handleLogout: () => void
+	isInitialized: boolean
 }
 
 export const AuthContext = createContext<AuthContextValue | undefined>(undefined)
@@ -144,6 +145,7 @@ export function AuthProvider({ children, strapiBaseUrl }: AuthProviderProps) {
 	const [authState, setAuthState] = useState<AuthState>({ token: null, user: null })
 	const [authError, setAuthError] = useState<string | null>(null)
 	const [isAuthenticating, setIsAuthenticating] = useState(false)
+	const [isInitialized, setIsInitialized] = useState(false)
 
 	// Lade Auth-Status beim Mount
 	useEffect(() => {
@@ -151,6 +153,7 @@ export function AuthProvider({ children, strapiBaseUrl }: AuthProviderProps) {
 		if (loaded.token && loaded.user) {
 			setAuthState(loaded)
 		}
+		setIsInitialized(true)
 	}, [])
 
 	// Höre auf localStorage Änderungen (für Cross-Tab-Synchronisation)
@@ -340,6 +343,7 @@ export function AuthProvider({ children, strapiBaseUrl }: AuthProviderProps) {
 		isAuthenticating,
 		handleLogin,
 		handleLogout,
+		isInitialized,
 	}
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -188,9 +188,16 @@ export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSect
 
 export type PageSection = StartpageSection
 
+export interface ComponentPermissionRestriction {
+	id: string
+	Public: boolean
+	Authenticated: boolean
+}
+
 export interface Page {
 	slug?: string | null
 	title?: string | null
+	Restriction?: ComponentPermissionRestriction | null
 	Sections?: PageSection[] | null
 }
 
