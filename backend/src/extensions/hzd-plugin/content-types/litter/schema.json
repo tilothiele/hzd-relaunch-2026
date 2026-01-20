@@ -105,6 +105,9 @@
         "videos",
         "audios"
       ]
+    },
+    "DisplayName": {
+      "type": "string"
     }
   }
 }

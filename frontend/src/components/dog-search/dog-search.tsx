@@ -1,7 +1,11 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, FormControlLabel, Chip, OutlinedInput, Pagination } from '@mui/material'
+import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, FormControlLabel, Chip, OutlinedInput, Pagination, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, ToggleButtonGroup, ToggleButton, Tooltip } from '@mui/material'
+import GridViewIcon from '@mui/icons-material/GridView'
+import TableRowsIcon from '@mui/icons-material/TableRows'
+import MaleIcon from '@mui/icons-material/Male'
+import FemaleIcon from '@mui/icons-material/Female'
 import { useDogs, type ColorFilter, type PageSize, type SexFilter, type DistanceFilter } from '@/hooks/use-dogs'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
 import { theme } from '@/themes'
@@ -18,6 +22,31 @@ const GERMANY_BOUNDS = {
 	maxLat: 55.0,
 	minLng: 5.0,
 	maxLng: 15.0,
+}
+
+import { calculateAge, formatDate } from '@/lib/date-utils'
+
+/**
+ * Berechnet die Entfernung zwischen zwei Koordinaten in Kilometern (Haversine-Formel)
+ */
+function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+	const R = 6371 // Erdradius in Kilometern
+	const dLat = (lat2 - lat1) * Math.PI / 180
+	const dLng = (lng2 - lng1) * Math.PI / 180
+	const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+		Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+		Math.sin(dLng / 2) * Math.sin(dLng / 2)
+	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+	return R * c
+}
+
+function getColorLabel(color: string | null | undefined): string {
+	switch (color) {
+		case 'S': return 'Schwarz'
+		case 'SM': return 'Schwarzmarken'
+		case 'B': return 'Blond'
+		default: return '-'
+	}
 }
 
 /**
@@ -77,6 +106,7 @@ export function DogSearch({ strapiBaseUrl, sexFilter, hzdSetting }: DogSearchPro
 	const [selectedDog, setSelectedDog] = useState<Dog | null>(null)
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [hasSearched, setHasSearched] = useState(false)
+	const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
 	const [isButtonHovered, setIsButtonHovered] = useState(false)
 
 	const userLocation = zipLocation || null
@@ -307,6 +337,23 @@ export function DogSearch({ strapiBaseUrl, sexFilter, hzdSetting }: DogSearchPro
 							'Keine Hunde gefunden'
 						)}
 					</div>
+					<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+						<GridViewIcon sx={{ fontSize: 20, color: viewMode === 'cards' ? theme.submitButtonColor : 'text.disabled' }} />
+						<Switch
+							size='small'
+							checked={viewMode === 'table'}
+							onChange={(e) => setViewMode(e.target.checked ? 'table' : 'cards')}
+							sx={{
+								'& .MuiSwitch-switchBase.Mui-checked': {
+									color: theme.submitButtonColor,
+								},
+								'& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+									backgroundColor: theme.submitButtonColor,
+								},
+							}}
+						/>
+						<TableRowsIcon sx={{ fontSize: 20, color: viewMode === 'table' ? theme.submitButtonColor : 'text.disabled' }} />
+					</Box>
 					<div className='flex items-center gap-2'>
 						<label
 							htmlFor='page-size'
@@ -377,17 +424,85 @@ export function DogSearch({ strapiBaseUrl, sexFilter, hzdSetting }: DogSearchPro
 							</Box>
 						) : null}
 						<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-							{enrichedDogs.map((dog) => (
-								<DogCard
-									key={dog.documentId}
-									dog={dog}
-									strapiBaseUrl={strapiBaseUrl}
-									onImageClick={() => handleDogImageClick(dog)}
-									userLocation={userLocation}
-									maxDistance={maxDistance === '' ? undefined : maxDistance}
-									hzdSetting={hzdSetting}
-								/>
-							))}
+							{viewMode === 'cards' ? (
+								enrichedDogs.map((dog) => (
+									<DogCard
+										key={dog.documentId}
+										dog={dog}
+										strapiBaseUrl={strapiBaseUrl}
+										onImageClick={() => handleDogImageClick(dog)}
+										userLocation={userLocation}
+										maxDistance={maxDistance === '' ? undefined : maxDistance}
+										hzdSetting={hzdSetting}
+									/>
+								))
+							) : (
+								<div className="col-span-full">
+									<TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #e5e7eb', borderRadius: '8px', overflow: 'hidden' }}>
+										<Table size="small">
+											<TableHead sx={{ backgroundColor: '#f9fafb' }}>
+												<TableRow>
+													<TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
+													<TableCell sx={{ fontWeight: 'bold' }}>Geschlecht</TableCell>
+													<TableCell sx={{ fontWeight: 'bold' }}>Wurftag/Alter</TableCell>
+													<TableCell sx={{ fontWeight: 'bold' }}>Farbe</TableCell>
+													<TableCell sx={{ fontWeight: 'bold' }}>Entfernung</TableCell>
+												</TableRow>
+											</TableHead>
+											<TableBody>
+												{enrichedDogs.map((dog) => {
+													let distance: number | null = null
+													if (userLocation && dog.Location && typeof dog.Location.lat === 'number' && typeof dog.Location.lng === 'number') {
+														distance = calculateDistance(
+															userLocation.lat,
+															userLocation.lng,
+															dog.Location.lat,
+															dog.Location.lng,
+														)
+													}
+
+													const age = calculateAge(dog.dateOfBirth)
+
+													return (
+														<TableRow
+															key={dog.documentId}
+															hover
+															onClick={() => handleDogImageClick(dog)}
+															sx={{ cursor: 'pointer' }}
+														>
+															<TableCell>
+																<div className="font-medium text-gray-900">{dog.fullKennelName ?? dog.givenName ?? 'Unbekannt'}</div>
+																{dog.fullKennelName && dog.givenName && (
+																	<div className="text-xs text-gray-500">{dog.givenName}</div>
+																)}
+															</TableCell>
+															<TableCell>
+																{dog.sex === 'M' ? (
+																	<Tooltip title="Rüde">
+																		<MaleIcon sx={{ color: '#0ea5e9' }} />
+																	</Tooltip>
+																) : dog.sex === 'F' ? (
+																	<Tooltip title="Hündin">
+																		<FemaleIcon sx={{ color: '#ec4899' }} />
+																	</Tooltip>
+																) : '-'}
+															</TableCell>
+															<TableCell>
+																{formatDate(dog.dateOfBirth)}
+																{age && <span className="text-gray-500 ml-1 text-xs">{age}</span>}
+															</TableCell>
+															<TableCell>{getColorLabel(dog.color)}</TableCell>
+															<TableCell>
+																{distance !== null ? `~${Math.round(distance)} km` : '-'}
+															</TableCell>
+														</TableRow>
+													)
+												})}
+											</TableBody>
+										</Table>
+									</TableContainer>
+								</div>
+							)}
 						</div>
 
 						{totalPages > 1 ? (

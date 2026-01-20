@@ -133,6 +133,8 @@ export function useDogs(options: UseDogsOptions = {}) {
 				}
 			}
 
+			console.log('Fetching dogs with variables:', JSON.stringify(variables, null, 2)) // Debugging color issue
+
 			const data = await fetchGraphQL<DogSearchResult>(
 				SEARCH_DOGS,
 				{
@@ -142,6 +144,7 @@ export function useDogs(options: UseDogsOptions = {}) {
 			)
 
 			const dogsArray = Array.isArray(data.hzdPluginDogs) ? data.hzdPluginDogs : []
+			console.log('Fetched dogs:', dogsArray) // Debugging color issue
 
 			setDogs(dogsArray)
 

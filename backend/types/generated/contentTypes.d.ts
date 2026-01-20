@@ -1541,6 +1541,7 @@ export interface PluginHzdPluginLitter extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     dateOfBirth: Schema.Attribute.Date;
     dateOfManting: Schema.Attribute.Date;
+    DisplayName: Schema.Attribute.String;
     expectedDateOfBirth: Schema.Attribute.Date;
     LitterStatus: Schema.Attribute.Enumeration<
       ['Planned', 'Manted', 'Littered', 'Closed']

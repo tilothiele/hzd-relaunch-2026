@@ -571,7 +571,6 @@ export const SEARCH_DOGS = `
 			dateOfBirth
 			dateOfDeath
 			microchipNo
-			microchipNo
 			father {
 				documentId
 				fullKennelName
