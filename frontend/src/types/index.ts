@@ -378,7 +378,15 @@ export interface Dog {
 }
 
 export interface DogSearchResult {
-	hzdPluginDogs: Dog[]
+	hzdPluginDogs_connection: {
+		nodes: Dog[]
+		pageInfo: {
+			total: number
+			page: number
+			pageSize: number
+			pageCount: number
+		}
+	}
 }
 
 export interface Breeder {
@@ -403,6 +411,7 @@ export interface Breeder {
 	WebsiteUrlDraft?: string | null
 	InternalNotes?: string | null
 	GeoLocation?: GeoLocation | null
+	avatar?: Image | null
 }
 
 export interface BreederSearchResult {
@@ -450,7 +459,15 @@ export interface Litter {
 }
 
 export interface LitterSearchResult {
-	hzdPluginLitters: Litter[]
+	hzdPluginLitters_connection: {
+		nodes: Litter[]
+		pageInfo: {
+			total: number
+			page: number
+			pageSize: number
+			pageCount: number
+		}
+	}
 }
 
 export interface IndexPage {

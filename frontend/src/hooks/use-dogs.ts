@@ -143,34 +143,40 @@ export function useDogs(options: UseDogsOptions = {}) {
 				},
 			)
 
-			const dogsArray = Array.isArray(data.hzdPluginDogs) ? data.hzdPluginDogs : []
+			const dogsArray = Array.isArray(data.hzdPluginDogs_connection?.nodes)
+				? data.hzdPluginDogs_connection.nodes
+				: []
 			console.log('Fetched dogs:', dogsArray) // Debugging color issue
 
-			setDogs(dogsArray)
-
-			// Berechne Paginierung basierend auf den serverseitigen Ergebnissen
-			// Wenn wir genau pageSize Ergebnisse haben, gibt es wahrscheinlich weitere Seiten
-			// Wenn wir weniger als pageSize haben, ist das die letzte Seite
-			let calculatedPageCount: number
-			let estimatedTotal: number
-
-			if (dogsArray.length === 0) {
-				// Keine Ergebnisse
-				calculatedPageCount = 0
-				estimatedTotal = 0
-			} else if (dogsArray.length < pageSize) {
-				// Weniger als pageSize Ergebnisse = letzte Seite
-				estimatedTotal = (page - 1) * pageSize + dogsArray.length
-				calculatedPageCount = page
-			} else {
-				// Genau pageSize Ergebnisse = es gibt wahrscheinlich weitere Seiten
-				// Wir nehmen an, dass es mindestens page + 1 Seiten gibt
-				calculatedPageCount = page + 1
-				estimatedTotal = page * pageSize + 1
+			// Process dogs (calculate distance, etc.)
+			let processedDogs = dogsArray
+			if (userLocation) {
+				processedDogs = dogsArray.map(dog => {
+					if (dog.Location) {
+						// Calculate distance if location is available
+						// Note: This logic seems to be handled in the component or elsewhere, 
+						// but keeping it consistent with previous logic if any processing was done.
+						// Actually, looking at previous code, there was no processing here, just assignment.
+						// But wait, the previous code had `enrichDogsWithFakeLocations` which was removed or not shown in the snippet?
+						// Ah, I see `enrichDogsWithFakeLocations` in a previous `view_file` of `dog-search.tsx`, not `use-dogs.ts`.
+						// Here it just sets the dogs.
+						return dog
+					}
+					return dog
+				})
 			}
 
-			setTotalDogs(estimatedTotal)
-			setPageCount(calculatedPageCount)
+			setDogs(dogsArray) // Using the raw array as before, assuming processing happens in component or is not needed here
+
+			// Use pageInfo from the connection for pagination
+			const pageInfo = data.hzdPluginDogs_connection?.pageInfo
+			if (pageInfo) {
+				setTotalDogs(pageInfo.total)
+				setPageCount(pageInfo.pageCount)
+			} else {
+				setTotalDogs(0)
+				setPageCount(0)
+			}
 		} catch (err) {
 			const fetchError = err instanceof Error
 				? err

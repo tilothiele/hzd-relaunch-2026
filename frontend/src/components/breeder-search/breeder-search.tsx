@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Box, Pagination, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
 import GridViewIcon from '@mui/icons-material/GridView'
 import TableRowsIcon from '@mui/icons-material/TableRows'
@@ -8,6 +8,7 @@ import { fetchGraphQL } from '@/lib/graphql-client'
 import { SEARCH_BREEDERS } from '@/lib/graphql/queries'
 import type { Breeder, BreederSearchResult } from '@/types'
 import { BreederCard } from './breeder-card'
+import { BreederDetailsModal } from './breeder-details-modal'
 import { BreederSearchForm } from './breeder-search-form'
 import { theme } from '@/themes'
 
@@ -27,6 +28,8 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 	const [totalBreeders, setTotalBreeders] = useState(0)
 	const [pageCount, setPageCount] = useState(0)
 	const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
+	const [selectedBreeder, setSelectedBreeder] = useState<Breeder | null>(null)
+	const [isModalOpen, setIsModalOpen] = useState(false)
 
 	const searchBreeders = useCallback(async () => {
 		if (!strapiBaseUrl) {
@@ -107,6 +110,16 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 
 	const handlePageChange = useCallback((newPage: number) => {
 		setPage(newPage)
+	}, [])
+
+	const handleBreederClick = useCallback((breeder: Breeder) => {
+		setSelectedBreeder(breeder)
+		setIsModalOpen(true)
+	}, [])
+
+	const handleCloseModal = useCallback(() => {
+		setIsModalOpen(false)
+		setSelectedBreeder(null)
 	}, [])
 
 	const totalPages = pageCount
@@ -216,6 +229,8 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 									<BreederCard
 										key={breeder.documentId}
 										breeder={breeder}
+										strapiBaseUrl={strapiBaseUrl}
+										onClick={() => handleBreederClick(breeder)}
 									/>
 								))}
 							</div>
@@ -237,7 +252,12 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 											const memberName = ((breeder.member?.firstName || '') + ' ' + (breeder.member?.lastName || '')).trim()
 
 											return (
-												<TableRow key={breeder.documentId} hover>
+												<TableRow
+													key={breeder.documentId}
+													hover
+													onClick={() => handleBreederClick(breeder)}
+													sx={{ cursor: 'pointer' }}
+												>
 													<TableCell>{breeder.kennelName || '-'}</TableCell>
 													<TableCell>{memberName || '-'}</TableCell>
 													<TableCell>{breeder.member?.city || '-'}</TableCell>
@@ -259,6 +279,13 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 					</div>
 				) : null}
 			</div>
+
+			<BreederDetailsModal
+				breeder={selectedBreeder}
+				open={isModalOpen}
+				onClose={handleCloseModal}
+				strapiBaseUrl={strapiBaseUrl}
+			/>
 		</div>
 	)
 }

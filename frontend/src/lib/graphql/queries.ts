@@ -558,44 +558,52 @@ export const GET_PAGE_BY_SLUG = `
 
 export const SEARCH_DOGS = `
 	query SearchDogs($filters: HzdPluginDogFiltersInput, $pagination: PaginationArg, $sort: [String]) {
-		hzdPluginDogs(
+		hzdPluginDogs_connection(
 			filters: $filters
 			pagination: $pagination
 			sort: $sort
 		) {
-			documentId
-			givenName
-			fullKennelName
-			sex
-			color
-			dateOfBirth
-			dateOfDeath
-			microchipNo
-			father {
+			nodes {
 				documentId
-				fullKennelName
 				givenName
-			}
-			mother {
-				documentId
 				fullKennelName
-				givenName
+				sex
+				color
+				dateOfBirth
+				dateOfDeath
+				microchipNo
+				father {
+					documentId
+					fullKennelName
+					givenName
+				}
+				mother {
+					documentId
+					fullKennelName
+					givenName
+				}
+				owner {
+					documentId
+					firstName
+					lastName
+				}
+				cFertile
+				Location {
+					lat
+					lng
+				}
+		  		avatar {
+					url
+					alternativeText
+					width
+					height
+				}
 			}
-			owner {
-				documentId
-				firstName
-				lastName
-			}
-			cFertile
-			Location {
-				lat
-				lng
-			}
-	  		avatar {
-				url
-				alternativeText
-				width
-				height
+			pageInfo {
+				total
+				page
+				pageSize
+				pageCount
 			}
 		}
 	}
@@ -624,6 +632,13 @@ export const SEARCH_BREEDERS = `
 					zip
 					countryCode
 				}
+				WebsiteUrl
+				avatar {
+					url
+					alternativeText
+					width
+					height
+				}
 			}
 			pageInfo {
 				total
@@ -637,121 +652,129 @@ export const SEARCH_BREEDERS = `
 
 export const SEARCH_LITTERS = `
 	query SearchLitters($filters: HzdPluginLitterFiltersInput, $pagination: PaginationArg, $sort: [String]) {
-		hzdPluginLitters(
+		hzdPluginLitters_connection(
 			filters: $filters
 			pagination: $pagination
 			sort: $sort
 		) {
-			documentId
-			dateOfManting
-			expectedDateOfBirth
-			dateOfBirth
-			LitterStatus
-			StatusMessage
-			OrderLetter
-			PuppyImage {
-				url
-				alternativeText
-				width
-				height
-			}
-			AmountRS {
-				id
-				Total
-				Available
-			}
-			AmountRSM {
-				id
-				Total
-				Available
-			}
-			AmountRB {
-				id
-				Total
-				Available
-			}
-			AmountHS {
-				id
-				Total
-				Available
-			}
-			AmountHSM {
-				id
-				Total
-				Available
-			}
-			AmountHB {
-				id
-				Total
-				Available
-			}
-			breeder {
+			nodes {
 				documentId
-				kennelName
-				breedingLicenseSince
-				IsActive
-				BreedersIntroduction
-				WebsiteUrl
-				WebsiteUrlDraft
-				InternalNotes
-				member {
-					firstName
-					lastName
-					region
-					phone
-					address1
-					address2
-					zip
-					countryCode
-				}
-				GeoLocation {
-					lat
-					lng
-				}
-			}
-			mother {
-				documentId
-				fullKennelName
-				givenName
-				sex
-				color
+				dateOfManting
+				expectedDateOfBirth
 				dateOfBirth
-				dateOfDeath
-				microchipNo
-				Exhibitions
-				BreedSurvey
-				Location {
-					lat
-					lng
-				}
-				avatar {
+				LitterStatus
+				StatusMessage
+				OrderLetter
+				PuppyImage {
 					url
 					alternativeText
 					width
 					height
 				}
+				AmountRS {
+					id
+					Total
+					Available
+				}
+				AmountRSM {
+					id
+					Total
+					Available
+				}
+				AmountRB {
+					id
+					Total
+					Available
+				}
+				AmountHS {
+					id
+					Total
+					Available
+				}
+				AmountHSM {
+					id
+					Total
+					Available
+				}
+				AmountHB {
+					id
+					Total
+					Available
+				}
+				breeder {
+					documentId
+					kennelName
+					breedingLicenseSince
+					IsActive
+					BreedersIntroduction
+					WebsiteUrl
+					WebsiteUrlDraft
+					InternalNotes
+					member {
+						firstName
+						lastName
+						region
+						phone
+						address1
+						address2
+						zip
+						countryCode
+					}
+					GeoLocation {
+						lat
+						lng
+					}
+				}
+				mother {
+					documentId
+					fullKennelName
+					givenName
+					sex
+					color
+					dateOfBirth
+					dateOfDeath
+					microchipNo
+					Exhibitions
+					BreedSurvey
+					Location {
+						lat
+						lng
+					}
+					avatar {
+						url
+						alternativeText
+						width
+						height
+					}
+				}
+				stuntDog {
+					documentId
+					fullKennelName
+					givenName
+					sex
+					color
+					dateOfBirth
+					dateOfDeath
+					microchipNo
+					Exhibitions
+					BreedSurvey
+					Location {
+						lat
+						lng
+					}
+					avatar {
+						url
+						alternativeText
+						width
+						height
+					}
+				}
 			}
-			stuntDog {
-				documentId
-				fullKennelName
-				givenName
-				sex
-				color
-				dateOfBirth
-				dateOfDeath
-				microchipNo
-				Exhibitions
-				BreedSurvey
-				Location {
-					lat
-					lng
-				}
-				avatar {
-					url
-					alternativeText
-					width
-					height
-				}
+			pageInfo {
+				total
+				page
+				pageSize
+				pageCount
 			}
 		}
 	}

@@ -1,28 +1,26 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import Image from 'next/image'
 import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, ToggleButtonGroup, ToggleButton, Tooltip, FormControlLabel } from '@mui/material'
 import GridViewIcon from '@mui/icons-material/GridView'
 import TableRowsIcon from '@mui/icons-material/TableRows'
 import MaleIcon from '@mui/icons-material/Male'
 import FemaleIcon from '@mui/icons-material/Female'
-import { resolveMediaUrl } from '@/components/header/logo-utils'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { SEARCH_LITTERS } from '@/lib/graphql/queries'
-import type { Litter, LitterSearchResult, HzdSetting, GeoLocation } from '@/types'
+
+import type { Litter, HzdSetting, GeoLocation } from '@/types'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
 import { theme } from '@/themes'
 import { LitterCard } from '@/components/litter-search/litter-card'
 import { LitterDetailsModal } from '@/components/litter-search/litter-details-modal'
+import { useLitters, type LitterStatus, type PageSize } from '@/hooks/use-litters'
 
 interface LitterSearchProps {
 	strapiBaseUrl: string
 	hzdSetting?: HzdSetting | null
 }
 
-type PageSize = 5 | 10 | 20
+
 
 // Deutschland grobe Grenzen: Lat 47-55, Lon 5-15
 const GERMANY_BOUNDS = {
@@ -113,132 +111,45 @@ const renderStatusBadge = (status: Litter['LitterStatus'], small = false) => {
 export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 	const [breederFilter, setBreederFilter] = useState('')
 	const [motherFilter, setMotherFilter] = useState('')
-	const [statusFilter, setStatusFilter] = useState<'' | 'Planned' | 'Manted' | 'Littered' | 'Closed'>('')
+	const [statusFilter, setStatusFilter] = useState<LitterStatus>('')
 	const [orderLetterFilter, setOrderLetterFilter] = useState('')
 	const [selectedMaleColors, setSelectedMaleColors] = useState<string[]>(['S', 'SM', 'B'])
 	const [selectedFemaleColors, setSelectedFemaleColors] = useState<string[]>(['S', 'SM', 'B'])
 	const [page, setPage] = useState(1)
 	const [pageSize, setPageSize] = useState<PageSize>(10)
-	const [litters, setLitters] = useState<Litter[]>([])
 	const [selectedLitter, setSelectedLitter] = useState<Litter | null>(null)
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [showMap, setShowMap] = useState(false)
 	const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
-	const [isLoading, setIsLoading] = useState(false)
-	const [error, setError] = useState<Error | null>(null)
-	const [totalLitters, setTotalLitters] = useState(0)
-	const [pageCount, setPageCount] = useState(0)
 	const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
 	const [isButtonHovered, setIsButtonHovered] = useState(false)
 
-	const searchLitters = useCallback(async () => {
-		if (!strapiBaseUrl) {
-			return
-		}
+	const filters = useMemo(() => ({
+		breederFilter,
+		motherFilter,
+		statusFilter,
+		orderLetterFilter,
+		selectedMaleColors,
+		selectedFemaleColors,
+	}), [breederFilter, motherFilter, statusFilter, orderLetterFilter, selectedMaleColors, selectedFemaleColors])
 
-		setIsLoading(true)
-		setError(null)
+	const {
+		litters,
+		totalLitters,
+		pageCount,
+		isLoading,
+		error,
+		searchLitters,
+	} = useLitters({
+		filters,
+		pagination: {
+			page,
+			pageSize,
+		},
+		autoLoad: false,
+	})
 
-		try {
-			const filterConditions: Array<Record<string, unknown>> = []
 
-			if (breederFilter.trim()) {
-				filterConditions.push({
-					breeder: {
-						kennelName: { containsi: breederFilter.trim() },
-					},
-				})
-			}
-
-			if (motherFilter.trim()) {
-				filterConditions.push({
-					or: [
-						{ mother: { fullKennelName: { containsi: motherFilter.trim() } } },
-						{ mother: { givenName: { containsi: motherFilter.trim() } } },
-					],
-				})
-			}
-
-			if (statusFilter) {
-				filterConditions.push({
-					LitterStatus: { eq: statusFilter },
-				})
-			}
-
-			if (orderLetterFilter) {
-				filterConditions.push({
-					OrderLetter: { eq: orderLetterFilter },
-				})
-			}
-
-			// Farben nur filtern, wenn Status "Geworfen" ist
-			if (statusFilter === 'Littered') {
-				if (selectedMaleColors.length > 0) {
-					const colorFilters = selectedMaleColors.map((color: string) => ({
-						[`AmountR${color}`]: { Available: { gt: 0 } }
-					}))
-					filterConditions.push({ or: colorFilters })
-				}
-
-				if (selectedFemaleColors.length > 0) {
-					const colorFilters = selectedFemaleColors.map((color: string) => ({
-						[`AmountH${color}`]: { Available: { gt: 0 } }
-					}))
-					filterConditions.push({ or: colorFilters })
-				}
-			}
-
-			const variables: Record<string, unknown> = {
-				pagination: {
-					page,
-					pageSize,
-				},
-				sort: ['dateOfBirth:desc', 'expectedDateOfBirth:desc'],
-			}
-
-			if (filterConditions.length > 0) {
-				variables.filters = {
-					and: filterConditions,
-				}
-			}
-
-			const data = await fetchGraphQL<LitterSearchResult>(
-				SEARCH_LITTERS,
-				{
-					baseUrl: strapiBaseUrl,
-					variables,
-				},
-			)
-
-			const littersArray = Array.isArray(data.hzdPluginLitters) ? data.hzdPluginLitters : []
-			setLitters(littersArray)
-
-			// Berechne Paginierung basierend auf den übergebenen Parametern
-			// Da die Meta-Informationen nicht in der Antwort enthalten sind,
-			// schätzen wir die Gesamtzahl basierend auf der Anzahl der zurückgegebenen Ergebnisse
-			// Wenn wir genau pageSize Ergebnisse haben, gibt es wahrscheinlich mehr
-			const estimatedTotal = littersArray.length === pageSize && page > 1
-				? page * pageSize + 1
-				: littersArray.length === pageSize
-					? page * pageSize
-					: (page - 1) * pageSize + littersArray.length
-
-			const calculatedPageCount = Math.ceil(estimatedTotal / pageSize)
-
-			setTotalLitters(estimatedTotal)
-			setPageCount(calculatedPageCount)
-		} catch (err) {
-			const fetchError = err instanceof Error
-				? err
-				: new Error('Würfe konnten nicht geladen werden.')
-			setError(fetchError)
-			setLitters([])
-			setTotalLitters(0)
-			setPageCount(0)
-		} finally {
-			setIsLoading(false)
-		}
-	}, [strapiBaseUrl, breederFilter, motherFilter, statusFilter, orderLetterFilter, selectedMaleColors, selectedFemaleColors, page, pageSize])
 
 	useEffect(() => {
 		void searchLitters()

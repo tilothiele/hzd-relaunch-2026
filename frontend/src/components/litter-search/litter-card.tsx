@@ -124,6 +124,9 @@ export function LitterCard({ litter, strapiBaseUrl, hzdSetting, distance, format
                     {distance !== null && <p><strong>Entfernung:</strong> ~{Math.round(distance)} km</p>}
                 </div>
                 <div>
+                    <p><strong>Züchter:</strong> {breederMember}</p>
+                </div>
+                <div>
                     <p><strong>Mutter:</strong> {motherName}</p>
                     {stuntDogName && <p><strong>Deckrüde:</strong> {stuntDogName}</p>}
                 </div>
