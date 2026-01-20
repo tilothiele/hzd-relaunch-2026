@@ -390,6 +390,8 @@ export interface Breeder {
 		lastName?: string | null
 		region?: string | null
 		phone?: string | null
+		email?: string | null
+		city?: string | null
 		address1?: string | null
 		address2?: string | null
 		zip?: string | null
@@ -404,7 +406,15 @@ export interface Breeder {
 }
 
 export interface BreederSearchResult {
-	hzdPluginBreeders: Breeder[]
+	hzdPluginBreeders_connection: {
+		nodes: Breeder[]
+		pageInfo: {
+			total: number
+			page: number
+			pageSize: number
+			pageCount: number
+		}
+	}
 }
 
 export interface Litter {

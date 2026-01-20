@@ -67,23 +67,17 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 				},
 			)
 
-			const breedersArray = Array.isArray(data.hzdPluginBreeders) ? data.hzdPluginBreeders : []
+			const breedersArray = Array.isArray(data.hzdPluginBreeders_connection.nodes) ? data.hzdPluginBreeders_connection.nodes : []
 			setBreeders(breedersArray)
 
-			// Berechne Paginierung basierend auf den übergebenen Parametern
-			// Da die Meta-Informationen nicht in der Antwort enthalten sind,
-			// schätzen wir die Gesamtzahl basierend auf der Anzahl der zurückgegebenen Ergebnisse
-			// Wenn wir genau pageSize Ergebnisse haben, gibt es wahrscheinlich mehr
-			const estimatedTotal = breedersArray.length === pageSize && page > 1
-				? page * pageSize + 1
-				: breedersArray.length === pageSize
-					? page * pageSize
-					: (page - 1) * pageSize + breedersArray.length
-
-			const calculatedPageCount = Math.ceil(estimatedTotal / pageSize)
-
-			setTotalBreeders(estimatedTotal)
-			setPageCount(calculatedPageCount)
+			const pageInfo = data.hzdPluginBreeders_connection?.pageInfo
+			if (pageInfo) {
+				setTotalBreeders(pageInfo.total)
+				setPageCount(pageInfo.pageCount)
+			} else {
+				setTotalBreeders(0)
+				setPageCount(0)
+			}
 		} catch (err) {
 			const fetchError = err instanceof Error
 				? err
@@ -162,6 +156,32 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 						/>
 						<TableRowsIcon sx={{ fontSize: 20, color: viewMode === 'table' ? theme.submitButtonColor : 'text.disabled' }} />
 					</Box>
+					{totalPages > 1 && (
+						<Box sx={{ display: 'flex', alignItems: 'center' }}>
+							<Pagination
+								count={totalPages}
+								page={currentPage}
+								onChange={(_, value) => handlePageChange(value)}
+								disabled={isLoading}
+								color='primary'
+								size='small'
+								showFirstButton
+								showLastButton
+								sx={{
+									'& .MuiPaginationItem-root': { fontSize: '0.875rem' },
+									'& .MuiPaginationItem-page.Mui-selected': {
+										backgroundColor: theme.submitButtonColor,
+										color: theme.submitButtonTextColor,
+										'&:hover': {
+											backgroundColor: theme.submitButtonColor,
+											filter: 'brightness(90%)',
+										},
+									},
+									'& .MuiPaginationItem-root.Mui-disabled': { opacity: 0.5 },
+								}}
+							/>
+						</Box>
+					)}
 					<div className='flex items-center gap-2'>
 						<label
 							htmlFor='page-size'
@@ -232,35 +252,6 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 							</TableContainer>
 						)}
 
-						{totalPages > 1 ? (
-							<Box className='mt-6 flex items-center justify-center'>
-								<Pagination
-									count={totalPages}
-									page={currentPage}
-									onChange={(_, value) => handlePageChange(value)}
-									disabled={isLoading}
-									color='primary'
-									showFirstButton
-									showLastButton
-									sx={{
-										'& .MuiPaginationItem-root': {
-											fontSize: '0.875rem',
-										},
-										'& .MuiPaginationItem-page.Mui-selected': {
-											backgroundColor: theme.submitButtonColor,
-											color: theme.submitButtonTextColor,
-											'&:hover': {
-												backgroundColor: theme.submitButtonColor,
-												filter: 'brightness(90%)',
-											},
-										},
-										'& .MuiPaginationItem-root.Mui-disabled': {
-											opacity: 0.5,
-										},
-									}}
-								/>
-							</Box>
-						) : null}
 					</>
 				) : !isLoading ? (
 					<div className='rounded-lg border border-gray-200 bg-gray-50 p-8 text-center text-gray-600'>

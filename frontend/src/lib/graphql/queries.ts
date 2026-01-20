@@ -603,23 +603,33 @@ export const SEARCH_DOGS = `
 
 export const SEARCH_BREEDERS = `
 	query SearchBreeders($filters: HzdPluginBreederFiltersInput, $pagination: PaginationArg, $sort: [String]) {
-		hzdPluginBreeders(
+		hzdPluginBreeders_connection(
 			filters: $filters
 			pagination: $pagination
 			sort: $sort
 		) {
-			documentId
-			kennelName
-			breedingLicenseSince
-			member {
-				firstName
-				lastName
-				region
-				phone
-				address1
-				address2
-				zip
-				countryCode
+			nodes {
+				documentId
+				kennelName
+				breedingLicenseSince
+				member {
+					firstName
+					lastName
+					region
+					phone
+					email
+					city
+					address1
+					address2
+					zip
+					countryCode
+				}
+			}
+			pageInfo {
+				total
+				page
+				pageSize
+				pageCount
 			}
 		}
 	}
