@@ -194,6 +194,11 @@ def map_csv_to_member(row: Dict[str, str]) -> Dict[str, Any]:
     if breeder_flag is not None:
         member_data['cFlagBreeder'] = breeder_flag
 
+    # cFlagActiveBreeder - person is a breeder
+    active_breeder_flag = parse_boolean(row.get('person is an active breeder', ''))
+    if active_breeder_flag is not None:
+        member_data['cFlagActiveBreeder'] = active_breeder_flag
+
     # membershipNo
     membership_no = parse_integer(row.get('membership number', ''))
 #    if(not membership_no):
@@ -323,7 +328,7 @@ def register_user(api_url: str, api_token: Optional[str], username: str, email: 
         }
     }
     """
-    
+
     # Use a default password for registration
     variables = {
         'input': {
@@ -370,10 +375,10 @@ def update_user_admin(api_url: str, api_token: Optional[str], document_id: str, 
         }
     }
     """
-    
+
     # Remove fields that shouldn't be in the update data if they are not allowed or redundant
     # For now, we keep them as they are in UsersPermissionsUserInput
-    
+
     variables = {
         'id': document_id,
         'data': member_data
@@ -420,7 +425,7 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
             h = find_existing_user_by_email(api_url, api_token, email)
             if h:
                 email = f"{username}@hovawarte.com"
-    
+
     if dry_run:
         if existing_document_id:
             print(f"[DRY RUN] Found existing user: {username} ({existing_document_id}) - Would update")
@@ -448,7 +453,7 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
         else:
             print(f"✗ Failed to update user: {username}")
             return False
-    
+
     return False
 
 def main():
