@@ -237,6 +237,7 @@ export interface GlobalLayout {
 	Sections?: StartpageSection[] | null
 	PartnerLink?: PartnerLink[] | null
 	PrivacyPolicy?: Image | null
+	page?: Page | null
 }
 
 export interface ComponentLayoutSOS {

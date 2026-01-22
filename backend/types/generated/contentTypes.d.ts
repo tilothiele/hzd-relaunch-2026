@@ -712,6 +712,7 @@ export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
     MenuStyle: Schema.Attribute.Enumeration<['Classic', 'StickyTransparent']> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'Classic'>;
+    page: Schema.Attribute.Relation<'oneToOne', 'api::page.page'>;
     PartnerLink: Schema.Attribute.Component<'links.partnerl-link', true>;
     PrivacyPolicy: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios'

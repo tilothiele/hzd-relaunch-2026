@@ -71,6 +71,11 @@
       "type": "component",
       "component": "layout.sos",
       "repeatable": false
+    },
+    "page": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::page.page"
     }
   }
 }

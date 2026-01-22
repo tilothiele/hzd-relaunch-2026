@@ -58,6 +58,205 @@ export const GET_LAYOUT = `
 				caption
 				previewUrl
 			}
+			page {
+				Sections {
+					__typename
+					... on ComponentBlocksRichTextSection {
+						Title
+						Subtitle
+						RichTextContent
+						RichTextOddEven
+						RichTextAnchor
+					}
+					... on ComponentBlocksHeroSectionSlideShow {
+						Headline {
+							id
+							Headline
+							Subheadline
+							HeroImage {
+								url
+								alternativeText
+								width
+								height
+								caption
+								previewUrl
+							}
+							ActionButton {
+								Label
+								Link
+								Primary
+							}
+						}
+					}
+					... on ComponentBlocksCardSection {
+						CardHeadline
+						CardColumnsOddEven
+						CardLayout
+						CardItem {
+							id
+							Headline
+							Subheadline
+							BackgroundImage {
+								url
+								alternativeText
+								width
+								height
+								caption
+								previewUrl
+							}
+							ActionButton {
+								Label
+								Link
+								Primary
+							}
+						}
+						CardsAnchor
+					}
+					... on ComponentBlocksTeaserTextWithImage {
+						TeaserOddEven
+						TeaserHeadline
+						TeaserText
+						ImagePosition
+						Image {
+							url
+							alternativeText
+							width
+							height
+							caption
+							previewUrl
+						}
+						ActionButton {
+							Label
+							Link
+							Primary
+						}
+						TeaserAnchor
+					}
+					... on ComponentBlocksTextColumnsSection {
+						TextColumnsOddEven
+						TextColumnsHeadline
+						TextColumnsSubHeadline
+						TextColumn {
+							id
+							ColumnHeadline
+							ColumnText
+							ColumnActionButton {
+								Label
+								Link
+								Primary
+							}
+							BulletItems {
+								id
+								Headline
+								ItemBody
+							}
+						}
+						TextColumnsAnchor
+					}
+					... on ComponentBlocksImageGallerySection {
+						GalleryHeadline
+						GalleryImages {
+							url
+							alternativeText
+							width
+							height
+							caption
+							previewUrl
+						}
+						ImageGalleryAnchor
+					}
+					... on ComponentBlocksSimpleCtaSection {
+						CtaHeadline
+						CtaInfoText
+						CtaBackgroundImage {
+							url
+							alternativeText
+							width
+							height
+							caption
+							previewUrl
+						}
+						CtaActionButton {
+							Label
+							Link
+							Primary
+						}
+						SimpleCtaAnchor
+					}
+					... on ComponentBlocksNewsArticlesSection {
+					MaxArticles
+								news_article_category {
+									documentId
+								}
+						NewsArticlesAnchor
+					}
+					... on ComponentBlocksContactGroupSection {
+						ContactGroup {
+							documentId
+							ContactGroupName
+							GroupDescription
+							contacts(sort: ["position:asc"]) {
+								documentId
+								position
+								Headline
+								Name
+								Street
+								ZipCity
+								Phone
+								Email1
+								Email2
+								Introduction
+								avatar {
+									url
+									alternativeText
+									width
+									height
+									caption
+									previewUrl
+								}
+								member {
+									documentId
+									firstName
+									lastName
+								}
+							}
+						}
+						ContactGroupAnchor
+					}
+					... on ComponentBlocksContactMailerSection {
+						ContactMailerAnchor
+						ContactMailerHeadline
+						ContactMailerInfotext
+						ReceipientOptions {
+	 						id
+	 						Email
+	 						DisplayName
+	 					}
+	 				}
+	 				... on ComponentBlocksSimpleHeroSection {
+	 					HeroAnchor
+	 					HeroHeadline
+	 					HeroTeaser
+	 					HeroImage {
+	 						url
+	 						alternativeText
+	 						width
+	 						height
+	 						caption
+	 						previewUrl
+	 					}
+	 					HeroLayout
+	 					HeroCta {
+	 						Label
+	 						Link
+	 						Primary
+	 					}
+	 					FullWidth
+	 					ShowLog
+						FadingBorder
+	 				}
+				}
+			}
 		}
 		hzdSetting {
 			DefaultAvatarS {

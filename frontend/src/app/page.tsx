@@ -1,13 +1,34 @@
 import { MainPageStructure } from './main-page-structure'
 import { theme as globalTheme } from '@/themes'
-import { fetchIndexPage } from '@/lib/server/fetch-index-page'
+import { fetchGraphQLServer, getStrapiBaseUrl } from '@/lib/server/graphql-client'
+import { GET_LAYOUT } from '@/lib/graphql/queries'
 import { renderServerSections } from '@/components/sections/server-section-factory'
+import type { GlobalLayout } from '@/types'
 
 export const dynamic = 'force-dynamic'
 
+interface LayoutData {
+	globalLayout: GlobalLayout
+	hzdSetting?: GlobalLayout['HzdSetting']
+}
+
 export default async function Home() {
-	const { globalLayout, baseUrl, error } = await fetchIndexPage()
-	const sections = globalLayout?.Sections ?? []
+	let globalLayout: GlobalLayout | null = null
+	let baseUrl: string = ''
+	let error: Error | null = null
+
+	try {
+		baseUrl = getStrapiBaseUrl()
+		const data = await fetchGraphQLServer<LayoutData>(GET_LAYOUT, { baseUrl })
+		globalLayout = data.globalLayout
+		if (globalLayout && data.hzdSetting) {
+			globalLayout.HzdSetting = data.hzdSetting
+		}
+	} catch (err) {
+		error = err instanceof Error ? err : new Error('Fehler beim Laden der Seite.')
+	}
+
+	const sections = globalLayout?.page?.Sections ?? []
 
 	if (error) {
 		return (

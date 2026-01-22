@@ -194,10 +194,10 @@ def map_csv_to_member(row: Dict[str, str]) -> Dict[str, Any]:
     if breeder_flag is not None:
         member_data['cFlagBreeder'] = breeder_flag
 
-    # cFlagActiveBreeder - person is a breeder
+    # cFlagActiveBreeder - person is an active breeder
     active_breeder_flag = parse_boolean(row.get('person is an active breeder', ''))
     if active_breeder_flag is not None:
-        member_data['cFlagBreeder'] = active_breeder_flag
+        member_data['IsActiveBreeder'] = active_breeder_flag
 
     # membershipNo
     membership_no = parse_integer(row.get('membership number', ''))
@@ -588,14 +588,20 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
              print("Skipping member without username or cId")
              return False
 
-    email = member_data.get('email')
-    if not email:
-        email = f"{username}@hovawarte.com"
+    # Extract real email if present (to be updated separately)
+    real_email = member_data.pop('cEmail', None)
+
+    # Use fallback email for initial safe storage
+    # We ignore the imported email for the first save attempt
+    email = f"{username}@hovawarte.com"
 
     # Separate breeder data from member data
     kennel_name = member_data.pop('kennelName', None)
     is_breeder = member_data.get('cFlagBreeder', False)
     
+    is_active_breeder = member_data.get('IsActiveBreeder', False)
+    member_data.pop('IsActiveBreeder', None)
+
     # 1. Search for existing user
     existing_document_id = None
     existing_breeder_id = None
@@ -609,7 +615,7 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
         # Fallback to username
         if not existing_document_id:
             existing_document_id = find_existing_user(api_url, api_token, username)
-        
+
         # Fallback to email
         if not existing_document_id:
             h = find_existing_user_by_email(api_url, api_token, email)
@@ -618,7 +624,7 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
                 # For now, just use the found user.
                 existing_document_id = h
                 # email = f"{username}@hovawarte.com" # This logic was a bit weird in original, keeping it simple.
-        
+
         if c_id and is_breeder:
             existing_breeder_id = find_existing_breeder_by_cid(api_url, api_token, c_id)
 
@@ -627,7 +633,7 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
             print(f"[DRY RUN] Found existing user: {username} ({existing_document_id}) - Would update")
         else:
             print(f"[DRY RUN] User not found: {username} - Would register and update")
-        
+
         if is_breeder:
              if existing_breeder_id:
                  print(f"[DRY RUN] Found existing breeder for cId {c_id} - Would update with kennel: {kennel_name}")
@@ -651,12 +657,24 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
     if document_id:
         if update_user_admin(api_url, api_token, document_id, member_data):
             print(f"✓ Updated user: {username} (ID: {document_id})")
-            
+
+            # Try to update the real email
+            if real_email:
+                try:
+                    # print(f"Attempting to update email for {username} to {real_email}")
+                    if update_user_admin(api_url, api_token, document_id, {'email': real_email, 'cEmail': real_email}):
+                        print(f"✓ Updated email for user {username}: {real_email}")
+                    else:
+                        print(f"⚠ Konnte Email nicht setzen fuer {username}: {real_email} (Update fehlgeschlagen)")
+                except Exception as e:
+                    print(f"⚠ Konnte Email nicht setzen fuer {username}: {real_email} ({e})")
+
+
             # 4. Handle Breeder Logic
             if is_breeder and c_id:
                 breeder_data = {
                     'cId': c_id,
-                    'IsActive': True,
+                    'IsActive': is_active_breeder,
                     'member': document_id, # Link to the member
                 }
                 if kennel_name:
