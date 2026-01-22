@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { Box, Pagination, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
+import { Box, Pagination, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel } from '@mui/material'
 import GridViewIcon from '@mui/icons-material/GridView'
 import TableRowsIcon from '@mui/icons-material/TableRows'
 import { fetchGraphQL } from '@/lib/graphql-client'
@@ -17,6 +17,8 @@ interface BreederSearchProps {
 }
 
 type PageSize = 5 | 10 | 20 | 50 | 100
+type SortDirection = 'asc' | 'desc'
+type SortField = 'kennelName' | 'member.lastName' | 'member.zip' | 'member.city' | 'member.phone' | 'member.email'
 
 export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 	const [nameFilter, setNameFilter] = useState('')
@@ -30,6 +32,10 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 	const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
 	const [selectedBreeder, setSelectedBreeder] = useState<Breeder | null>(null)
 	const [isModalOpen, setIsModalOpen] = useState(false)
+
+	// Sort state
+	const [sortField, setSortField] = useState<SortField>('kennelName')
+	const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
 
 	const searchBreeders = useCallback(async () => {
 		if (!strapiBaseUrl) {
@@ -55,7 +61,7 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 					page,
 					pageSize,
 				},
-				sort: ['kennelName:asc'],
+				sort: [`${sortField}:${sortDirection}`],
 			}
 
 			if (filterConditions.length > 0) {
@@ -94,7 +100,7 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [strapiBaseUrl, nameFilter, page, pageSize])
+	}, [strapiBaseUrl, nameFilter, page, pageSize, sortField, sortDirection])
 
 	useEffect(() => {
 		void searchBreeders()
@@ -123,6 +129,15 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 		setIsModalOpen(false)
 		setSelectedBreeder(null)
 	}, [])
+
+	const handleSort = useCallback((field: SortField) => {
+		if (sortField === field) {
+			setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')
+		} else {
+			setSortField(field)
+			setSortDirection('asc')
+		}
+	}, [sortField])
 
 	const totalPages = pageCount
 	const currentPage = page
@@ -241,12 +256,60 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 								<Table size="small">
 									<TableHead sx={{ backgroundColor: '#f9fafb' }}>
 										<TableRow>
-											<TableCell sx={{ fontWeight: 'bold' }}>Zwinger</TableCell>
-											<TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
-											<TableCell sx={{ fontWeight: 'bold' }}>Ort</TableCell>
-											<TableCell sx={{ fontWeight: 'bold' }}>PLZ</TableCell>
-											<TableCell sx={{ fontWeight: 'bold' }}>Telefon</TableCell>
-											<TableCell sx={{ fontWeight: 'bold' }}>E-Mail</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>
+												<TableSortLabel
+													active={sortField === 'kennelName'}
+													direction={sortField === 'kennelName' ? sortDirection : 'asc'}
+													onClick={() => handleSort('kennelName')}
+												>
+													Zwinger
+												</TableSortLabel>
+											</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>
+												<TableSortLabel
+													active={sortField === 'member.lastName'}
+													direction={sortField === 'member.lastName' ? sortDirection : 'asc'}
+													onClick={() => handleSort('member.lastName')}
+												>
+													Züchter
+												</TableSortLabel>
+											</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>
+												<TableSortLabel
+													active={sortField === 'member.zip'}
+													direction={sortField === 'member.zip' ? sortDirection : 'asc'}
+													onClick={() => handleSort('member.zip')}
+												>
+													PLZ
+												</TableSortLabel>
+											</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>
+												<TableSortLabel
+													active={sortField === 'member.city'}
+													direction={sortField === 'member.city' ? sortDirection : 'asc'}
+													onClick={() => handleSort('member.city')}
+												>
+													Ort
+												</TableSortLabel>
+											</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>
+												<TableSortLabel
+													active={sortField === 'member.phone'}
+													direction={sortField === 'member.phone' ? sortDirection : 'asc'}
+													onClick={() => handleSort('member.phone')}
+												>
+													Telefon
+												</TableSortLabel>
+											</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>
+												<TableSortLabel
+													active={sortField === 'member.email'}
+													direction={sortField === 'member.email' ? sortDirection : 'asc'}
+													onClick={() => handleSort('member.email')}
+												>
+													E-Mail
+												</TableSortLabel>
+											</TableCell>
 										</TableRow>
 									</TableHead>
 									<TableBody>
@@ -262,8 +325,8 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 												>
 													<TableCell>{breeder.kennelName || '-'}</TableCell>
 													<TableCell>{memberName || '-'}</TableCell>
-													<TableCell>{breeder.member?.city || '-'}</TableCell>
 													<TableCell>{breeder.member?.zip || '-'}</TableCell>
+													<TableCell>{breeder.member?.city || '-'}</TableCell>
 													<TableCell>{breeder.member?.phone || '-'}</TableCell>
 													<TableCell>{breeder.member?.email || '-'}</TableCell>
 												</TableRow>
