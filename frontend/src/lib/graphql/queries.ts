@@ -620,6 +620,7 @@ export const SEARCH_BREEDERS = `
 				documentId
 				kennelName
 				breedingLicenseSince
+				IsActive
 				member {
 					firstName
 					lastName
