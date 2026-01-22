@@ -197,7 +197,7 @@ def map_csv_to_member(row: Dict[str, str]) -> Dict[str, Any]:
     # cFlagActiveBreeder - person is a breeder
     active_breeder_flag = parse_boolean(row.get('person is an active breeder', ''))
     if active_breeder_flag is not None:
-        member_data['cFlagActiveBreeder'] = active_breeder_flag
+        member_data['cFlagBreeder'] = active_breeder_flag
 
     # membershipNo
     membership_no = parse_integer(row.get('membership number', ''))
@@ -226,6 +226,18 @@ def map_csv_to_member(row: Dict[str, str]) -> Dict[str, Any]:
     cancellation_on = parse_date(row.get('date of leaving', ''))
     if cancellation_on:
         member_data['cancellationOn'] = cancellation_on
+
+    # person is a member - map to blocked status
+    # If not a member (0), then blocked=True
+    is_member = parse_boolean(row.get('person is a member', ''))
+    #print(c_id, is_member)
+    if is_member is not None:
+        member_data['blocked'] = not is_member
+
+    # kennelName - breeding station
+    kennel_name = clean_string(row.get('breeding station', ''))
+    if kennel_name:
+        member_data['kennelName'] = kennel_name
 
     return member_data
 
@@ -305,6 +317,46 @@ def find_existing_user(api_url: str, api_token: Optional[str], username: str) ->
                 return data[0].get('documentId')
     except Exception as e:
         print(f"Warning: Error finding existing member: {e}")
+        pass
+
+    return None
+
+def find_existing_user_by_cid(api_url: str, api_token: Optional[str], c_id: int) -> Optional[str]:
+    """Find existing member by cId using GraphQL. Returns documentId if found, None otherwise."""
+    url = f"{api_url}"
+
+    headers = {
+        'Content-Type': 'application/json',
+    }
+
+    if api_token:
+        headers['Authorization'] = f'Bearer {api_token}'
+
+    query = """
+    query FindUserByCId($cId: Int!) {
+        usersPermissionsUsers(filters: { cId: { eq: $cId } }) {
+            documentId
+        }
+    }
+    """
+
+    try:
+        response = requests.post(
+            url,
+            json={'query': query, 'variables': {'cId': c_id}},
+            headers=headers,
+            timeout=30
+        )
+
+        if response.status_code == 200:
+            result = response.json()
+            if 'errors' in result:
+                return None
+            data = result.get('data', {}).get('usersPermissionsUsers', [])
+            if data and len(data) > 0:
+                return data[0].get('documentId')
+    except Exception as e:
+        print(f"Warning: Error finding existing member by cId: {e}")
         pass
 
     return None
@@ -396,7 +448,7 @@ def update_user_admin(api_url: str, api_token: Optional[str], document_id: str, 
             if 'errors' in result:
                 error_msg = '; '.join([err.get('message', str(err)) for err in result['errors']])
                 print(f"✗ Failed to update user {document_id}: {error_msg}")
-                printf(result)
+                # printf(result)
                 return False
             return True
         else:
@@ -405,32 +457,182 @@ def update_user_admin(api_url: str, api_token: Optional[str], document_id: str, 
         print(f"✗ Error updating user {document_id}: {e}")
     return False
 
+def find_existing_breeder_by_cid(api_url: str, api_token: Optional[str], c_id: int) -> Optional[str]:
+    """Find existing breeder by cId using GraphQL. Returns documentId if found, None otherwise."""
+    url = f"{api_url}"
+
+    headers = {
+        'Content-Type': 'application/json',
+    }
+
+    if api_token:
+        headers['Authorization'] = f'Bearer {api_token}'
+
+    query = """
+    query FindBreederByCId($cId: Int!) {
+        hzdPluginBreeders(filters: { cId: { eq: $cId } }) {
+            documentId
+        }
+    }
+    """
+
+    try:
+        response = requests.post(
+            url,
+            json={'query': query, 'variables': {'cId': c_id}},
+            headers=headers,
+            timeout=30
+        )
+
+        if response.status_code == 200:
+            result = response.json()
+            if 'errors' in result:
+                return None
+            data = result.get('data', {}).get('hzdPluginBreeders', [])
+            if data and len(data) > 0:
+                return data[0].get('documentId')
+    except Exception as e:
+        print(f"Warning: Error finding existing breeder: {e}")
+        pass
+
+    return None
+
+def create_breeder(api_url: str, api_token: Optional[str], breeder_data: Dict[str, Any]) -> Optional[str]:
+    """Create a new breeder via GraphQL. Returns documentId if successful."""
+    url = f"{api_url}"
+    headers = {
+        'Content-Type': 'application/json',
+    }
+    if api_token:
+        headers['Authorization'] = f'Bearer {api_token}'
+
+    mutation = """
+    mutation CreateBreeder($data: HzdPluginBreederInput!) {
+        createHzdPluginBreeder(data: $data) {
+            documentId
+        }
+    }
+    """
+
+    variables = {
+        'data': breeder_data
+    }
+
+    try:
+        response = requests.post(
+            url,
+            json={'query': mutation, 'variables': variables},
+            headers=headers,
+            timeout=30
+        )
+        if response.status_code == 200:
+            result = response.json()
+            if 'errors' in result:
+                error_msg = '; '.join([err.get('message', str(err)) for err in result['errors']])
+                print(f"✗ Failed to create breeder: {error_msg}")
+                return None
+            return result.get('data', {}).get('createHzdPluginBreeder', {}).get('documentId')
+    except Exception as e:
+        print(f"✗ Error creating breeder: {e}")
+    return None
+
+def update_breeder(api_url: str, api_token: Optional[str], document_id: str, breeder_data: Dict[str, Any]) -> bool:
+    """Update breeder attributes via GraphQL."""
+    url = f"{api_url}"
+    headers = {
+        'Content-Type': 'application/json',
+    }
+    if api_token:
+        headers['Authorization'] = f'Bearer {api_token}'
+
+    mutation = """
+    mutation UpdateBreeder($documentId: ID!, $data: HzdPluginBreederInput!) {
+        updateHzdPluginBreeder(documentId: $documentId, data: $data) {
+            documentId
+        }
+    }
+    """
+
+    variables = {
+        'documentId': document_id,
+        'data': breeder_data
+    }
+
+    try:
+        response = requests.post(
+            url,
+            json={'query': mutation, 'variables': variables},
+            headers=headers,
+            timeout=30
+        )
+        if response.status_code == 200:
+            result = response.json()
+            if 'errors' in result:
+                error_msg = '; '.join([err.get('message', str(err)) for err in result['errors']])
+                print(f"✗ Failed to update breeder {document_id}: {error_msg}")
+                return False
+            return True
+    except Exception as e:
+        print(f"✗ Error updating breeder {document_id}: {e}")
+    return False
+
 def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str, Any],
                   dry_run: bool = False) -> bool:
     """Import a single member by searching, registering if needed, and then updating."""
     username = member_data.get('username')
     if not username:
-        cId = member_data["cId"]
-        username = f"user-{cId}"
+        cId = member_data.get("cId")
+        if cId:
+             username = f"user-{cId}"
+        else:
+             print("Skipping member without username or cId")
+             return False
 
     email = member_data.get('email')
     if not email:
         email = f"{username}@hovawarte.com"
 
+    # Separate breeder data from member data
+    kennel_name = member_data.pop('kennelName', None)
+    is_breeder = member_data.get('cFlagBreeder', False)
+    
     # 1. Search for existing user
     existing_document_id = None
+    existing_breeder_id = None
+    c_id = member_data.get('cId')
+
     if not dry_run:
-        existing_document_id = find_existing_user(api_url, api_token, username)
+        # First try finding by cId
+        if c_id:
+            existing_document_id = find_existing_user_by_cid(api_url, api_token, c_id)
+
+        # Fallback to username
+        if not existing_document_id:
+            existing_document_id = find_existing_user(api_url, api_token, username)
+        
+        # Fallback to email
         if not existing_document_id:
             h = find_existing_user_by_email(api_url, api_token, email)
             if h:
-                email = f"{username}@hovawarte.com"
+                # If found by email, we might want to update the username to match what we expect?
+                # For now, just use the found user.
+                existing_document_id = h
+                # email = f"{username}@hovawarte.com" # This logic was a bit weird in original, keeping it simple.
+        
+        if c_id and is_breeder:
+            existing_breeder_id = find_existing_breeder_by_cid(api_url, api_token, c_id)
 
     if dry_run:
         if existing_document_id:
             print(f"[DRY RUN] Found existing user: {username} ({existing_document_id}) - Would update")
         else:
             print(f"[DRY RUN] User not found: {username} - Would register and update")
+        
+        if is_breeder:
+             if existing_breeder_id:
+                 print(f"[DRY RUN] Found existing breeder for cId {c_id} - Would update with kennel: {kennel_name}")
+             else:
+                 print(f"[DRY RUN] Breeder not found for cId {c_id} - Would create with kennel: {kennel_name}")
         return True
 
     # 2. Register if not exists
@@ -449,6 +651,28 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
     if document_id:
         if update_user_admin(api_url, api_token, document_id, member_data):
             print(f"✓ Updated user: {username} (ID: {document_id})")
+            
+            # 4. Handle Breeder Logic
+            if is_breeder and c_id:
+                breeder_data = {
+                    'cId': c_id,
+                    'IsActive': True,
+                    'member': document_id, # Link to the member
+                }
+                if kennel_name:
+                    breeder_data['kennelName'] = kennel_name
+
+                if existing_breeder_id:
+                    if update_breeder(api_url, api_token, existing_breeder_id, breeder_data):
+                        print(f"✓ Updated breeder for user {username}")
+                    else:
+                        print(f"✗ Failed to update breeder for user {username}")
+                else:
+                    if create_breeder(api_url, api_token, breeder_data):
+                        print(f"✓ Created new breeder for user {username}")
+                    else:
+                        print(f"✗ Failed to create breeder for user {username}")
+
             return True
         else:
             print(f"✗ Failed to update user: {username}")

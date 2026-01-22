@@ -10,7 +10,6 @@ import { useDogs, type ColorFilter, type PageSize, type SexFilter, type Distance
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
 import { theme } from '@/themes'
 
-type ExaminationFilter = 'HD' | 'HeartCheck' | 'Genprofil' | 'EyesCheck' | 'ColorCheck'
 import { DogCard } from './dog-card'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { DogDetailModal } from './dog-detail-modal'

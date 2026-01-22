@@ -223,7 +223,7 @@ def map_csv_to_member(row: Dict[str, str]) -> Dict[str, Any]:
         member_data['cancellationOn'] = cancellation_on
 
     print(member_data)
-    
+
     return member_data
 
 def find_existing_user(api_url: str, api_token: Optional[str], c_id: int) -> Optional[int]:

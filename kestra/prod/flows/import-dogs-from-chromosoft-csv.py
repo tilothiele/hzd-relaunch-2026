@@ -476,8 +476,7 @@ def ensure_breeder_exists(client: GraphQLClient, breeder_c_id: Optional[int], ke
 
 	# Erstelle neuen Breeder
 	breeder_payload: dict[str, Any] = {
-		'cId': breeder_c_id,
-		'IsActive': True,
+		'cId': breeder_c_id
 	}
 	if user_id:
 		breeder_payload['member'] = user_id
