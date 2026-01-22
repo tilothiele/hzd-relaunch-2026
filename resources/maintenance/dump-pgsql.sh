@@ -1,8 +1,8 @@
 #!/bin/bash
-#
-#
 
-. .env
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+
+. $SCRIPT_DIR/.env
 
 TARGET_DIR="/local-backups/hzd-backend-prod"
 echo "dump postgresql database"
