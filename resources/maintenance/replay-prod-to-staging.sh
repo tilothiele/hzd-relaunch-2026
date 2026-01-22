@@ -9,15 +9,9 @@ set -euo pipefail
 CONTAINERS=("hzd-frontend-prod" "hzd-backend-prod" "hzd-backend-staging" "hzd-backend-staging")
 
 # PostgreSQL
-PG_HOST="nogkocck8kgw0wkooww0s4ss"
-PG_PORT="5432"
-PG_USER="postgres"
-PG_PASSWORD="6h7ZMTrQDqQzrKu2GfjQwvTPS1l9JzL5lPXUJy9COhiFBSJ6Kr93MK8CQBC7RHwF"
-PG_PROD_DB="hzd_website_prod"
-PG_STAGE_DB="hzd_website_test"
-PG_STAGE_USER="hzd_website_test"
-DUMP_FILE="prod_dump.sql"
-PG_NETWORK="coolify"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+
+. $SCRIPT_DIR/.env
 
 # Volumes/Verzeichnisse
 VOL_NAME_PA1="iws80ks8w8g8ckogs84gggsw-hzd-strapi-prod"
