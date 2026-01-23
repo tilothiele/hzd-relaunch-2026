@@ -24,6 +24,8 @@ def run(playwright: Playwright) -> None:
     browser = playwright.chromium.launch(headless=True)
     context = browser.new_context(ignore_https_errors=True)
     page = context.new_page()
+    page.set_default_timeout(100000)
+    page.set_default_navigation_timeout(100000)
     page.goto("https://hzd.chromosoft.de/login")
     page.locator("input[name=\"username\"]").click()
     page.locator("input[name=\"username\"]").fill(username)
