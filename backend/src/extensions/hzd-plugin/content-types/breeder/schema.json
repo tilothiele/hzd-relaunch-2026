@@ -22,6 +22,10 @@
     "breedingLicenseSince": {
       "type": "date"
     },
+    "Disable": {
+      "type": "boolean",
+      "default": false
+    },
     "IsActive": {
       "type": "boolean"
     },

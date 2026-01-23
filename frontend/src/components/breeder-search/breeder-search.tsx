@@ -48,6 +48,7 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 		try {
 			const filterConditions: Array<Record<string, unknown>> = [
 				{ IsActive: { eq: true } },
+				{ Disabled: { ne: true } },
 			]
 
 			if (nameFilter.trim()) {

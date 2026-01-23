@@ -1364,6 +1364,7 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    Disable: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     GeoLocation: Schema.Attribute.Component<'breeding.geo-location', false>;
     InternalNotes: Schema.Attribute.Text;
     IsActive: Schema.Attribute.Boolean;

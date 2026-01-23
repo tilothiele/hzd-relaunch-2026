@@ -407,6 +407,7 @@ export interface Breeder {
 		countryCode?: string | null
 	} | null
 	IsActive?: boolean | null
+	Disabled?: boolean | null
 	BreedersIntroduction?: string | null
 	WebsiteUrl?: string | null
 	WebsiteUrlDraft?: string | null
