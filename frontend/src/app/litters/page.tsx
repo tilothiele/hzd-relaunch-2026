@@ -2,12 +2,10 @@
 
 import { useMemo, type CSSProperties } from 'react'
 import { useGlobalLayout } from '@/hooks/use-global-layout'
-import { Header } from '@/components/header/header'
-import { Footer } from '@/components/footer/footer'
-import { CookieBanner } from '@/components/cookie-banner/cookie-banner'
 import { LitterSearch } from '@/components/litter-search/litter-search'
 import { useTheme } from '@/hooks/use-theme'
 import { useAuth } from '@/hooks/use-auth'
+import { MainPageStructure } from '../main-page-structure'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,20 +26,6 @@ function LittersPageSkeleton() {
 export default function LittersPage() {
 	const { globalLayout, isLoading, error, baseUrl } = useGlobalLayout()
 	const { theme } = useTheme()
-	const {
-		isAuthenticated,
-		user,
-		authError,
-		isAuthenticating,
-		handleLogin,
-		handleLogout,
-	} = useAuth(baseUrl || '')
-
-	const themeStyles = useMemo(() => ({
-		'--theme-text-color': theme.textColor,
-		'--theme-heading-color': theme.headerBackground,
-		color: theme.textColor,
-	}) as CSSProperties, [theme])
 
 	if (isLoading || !globalLayout) {
 		return <LittersPageSkeleton />
@@ -64,31 +48,17 @@ export default function LittersPage() {
 	}
 
 	return (
-		<div style={themeStyles}>
-			<Header
-				globalLayout={globalLayout}
+		<MainPageStructure
+			homepage={globalLayout}
+			strapiBaseUrl={baseUrl}
+			theme={theme}
+			pageTitle='Welpen finden'
+		>
+			<LitterSearch
 				strapiBaseUrl={baseUrl}
-				theme={theme}
-				isAuthenticated={isAuthenticated}
-				user={user}
-				onLogin={handleLogin}
-				onLogout={handleLogout}
-				isAuthenticating={isAuthenticating}
-				error={authError}
+				hzdSetting={globalLayout.HzdSetting}
 			/>
-			<main>
-				<LitterSearch
-					strapiBaseUrl={baseUrl}
-					hzdSetting={globalLayout.HzdSetting}
-				/>
-			</main>
-			<Footer
-				globalLayout={globalLayout}
-				strapiBaseUrl={baseUrl}
-				theme={theme}
-			/>
-			<CookieBanner />
-		</div>
+		</MainPageStructure>
 	)
 }
 

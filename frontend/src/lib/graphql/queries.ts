@@ -831,6 +831,10 @@ export const SEARCH_BREEDERS = `
 					address2
 					zip
 					countryCode
+					geoLocation {
+						lat
+						lng
+					}
 				}
 				WebsiteUrl
 				avatar {

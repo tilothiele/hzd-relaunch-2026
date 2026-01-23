@@ -25,19 +25,7 @@ const GERMANY_BOUNDS = {
 
 import { calculateAge, formatDate } from '@/lib/date-utils'
 
-/**
- * Berechnet die Entfernung zwischen zwei Koordinaten in Kilometern (Haversine-Formel)
- */
-function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
-	const R = 6371 // Erdradius in Kilometern
-	const dLat = (lat2 - lat1) * Math.PI / 180
-	const dLng = (lng2 - lng1) * Math.PI / 180
-	const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-		Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-		Math.sin(dLng / 2) * Math.sin(dLng / 2)
-	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-	return R * c
-}
+import { calculateDistance } from '@/lib/geo-utils'
 
 function getColorLabel(color: string | null | undefined): string {
 	switch (color) {
@@ -215,6 +203,40 @@ export function DogSearch({ strapiBaseUrl, sexFilter, hzdSetting }: DogSearchPro
 
 				{/* Karte */}
 				<HzdMap isVisible={showMap} items={mapItems} userLocation={zipLocation} />
+
+				{showMap && (
+					<Box sx={{ mb: 4, display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 2 }}>
+						<MeinePlz
+							initialZip={zipCode}
+							onZipChange={setZipCode}
+							onLocationChange={setZipLocation}
+						/>
+						<FormControl fullWidth size='small' disabled={!isLocationAvailable}>
+							<InputLabel>Maximale Entfernung</InputLabel>
+							<Select
+								value={maxDistance === '' ? '' : String(maxDistance)}
+								label='Maximale Entfernung'
+								onChange={(e) => {
+									const value = e.target.value
+									if (value === '') {
+										setMaxDistance('')
+									} else {
+										const numValue = Number(value)
+										if (!isNaN(numValue) && (numValue === 50 || numValue === 100 || numValue === 300 || numValue === 800)) {
+											setMaxDistance(numValue as DistanceFilter)
+										}
+									}
+								}}
+							>
+								<MenuItem value=''>-</MenuItem>
+								<MenuItem value='50'>50 km</MenuItem>
+								<MenuItem value='100'>100 km</MenuItem>
+								<MenuItem value='300'>300 km</MenuItem>
+								<MenuItem value='800'>800 km</MenuItem>
+							</Select>
+						</FormControl>
+					</Box>
+				)}
 				<Box className='rounded-lg bg-white p-4 shadow-md'>
 					{/* Erste Zeile: Name, Farbe, Chipnummer */}
 					<Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: 3 }}>
@@ -261,38 +283,7 @@ export function DogSearch({ strapiBaseUrl, sexFilter, hzdSetting }: DogSearchPro
 						/>
 					</Box>
 
-					{/* PLZ und Maximale Entfernung */}
-					<Box sx={{ mt: 2, display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' }, gap: 2 }}>
-						<MeinePlz
-							initialZip={zipCode}
-							onZipChange={setZipCode}
-							onLocationChange={setZipLocation}
-						/>
-						<FormControl fullWidth size='small' disabled={!isLocationAvailable}>
-							<InputLabel>Maximale Entfernung</InputLabel>
-							<Select
-								value={maxDistance === '' ? '' : String(maxDistance)}
-								label='Maximale Entfernung'
-								onChange={(e) => {
-									const value = e.target.value
-									if (value === '') {
-										setMaxDistance('')
-									} else {
-										const numValue = Number(value)
-										if (!isNaN(numValue) && (numValue === 50 || numValue === 100 || numValue === 300 || numValue === 800)) {
-											setMaxDistance(numValue as DistanceFilter)
-										}
-									}
-								}}
-							>
-								<MenuItem value=''>-</MenuItem>
-								<MenuItem value='50'>50 km</MenuItem>
-								<MenuItem value='100'>100 km</MenuItem>
-								<MenuItem value='300'>300 km</MenuItem>
-								<MenuItem value='800'>800 km</MenuItem>
-							</Select>
-						</FormControl>
-					</Box>
+
 
 					<Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
 						<Button

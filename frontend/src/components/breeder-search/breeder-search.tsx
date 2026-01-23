@@ -1,7 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
-import { Box, Pagination, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel } from '@mui/material'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Box, Pagination, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, FormControlLabel } from '@mui/material'
 import GridViewIcon from '@mui/icons-material/GridView'
 import TableRowsIcon from '@mui/icons-material/TableRows'
 import { fetchGraphQL } from '@/lib/graphql-client'
@@ -10,7 +10,10 @@ import type { Breeder, BreederSearchResult } from '@/types'
 import { BreederCard } from './breeder-card'
 import { BreederDetailsModal } from './breeder-details-modal'
 import { BreederSearchForm } from './breeder-search-form'
+import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { theme } from '@/themes'
+import { MeinePlz } from '@/components/hzd-map/meine-plz'
+import { calculateDistance } from '@/lib/geo-utils'
 
 interface BreederSearchProps {
 	strapiBaseUrl?: string | null
@@ -32,10 +35,15 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 	const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
 	const [selectedBreeder, setSelectedBreeder] = useState<Breeder | null>(null)
 	const [isModalOpen, setIsModalOpen] = useState(false)
+	const [showMap, setShowMap] = useState(false)
+	const [zipCode, setZipCode] = useState('')
+	const [zipLocation, setZipLocation] = useState<{ lat: number; lng: number } | null>(null)
 
 	// Sort state
 	const [sortField, setSortField] = useState<SortField>('kennelName')
 	const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
+
+	const userLocation = zipLocation || null
 
 	const searchBreeders = useCallback(async () => {
 		if (!strapiBaseUrl) {
@@ -58,7 +66,13 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 
 			if (nameFilter.trim()) {
 				filterConditions.push({
-					kennelName: { containsi: nameFilter.trim() },
+					or: [
+						{ kennelName: { containsi: nameFilter.trim() } },
+						{ member: { lastName: { containsi: nameFilter.trim() } } },
+						{ member: { firstName: { containsi: nameFilter.trim() } } },
+						{ member: { DisplayName: { containsi: nameFilter.trim() } } },
+						{ member: { username: { containsi: nameFilter.trim() } } },
+					],
 				})
 			}
 
@@ -145,12 +159,65 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 		}
 	}, [sortField])
 
+	// Konvertiere Züchter in MapItems
+	const mapItems = useMemo<MapItem[]>(() => {
+		return breeders
+			.filter(breeder => breeder.member?.geoLocation?.lat && breeder.member?.geoLocation?.lng)
+			.map(breeder => ({
+				id: breeder.documentId,
+				position: [breeder.member!.geoLocation!.lat, breeder.member!.geoLocation!.lng],
+				title: breeder.kennelName || 'Unbekannt',
+				popupContent: (
+					<div>
+						<strong>{breeder.kennelName}</strong>
+						{breeder.member?.firstName && breeder.member?.lastName && (
+							<div>{breeder.member.firstName} {breeder.member.lastName}</div>
+						)}
+					</div>
+				),
+			}))
+	}, [breeders])
+
 	const totalPages = pageCount
 	const currentPage = page
 
 	return (
 		<div className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em' }}>
 			<div className='w-full max-w-6xl'>
+				{/* Karten-Toggle */}
+				<Box className='mb-4 rounded-lg bg-white p-4 shadow-md'>
+					<FormControlLabel
+						control={
+							<Switch
+								checked={showMap}
+								onChange={(e) => setShowMap(e.target.checked)}
+								sx={{
+									'& .MuiSwitch-switchBase.Mui-checked': {
+										color: theme.submitButtonColor,
+									},
+									'& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+										backgroundColor: theme.submitButtonColor,
+									},
+								}}
+							/>
+						}
+						label='Karte anzeigen'
+					/>
+				</Box>
+
+				{/* Karte */}
+				<HzdMap isVisible={showMap} items={mapItems} userLocation={zipLocation} height={500} />
+
+				{showMap && (
+					<Box className='mb-4 w-full md:w-64'>
+						<MeinePlz
+							initialZip={zipCode}
+							onZipChange={setZipCode}
+							onLocationChange={setZipLocation}
+						/>
+					</Box>
+				)}
+
 				<BreederSearchForm
 					nameFilter={nameFilter}
 					onNameFilterChange={setNameFilter}
@@ -254,6 +321,7 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 										breeder={breeder}
 										strapiBaseUrl={strapiBaseUrl}
 										onClick={() => handleBreederClick(breeder)}
+										userLocation={userLocation}
 									/>
 								))}
 							</div>
@@ -316,11 +384,23 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 													E-Mail
 												</TableSortLabel>
 											</TableCell>
+											<TableCell sx={{ fontWeight: 'bold' }}>
+												Entfernung
+											</TableCell>
 										</TableRow>
 									</TableHead>
 									<TableBody>
 										{breeders.map((breeder) => {
 											const memberName = ((breeder.member?.firstName || '') + ' ' + (breeder.member?.lastName || '')).trim()
+											let distance: number | null = null
+											if (userLocation && breeder.member?.geoLocation && typeof breeder.member.geoLocation.lat === 'number' && typeof breeder.member.geoLocation.lng === 'number') {
+												distance = calculateDistance(
+													userLocation.lat,
+													userLocation.lng,
+													breeder.member.geoLocation.lat,
+													breeder.member.geoLocation.lng
+												)
+											}
 
 											return (
 												<TableRow
@@ -335,6 +415,7 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 													<TableCell>{breeder.member?.city || '-'}</TableCell>
 													<TableCell>{breeder.member?.phone || '-'}</TableCell>
 													<TableCell>{breeder.member?.email || '-'}</TableCell>
+													<TableCell>{distance !== null ? `~${Math.round(distance)} km` : '-'}</TableCell>
 												</TableRow>
 											)
 										})}

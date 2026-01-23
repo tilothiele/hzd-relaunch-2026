@@ -223,10 +223,6 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 		<>
 			<div className='container mx-auto px-4 py-8'>
 				<Box className='mb-8 rounded-lg bg-white p-6 shadow-md'>
-					<h2 className='mb-6 text-2xl font-bold text-gray-900'>
-						Würfe suchen
-					</h2>
-
 					<Box className='mb-6 rounded border border-gray-100 bg-gray-50/50 p-2'>
 						<FormControlLabel
 							control={
@@ -250,14 +246,17 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 					{showMap && (
 						<Box sx={{ mb: 4 }}>
 							<HzdMap isVisible={showMap} items={mapItems} userLocation={userLocation} height="400px" />
+							<Box sx={{ mt: 2, width: { xs: '100%', md: '300px' } }}>
+								<MeinePlz
+									onLocationChange={setUserLocation}
+									fullWidth={true}
+								/>
+							</Box>
 						</Box>
 					)}
 
 					<Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(4, 1fr)' }, gap: 2 }}>
-						<MeinePlz
-							onLocationChange={setUserLocation}
-							fullWidth={true}
-						/>
+
 						<TextField
 							label='Züchter'
 							value={breederFilter}

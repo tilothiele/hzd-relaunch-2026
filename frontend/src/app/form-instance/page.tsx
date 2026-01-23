@@ -2,9 +2,6 @@
 
 import { useMemo, type CSSProperties } from 'react'
 import { useGlobalLayout } from '@/hooks/use-global-layout'
-import { Header } from '@/components/header/header'
-import { Footer } from '@/components/footer/footer'
-import { CookieBanner } from '@/components/cookie-banner/cookie-banner'
 import { useTheme } from '@/hooks/use-theme'
 import { useAuth } from '@/hooks/use-auth'
 import { FormsInstanceSearch } from '@/components/form-instance-search/form-instance-search'

@@ -26,7 +26,7 @@ export function BreederSearchForm({
 			</Typography>
 			<Box sx={{ display: 'grid', gap: 2 }}>
 				<TextField
-					label='Zwingername'
+					label='Zwinger- oder Züchtername'
 					value={nameFilter}
 					onChange={(e) => onNameFilterChange(e.target.value)}
 					onKeyDown={(e) => {
@@ -34,7 +34,7 @@ export function BreederSearchForm({
 							onSearch()
 						}
 					}}
-					placeholder='Zwingername'
+					placeholder='Zwinger- oder Züchtername'
 					fullWidth
 					size='small'
 				/>

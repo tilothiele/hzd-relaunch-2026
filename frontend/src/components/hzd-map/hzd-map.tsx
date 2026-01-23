@@ -243,7 +243,7 @@ export function HzdMap({ isVisible, items, userLocation, height = '400px' }: Hzd
     return (
         <div
             className='relative mb-6 w-full overflow-hidden rounded-lg border border-gray-200 shadow-md'
-            style={{ height: mapHeight }}
+            style={{ height: mapHeight, zIndex: 0 }}
         >
             <MapContainer
                 center={userPosition || GERMANY_CENTER}

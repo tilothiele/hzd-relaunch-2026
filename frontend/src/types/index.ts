@@ -405,6 +405,7 @@ export interface Breeder {
 		address2?: string | null
 		zip?: string | null
 		countryCode?: string | null
+		geoLocation?: GeoLocation | null
 	} | null
 	IsActive?: boolean | null
 	Disable?: boolean | null

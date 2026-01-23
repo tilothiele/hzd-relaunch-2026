@@ -4,10 +4,14 @@ import Image from 'next/image'
 import type { Breeder } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 
+import { calculateDistance } from '@/lib/geo-utils'
+
 interface BreederCardProps {
 	breeder: Breeder
 	strapiBaseUrl?: string | null
 	onClick?: () => void
+	userLocation?: { lat: number; lng: number } | null
+	maxDistance?: number | string
 }
 
 function formatDate(dateString: string | null | undefined): string {
@@ -35,9 +39,19 @@ function getRegionLabel(region: string | null | undefined): string {
 	return region
 }
 
-export function BreederCard({ breeder, strapiBaseUrl, onClick }: BreederCardProps) {
+export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, maxDistance }: BreederCardProps) {
 	const kennelName = breeder.kennelName ?? 'Kein Zwingername bekannt'
 	const member = breeder.member
+
+	let distance: number | null = null
+	if (userLocation && member?.geoLocation && typeof member.geoLocation.lat === 'number' && typeof member.geoLocation.lng === 'number') {
+		distance = calculateDistance(
+			userLocation.lat,
+			userLocation.lng,
+			member.geoLocation.lat,
+			member.geoLocation.lng
+		)
+	}
 
 	return (
 		<div
@@ -57,9 +71,16 @@ export function BreederCard({ breeder, strapiBaseUrl, onClick }: BreederCardProp
 			</div>
 
 			<div className='flex flex-1 flex-col p-4'>
-				<h3 className='mb-3 text-lg font-semibold text-gray-900'>
-					{kennelName}
-				</h3>
+				<div className='mb-3 flex justify-between items-start'>
+					<h3 className='text-lg font-semibold text-gray-900'>
+						{kennelName}
+					</h3>
+					{distance !== null && (
+						<span className='rounded bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700'>
+							~{Math.round(distance)} km
+						</span>
+					)}
+				</div>
 				<div className='space-y-2 text-sm text-gray-600'>
 					{breeder.breedingLicenseSince ? (
 						<p>
