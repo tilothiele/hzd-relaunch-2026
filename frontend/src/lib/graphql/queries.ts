@@ -785,6 +785,13 @@ export const SEARCH_DOGS = `
 					documentId
 					firstName
 					lastName
+					address1
+					address2
+					zip
+					city
+					countryCode
+					phone
+					email
 				}
 				cFertile
 				Location {

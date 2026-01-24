@@ -370,6 +370,13 @@ export interface Dog {
 		documentId: string
 		firstName?: string | null
 		lastName?: string | null
+		address1?: string | null
+		address2?: string | null
+		zip?: string | null
+		city?: string | null
+		countryCode?: string | null
+		phone?: string | null
+		email?: string | null
 	} | null
 	Location?: GeoLocation | null
 	cFertile?: boolean | null

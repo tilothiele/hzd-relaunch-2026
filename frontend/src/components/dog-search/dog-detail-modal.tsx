@@ -7,6 +7,7 @@ import type { Dog, HzdSetting } from '@/types'
 import { theme } from '@/themes'
 import { DogDataTab } from './dog-detail-modal/dog-data-tab'
 import { DogPedigreeTab } from './dog-detail-modal/dog-pedigree-tab'
+import { DogOwnerTab } from './dog-detail-modal/dog-owner-tab'
 import { DogPersonalWordsTab } from './dog-detail-modal/dog-personal-words-tab'
 import { DogImagesTab } from './dog-detail-modal/dog-images-tab'
 import { DogPerformanceTab } from './dog-detail-modal/dog-performance-tab'
@@ -20,7 +21,7 @@ interface DogDetailModalProps {
 	hzdSetting?: HzdSetting | null
 }
 
-type TabId = 0 | 1 | 2 | 3 | 4 | 5
+type TabId = 0 | 1 | 2 | 3 | 4 | 5 | 6
 
 export function DogDetailModal({
 	dog,
@@ -130,6 +131,7 @@ export function DogDetailModal({
 						>
 							<Tab label='Daten' />
 							<Tab label='Pedigree' />
+							<Tab label='Besitzer' />
 							<Tab label='Persönliche Worte' />
 							<Tab label='Bilder' />
 							<Tab label='Leistungen' />
@@ -138,7 +140,7 @@ export function DogDetailModal({
 					</Box>
 
 					{/* Tab Panels */}
-					<Box sx={{ mt: 3, minHeight: '400px', height: activeTab === 5 ? '500px' : 'auto' }}>
+					<Box sx={{ mt: 3, minHeight: '400px', height: activeTab === 6 ? '500px' : 'auto' }}>
 						{activeTab === 0 && (
 							<DogDataTab dog={dog} strapiBaseUrl={strapiBaseUrl} hzdSetting={hzdSetting} />
 						)}
@@ -148,18 +150,22 @@ export function DogDetailModal({
 						)}
 
 						{activeTab === 2 && (
-							<DogPersonalWordsTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
+							<DogOwnerTab dog={dog} />
 						)}
 
 						{activeTab === 3 && (
-							<DogImagesTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
+							<DogPersonalWordsTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
 						)}
 
 						{activeTab === 4 && (
-							<DogPerformanceTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
+							<DogImagesTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
 						)}
 
 						{activeTab === 5 && (
+							<DogPerformanceTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
+						)}
+
+						{activeTab === 6 && (
 							<DogChatTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
 						)}
 					</Box>
