@@ -85,6 +85,9 @@ export function useDogs(options: UseDogsOptions = {}) {
 					or: [
 						{ givenName: { containsi: nameFilter.trim() } },
 						{ fullKennelName: { containsi: nameFilter.trim() } },
+						{ owner: { firstName: { containsi: nameFilter.trim() } } },
+						{ owner: { lastName: { containsi: nameFilter.trim() } } },
+						{ owner: { city: { containsi: nameFilter.trim() } } },
 					],
 				})
 			}
