@@ -409,7 +409,8 @@ def read_chromosoft_csv(file_path: Path) -> list[ChromosoftDogRecord]:
 
 def build_graphql_payload(
 	record: ChromosoftDogRecord,
-	breeder_id: Optional[str] = None
+	breeder_id: Optional[str] = None,
+	owner_id: Optional[str] = None
 ) -> dict[str, Any]:
 	payload: dict[str, Any] = {}
 
@@ -437,6 +438,10 @@ def build_graphql_payload(
 	# Breeder-Verknüpfung über breeder: ID (Relation zu HzdPluginBreeder)
 	if breeder_id:
 		assign('breeder', breeder_id)
+
+	# Owner-Verknüpfung über owner: ID (Relation zu UsersPermissionsUser)
+	if owner_id:
+		assign('owner', owner_id)
 
 	# Studbook Number
 	assign('cStudBookNumber', record.studbook_number)
@@ -568,6 +573,7 @@ def import_records(
 			breeder_status = None
 
 			# Prüfe Owner-Verknüpfung
+			owner_user_id = None
 			if record.owner_id:
 				owner_user_id = client.find_user_by_cid(record.owner_id)
 				if owner_user_id:
@@ -596,7 +602,8 @@ def import_records(
 			breeder_id = breeder_map.get(record.breeder_id) if record.breeder_id else None
 			payload = build_graphql_payload(
 				record,
-				breeder_id=breeder_id
+				breeder_id=breeder_id,
+				owner_id=owner_user_id
 			)
 
 			existing_id = client.find_by_cid(record.c_id)
