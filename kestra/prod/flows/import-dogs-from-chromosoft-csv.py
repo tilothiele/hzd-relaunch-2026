@@ -132,6 +132,8 @@ class ChromosoftDogRecord:
 	studbook_number: str
 	sire_studbook_number: str
 	dam_studbook_number: str
+	sire_full_name: str
+	dam_full_name: str
 
 
 class GraphQLClient:
@@ -392,6 +394,8 @@ def row_to_record(row: dict[str, str]) -> ChromosoftDogRecord:
 		studbook_number=row.get('studbook number', '').strip(),
 		sire_studbook_number=row.get('studbook number (sire)', '').strip(),
 		dam_studbook_number=row.get('studbook number (dam)', '').strip(),
+		sire_full_name=row.get('fullname (sire)', '').strip(),
+		dam_full_name=row.get('fullname (dam)', '').strip(),
 	)
 
 
@@ -410,7 +414,9 @@ def read_chromosoft_csv(file_path: Path) -> list[ChromosoftDogRecord]:
 def build_graphql_payload(
 	record: ChromosoftDogRecord,
 	breeder_id: Optional[str] = None,
-	owner_id: Optional[str] = None
+	owner_id: Optional[str] = None,
+	father_id: Optional[str] = None,
+	mother_id: Optional[str] = None
 ) -> dict[str, Any]:
 	payload: dict[str, Any] = {}
 
@@ -442,6 +448,12 @@ def build_graphql_payload(
 	# Owner-Verknüpfung über owner: ID (Relation zu UsersPermissionsUser)
 	if owner_id:
 		assign('owner', owner_id)
+
+	# Eltern-Verknüpfung
+	if father_id:
+		assign('father', father_id)
+	if mother_id:
+		assign('mother', mother_id)
 
 	# Studbook Number
 	assign('cStudBookNumber', record.studbook_number)
@@ -562,6 +574,12 @@ def import_records(
 				print(f'Fehler beim Erstellen von Breeder cId={breeder_c_id}: {exc}', file=sys.stderr)
 			breeder_map[breeder_c_id] = None
 
+	# Map aufbauen: Full Name -> Record
+	record_by_name: dict[str, ChromosoftDogRecord] = {}
+	for record in records:
+		if record.full_name:
+			record_by_name[record.full_name] = record
+
 	for idx, record in enumerate(records):
 		try:
 			# Kleine Pause zwischen Anfragen, um den Server nicht zu überlasten
@@ -593,8 +611,24 @@ def import_records(
 			else:
 				breeder_status = "nicht vorhanden"
 
+			# Eltern ermitteln
+			father_id = None
+			mother_id = None
+			
+			if record.sire_full_name:
+				sire_record = record_by_name.get(record.sire_full_name)
+				if sire_record:
+					# Ermittle ID über API
+					father_id = client.find_by_cid(sire_record.c_id)
+			
+			if record.dam_full_name:
+				dam_record = record_by_name.get(record.dam_full_name)
+				if dam_record:
+					# Ermittle ID über API
+					mother_id = client.find_by_cid(dam_record.c_id)
+
 			# Logmeldung pro Hund
-			print(f"Hund cId={record.c_id} ({record.given_name}): Owner={owner_status}, Breeder={breeder_status}")
+			print(f"Hund cId={record.c_id} ({record.given_name}): Owner={owner_status}, Breeder={breeder_status}, Father={'gefunden' if father_id else 'fehlt'}, Mother={'gefunden' if mother_id else 'fehlt'}")
 
 			# Erstelle Payload
 			# Die Verknüpfung Dog -> Owner erfolgt über cOwnerId (gemappt auf user.cId)
@@ -603,7 +637,9 @@ def import_records(
 			payload = build_graphql_payload(
 				record,
 				breeder_id=breeder_id,
-				owner_id=owner_user_id
+				owner_id=owner_user_id,
+				father_id=father_id,
+				mother_id=mother_id
 			)
 
 			existing_id = client.find_by_cid(record.c_id)

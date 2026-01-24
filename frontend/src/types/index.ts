@@ -356,16 +356,8 @@ export interface Dog {
 	dateOfBirth?: string | null
 	dateOfDeath?: string | null
 	microchipNo?: string | null
-	father?: {
-		documentId: string
-		fullKennelName?: string | null
-		givenName?: string | null
-	} | null
-	mother?: {
-		documentId: string
-		fullKennelName?: string | null
-		givenName?: string | null
-	} | null
+	father?: Dog | null
+	mother?: Dog | null
 	owner?: {
 		documentId: string
 		firstName?: string | null

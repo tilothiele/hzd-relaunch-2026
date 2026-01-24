@@ -775,11 +775,155 @@ export const SEARCH_DOGS = `
 					documentId
 					fullKennelName
 					givenName
+					dateOfBirth
+					dateOfDeath
+					owner {
+						firstName
+						lastName
+					}
+					father {
+						documentId
+						fullKennelName
+						givenName
+						dateOfBirth
+						dateOfDeath
+						owner {
+							firstName
+							lastName
+						}
+						father {
+							documentId
+							fullKennelName
+							givenName
+							dateOfBirth
+							dateOfDeath
+							owner {
+								firstName
+								lastName
+							}
+						}
+						mother {
+							documentId
+							fullKennelName
+							givenName
+							dateOfBirth
+							dateOfDeath
+							owner {
+								firstName
+								lastName
+							}
+						}
+					}
+					mother {
+						documentId
+						fullKennelName
+						givenName
+						dateOfBirth
+						dateOfDeath
+						owner {
+							firstName
+							lastName
+						}
+						father {
+							documentId
+							fullKennelName
+							givenName
+							dateOfBirth
+							dateOfDeath
+							owner {
+								firstName
+								lastName
+							}
+						}
+						mother {
+							documentId
+							fullKennelName
+							givenName
+							dateOfBirth
+							dateOfDeath
+							owner {
+								firstName
+								lastName
+							}
+						}
+					}
 				}
 				mother {
 					documentId
 					fullKennelName
 					givenName
+					dateOfBirth
+					dateOfDeath
+					owner {
+						firstName
+						lastName
+					}
+					father {
+						documentId
+						fullKennelName
+						givenName
+						dateOfBirth
+						dateOfDeath
+						owner {
+							firstName
+							lastName
+						}
+						father {
+							documentId
+							fullKennelName
+							givenName
+							dateOfBirth
+							dateOfDeath
+							owner {
+								firstName
+								lastName
+							}
+						}
+						mother {
+							documentId
+							fullKennelName
+							givenName
+							dateOfBirth
+							dateOfDeath
+							owner {
+								firstName
+								lastName
+							}
+						}
+					}
+					mother {
+						documentId
+						fullKennelName
+						givenName
+						dateOfBirth
+						dateOfDeath
+						owner {
+							firstName
+							lastName
+						}
+						father {
+							documentId
+							fullKennelName
+							givenName
+							dateOfBirth
+							dateOfDeath
+							owner {
+								firstName
+								lastName
+							}
+						}
+						mother {
+							documentId
+							fullKennelName
+							givenName
+							dateOfBirth
+							dateOfDeath
+							owner {
+								firstName
+								lastName
+							}
+						}
+					}
 				}
 				owner {
 					documentId
