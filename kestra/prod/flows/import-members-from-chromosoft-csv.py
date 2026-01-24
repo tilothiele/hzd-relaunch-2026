@@ -598,7 +598,7 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
     # Separate breeder data from member data
     kennel_name = member_data.pop('kennelName', None)
     is_breeder = member_data.get('cFlagBreeder', False)
-    
+
     is_active_breeder = member_data.get('IsActiveBreeder', False)
     member_data.pop('IsActiveBreeder', None)
 

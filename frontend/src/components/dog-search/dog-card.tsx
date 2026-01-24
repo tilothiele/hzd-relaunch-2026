@@ -73,13 +73,13 @@ function getGivenNameIcon(sex: string | null | undefined): string {
 function getDefaultImageForColor(color: string | null | undefined): string {
 	switch (color) {
 		case 'S':
-			return '/static-images/hovis/hovi-schwarz.png'
+			return '/static-images/hovis/hovi-schwarz.jpg'
 		case 'SM':
-			return '/static-images/hovis/hovi-schwarzmarken.png'
+			return '/static-images/hovis/hovi-schwarzmarken.jpg'
 		case 'B':
-			return '/static-images/hovis/hovi-blond.png'
+			return '/static-images/hovis/hovi-blond.jpg'
 		default:
-			return '/static-images/hovis/hovi-schwarz.png'
+			return '/static-images/hovis/hovi-schwarz.jpg'
 	}
 }
 
