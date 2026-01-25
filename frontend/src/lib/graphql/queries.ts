@@ -771,6 +771,11 @@ export const SEARCH_DOGS = `
 				dateOfBirth
 				dateOfDeath
 				microchipNo
+				owner {
+					documentId
+					firstName
+					lastName
+				}
 				withersHeight
 				Exhibitions
 				BreedSurvey

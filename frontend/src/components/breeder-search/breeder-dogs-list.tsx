@@ -3,7 +3,7 @@
 import { DogCard } from '@/components/dog-search/dog-card'
 import { useDogs } from '@/hooks/use-dogs'
 import { Box, CircularProgress, Pagination, Typography } from '@mui/material'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 interface BreederDogsListProps {
     ownerDocumentId: string
@@ -14,16 +14,19 @@ export function BreederDogsList({ ownerDocumentId, strapiBaseUrl }: BreederDogsL
     const [page, setPage] = useState(1)
     const pageSize = 5
 
-    const { dogs, totalDogs, pageCount, isLoading } = useDogs({
-        filters: {
-            ownerDocumentId,
-            sort: ['givenName:asc'],
-        },
-        pagination: {
-            page,
-            pageSize,
-        },
-    })
+    const { dogs, totalDogs, pageCount, isLoading } = useDogs(
+        useMemo(() => ({
+            filters: {
+                ownerDocumentId,
+                sort: ['givenName:asc'],
+            },
+            pagination: {
+                page,
+                pageSize,
+            },
+            baseUrl: strapiBaseUrl,
+        }), [ownerDocumentId, page, pageSize, strapiBaseUrl])
+    )
 
     const handlePageChange = (_: unknown, value: number) => {
         setPage(value)

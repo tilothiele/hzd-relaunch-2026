@@ -43,6 +43,7 @@ export interface UseDogsOptions {
 	filters?: DogsFilters
 	pagination?: DogsPagination
 	autoLoad?: boolean
+	baseUrl?: string | null
 }
 
 export function useDogs(options: UseDogsOptions = {}) {
@@ -51,6 +52,7 @@ export function useDogs(options: UseDogsOptions = {}) {
 		filters = {},
 		pagination = {},
 		autoLoad = true,
+		baseUrl: optionsBaseUrl,
 	} = options
 
 	const [dogs, setDogs] = useState<Dog[]>([])
@@ -59,12 +61,14 @@ export function useDogs(options: UseDogsOptions = {}) {
 	const [totalDogs, setTotalDogs] = useState(0)
 	const [pageCount, setPageCount] = useState(0)
 
-	const baseUrl = config.strapiBaseUrl
+	const baseUrl = optionsBaseUrl || config.strapiBaseUrl
 	const nameFilter = filters.nameFilter ?? ''
 	const sexFilter = filters.sexFilter ?? ''
 	const colorFilter = filters.colorFilter ?? ''
 	const chipNoFilter = filters.chipNoFilter ?? ''
 	const maxDistance = filters.maxDistance ?? ''
+	const ownerDocumentId = filters.ownerDocumentId
+	const sort = filters.sort
 	const userLocation = filters.userLocation
 	const page = pagination.page ?? 1
 	const pageSize = pagination.pageSize ?? 10
@@ -112,9 +116,9 @@ export function useDogs(options: UseDogsOptions = {}) {
 				})
 			}
 
-			if (filters.ownerDocumentId) {
+			if (ownerDocumentId) {
 				filterConditions.push({
-					owner: { documentId: { eq: filters.ownerDocumentId } },
+					owner: { documentId: { eq: ownerDocumentId } },
 				})
 			}
 
@@ -123,7 +127,7 @@ export function useDogs(options: UseDogsOptions = {}) {
 					page,
 					pageSize,
 				},
-				sort: filters.sort || ['fullKennelName:asc'],
+				sort: sort || ['fullKennelName:asc'],
 			}
 
 			if (filterConditions.length > 0) {
@@ -187,7 +191,7 @@ export function useDogs(options: UseDogsOptions = {}) {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [baseUrl, nameFilter, sexFilter, colorFilter, chipNoFilter, page, pageSize])
+	}, [baseUrl, nameFilter, sexFilter, colorFilter, chipNoFilter, ownerDocumentId, JSON.stringify(sort), page, pageSize])
 
 	useEffect(() => {
 		if (autoLoad && baseUrl && baseUrl.trim().length > 0) {
