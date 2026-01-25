@@ -113,34 +113,13 @@ function calculateAge(dateOfBirth: string | null | undefined): string | null {
 }
 
 export function DogDataTab({ dog, strapiBaseUrl, hzdSetting }: DogDataTabProps) {
-	const avatarUrl = dog.avatar?.url
-	const avatarAlt = dog.avatar?.alternativeText ?? 'Hund'
-	const baseUrl = strapiBaseUrl ?? ''
 	const age = calculateAge(dog.dateOfBirth)
 
 	return (
 		<div>
-			{/* Image */}
-			<div className='mb-6 h-96 w-full overflow-hidden rounded-lg bg-gray-100'>
-				<Image
-					src={resolveMediaUrl(
-						dog.avatar ||
-						(dog.color === 'SM' ? hzdSetting?.DefaultAvatarSM :
-							dog.color === 'B' ? hzdSetting?.DefaultAvatarB :
-								hzdSetting?.DefaultAvatarS) || null,
-						strapiBaseUrl
-					) || '/static-images/hovis/hovi-schwarz.png'}
-					alt={avatarAlt}
-					width={800}
-					height={384}
-					className='h-full w-full object-cover object-center'
-					unoptimized
-				/>
-			</div>
-
 			{/* Details Grid */}
-			<div className='grid gap-6 md:grid-cols-2'>
-				<div className='space-y-4'>
+			<div className='grid gap-4 md:grid-cols-2'>
+				<div className='space-y-2'>
 					<div className='flex items-center gap-4'>
 						<Tooltip title='Zwingername' arrow>
 							<div className='flex h-10 w-10 cursor-help items-center justify-center'>
@@ -161,25 +140,7 @@ export function DogDataTab({ dog, strapiBaseUrl, hzdSetting }: DogDataTabProps) 
 						</div>
 					</div>
 
-					{dog.givenName && dog.fullKennelName ? (
-						<div className='flex items-center gap-4'>
-							<Tooltip title='Rufname' arrow>
-								<div className='flex h-10 w-10 cursor-help items-center justify-center'>
-									<Image
-										src={getGivenNameIcon(dog.sex)}
-										alt='Rufname'
-										width={24}
-										height={24}
-										className='object-contain'
-										unoptimized
-									/>
-								</div>
-							</Tooltip>
-							<div>
-								<p className='text-base text-gray-900'>{dog.givenName}</p>
-							</div>
-						</div>
-					) : null}
+
 
 					<div className='flex items-center gap-4'>
 						<Tooltip title='Geschlecht' arrow>
@@ -218,7 +179,7 @@ export function DogDataTab({ dog, strapiBaseUrl, hzdSetting }: DogDataTabProps) 
 					</div>
 				</div>
 
-				<div className='space-y-4'>
+				<div className='space-y-2'>
 					{dog.dateOfBirth ? (
 						<div className='flex items-center gap-4'>
 							<Tooltip title='Geburtsdatum' arrow>
@@ -283,6 +244,26 @@ export function DogDataTab({ dog, strapiBaseUrl, hzdSetting }: DogDataTabProps) 
 							</Tooltip>
 							<div>
 								<p className='text-base text-gray-900'>{dog.microchipNo}</p>
+							</div>
+						</div>
+					) : null}
+
+					{dog.withersHeight ? (
+						<div className='flex items-center gap-4'>
+							<Tooltip title='Schulterhöhe' arrow>
+								<div className='flex h-10 w-10 cursor-help items-center justify-center'>
+									<Image
+										src='/icons/zucht-icon-groesse-hzd-hovawart-zuchtgemeinschaft.png'
+										alt='Schulterhöhe'
+										width={24}
+										height={24}
+										className='object-contain'
+										unoptimized
+									/>
+								</div>
+							</Tooltip>
+							<div>
+								<p className='text-base text-gray-900'>{dog.withersHeight} cm</p>
 							</div>
 						</div>
 					) : null}

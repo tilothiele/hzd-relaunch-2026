@@ -24,11 +24,10 @@ export default async function DogsPage() {
 			homepage={globalLayout}
 			strapiBaseUrl={baseUrl}
 			theme={theme}
-			pageTitle='Zuchthündinnen'
+			pageTitle='Unsere Zuchthunde'
 		>
 			<DogSearch
 				strapiBaseUrl={baseUrl}
-				sexFilter='F'
 				hzdSetting={globalLayout?.HzdSetting}
 			/>
 		</MainPageStructure>

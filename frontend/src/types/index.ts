@@ -374,6 +374,13 @@ export interface Dog {
 	cFertile?: boolean | null
 	Exhibitions?: string | null
 	BreedSurvey?: string | null
+	withersHeight?: string | null
+	BreedersIntroduction?: string | null
+	MemosReleased?: string | null
+	breeder?: {
+		BreedersIntroduction?: string | null
+	} | null
+	Images?: Image[] | null
 	avatar?: Image | null
 }
 

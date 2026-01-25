@@ -771,6 +771,21 @@ export const SEARCH_DOGS = `
 				dateOfBirth
 				dateOfDeath
 				microchipNo
+				withersHeight
+				Exhibitions
+				BreedSurvey
+				Images {
+					url
+					alternativeText
+					width
+					height
+					caption
+					previewUrl
+				}
+				MemosReleased
+				breeder {
+					BreedersIntroduction
+				}
 				father {
 					documentId
 					fullKennelName

@@ -145,6 +145,13 @@
     },
     "cStudBookNumberMother": {
       "type": "string"
+    },
+    "Images": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images"
+      ]
     }
   }
 }

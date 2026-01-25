@@ -67,21 +67,7 @@ function getGivenNameIcon(sex: string | null | undefined): string {
 	}
 }
 
-/**
- * Gibt das passende Standardbild basierend auf der Farbe zurück
- */
-function getDefaultImageForColor(color: string | null | undefined): string {
-	switch (color) {
-		case 'S':
-			return '/static-images/hovis/hovi-schwarz.jpg'
-		case 'SM':
-			return '/static-images/hovis/hovi-schwarzmarken.jpg'
-		case 'B':
-			return '/static-images/hovis/hovi-blond.jpg'
-		default:
-			return '/static-images/hovis/hovi-schwarz.jpg'
-	}
-}
+import { resolveDogImage } from '@/lib/dog-utils'
 
 /**
  * Männliches Geschlechtssymbol (Mars-Symbol)
@@ -173,8 +159,10 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 	const avatarUrl = dog.avatar?.url
 	const avatarAlt = dog.avatar?.alternativeText ?? 'Hund'
 	const fullName = dog.fullKennelName ?? dog.givenName ?? 'Unbekannt'
-	const baseUrl = strapiBaseUrl ?? ''
+	// const baseUrl = strapiBaseUrl ?? '' // Unused now
 	const age = calculateAge(dog.dateOfBirth)
+
+	const displayImageUrl = resolveDogImage(dog, hzdSetting, strapiBaseUrl)
 
 	// Berechne Entfernung, falls userLocation und dog.Location verfügbar sind
 	let distance: number | null = null
@@ -202,78 +190,38 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 				},
 			}}
 		>
-			{avatarUrl ? (
-				<CardMedia
-					component='div'
-					sx={{
-						position: 'relative',
-						width: '100%',
-						aspectRatio: '4 / 3',
-						cursor: 'pointer',
-						'&:hover': {
-							opacity: 0.9,
-						},
-					}}
-					onClick={onImageClick}
-					onKeyDown={(e) => {
-						if (e.key === 'Enter' || e.key === ' ') {
-							e.preventDefault()
-							onImageClick?.()
-						}
-					}}
-					tabIndex={0}
-					role='button'
-					aria-label='Hundedetails anzeigen'
-				>
-					<Image
-						src={resolveMediaUrl(dog.avatar, strapiBaseUrl) || ''}
-						alt={avatarAlt}
-						fill
-						style={{ objectFit: 'cover' }}
-						unoptimized
-					/>
-					{dog.sex === 'M' && <MaleSexSymbol />}
-					{dog.sex === 'F' && <FemaleSexSymbol />}
-				</CardMedia>
-			) : (
-				<CardMedia
-					component='div'
-					sx={{
-						position: 'relative',
-						width: '100%',
-						aspectRatio: '4 / 3',
-						cursor: 'pointer',
-						'&:hover': {
-							opacity: 0.9,
-						},
-					}}
-					onClick={onImageClick}
-					onKeyDown={(e) => {
-						if (e.key === 'Enter' || e.key === ' ') {
-							e.preventDefault()
-							onImageClick?.()
-						}
-					}}
-					tabIndex={0}
-					role='button'
-					aria-label='Hundedetails anzeigen'
-				>
-					<Image
-						src={resolveMediaUrl(
-							(dog.color === 'SM' ? hzdSetting?.DefaultAvatarSM :
-								dog.color === 'B' ? hzdSetting?.DefaultAvatarB :
-									hzdSetting?.DefaultAvatarS) || null,
-							strapiBaseUrl
-						) || getDefaultImageForColor(dog.color)}
-						alt={avatarAlt}
-						fill
-						style={{ objectFit: 'cover' }}
-						unoptimized
-					/>
-					{dog.sex === 'M' && <MaleSexSymbol />}
-					{dog.sex === 'F' && <FemaleSexSymbol />}
-				</CardMedia>
-			)}
+			<CardMedia
+				component='div'
+				sx={{
+					position: 'relative',
+					width: '100%',
+					aspectRatio: '4 / 3',
+					cursor: 'pointer',
+					'&:hover': {
+						opacity: 0.9,
+					},
+				}}
+				onClick={onImageClick}
+				onKeyDown={(e: React.KeyboardEvent) => {
+					if (e.key === 'Enter' || e.key === ' ') {
+						e.preventDefault()
+						onImageClick?.()
+					}
+				}}
+				tabIndex={0}
+				role='button'
+				aria-label='Hundedetails anzeigen'
+			>
+				<Image
+					src={displayImageUrl}
+					alt={avatarAlt}
+					fill
+					style={{ objectFit: 'cover' }}
+					unoptimized
+				/>
+				{dog.sex === 'M' && <MaleSexSymbol />}
+				{dog.sex === 'F' && <FemaleSexSymbol />}
+			</CardMedia>
 
 			<CardContent>
 				<Table size='small'>

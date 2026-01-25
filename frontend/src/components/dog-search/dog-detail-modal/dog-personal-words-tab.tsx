@@ -8,10 +8,21 @@ interface DogPersonalWordsTabProps {
 }
 
 export function DogPersonalWordsTab({ dog, strapiBaseUrl }: DogPersonalWordsTabProps) {
+	const content = dog.MemosReleased || dog.breeder?.BreedersIntroduction
+
+	if (!content) {
+		return (
+			<div className='rounded-lg bg-gray-50 p-8 text-center text-gray-500'>
+				<p>Keine persönlichen Worte verfügbar.</p>
+			</div>
+		)
+	}
+
 	return (
-		<div className='rounded-lg bg-gray-50 p-8 text-center text-gray-500'>
-			<p>Persönliche Worte werden hier angezeigt.</p>
-		</div>
+		<div
+			className='prose max-w-none text-gray-700'
+			dangerouslySetInnerHTML={{ __html: content }}
+		/>
 	)
 }
 

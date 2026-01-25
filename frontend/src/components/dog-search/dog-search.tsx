@@ -12,7 +12,7 @@ import { theme } from '@/themes'
 
 import { DogCard } from './dog-card'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
-import { DogDetailModal } from './dog-detail-modal'
+import { DogDetailView } from './dog-detail-view'
 import type { Dog, GeoLocation, HzdSetting } from '@/types'
 
 // Deutschland grobe Grenzen: Lat 47-55, Lon 5-15
@@ -76,12 +76,12 @@ function enrichDogsWithFakeLocations(dogs: Dog[]): Dog[] {
 
 interface DogSearchProps {
 	strapiBaseUrl?: string | null
-	sexFilter: SexFilter
 	hzdSetting?: HzdSetting | null
 }
 
-export function DogSearch({ strapiBaseUrl, sexFilter, hzdSetting }: DogSearchProps) {
+export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 	const [nameFilter, setNameFilter] = useState('')
+	const [sexFilter, setSexFilter] = useState<SexFilter>('')
 	const [colorFilter, setColorFilter] = useState<ColorFilter>('')
 	const [chipNoFilter, setChipNoFilter] = useState('')
 	const [zipCode, setZipCode] = useState('')
@@ -91,7 +91,6 @@ export function DogSearch({ strapiBaseUrl, sexFilter, hzdSetting }: DogSearchPro
 	const [pageSize, setPageSize] = useState<PageSize>(10)
 	const [showMap, setShowMap] = useState(false)
 	const [selectedDog, setSelectedDog] = useState<Dog | null>(null)
-	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [hasSearched, setHasSearched] = useState(false)
 	const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
 	const [isButtonHovered, setIsButtonHovered] = useState(false)
@@ -142,11 +141,11 @@ export function DogSearch({ strapiBaseUrl, sexFilter, hzdSetting }: DogSearchPro
 
 	const handleDogImageClick = useCallback((dog: Dog) => {
 		setSelectedDog(dog)
-		setIsModalOpen(true)
+		// Scroll to top when opening detail view
+		window.scrollTo({ top: 0, behavior: 'smooth' })
 	}, [])
 
-	const handleCloseModal = useCallback(() => {
-		setIsModalOpen(false)
+	const handleBackToSearch = useCallback(() => {
 		setSelectedDog(null)
 	}, [])
 
@@ -176,6 +175,17 @@ export function DogSearch({ strapiBaseUrl, sexFilter, hzdSetting }: DogSearchPro
 
 	const totalPages = pageCount
 	const currentPage = page
+
+	if (selectedDog) {
+		return (
+			<DogDetailView
+				dog={selectedDog}
+				strapiBaseUrl={strapiBaseUrl}
+				hzdSetting={hzdSetting}
+				onBack={handleBackToSearch}
+			/>
+		)
+	}
 
 	return (
 		<div className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em' }}>
@@ -253,6 +263,19 @@ export function DogSearch({ strapiBaseUrl, sexFilter, hzdSetting }: DogSearchPro
 							fullWidth
 							size='small'
 						/>
+
+						<FormControl fullWidth size='small'>
+							<InputLabel>Geschlecht</InputLabel>
+							<Select
+								value={sexFilter}
+								label='Geschlecht'
+								onChange={(e) => setSexFilter(e.target.value as SexFilter)}
+							>
+								<MenuItem value=''>Alle</MenuItem>
+								<MenuItem value='F'>Zuchthündinnen</MenuItem>
+								<MenuItem value='M'>Deckrüden</MenuItem>
+							</Select>
+						</FormControl>
 
 						<FormControl fullWidth size='small'>
 							<InputLabel>Farbe</InputLabel>
@@ -532,14 +555,7 @@ export function DogSearch({ strapiBaseUrl, sexFilter, hzdSetting }: DogSearchPro
 				) : null}
 			</div>
 
-			{/* Dog Detail Modal */}
-			<DogDetailModal
-				dog={selectedDog}
-				strapiBaseUrl={strapiBaseUrl}
-				isOpen={isModalOpen}
-				onClose={handleCloseModal}
-				hzdSetting={hzdSetting}
-			/>
+			{/* Dog Detail Modal removed in favor of conditional rendering */}
 		</div>
 	)
 }

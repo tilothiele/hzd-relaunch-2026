@@ -20,7 +20,7 @@ export function DogPedigreeTab({ dog }: DogPedigreeTabProps) {
 		}
 
 		return (
-			<div className='flex h-full w-full flex-col justify-center rounded-lg border border-gray-200 bg-white p-2 text-xs shadow-sm'>
+			<div className='flex h-full w-full flex-col justify-center rounded-lg border border-gray-200 bg-white p-2 text-sm shadow-sm'>
 				<div className='mb-1 font-bold text-gray-900'>
 					{dog.fullKennelName || dog.givenName}
 				</div>
@@ -44,10 +44,10 @@ export function DogPedigreeTab({ dog }: DogPedigreeTabProps) {
 	}
 
 	return (
-		<div className='h-[600px] w-full overflow-auto p-4'>
-			<div className='flex min-w-[1000px] flex-col gap-8'>
+		<div className='w-full p-4'>
+			<div className='flex flex-col items-center gap-8'>
 				{/* Generation 1: Parents */}
-				<div className='flex flex-col gap-12'>
+				<div className='flex flex-col gap-12 items-center'>
 
 					{/* Father's Line */}
 					<div className='flex flex-row items-center gap-4'>
