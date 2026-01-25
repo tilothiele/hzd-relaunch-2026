@@ -3,6 +3,7 @@
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
 import Image from 'next/image'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
+import type { Dog } from '@/types'
 
 interface DogImagesTabProps {
 	dog: Dog

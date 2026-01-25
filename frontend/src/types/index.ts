@@ -401,6 +401,7 @@ export interface Breeder {
 	kennelName?: string | null
 	breedingLicenseSince?: string | null
 	member?: {
+		documentId: string
 		firstName?: string | null
 		lastName?: string | null
 		region?: string | null

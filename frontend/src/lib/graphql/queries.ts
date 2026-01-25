@@ -987,6 +987,7 @@ export const SEARCH_BREEDERS = `
 				breedingLicenseSince
 				IsActive
 				member {
+					documentId
 					firstName
 					lastName
 					region
