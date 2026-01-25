@@ -22,6 +22,8 @@ interface DogsFilters {
 	chipNoFilter?: string
 	maxDistance?: DistanceFilter
 	userLocation?: { lat: number; lng: number }
+	ownerDocumentId?: string
+	sort?: string[]
 }
 
 interface DogsPagination {
@@ -110,12 +112,18 @@ export function useDogs(options: UseDogsOptions = {}) {
 				})
 			}
 
+			if (filters.ownerDocumentId) {
+				filterConditions.push({
+					owner: { documentId: { eq: filters.ownerDocumentId } },
+				})
+			}
+
 			const variables: Record<string, unknown> = {
 				pagination: {
 					page,
 					pageSize,
 				},
-				sort: ['fullKennelName:asc'],
+				sort: filters.sort || ['fullKennelName:asc'],
 			}
 
 			if (filterConditions.length > 0) {

@@ -7,6 +7,7 @@ import type { Breeder } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { theme } from '@/themes'
 import Link from 'next/link'
+import { BreederDogsList } from './breeder-dogs-list'
 
 interface BreederDetailsModalProps {
     breeder: Breeder | null
@@ -170,6 +171,13 @@ export function BreederDetailsModal({ breeder, open, onClose, strapiBaseUrl }: B
                                     <div className='prose prose-sm max-w-none text-gray-600' dangerouslySetInnerHTML={{ __html: breeder.BreedersIntroduction }} />
                                 </>
                             ) : null}
+
+                            {member?.documentId && (
+                                <BreederDogsList
+                                    ownerDocumentId={member.documentId}
+                                    strapiBaseUrl={strapiBaseUrl}
+                                />
+                            )}
                         </div>
                     </Box>
                 </Box>
