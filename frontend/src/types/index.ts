@@ -396,6 +396,16 @@ export interface DogSearchResult {
 	}
 }
 
+export interface Address {
+	id: string
+	FullName?: string | null
+	Address1?: string | null
+	Address2?: string | null
+	CountryCode?: string | null
+	Zip?: string | null
+	City?: string | null
+}
+
 export interface Breeder {
 	documentId: string
 	kennelName?: string | null
@@ -424,6 +434,7 @@ export interface Breeder {
 	InternalNotes?: string | null
 	GeoLocation?: GeoLocation | null
 	avatar?: Image | null
+	Address?: Address | null
 }
 
 export interface BreederSearchResult {

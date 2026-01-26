@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Box, Typography, TextField, Button, Avatar, Chip, Divider, Grid } from '@mui/material'
+import { Box, Typography, TextField, Button, Avatar, Chip, Divider } from '@mui/material'
 import type { Breeder } from '@/types'
 import { fetchGraphQL } from '@/lib/graphql-client'
 import { UPDATE_BREEDER } from '@/lib/graphql/mutations'
@@ -128,8 +128,8 @@ export function MeinZwingerTab({ breeder, strapiBaseUrl }: MeinZwingerTabProps) 
 
             <Divider sx={{ my: 4 }} />
 
-            <Grid container spacing={4}>
-                <Grid item xs={12} md={6}>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
+                <Box sx={{ flex: 1 }}>
                     <Typography variant='h6' sx={{ mb: 2 }}>Mitgliedsadresse (Read-only)</Typography>
                     <Box sx={{ p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
                         <Typography variant='body2' color='text.secondary'>Name</Typography>
@@ -141,9 +141,9 @@ export function MeinZwingerTab({ breeder, strapiBaseUrl }: MeinZwingerTabProps) 
                         <Typography variant='body2' color='text.secondary'>Ort</Typography>
                         <Typography variant='body1'>{breeder.member?.zip} {breeder.member?.city}</Typography>
                     </Box>
-                </Grid>
+                </Box>
 
-                <Grid item xs={12} md={6}>
+                <Box sx={{ flex: 1 }}>
                     <Typography variant='h6' sx={{ mb: 2 }}>Zwingeradresse (Bearbeitbar)</Typography>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                         <TextField
@@ -191,8 +191,8 @@ export function MeinZwingerTab({ breeder, strapiBaseUrl }: MeinZwingerTabProps) 
                             size='small'
                         />
                     </Box>
-                </Grid>
-            </Grid>
+                </Box>
+            </Box>
 
             <Box sx={{ mt: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Button
