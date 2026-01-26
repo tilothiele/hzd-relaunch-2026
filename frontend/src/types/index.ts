@@ -417,6 +417,8 @@ export interface Breeder {
 	IsActive?: boolean | null
 	Disable?: boolean | null
 	BreedersIntroduction?: string | null
+	BreedersIntroDraft?: string | null
+	isDirty?: boolean | null
 	WebsiteUrl?: string | null
 	WebsiteUrlDraft?: string | null
 	InternalNotes?: string | null
@@ -443,6 +445,8 @@ export interface Litter {
 	dateOfBirth?: string | null
 	LitterStatus: 'Planned' | 'Manted' | 'Littered' | 'Closed'
 	StatusMessage?: string | null
+	StatusMessageDraft?: string | null
+	StatusMessageDirtyFlag?: boolean | null
 	AmountRS?: PuppyAmount | null
 	AmountRSM?: PuppyAmount | null
 	AmountRB?: PuppyAmount | null

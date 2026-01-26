@@ -1352,6 +1352,7 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
   attributes: {
     Address: Schema.Attribute.Component<'personal.address', false>;
     avatar: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    BreedersIntroDraft: Schema.Attribute.Text;
     BreedersIntroduction: Schema.Attribute.RichText &
       Schema.Attribute.CustomField<
         'plugin::ckeditor5.CKEditor',
@@ -1368,6 +1369,7 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
     GeoLocation: Schema.Attribute.Component<'breeding.geo-location', false>;
     InternalNotes: Schema.Attribute.Text;
     IsActive: Schema.Attribute.Boolean;
+    isDirty: Schema.Attribute.Boolean;
     kennelName: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 200;

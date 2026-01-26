@@ -79,6 +79,12 @@
       "type": "component",
       "component": "breeding.geo-location",
       "repeatable": false
+    },
+    "BreedersIntroDraft": {
+      "type": "text"
+    },
+    "isDirty": {
+      "type": "boolean"
     }
   }
 }

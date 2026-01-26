@@ -1,12 +1,60 @@
-'use client'
+import { useState, useEffect } from 'react'
+import { Tabs, Tab, Box } from '@mui/material'
+import { GET_BREEDER_BY_USER } from '@/lib/graphql/queries'
+import { fetchGraphQL } from '@/lib/graphql-client'
+import { MeinProfilTab } from './tabs/mein-profil-tab'
+import { MeinZwingerTab } from './tabs/mein-zwinger-tab'
+import { MeineWuerfeTab } from './tabs/meine-wuerfe-tab'
+import { MeineDeckruedenTab } from './tabs/meine-deckrueden-tab'
+import { MitteilungenTab } from './tabs/mitteilungen-tab'
+import type { AuthUser, BreederSearchResult, Breeder } from '@/types'
 
-import { useState } from 'react'
-import { Tabs, Tab, Box, Typography } from '@mui/material'
+type TabId = 0 | 1 | 2 | 3 | 4
 
-type TabId = 0 | 1 | 2 | 3
+interface MeineHzdTabsProps {
+	user: AuthUser | null
+	strapiBaseUrl?: string | null
+}
 
-export function MeineHzdTabs() {
+export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 	const [activeTab, setActiveTab] = useState<TabId>(0)
+	const [breeder, setBreeder] = useState<Breeder | null>(null)
+
+	useEffect(() => {
+		async function loadBreeder() {
+			if (!user?.documentId) {
+				setBreeder(null)
+				return
+			}
+
+			try {
+				console.log('Fetching breeder for user:', user.documentId)
+				const data = await fetchGraphQL<BreederSearchResult>(GET_BREEDER_BY_USER, {
+					variables: { userId: user.documentId },
+					baseUrl: strapiBaseUrl,
+				})
+				console.log('Breeder fetch result:', data)
+
+				if (data?.hzdPluginBreeders_connection?.nodes?.length) {
+					setBreeder(data.hzdPluginBreeders_connection.nodes[0])
+				} else {
+					setBreeder(null)
+				}
+			} catch (error) {
+				console.error('Failed to load breeder data. Error details:', JSON.stringify(error, null, 2))
+				setBreeder(null)
+			}
+		}
+
+		loadBreeder()
+	}, [user, strapiBaseUrl])
+
+	useEffect(() => {
+		// If active tab is Mein Zwinger (1) and user is not a breeder, switch to Profile (0)
+		if (activeTab === 1 && !breeder) {
+			setActiveTab(0)
+		}
+	}, [breeder, activeTab])
 
 	const handleTabChange = (_event: React.SyntheticEvent, newValue: TabId) => {
 		setActiveTab(newValue)
@@ -34,7 +82,7 @@ export function MeineHzdTabs() {
 					}}
 				>
 					<Tab label='Mein Profil' />
-					<Tab label='Mein Zwinger' />
+					{breeder && <Tab label='Mein Zwinger' />}
 					<Tab label='Meine Würfe' />
 					<Tab label='Meine Deckrüden' />
 					<Tab label='Mitteilungen' />
@@ -42,53 +90,12 @@ export function MeineHzdTabs() {
 			</Box>
 
 			<Box sx={{ mt: 3, minHeight: '400px' }}>
-				{activeTab === 0 && (
-					<Box>
-						<Typography variant='body1' color='text.secondary' sx={{ mb: 3 }}>
-							Profil-Informationen werden hier verwaltet.
-						</Typography>
-						<Box
-							component='ul'
-							sx={{
-								listStyleType: 'disc',
-								pl: 4,
-								mb: 0,
-								'& li': {
-									mb: 1.5,
-									fontSize: '1rem',
-									color: 'text.primary',
-								},
-							}}
-						>
-							<Box component='li'>Persönliche Daten (Name, E-Mail, Telefon, Adresse)</Box>
-							<Box component='li'>Passwort ändern (für den Login)</Box>
-							<Box component='li'>Kontoverbindung / SEPA-Mandat (für die Zahlung)</Box>
-						</Box>
-					</Box>
-				)}
-				{activeTab === 1 && (
-					<Box>
-						<Typography variant='body1' color='text.secondary'>
-							Würfe-Informationen werden hier verwaltet.
-						</Typography>
-					</Box>
-				)}
-				{activeTab === 2 && (
-					<Box>
-						<Typography variant='body1' color='text.secondary'>
-							Deckrüden-Informationen werden hier verwaltet.
-						</Typography>
-					</Box>
-				)}
-				{activeTab === 3 && (
-					<Box>
-						<Typography variant='body1' color='text.secondary'>
-							Mitteilungen werden hier verwaltet.
-						</Typography>
-					</Box>
-				)}
+				{activeTab === 0 && <MeinProfilTab />}
+				{activeTab === 1 && breeder && <MeinZwingerTab breeder={breeder} strapiBaseUrl={strapiBaseUrl} />}
+				{activeTab === 2 && breeder && <MeineWuerfeTab breeder={breeder} strapiBaseUrl={strapiBaseUrl} />}
+				{activeTab === 3 && <MeineDeckruedenTab />}
+				{activeTab === 4 && <MitteilungenTab />}
 			</Box>
 		</Box>
 	)
 }
-

@@ -1711,3 +1711,78 @@ export const GET_SITEMAP_DATA = `
 	}
 `
 
+
+export const GET_BREEDER_BY_USER = `
+	query GetBreederByUser($userId: ID!) {
+		hzdPluginBreeders_connection(filters: { member: { documentId: { eq: $userId } } }) {
+			nodes {
+				documentId
+				kennelName
+				breedingLicenseSince
+				IsActive
+				Disable
+				WebsiteUrl
+				WebsiteUrlDraft
+				BreedersIntroduction
+				BreedersIntroDraft
+				isDirty
+				InternalNotes
+				member {
+					documentId
+					firstName
+					lastName
+					address1
+					zip
+					city
+				}
+				avatar {
+					url
+					alternativeText
+					width
+					height
+				}
+				Address {
+					id
+					FullName
+					Address1
+					Address2
+					CountryCode
+					Zip
+					City
+				}
+			}
+		}
+	}
+`
+
+export const GET_LITTERS_BY_BREEDER = `
+	query GetLittersByBreeder($breederId: ID!) {
+		hzdPluginLitters_connection(filters: { breeder: { documentId: { eq: $breederId } } }, sort: "dateOfBirth:desc") {
+			nodes {
+				documentId
+				OrderLetter
+				dateOfManting
+				dateOfBirth
+				expectedDateOfBirth
+				LitterStatus
+				StatusMessageDraft
+				StatusMessageDirtyFlag
+				AmountRS { id Total Available }
+				AmountRSM { id Total Available }
+				AmountRB { id Total Available }
+				AmountHS { id Total Available }
+				AmountHSM { id Total Available }
+				AmountHB { id Total Available }
+				breeder {
+					documentId
+				}
+				mother {
+					fullKennelName
+				}
+				stuntDog {
+					fullKennelName
+				}
+			}
+		}
+	}
+`
