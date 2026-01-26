@@ -28,6 +28,9 @@ export function BreederDogsList({ ownerDocumentId, strapiBaseUrl }: BreederDogsL
         }), [ownerDocumentId, page, pageSize, strapiBaseUrl])
     )
 
+    console.log('dogs', dogs)
+    console.log('ownerDocumentId', ownerDocumentId)
+
     const handlePageChange = (_: unknown, value: number) => {
         setPage(value)
     }

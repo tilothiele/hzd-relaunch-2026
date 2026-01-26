@@ -8,6 +8,8 @@ import { LoginControls } from './login-controls'
 import { resolveMediaUrl } from './logo-utils'
 import { DrawerMenuComponent } from './drawer-menu'
 import { cn } from '@/lib/utils'
+import { useEffect, useState } from 'react'
+import HomeIcon from '@mui/icons-material/Home'
 
 interface LoginCredentials {
 	identifier: string
@@ -39,6 +41,19 @@ export function Header({
 	error,
 	pageTitle,
 }: HeaderProps) {
+	const [isScrolled, setIsScrolled] = useState(false)
+
+	useEffect(() => {
+		const handleScroll = () => {
+			setIsScrolled(window.scrollY > 50)
+		}
+
+		// Initial check
+		handleScroll()
+
+		window.addEventListener('scroll', handleScroll, { passive: true })
+		return () => window.removeEventListener('scroll', handleScroll)
+	}, [])
 
 	const logoSrc = resolveMediaUrl(globalLayout?.Logo, strapiBaseUrl ?? '')
 	const logoAlt = globalLayout?.Logo?.alternativeText ?? 'HZD Logo'
@@ -69,9 +84,14 @@ export function Header({
 						drawerMenu={globalLayout?.DrawerMenu}
 						theme={theme}
 					/>
+
+					{/* Desktop Logo (Always visible or handled separately if needed) */}
 					<Link
 						href='/'
-						className='absolute -top-8 left-12 z-[110] flex items-center justify-center transition-opacity hover:opacity-80'
+						className={cn(
+							'absolute -top-8 left-12 z-[110] hidden md:flex items-center justify-center transition-opacity hover:opacity-80',
+							// If we wanted to hide desktop logo on scroll, we could add class here, but user specified mobile view
+						)}
 						aria-label='Zur Startseite'
 					>
 						{logoSrc ? (
@@ -80,7 +100,7 @@ export function Header({
 								alt={logoAlt}
 								width={logoWidth}
 								height={logoHeight}
-								className='mb-1 h-[111px] w-[111px] object-contain md:h-[158px] md:w-[158px]'
+								className='mb-1 h-[158px] w-[158px] object-contain'
 								unoptimized
 								priority
 							/>
@@ -89,6 +109,54 @@ export function Header({
 								HZD
 							</span>
 						)}
+					</Link>
+
+					{/* Mobile Logo / Home Icon */}
+					<Link
+						href='/'
+						className={cn(
+							'absolute z-[110] flex md:hidden items-center justify-center transition-all duration-300 hover:opacity-80',
+							// Position: Default large (-top-8) vs Compact (centered).
+							// Compact if scrolled OR width < 500px
+							isScrolled
+								? 'top-1/2 -translate-y-1/2 left-10'
+								: 'max-[500px]:top-1/2 max-[500px]:-translate-y-1/2 max-[500px]:left-10 -top-8 left-12'
+						)}
+						aria-label='Zur Startseite'
+					>
+						{/* Show Logo when NOT scrolled AND width >= 500px */}
+						<div className={cn(
+							'transition-opacity duration-300',
+							isScrolled
+								? 'opacity-0 pointer-events-none absolute'
+								: 'opacity-100 max-[500px]:opacity-0 max-[500px]:pointer-events-none max-[500px]:absolute'
+						)}>
+							{logoSrc ? (
+								<Image
+									src={logoSrc}
+									alt={logoAlt}
+									width={logoWidth}
+									height={logoHeight}
+									className='mb-1 h-[111px] w-[111px] object-contain'
+									unoptimized
+									priority
+								/>
+							) : (
+								<span className='text-lg font-semibold tracking-wide text-center'>
+									HZD
+								</span>
+							)}
+						</div>
+
+						{/* Show Home Icon when scrolled OR width < 500px */}
+						<div className={cn(
+							'transition-opacity duration-300',
+							isScrolled
+								? 'opacity-100'
+								: 'opacity-0 pointer-events-none absolute max-[500px]:opacity-100 max-[500px]:static max-[500px]:pointer-events-auto'
+						)}>
+							<HomeIcon sx={{ fontSize: 32, color: theme.headerFooterTextColor }} />
+						</div>
 					</Link>
 				</div>
 
