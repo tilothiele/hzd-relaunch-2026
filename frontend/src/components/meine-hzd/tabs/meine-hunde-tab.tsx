@@ -41,12 +41,15 @@ export function MeineHundeTab({ user, strapiBaseUrl }: MeineHundeTabProps) {
                                 documentId: {
                                     eq: user.documentId
                                 }
+                            },
+                            cFertile: {
+                                eq: true
                             }
                         },
                         pagination: {
                             pageSize: 100 // Fetch all or reasonably many
                         },
-                        sort: ["givenName:asc"]
+                        sort: ["dateOfBirth:desc"]
                     },
                     baseUrl: strapiBaseUrl
                 })
@@ -94,7 +97,7 @@ export function MeineHundeTab({ user, strapiBaseUrl }: MeineHundeTabProps) {
     return (
         <Box>
             <Typography variant='h6' gutterBottom>
-                Meine Hunde
+                Meine Zuchthunde
             </Typography>
             <TableContainer component={Paper} variant="outlined">
                 <Table sx={{ minWidth: 650 }} aria-label="meine hunde tabelle">
