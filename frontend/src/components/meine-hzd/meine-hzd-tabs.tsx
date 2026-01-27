@@ -5,7 +5,7 @@ import { fetchGraphQL } from '@/lib/graphql-client'
 import { MeinProfilTab } from './tabs/mein-profil-tab'
 import { MeinZwingerTab } from './tabs/mein-zwinger-tab'
 import { MeineWuerfeTab } from './tabs/meine-wuerfe-tab'
-import { MeineDeckruedenTab } from './tabs/meine-deckrueden-tab'
+import { MeineHundeTab } from './tabs/meine-hunde-tab'
 import { MitteilungenTab } from './tabs/mitteilungen-tab'
 import type { AuthUser, BreederSearchResult, Breeder } from '@/types'
 
@@ -50,8 +50,8 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 	}, [user, strapiBaseUrl])
 
 	useEffect(() => {
-		// If active tab is Mein Zwinger (1) and user is not a breeder, switch to Profile (0)
-		if (activeTab === 1 && !breeder) {
+		// If active tab is Mein Zwinger (1) or Meine Hunde (3) and user is not a breeder, switch to Profile (0)
+		if ((activeTab === 1 || activeTab === 3) && !breeder) {
 			setActiveTab(0)
 		}
 	}, [breeder, activeTab])
@@ -81,11 +81,11 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 						},
 					}}
 				>
-					<Tab label='Mein Profil' />
-					{breeder && <Tab label='Mein Zwinger' />}
-					<Tab label='Meine Würfe' />
-					<Tab label='Meine Deckrüden' />
-					<Tab label='Mitteilungen' />
+					<Tab label='Mein Profil' value={0} />
+					{breeder && <Tab label='Mein Zwinger' value={1} />}
+					<Tab label='Meine Würfe' value={2} />
+					{breeder && <Tab label='Meine Hunde' value={3} />}
+					<Tab label='Mitteilungen' value={4} />
 				</Tabs>
 			</Box>
 
@@ -93,7 +93,7 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 				{activeTab === 0 && <MeinProfilTab />}
 				{activeTab === 1 && breeder && <MeinZwingerTab breeder={breeder} strapiBaseUrl={strapiBaseUrl} />}
 				{activeTab === 2 && breeder && <MeineWuerfeTab breeder={breeder} strapiBaseUrl={strapiBaseUrl} />}
-				{activeTab === 3 && <MeineDeckruedenTab />}
+				{activeTab === 3 && breeder && <MeineHundeTab user={user} strapiBaseUrl={strapiBaseUrl} />}
 				{activeTab === 4 && <MitteilungenTab />}
 			</Box>
 		</Box>
