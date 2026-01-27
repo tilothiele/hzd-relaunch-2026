@@ -771,6 +771,7 @@ export const SEARCH_DOGS = `
 				dateOfBirth
 				dateOfDeath
 				microchipNo
+				cStudBookNumber
 				owner {
 					documentId
 					firstName
@@ -787,6 +788,7 @@ export const SEARCH_DOGS = `
 					caption
 					previewUrl
 				}
+				cFertile
 				MemosReleased
 				breeder {
 					BreedersIntroduction

@@ -356,6 +356,7 @@ export interface Dog {
 	dateOfBirth?: string | null
 	dateOfDeath?: string | null
 	microchipNo?: string | null
+	cStudBookNumber?: string | null
 	father?: Dog | null
 	mother?: Dog | null
 	owner?: {
