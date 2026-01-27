@@ -34,3 +34,36 @@ export const UPDATE_LITTER = `
 		}
 	}
 `
+
+export const UPDATE_USER = `
+	mutation UpdateUser($id: ID!, $data: UsersPermissionsUserInput!) {
+		updateUsersPermissionsUser(id: $id, data: $data) {
+			data {
+				documentId
+				username
+				email
+				firstName
+				lastName
+				address1
+				address2
+				zip
+				city
+				phone
+				title
+				countryCode
+			}
+		}
+	}
+`
+
+export const CHANGE_PASSWORD = `
+	mutation ChangePassword($currentPassword: String!, $password: String!, $passwordConfirmation: String!) {
+	changePassword(currentPassword: $currentPassword, password: $password, passwordConfirmation: $passwordConfirmation) {
+		jwt
+			user {
+			id
+			username
+		}
+	}
+}
+`

@@ -6,10 +6,9 @@ import { MeinProfilTab } from './tabs/mein-profil-tab'
 import { MeinZwingerTab } from './tabs/mein-zwinger-tab'
 import { MeineWuerfeTab } from './tabs/meine-wuerfe-tab'
 import { MeineHundeTab } from './tabs/meine-hunde-tab'
-import { MitteilungenTab } from './tabs/mitteilungen-tab'
 import type { AuthUser, BreederSearchResult, Breeder } from '@/types'
 
-type TabId = 0 | 1 | 2 | 3 | 4
+type TabId = 0 | 1 | 2 | 3
 
 interface MeineHzdTabsProps {
 	user: AuthUser | null
@@ -19,6 +18,10 @@ interface MeineHzdTabsProps {
 export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 	const [activeTab, setActiveTab] = useState<TabId>(0)
 	const [breeder, setBreeder] = useState<Breeder | null>(null)
+
+	if (!user) {
+		return null
+	}
 
 	useEffect(() => {
 		async function loadBreeder() {
@@ -50,8 +53,8 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 	}, [user, strapiBaseUrl])
 
 	useEffect(() => {
-		// If active tab is Mein Zwinger (1) or Meine Hunde (3) and user is not a breeder, switch to Profile (0)
-		if ((activeTab === 1 || activeTab === 3) && !breeder) {
+		// If active tab is Mein Zwinger (1) and user is not a breeder, switch to Profile (0)
+		if (activeTab === 1 && !breeder) {
 			setActiveTab(0)
 		}
 	}, [breeder, activeTab])
@@ -84,17 +87,15 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 					<Tab label='Mein Profil' value={0} />
 					{breeder && <Tab label='Mein Zwinger' value={1} />}
 					<Tab label='Meine Würfe' value={2} />
-					{breeder && <Tab label='Meine Hunde' value={3} />}
-					<Tab label='Mitteilungen' value={4} />
+					<Tab label='Meine Hunde' value={3} />
 				</Tabs>
 			</Box>
 
 			<Box sx={{ mt: 3, minHeight: '400px' }}>
-				{activeTab === 0 && <MeinProfilTab />}
+				{activeTab === 0 && <MeinProfilTab user={user} />}
 				{activeTab === 1 && breeder && <MeinZwingerTab breeder={breeder} strapiBaseUrl={strapiBaseUrl} />}
 				{activeTab === 2 && breeder && <MeineWuerfeTab breeder={breeder} strapiBaseUrl={strapiBaseUrl} />}
-				{activeTab === 3 && breeder && <MeineHundeTab user={user} strapiBaseUrl={strapiBaseUrl} />}
-				{activeTab === 4 && <MitteilungenTab />}
+				{activeTab === 3 && <MeineHundeTab user={user} strapiBaseUrl={strapiBaseUrl} />}
 			</Box>
 		</Box>
 	)

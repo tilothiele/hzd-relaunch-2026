@@ -325,6 +325,9 @@ export interface AuthUser {
 	confirmed?: boolean | null
 	blocked?: boolean | null
 	role?: UsersPermissionsMeRole | null
+	title?: string | null
+	membershipNumber?: number | null
+	dateOfBirth?: string | null
 	firstName?: string | null
 	lastName?: string | null
 	address1?: string | null
