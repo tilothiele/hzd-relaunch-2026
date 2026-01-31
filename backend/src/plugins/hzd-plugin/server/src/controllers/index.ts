@@ -12,4 +12,4 @@ export default {
   litter,
   geolocation: geolocationController,
   'geolocation-sync': geolocationSync,
-};
+} as any;

@@ -11,4 +11,4 @@ export default {
   litter,
   geolocation,
   'geolocation-sync': geolocationSync,
-};
+} as any;
