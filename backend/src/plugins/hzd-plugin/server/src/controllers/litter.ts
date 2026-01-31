@@ -4,6 +4,8 @@
 
 import { factories } from '@strapi/strapi'
 
-export default factories.createCoreController('plugin::hzd-plugin.litter');
+import type { Core } from '@strapi/strapi';
+
+export default ({ strapi }: { strapi: Core.Strapi }) => factories.createCoreController('plugin::hzd-plugin.litter')({ strapi });
 
 
