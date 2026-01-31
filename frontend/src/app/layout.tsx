@@ -10,8 +10,8 @@ import { TestBanner } from '@/components/test-banner/test-banner'
 config.autoAddCss = false
 
 export const metadata: Metadata = {
-	title: 'HZD - Hovawart Zuchtverein Deutschland',
-	description: 'Herzlich willkommen bei der HZD - Hovawart Zuchtverein Deutschland',
+	title: 'Hovawart Zuchtgemeinschaft Deutschland e.V.',
+	description: 'Herzlich willkommen bei der Hovawart Zuchtgemeinschaft Deutschland e.V.',
 }
 
 export default async function RootLayout({

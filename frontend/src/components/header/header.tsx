@@ -100,7 +100,10 @@ export function Header({
 								alt={logoAlt}
 								width={logoWidth}
 								height={logoHeight}
-								className='mb-1 h-[158px] w-[158px] object-contain'
+								className={cn(
+									'mb-1 object-contain transition-all duration-500 ease-in-out',
+									isScrolled ? 'h-[63px] w-[63px]' : 'h-[158px] w-[158px]'
+								)}
 								unoptimized
 								priority
 							/>
