@@ -4,7 +4,9 @@
 
 import { factories } from '@strapi/strapi';
 
-export default ({ strapi }) => ({
+import type { Core } from '@strapi/strapi';
+
+export default ({ strapi }: { strapi: Core.Strapi }) => ({
     async getGeoLocationByZip(ctx) {
         const { countryCode, zip } = ctx.query;
 
