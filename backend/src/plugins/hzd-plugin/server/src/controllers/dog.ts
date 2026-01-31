@@ -2,9 +2,10 @@
  *  controller
  */
 
-import { factories } from '@strapi/strapi'
+import { factories } from '@strapi/strapi';
+import type { Core } from '@strapi/strapi';
 
-export default factories.createCoreController('plugin::hzd-plugin.dog', ({ strapi }) => ({
+export default ({ strapi }: { strapi: Core.Strapi }) => factories.createCoreController('plugin::hzd-plugin.dog', ({ strapi }) => ({
 	async find(ctx) {
 		const service = strapi.service('plugin::hzd-plugin.dog') as any
 		return service.find(ctx)
@@ -21,6 +22,6 @@ export default factories.createCoreController('plugin::hzd-plugin.dog', ({ strap
 		const service = strapi.service('plugin::hzd-plugin.dog') as any
 		return service.update(ctx)
 	},
-}));
+}))({ strapi });
 
 
