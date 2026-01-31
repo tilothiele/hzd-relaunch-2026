@@ -33,6 +33,7 @@
   "dependencies": {
     "@strapi/design-system": "^2.0.0-rc.30",
     "@strapi/icons": "^2.0.0-rc.30",
+    "node-cron": "^4.2.1",
     "react-intl": "^7.1.14"
   },
   "devDependencies": {
