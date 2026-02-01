@@ -23,6 +23,8 @@ VOL_SA1="/var/lib/docker/volumes/$VOL_NAME_SA1/_data"
 #VOL_PB1="/var/lib/docker/volumes/$VOL_NAME_PB1/_data"
 #VOL_SB1="/var/lib/docker/volumes/SB1/_data"
 
+DUMP_FILE=hzd-website-prod.dump
+
 ### ================================
 ###  Funktionen
 ### ================================
@@ -47,7 +49,7 @@ dump_db() {
     docker run --rm -it -e PGPASSWORD="$PG_PASSWORD" --network "$PG_NETWORK" \
       -v ./transfer:/transfer \
       pgvector/pgvector:pg17 \
-      pg_dump -h "$PG_HOST" -U "$PG_USER" -d "$PG_PROD_DB" -f "/transfer/$DUMP_FILE"
+      pg_dump -h "$PG_HOST" -U "$PG_USER" -d "$PG_PROD_DB" -Fc --no-owner --no-acl -f "/transfer/$DUMP_FILE"
 }
 
 restore_stage() {
@@ -79,7 +81,7 @@ copy_volume() {
     dst=$2
 
     echo "--- Volume kopieren: $src → $dst ---"
-    rsync -a --delete "$src/" "$dst/"
+    sudo rsync -a --delete "$src/" "$dst/"
 }
 
 ### ================================
@@ -90,8 +92,8 @@ echo "### Starte Update/Sync-Prozess ###"
 
 stop_containers
 dump_db
-restore_stage
 copy_volume "$VOL_PA1" "$VOL_SA1"
+restore_stage
 
 #copy_volume "$VOL_PB1" "$VOL_SB1"
 
