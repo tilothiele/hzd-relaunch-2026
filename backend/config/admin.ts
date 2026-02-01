@@ -23,7 +23,7 @@ export default ({ env }) => ({
   },
   transfer: {
     remote: {
-      enabled: env.bool('TRANSFER_REMOTE_ENABLED', false),
+      enabled: true,
     },
     token: {
       salt: env('TRANSFER_TOKEN_SALT'),
