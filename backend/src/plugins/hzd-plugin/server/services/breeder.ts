@@ -4,6 +4,4 @@
 
 import { factories } from '@strapi/strapi';
 
-import type { Core } from '@strapi/strapi';
-
-export default ({ strapi }: { strapi: Core.Strapi }) => factories.createCoreService('plugin::hzd-plugin.breeder')({ strapi });
+export default factories.createCoreService('plugin::hzd-plugin.breeder');
