@@ -22,6 +22,9 @@ export default ({ env }) => ({
     salt: env('API_TOKEN_SALT'),
   },
   transfer: {
+    remote: {
+      enabled: env.bool('TRANSFER_REMOTE_ENABLED', false),
+    },
     token: {
       salt: env('TRANSFER_TOKEN_SALT'),
     },

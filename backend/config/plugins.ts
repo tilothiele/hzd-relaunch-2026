@@ -1,4 +1,4 @@
-export default ({env}) => ({
+export default ({ env }) => ({
   'users-permissions': {
     enabled: true,
     jwtSecret: env('JWT_SECRET') || 'your-secret-key',
@@ -10,7 +10,7 @@ export default ({env}) => ({
     enabled: true,
     resolve: './src/plugins/hzd-plugin'
   },
- email: {
+  email: {
     config: {
       provider: 'nodemailer',
       providerOptions: {
@@ -24,7 +24,7 @@ export default ({env}) => ({
       },
       settings: {
         defaultFrom: env('SMTP_DEFAULT_FROM', 't.thiele@hovawarte.com'),
-        defaultReplyTo:env('SMTP_DEFAULT_REPLY_TO', 't.thiele@hovawarte.com'),
+        defaultReplyTo: env('SMTP_DEFAULT_REPLY_TO', 't.thiele@hovawarte.com'),
       },
     },
   },
@@ -41,6 +41,7 @@ export default ({env}) => ({
       errorHandler: (error, strapi) => {
         console.log(error); // TODO ntfy integrieren
       },
+      sqlite3Executable: env('SQLITE3_EXECUTABLE', 'sqlite3'),
       pgDumpExecutable: env('PG_DUMP_EXECUTABLE', '/usr/bin/pg_dump'),
       storageService: 'aws-s3',
       awsAccessKeyId: env('AWS_ACCESS_KEY_ID'),
@@ -53,66 +54,66 @@ export default ({env}) => ({
   tinymce: {
     enabled: true,
     config: {
-        editor: {
-            outputFormat: "html",
-            tinymceSrc: "/tinymce/tinymce.min.js", // USE WITH YOUR PUBLIC PATH TO TINYMCE LIBRARY FOR USING SELF HOSTED TINYMCE
-            editorConfig: {
-                language: "de",
-                license_key: "gpl",
-                height: 500,
-                menubar: false,
-                extended_valid_elements: "span, img, small",
-                forced_root_block: "",
-                convert_urls: true,
-                relative_urls: false,
-                //base_url: "http://localhost:1337",
+      editor: {
+        outputFormat: "html",
+        tinymceSrc: "/tinymce/tinymce.min.js", // USE WITH YOUR PUBLIC PATH TO TINYMCE LIBRARY FOR USING SELF HOSTED TINYMCE
+        editorConfig: {
+          language: "de",
+          license_key: "gpl",
+          height: 500,
+          menubar: false,
+          extended_valid_elements: "span, img, small",
+          forced_root_block: "",
+          convert_urls: true,
+          relative_urls: false,
+          //base_url: "http://localhost:1337",
 
-                // urlconverter_callback: (url) => {
-                //     console.log(url)
-				// 	if (!url) {
-				// 		return url
-				// 	}
+          // urlconverter_callback: (url) => {
+          //     console.log(url)
+          // 	if (!url) {
+          // 		return url
+          // 	}
 
-				// 	return url.replace(/^\/\//, '/')
-                // },
-                entity_encoding: "raw",
-                plugins:
-                    "advlist autolink lists link image charmap preview anchor \
+          // 	return url.replace(/^\/\//, '/')
+          // },
+          entity_encoding: "raw",
+          plugins:
+            "advlist autolink lists link image charmap preview anchor \
                     searchreplace visualblocks code fullscreen table emoticons nonbreaking \
                     insertdatetime media table code help wordcount",
-                toolbar:
-                    "undo redo | styles | bold italic forecolor backcolor | \
+          toolbar:
+            "undo redo | styles | bold italic forecolor backcolor | \
                     alignleft aligncenter alignright alignjustify | \
                     media table emoticons visualblocks code|\
                     nonbreaking bullist numlist outdent indent | removeformat | help",
-                style_formats: [
-                    {
-                        title: "Headings",
-                        items: [
-                            { title: "h1", block: "h1" },
-                            { title: "h2", block: "h2" },
-                            { title: "h3", block: "h3" },
-                            { title: "h4", block: "h4" },
-                            { title: "h5", block: "h5" },
-                            { title: "h6", block: "h6" },
-                        ],
-                    },
-
-                    {
-                        title: "Text",
-                        items: [
-                            { title: "Paragraph", block: "p" },
-                            {
-                                title: "Paragraph with small letters",
-                                block: "small",
-                            },
-                        ],
-                    },
-                ],
+          style_formats: [
+            {
+              title: "Headings",
+              items: [
+                { title: "h1", block: "h1" },
+                { title: "h2", block: "h2" },
+                { title: "h3", block: "h3" },
+                { title: "h4", block: "h4" },
+                { title: "h5", block: "h5" },
+                { title: "h6", block: "h6" },
+              ],
             },
+
+            {
+              title: "Text",
+              items: [
+                { title: "Paragraph", block: "p" },
+                {
+                  title: "Paragraph with small letters",
+                  block: "small",
+                },
+              ],
+            },
+          ],
         },
+      },
     },
-},
+  },
 
 });
 
