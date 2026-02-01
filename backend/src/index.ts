@@ -206,6 +206,11 @@ export default {
    * run jobs, or perform some special logic.
    */
   bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    const enabled = strapi.config.get('server.transfer.remote.enabled', true);
+    strapi.log.info(
+      `Remote data transfer is ${enabled ? 'ENABLED' : 'DISABLED'}`
+    );
+
     const uid = 'api::form-instance.form-instance';
 
     try {
