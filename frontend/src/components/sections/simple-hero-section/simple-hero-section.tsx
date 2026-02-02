@@ -63,7 +63,7 @@ export function SimpleHeroSectionComponent({
         >
             <div
                 ref={elementRef}
-                className="relative flex min-h-[500px] flex-col overflow-hidden md:flex-row"
+                className="hero relative flex min-h-[500px] flex-col overflow-hidden md:flex-row"
                 style={{
                     opacity: isVisible ? 1 : 0,
                     transform: isVisible ? 'translateY(0)' : 'translateY(20px)',

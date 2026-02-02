@@ -52,6 +52,16 @@
 		color: var(--color-text);
 	}
 
+	.prose {
+		font-size: 1.1rem;
+	}
+
+	/* Override inline styles from editors */
+	.prose [style*="font-size: medium"],
+	.prose [style*="font-size:medium"] {
+		font-size: 1.1rem !important;
+	}
+
 	p {
 		font-family: var(--font-body);
 		color: var(--color-text);
@@ -79,6 +89,16 @@
 
 	h2 {
 		font-size: 1.5rem;
+		line-height: 1.1rem;
+		margin-bottom: 1rem;
+		margin-top: 1rem;
+	}
+
+	h3,
+	h4,
+	h5,
+	h6 {
+		font-size: 1.4rem;
 		line-height: 1.1rem;
 		margin-bottom: 1rem;
 		margin-top: 1rem;
@@ -185,6 +205,9 @@ h5 {
 }
 */
 
+.hero p {
+	font-size: 1.25rem;
+}
 
 .hero-section-slider {
 	.hero-section-slide-image {

@@ -43,7 +43,7 @@ export function FullWidthHeroSectionComponent({
         >
             <div
                 ref={elementRef}
-                className="relative flex h-[600px] w-full flex-col justify-end overflow-hidden md:h-[700px] lg:h-[800px]"
+                className="hero relative flex h-[600px] w-full flex-col justify-end overflow-hidden md:h-[700px] lg:h-[800px]"
                 style={{
                     opacity: isVisible ? 1 : 0,
                     transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
@@ -71,8 +71,8 @@ export function FullWidthHeroSectionComponent({
                 />
 
                 {/* Content */}
-                <div className="container relative z-20 mx-auto px-6 pb-14 md:px-12 lg:pb-24">
-                    <div className="max-w-4xl">
+                <div className="container relative z-20 mx-auto px-6 pb-11 md:px-12 lg:pb-20">
+                    <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
                         {headline ? (
                             <h1 className="mb-6 text-4xl font-bold leading-tight text-white md:text-5xl lg:text-7xl">
                                 {headline}
@@ -80,10 +80,10 @@ export function FullWidthHeroSectionComponent({
                         ) : null}
 
                         {teaserText ? (
-                            <div
-                                className="prose prose-lg mb-10 max-w-none text-gray-200"
-                                dangerouslySetInnerHTML={{ __html: teaserText }}
-                            />
+                            <p
+                                className="mb-10 max-w-none text-gray-200">
+                                {teaserText}
+                            </p>
                         ) : null}
 
                         {actionButton ? (
