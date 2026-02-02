@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, CardMedia, Typography } from '@mui/material'
+
 import Image from 'next/image'
 import type { CardItem } from '@/types'
 import type { ThemeDefinition } from '@/themes'
@@ -16,24 +16,20 @@ export function BorderedCardItem({ card, strapiBaseUrl, theme, isUnread }: Borde
     const imageUrl = resolveMediaUrl(card.BackgroundImage, strapiBaseUrl)
 
     return (
-        <Card
-            sx={{
+        <div
+            style={{
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                borderTop: `6px solid ${theme.headerBackground}`, // Blueish top border
                 borderRadius: 0,
-                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-                backgroundColor: '#f3f4f6', // Light gray background essentially white/light
+                boxShadow: 'none',
+                backgroundColor: 'var(--color-cards-background)', // Light gray background essentially white/light
                 transition: 'transform 0.2s',
-                '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-                },
             }}
+            className="hover:-translate-y-1 hover:shadow-lg group"
         >
             {imageUrl && (
-                <Box sx={{ position: 'relative', width: '100%', paddingTop: '60%' }}>
+                <div style={{ position: 'relative', width: '100%', paddingTop: '60%' }}>
                     <Image
                         src={imageUrl}
                         alt={card.BackgroundImage?.alternativeText ?? card.Headline ?? ''}
@@ -41,51 +37,62 @@ export function BorderedCardItem({ card, strapiBaseUrl, theme, isUnread }: Borde
                         style={{ objectFit: 'cover' }}
                         unoptimized
                     />
-                </Box>
+                </div>
             )}
 
-            <CardContent sx={{
+            <div style={{
                 flexGrow: 1,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                textAlign: 'center',
-                padding: 4,
-                gap: 2
+                padding: '32px', // p-8 equivalent to MUI spacing(4) -> 4 * 8px = 32px
+                gap: '16px' // gap-4 equivalent to MUI spacing(2) -> 2 * 8px = 16px
             }}>
                 {card.Headline && (
-                    <Typography
-                        variant='h6'
-                        component='h3'
-                        sx={{
-                            color: theme.headerBackground, // Use primary/header color for headline
+                    <h3
+                        style={{
+                            color: theme.cardsText,
                             fontWeight: isUnread ? 900 : 700,
-                            textTransform: 'uppercase',
                             lineHeight: 1.2,
+                            margin: 0
                         }}
                     >
                         {card.Headline}
-                    </Typography>
+                    </h3>
                 )}
 
                 {card.Subheadline && (
-                    <Typography
-                        variant='body1'
-                        sx={{
+                    <p
+                        style={{
                             color: theme.cardsText,
                             lineHeight: 1.6,
+                            fontSize: '1rem', // ~body1
+                            margin: 0
                         }}
                     >
                         {card.Subheadline}
-                    </Typography>
+                    </p>
+                )}
+
+                {card.TeaserText && (
+                    <p
+                        style={{
+                            color: theme.cardsText,
+                            lineHeight: 1.5,
+                            marginTop: '8px',
+                            margin: 0
+                        }}
+                    >
+                        {card.TeaserText}
+                    </p>
                 )}
 
                 {card.ActionButton && (
-                    <Box sx={{ marginTop: 'auto', paddingTop: 2 }}>
+                    <div style={{ marginTop: 'auto', paddingTop: '16px' }}>
                         <ActionButton actionButton={card.ActionButton} theme={theme} />
-                    </Box>
+                    </div>
                 )}
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     )
 }

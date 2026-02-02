@@ -117,86 +117,104 @@ export function LitterCard({ litter, strapiBaseUrl, hzdSetting, distance, format
                 </div>
             </div>
 
-            {/* Info block – two columns */}
-            <div className="grid grid-cols-2 gap-4 text-sm text-gray-600 mb-4">
-                <div>
-                    <p><strong>Zwinger:</strong> {kennelName}</p>
-                    {distance !== null && <p><strong>Entfernung:</strong> ~{Math.round(distance)} km</p>}
-                </div>
-                <div>
-                    <p><strong>Züchter:</strong> {breederMember}</p>
-                </div>
-                <div>
-                    <p><strong>Mutter:</strong> {motherName}</p>
-                    {stuntDogName && <p><strong>Deckrüde:</strong> {stuntDogName}</p>}
-                </div>
+            {/* Info block – Table */}
+            <div className="mb-4">
+                <table className="w-full text-sm text-gray-600">
+                    <tbody>
+                        <tr className="border-b border-gray-100 last:border-0">
+                            <td className="py-2 font-bold w-[40%] align-top">Zwinger:</td>
+                            <td className="py-2 align-top">{kennelName}</td>
+                        </tr>
+                        {distance !== null && (
+                            <tr className="border-b border-gray-100 last:border-0">
+                                <td className="py-2 font-bold align-top">Entfernung:</td>
+                                <td className="py-2 align-top">~{Math.round(distance)} km</td>
+                            </tr>
+                        )}
+                        <tr className="border-b border-gray-100 last:border-0">
+                            <td className="py-2 font-bold align-top">Züchter:</td>
+                            <td className="py-2 align-top">{breederMember}</td>
+                        </tr>
+                        <tr className="border-b border-gray-100 last:border-0">
+                            <td className="py-2 font-bold align-top">Mutter:</td>
+                            <td className="py-2 align-top">{motherName}</td>
+                        </tr>
+                        {stuntDogName && (
+                            <tr className="border-b border-gray-100 last:border-0">
+                                <td className="py-2 font-bold align-top">Deckrüde:</td>
+                                <td className="py-2 align-top">{stuntDogName}</td>
+                            </tr>
+                        )}
+                        {litter.dateOfManting && (
+                            <tr className="border-b border-gray-100 last:border-0">
+                                <td className="py-2 font-bold align-top">Deckdatum:</td>
+                                <td className="py-2 align-top">{formatDate(litter.dateOfManting)}</td>
+                            </tr>
+                        )}
+                        {litter.expectedDateOfBirth && (
+                            <tr className="border-b border-gray-100 last:border-0">
+                                <td className="py-2 font-bold align-top">Erw. Geburtsdatum:</td>
+                                <td className="py-2 align-top">{formatDate(litter.expectedDateOfBirth)}</td>
+                            </tr>
+                        )}
+                        {litter.dateOfBirth && (
+                            <tr className="border-b border-gray-100 last:border-0">
+                                <td className="py-2 font-bold align-top">Geburtsdatum:</td>
+                                <td className="py-2 align-top">{formatDate(litter.dateOfBirth)}</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
             </div>
+            {(litter.AmountRS || litter.AmountRSM || litter.AmountRB || litter.AmountHS || litter.AmountHSM || litter.AmountHB) ? (
+                <div className='mt-3 space-y-1 border-t border-gray-200 pt-2'>
+                    <table className="w-full">
+                        <thead>
+                            <tr className="text-gray-500">
+                                <th className="text-left font-medium pb-2"></th>
+                                <th className="text-center font-bold pb-2">RÜDEN</th>
+                                <th className="text-center font-bold pb-2">HÜNDINNEN</th>
+                            </tr>
+                        </thead>
+                        <tbody className="text-gray-700">
+                            {[
+                                { key: 'S', label: 'Schwarz' },
+                                { key: 'SM', label: 'Schwarzmarken' },
+                                { key: 'B', label: 'Blond' }
+                            ].map(({ key, label }) => {
+                                const male = (litter as any)[`AmountR${key}`]
+                                const female = (litter as any)[`AmountH${key}`]
+                                if (!male && !female) return null
 
-            <div className='space-y-2 text-sm text-gray-600'>
-                {litter.dateOfManting ? (
-                    <p>
-                        <strong>Deckdatum:</strong> {formatDate(litter.dateOfManting)}
-                    </p>
-                ) : null}
-                {litter.expectedDateOfBirth ? (
-                    <p>
-                        <strong>Erwartetes Geburtsdatum:</strong> {formatDate(litter.expectedDateOfBirth)}
-                    </p>
-                ) : null}
-                {litter.dateOfBirth ? (
-                    <p>
-                        <strong>Geburtsdatum:</strong> {formatDate(litter.dateOfBirth)}
-                    </p>
-                ) : null}
-                {(litter.AmountRS || litter.AmountRSM || litter.AmountRB || litter.AmountHS || litter.AmountHSM || litter.AmountHB) ? (
-                    <div className='mt-3 space-y-1 border-t border-gray-200 pt-2'>
-                        <table className="w-full">
-                            <thead>
-                                <tr className="text-gray-500">
-                                    <th className="text-left font-medium pb-2"></th>
-                                    <th className="text-center font-bold pb-2">RÜDEN</th>
-                                    <th className="text-center font-bold pb-2">HÜNDINNEN</th>
-                                </tr>
-                            </thead>
-                            <tbody className="text-gray-700">
-                                {[
-                                    { key: 'S', label: 'Schwarz' },
-                                    { key: 'SM', label: 'Schwarzmarken' },
-                                    { key: 'B', label: 'Blond' }
-                                ].map(({ key, label }) => {
-                                    const male = (litter as any)[`AmountR${key}`]
-                                    const female = (litter as any)[`AmountH${key}`]
-                                    if (!male && !female) return null
+                                const hasAvailable = (male?.Available ?? 0) > 0 || (female?.Available ?? 0) > 0
+                                const rowClass = hasAvailable ? 'border-b border-gray-100 last:border-0' : 'border-b border-gray-100 last:border-0 text-gray-400'
 
-                                    const hasAvailable = (male?.Available ?? 0) > 0 || (female?.Available ?? 0) > 0
-                                    const rowClass = hasAvailable ? 'border-b border-gray-100 last:border-0' : 'border-b border-gray-100 last:border-0 text-gray-400'
-
-                                    return (
-                                        <tr key={key} className={rowClass}>
-                                            <td className="py-1 font-medium">{label}</td>
-                                            <td className="py-1 text-center font-mono">
-                                                <span className={male?.Available > 0 ? 'text-green-700 font-bold' : (!hasAvailable ? 'text-gray-400' : 'text-gray-600')}>
-                                                    {male?.Available ?? 0}/{male?.Total ?? 0}
-                                                </span>
-                                            </td>
-                                            <td className="py-1 text-center font-mono">
-                                                <span className={female?.Available > 0 ? 'text-green-700 font-bold' : (!hasAvailable ? 'text-gray-400' : 'text-gray-600')}>
-                                                    {female?.Available ?? 0}/{female?.Total ?? 0}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    )
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
-                ) : null}
-                {litter.StatusMessage ? (
-                    <div className='mt-3 rounded bg-blue-50 p-2'>
-                        <p className='text-xs text-blue-700'>{litter.StatusMessage}</p>
-                    </div>
-                ) : null}
-            </div>
+                                return (
+                                    <tr key={key} className={rowClass}>
+                                        <td className="py-1 font-medium">{label}</td>
+                                        <td className="py-1 text-center font-mono">
+                                            <span className={male?.Available > 0 ? 'text-green-700 font-bold' : (!hasAvailable ? 'text-gray-400' : 'text-gray-600')}>
+                                                {male?.Available ?? 0}/{male?.Total ?? 0}
+                                            </span>
+                                        </td>
+                                        <td className="py-1 text-center font-mono">
+                                            <span className={female?.Available > 0 ? 'text-green-700 font-bold' : (!hasAvailable ? 'text-gray-400' : 'text-gray-600')}>
+                                                {female?.Available ?? 0}/{female?.Total ?? 0}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                )
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            ) : null}
+            {litter.StatusMessage ? (
+                <div className='mt-3 rounded bg-blue-50 p-2'>
+                    <p className='text-xs text-blue-700'>{litter.StatusMessage}</p>
+                </div>
+            ) : null}
         </div>
+
     )
 }

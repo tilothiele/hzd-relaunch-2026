@@ -1,9 +1,8 @@
-'use client'
 
-import { Button } from '@mui/material'
 import Link from 'next/link'
 import type { ActionButton as ActionButtonType } from '@/types'
 import type { ThemeDefinition } from '@/themes'
+
 
 interface ActionButtonProps {
 	actionButton: ActionButtonType
@@ -22,111 +21,65 @@ export function ActionButton({ actionButton, theme }: ActionButtonProps) {
 	const buttonColor = theme?.buttonColor ?? 'var(--color-action-primary)'
 	const buttonTextColor = theme?.buttonTextColor ?? 'var(--color-action-primary-text)'
 
-	// --color-action-primary-text: var(--color-putty-200);
-	// --color-action-primary-background: var(--color-putty-200);
-
-
 	// Prüfe ob es ein interner oder externer Link ist
 	const isExternalLink = actionButton.Link.startsWith('http://') || actionButton.Link.startsWith('https://')
 
-	const commonSx = {
-		borderRadius: '12px',
-		px: 3,
-		py: 1.5,
-		fontSize: '0.875rem',
-		fontWeight: 600,
-		textTransform: 'uppercase' as const,
+	const baseStyles: React.CSSProperties = {
 		display: 'inline-flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		borderRadius: '12px',
+		padding: '10px 24px', // py-1.5 -> 6px, px-3 -> 12px in MUI but typically button padding is larger. Keeping user request for "standard". px-3=24px, py-1.5=12px approx.
+		fontSize: '1.15rem',
+		fontWeight: 400,
+		textDecoration: 'none',
+		transition: 'all 0.2s ease-in-out',
+		cursor: 'pointer',
+		lineHeight: 1.5
 	}
+
+	// Determine specific styles based on variant
+	let specificStyles: React.CSSProperties = {}
 
 	if (isPrimary) {
-		// Primary Button: contained (solid)
-		if (isExternalLink) {
-			return (
-				<Button
-					component='a'
-					href={actionButton.Link}
-					target='_blank'
-					rel='noopener noreferrer'
-					variant='contained'
-					sx={{
-						...commonSx,
-						backgroundColor: buttonColor,
-						color: buttonTextColor,
-						'&:hover': {
-							backgroundColor: buttonColor,
-							opacity: 0.9,
-						},
-					}}
-				>
-					{label}
-				</Button>
-			)
+		specificStyles = {
+			backgroundColor: buttonColor,
+			color: buttonTextColor,
+			border: `1px solid ${buttonColor}`,
 		}
-
-		return (
-			<Button
-				component={Link}
-				href={actionButton.Link}
-				variant='contained'
-				sx={{
-					...commonSx,
-					backgroundColor: buttonColor,
-					color: buttonTextColor,
-					'&:hover': {
-						backgroundColor: buttonColor,
-						opacity: 0.9,
-					},
-				}}
-			>
-				{label}
-			</Button>
-		)
+	} else {
+		// Secondary / Outlined
+		specificStyles = {
+			backgroundColor: 'transparent',
+			color: buttonColor,
+			border: `1px solid ${buttonColor}`,
+		}
 	}
 
-	// Secondary Button: outlined (hollow)
+	const hoverClass = "shadow-lg hover:shadow-xl hover:!bg-[var(--color-action-primary-hover)] hover:!border-[var(--color-action-primary-hover)] hover:!text-white hover:!font-medium transition-all duration-200"
+
 	if (isExternalLink) {
 		return (
-			<Button
-				component='a'
+			<a
 				href={actionButton.Link}
 				target='_blank'
 				rel='noopener noreferrer'
-				variant='outlined'
-				sx={{
-					...commonSx,
-					borderColor: buttonColor,
-					color: buttonColor,
-					backgroundColor: 'transparent',
-					'&:hover': {
-						borderColor: buttonColor,
-						backgroundColor: 'rgba(0, 0, 0, 0.04)',
-					},
-				}}
+				style={{ ...baseStyles, ...specificStyles }}
+				className={hoverClass}
 			>
 				{label}
-			</Button>
+			</a>
 		)
 	}
 
 	return (
-		<Button
-			component={Link}
+		<Link
 			href={actionButton.Link}
-			variant='outlined'
-			sx={{
-				...commonSx,
-				borderColor: buttonColor,
-				color: buttonColor,
-				backgroundColor: 'transparent',
-				'&:hover': {
-					borderColor: buttonColor,
-					backgroundColor: 'rgba(0, 0, 0, 0.04)',
-				},
-			}}
+			style={{ ...baseStyles, ...specificStyles }}
+			className={hoverClass}
 		>
 			{label}
-		</Button>
+		</Link>
 	)
 }
 

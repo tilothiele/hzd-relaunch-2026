@@ -68,12 +68,9 @@ export function CardSectionComponent({
 				<Box
 					ref={elementRef}
 					sx={{
-						display: 'grid',
-						gridTemplateColumns: {
-							xs: '1fr',
-							md: 'repeat(2, 1fr)',
-							lg: 'repeat(3, 1fr)',
-						},
+						display: 'flex',
+						flexWrap: 'wrap',
+						justifyContent: 'center',
 						gap: 4,
 						opacity: isVisible ? 1 : 0,
 						transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
@@ -84,12 +81,24 @@ export function CardSectionComponent({
 						const key = card.id ?? card.Headline ?? `card-${index}`
 
 						return (
-							<BorderedCardItem
+							<Box
 								key={key}
-								card={card}
-								strapiBaseUrl={strapiBaseUrl}
-								theme={theme}
-							/>
+								sx={{
+									width: {
+										xs: '100%',
+										md: 'calc(50% - 16px)',
+										lg: 'calc(33.333% - 22px)',
+									},
+									display: 'flex',
+									flexDirection: 'column',
+								}}
+							>
+								<BorderedCardItem
+									card={card}
+									strapiBaseUrl={strapiBaseUrl}
+									theme={theme}
+								/>
+							</Box>
 						)
 					})}
 				</Box>

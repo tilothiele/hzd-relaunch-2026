@@ -33,6 +33,7 @@ export interface CardItem {
 	id?: string
 	Headline?: string | null
 	Subheadline?: string | null
+	TeaserText?: string | null
 	BackgroundImage?: Image | null
 	ActionButton?: ActionButton | null
 }

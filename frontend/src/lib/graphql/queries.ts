@@ -97,6 +97,7 @@ export const GET_LAYOUT = `
 							id
 							Headline
 							Subheadline
+							TeaserText
 							BackgroundImage {
 								url
 								alternativeText
@@ -323,6 +324,7 @@ export const GET_INDEX_PAGE = `
 						id
 						Headline
 						Subheadline
+						TeaserText
 						BackgroundImage {
 							url
 							alternativeText
@@ -568,6 +570,7 @@ export const GET_PAGE_BY_SLUG = `
 							id
 							Headline
 							Subheadline
+							TeaserText
 							BackgroundImage {
 								url
 								alternativeText
