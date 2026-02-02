@@ -146,7 +146,7 @@ export interface SimpleHeroSection {
 	HeroHeadline?: string | null
 	HeroTeaser?: string | null
 	HeroImage?: Image | null
-	HeroLayout?: 'Image_left' | 'Image_right' | null
+	HeroLayout?: 'Image_left' | 'Image_right' | 'full_width' | null
 	HeroCta?: ActionButton | null
 	FullWidth?: boolean | null
 	ShowLog?: boolean | null

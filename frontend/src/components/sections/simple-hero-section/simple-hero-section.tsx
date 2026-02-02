@@ -8,6 +8,8 @@ import { ActionButton } from '@/components/ui/action-button'
 import { SectionContainer } from '../section-container/section-container'
 import { useScrollAnimation } from '@/hooks/use-scroll-animation'
 
+import { FullWidthHeroSectionComponent } from './full-width-hero-section'
+
 interface SimpleHeroSectionComponentProps {
     section: SimpleHeroSection
     strapiBaseUrl: string
@@ -29,6 +31,17 @@ export function SimpleHeroSectionComponent({
     const imageUrl = resolveMediaUrl(section.HeroImage, strapiBaseUrl)
     const imageAlt = section.HeroImage?.alternativeText ?? 'Hero Bild'
     const layout = section.HeroLayout ?? 'Image_right'
+
+    if (layout === 'full_width') {
+        return (
+            <FullWidthHeroSectionComponent
+                section={section}
+                strapiBaseUrl={strapiBaseUrl}
+                theme={theme}
+            />
+        )
+    }
+
     const headline = section.HeroHeadline
     const teaserText = section.HeroTeaser
     const actionButton = section.HeroCta
@@ -81,7 +94,7 @@ export function SimpleHeroSectionComponent({
                     <div className="max-w-xl">
 
                         {headline ? (
-                            <h1 className="mb-6 text-4xl font-bold leading-tight md:text-5xl lg:text-6xl" style={{ color: theme.headlineColor }}>
+                            <h1 className="mb-6 text-4xl line-height-1.1 font-bold leading-tight md:text-5xl lg:text-6xl" style={{ color: theme.headlineColor }}>
                                 {headline}
                             </h1>
                         ) : null}
@@ -89,8 +102,11 @@ export function SimpleHeroSectionComponent({
                         {teaserText ? (
                             <div
                                 className="prose prose-lg mb-10 max-w-none text-gray-600"
-                                dangerouslySetInnerHTML={{ __html: teaserText }}
-                            />
+                            >
+                                <p
+                                    dangerouslySetInnerHTML={{ __html: teaserText }}
+                                ></p>
+                            </div>
                         ) : null}
 
                         {actionButton ? (

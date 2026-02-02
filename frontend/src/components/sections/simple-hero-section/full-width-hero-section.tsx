@@ -1,0 +1,99 @@
+'use client'
+
+import Image from 'next/image'
+import type { SimpleHeroSection } from '@/types'
+import type { ThemeDefinition } from '@/themes'
+import { resolveMediaUrl } from '@/components/header/logo-utils'
+import { ActionButton } from '@/components/ui/action-button'
+import { SectionContainer } from '../section-container/section-container'
+import { useScrollAnimation } from '@/hooks/use-scroll-animation'
+
+interface FullWidthHeroSectionComponentProps {
+    section: SimpleHeroSection
+    strapiBaseUrl: string
+    theme: ThemeDefinition
+}
+
+export function FullWidthHeroSectionComponent({
+    section,
+    strapiBaseUrl,
+    theme,
+}: FullWidthHeroSectionComponentProps) {
+    const { elementRef, isVisible } = useScrollAnimation({
+        threshold: 0.1,
+        triggerOnce: false,
+    })
+
+    const imageUrl = resolveMediaUrl(section.HeroImage, strapiBaseUrl)
+    const imageAlt = section.HeroImage?.alternativeText ?? 'Hero Bild'
+    const headline = section.HeroHeadline
+    const teaserText = section.HeroTeaser
+    const actionButton = section.HeroCta
+
+    if (!imageUrl) {
+        return null
+    }
+
+    return (
+        <SectionContainer
+            variant="full-width"
+            id={section.HeroAnchor || undefined}
+            paddingTop="0"
+            paddingBottom="0"
+        >
+            <div
+                ref={elementRef}
+                className="relative flex h-[600px] w-full flex-col justify-end overflow-hidden md:h-[700px] lg:h-[800px]"
+                style={{
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+                    transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
+                }}
+            >
+                {/* Background Image */}
+                <div className="absolute inset-0 z-0">
+                    <Image
+                        src={imageUrl}
+                        alt={imageAlt}
+                        fill
+                        className="object-cover"
+                        priority
+                        unoptimized
+                    />
+                </div>
+
+                {/* Backdrop Gradient: Transparent top -> Dark bottom */}
+                <div
+                    className="absolute inset-0 z-10"
+                    style={{
+                        background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 25%, rgba(0,0,0,0) 50%)'
+                    }}
+                />
+
+                {/* Content */}
+                <div className="container relative z-20 mx-auto px-6 pb-14 md:px-12 lg:pb-24">
+                    <div className="max-w-4xl">
+                        {headline ? (
+                            <h1 className="mb-6 text-4xl font-bold leading-tight text-white md:text-5xl lg:text-7xl">
+                                {headline}
+                            </h1>
+                        ) : null}
+
+                        {teaserText ? (
+                            <div
+                                className="prose prose-lg mb-10 max-w-none text-gray-200"
+                                dangerouslySetInnerHTML={{ __html: teaserText }}
+                            />
+                        ) : null}
+
+                        {actionButton ? (
+                            <div>
+                                <ActionButton actionButton={actionButton} theme={theme} />
+                            </div>
+                        ) : null}
+                    </div>
+                </div>
+            </div>
+        </SectionContainer>
+    )
+}

@@ -31,7 +31,8 @@
       "default": "Image right",
       "enum": [
         "Image left",
-        "Image right"
+        "Image right",
+        "full width"
       ]
     },
     "HeroCta": {

@@ -107,6 +107,8 @@ export async function fetchGraphQL<T>(
 		if (!response.ok) {
 			const errorData = await response.json().catch(() => null)
 			const errorMessage = errorData?.error?.message ?? 'GraphQL-Anfrage fehlgeschlagen'
+			console.error('GraphQL Error:', errorMessage)
+			console.error('GraphQL Error Data:', errorData)
 			throw new Error(errorMessage)
 		}
 
