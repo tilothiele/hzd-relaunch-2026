@@ -68,6 +68,10 @@ export const GET_LAYOUT = `
 						RichTextContent
 						RichTextOddEven
 						RichTextAnchor
+						RichTextPadding {
+							Top
+							Bottom
+						}
 					}
 					... on ComponentBlocksHeroSectionSlideShow {
 						Headline {
@@ -154,6 +158,10 @@ export const GET_LAYOUT = `
 							}
 						}
 						TextColumnsAnchor
+						Padding {
+							Top
+							Bottom
+						}
 					}
 					... on ComponentBlocksImageGallerySection {
 						GalleryHeadline
@@ -295,6 +303,10 @@ export const GET_INDEX_PAGE = `
 					RichTextContent
 					RichTextOddEven
 					RichTextAnchor
+					RichTextPadding {
+						Top
+						Bottom
+					}
 				}
 				... on ComponentBlocksHeroSectionSlideShow {
 					Headline {
@@ -381,6 +393,10 @@ export const GET_INDEX_PAGE = `
 						}
 					}
 					TextColumnsAnchor
+					Padding {
+						Top
+						Bottom
+					}
 				}
 				... on ComponentBlocksImageGallerySection {
 					GalleryHeadline
@@ -542,6 +558,10 @@ export const GET_PAGE_BY_SLUG = `
 							RichTextContent
 							RichTextOddEven
 							RichTextAnchor
+							RichTextPadding {
+								Top
+								Bottom
+							}
 						}
 						... on ComponentBlocksHeroSectionSlideShow {
 							Headline {
@@ -653,6 +673,10 @@ export const GET_PAGE_BY_SLUG = `
 								}
 							}
 							TextColumnsAnchor
+							Padding {
+								Top
+								Bottom
+							}
 						}
 						... on ComponentBlocksImageGallerySection {
 							GalleryHeadline

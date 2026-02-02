@@ -1,5 +1,10 @@
 import type { BlocksContent } from '@strapi/blocks-react-renderer'
 
+export interface ComponentLayoutPadding {
+	Top: 'small' | 'middle' | 'large' | null
+	Bottom: 'small' | 'middle' | 'large' | null
+}
+
 export interface Image {
 	url: string
 	alternativeText?: string | null
@@ -55,6 +60,7 @@ export interface RichTextSection {
 	RichTextOddEven?: 'Odd' | 'Even' | null
 	RichTextContent?: string | null
 	RichTextAnchor?: string | null
+	RichTextPadding?: ComponentLayoutPadding | null
 }
 
 export interface File {
@@ -123,6 +129,7 @@ export interface TextColumnsSection {
 	TextColumnsSubHeadline?: string | null
 	TextColumn?: TextColumn[] | null
 	TextColumnsAnchor?: string | null
+	Padding?: ComponentLayoutPadding | null
 }
 
 export interface ImageGallerySection {

@@ -119,7 +119,7 @@ export function SimpleHeroSectionComponent({
 
                 {/* Image Side */}
                 {imageUrl ? (
-                    <div className={`relative h-[300px] w-full md:h-auto md:w-1/2 ${isImageLeft ? 'md:order-1' : 'md:order-2'}`}>
+                    <div className={`hidden md:block relative w-full md:h-auto md:w-1/2 ${isImageLeft ? 'md:order-1' : 'md:order-2'}`}>
                         <Image
                             src={imageUrl}
                             alt={imageAlt}

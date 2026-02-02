@@ -25,6 +25,11 @@
     },
     "TextColumnsAnchor": {
       "type": "string"
+    },
+    "Padding": {
+      "type": "component",
+      "component": "layout.padding",
+      "repeatable": false
     }
   },
   "config": {}

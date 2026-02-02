@@ -121,13 +121,26 @@ export function TextColumnsSectionComponent({
 
 	const backgroundColor = section.TextColumnsOddEven === 'Odd' ? 'var(--color-odd-section-background)' : theme.evenBgColor
 
+	const mapPadding = (size: 'small' | 'middle' | 'large' | null | undefined) => {
+		switch (size) {
+			case 'small': return '1rem'
+			case 'middle': return '3rem'
+			case 'large': return '5rem'
+			default: return '1.2rem' // Default top padding for TextColumns
+		}
+	}
+
+	// Use specific defaults if not provided to match original style '1.2rem' top, '1.5rem' bottom
+	const paddingTop = section.Padding?.Top ? mapPadding(section.Padding.Top) : '1.2rem'
+	const paddingBottom = section.Padding?.Bottom ? mapPadding(section.Padding.Bottom) : '1.5rem'
+
 	return (
 		<SectionContainer
 			variant='max-width'
 			id={section.TextColumnsAnchor || undefined}
 			backgroundColor={backgroundColor}
-			marginTop='1.2rem'
-			paddingBottom='1.5rem'
+			paddingTop={paddingTop}
+			paddingBottom={paddingBottom}
 		>
 			<div className="w-full max-w-[1200px]">
 				{section.TextColumnsHeadline ? (

@@ -28,6 +28,11 @@
     },
     "RichTextAnchor": {
       "type": "string"
+    },
+    "RichTextPadding": {
+      "type": "component",
+      "component": "layout.padding",
+      "repeatable": false
     }
   },
   "config": {}

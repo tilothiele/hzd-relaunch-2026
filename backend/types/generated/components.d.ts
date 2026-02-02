@@ -141,6 +141,7 @@ export interface BlocksRichTextSection extends Struct.ComponentSchema {
         }
       >;
     RichTextOddEven: Schema.Attribute.Enumeration<['Odd', 'Even']>;
+    RichTextPadding: Schema.Attribute.Component<'layout.padding', false>;
     Subtitle: Schema.Attribute.String;
     Title: Schema.Attribute.String;
   };
@@ -248,6 +249,7 @@ export interface BlocksTextColumnsSection extends Struct.ComponentSchema {
     displayName: 'TextColumnsSection';
   };
   attributes: {
+    Padding: Schema.Attribute.Component<'layout.padding', false>;
     TextColumn: Schema.Attribute.Component<'columns.text-column', true>;
     TextColumnsAnchor: Schema.Attribute.String;
     TextColumnsHeadline: Schema.Attribute.String;
@@ -528,6 +530,17 @@ export interface LayoutFooter extends Struct.ComponentSchema {
   };
 }
 
+export interface LayoutPadding extends Struct.ComponentSchema {
+  collectionName: 'components_layout_paddings';
+  info: {
+    displayName: 'Padding';
+  };
+  attributes: {
+    Bottom: Schema.Attribute.Enumeration<['small', 'middle', 'large']>;
+    Top: Schema.Attribute.Enumeration<['small', 'middle', 'large']>;
+  };
+}
+
 export interface LayoutSos extends Struct.ComponentSchema {
   collectionName: 'components_layout_sos';
   info: {
@@ -682,6 +695,7 @@ declare module '@strapi/strapi' {
       'form.text-area': FormTextArea;
       'layout.color-theme': LayoutColorTheme;
       'layout.footer': LayoutFooter;
+      'layout.padding': LayoutPadding;
       'layout.sos': LayoutSos;
       'links.action-button': LinksActionButton;
       'links.partnerl-link': LinksPartnerlLink;

@@ -18,13 +18,25 @@ export function RichTextSectionComponent({
 
 	const backgroundColor = section.RichTextOddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
 
+	const mapPadding = (size: 'small' | 'middle' | 'large' | null | undefined) => {
+		switch (size) {
+			case 'small': return '1rem'
+			case 'middle': return '2rem'
+			case 'large': return '3rem'
+			default: return '1em'
+		}
+	}
+
+	const paddingTop = mapPadding(section.RichTextPadding?.Top)
+	const paddingBottom = mapPadding(section.RichTextPadding?.Bottom)
+
 	return (
 		<SectionContainer
 			variant='max-width'
 			id={section.RichTextAnchor || undefined}
 			backgroundColor={backgroundColor}
-			marginTop='1em'
-			marginBottom='1em'
+			paddingTop={paddingTop}
+			paddingBottom={paddingBottom}
 		>
 			<div className="w-full max-w-[1200px]">
 				{section.Title && (

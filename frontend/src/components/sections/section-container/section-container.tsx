@@ -37,6 +37,7 @@ export function SectionContainer({
 				paddingLeft: paddingX,
 				paddingRight: paddingX,
 				marginBottom,
+				marginTop,
 				backgroundColor,
 			}}
 		>

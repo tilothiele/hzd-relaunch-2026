@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_layout_paddings",
+  "info": {
+    "displayName": "Padding"
+  },
+  "options": {},
+  "attributes": {
+    "Top": {
+      "type": "enumeration",
+      "enum": [
+        "small",
+        "middle",
+        "large"
+      ]
+    },
+    "Bottom": {
+      "type": "enumeration",
+      "enum": [
+        "small",
+        "middle",
+        "large"
+      ]
+    }
+  },
+  "config": {}
+}

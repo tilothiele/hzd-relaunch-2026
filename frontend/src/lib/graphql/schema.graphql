@@ -267,60 +267,6 @@ input JSONFilterInput {
   between: [JSON]
 }
 
-input ComponentSeoSeoFiltersInput {
-  TitleTag: StringFilterInput
-  MetaDescription: StringFilterInput
-  Keywords: StringFilterInput
-  ExcludeFromSitemap: BooleanFilterInput
-  and: [ComponentSeoSeoFiltersInput]
-  or: [ComponentSeoSeoFiltersInput]
-  not: ComponentSeoSeoFiltersInput
-}
-
-input ComponentSeoSeoInput {
-  id: ID
-  TitleTag: String
-  MetaDescription: String
-  Keywords: String
-  ExcludeFromSitemap: Boolean
-}
-
-type ComponentSeoSeo {
-  id: ID!
-  TitleTag: String
-  MetaDescription: String
-  Keywords: String
-  ExcludeFromSitemap: Boolean
-}
-
-input ComponentPermissionRestrictionFiltersInput {
-  Public: BooleanFilterInput
-  Authenticated: BooleanFilterInput
-  and: [ComponentPermissionRestrictionFiltersInput]
-  or: [ComponentPermissionRestrictionFiltersInput]
-  not: ComponentPermissionRestrictionFiltersInput
-}
-
-input ComponentPermissionRestrictionInput {
-  id: ID
-  Public: Boolean
-  Authenticated: Boolean
-}
-
-type ComponentPermissionRestriction {
-  id: ID!
-  Public: Boolean!
-  Authenticated: Boolean!
-}
-
-type ComponentPermissionGroups {
-  id: ID!
-  Any: Boolean
-  Member: Boolean
-  HeadOfEvent: Boolean
-  BreedWarden: Boolean
-}
-
 input ComponentPersonalShippingAddressFiltersInput {
   Name: StringFilterInput
   AdditionalName: StringFilterInput
@@ -385,6 +331,60 @@ type ComponentPersonalAddress {
   City: String
 }
 
+input ComponentSeoSeoFiltersInput {
+  TitleTag: StringFilterInput
+  MetaDescription: StringFilterInput
+  Keywords: StringFilterInput
+  ExcludeFromSitemap: BooleanFilterInput
+  and: [ComponentSeoSeoFiltersInput]
+  or: [ComponentSeoSeoFiltersInput]
+  not: ComponentSeoSeoFiltersInput
+}
+
+input ComponentSeoSeoInput {
+  id: ID
+  TitleTag: String
+  MetaDescription: String
+  Keywords: String
+  ExcludeFromSitemap: Boolean
+}
+
+type ComponentSeoSeo {
+  id: ID!
+  TitleTag: String
+  MetaDescription: String
+  Keywords: String
+  ExcludeFromSitemap: Boolean
+}
+
+input ComponentPermissionRestrictionFiltersInput {
+  Public: BooleanFilterInput
+  Authenticated: BooleanFilterInput
+  and: [ComponentPermissionRestrictionFiltersInput]
+  or: [ComponentPermissionRestrictionFiltersInput]
+  not: ComponentPermissionRestrictionFiltersInput
+}
+
+input ComponentPermissionRestrictionInput {
+  id: ID
+  Public: Boolean
+  Authenticated: Boolean
+}
+
+type ComponentPermissionRestriction {
+  id: ID!
+  Public: Boolean!
+  Authenticated: Boolean!
+}
+
+type ComponentPermissionGroups {
+  id: ID!
+  Any: Boolean
+  Member: Boolean
+  HeadOfEvent: Boolean
+  BreedWarden: Boolean
+}
+
 input ComponentLinksPartnerlLinkFiltersInput {
   PartnerLinkUrl: StringFilterInput
   AltText: StringFilterInput
@@ -435,6 +435,24 @@ type ComponentLayoutSos {
   ShowSOS: Boolean!
   SosTitle: String
   SosLink: String
+}
+
+enum ENUM_COMPONENTLAYOUTPADDING_TOP {
+  small
+  middle
+  large
+}
+
+enum ENUM_COMPONENTLAYOUTPADDING_BOTTOM {
+  small
+  middle
+  large
+}
+
+type ComponentLayoutPadding {
+  id: ID!
+  Top: ENUM_COMPONENTLAYOUTPADDING_TOP
+  Bottom: ENUM_COMPONENTLAYOUTPADDING_BOTTOM
 }
 
 input ComponentLayoutFooterInput {
@@ -752,6 +770,7 @@ type ComponentBlocksTextColumnsSection {
   TextColumn(filters: ComponentColumnsTextColumnFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [ComponentColumnsTextColumn]
   TextColumnsOddEven: ENUM_COMPONENTBLOCKSTEXTCOLUMNSSECTION_TEXTCOLUMNSODDEVEN
   TextColumnsAnchor: String
+  Padding: ComponentLayoutPadding
 }
 
 enum ENUM_COMPONENTBLOCKSTEASERTEXTWITHIMAGE_IMAGEPOSITION {
@@ -845,6 +864,7 @@ type ComponentBlocksRichTextSection {
   RichTextContent: String
   RichTextOddEven: ENUM_COMPONENTBLOCKSRICHTEXTSECTION_RICHTEXTODDEVEN
   RichTextAnchor: String
+  RichTextPadding: ComponentLayoutPadding
 }
 
 type ComponentBlocksNewsArticlesSection {
@@ -2487,7 +2507,7 @@ type SupplementalDocumentGroupEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union GenericMorph = ComponentSeoSeo | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
+union GenericMorph = ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentSeoSeo | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
 
 input FileInfoInput {
   name: String
