@@ -66,22 +66,23 @@ export function FullWidthHeroSectionComponent({
                 <div
                     className="absolute inset-0 z-10"
                     style={{
-                        background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 25%, rgba(0,0,0,0) 50%)'
+                        background: 'linear-gradient(to top, var(--color-backdrop-gradient) 0%, transparent 50%)'
                     }}
                 />
 
                 {/* Content */}
                 <div className="container relative z-20 mx-auto px-6 pb-11 md:px-12 lg:pb-20">
-                    <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
+                    <div className="mx-auto flex max-w-4xl flex-col items-center text-center" style={{ color: 'var(--color-backdrop-gradient-text)' }}>
                         {headline ? (
-                            <h1 className="mb-6 text-4xl font-bold leading-tight text-white md:text-5xl lg:text-7xl">
+                            <h1 className="mb-6 text-4xl font-bold leading-tight md:text-5xl lg:text-7xl" style={{ color: 'inherit' }}>
                                 {headline}
                             </h1>
                         ) : null}
 
                         {teaserText ? (
                             <p
-                                className="mb-10 max-w-none text-gray-200">
+                                className="mb-10 max-w-none"
+                                style={{ color: 'inherit' }}>
                                 {teaserText}
                             </p>
                         ) : null}

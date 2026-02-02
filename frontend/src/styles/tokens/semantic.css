@@ -34,6 +34,9 @@
     /* hero slide show */
     --color-hero-slide-show-text: var(--color-pine-cone-700);
 
+    --color-backdrop-gradient: var(--color-tree-poppy-100);
+    --color-backdrop-gradient-text: var(--color-tree-poppy-800);
+
     /* fb, yt, ... */
     --color-social-icon: var(--color-tree-poppy-500);
 
