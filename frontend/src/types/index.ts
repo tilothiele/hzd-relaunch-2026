@@ -134,7 +134,7 @@ export interface ImageGallerySection {
 export interface SimpleCtaSection {
 	__typename: 'ComponentBlocksSimpleCtaSection'
 	CtaHeadline?: string | null
-	CtaInfoText?: string | null
+	CtaInfoText?: BlocksContent | null
 	CtaBackgroundImage?: Image | null
 	CtaActionButton?: (ActionButton | null)[] | null
 	SimpleCtaAnchor?: string | null

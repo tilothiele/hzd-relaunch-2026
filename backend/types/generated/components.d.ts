@@ -157,13 +157,7 @@ export interface BlocksSimpleCtaSection extends Struct.ComponentSchema {
       'images' | 'files' | 'videos' | 'audios'
     >;
     CtaHeadline: Schema.Attribute.String;
-    CtaInfoText: Schema.Attribute.RichText &
-      Schema.Attribute.CustomField<
-        'plugin::ckeditor5.CKEditor',
-        {
-          preset: 'defaultHtml';
-        }
-      >;
+    CtaInfoText: Schema.Attribute.Blocks;
     SimpleCtaAnchor: Schema.Attribute.String;
   };
 }

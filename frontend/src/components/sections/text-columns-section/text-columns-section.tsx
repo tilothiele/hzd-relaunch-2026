@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { Box, Accordion, AccordionSummary, AccordionDetails } from '@mui/material'
+import { Accordion, AccordionSummary, AccordionDetails } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import type { TextColumnsSection, BulletItem } from '@/types'
 import type { ThemeDefinition } from '@/themes'
@@ -76,10 +76,9 @@ function BulletItemAccordion({
 						}}
 
 					>
-						<div
-							className="prose prose-sm max-w-none dark:prose-invert [&_p]:my-2"
-							dangerouslySetInnerHTML={{ __html: itemBody }}
-						/>
+						<div className="prose prose-sm max-w-none dark:prose-invert [&_p]:my-2">
+							<p>{itemBody}</p>
+						</div>
 					</AccordionDetails>
 				) : null
 			}
@@ -129,7 +128,7 @@ export function TextColumnsSectionComponent({
 			marginTop='1.2rem'
 			marginBottom='1.5rem'
 		>
-			<Box sx={{ width: '100%', maxWidth: '1200px' }}>
+			<div className="w-full max-w-[1200px]">
 				{section.TextColumnsHeadline ? (
 					<h2 className='mb-3 text-3xl'>
 						{section.TextColumnsHeadline}
@@ -141,13 +140,10 @@ export function TextColumnsSectionComponent({
 					</h3>
 				) : null}
 
-				<Box
+				<div
 					ref={elementRef}
-					sx={{
-						display: 'flex',
-						flexWrap: 'wrap',
-						gap: 5,
-						width: '100%',
+					className="flex w-full flex-wrap gap-10"
+					style={{
 						opacity: isVisible ? 1 : 0,
 						transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
 						transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
@@ -163,13 +159,11 @@ export function TextColumnsSectionComponent({
 						) ?? []
 
 						return (
-							<Box
+							<div
 								key={key}
-								sx={{
-									width: { xs: '100%', md: 'calc(50% - 20px)' },
-								}}
+								className="w-full md:w-[calc(50%-20px)]"
 							>
-								<Box sx={{ display: 'flex', flexDirection: 'column' }}>
+								<div className="flex flex-col">
 									{columnHeadline ? (
 										<h5 className='mt-3 mb-2'>{columnHeadline}</h5>
 									) : null}
@@ -201,16 +195,16 @@ export function TextColumnsSectionComponent({
 									) : null}
 
 									{columnActionButton ? (
-										<Box sx={{ mt: 2 }}>
+										<div className="mt-4">
 											<ActionButton actionButton={columnActionButton} theme={theme} />
-										</Box>
+										</div>
 									) : null}
-								</Box>
-							</Box>
+								</div>
+							</div>
 						)
 					})}
-				</Box>
-			</Box>
+				</div>
+			</div>
 		</SectionContainer>
 	)
 }

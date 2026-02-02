@@ -8,6 +8,8 @@ import { ActionButton } from '@/components/ui/action-button'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { useScrollAnimation } from '@/hooks/use-scroll-animation'
 
+import { BlocksRenderer, type BlocksContent } from '@strapi/blocks-react-renderer'
+
 interface SimpleCtaSectionComponentProps {
 	section: SimpleCtaSection
 	strapiBaseUrl: string
@@ -27,7 +29,7 @@ export function SimpleCtaSectionComponent({
 	const backgroundColor = theme.evenBgColor
 	const backgroundImageUrl = resolveMediaUrl(section.CtaBackgroundImage, strapiBaseUrl)
 	const headline = section.CtaHeadline
-	const text = section.CtaInfoText
+	const text = section.CtaInfoText as BlocksContent | null
 	const actionButtons = section.CtaActionButton?.filter(
 		(button): button is NonNullable<typeof button> => Boolean(button),
 	) ?? []
@@ -81,13 +83,13 @@ export function SimpleCtaSectionComponent({
 							}}
 						>
 							{headline ? (
-								<h2>{headline}</h2>
+								<h2 className="mb-5">{headline}</h2>
 							) : null}
 
 							{text ? (
-								<Box
-									dangerouslySetInnerHTML={{ __html: text }}
-								/>
+								<div className="mb-5">
+									<BlocksRenderer content={text} />
+								</div>
 							) : null}
 
 							{actionButtons.length > 0 ? (

@@ -9,11 +9,7 @@
       "type": "string"
     },
     "CtaInfoText": {
-      "type": "customField",
-      "customField": "plugin::ckeditor5.CKEditor",
-      "options": {
-        "preset": "defaultHtml"
-      }
+      "type": "blocks"
     },
     "CtaActionButton": {
       "type": "component",
