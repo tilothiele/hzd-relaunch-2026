@@ -35,6 +35,7 @@ function BulletItemAccordion({
 			onChange={onToggle}
 			sx={{
 				boxShadow: 'none',
+				backgroundColor: 'rgba(255, 255, 255, 0)',
 				borderBottom: '1px solid',
 				borderColor: 'divider',
 				'&:before': {
@@ -118,7 +119,7 @@ export function TextColumnsSectionComponent({
 		return null
 	}
 
-	const backgroundColor = section.TextColumnsOddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
+	const backgroundColor = section.TextColumnsOddEven === 'Odd' ? 'var(--color-odd-section-background)' : theme.evenBgColor
 
 	return (
 		<SectionContainer
@@ -126,7 +127,7 @@ export function TextColumnsSectionComponent({
 			id={section.TextColumnsAnchor || undefined}
 			backgroundColor={backgroundColor}
 			marginTop='1.2rem'
-			marginBottom='1.5rem'
+			paddingBottom='1.5rem'
 		>
 			<div className="w-full max-w-[1200px]">
 				{section.TextColumnsHeadline ? (

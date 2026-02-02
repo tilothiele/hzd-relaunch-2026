@@ -150,37 +150,45 @@ export function LitterCard({ litter, strapiBaseUrl, hzdSetting, distance, format
                 ) : null}
                 {(litter.AmountRS || litter.AmountRSM || litter.AmountRB || litter.AmountHS || litter.AmountHSM || litter.AmountHB) ? (
                     <div className='mt-3 space-y-1 border-t border-gray-200 pt-2'>
-                        <div className="flex justify-between items-center mb-1">
-                            <p className='font-medium text-gray-700'>Welpen:</p>
-                            <div className="flex gap-4 text-[10px] text-gray-500 font-bold">
-                                <span>RUDEN (R)</span>
-                                <span>HÜNDINNEN (H)</span>
-                            </div>
-                        </div>
+                        <table className="w-full">
+                            <thead>
+                                <tr className="text-gray-500">
+                                    <th className="text-left font-medium pb-2"></th>
+                                    <th className="text-center font-bold pb-2">RÜDEN</th>
+                                    <th className="text-center font-bold pb-2">HÜNDINNEN</th>
+                                </tr>
+                            </thead>
+                            <tbody className="text-gray-700">
+                                {[
+                                    { key: 'S', label: 'Schwarz' },
+                                    { key: 'SM', label: 'Schwarzmarken' },
+                                    { key: 'B', label: 'Blond' }
+                                ].map(({ key, label }) => {
+                                    const male = (litter as any)[`AmountR${key}`]
+                                    const female = (litter as any)[`AmountH${key}`]
+                                    if (!male && !female) return null
 
-                        {[
-                            { key: 'S', label: 'Schwarz' },
-                            { key: 'SM', label: 'Schwarzmarken' },
-                            { key: 'B', label: 'Blond' }
-                        ].map(({ key, label }) => {
-                            const male = (litter as any)[`AmountR${key}`]
-                            const female = (litter as any)[`AmountH${key}`]
-                            if (!male && !female) return null
+                                    const hasAvailable = (male?.Available ?? 0) > 0 || (female?.Available ?? 0) > 0
+                                    const rowClass = hasAvailable ? 'border-b border-gray-100 last:border-0' : 'border-b border-gray-100 last:border-0 text-gray-400'
 
-                            return (
-                                <div key={key} className="flex justify-between items-center pl-2">
-                                    <span className="text-sm"><strong>{label}:</strong></span>
-                                    <div className="flex gap-4 font-mono text-sm">
-                                        <span className={male?.Available > 0 ? 'text-green-700 font-bold' : 'text-gray-400'}>
-                                            {male?.Available ?? 0}/{male?.Total ?? 0}
-                                        </span>
-                                        <span className={female?.Available > 0 ? 'text-green-700 font-bold' : 'text-gray-400'}>
-                                            {female?.Available ?? 0}/{female?.Total ?? 0}
-                                        </span>
-                                    </div>
-                                </div>
-                            )
-                        })}
+                                    return (
+                                        <tr key={key} className={rowClass}>
+                                            <td className="py-1 font-medium">{label}</td>
+                                            <td className="py-1 text-center font-mono">
+                                                <span className={male?.Available > 0 ? 'text-green-700 font-bold' : (!hasAvailable ? 'text-gray-400' : 'text-gray-600')}>
+                                                    {male?.Available ?? 0}/{male?.Total ?? 0}
+                                                </span>
+                                            </td>
+                                            <td className="py-1 text-center font-mono">
+                                                <span className={female?.Available > 0 ? 'text-green-700 font-bold' : (!hasAvailable ? 'text-gray-400' : 'text-gray-600')}>
+                                                    {female?.Available ?? 0}/{female?.Total ?? 0}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    )
+                                })}
+                            </tbody>
+                        </table>
                     </div>
                 ) : null}
                 {litter.StatusMessage ? (

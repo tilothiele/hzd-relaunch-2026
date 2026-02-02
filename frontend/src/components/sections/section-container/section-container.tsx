@@ -36,8 +36,8 @@ export function SectionContainer({
 				paddingBottom,
 				paddingLeft: paddingX,
 				paddingRight: paddingX,
-				marginTop,
 				marginBottom,
+				backgroundColor,
 			}}
 		>
 			<div className={innerContainerClasses}>{children}</div>

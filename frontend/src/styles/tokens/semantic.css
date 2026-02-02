@@ -46,6 +46,8 @@
 
     /* sonstiges */
 
+    --color-odd-section-background: var(--color-tree-poppy-900);
+
     --color-text: var(--color-astronaut-300);
     --color-text-headline: var(--color-astronaut-200);
     --color-text-subheadline: var(--color-astronaut-100);
