@@ -5,6 +5,7 @@ import { renderServerSections } from '@/components/sections/server-section-facto
 import NotFoundSection from '@/components/sections/not-found-section/not-found-section'
 import AccessForbiddenSection from '@/components/sections/access-forbidden-section/access-forbidden-section'
 import { AuthGuard } from '@/components/auth-guard/auth-guard'
+import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,6 +13,23 @@ interface PageProps {
 	params: Promise<{
 		slug: string
 	}>
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+	const { slug } = await params
+	if (!slug || slug.trim().length === 0) {
+		return {}
+	}
+
+	const { page } = await fetchPageBySlug(slug.trim())
+
+	if (!page) {
+		return {}
+	}
+
+	return {
+		title: page.title,
+	}
 }
 
 export default async function Page({ params }: PageProps) {

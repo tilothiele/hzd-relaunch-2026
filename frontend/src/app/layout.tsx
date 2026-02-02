@@ -10,7 +10,10 @@ import { TestBanner } from '@/components/test-banner/test-banner'
 config.autoAddCss = false
 
 export const metadata: Metadata = {
-	title: 'Hovawart Zuchtgemeinschaft Deutschland e.V.',
+	title: {
+		default: 'Hovawart Zuchtgemeinschaft Deutschland e.V.',
+		template: 'Hovawart Zuchtgemeinschaft Deutschland e.V. - %s',
+	},
 	description: 'Herzlich willkommen bei der Hovawart Zuchtgemeinschaft Deutschland e.V.',
 }
 
