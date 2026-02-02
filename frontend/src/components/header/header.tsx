@@ -77,9 +77,9 @@ export function Header({
 
 	// Logo Background Logic
 	const logoContainerStyle = logoBackground ? {
-		backgroundColor: headerBg,
+		backgroundColor: 'var(--color-logo-background-face)',
 		padding: isScrolled ? '6px 12px' : '15px 30px',
-		borderRadius: '20px', // Rounded edges
+		borderRadius: '0',
 		boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
 	} : {}
 
