@@ -1425,6 +1425,14 @@ export const GET_NEWS_ARTICLES = `
 	}
 `
 
+export const GET_NEWS_ARTICLES_COUNT = `
+	query GetNewsArticlesCount($filters: NewsArticleFiltersInput, $pagination: PaginationArg) {
+		newsArticles(filters: $filters, pagination: $pagination) {
+			documentId
+		}
+	}
+`
+
 export const GET_NEWS_ARTICLE_BY_SLUG = `
 	query GetNewsArticleBySlug($slug: String!) {
 		newsArticles(filters: { Slug: { eq: $slug } }, pagination: { pageSize: 1 }) {
