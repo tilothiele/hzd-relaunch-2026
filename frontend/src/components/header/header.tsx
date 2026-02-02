@@ -205,12 +205,13 @@ export function Header({
 					/>
 				</div>
 			</nav>
-
+/*
 			{pageTitle ? (
 				<div className='flex w-full justify-end'>
 					<span style={{ marginRight: '20vw', fontSize: '1.2em' }}>{pageTitle}</span>
 				</div>
 			) : null}
+			*/}
 		</header>
 	)
 }
