@@ -59,6 +59,7 @@ export const GET_LAYOUT = `
 				previewUrl
 			}
 			page {
+				LogoBackground
 				Sections {
 					__typename
 					... on ComponentBlocksRichTextSection {
@@ -284,6 +285,7 @@ export const GET_LAYOUT = `
 export const GET_INDEX_PAGE = `
 	query GetIndexPage {
 		indexPage {
+			LogoBackground
 			Sections {
 				__typename
 			    ... on ComponentBlocksRichTextSection {
@@ -526,6 +528,7 @@ export const GET_PAGE_BY_SLUG = `
 		pages(filters: { slug: { eq: $slug } }, pagination: { pageSize: 1 }) {
 					slug
 					title
+					LogoBackground
 					Restriction {
 						Public
 					}

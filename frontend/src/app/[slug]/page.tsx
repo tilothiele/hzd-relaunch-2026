@@ -159,6 +159,7 @@ export default async function Page({ params }: PageProps) {
 			theme={theme}
 			strapiBaseUrl={baseUrl}
 			pageTitle={page.title}
+			logoBackground={page.LogoBackground}
 		>
 			{renderedSections}
 		</MainPageStructure>

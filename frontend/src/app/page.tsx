@@ -59,6 +59,7 @@ export default async function Home() {
 			homepage={globalLayout}
 			strapiBaseUrl={baseUrl}
 			theme={theme}
+			logoBackground={globalLayout?.page?.LogoBackground}
 		>
 			{renderedSections}
 		</MainPageStructure>

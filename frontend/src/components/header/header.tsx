@@ -34,6 +34,7 @@ interface HeaderProps {
 	isAuthenticating: boolean
 	error?: string | null
 	pageTitle?: string | null
+	logoBackground?: boolean | null
 }
 
 export function Header({
@@ -47,6 +48,7 @@ export function Header({
 	isAuthenticating,
 	error,
 	pageTitle,
+	logoBackground,
 }: HeaderProps) {
 	const [isScrolled, setIsScrolled] = useState(false)
 
@@ -73,6 +75,18 @@ export function Header({
 		? `color-mix(in srgb, ${theme.headerBackground}, transparent 20%)`
 		: theme.headerBackground
 
+	// Logo Background Logic
+	const logoContainerStyle = logoBackground ? {
+		backgroundColor: headerBg,
+		padding: isScrolled ? '6px 12px' : '15px 30px',
+		borderRadius: '20px', // Rounded edges
+		boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+	} : {}
+
+	const logoContainerClass = logoBackground
+		? 'transition-all duration-500 ease-in-out'
+		: ''
+
 	return (
 		<header
 			style={{
@@ -92,33 +106,37 @@ export function Header({
 						theme={theme}
 					/>
 
-					{/* Desktop Logo (Always visible or handled separately if needed) */}
+					{/* Desktop Logo */}
 					<Link
 						href='/'
 						className={cn(
 							'absolute -top-8 left-12 z-[110] hidden md:flex items-center justify-center transition-opacity hover:opacity-80',
-							// If we wanted to hide desktop logo on scroll, we could add class here, but user specified mobile view
 						)}
 						aria-label='Zur Startseite'
 					>
-						{logoSrc ? (
-							<Image
-								src={logoSrc}
-								alt={logoAlt}
-								width={logoWidth}
-								height={logoHeight}
-								className={cn(
-									'mb-1 object-contain transition-all duration-500 ease-in-out',
-									isScrolled ? 'h-[63px] w-[63px]' : 'h-[158px] w-[158px]'
-								)}
-								unoptimized
-								priority
-							/>
-						) : (
-							<span className='text-lg font-semibold tracking-wide text-center'>
-								HZD
-							</span>
-						)}
+						<div
+							style={logoContainerStyle}
+							className={cn('flex items-center justify-center', logoContainerClass)}
+						>
+							{logoSrc ? (
+								<Image
+									src={logoSrc}
+									alt={logoAlt}
+									width={logoWidth}
+									height={logoHeight}
+									className={cn(
+										'mb-1 object-contain transition-all duration-500 ease-in-out',
+										isScrolled ? 'h-[63px] w-[63px]' : 'h-[158px] w-[158px]'
+									)}
+									unoptimized
+									priority
+								/>
+							) : (
+								<span className='text-lg font-semibold tracking-wide text-center'>
+									HZD
+								</span>
+							)}
+						</div>
 					</Link>
 
 					{/* Mobile Logo / Home Icon */}
@@ -126,8 +144,6 @@ export function Header({
 						href='/'
 						className={cn(
 							'absolute z-[110] flex md:hidden items-center justify-center transition-all duration-300 hover:opacity-80',
-							// Position: Default large (-top-8) vs Compact (centered).
-							// Compact if scrolled OR width < 500px
 							isScrolled
 								? 'top-1/2 -translate-y-1/2 left-10'
 								: 'max-[500px]:top-1/2 max-[500px]:-translate-y-1/2 max-[500px]:left-10 -top-8 left-12'
@@ -141,21 +157,26 @@ export function Header({
 								? 'opacity-0 pointer-events-none absolute'
 								: 'opacity-100 max-[500px]:opacity-0 max-[500px]:pointer-events-none max-[500px]:absolute'
 						)}>
-							{logoSrc ? (
-								<Image
-									src={logoSrc}
-									alt={logoAlt}
-									width={logoWidth}
-									height={logoHeight}
-									className='mb-1 h-[111px] w-[111px] object-contain'
-									unoptimized
-									priority
-								/>
-							) : (
-								<span className='text-lg font-semibold tracking-wide text-center'>
-									HZD
-								</span>
-							)}
+							<div
+								style={logoContainerStyle}
+								className={cn('flex items-center justify-center', logoContainerClass)}
+							>
+								{logoSrc ? (
+									<Image
+										src={logoSrc}
+										alt={logoAlt}
+										width={logoWidth}
+										height={logoHeight}
+										className='mb-1 h-[111px] w-[111px] object-contain'
+										unoptimized
+										priority
+									/>
+								) : (
+									<span className='text-lg font-semibold tracking-wide text-center'>
+										HZD
+									</span>
+								)}
+							</div>
 						</div>
 
 						{/* Show Home Icon when scrolled OR width < 500px */}

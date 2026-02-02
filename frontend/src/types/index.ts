@@ -197,6 +197,7 @@ export interface ComponentPermissionRestriction {
 export interface Page {
 	slug?: string | null
 	title?: string | null
+	LogoBackground?: boolean | null
 	Restriction?: ComponentPermissionRestriction | null
 	Sections?: PageSection[] | null
 }

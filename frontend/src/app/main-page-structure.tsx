@@ -55,9 +55,10 @@ interface MainPageStructure {
 	children?: React.ReactNode
 	sections?: StartpageSection[] | null
 	loading?: boolean
+	logoBackground?: boolean | null
 }
 
-export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pageTitle, theme, children, sections }: MainPageStructure) {
+export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pageTitle, theme, children, sections, logoBackground }: MainPageStructure) {
 	const {
 		isAuthenticated,
 		user,
@@ -90,6 +91,7 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 			<Header
 				globalLayout={homepage}
 				pageTitle={pageTitle}
+				logoBackground={logoBackground}
 				strapiBaseUrl={strapiBaseUrl}
 				theme={currentTheme}
 				isAuthenticated={isAuthenticated}

@@ -48,6 +48,10 @@
       "type": "component",
       "component": "permission.restriction",
       "repeatable": false
+    },
+    "LogoBackground": {
+      "type": "boolean",
+      "default": false
     }
   }
 }
