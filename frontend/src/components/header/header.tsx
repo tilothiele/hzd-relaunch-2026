@@ -11,6 +11,13 @@ import { cn } from '@/lib/utils'
 import { useEffect, useState } from 'react'
 import HomeIcon from '@mui/icons-material/Home'
 
+const PageTitle = (pageTitle: string) => {
+	return (
+		<div className='flex w-full justify-end'>
+			<span style={{ marginRight: '20vw', fontSize: '1.2em' }}>{pageTitle}</span>
+		</div>
+	)
+}
 interface LoginCredentials {
 	identifier: string
 	password: string
@@ -205,13 +212,7 @@ export function Header({
 					/>
 				</div>
 			</nav>
-/*
-			{pageTitle ? (
-				<div className='flex w-full justify-end'>
-					<span style={{ marginRight: '20vw', fontSize: '1.2em' }}>{pageTitle}</span>
-				</div>
-			) : null}
-			*/}
+			{/* Page Title hier ggf wieder einfügen*/}
 		</header>
 	)
 }
