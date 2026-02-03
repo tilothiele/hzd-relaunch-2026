@@ -227,9 +227,9 @@ export function ContactMailerSectionComponent({
                                         bgcolor: theme.submitButtonColor,
                                         color: theme.submitButtonTextColor,
                                         fontWeight: 700,
+                                        borderRadius: '999px',
                                         '&:hover': {
-                                            bgcolor: theme.submitButtonColor,
-                                            filter: 'brightness(90%)',
+                                            bgcolor: theme.buttonHoverColor,
                                         },
                                     }}
                                 >
