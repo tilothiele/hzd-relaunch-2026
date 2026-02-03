@@ -6,6 +6,8 @@ import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { fetchCategoryBySlug, fetchArticlesByCategory } from '@/lib/server/fetch-articles-by-category'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import NotFoundSection from '@/components/sections/not-found-section/not-found-section'
+import { NewsArticle } from '@/types/'
+import { formattedDateOfPublication } from '@/lib/article-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,17 +25,13 @@ function ArticleCard({
 	strapiBaseUrl,
 	featured = false
 }: {
-	article: any
+	article: NewsArticle
 	strapiBaseUrl: string
 	featured?: boolean
 }) {
-	const formattedDate = article.publishedAt
-		? new Date(article.publishedAt).toLocaleDateString('de-DE', {
-			day: '2-digit',
-			month: '2-digit',
-			year: 'numeric'
-		})
-		: null
+
+	const formattedDate = formattedDateOfPublication(article)
+	const pubDate = article.DateOfPublication || article.publishedAt || undefined
 
 	const imageUrl = article.Image?.url
 		? (article.Image.url.startsWith('http') ? article.Image.url : `${strapiBaseUrl}${article.Image.url}`)
@@ -49,7 +47,7 @@ function ArticleCard({
 				<div className={`relative overflow-hidden ${featured ? 'aspect-[21/9]' : 'aspect-video'}`}>
 					<Image
 						src={imageUrl}
-						alt={article.Image.alternativeText || article.Headline || 'Artikelbild'}
+						alt={article.Image?.alternativeText || article.Headline || 'Artikelbild'}
 						fill
 						className='object-cover transition-transform duration-300 group-hover:scale-105'
 						unoptimized
@@ -58,7 +56,7 @@ function ArticleCard({
 			)}
 			<div className='p-6'>
 				{formattedDate && (
-					<time className='text-sm text-gray-500' dateTime={article.publishedAt}>
+					<time className='text-sm text-gray-500' dateTime={pubDate}>
 						{formattedDate}
 					</time>
 				)}

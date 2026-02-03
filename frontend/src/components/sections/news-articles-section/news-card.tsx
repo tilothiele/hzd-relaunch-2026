@@ -16,8 +16,9 @@ interface NewsCardProps {
 
 export function NewsCard({ article, strapiBaseUrl, theme, isUnread }: NewsCardProps) {
     const imageUrl = resolveMediaUrl(article.Image, strapiBaseUrl)
-    const formattedDate = article.publishedAt
-        ? new Date(article.publishedAt).toLocaleDateString('de-DE', {
+    const dateToUse = article.DateOfPublication || article.publishedAt
+    const formattedDate = dateToUse
+        ? new Date(dateToUse).toLocaleDateString('de-DE', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric'

@@ -8,6 +8,7 @@ export interface NewsArticle {
     SubHeadline?: string | null
     TeaserText?: string | null
     Slug?: string | null
+    DateOfPublication?: string | null
     publishedAt?: string | null
     Image?: Image | null
     category?: {

@@ -6,6 +6,7 @@ import { renderServerSections } from '@/components/sections/server-section-facto
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import NotFoundSection from '@/components/sections/not-found-section/not-found-section'
 import { MarkAsRead } from '@/components/news/mark-as-read'
+import { formattedDateOfPublication } from '@/lib/article-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,13 +35,7 @@ function ArticleHeader({
     strapiBaseUrl: string
     theme: ThemeDefinition
 }) {
-    const formattedDate = publishedAt
-        ? new Date(publishedAt).toLocaleDateString('de-DE', {
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric'
-        })
-        : null
+    const formattedDate = formattedDateOfPublication(publishedAt)
 
     return (
         <div className='flex w-full justify-center px-6 py-12'>
@@ -162,7 +157,7 @@ export default async function ArticlePage({ params }: PageProps) {
                     headline={article.Headline}
                     subHeadline={article.SubHeadline}
                     author={article.Author}
-                    publishedAt={article.publishedAt}
+                    publishedAt={article.DateOfPublication || article.publishedAt}
                     image={article.Image}
                     strapiBaseUrl={baseUrl}
                     theme={theme}

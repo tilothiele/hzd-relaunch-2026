@@ -1451,6 +1451,7 @@ export const GET_NEWS_ARTICLES = `
 			SubHeadline
 			TeaserText
 			Slug
+			DateOfPublication
 			publishedAt
 			Image {
 				url
