@@ -53,7 +53,7 @@ export const theme: ThemeDefinition = {
 	buttonColor: 'var(--color-action-primary)',
 	buttonTextColor: 'var(--color-action-primary-text)',
 
-	oddBgColor: 'var(--color-bg-gray)',
+	oddBgColor: 'var(--color-odd-section-background)',
 	evenBgColor: 'var(--color-white)',
 
 	cardsBackground: 'var(--color-cards-background)',

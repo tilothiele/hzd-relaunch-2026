@@ -119,7 +119,7 @@ export function TextColumnsSectionComponent({
 		return null
 	}
 
-	const backgroundColor = section.TextColumnsOddEven === 'Odd' ? 'var(--color-odd-section-background)' : theme.evenBgColor
+	const backgroundColor = section.TextColumnsOddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
 
 	const mapPadding = (size: 'small' | 'middle' | 'large' | null | undefined) => {
 		switch (size) {
