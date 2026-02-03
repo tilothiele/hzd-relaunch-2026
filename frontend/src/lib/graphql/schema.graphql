@@ -1997,6 +1997,7 @@ input HzdSettingInput {
   DefaultAvatarSM: ID
   DefaultAvatarS: ID
   DefaultBreederAvatar: ID
+  DefaultLitterAvatar: ID
   publishedAt: DateTime
 }
 
@@ -2006,6 +2007,7 @@ type HzdSetting {
   DefaultAvatarSM: UploadFile
   DefaultAvatarS: UploadFile
   DefaultBreederAvatar: UploadFile
+  DefaultLitterAvatar: UploadFile
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime

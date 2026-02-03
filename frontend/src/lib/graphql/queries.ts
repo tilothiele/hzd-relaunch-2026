@@ -293,6 +293,12 @@ export const GET_LAYOUT = `
 				width
 				height
 			}
+			DefaultLitterAvatar {
+				url
+				alternativeText
+				width
+				height
+			}
 		}
 	}
 `

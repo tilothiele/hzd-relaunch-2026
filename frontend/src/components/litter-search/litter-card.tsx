@@ -108,7 +108,10 @@ export function LitterCard({ litter, strapiBaseUrl, hzdSetting, distance, format
                 {/* Puppy image or placeholder */}
                 <div className='relative aspect-[4/3] overflow-hidden rounded-md bg-gray-100'>
                     <Image
-                        src={litter.PuppyImage ? resolveMediaUrl(litter.PuppyImage, strapiBaseUrl) || '/static-images/placeholder/puppies.png' : '/static-images/placeholder/puppies.png'}
+                        src={resolveMediaUrl(
+                            litter.PuppyImage || hzdSetting?.DefaultLitterAvatar,
+                            strapiBaseUrl
+                        ) || '/static-images/placeholder/puppies.png'}
                         alt="Welpen"
                         fill
                         className='object-cover'

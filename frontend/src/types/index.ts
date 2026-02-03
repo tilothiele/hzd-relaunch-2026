@@ -231,6 +231,7 @@ export interface HzdSetting {
 	DefaultAvatarSM?: Image | null
 	DefaultAvatarB?: Image | null
 	DefaultBreederAvatar?: Image | null
+	DefaultLitterAvatar?: Image | null
 }
 
 export interface GlobalLayout {

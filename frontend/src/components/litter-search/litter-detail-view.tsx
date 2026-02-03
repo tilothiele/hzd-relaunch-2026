@@ -135,7 +135,10 @@ export function LitterDetailView({
         <div className='flex flex-col items-center w-full max-w-4xl mx-auto'>
             <div className='relative w-full aspect-[4/3] overflow-hidden rounded-md bg-gray-100 mb-2'>
                 <Image
-                    src={litter.PuppyImage ? resolveMediaUrl(litter.PuppyImage, strapiBaseUrl) || '/static-images/placeholder/puppies.png' : '/static-images/placeholder/puppies.png'}
+                    src={resolveMediaUrl(
+                        litter.PuppyImage || hzdSetting?.DefaultLitterAvatar,
+                        strapiBaseUrl
+                    ) || '/static-images/placeholder/puppies.png'}
                     alt="Welpen"
                     fill
                     className='object-cover'

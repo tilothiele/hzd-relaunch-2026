@@ -753,6 +753,9 @@ export interface ApiHzdSettingHzdSetting extends Struct.SingleTypeSchema {
     DefaultBreederAvatar: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios'
     >;
+    DefaultLitterAvatar: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
