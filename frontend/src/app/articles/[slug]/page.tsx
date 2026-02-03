@@ -31,7 +31,9 @@ function ArticleCard({
 }) {
 
 	const formattedDate = formattedDateOfPublication(article)
-	const pubDate = article.DateOfPublication || article.publishedAt || undefined
+	const pubDate1 = article.DateOfPublication
+	const pubDate2 = pubDate1 ? pubDate1 : article.publishedAt
+	const pubDate = pubDate2 ? pubDate2 : undefined
 
 	const imageUrl = article.Image?.url
 		? (article.Image.url.startsWith('http') ? article.Image.url : `${strapiBaseUrl}${article.Image.url}`)
