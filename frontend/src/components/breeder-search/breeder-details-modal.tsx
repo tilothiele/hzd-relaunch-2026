@@ -4,7 +4,7 @@ import { Modal, Box, IconButton, Typography, Divider } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import Image from 'next/image'
-import type { Breeder } from '@/types'
+import type { Breeder, HzdSetting } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { theme } from '@/themes'
 import Link from 'next/link'
@@ -15,6 +15,7 @@ interface BreederDetailsModalProps {
     open: boolean
     onClose: () => void
     strapiBaseUrl?: string | null
+    hzdSetting?: HzdSetting | null
 }
 
 function formatDate(dateString: string | null | undefined): string {
@@ -41,14 +42,17 @@ function getRegionLabel(region: string | null | undefined): string {
     return region
 }
 
-export function BreederDetailsModal({ breeder, open, onClose, strapiBaseUrl }: BreederDetailsModalProps) {
+export function BreederDetailsModal({ breeder, open, onClose, strapiBaseUrl, hzdSetting }: BreederDetailsModalProps) {
     if (!breeder) {
         return null
     }
 
     const kennelName = breeder.kennelName ?? 'Kein Zwingername bekannt'
     const member = breeder.member
-    const avatarUrl = resolveMediaUrl(breeder.avatar, strapiBaseUrl) || '/static-images/placeholder/user-avatar.png'
+    const avatarUrl = resolveMediaUrl(
+        breeder.avatar || hzdSetting?.DefaultBreederAvatar,
+        strapiBaseUrl
+    ) || '/static-images/placeholder/user-avatar.png'
 
     return (
         <Modal

@@ -7,7 +7,7 @@ import TableRowsIcon from '@mui/icons-material/TableRows'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import { fetchGraphQL } from '@/lib/graphql-client'
 import { SEARCH_BREEDERS } from '@/lib/graphql/queries'
-import type { Breeder, BreederSearchResult } from '@/types'
+import type { Breeder, BreederSearchResult, HzdSetting } from '@/types'
 import { BreederCard } from './breeder-card'
 import { BreederDetailsModal } from './breeder-details-modal'
 import { BreederSearchForm } from './breeder-search-form'
@@ -18,13 +18,14 @@ import { calculateDistance } from '@/lib/geo-utils'
 
 interface BreederSearchProps {
 	strapiBaseUrl?: string | null
+	hzdSetting?: HzdSetting | null
 }
 
 type PageSize = 5 | 10 | 20 | 50 | 100
 type SortDirection = 'asc' | 'desc'
 type SortField = 'kennelName' | 'member.lastName' | 'member.zip' | 'member.city' | 'member.phone' | 'member.email'
 
-export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
+export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps) {
 	const [nameFilter, setNameFilter] = useState('')
 	const [page, setPage] = useState(1)
 	const [pageSize, setPageSize] = useState<PageSize>(10)
@@ -323,6 +324,7 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 										strapiBaseUrl={strapiBaseUrl}
 										onClick={() => handleBreederClick(breeder)}
 										userLocation={userLocation}
+										hzdSetting={hzdSetting}
 									/>
 								))}
 							</div>
@@ -454,6 +456,7 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 				open={isModalOpen}
 				onClose={handleCloseModal}
 				strapiBaseUrl={strapiBaseUrl}
+				hzdSetting={hzdSetting}
 			/>
 		</div>
 	)

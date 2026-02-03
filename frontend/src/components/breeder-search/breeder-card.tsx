@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
-import type { Breeder } from '@/types'
+import type { Breeder, HzdSetting } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 
 import { calculateDistance } from '@/lib/geo-utils'
@@ -13,6 +13,7 @@ interface BreederCardProps {
 	onClick?: () => void
 	userLocation?: { lat: number; lng: number } | null
 	maxDistance?: number | string
+	hzdSetting?: HzdSetting | null
 }
 
 function formatDate(dateString: string | null | undefined): string {
@@ -40,7 +41,7 @@ function getRegionLabel(region: string | null | undefined): string {
 	return region
 }
 
-export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, maxDistance }: BreederCardProps) {
+export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, maxDistance, hzdSetting }: BreederCardProps) {
 	const kennelName = breeder.kennelName ?? 'Kein Zwingername bekannt'
 	const member = breeder.member
 
@@ -62,7 +63,10 @@ export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, max
 		>
 			<div className='relative h-48 w-full shrink-0 bg-gray-100 sm:h-auto sm:w-48'>
 				<Image
-					src={breeder.avatar ? resolveMediaUrl(breeder.avatar, strapiBaseUrl) || '/static-images/placeholder/user-avatar.png' : '/static-images/placeholder/user-avatar.png'}
+					src={resolveMediaUrl(
+						breeder.avatar || hzdSetting?.DefaultBreederAvatar,
+						strapiBaseUrl
+					) || '/static-images/placeholder/user-avatar.png'}
 					alt={kennelName}
 					fill
 					className='object-cover'

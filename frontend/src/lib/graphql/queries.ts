@@ -287,6 +287,12 @@ export const GET_LAYOUT = `
 				width
 				height
 			}
+			DefaultBreederAvatar {
+				url
+				alternativeText
+				width
+				height
+			}
 		}
 	}
 `

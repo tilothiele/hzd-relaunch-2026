@@ -27,7 +27,7 @@ export default async function BreedersPage() {
 			theme={theme}
 			pageTitle={pageTitle}
 		>
-			<BreederSearch strapiBaseUrl={baseUrl} />
+			<BreederSearch strapiBaseUrl={baseUrl} hzdSetting={globalLayout?.HzdSetting} />
 		</MainPageStructure>
 	)
 }

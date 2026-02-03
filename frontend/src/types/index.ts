@@ -230,6 +230,7 @@ export interface HzdSetting {
 	DefaultAvatarS?: Image | null
 	DefaultAvatarSM?: Image | null
 	DefaultAvatarB?: Image | null
+	DefaultBreederAvatar?: Image | null
 }
 
 export interface GlobalLayout {

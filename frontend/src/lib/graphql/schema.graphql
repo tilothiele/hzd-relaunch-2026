@@ -267,6 +267,32 @@ input JSONFilterInput {
   between: [JSON]
 }
 
+input ComponentSeoSeoFiltersInput {
+  TitleTag: StringFilterInput
+  MetaDescription: StringFilterInput
+  Keywords: StringFilterInput
+  ExcludeFromSitemap: BooleanFilterInput
+  and: [ComponentSeoSeoFiltersInput]
+  or: [ComponentSeoSeoFiltersInput]
+  not: ComponentSeoSeoFiltersInput
+}
+
+input ComponentSeoSeoInput {
+  id: ID
+  TitleTag: String
+  MetaDescription: String
+  Keywords: String
+  ExcludeFromSitemap: Boolean
+}
+
+type ComponentSeoSeo {
+  id: ID!
+  TitleTag: String
+  MetaDescription: String
+  Keywords: String
+  ExcludeFromSitemap: Boolean
+}
+
 input ComponentPersonalShippingAddressFiltersInput {
   Name: StringFilterInput
   AdditionalName: StringFilterInput
@@ -329,32 +355,6 @@ type ComponentPersonalAddress {
   CountryCode: String!
   Zip: String
   City: String
-}
-
-input ComponentSeoSeoFiltersInput {
-  TitleTag: StringFilterInput
-  MetaDescription: StringFilterInput
-  Keywords: StringFilterInput
-  ExcludeFromSitemap: BooleanFilterInput
-  and: [ComponentSeoSeoFiltersInput]
-  or: [ComponentSeoSeoFiltersInput]
-  not: ComponentSeoSeoFiltersInput
-}
-
-input ComponentSeoSeoInput {
-  id: ID
-  TitleTag: String
-  MetaDescription: String
-  Keywords: String
-  ExcludeFromSitemap: Boolean
-}
-
-type ComponentSeoSeo {
-  id: ID!
-  TitleTag: String
-  MetaDescription: String
-  Keywords: String
-  ExcludeFromSitemap: Boolean
 }
 
 input ComponentPermissionRestrictionFiltersInput {
@@ -1996,6 +1996,7 @@ input HzdSettingInput {
   DefaultAvatarB: ID
   DefaultAvatarSM: ID
   DefaultAvatarS: ID
+  DefaultBreederAvatar: ID
   publishedAt: DateTime
 }
 
@@ -2004,6 +2005,7 @@ type HzdSetting {
   DefaultAvatarB: UploadFile
   DefaultAvatarSM: UploadFile
   DefaultAvatarS: UploadFile
+  DefaultBreederAvatar: UploadFile
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -2507,7 +2509,7 @@ type SupplementalDocumentGroupEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union GenericMorph = ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentSeoSeo | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
+union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
 
 input FileInfoInput {
   name: String
