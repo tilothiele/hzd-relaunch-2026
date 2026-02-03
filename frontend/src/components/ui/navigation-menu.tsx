@@ -72,7 +72,7 @@ function DesktopMenuItem({
 								textTransform: 'none',
 								paddingRight: 0.5,
 								'&:hover': {
-									color: 'var(--color-secondary)',
+									fontWeight: 700,
 									backgroundColor: 'transparent',
 								},
 							}}
@@ -100,8 +100,7 @@ function DesktopMenuItem({
 							color: theme.headerFooterTextColor,
 							padding: '4px',
 							'&:hover': {
-								color: 'var(--color-secondary)',
-								backgroundColor: 'rgba(252, 211, 77, 0.1)',
+								fontWeight: 700
 							},
 						}}
 					>
@@ -155,8 +154,7 @@ function DesktopMenuItem({
 												padding: '8px 16px',
 												color: 'var(--color-text)',
 												'&:hover': {
-													backgroundColor: 'rgba(252, 211, 77, 0.1)',
-													color: 'var(--color-secondary)',
+													fontWeight: 700,
 												},
 											}}
 										>
@@ -192,8 +190,7 @@ function DesktopMenuItem({
 																color: 'var(--color-text)',
 																fontWeight: 600,
 																'&:hover': {
-																	backgroundColor: 'rgba(252, 211, 77, 0.1)',
-																	color: 'var(--color-secondary)',
+																	fontWeight: 700,
 																},
 															}}
 														>
@@ -237,8 +234,7 @@ function DesktopMenuItem({
 																	paddingLeft: 6,
 																	color: 'var(--color-text)',
 																	'&:hover': {
-																		backgroundColor: 'rgba(252, 211, 77, 0.1)',
-																		color: 'var(--color-secondary)',
+																		fontWeight: 700,
 																	},
 																}}
 															>
@@ -260,8 +256,7 @@ function DesktopMenuItem({
 													paddingLeft: 4,
 													color: 'var(--color-text)',
 													'&:hover': {
-														backgroundColor: 'rgba(252, 211, 77, 0.1)',
-														color: 'var(--color-secondary)',
+														fontWeight: 700,
 													},
 												}}
 											>
@@ -282,8 +277,7 @@ function DesktopMenuItem({
 								sx={{
 									color: '#565757',
 									'&:hover': {
-										backgroundColor: 'rgba(252, 211, 77, 0.1)',
-										color: 'var(--color-secondary)',
+										fontWeight: 700,
 									},
 								}}
 							>
@@ -307,8 +301,7 @@ function DesktopMenuItem({
 					fontWeight: 500,
 					textTransform: 'none',
 					'&:hover': {
-						color: 'var(--color-secondary)',
-						backgroundColor: 'transparent',
+						fontWeight: 700,
 					},
 				}}
 			>
