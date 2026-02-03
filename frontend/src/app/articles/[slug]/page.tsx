@@ -33,7 +33,7 @@ function ArticleCard({
 	const formattedDate = formattedDateOfPublication(article)
 	const pubDate = article.DateOfPublication || article.publishedAt || undefined
 
-	console.log(article, formattedDate, pubDate)
+	//console.log(article, formattedDate, pubDate)
 
 	const imageUrl = article.Image?.url
 		? (article.Image.url.startsWith('http') ? article.Image.url : `${strapiBaseUrl}${article.Image.url}`)

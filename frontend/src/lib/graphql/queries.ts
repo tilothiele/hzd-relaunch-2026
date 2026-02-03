@@ -1717,6 +1717,7 @@ export const GET_NEWS_ARTICLES_BY_CATEGORY = `
 				SubHeadline
 				TeaserText
 				Slug
+				DateOfPublication
 				publishedAt
 				FeaturedArticle
 				Image {
