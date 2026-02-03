@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import type { Breeder } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 
@@ -73,7 +74,21 @@ export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, max
 			<div className='flex flex-1 flex-col p-4'>
 				<div className='mb-3 flex justify-between items-start'>
 					<h3 className='text-lg font-semibold text-gray-900'>
-						{kennelName}
+						{breeder.WebsiteUrl ? (
+							<a
+								href={breeder.WebsiteUrl}
+								target='_blank'
+								rel='noopener noreferrer'
+								className='hover:underline inline-flex items-center gap-1 transition-colors'
+								style={{ color: 'var(--color-submit-button)' }}
+								onClick={(e) => e.stopPropagation()}
+							>
+								{kennelName}
+								<OpenInNewIcon sx={{ fontSize: 16 }} />
+							</a>
+						) : (
+							kennelName
+						)}
 					</h3>
 					{distance !== null && (
 						<span className='rounded bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700'>
@@ -114,19 +129,7 @@ export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, max
 							{[member.zip, member.countryCode].filter(Boolean).join(' / ')}
 						</p>
 					) : null}
-					{breeder.WebsiteUrl ? (
-						<p className='mt-2 pt-2 border-t border-gray-100'>
-							<a
-								href={breeder.WebsiteUrl}
-								target='_blank'
-								rel='noopener noreferrer'
-								className='text-submit-button hover:underline'
-								style={{ color: 'var(--color-submit-button)' }}
-							>
-								{breeder.WebsiteUrl}
-							</a>
-						</p>
-					) : null}
+
 				</div>
 			</div>
 		</div>

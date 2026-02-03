@@ -2,6 +2,7 @@
 
 import { Box, Typography, IconButton, Tooltip } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import Image from 'next/image'
 import type { Litter, HzdSetting } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
@@ -201,7 +202,25 @@ export function LitterDetailView({
                 <section>
                     <SectionHeader title="Züchter" />
                     <div className="rounded-lg bg-gray-50 px-6 py-2">
-                        <DetailRow label="Zwinger" value={kennelName} />
+                        <DetailRow
+                            label="Zwinger"
+                            value={
+                                litter.breeder?.WebsiteUrl ? (
+                                    <a
+                                        href={litter.breeder.WebsiteUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-primary hover:underline hover:text-primary-dark transition-colors inline-flex items-center gap-1"
+                                        style={{ color: theme.submitButtonColor }}
+                                    >
+                                        {kennelName}
+                                        <OpenInNewIcon sx={{ fontSize: 16 }} />
+                                    </a>
+                                ) : (
+                                    kennelName
+                                )
+                            }
+                        />
                         {breederMember && (
                             <DetailRow label="Name" value={breederMember} />
                         )}

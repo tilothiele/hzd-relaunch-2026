@@ -2,6 +2,7 @@
 
 import { Modal, Box, IconButton, Typography, Divider } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import Image from 'next/image'
 import type { Breeder } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
@@ -76,7 +77,20 @@ export function BreederDetailsModal({ breeder, open, onClose, strapiBaseUrl }: B
                 {/* Header with Close Button */}
                 <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid', borderColor: 'divider' }}>
                     <Typography variant='h6' component='h2' sx={{ fontWeight: 600 }}>
-                        {kennelName}
+                        {breeder.WebsiteUrl ? (
+                            <a
+                                href={breeder.WebsiteUrl}
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                className='hover:underline inline-flex items-center gap-1 transition-colors'
+                                style={{ color: theme.submitButtonColor, textDecoration: 'none' }}
+                            >
+                                {kennelName}
+                                <OpenInNewIcon sx={{ fontSize: 18 }} />
+                            </a>
+                        ) : (
+                            kennelName
+                        )}
                     </Typography>
                     <IconButton onClick={onClose} size='small'>
                         <CloseIcon />

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Box, Pagination, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, FormControlLabel } from '@mui/material'
 import GridViewIcon from '@mui/icons-material/GridView'
 import TableRowsIcon from '@mui/icons-material/TableRows'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import { fetchGraphQL } from '@/lib/graphql-client'
 import { SEARCH_BREEDERS } from '@/lib/graphql/queries'
 import type { Breeder, BreederSearchResult } from '@/types'
@@ -409,7 +410,23 @@ export function BreederSearch({ strapiBaseUrl }: BreederSearchProps) {
 													onClick={() => handleBreederClick(breeder)}
 													sx={{ cursor: 'pointer' }}
 												>
-													<TableCell>{breeder.kennelName || '-'}</TableCell>
+													<TableCell>
+														{breeder.WebsiteUrl ? (
+															<a
+																href={breeder.WebsiteUrl}
+																target='_blank'
+																rel='noopener noreferrer'
+																className='hover:underline inline-flex items-center gap-1 transition-colors'
+																style={{ color: theme.submitButtonColor, textDecoration: 'none' }}
+																onClick={(e) => e.stopPropagation()}
+															>
+																{breeder.kennelName || '-'}
+																<OpenInNewIcon sx={{ fontSize: 16 }} />
+															</a>
+														) : (
+															breeder.kennelName || '-'
+														)}
+													</TableCell>
 													<TableCell>{memberName || '-'}</TableCell>
 													<TableCell>{breeder.member?.zip || '-'}</TableCell>
 													<TableCell>{breeder.member?.city || '-'}</TableCell>
