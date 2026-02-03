@@ -14,6 +14,7 @@ import { theme } from '@/themes'
 import { LitterCard } from '@/components/litter-search/litter-card'
 import { LitterDetailsModal } from '@/components/litter-search/litter-details-modal'
 import { useLitters, type LitterStatus, type PageSize } from '@/hooks/use-litters'
+import { SubmitButton } from '@/components/ui/submit-button'
 
 interface LitterSearchProps {
 	strapiBaseUrl: string
@@ -122,7 +123,6 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 	const [showMap, setShowMap] = useState(false)
 	const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
 	const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
-	const [isButtonHovered, setIsButtonHovered] = useState(false)
 
 	const filters = useMemo(() => ({
 		breederFilter,
@@ -398,27 +398,12 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 							</Box>
 						</Box>
 
-						<Button
-							variant='contained'
+						<SubmitButton
+							label="Suchen"
+							loadingLabel="Suche..."
 							onClick={handleSearch}
-							disabled={isLoading}
-							sx={{
-								backgroundColor: theme.submitButtonColor,
-								color: theme.submitButtonTextColor,
-								borderRadius: '999px',
-								'&:hover': {
-									backgroundColor: theme.buttonHoverColor,
-								},
-								'&:disabled': {
-									backgroundColor: '#d1d5db',
-									color: '#9ca3af',
-								},
-							}}
-							onMouseEnter={() => setIsButtonHovered(true)}
-							onMouseLeave={() => setIsButtonHovered(false)}
-						>
-							{isLoading ? 'Suche...' : 'Suchen'}
-						</Button>
+							isLoading={isLoading}
+						/>
 					</Box>
 				</Box>
 

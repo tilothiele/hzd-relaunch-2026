@@ -6,6 +6,7 @@ import type { ContactMailerSection } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { useAuth } from '@/hooks/use-auth'
+import { SubmitButton } from '@/components/ui/submit-button'
 
 interface ContactMailerSectionComponentProps {
     section: ContactMailerSection
@@ -217,24 +218,22 @@ export function ContactMailerSectionComponent({
                             </Box>
 
                             <Box sx={{ gridColumn: { md: 'span 2' }, display: 'flex', justifyContent: 'center', mt: 2 }}>
-                                <Button
+                                <SubmitButton
                                     type="submit"
-                                    variant="contained"
-                                    disabled={status === 'loading'}
+                                    label="Nachricht senden"
+                                    loadingLabel={
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <CircularProgress size={20} color="inherit" />
+                                            <span>Senden...</span>
+                                        </Box>
+                                    }
+                                    isLoading={status === 'loading'}
                                     sx={{
                                         px: 10,
                                         py: 1.5,
-                                        bgcolor: theme.submitButtonColor,
-                                        color: theme.submitButtonTextColor,
                                         fontWeight: 700,
-                                        borderRadius: '999px',
-                                        '&:hover': {
-                                            bgcolor: theme.buttonHoverColor,
-                                        },
                                     }}
-                                >
-                                    {status === 'loading' ? <CircularProgress size={24} color="inherit" /> : 'Nachricht senden'}
-                                </Button>
+                                />
                             </Box>
                         </Box>
                     </form>

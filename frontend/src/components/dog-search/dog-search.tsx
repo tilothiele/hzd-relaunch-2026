@@ -14,6 +14,7 @@ import { DogCard } from './dog-card'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { DogDetailView } from './dog-detail-view'
 import type { Dog, GeoLocation, HzdSetting } from '@/types'
+import { SubmitButton } from '@/components/ui/submit-button'
 
 // Deutschland grobe Grenzen: Lat 47-55, Lon 5-15
 const GERMANY_BOUNDS = {
@@ -93,7 +94,6 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 	const [selectedDog, setSelectedDog] = useState<Dog | null>(null)
 	const [hasSearched, setHasSearched] = useState(false)
 	const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
-	const [isButtonHovered, setIsButtonHovered] = useState(false)
 
 	const userLocation = zipLocation || null
 	const isLocationAvailable = !!userLocation
@@ -309,27 +309,12 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 
 
 					<Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-						<Button
-							variant='contained'
+						<SubmitButton
+							label="Suchen"
+							loadingLabel="Suche..."
 							onClick={handleSearch}
-							disabled={isLoading}
-							sx={{
-								backgroundColor: theme.submitButtonColor,
-								color: theme.submitButtonTextColor,
-								borderRadius: '999px',
-								'&:hover': {
-									backgroundColor: theme.buttonHoverColor,
-								},
-								'&:disabled': {
-									backgroundColor: '#d1d5db',
-									color: '#9ca3af',
-								},
-							}}
-							onMouseEnter={() => setIsButtonHovered(true)}
-							onMouseLeave={() => setIsButtonHovered(false)}
-						>
-							{isLoading ? 'Suche...' : 'Suchen'}
-						</Button>
+							isLoading={isLoading}
+						/>
 					</Box>
 				</Box>
 
