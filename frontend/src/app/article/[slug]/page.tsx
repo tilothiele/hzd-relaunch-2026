@@ -6,7 +6,7 @@ import { renderServerSections } from '@/components/sections/server-section-facto
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import NotFoundSection from '@/components/sections/not-found-section/not-found-section'
 import { MarkAsRead } from '@/components/news/mark-as-read'
-import { formattedDateOfPublication } from '@/lib/article-utils'
+import { formattedDate } from '@/lib/article-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -35,16 +35,16 @@ function ArticleHeader({
     strapiBaseUrl: string
     theme: ThemeDefinition
 }) {
-    const formattedDate = formattedDateOfPublication(publishedAt)
+    const fmtDate = formattedDate(publishedAt)
 
     return (
         <div className='flex w-full justify-center px-6 py-12'>
             <article className='w-full max-w-4xl'>
                 {/* Article Metadata */}
                 <div className='mb-8 space-y-2' style={{ color: theme.textColor }}>
-                    {formattedDate && (
+                    {fmtDate && (
                         <time className='text-sm opacity-80' dateTime={publishedAt || undefined} style={{ color: 'inherit' }}>
-                            {formattedDate}
+                            {fmtDate}
                         </time>
                     )}
                     <h1 className='text-4xl font-bold tracking-tight md:text-5xl' style={{ color: 'inherit' }}>
