@@ -18,8 +18,17 @@ export function ActionButton({ actionButton, theme }: ActionButtonProps) {
 	const label = actionButton.Label ?? 'Mehr erfahren'
 
 	// Theme-Farben oder Fallback
-	const buttonColor = theme?.buttonColor ?? 'var(--color-action-primary)'
-	const buttonTextColor = theme?.buttonTextColor ?? 'var(--color-action-primary-text)'
+	const buttonColor = isPrimary
+		? (theme?.buttonColor ?? 'var(--color-action-primary)')
+		: (theme?.secondaryButtonColor ?? 'var(--color-action-secondary)')
+
+	const buttonTextColor = isPrimary
+		? (theme?.buttonTextColor ?? 'var(--color-action-primary-text)')
+		: (theme?.secondaryButtonTextColor ?? 'var(--color-action-secondary-text)')
+
+	const hoverColor = isPrimary
+		? (theme?.buttonHoverColor ?? 'var(--color-action-primary-hover)')
+		: (theme?.secondaryButtonHoverColor ?? 'var(--color-action-secondary-hover)')
 
 	// Prüfe ob es ein interner oder externer Link ist
 	const isExternalLink = actionButton.Link.startsWith('http://') || actionButton.Link.startsWith('https://')
@@ -28,8 +37,8 @@ export function ActionButton({ actionButton, theme }: ActionButtonProps) {
 		display: 'inline-flex',
 		alignItems: 'center',
 		justifyContent: 'center',
-		borderRadius: '50%',
-		padding: '10px 24px', // py-1.5 -> 6px, px-3 -> 12px in MUI but typically button padding is larger. Keeping user request for "standard". px-3=24px, py-1.5=12px approx.
+		borderRadius: '999px',
+		padding: '6px 24px', // Reduced padding to match ~20% height reduction request (was 10px)
 		fontSize: '1.15rem',
 		fontWeight: 400,
 		textDecoration: 'none',
@@ -39,24 +48,22 @@ export function ActionButton({ actionButton, theme }: ActionButtonProps) {
 	}
 
 	// Determine specific styles based on variant
-	let specificStyles: React.CSSProperties = {}
-
-	if (isPrimary) {
-		specificStyles = {
-			backgroundColor: buttonColor,
-			color: buttonTextColor,
-			border: `1px solid ${buttonColor}`,
-		}
-	} else {
-		// Secondary / Outlined
-		specificStyles = {
-			backgroundColor: 'transparent',
-			color: buttonColor,
-			border: `1px solid ${buttonColor}`,
-		}
+	// Determine specific styles based on variant
+	const specificStyles: React.CSSProperties = {
+		backgroundColor: buttonColor,
+		color: buttonTextColor,
+		border: `1px solid ${buttonColor}`,
 	}
 
-	const hoverClass = "shadow-lg hover:shadow-xl hover:!bg-[var(--color-action-primary-hover)] hover:!border-[var(--color-action-primary-hover)] hover:!text-white hover:!font-medium transition-all duration-200"
+	const allStyles: any = {
+		...baseStyles,
+		...specificStyles,
+		'--button-hover-color': hoverColor,
+	}
+
+	const hoverClass = `shadow-lg hover:shadow-xl hover:!bg-[var(--button-hover-color)] hover:!border-[var(--button-hover-color)] hover:!text-white hover:!font-medium transition-all duration-200`
+
+	console.log(hoverClass)
 
 	if (isExternalLink) {
 		return (
@@ -64,7 +71,7 @@ export function ActionButton({ actionButton, theme }: ActionButtonProps) {
 				href={actionButton.Link}
 				target='_blank'
 				rel='noopener noreferrer'
-				style={{ ...baseStyles, ...specificStyles }}
+				style={allStyles}
 				className={hoverClass}
 			>
 				{label}
@@ -75,11 +82,10 @@ export function ActionButton({ actionButton, theme }: ActionButtonProps) {
 	return (
 		<Link
 			href={actionButton.Link}
-			style={{ ...baseStyles, ...specificStyles }}
+			style={allStyles}
 			className={hoverClass}
 		>
 			{label}
 		</Link>
 	)
 }
-
