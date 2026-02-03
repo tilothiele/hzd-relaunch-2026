@@ -316,9 +316,9 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 							sx={{
 								backgroundColor: theme.submitButtonColor,
 								color: theme.submitButtonTextColor,
-								filter: isButtonHovered ? 'brightness(90%)' : 'none',
+								borderRadius: '999px',
 								'&:hover': {
-									backgroundColor: theme.submitButtonColor,
+									backgroundColor: theme.buttonHoverColor,
 								},
 								'&:disabled': {
 									backgroundColor: '#d1d5db',

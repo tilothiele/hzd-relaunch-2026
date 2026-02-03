@@ -47,9 +47,9 @@ export function BreederSearchForm({
 					sx={{
 						backgroundColor: theme.submitButtonColor,
 						color: theme.submitButtonTextColor,
-						filter: isHovered ? 'brightness(90%)' : 'none',
+						borderRadius: '999px',
 						'&:hover': {
-							backgroundColor: theme.submitButtonColor,
+							backgroundColor: theme.buttonHoverColor,
 						},
 						'&:disabled': {
 							backgroundColor: '#d1d5db',
