@@ -10,8 +10,15 @@ export interface ThemeDefinition {
 
 	headlineColor: string
 	textColor: string
+
 	buttonColor: string
 	buttonTextColor: string
+	buttonHoverColor: string
+
+	secondaryButtonColor: string
+	secondaryButtonTextColor: string
+	secondaryButtonHoverColor: string
+
 	headerFooterTextColor: string
 	oddBgColor: string
 	evenBgColor: string
@@ -51,7 +58,12 @@ export const theme: ThemeDefinition = {
 	textColor: 'var(--color-text)',
 
 	buttonColor: 'var(--color-action-primary)',
+	buttonHoverColor: 'var(--color-action-primary-hover)',
 	buttonTextColor: 'var(--color-action-primary-text)',
+
+	secondaryButtonColor: 'var(--color-action-secondary)',
+	secondaryButtonHoverColor: 'var(--color-action-secondary-hover)',
+	secondaryButtonTextColor: 'var(--color-action-secondary-text)',
 
 	oddBgColor: 'var(--color-odd-section-background)',
 	evenBgColor: 'var(--color-white)',

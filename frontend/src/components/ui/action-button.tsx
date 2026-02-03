@@ -28,7 +28,7 @@ export function ActionButton({ actionButton, theme }: ActionButtonProps) {
 		display: 'inline-flex',
 		alignItems: 'center',
 		justifyContent: 'center',
-		borderRadius: '12px',
+		borderRadius: '50%',
 		padding: '10px 24px', // py-1.5 -> 6px, px-3 -> 12px in MUI but typically button padding is larger. Keeping user request for "standard". px-3=24px, py-1.5=12px approx.
 		fontSize: '1.15rem',
 		fontWeight: 400,
