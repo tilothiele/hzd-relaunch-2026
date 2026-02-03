@@ -1,9 +1,11 @@
 import { NewsArticle } from "@/types"
 
 const formattedDateOfPublication = (article: NewsArticle) => {
-    const d = article.DateOfPublication || article.publishedAt
+    const d1 = article.DateOfPublication
 
-    return formattedDate(d)
+    const d2 = d1 ? d1 : article.publishedAt
+
+    return formattedDate(d2)
 
 }
 
