@@ -12,6 +12,7 @@ import { ContactGroupSectionComponent } from './contact-group-section/contact-gr
 import { NewsArticlesSectionComponent } from './news-articles-section/news-articles-section'
 import { ContactMailerSectionComponent } from './contact-mailer-section/contact-mailer-section'
 import { SimpleHeroSectionComponent } from './simple-hero-section/simple-hero-section'
+import { DocumentBundleSectionComponent } from './document-bundle-section/document-bundle-section'
 
 interface RenderSectionParams {
 	section: StartpageSection
@@ -136,6 +137,15 @@ function renderSection({
 					strapiBaseUrl={strapiBaseUrl}
 					theme={theme}
 					logo={logo}
+				/>
+			)
+		case 'ComponentBlocksDocumentBundleSection':
+			return (
+				<DocumentBundleSectionComponent
+					key={key}
+					section={section}
+					strapiBaseUrl={strapiBaseUrl}
+					theme={theme}
 				/>
 			)
 		default:

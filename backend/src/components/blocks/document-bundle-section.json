@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_blocks_document_bundle_sections",
+  "info": {
+    "displayName": "DocumentBundleSection"
+  },
+  "options": {},
+  "attributes": {
+    "DBSName": {
+      "type": "string"
+    },
+    "DBSDescription": {
+      "type": "text"
+    },
+    "DocumentBundle": {
+      "type": "component",
+      "component": "blocks.document-bundle",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}

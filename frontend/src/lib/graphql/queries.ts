@@ -795,6 +795,23 @@ export const GET_PAGE_BY_SLUG = `
 							}
 							NewsArticlesAnchor
 						}
+						... on ComponentBlocksDocumentBundleSection {
+							DBSName
+							DBSDescription
+							DocumentBundle {
+								BundleName
+								BundleDocument {
+									Name
+									Document {
+										url
+										name
+										ext
+										mime
+										size
+									}
+								}
+							}
+						}
 					}
 				}
 	}

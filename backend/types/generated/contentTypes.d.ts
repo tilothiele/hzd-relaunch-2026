@@ -1119,6 +1119,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.contact-group-section',
         'blocks.contact-mailer-section',
         'blocks.simple-hero-section',
+        'blocks.document-bundle-section',
       ]
     >;
     SEO: Schema.Attribute.Component<'seo.seo', true>;

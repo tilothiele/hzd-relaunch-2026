@@ -1,5 +1,16 @@
 import type { Schema, Struct } from '@strapi/strapi';
 
+export interface BlocksBundleDocuments extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_bundle_documents';
+  info: {
+    displayName: 'BundleDocuments';
+  };
+  attributes: {
+    Document: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    Name: Schema.Attribute.String;
+  };
+}
+
 export interface BlocksCardItem extends Struct.ComponentSchema {
   collectionName: 'components_blocks_card_items';
   info: {
@@ -64,6 +75,29 @@ export interface BlocksContactMailerSection extends Struct.ComponentSchema {
       'blocks.email-addresses',
       true
     >;
+  };
+}
+
+export interface BlocksDocumentBundle extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_document_bundles';
+  info: {
+    displayName: 'DocumentBundle';
+  };
+  attributes: {
+    BundleDocument: Schema.Attribute.Component<'blocks.bundle-documents', true>;
+    BundleName: Schema.Attribute.String;
+  };
+}
+
+export interface BlocksDocumentBundleSection extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_document_bundle_sections';
+  info: {
+    displayName: 'DocumentBundleSection';
+  };
+  attributes: {
+    DBSDescription: Schema.Attribute.Text;
+    DBSName: Schema.Attribute.String;
+    DocumentBundle: Schema.Attribute.Component<'blocks.document-bundle', true>;
   };
 }
 
@@ -675,10 +709,13 @@ export interface SeoSeo extends Struct.ComponentSchema {
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
+      'blocks.bundle-documents': BlocksBundleDocuments;
       'blocks.card-item': BlocksCardItem;
       'blocks.card-section': BlocksCardSection;
       'blocks.contact-group-section': BlocksContactGroupSection;
       'blocks.contact-mailer-section': BlocksContactMailerSection;
+      'blocks.document-bundle': BlocksDocumentBundle;
+      'blocks.document-bundle-section': BlocksDocumentBundleSection;
       'blocks.email-addresses': BlocksEmailAddresses;
       'blocks.hero-section-slide-show': BlocksHeroSectionSlideShow;
       'blocks.image-gallery-section': BlocksImageGallerySection;

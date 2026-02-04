@@ -194,7 +194,28 @@ export interface NewsArticlesSection {
 	NewsArticlesAnchor?: string | null
 }
 
-export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | SimpleCtaSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection
+export interface BundleDocuments {
+	id: string
+	Name?: string | null
+	Document?: File | null
+}
+
+export interface DocumentBundle {
+	id: string
+	BundleName?: string | null
+	BundleDocument?: BundleDocuments[] | null
+}
+
+export interface DocumentBundleSection {
+	__typename: 'ComponentBlocksDocumentBundleSection'
+	id: string
+	DBSName?: string | null
+	DBSDescription?: string | null
+	DocumentBundle?: DocumentBundle[] | null
+	DocumentBundleAnchor?: string | null
+}
+
+export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | SimpleCtaSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection | DocumentBundleSection
 
 export type PageSection = StartpageSection
 

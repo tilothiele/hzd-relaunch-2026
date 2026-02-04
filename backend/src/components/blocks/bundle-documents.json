@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_blocks_bundle_documents",
+  "info": {
+    "displayName": "BundleDocuments"
+  },
+  "options": {},
+  "attributes": {
+    "Name": {
+      "type": "string"
+    },
+    "Document": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  },
+  "config": {}
+}

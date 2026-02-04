@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_blocks_document_bundles",
+  "info": {
+    "displayName": "DocumentBundle"
+  },
+  "options": {},
+  "attributes": {
+    "BundleName": {
+      "type": "string"
+    },
+    "BundleDocument": {
+      "type": "component",
+      "component": "blocks.bundle-documents",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}
