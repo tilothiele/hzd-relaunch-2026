@@ -188,6 +188,8 @@ export interface NewsArticlesSection {
 	MaxArticles?: number | null
 	news_article_category?: {
 		documentId: string
+		CategoryName?: string | null
+		CategoryDescription?: string | null
 	} | null
 	NewsArticlesAnchor?: string | null
 }

@@ -790,6 +790,8 @@ export const GET_PAGE_BY_SLUG = `
 							MaxArticles
 							news_article_category {
 								documentId
+								CategoryName
+								CategoryDescription
 							}
 							NewsArticlesAnchor
 						}

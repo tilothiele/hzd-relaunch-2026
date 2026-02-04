@@ -40,16 +40,28 @@ export async function NewsArticlesSectionComponent({
             <Box sx={{ width: '100%' }}>
                 <Typography
                     variant='h4'
-                    component='h2'
+                    component='h1'
                     sx={{
                         textAlign: 'center',
                         fontWeight: 700,
-                        mb: 6,
+                        mb: 2,
                         color: theme.headlineColor
                     }}
                 >
-                    Aktuelles
+                    {section.news_article_category?.CategoryName ?? 'Aktuelles'}
                 </Typography>
+
+                {section.news_article_category?.CategoryDescription && (
+                    <div
+                        className='prose prose-xl mx-auto mb-10 max-w-[800px] text-center dark:prose-invert [&_p]:my-2'
+                        style={{
+                            color: theme.textColor,
+                            '--tw-prose-body': theme.textColor,
+                            '--tw-prose-headings': theme.headlineColor,
+                        } as React.CSSProperties}
+                        dangerouslySetInnerHTML={{ __html: section.news_article_category.CategoryDescription }}
+                    />
+                )}
 
                 <NewsArticleList
                     articles={articles}
