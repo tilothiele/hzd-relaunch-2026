@@ -10,6 +10,7 @@ import { DogOwnerTab } from './dog-detail-modal/dog-owner-tab'
 import { DogPersonalWordsTab } from './dog-detail-modal/dog-personal-words-tab'
 import { DogImagesTab } from './dog-detail-modal/dog-images-tab'
 import { DogPerformanceTab } from './dog-detail-modal/dog-performance-tab'
+import { DogDocumentsTab } from './dog-detail-modal/dog-documents-tab'
 
 import type { Dog, HzdSetting } from '@/types'
 import { theme } from '@/themes'
@@ -101,6 +102,12 @@ export function DogDetailView({ dog, strapiBaseUrl, hzdSetting, onBack }: DogDet
                 <section>
                     <SectionHeader title="Leistungen" />
                     <DogPerformanceTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
+                </section>
+
+                {/* 7. Dokumente */}
+                <section>
+                    <SectionHeader title="Dokumente" />
+                    <DogDocumentsTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
                 </section>
 
             </div>

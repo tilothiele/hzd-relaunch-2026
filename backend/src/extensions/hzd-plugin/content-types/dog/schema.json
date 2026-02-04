@@ -152,6 +152,11 @@
       "allowedTypes": [
         "images"
       ]
+    },
+    "DogDocument": {
+      "type": "component",
+      "component": "breeding.dog-document",
+      "repeatable": true
     }
   }
 }

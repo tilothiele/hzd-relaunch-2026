@@ -561,6 +561,7 @@ export const GET_PAGE_BY_SLUG = `
 					LogoBackground
 					Restriction {
 						Public
+						Authenticated
 					}
 					Sections {
 						__typename
@@ -829,6 +830,17 @@ export const SEARCH_DOGS = `
 					height
 					caption
 					previewUrl
+				}
+				DogDocument {
+					id
+					Description
+					MediaFile {
+						url
+						name
+						ext
+						mime
+						size
+					}
 				}
 				cFertile
 				MemosReleased

@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_breeding_dog_documents",
+  "info": {
+    "displayName": "DogDocument"
+  },
+  "options": {},
+  "attributes": {
+    "Description": {
+      "type": "string"
+    },
+    "MediaFile": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  },
+  "config": {}
+}

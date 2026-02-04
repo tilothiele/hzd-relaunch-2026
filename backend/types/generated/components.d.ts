@@ -258,6 +258,20 @@ export interface BlocksTextColumnsSection extends Struct.ComponentSchema {
   };
 }
 
+export interface BreedingDogDocument extends Struct.ComponentSchema {
+  collectionName: 'components_breeding_dog_documents';
+  info: {
+    displayName: 'DogDocument';
+  };
+  attributes: {
+    Description: Schema.Attribute.String;
+    MediaFile: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios',
+      true
+    >;
+  };
+}
+
 export interface BreedingGeoLocation extends Struct.ComponentSchema {
   collectionName: 'components_breeding_geo_locations';
   info: {
@@ -677,6 +691,7 @@ declare module '@strapi/strapi' {
       'blocks.supplemental-document-group-section': BlocksSupplementalDocumentGroupSection;
       'blocks.teaser-text-with-image': BlocksTeaserTextWithImage;
       'blocks.text-columns-section': BlocksTextColumnsSection;
+      'breeding.dog-document': BreedingDogDocument;
       'breeding.geo-location': BreedingGeoLocation;
       'breeding.puppy-amount': BreedingPuppyAmount;
       'calendar.calendar-document': CalendarCalendarDocument;

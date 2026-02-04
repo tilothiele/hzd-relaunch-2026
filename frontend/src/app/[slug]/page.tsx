@@ -5,6 +5,7 @@ import { renderServerSections } from '@/components/sections/server-section-facto
 import NotFoundSection from '@/components/sections/not-found-section/not-found-section'
 import AccessForbiddenSection from '@/components/sections/access-forbidden-section/access-forbidden-section'
 import { AuthGuard } from '@/components/auth-guard/auth-guard'
+import { StrictlyPrivatePage } from '@/components/auth/strictly-private-page'
 import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
@@ -97,53 +98,10 @@ export default async function Page({ params }: PageProps) {
 	 * we show AccessForbiddenSection immediately.
 	 */
 
-	const isPublic = page.Restriction?.Public ?? true // Default to public if no restriction defined
+	const isPublicAccessible = page.Restriction?.Public ?? true // Default to public if no restriction defined
+	const isAuthenticatedRequired = page.Restriction?.Authenticated ?? false
 	// const needsAuth = page.Restriction && !page.Restriction.Public && page.Restriction.Authenticated
 
-	// If it's NOT public and NOT accessible via auth (e.g. strict internal only, or just disabled public access without auth fallback configured properly),
-	// show forbidden immediately.
-	// HOWEVER, usually "Authenticated" flag means "needs login".
-	// If Public=false, usually Authenticated=true (or explicit group checks).
-
-	if (page.Restriction && !page.Restriction.Public) {
-		if (!page.Restriction.Authenticated) {
-			// Not public, not for general authenticated users -> Forbidden
-			return (
-				<MainPageStructure
-					homepage={globalLayout}
-					strapiBaseUrl={baseUrl}
-					pageTitle='403 - Zugriff verweigert'
-				>
-					<AccessForbiddenSection />
-				</MainPageStructure>
-			)
-		}
-
-		// Needs Authentication -> Wrap in AuthGuard
-		const sections = page.Sections || []
-		const theme = globalTheme
-		const renderedSections = renderServerSections({
-			sections,
-			strapiBaseUrl: baseUrl,
-			theme,
-			logo: globalLayout?.Logo
-		})
-
-		return (
-			<MainPageStructure
-				homepage={globalLayout}
-				theme={theme}
-				strapiBaseUrl={baseUrl}
-				pageTitle={page.title}
-			>
-				<AuthGuard fallback={<AccessForbiddenSection />}>
-					{renderedSections}
-				</AuthGuard>
-			</MainPageStructure>
-		)
-	}
-
-	// Default Public Access
 	const sections = page.Sections || []
 	const theme = globalTheme
 	const renderedSections = renderServerSections({
@@ -153,15 +111,50 @@ export default async function Page({ params }: PageProps) {
 		logo: globalLayout?.Logo
 	})
 
+	// If it's NOT public and NOT accessible via auth (e.g. strict internal only, or just disabled public access without auth fallback configured properly),
+	// show forbidden immediately.
+	// HOWEVER, usually "Authenticated" flag means "needs login".
+	// If Public=false, usually Authenticated=true (or explicit group checks).
+
+	// 1. Public Access -> Render immediately
+	if (isPublicAccessible) {
+		return (
+			<MainPageStructure
+				homepage={globalLayout}
+				theme={theme}
+				strapiBaseUrl={baseUrl}
+				pageTitle={page.title}
+			>
+				{renderedSections}
+			</MainPageStructure>
+		)
+	}
+
+	// 2. Strictly Private (Not Public, Not Authenticated) -> Forbidden
+	// User requested to calculate isUserAuthenticated via hook here.
+	if (!isAuthenticatedRequired) {
+		return (
+			<MainPageStructure
+				homepage={globalLayout}
+				strapiBaseUrl={baseUrl}
+				pageTitle='403 - Zugriff verweigert'
+			>
+				<StrictlyPrivatePage fallback={<AccessForbiddenSection />} />
+			</MainPageStructure>
+		)
+	}
+
+	// 3. Authenticated Access -> Wrap in AuthGuard
 	return (
 		<MainPageStructure
 			homepage={globalLayout}
 			theme={theme}
 			strapiBaseUrl={baseUrl}
 			pageTitle={page.title}
-			logoBackground={page.LogoBackground}
 		>
-			{renderedSections}
+			<AuthGuard fallback={<AccessForbiddenSection />}>
+				{renderedSections}
+			</AuthGuard>
 		</MainPageStructure>
 	)
 }

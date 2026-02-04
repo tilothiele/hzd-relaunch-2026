@@ -115,7 +115,7 @@ const OTHER_COUNTRIES = [
 const ALL_COUNTRIES = [...PRIORITY_COUNTRIES, ...OTHER_COUNTRIES]
 import { fetchGraphQL } from '@/lib/graphql-client'
 import { GET_ME } from '@/lib/graphql/queries'
-import { UPDATE_USER, CHANGE_PASSWORD } from '@/lib/graphql/mutations'
+import { CHANGE_PASSWORD } from '@/lib/graphql/mutations'
 import type { AuthUser } from '@/types'
 import { formatDate } from '@/lib/utils'
 
@@ -148,7 +148,7 @@ export function MeinProfilTab({ user: initialUser }: MeinProfilTabProps) {
         passwordConfirmation: ''
     })
 
-    const [isSavingProfile, setIsSavingProfile] = useState(false)
+
     const [isChangingPassword, setIsChangingPassword] = useState(false)
 
     useEffect(() => {
@@ -186,54 +186,13 @@ export function MeinProfilTab({ user: initialUser }: MeinProfilTabProps) {
         }
     }
 
-    const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        })
-    }
+
 
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPasswordData({
             ...passwordData,
             [e.target.name]: e.target.value
         })
-    }
-
-    const handleSaveProfile = async (e: React.FormEvent) => {
-        e.preventDefault()
-        if (!user?.id) return
-
-        setIsSavingProfile(true)
-        setError(null)
-        setSuccessMessage(null)
-
-        try {
-            await fetchGraphQL(UPDATE_USER, {
-                variables: {
-                    id: user.id,
-                    data: {
-                        title: formData.title,
-                        firstName: formData.firstName,
-                        lastName: formData.lastName,
-                        address1: formData.address1,
-                        address2: formData.address2,
-                        zip: formData.zip,
-                        city: formData.city,
-                        countryCode: formData.countryCode,
-                        phone: formData.phone
-                    }
-                }
-            })
-            setSuccessMessage('Profil erfolgreich aktualisiert.')
-            // Reload user data to be sure
-            loadUserData()
-        } catch (err) {
-            console.error('Failed to update profile', err)
-            setError('Fehler beim Speichern der Änderungen.')
-        } finally {
-            setIsSavingProfile(false)
-        }
     }
 
     const handleChangePassword = async (e: React.FormEvent) => {
@@ -321,116 +280,111 @@ export function MeinProfilTab({ user: initialUser }: MeinProfilTabProps) {
                 </Box>
             </Paper>
 
+            {/* Intro Text */}
+            <Typography variant="body1" paragraph>
+                Hier können Sie Ihr Passwort ändern. Die Profilinformationen werden federführend in Chromosoft gepflegt.
+                Wenn Änderungen an Ihren Profildaten nötig sind, melden Sie diese bitte an die HZD-Geschäftsstelle.
+                Von dort werden die Daten an Chromosoft übermittelt und stehen Ihnen nach der nächsten Synchronisation zur Verfügung.
+            </Typography>
+
             <Divider sx={{ mb: 4 }} />
 
-            {/* Editable Profile Section */}
+            {/* Read-Only Profile Data Section */}
             <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-                Persönliche Daten bearbeiten
+                Persönliche Daten
             </Typography>
-            <form onSubmit={handleSaveProfile}>
-                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(12, 1fr)' }, gap: 2 }}>
-                    <Box sx={{ gridColumn: { xs: 'span 12', sm: 'span 4' } }}>
-                        <TextField
-                            fullWidth
-                            label="Titel"
-                            name="title"
-                            value={formData.title}
-                            onChange={handleProfileChange}
-                        />
-                    </Box>
-                    <Box sx={{ gridColumn: { xs: 'span 12', sm: 'span 4' } }}>
-                        <TextField
-                            fullWidth
-                            label="Vorname"
-                            name="firstName"
-                            value={formData.firstName}
-                            onChange={handleProfileChange}
-                        />
-                    </Box>
-                    <Box sx={{ gridColumn: { xs: 'span 12', sm: 'span 4' } }}>
-                        <TextField
-                            fullWidth
-                            label="Nachname"
-                            name="lastName"
-                            value={formData.lastName}
-                            onChange={handleProfileChange}
-                        />
-                    </Box>
-                    <Box sx={{ gridColumn: 'span 12' }}>
-                        <TextField
-                            fullWidth
-                            label="Straße & Hausnummer"
-                            name="address1"
-                            value={formData.address1}
-                            onChange={handleProfileChange}
-                        />
-                    </Box>
-                    <Box sx={{ gridColumn: 'span 12' }}>
-                        <TextField
-                            fullWidth
-                            label="Adresszusatz"
-                            name="address2"
-                            value={formData.address2}
-                            onChange={handleProfileChange}
-                        />
-                    </Box>
-                    <Box sx={{ gridColumn: { xs: 'span 12', sm: 'span 4' } }}>
-                        <TextField
-                            fullWidth
-                            label="PLZ"
-                            name="zip"
-                            value={formData.zip}
-                            onChange={handleProfileChange}
-                        />
-                    </Box>
-                    <Box sx={{ gridColumn: { xs: 'span 12', sm: 'span 8' } }}>
-                        <TextField
-                            fullWidth
-                            label="Ort"
-                            name="city"
-                            value={formData.city}
-                            onChange={handleProfileChange}
-                        />
-                    </Box>
-                    <Box sx={{ gridColumn: 'span 12' }}>
-                        <TextField
-                            select
-                            fullWidth
-                            label="Ländercode"
-                            name="countryCode"
-                            value={formData.countryCode}
-                            onChange={handleProfileChange}
-                        >
-                            {ALL_COUNTRIES.map((option) => (
-                                <MenuItem key={option.code} value={option.code}>
-                                    {option.name} ({option.code})
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                    </Box>
-                    <Box sx={{ gridColumn: 'span 12' }}>
-                        <TextField
-                            fullWidth
-                            label="Telefon"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleProfileChange}
-                        />
-                    </Box>
-                    <Box sx={{ gridColumn: 'span 12' }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                            <Button
-                                type="submit"
-                                variant="contained"
-                                color="primary"
-                                disabled={isSavingProfile}
-                            >
-                                {isSavingProfile ? <CircularProgress size={24} /> : 'Speichern'}
-                            </Button>
-                        </Box>
-                    </Box>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(12, 1fr)' }, gap: 2 }}>
+                <Box sx={{ gridColumn: { xs: 'span 12', sm: 'span 4' } }}>
+                    <TextField
+                        fullWidth
+                        label="Titel"
+                        name="title"
+                        value={formData.title}
+                        InputProps={{ readOnly: true }}
+                        variant="filled"
+                    />
                 </Box>
-            </form>
+                <Box sx={{ gridColumn: { xs: 'span 12', sm: 'span 4' } }}>
+                    <TextField
+                        fullWidth
+                        label="Vorname"
+                        name="firstName"
+                        value={formData.firstName}
+                        InputProps={{ readOnly: true }}
+                        variant="filled"
+                    />
+                </Box>
+                <Box sx={{ gridColumn: { xs: 'span 12', sm: 'span 4' } }}>
+                    <TextField
+                        fullWidth
+                        label="Nachname"
+                        name="lastName"
+                        value={formData.lastName}
+                        InputProps={{ readOnly: true }}
+                        variant="filled"
+                    />
+                </Box>
+                <Box sx={{ gridColumn: 'span 12' }}>
+                    <TextField
+                        fullWidth
+                        label="Straße & Hausnummer"
+                        name="address1"
+                        value={formData.address1}
+                        InputProps={{ readOnly: true }}
+                        variant="filled"
+                    />
+                </Box>
+                <Box sx={{ gridColumn: 'span 12' }}>
+                    <TextField
+                        fullWidth
+                        label="Adresszusatz"
+                        name="address2"
+                        value={formData.address2}
+                        InputProps={{ readOnly: true }}
+                        variant="filled"
+                    />
+                </Box>
+                <Box sx={{ gridColumn: { xs: 'span 12', sm: 'span 4' } }}>
+                    <TextField
+                        fullWidth
+                        label="PLZ"
+                        name="zip"
+                        value={formData.zip}
+                        InputProps={{ readOnly: true }}
+                        variant="filled"
+                    />
+                </Box>
+                <Box sx={{ gridColumn: { xs: 'span 12', sm: 'span 8' } }}>
+                    <TextField
+                        fullWidth
+                        label="Ort"
+                        name="city"
+                        value={formData.city}
+                        InputProps={{ readOnly: true }}
+                        variant="filled"
+                    />
+                </Box>
+                <Box sx={{ gridColumn: 'span 12' }}>
+                    <TextField
+                        fullWidth
+                        label="Ländercode"
+                        name="countryCode"
+                        value={formData.countryCode}
+                        InputProps={{ readOnly: true }}
+                        variant="filled"
+                    />
+                </Box>
+                <Box sx={{ gridColumn: 'span 12' }}>
+                    <TextField
+                        fullWidth
+                        label="Telefon"
+                        name="phone"
+                        value={formData.phone}
+                        InputProps={{ readOnly: true }}
+                        variant="filled"
+                    />
+                </Box>
+            </Box>
 
             <Divider sx={{ my: 4 }} />
 

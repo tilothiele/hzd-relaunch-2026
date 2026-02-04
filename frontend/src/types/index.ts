@@ -361,6 +361,12 @@ export interface GeoLocation {
 	lng: number
 }
 
+export interface DogDocument {
+	id: string
+	Description?: string | null
+	MediaFile?: File[] | null
+}
+
 export interface Dog {
 	documentId: string
 	givenName?: string | null
@@ -397,6 +403,7 @@ export interface Dog {
 	} | null
 	Images?: Image[] | null
 	avatar?: Image | null
+	DogDocument?: DogDocument[] | null
 }
 
 export interface DogSearchResult {

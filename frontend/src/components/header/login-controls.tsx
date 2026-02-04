@@ -315,6 +315,14 @@ export function LoginControls({
 					{activeTab === 'login' && (
 						<form id='login-form' onSubmit={handleLoginSubmit} className='p-6'>
 							<div className='flex flex-col gap-5'>
+								<p className='text-sm text-gray-700 mb-5'>
+									Sollten Sie sich erstmalig anmelden wollen, fordern Sie bitte erst über die 'Passwort vergessen' Funktion ein neues Passwort an.
+									Verwenden Sie die EMail-Adresse, die sie in Ihrem Mitgliedsantrag angegeben haben.
+									Nachdem Ihre bestätigte Mitgliedschaft von der HZD-Geschäftsstelle in der Chromosoft-Datenbank eingetragen wurde,
+									steht Ihr Profil automatisch am Folgetag zur Verfügung.
+								</p>
+							</div>
+							<div className='flex flex-col gap-5'>
 								<label className='block text-sm font-medium text-gray-700'>
 									<span className='mb-2 block'>E-Mail oder HZD-Mitgliedsnummer</span>
 									<input
@@ -385,14 +393,13 @@ export function LoginControls({
 					{/* Register Tab */}
 					{activeTab === 'register' && (
 						<div className='p-6'>
-							<h2 className='mb-4 text-lg font-bold text-gray-900'>Registrieren</h2>
 							<p className='mb-4 text-sm text-gray-600'>
 								Ihr Benutzerprofil wird automatisch erstellt, nachdem Ihre Mitgliedschaft
 								bestätigt wurde.
 							</p>
 							<p className='text-sm text-gray-600'>
 								Sollten Sie Fragen haben oder Probleme beim Registrieren haben, wenden Sie
-								sich bitte an unseren Support.
+								sich bitte an unseren IT-Support oder die HZD-Geschäftsstelle.
 							</p>
 						</div>
 					)}
@@ -406,8 +413,8 @@ export function LoginControls({
 						>
 							<div className='flex flex-col gap-5'>
 								<p className='mb-2 text-sm text-gray-600'>
-									Geben Sie Ihre E-Mail-Adresse ein. Wir senden Ihnen einen Link zum
-									Zurücksetzen Ihres Passworts.
+									Geben Sie Ihre E-Mail-Adresse ein, die Sie in Ihrem Mitgliedsantrag angegeben haben.
+									Wir senden Ihnen einen Link zum	Zurücksetzen Ihres Passworts.
 								</p>
 
 								<label className='block text-sm font-medium text-gray-700'>

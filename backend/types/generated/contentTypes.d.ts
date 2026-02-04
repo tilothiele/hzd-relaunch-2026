@@ -1440,6 +1440,7 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
     cStudBookNumberMother: Schema.Attribute.String;
     dateOfBirth: Schema.Attribute.Date;
     dateOfDeath: Schema.Attribute.Date;
+    DogDocument: Schema.Attribute.Component<'breeding.dog-document', true>;
     Exhibitions: Schema.Attribute.Text;
     father: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.dog'>;
     fullKennelName: Schema.Attribute.String &
