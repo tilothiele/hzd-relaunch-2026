@@ -19,6 +19,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
     faCalendar,
+    faLock,
     faUser,
     faVenusMars,
     faBullhorn,
@@ -85,6 +86,7 @@ const iconMap: Record<string, any> = {
     'fa-report': faReport,
     'fa-file': faFile,
     'fa-user': faUser,
+    'fa-lock': faLock,
     'fa-home': faHouse,
     'fa-newspaper': faNewspaper,
     'fa-users': faUserGroup
