@@ -105,8 +105,7 @@ export function NewsCardListView({ article, strapiBaseUrl, theme, isUnread }: Ne
                                 WebkitLineClamp: 2,
                                 WebkitBoxOrient: 'vertical',
                                 overflow: 'hidden',
-                                lineHeight: 1.5,
-                                mt: 'auto'
+                                lineHeight: 1.5
                             }}
                         >
                             {article.TeaserText}
