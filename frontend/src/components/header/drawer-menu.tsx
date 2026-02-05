@@ -132,13 +132,27 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
 
         return (
             <React.Fragment key={label}>
-                <ListItem disablePadding>
+                <ListItem
+                    disablePadding
+                    secondaryAction={
+                        hasChildren && (
+                            <IconButton
+                                edge="end"
+                                onClick={(e) => handleSubmenuToggle(e, label)}
+                                sx={{ color: theme.drawerText, mr: 1 }}
+                            >
+                                {isSubOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                            </IconButton>
+                        )
+                    }
+                >
                     <ListItemButton
                         component={url ? Link : 'div'}
                         href={url || undefined}
-                        onClick={hasChildren ? (e: React.MouseEvent<unknown>) => handleSubmenuToggle(e, label) : toggleDrawer(false)}
+                        onClick={(!url && hasChildren) ? (e: React.MouseEvent<unknown>) => handleSubmenuToggle(e, label) : toggleDrawer(false)}
                         sx={{
                             pl: level * 3 + 2,
+                            pr: hasChildren ? 7 : 2,
                             '&:hover': {
                                 backgroundColor: 'rgba(26, 54, 115, 0.04)',
                             },
@@ -164,7 +178,6 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                                 color: level === 0 ? theme.drawerText : 'var(--color-text)',
                             }}
                         />
-                        {hasChildren && (isSubOpen ? <ExpandLessIcon sx={{ color: theme.drawerText }} /> : <ExpandMoreIcon sx={{ color: theme.drawerText }} />)}
                     </ListItemButton>
                 </ListItem>
                 {hasChildren && (
