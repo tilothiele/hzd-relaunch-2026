@@ -338,7 +338,6 @@ export interface Menu {
 export interface MenuItem {
 	name: string
 	id?: string
-	faIcon?: string
 	url?: string
 	icon?: string // Added icon for DrawerMenu
 	children?: MenuItem[]

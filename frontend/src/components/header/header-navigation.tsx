@@ -69,6 +69,7 @@ export function HeaderNavigation({
                 <DrawerMenuComponent
                     drawerMenu={globalLayout?.DrawerMenu}
                     theme={theme}
+                    user={user}
                 />
 
                 {/* Desktop Logo */}

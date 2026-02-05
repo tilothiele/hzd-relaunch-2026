@@ -20,6 +20,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
     faCalendar,
     faLock,
+    faLockOpen,
     faUser,
     faVenusMars,
     faBullhorn,
@@ -36,14 +37,14 @@ import {
     faEnvelope
 } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
-import type { Menu as MenuType, MenuItem as MenuItemType } from '@/types'
+import type { Menu as MenuType, MenuItem as MenuItemType, AuthUser } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import {
     getMenuItemUrl,
     getMenuItemLabel,
     getMenuItemIcon,
-    getMenuItemFaIcon,
-    getMenuItemBadgeCategory
+    getMenuItemBadgeCategory,
+    getMenuItemEnabled
 } from '@/lib/menu-helper'
 import { useBadgeNumber } from '@/lib/badge-numbers'
 
@@ -87,6 +88,7 @@ const iconMap: Record<string, any> = {
     'fa-file': faFile,
     'fa-user': faUser,
     'fa-lock': faLock,
+    'fa-lock-open': faLockOpen,
     'fa-home': faHouse,
     'fa-newspaper': faNewspaper,
     'fa-users': faUserGroup
@@ -100,9 +102,10 @@ const getIcon = (iconName?: string) => {
 interface DrawerMenuProps {
     drawerMenu: MenuType | null | undefined
     theme: ThemeDefinition
+    user: AuthUser | null
 }
 
-export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
+export function DrawerMenuComponent({ drawerMenu, theme, user }: DrawerMenuProps) {
     const [isOpen, setIsOpen] = useState(false)
     const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({})
 
@@ -123,10 +126,12 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
     }
 
     const renderMenuItem = (item: MenuItemType, level = 0) => {
-        const hasChildren = item.children && item.children.length > 0
+        const isEnabled = getMenuItemEnabled(item, user)
+        // If disabled, we treat it as having no children to prevent expansion
+        const hasChildren = isEnabled && item.children && item.children.length > 0
         const label = getMenuItemLabel(item)
         const isSubOpen = openSubmenus[label]
-        const icon = getMenuItemIcon(item) || getMenuItemFaIcon(item)
+        const icon = getMenuItemIcon(item, user)
         const url = getMenuItemUrl(item)
         const badgeCategory = getMenuItemBadgeCategory(item)
 
@@ -147,14 +152,17 @@ export function DrawerMenuComponent({ drawerMenu, theme }: DrawerMenuProps) {
                     }
                 >
                     <ListItemButton
-                        component={url ? Link : 'div'}
-                        href={url || undefined}
-                        onClick={(!url && hasChildren) ? (e: React.MouseEvent<unknown>) => handleSubmenuToggle(e, label) : toggleDrawer(false)}
+                        component={url && isEnabled ? Link : 'div'}
+                        href={(url && isEnabled) ? url : undefined}
+                        disabled={!isEnabled}
+                        onClick={(!url && hasChildren && isEnabled) ? (e: React.MouseEvent<unknown>) => handleSubmenuToggle(e, label) : (!isEnabled ? undefined : toggleDrawer(false))}
                         sx={{
                             pl: level * 3 + 2,
                             pr: hasChildren ? 7 : 2,
+                            opacity: isEnabled ? 1 : 0.5,
+                            pointerEvents: isEnabled ? 'auto' : 'none',
                             '&:hover': {
-                                backgroundColor: 'rgba(26, 54, 115, 0.04)',
+                                backgroundColor: isEnabled ? 'rgba(26, 54, 115, 0.04)' : 'transparent',
                             },
                         }}
                     >
