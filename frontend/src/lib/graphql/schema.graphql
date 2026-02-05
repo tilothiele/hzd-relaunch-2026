@@ -1920,6 +1920,7 @@ input ContactGroupInput {
   GroupDescription: JSON
   contacts: [ID]
   DetailsLink: [ComponentLinksActionButtonInput]
+  GroupImage: ID
   publishedAt: DateTime
 }
 
@@ -1930,6 +1931,7 @@ type ContactGroup {
   contacts_connection(filters: ContactFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): ContactRelationResponseCollection
   contacts(filters: ContactFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [Contact]!
   DetailsLink(filters: ComponentLinksActionButtonFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [ComponentLinksActionButton]
+  GroupImage: UploadFile
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime

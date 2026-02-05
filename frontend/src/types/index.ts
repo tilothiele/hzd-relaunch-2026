@@ -306,6 +306,7 @@ export interface Contact {
 export interface ContactGroup {
 	documentId: string
 	ContactGroupName?: string | null
+	GroupImage?: Image | null
 	GroupDescription?: unknown | null
 	contacts?: Contact[] | null
 	DetailsLink?: ActionButton[] | null

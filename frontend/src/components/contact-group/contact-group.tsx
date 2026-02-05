@@ -156,6 +156,7 @@ export function ContactGroupComponent({ contactGroup, strapiBaseUrl, theme }: Co
 	const detailsLink = Array.isArray(contactGroup.DetailsLink) ? contactGroup.DetailsLink[0] : contactGroup.DetailsLink
 
 
+
 	// Sortiere Contacts nach position, falls vorhanden
 	const sortedContacts = [...contacts].sort((a, b) => {
 		const posA = a.position ?? 0
@@ -170,6 +171,19 @@ export function ContactGroupComponent({ contactGroup, strapiBaseUrl, theme }: Co
 					{contactGroup.ContactGroupName}
 				</Typography>
 			) : null}
+
+			{contactGroup.GroupImage && (
+				<Box sx={{ mb: 4, width: '100%', maxWidth: '800px', display: 'flex', justifyContent: 'center', mx: 'auto' }}>
+					<Image
+						src={resolveMediaUrl(contactGroup.GroupImage, strapiBaseUrl) || ''}
+						alt={contactGroup.GroupImage.alternativeText || contactGroup.ContactGroupName || 'Gruppe Bild'}
+						width={contactGroup.GroupImage.width || 800}
+						height={contactGroup.GroupImage.height || 600}
+						style={{ maxWidth: '100%', height: 'auto', borderRadius: 8 }}
+						unoptimized
+					/>
+				</Box>
+			)}
 
 			{contactGroup.GroupDescription ? (
 				<Box

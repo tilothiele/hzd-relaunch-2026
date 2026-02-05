@@ -542,6 +542,9 @@ export interface ApiContactGroupContactGroup
       Schema.Attribute.Private;
     DetailsLink: Schema.Attribute.Component<'links.action-button', true>;
     GroupDescription: Schema.Attribute.Blocks;
+    GroupImage: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',

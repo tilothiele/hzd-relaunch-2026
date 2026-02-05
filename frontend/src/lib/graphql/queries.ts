@@ -204,6 +204,12 @@ export const GET_LAYOUT = `
 						ContactGroup {
 							documentId
 							ContactGroupName
+							GroupImage {
+								url
+								alternativeText
+								width
+								height
+							}
 							GroupDescription
 							contacts(sort: ["position:asc"]) {
 								documentId
@@ -455,6 +461,12 @@ export const GET_INDEX_PAGE = `
 					ContactGroup {
 						documentId
 						ContactGroupName
+						GroupImage {
+							url
+							alternativeText
+							width
+							height
+						}
 						GroupDescription
 						contacts(sort: ["position:asc"]) {
 							documentId
@@ -735,6 +747,12 @@ export const GET_PAGE_BY_SLUG = `
 							ContactGroup {
 								documentId
 								ContactGroupName
+								GroupImage {
+									url
+									alternativeText
+									width
+									height
+								}
 								GroupDescription
 								contacts(sort: ["position:asc"]) {
 									documentId
@@ -1674,6 +1692,12 @@ export const GET_NEWS_ARTICLE_BY_SLUG = `
 					ContactGroup {
 						documentId
 						ContactGroupName
+						GroupImage {
+							url
+							alternativeText
+							width
+							height
+						}
 						GroupDescription
 						contacts(sort: ["position:asc"]) {
 							documentId
