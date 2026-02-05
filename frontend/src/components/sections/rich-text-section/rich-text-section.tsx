@@ -12,10 +12,6 @@ export function RichTextSectionComponent({
 	section,
 	theme,
 }: RichTextSectionComponentProps) {
-	if (!section.RichTextContent) {
-		return null
-	}
-
 	const backgroundColor = section.RichTextOddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
 
 	const mapPadding = (size: 'small' | 'middle' | 'large' | null | undefined) => {
