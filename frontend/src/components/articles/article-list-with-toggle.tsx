@@ -1,29 +1,27 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { getReadArticles } from '@/lib/client/db'
-import type { NewsArticle } from '@/lib/server/news-utils'
-import type { ThemeDefinition } from '@/themes'
-import { NewsCard } from './news-card'
-import { NewsCardListView } from './news-card-list-view'
 import { Box } from '@mui/material'
 import { ViewToggle } from '@/components/common/view-toggle'
+import type { NewsArticle } from '@/types'
+import type { ThemeDefinition } from '@/themes'
+import { ArticleCard } from './article-card'
+import { NewsCardListView } from '@/components/sections/news-articles-section/news-card-list-view'
+import { getReadArticles } from '@/lib/client/db'
 
-interface NewsArticleListProps {
+interface ArticleListWithToggleProps {
     articles: NewsArticle[]
     strapiBaseUrl: string
     theme: ThemeDefinition
 }
 
-export function NewsArticleList({ articles, strapiBaseUrl, theme }: NewsArticleListProps) {
-    const [readArticles, setReadArticles] = useState<Set<string>>(new Set())
+export function ArticleListWithToggle({ articles, strapiBaseUrl, theme }: ArticleListWithToggleProps) {
     const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
+    const [readArticles, setReadArticles] = useState<Set<string>>(new Set())
 
     useEffect(() => {
         getReadArticles().then(setReadArticles).catch(console.error)
     }, [])
-
-
 
     return (
         <Box sx={{ width: '100%' }}>
@@ -32,21 +30,15 @@ export function NewsArticleList({ articles, strapiBaseUrl, theme }: NewsArticleL
             </Box>
 
             {viewMode === 'cards' ? (
-                <Box sx={{
-                    display: 'grid',
-                    gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
-                    gap: 4,
-                }}>
+                <div className='grid gap-8 md:grid-cols-2 lg:grid-cols-3'>
                     {articles.map((article) => (
-                        <NewsCard
+                        <ArticleCard
                             key={article.documentId}
                             article={article}
                             strapiBaseUrl={strapiBaseUrl}
-                            theme={theme}
-                            isUnread={!readArticles.has(article.documentId)}
                         />
                     ))}
-                </Box>
+                </div>
             ) : (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                     {articles.map((article) => (

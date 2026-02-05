@@ -6,8 +6,8 @@ import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { fetchCategoryBySlug, fetchArticlesByCategory } from '@/lib/server/fetch-articles-by-category'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import NotFoundSection from '@/components/sections/not-found-section/not-found-section'
-import { NewsArticle } from '@/types/'
-import { formattedDateOfPublication } from '@/lib/article-utils'
+import { ArticleCard } from '@/components/articles/article-card'
+import { ArticleListWithToggle } from '@/components/articles/article-list-with-toggle'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,72 +18,6 @@ interface PageProps {
 	searchParams: Promise<{
 		page?: string
 	}>
-}
-
-function ArticleCard({
-	article,
-	strapiBaseUrl,
-	featured = false
-}: {
-	article: NewsArticle
-	strapiBaseUrl: string
-	featured?: boolean
-}) {
-
-	const formattedDate = formattedDateOfPublication(article)
-	const pubDate = article.DateOfPublication || article.publishedAt || undefined
-
-	//console.log(article, formattedDate, pubDate)
-
-	const imageUrl = article.Image?.url
-		? (article.Image.url.startsWith('http') ? article.Image.url : `${strapiBaseUrl}${article.Image.url}`)
-		: null
-
-	return (
-		<Link
-			href={`/article/${article.Slug}`}
-			className={`group block overflow-hidden rounded-lg bg-white shadow-md transition-all hover:shadow-xl ${featured ? 'md:col-span-2' : ''
-				}`}
-		>
-			{imageUrl && (
-				<div className={`relative overflow-hidden ${featured ? 'aspect-[21/9]' : 'aspect-video'}`}>
-					<Image
-						src={imageUrl}
-						alt={article.Image?.alternativeText || article.Headline || 'Artikelbild'}
-						fill
-						className='object-cover transition-transform duration-300 group-hover:scale-105'
-						unoptimized
-					/>
-				</div>
-			)}
-			<div className='p-6'>
-				{formattedDate && (
-					<time className='text-sm text-gray-500' dateTime={pubDate}>
-						{formattedDate}
-					</time>
-				)}
-				<h3 className={`mt-2 font-bold text-gray-900 ${featured ? 'text-2xl md:text-3xl' : 'text-xl'}`}>
-					{article.Headline}
-				</h3>
-				{article.SubHeadline && (
-					<p className={`mt-2 text-gray-600 ${featured ? 'text-lg' : 'text-base'}`}>
-						{article.SubHeadline}
-					</p>
-				)}
-				{article.TeaserText && (
-					<p className='mt-3 line-clamp-3 text-gray-600'>
-						{article.TeaserText}
-					</p>
-				)}
-				<div className='mt-4 inline-flex items-center text-sm font-medium text-blue-600 group-hover:text-blue-700'>
-					Weiterlesen
-					<svg className='ml-2 h-4 w-4 transition-transform group-hover:translate-x-1' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
-						<path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
-					</svg>
-				</div>
-			</div>
-		</Link>
-	)
 }
 
 function Pagination({ currentPage, totalPages, baseUrl }: { currentPage: number; totalPages: number; baseUrl: string }) {
@@ -258,15 +192,11 @@ export default async function ArticlesCategoryPage({ params, searchParams }: Pag
 					</h2>
 					{articles.length > 0 ? (
 						<>
-							<div className='grid gap-8 md:grid-cols-2 lg:grid-cols-3'>
-								{articles.map((article) => (
-									<ArticleCard
-										key={article.documentId}
-										article={article}
-										strapiBaseUrl={baseUrl}
-									/>
-								))}
-							</div>
+							<ArticleListWithToggle
+								articles={articles}
+								strapiBaseUrl={baseUrl}
+								theme={theme}
+							/>
 							<Pagination
 								currentPage={currentPage}
 								totalPages={totalPages}

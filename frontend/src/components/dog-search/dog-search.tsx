@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, FormControlLabel, Chip, OutlinedInput, Pagination, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, ToggleButtonGroup, ToggleButton, Tooltip } from '@mui/material'
-import GridViewIcon from '@mui/icons-material/GridView'
-import TableRowsIcon from '@mui/icons-material/TableRows'
+import { ViewToggle } from '@/components/common/view-toggle'
+
 import MaleIcon from '@mui/icons-material/Male'
 import FemaleIcon from '@mui/icons-material/Female'
 import { useDogs, type ColorFilter, type PageSize, type SexFilter, type DistanceFilter } from '@/hooks/use-dogs'
@@ -336,21 +336,7 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 						)}
 					</div>
 					<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-						<GridViewIcon sx={{ fontSize: 20, color: viewMode === 'cards' ? theme.submitButtonColor : 'text.disabled' }} />
-						<Switch
-							size='small'
-							checked={viewMode === 'table'}
-							onChange={(e) => setViewMode(e.target.checked ? 'table' : 'cards')}
-							sx={{
-								'& .MuiSwitch-switchBase.Mui-checked': {
-									color: theme.submitButtonColor,
-								},
-								'& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-									backgroundColor: theme.submitButtonColor,
-								},
-							}}
-						/>
-						<TableRowsIcon sx={{ fontSize: 20, color: viewMode === 'table' ? theme.submitButtonColor : 'text.disabled' }} />
+						<ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
 					</Box>
 					<div className='flex items-center gap-2'>
 						<label

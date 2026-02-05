@@ -11,6 +11,7 @@ import type { Litter, HzdSetting, GeoLocation } from '@/types'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
 import { theme } from '@/themes'
+import { ViewToggle } from '@/components/common/view-toggle'
 import { LitterCard } from '@/components/litter-search/litter-card'
 import { LitterDetailView } from '@/components/litter-search/litter-detail-view'
 import { useLitters, type LitterStatus, type PageSize } from '@/hooks/use-litters'
@@ -451,21 +452,7 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 						)}
 					</div>
 					<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-						<GridViewIcon sx={{ fontSize: 20, color: viewMode === 'cards' ? theme.submitButtonColor : 'text.disabled' }} />
-						<Switch
-							size='small'
-							checked={viewMode === 'table'}
-							onChange={(e) => setViewMode(e.target.checked ? 'table' : 'cards')}
-							sx={{
-								'& .MuiSwitch-switchBase.Mui-checked': {
-									color: theme.submitButtonColor,
-								},
-								'& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-									backgroundColor: theme.submitButtonColor,
-								},
-							}}
-						/>
-						<TableRowsIcon sx={{ fontSize: 20, color: viewMode === 'table' ? theme.submitButtonColor : 'text.disabled' }} />
+						<ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
 					</Box>
 				</div>
 				<div className='flex items-center gap-2'>

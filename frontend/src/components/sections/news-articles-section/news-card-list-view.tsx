@@ -1,20 +1,20 @@
 'use client'
 
-import { Card, CardContent, Typography, Box } from '@mui/material'
+import { Card, CardContent, Typography, Box, Button } from '@mui/material'
 import Link from 'next/link'
 import Image from 'next/image'
-import type { ThemeDefinition } from '@/themes'
 import type { NewsArticle } from '@/lib/server/news-utils'
+import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 
-interface NewsCardProps {
+interface NewsCardListViewProps {
     article: NewsArticle
     strapiBaseUrl: string
     theme: ThemeDefinition
     isUnread?: boolean
 }
 
-export function NewsCard({ article, strapiBaseUrl, theme, isUnread }: NewsCardProps) {
+export function NewsCardListView({ article, strapiBaseUrl, theme, isUnread }: NewsCardListViewProps) {
     const imageUrl = resolveMediaUrl(article.Image, strapiBaseUrl)
     const dateToUse = article.DateOfPublication || article.publishedAt
     const formattedDate = dateToUse
@@ -26,25 +26,23 @@ export function NewsCard({ article, strapiBaseUrl, theme, isUnread }: NewsCardPr
         : null
 
     return (
-        <Link href={`/article/${article.Slug}`} style={{ textDecoration: 'none' }}>
+        <Link href={`/article${article.Slug}`} style={{ textDecoration: 'none' }}>
             <Card
                 sx={{
-                    height: '100%',
                     display: 'flex',
-                    flexDirection: 'column',
-                    borderRadius: 2,
-                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    height: { sm: '180px' }, // Fixed height for desktop to ensure two-line layout
+                    overflow: 'hidden',
+                    boxShadow: '0 2px 4px -1px rgb(0 0 0 / 0.1)',
                     transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
                     '&:hover': {
-                        transform: 'translateY(-4px)',
-                        boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                     },
-                    position: 'relative',
-                    overflow: 'hidden'
                 }}
             >
                 {imageUrl && (
-                    <Box sx={{ position: 'relative', width: '100%', paddingTop: '56.25%' }}>
+                    <Box sx={{ position: 'relative', width: { xs: '100%', sm: '240px' }, minWidth: { sm: '240px' }, height: { xs: '200px', sm: 'auto' } }}>
                         <Image
                             src={imageUrl}
                             alt={article.Image?.alternativeText || article.Headline || ''}
@@ -54,32 +52,33 @@ export function NewsCard({ article, strapiBaseUrl, theme, isUnread }: NewsCardPr
                         />
                     </Box>
                 )}
-
-                <CardContent sx={{ flexGrow: 1, padding: 3, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 2 }}>
+                    {/* Top Line: Category, Date, Headline */}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
                             {isUnread && (
                                 <Typography
                                     variant="caption"
                                     sx={{
-                                        backgroundColor: theme.submitButtonColor, // MUI error.main color
+                                        backgroundColor: theme.submitButtonColor,
                                         color: theme.submitButtonTextColor,
-                                        px: 1.5,
-                                        py: 0.5,
-                                        borderRadius: 1,
+                                        px: 1,
+                                        py: 0.25,
+                                        borderRadius: 0.5,
                                         fontWeight: 600,
-                                        textTransform: 'uppercase'
+                                        textTransform: 'uppercase',
+                                        fontSize: '0.7rem'
                                     }}
                                 >
                                     Ungelesen
                                 </Typography>
                             )}
+                            {formattedDate && (
+                                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                                    {formattedDate}
+                                </Typography>
+                            )}
                         </Box>
-                        {formattedDate && (
-                            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                                {formattedDate}
-                            </Typography>
-                        )}
                     </Box>
 
                     <Typography
@@ -87,34 +86,32 @@ export function NewsCard({ article, strapiBaseUrl, theme, isUnread }: NewsCardPr
                         component="h3"
                         sx={{
                             color: theme.textColor,
-                            fontWeight: 900,
-                            lineHeight: 1.3,
-                            mb: 1
+                            fontWeight: 800,
+                            lineHeight: 1.2,
+                            mb: 1,
+                            fontSize: '1.1rem'
                         }}
                     >
                         {article.Headline}
                     </Typography>
 
+                    {/* Bottom Line: Teaser Text */}
                     {article.TeaserText && (
                         <Typography
                             variant="body2"
                             sx={{
                                 color: theme.textColor,
                                 display: '-webkit-box',
-                                WebkitLineClamp: 3,
+                                WebkitLineClamp: 2,
                                 WebkitBoxOrient: 'vertical',
                                 overflow: 'hidden',
-                                lineHeight: 1.6
+                                lineHeight: 1.5,
+                                mt: 'auto'
                             }}
                         >
                             {article.TeaserText}
                         </Typography>
                     )}
-
-                    <Box sx={{ mt: 'auto', pt: 2, display: 'flex', alignItems: 'center', color: theme.headerBackground, fontWeight: 700, fontSize: '0.875rem' }}>
-                        Weiterlesen
-                        <Box component="span" sx={{ ml: 1 }}>→</Box>
-                    </Box>
                 </CardContent>
             </Card>
         </Link>
