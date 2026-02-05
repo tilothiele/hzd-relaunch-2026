@@ -308,6 +308,7 @@ export interface ContactGroup {
 	ContactGroupName?: string | null
 	GroupDescription?: unknown | null
 	contacts?: Contact[] | null
+	DetailsLink?: ActionButton[] | null
 	createdAt?: string | null
 	updatedAt?: string | null
 	publishedAt?: string | null

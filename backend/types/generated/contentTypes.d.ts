@@ -540,6 +540,7 @@ export interface ApiContactGroupContactGroup
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    DetailsLink: Schema.Attribute.Component<'links.action-button', true>;
     GroupDescription: Schema.Attribute.Blocks;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<

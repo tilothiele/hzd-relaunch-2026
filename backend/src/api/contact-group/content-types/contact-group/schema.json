@@ -22,6 +22,11 @@
       "relation": "oneToMany",
       "target": "api::contact.contact",
       "mappedBy": "contact_group"
+    },
+    "DetailsLink": {
+      "type": "component",
+      "component": "links.action-button",
+      "repeatable": true
     }
   }
 }

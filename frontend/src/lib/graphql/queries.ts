@@ -226,9 +226,13 @@ export const GET_LAYOUT = `
 								}
 								member {
 									documentId
-									firstName
-									lastName
+								lastName
 								}
+							}
+							DetailsLink {
+								Label
+								Link
+								Primary
 							}
 						}
 						ContactGroupAnchor
@@ -476,6 +480,12 @@ export const GET_INDEX_PAGE = `
 								firstName
 								lastName
 							}
+						}
+
+						DetailsLink {
+							Label
+							Link
+							Primary
 						}
 					}
 					ContactGroupAnchor
@@ -750,6 +760,11 @@ export const GET_PAGE_BY_SLUG = `
 										firstName
 										lastName
 									}
+								}
+								DetailsLink {
+									Label
+									Link
+									Primary
 								}
 							}
 							ContactGroupAnchor
@@ -1684,6 +1699,11 @@ export const GET_NEWS_ARTICLE_BY_SLUG = `
 								firstName
 								lastName
 							}
+						}
+						DetailsLink {
+							Label
+							Link
+							Primary
 						}
 					}
 				}

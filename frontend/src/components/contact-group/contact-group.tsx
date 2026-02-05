@@ -153,6 +153,8 @@ function ContactCard({ contact, strapiBaseUrl, theme }: ContactCardProps) {
 
 export function ContactGroupComponent({ contactGroup, strapiBaseUrl, theme }: ContactGroupProps) {
 	const contacts = contactGroup.contacts || []
+	const detailsLink = Array.isArray(contactGroup.DetailsLink) ? contactGroup.DetailsLink[0] : contactGroup.DetailsLink
+
 
 	// Sortiere Contacts nach position, falls vorhanden
 	const sortedContacts = [...contacts].sort((a, b) => {
@@ -162,9 +164,9 @@ export function ContactGroupComponent({ contactGroup, strapiBaseUrl, theme }: Co
 	})
 
 	return (
-		<Box sx={{ padding: 4 }}>
+		<Box sx={{ padding: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 			{contactGroup.ContactGroupName ? (
-				<Typography variant='h4' component='h2' className='mb-6 font-bold' sx={{ marginBottom: 4, color: theme.headlineColor }}>
+				<Typography variant='h4' component='h2' className='mb-6 font-bold' sx={{ marginBottom: 4, color: theme.headlineColor, textAlign: 'center' }}>
 					{contactGroup.ContactGroupName}
 				</Typography>
 			) : null}
@@ -175,6 +177,7 @@ export function ContactGroupComponent({ contactGroup, strapiBaseUrl, theme }: Co
 						mb: 4,
 						'& p': { mb: 2 },
 						'& p:last-child': { mb: 0 },
+						width: '100%',
 					}}
 					dangerouslySetInnerHTML={{
 						__html: typeof contactGroup.GroupDescription === 'string'
@@ -191,18 +194,59 @@ export function ContactGroupComponent({ contactGroup, strapiBaseUrl, theme }: Co
 			) : (
 				<Box
 					sx={{
-						display: 'grid',
-						gridTemplateColumns: {
-							xs: '1fr',
-							sm: 'repeat(2, 1fr)',
-							md: 'repeat(3, 1fr)',
-						},
+						display: 'flex',
+						flexWrap: 'wrap',
+						justifyContent: 'center',
 						gap: 3,
+						width: '100%',
 					}}
 				>
 					{sortedContacts.map((contact) => (
-						<ContactCard key={contact.documentId} contact={contact} strapiBaseUrl={strapiBaseUrl} theme={theme} />
+						<Box
+							key={contact.documentId}
+							sx={{
+								width: {
+									xs: '100%',
+									sm: 'calc(50% - 12px)', // 24px gap / 2 = 12px
+									md: 'calc(33.333% - 16px)', // 24px gap * 2 / 3 = 16px approx? No.
+									// Gap logic in flex is tricky with calc.
+									// Better: Use margin or dedicated grid system if available.
+									// Or: width: calc((100% - (gap * (itemsPerRow - 1))) / itemsPerRow)
+									// Gap is 3 * 8px = 24px.
+									// MD: 3 items. 2 gaps. Total gap width = 48px. Item width = (100% - 48px) / 3
+									// SM: 2 items. 1 gap. Total gap width = 24px. Item width = (100% - 24px) / 2
+								},
+								flexBasis: {
+									xs: '100%',
+									sm: 'calc((100% - 24px) / 2)',
+									md: 'calc((100% - 48px) / 3)',
+								},
+								maxWidth: {
+									xs: '100%',
+									sm: 'calc((100% - 24px) / 2)',
+									md: 'calc((100% - 48px) / 3)',
+								}
+							}}
+						>
+							<ContactCard contact={contact} strapiBaseUrl={strapiBaseUrl} theme={theme} />
+						</Box>
 					))}
+				</Box>
+			)}
+
+			{detailsLink && (detailsLink.Label || detailsLink.Link) && (
+				<Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', width: '100%' }}>
+					<Link
+						href={detailsLink.Link || '#'}
+						className='inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold transition-colors duration-200'
+						style={{
+							backgroundColor: detailsLink.Primary ? theme.buttonColor : 'transparent',
+							color: detailsLink.Primary ? theme.buttonTextColor : theme.buttonColor,
+							border: detailsLink.Primary ? 'none' : `2px solid ${theme.buttonColor}`,
+						}}
+					>
+						{detailsLink.Label || 'Mehr erfahren'}
+					</Link>
 				</Box>
 			)}
 		</Box>
