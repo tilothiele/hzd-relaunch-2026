@@ -17,6 +17,7 @@ type PageSize = 5 | 10 | 20
 
 interface FormWithCount extends Form {
 	instanceCount: number
+	latestInstanceCreatedAt?: string | null
 }
 
 export function FormsInstanceSearch({ strapiBaseUrl }: FormsInstanceSearchProps) {
@@ -74,9 +75,17 @@ export function FormsInstanceSearch({ strapiBaseUrl }: FormsInstanceSearchProps)
 					)
 
 					const instances = Array.isArray(data.formInstances) ? data.formInstances : []
+					const latestInstance = instances.reduce((latest, current) => {
+						if (!latest) return current
+						if (!current.createdAt) return latest
+						if (!latest.createdAt) return current
+						return new Date(current.createdAt) > new Date(latest.createdAt) ? current : latest
+					}, null as (typeof instances)[0] | null)
+
 					return {
 						...form,
 						instanceCount: instances.length,
+						latestInstanceCreatedAt: latestInstance?.createdAt || null,
 					}
 				} catch (err) {
 					console.error(`Fehler beim Zählen der Instanzen für Form ${form.documentId}:`, err)
@@ -296,7 +305,7 @@ export function FormsInstanceSearch({ strapiBaseUrl }: FormsInstanceSearchProps)
 											</TableCell>
 											<TableCell>
 												<Typography variant='body2' className='text-gray-600'>
-													{formatDate(form.updatedAt)}
+													{formatDate(formWithCount.latestInstanceCreatedAt || form.updatedAt)}
 												</Typography>
 											</TableCell>
 											<TableCell align='center'>
