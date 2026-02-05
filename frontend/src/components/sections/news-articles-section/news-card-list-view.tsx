@@ -31,7 +31,7 @@ export function NewsCardListView({ article, strapiBaseUrl, theme, isUnread }: Ne
                 sx={{
                     display: 'flex',
                     flexDirection: { xs: 'column', sm: 'row' },
-                    height: { sm: '180px' }, // Fixed height for desktop to ensure two-line layout
+                    height: (!imageUrl && !article.TeaserText) ? 'auto' : { sm: '180px' }, // Fixed height for desktop only if content needs space
                     overflow: 'hidden',
                     boxShadow: '0 2px 4px -1px rgb(0 0 0 / 0.1)',
                     transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
