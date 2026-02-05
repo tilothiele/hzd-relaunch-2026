@@ -45,7 +45,7 @@ export function RichTextSectionComponent({
 						{section.Subtitle}
 					</h3>
 				)}
-				<div
+				{section.RichTextContent && <div
 					className='prose prose-xl max-w-none dark:prose-invert [&_p]:my-2'
 					style={{
 						color: theme.textColor,
@@ -53,7 +53,7 @@ export function RichTextSectionComponent({
 						'--tw-prose-headings': theme.headlineColor,
 					} as React.CSSProperties}
 					dangerouslySetInnerHTML={{ __html: section.RichTextContent }}
-				/>
+				/>}
 			</div>
 		</SectionContainer>
 	)
