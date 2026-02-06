@@ -1856,6 +1856,14 @@ export const GET_BREEDER_BY_USER = `
 				BreedersIntroDraft
 				isDirty
 				InternalNotes
+				BreederEmail
+				owner_member {
+					documentId
+					firstName
+					lastName
+					email
+					username
+				}
 				member {
 					documentId
 					firstName

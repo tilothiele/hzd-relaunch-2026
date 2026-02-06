@@ -85,6 +85,14 @@
     },
     "isDirty": {
       "type": "boolean"
+    },
+    "owner_member": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "BreederEmail": {
+      "type": "email"
     }
   }
 }

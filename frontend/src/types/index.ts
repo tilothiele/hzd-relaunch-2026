@@ -481,6 +481,8 @@ export interface Breeder {
 	GeoLocation?: GeoLocation | null
 	avatar?: Image | null
 	Address?: Address | null
+	BreederEmail?: string | null
+	owner_member?: AuthUser | null
 }
 
 export interface BreederSearchResult {

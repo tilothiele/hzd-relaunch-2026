@@ -15,6 +15,7 @@ export function MeinZwingerTab({ breeder, strapiBaseUrl }: MeinZwingerTabProps) 
     const [websiteUrlDraft, setWebsiteUrlDraft] = useState(breeder.WebsiteUrlDraft || '')
     // BreedersIntroDraft is now available in schema
     const [breederIntroDraft, setBreederIntroDraft] = useState(breeder.BreedersIntroDraft || '')
+    const [breederEmail, setBreederEmail] = useState(breeder.BreederEmail || '')
 
     const [address, setAddress] = useState({
         FullName: breeder.Address?.FullName || '',
@@ -43,6 +44,7 @@ export function MeinZwingerTab({ breeder, strapiBaseUrl }: MeinZwingerTabProps) 
                     data: {
                         WebsiteUrlDraft: websiteUrlDraft,
                         BreedersIntroDraft: breederIntroDraft,
+                        BreederEmail: breederEmail,
                         Address: address,
                     },
                 },
@@ -110,6 +112,18 @@ export function MeinZwingerTab({ breeder, strapiBaseUrl }: MeinZwingerTabProps) 
             </Box>
 
             <Box sx={{ mb: 3 }}>
+                <Typography variant='subtitle2' color='text.secondary'>Email (Zwinger)</Typography>
+                <TextField
+                    fullWidth
+                    variant='outlined'
+                    value={breederEmail}
+                    onChange={(e) => setBreederEmail(e.target.value)}
+                    size='small'
+                    sx={{ mt: 1 }}
+                />
+            </Box>
+
+            <Box sx={{ mb: 3 }}>
                 <Typography variant='subtitle2' color='text.secondary'>Persönliche Worte (Veröffentlicht)</Typography>
                 <Typography variant='body1' sx={{ whiteSpace: 'pre-wrap', mb: 2, border: '1px solid #eee', p: 1, borderRadius: 1, maxHeight: 100, overflow: 'auto' }}>
                     {breeder.BreedersIntroduction || '-'}
@@ -132,6 +146,14 @@ export function MeinZwingerTab({ breeder, strapiBaseUrl }: MeinZwingerTabProps) 
                 <Box sx={{ flex: 1 }}>
                     <Typography variant='h6' sx={{ mb: 2 }}>Mitgliedsadresse (Read-only)</Typography>
                     <Box sx={{ p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
+                        {breeder.owner_member && (
+                            <Box sx={{ mb: 2, pb: 2, borderBottom: '1px solid #eee' }}>
+                                <Typography variant='subtitle2' color='text.secondary'>Verknüpftes Mitglied (Owner)</Typography>
+                                <Typography variant='body1'>{breeder.owner_member.firstName} {breeder.owner_member.lastName}</Typography>
+                                <Typography variant='body2' color='text.secondary'>{breeder.owner_member.email}</Typography>
+                            </Box>
+                        )}
+
                         <Typography variant='body2' color='text.secondary'>Name</Typography>
                         <Typography variant='body1' gutterBottom>{breeder.member?.firstName} {breeder.member?.lastName}</Typography>
 

@@ -48,7 +48,7 @@ function PuppyAmountField({ label, value, onChange, disabled }: { label: string,
     }
 
     return (
-        <Box sx={{ p: 2, border: '1px solid #eee', borderRadius: 1, height: '100%', width: '100%', bgcolor: disabled ? '#f5f5f5' : 'transparent' }}>
+        <Box sx={{ p: 2, border: '1px solid #eee', borderRadius: 1, height: '100%', width: '100%', bgcolor: disabled ? '#f5f5f5' : 'white' }}>
             <Typography variant='subtitle2' gutterBottom color={disabled ? 'text.secondary' : 'text.primary'}>{label}</Typography>
             <Box sx={{ display: 'flex', gap: 2 }}>
                 <TextField

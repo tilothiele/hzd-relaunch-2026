@@ -1365,6 +1365,7 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
   attributes: {
     Address: Schema.Attribute.Component<'personal.address', false>;
     avatar: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    BreederEmail: Schema.Attribute.Email;
     BreedersIntroDraft: Schema.Attribute.Text;
     BreedersIntroduction: Schema.Attribute.RichText &
       Schema.Attribute.CustomField<
@@ -1398,6 +1399,10 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     member: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    owner_member: Schema.Attribute.Relation<
       'oneToOne',
       'plugin::users-permissions.user'
     >;

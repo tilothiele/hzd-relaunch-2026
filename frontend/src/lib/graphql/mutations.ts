@@ -6,6 +6,14 @@ export const UPDATE_BREEDER = `
 			WebsiteUrlDraft
 			BreedersIntroduction
 			BreedersIntroDraft
+			BreederEmail
+			owner_member {
+				documentId
+				firstName
+				lastName
+				email
+				username
+			}
 			Address {
 				id
 				FullName
