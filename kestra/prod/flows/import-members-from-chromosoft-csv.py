@@ -117,6 +117,15 @@ def clean_string(value: str, max_length: Optional[int] = None) -> Optional[str]:
         cleaned = cleaned[:max_length]
     return cleaned
 
+def is_valid_email(email: str) -> bool:
+    """Check if email format is valid."""
+    if not email:
+        return False
+    # Simple regex for email validation
+    # Disallow leading/trailing dots and consecutive dots in local part
+    pattern = r'^[a-zA-Z0-9_%+-]+(\.[a-zA-Z0-9_%+-]+)*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
+
 def map_csv_to_member(row: Dict[str, str]) -> Dict[str, Any]:
     """Map CSV row to Strapi member data structure."""
     member_data = {}
@@ -158,7 +167,11 @@ def map_csv_to_member(row: Dict[str, str]) -> Dict[str, Any]:
 
     email = clean_string(row.get('email', ''), max_length=100)
     if email:
-        member_data['cEmail'] = email
+        if is_valid_email(email):
+            member_data['cEmail'] = email
+        else:
+            # print(f"Warning: Invalid email found: {email} - ignoring")
+            pass
 
     # zip
     zipcode = clean_string(row.get('zipcode', ''), max_length=5)
@@ -230,9 +243,34 @@ def map_csv_to_member(row: Dict[str, str]) -> Dict[str, Any]:
     # person is a member - map to blocked status
     # If not a member (0), then blocked=True
     is_member = parse_boolean(row.get('person is a member', ''))
-    #print(c_id, is_member)
+    
+    # Calculate blocked status based on dates
+    today = datetime.now().date()
+    is_blocked_by_date = False
+
+    if member_since:
+        try:
+             # member_since is YYYY-MM-DD string
+             ms_date = datetime.strptime(member_since, '%Y-%m-%d').date()
+             if ms_date > today:
+                 is_blocked_by_date = True
+        except ValueError:
+            pass
+
+    if cancellation_on:
+        try:
+            co_date = datetime.strptime(cancellation_on, '%Y-%m-%d').date()
+            if co_date < today:
+                is_blocked_by_date = True
+        except ValueError:
+             pass
+
     if is_member is not None:
-        member_data['blocked'] = not is_member
+        # Blocked if NOT member OR blocked by date logic
+        member_data['blocked'] = (not is_member) or is_blocked_by_date
+    elif is_blocked_by_date:
+        # If is_member is missing but date logic says blocked, set blocked
+        member_data['blocked'] = True
 
     # kennelName - breeding station
     kennel_name = clean_string(row.get('breeding station', ''))
@@ -404,6 +442,10 @@ def register_user(api_url: str, api_token: Optional[str], username: str, email: 
                 print(f"✗ Failed to register user {username}: {error_msg}")
                 return None
             return result.get('data', {}).get('register', {}).get('user', {}).get('documentId')
+        else:
+            print(f"✗ Failed to register user {username}: {response.status_code}")
+            print(response.text)
+            return None
     except Exception as e:
         print(f"✗ Error registering user {username}: {e}")
     return None

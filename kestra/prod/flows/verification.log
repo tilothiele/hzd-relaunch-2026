@@ -1,0 +1,305 @@
+Testing is_valid_email...
+✓ Valid: test@example.com
+✓ Valid: user.name@domain.co.uk
+✓ Valid: user_name@domain.com
+✓ Valid: user+name@domain.com
+✓ Valid: 123@domain.com
+✓ Invalid: plainaddress
+✓ Invalid: #@%^%#$@#$@#.com
+✓ Invalid: @example.com
+✓ Invalid: Joe Smith <email@example.com>
+✓ Invalid: email.example.com
+✓ Invalid: email@example@example.com
+✓ Invalid: .email@example.com
+✓ Invalid: email.@example.com
+✓ Invalid: email..email@example.com
+✓ Invalid: 
+✓ Invalid: None
+✓ Invalid: email1@example.com, email2@example.com
+✓ Invalid: email1@example.com email2@example.com
+✓ Invalid: email1@example.com;email2@example.com
+
+Testing map_csv_to_member with emails...
+✓ map_csv_to_member handled valid email correctly
+✓ map_csv_to_member handled invalid email correctly (ignored)
+✓ map_csv_to_member handled empty email correctly
+
+Testing map_csv_to_member blocked logic...
+✓ Future joining date correctly blocks user
+✓ Past leaving date correctly blocks user
+✓ Active member with valid dates not blocked
+✓ Non-member correctly blocked
+
+Verifying CSV data in alle_hzd_mitglieder.csv...
+Scanned 5155 rows.
+Warning: Could not parse date 'DE85 5001 0517 5439 3214 86'
+
+--- Validation Report ---
+
+[FAIL] Found 202 active members with invalid/empty emails:
+  (10837 Dagmar Wortmann) - Status: 1 - Email: '-'
+  (10835 Pia Lage) - Status: 1 - Email: '-'
+  (10699 Burkhard Middeke) - Status: 1 - Email: '-'
+  (10689 Klaus Rothauge) - Status: 1 - Email: '-'
+  (10685 Laura Victoria Czapla) - Status: 1 - Email: '-'
+  (10550 Anne Martens Sehlmeyer) - Status: 1 - Email: '-'
+  (10385 Patrick Ries) - Status: 1 - Email: '-'
+  (10321 Lisa Glowik) - Status: 1 - Email: '-'
+  (10315 Katrin Engels) - Status: 1 - Email: '-'
+  (10312 Armin Schaab) - Status: 1 - Email: '-'
+  (10311 Martina Graef) - Status: 1 - Email: '-'
+  (10282 Annette Meyer) - Status: 1 - Email: '-'
+  (10276 Otmar Lennartz) - Status: 1 - Email: '-'
+  (10250 Diana Blacevic) - Status: 1 - Email: '-'
+  (10239 Elseline Hutta-Flink) - Status: 1 - Email: '-'
+  (10207 Gabriele Stelling) - Status: 1 - Email: '-'
+  (10198 Meike Pendo Schäfer) - Status: 1 - Email: '-'
+  (10197 Annika Potthast) - Status: 1 - Email: '-'
+  (10196 Sabine Kliche) - Status: 1 - Email: '-'
+  (10187 Rolf Leger) - Status: 1 - Email: '-'
+  (10162 Barbara Neuschäfer) - Status: 1 - Email: '-'
+  (10156 Nadja Manke) - Status: 1 - Email: '-'
+  (10138 Marina Töpper-Kirch) - Status: 1 - Email: '-'
+  (10057 Alexandra Stenke) - Status: 1 - Email: '-'
+  (10048 Karin Seide) - Status: 1 - Email: '-'
+  (10044 Karola Rehberg) - Status: 1 - Email: '-'
+  (10041 Rolf Härdi) - Status: 1 - Email: '-'
+  (9959 Karen Marie Pedersen) - Status: 1 - Email: '-'
+  (9957 Katrin Prante) - Status: 1 - Email: '-'
+  (9951 Bernd Wienhofen) - Status: 1 - Email: '-'
+  (9880 Sonja Böhm) - Status: 1 - Email: '-'
+  (9877 Jeannette Becker-Schenk) - Status: 1 - Email: '-'
+  (9852 Reiner Köhler) - Status: 1 - Email: '-'
+  (9845 Hans Beutner) - Status: 1 - Email: '-'
+  (9781 Dariusz Sniegocki) - Status: 1 - Email: '-'
+  (9780 Patricia Desgrandes) - Status: 1 - Email: '-'
+  (9776 Conny Preschke) - Status: 1 - Email: '-'
+  (9775 Daniela Streitt) - Status: 1 - Email: '-'
+  (9766 Anja Scharfenberg) - Status: 1 - Email: '-'
+  (9750 Gerd Vievers) - Status: 1 - Email: '-'
+  (9735 Bernd Kalipke) - Status: 1 - Email: '-'
+  (9688 Bianca Melchior) - Status: 1 - Email: '-'
+  (9679 Anita Küchler-Walser) - Status: 1 - Email: '-'
+  (9667 Andrea Henningsen) - Status: 1 - Email: '-'
+  (9665 Heide Schwarz) - Status: 1 - Email: '-'
+  (9576 Thomas Lennert) - Status: 1 - Email: '-'
+  (9490 Manfred Plein) - Status: 1 - Email: '-'
+  (9450 Peter K. Lange) - Status: 1 - Email: '-'
+  (9414 Ute Ahrend) - Status: 1 - Email: '-'
+  (9413 Katja Oelmann) - Status: 1 - Email: '-'
+  (9412 Michael Chalupka) - Status: 1 - Email: '-'
+  (9377 Henning Schwarze) - Status: 1 - Email: '-'
+  (9356 Angelika Henningsen) - Status: 1 - Email: '-'
+  (9353 Burkhard Benecken) - Status: 1 - Email: '-'
+  (9337 Wim Bekker) - Status: 1 - Email: '-'
+  (9333 Jutta Holzapfel-Wächter) - Status: 1 - Email: '-'
+  (9332 Nora Lisanne Schmid) - Status: 1 - Email: '-'
+  (9323 Tanja Nagel) - Status: 1 - Email: '-'
+  (9303 Erika Bluhm) - Status: 1 - Email: '-'
+  (9294 Thomas Dahms) - Status: 0 - Email: '-'
+  (9253 Sandra Sonnenberg) - Status: 1 - Email: '-'
+  (9230 Eva-Maria Wagenhäuser-Müller) - Status: 1 - Email: '-'
+  (9207 Christian Mändl) - Status: 1 - Email: '-'
+  (9197 Michael Lohmann) - Status: 1 - Email: '-'
+  (9171 Stephan Brey) - Status: 1 - Email: '-'
+  (9141 Wolfgang Wehming) - Status: 1 - Email: '-'
+  (9140 Ulrike Kurpjuhn) - Status: 1 - Email: '-'
+  (9137 Inge Müller-Dertinger) - Status: 1 - Email: '-'
+  (9132 Margot Schmieder-Waibel) - Status: 1 - Email: '-'
+  (9107 Jürgen Dreyer) - Status: 1 - Email: '-'
+  (9103 Joachim Schloots) - Status: 1 - Email: '-'
+  (9005 Marcus Pfaff) - Status: 1 - Email: '-'
+  (9002 Margaryta Kovnyer) - Status: 1 - Email: '-'
+  (8989 Christian Schmidt) - Status: 1 - Email: '-'
+  (8975 Ruth Schwedler) - Status: 1 - Email: '-'
+  (8968 Florian Sossenheimer) - Status: 1 - Email: '-'
+  (8884 Pia Jacqueline Wolter) - Status: 1 - Email: '-'
+  (8878 Kathrin Lippert-Voges) - Status: 1 - Email: '-'
+  (8876 Christina Scheller) - Status: 1 - Email: '-'
+  (8871 Juliane Steinlicht) - Status: 1 - Email: '-'
+  (8870 Corny Semerad) - Status: 1 - Email: '-'
+  (8867 Lothar Ströhle) - Status: 1 - Email: '-'
+  (8859 Gertrud Künzle) - Status: 1 - Email: '-'
+  (8839 Jens Lottermoser) - Status: 1 - Email: '-'
+  (5274 Kirstin Andreä) - Status: 1 - Email: '-'
+  (5202 Ingrid Schipper) - Status: 1 - Email: '-'
+  (5156 Elke Lay) - Status: 1 - Email: '-'
+  (5155 Elke Behring) - Status: 1 - Email: '-'
+  (5147 Birgit Welge-Duschek) - Status: 1 - Email: '-'
+  (5141 Mechthild Niehues-Bolle) - Status: 1 - Email: '-'
+  (5139 Silvia Riese) - Status: 1 - Email: '-'
+  (5121 Ralf Lübnitz) - Status: 1 - Email: '-'
+  (5106 Eike Hoffmann) - Status: 1 - Email: '-'
+  (5055 Frank Coenen) - Status: 0 - Email: '-'
+  (5047 Alexandra Keinemann) - Status: 0 - Email: '-'
+  (5035 Heike Krimpmann) - Status: 1 - Email: '-'
+  (5015 Gisela Neumann) - Status: 1 - Email: '-'
+  (4970 Jack de Jong) - Status: 1 - Email: '-'
+  (4930 Gabriele von den Benken) - Status: 1 - Email: '-'
+  (4909 Stefan Greuel) - Status: 1 - Email: '-'
+  (4908 Rita Buttler) - Status: 1 - Email: '-'
+  (4892 Silke ten Brinke) - Status: 1 - Email: '-'
+  (4887 Klaus Böckmann) - Status: 1 - Email: '-'
+  (4884 Kerstin Sobottka) - Status: 1 - Email: '-'
+  (4876 Sivert Kuipers) - Status: 1 - Email: '-'
+  (4767 Michaela Gärtner-Eickhoff) - Status: 1 - Email: '-'
+  (4762 Ursula Sudhoff) - Status: 1 - Email: '-'
+  (4694 Michael Vlachakos) - Status: 1 - Email: '-'
+  (4660 Claudia von Schilling) - Status: 1 - Email: '-'
+  (4639 Lothar Katriniok) - Status: 1 - Email: '-'
+  (4635 Tim Gerhards) - Status: 1 - Email: '-'
+  (4634 Cordula Rottmann) - Status: 1 - Email: '-'
+  (4629 Katrin Lübsen) - Status: 1 - Email: '-'
+  (4571 Regina Bausch) - Status: 1 - Email: '-'
+  (4564 Birgitta Bagge) - Status: 1 - Email: '-'
+  (4550 Jochen Meyer) - Status: 1 - Email: '-'
+  (4526 Gabriele Kaisler) - Status: 1 - Email: '-'
+  (4491 Susanne Kapplusch-Scharf) - Status: 1 - Email: '-'
+  (4489 Oswald Kuroczik) - Status: 1 - Email: '-'
+  (4488 Franz-Josef Volkmann) - Status: 1 - Email: '-'
+  (4394 Sybille Vlachakos) - Status: 1 - Email: '-'
+  (4355 Brigitte Kösling) - Status: 1 - Email: '-'
+  (4153 Birgit Dennog) - Status: 1 - Email: '-'
+  (4145 Susan Schievelbein) - Status: 1 - Email: '-'
+  (4125 Jörg Köhnenkamp) - Status: 1 - Email: '-'
+  (4021 Herbert Zinke) - Status: 1 - Email: '-'
+  (3975 Dirk Langemeyer) - Status: 1 - Email: '-'
+  (3925 Ursula Luckhaupt) - Status: 1 - Email: '-'
+  (3923 Ralf Luckhaupt) - Status: 1 - Email: '-'
+  (3897 Ingrid Mehrtens) - Status: 1 - Email: '-'
+  (3881 Inge Eilers) - Status: 1 - Email: '-'
+  (3863 Carolin Claußen) - Status: 1 - Email: '-'
+  (3836 Bernd Lehners) - Status: 1 - Email: '-'
+  (3745 Heike Birkholz) - Status: 1 - Email: '-'
+  (3709 Peter Junghänel) - Status: 1 - Email: '-'
+  (3319 Karin Blaschko) - Status: 1 - Email: '-'
+  (3316 Elisabeth Zacherl) - Status: 1 - Email: '-'
+  (3206 Thomas Müller-Karpf) - Status: 1 - Email: '-'
+  (3159 Rosemarie Deißler) - Status: 1 - Email: '-'
+  (3046 Marie-Paule Scheid) - Status: 1 - Email: '-'
+  (3028 Daniela Deißler) - Status: 1 - Email: '-'
+  (2973 Stephan Zeller) - Status: 1 - Email: '-'
+  (2972 Johann Zeller) - Status: 1 - Email: '-'
+  (2971 Arthur Unterreiner) - Status: 1 - Email: '-'
+  (2898 Oliver Müller) - Status: 1 - Email: '-'
+  (2827 Günther Reinbold) - Status: 1 - Email: '-'
+  (2748 Sigrun Steinfort) - Status: 1 - Email: '-'
+  (2589 Petra Plaschke) - Status: 1 - Email: '-'
+  (2513 Anja Grünberg) - Status: 1 - Email: '-'
+  (2498 Marion Bock) - Status: 1 - Email: '-'
+  (2490 Jürgen Röhrs) - Status: 1 - Email: '-'
+  (2487 Sigrid Massuthe) - Status: 1 - Email: '-'
+  (2474 Tobias Schubotz) - Status: 1 - Email: '-'
+  (2469 Angelika Bengelsdorf) - Status: 1 - Email: '-'
+  (2467 Vanessa Siekmeier) - Status: 1 - Email: '-'
+  (2420 Ursula Haas) - Status: 1 - Email: '-'
+  (2398 Hans Gerono) - Status: 1 - Email: '-'
+  (2375 Petra Schmidt) - Status: 1 - Email: '-'
+  (2355 Heinz Spilker) - Status: 1 - Email: '-'
+  (2314 Camilla Hamann) - Status: 1 - Email: '-'
+  (2228 Lutz Scheibler) - Status: 1 - Email: '-'
+  (2188 Detlef Romeike) - Status: 1 - Email: '-'
+  (2033 Rolf Jensen) - Status: 1 - Email: '-'
+  (1892 Thomas Kaiser) - Status: 1 - Email: '-'
+  (1869 Erhard Trociewitz) - Status: 1 - Email: '-'
+  (1854 Rainer Schilling) - Status: 1 - Email: '-'
+  (1837 Marlis Knigge) - Status: 1 - Email: '-'
+  (1563 Helmut Baumann) - Status: 1 - Email: '-'
+  (1545 Brigitta Kraus) - Status: 1 - Email: '-'
+  (1412 Jutta Müller) - Status: 1 - Email: '-'
+  (1212 Christian Knape) - Status: 1 - Email: '-'
+  (1200 Anna Kerneck) - Status: 1 - Email: '-'
+  (1165 Bettina Krüger) - Status: 1 - Email: '-'
+  (1163 Markus Czeszynski) - Status: 1 - Email: '-'
+  (1150 Tobias Beyermann) - Status: 1 - Email: '-'
+  (1149 Manfred Müller) - Status: 1 - Email: '-'
+  (1148 Heidrun Schuh) - Status: 1 - Email: '-'
+  (1133 Jana Winkler) - Status: 1 - Email: '-'
+  (1121 Margit Schulz) - Status: 1 - Email: '-'
+  (1115 Petra Dorszewski-Grashof) - Status: 1 - Email: '-'
+  (1114 Ralf Grashof) - Status: 1 - Email: '-'
+  (1100 Regina Rudloff) - Status: 1 - Email: '-'
+  (1098 Steffen Schock) - Status: 1 - Email: '-'
+  (1079 Birgit Langen) - Status: 1 - Email: '-'
+  (1033 Frank Engler) - Status: 1 - Email: '-'
+  (1013 Steffen Jakobi) - Status: 1 - Email: '-'
+  (1006 Viola Thiede) - Status: 1 - Email: '-'
+  (1002 Dietmar Frank) - Status: 1 - Email: '-'
+  (976 Christine Götzke) - Status: 1 - Email: '-'
+  (958 Elisabeth Eggert) - Status: 1 - Email: '-'
+  (890 Dorothea Moritz) - Status: 1 - Email: '-'
+  (845 Mario Zeiß) - Status: 1 - Email: '-'
+  (794 Marion Winter) - Status: 1 - Email: '-'
+  (783 Lutz Langen) - Status: 1 - Email: '-'
+  (674 Marlis Fels) - Status: 1 - Email: '-'
+  (550 Kathrin Kokolsky) - Status: 1 - Email: '-'
+  (470 Norbert Fieke) - Status: 1 - Email: '-'
+  (435 Ingo Kokolsky) - Status: 1 - Email: '-'
+  (309 Ursula Gruner) - Status: 1 - Email: '-'
+  (237 Susanne Schmid) - Status: 1 - Email: '-'
+  (236 Gerald Schmid) - Status: 1 - Email: '-'
+  (166 Iris Arand) - Status: 1 - Email: '-'
+
+[FAIL] Found 54 emails used by multiple active members:
+  Email 't.heddergott@vodafone.de' used by: (10830 Regina Heddergott Status: 1), (10829 Thorsten Heddergott Status: 1)
+  Email 'ch-lu-klems@t-online.de' used by: (10820 Ludger Klems Status: 1), (10745 Christiane Klems Status: 1)
+  Email 'fam.schwaderer@t-online.de' used by: (10739 Jörg Schwaderer Status: 1), (10738 Angela Ott-Schwaderer Status: 1)
+  Email 'arendt-mail@t-online.de' used by: (10708 Sandra Arendt Status: 1), (10693 Thomas Arendt Status: 1)
+  Email 'r.u.c.luncke@t-online.de' used by: (10610 Christina Luncke Status: 1), (9710 Rolf Luncke Status: 1)
+  Email 'timenger@gmail.com' used by: (10575 Sandra Enger Status: 1), (9828 Tim Enger Status: 1)
+  Email 'mheinrab@aol.com' used by: (10564 Marc Hein Status: 1), (2349 Tanja Hein Status: 1)
+  Email 'jelle@ictubbesing.de' used by: (10511 Iris Tubbesing Status: 1), (10510 Christian Fratzke-Tubbesing    Status: 1)
+  Email 'julia.koops@gmx.de' used by: (10465 Emma Siry Koops Status: 1), (10464 Julia Koops Status: 1)
+  Email 'schroeder.ahnatal@t-online.de' used by: (10461 Bettina Schröder Status: 1), (3732 Dieter Schröder Status: 1)
+  Email 'sabine.schmidt@fascon.net' used by: (10423 Frank Schmidt Status: 1), (10422 Sabine Schmidt Status: 1)
+  Email 'darcio@gmx.de' used by: (10303 Romy Jensen Status: 1), (10302 Darius Jensen Status: 1)
+  Email 'familie.rueter@posteo.de' used by: (10297 Stefan Rüter Status: 1), (10296 Maria Rüter Status: 1)
+  Email 'irene.lacroix@gmx.de' used by: (10286 André Lacroix Status: 1), (10285 Irene Lacroix Status: 1)
+  Email 'karin.kaindl@gmx.de' used by: (10260 Erwin Kaindl Status: 1), (9912 Karin Kaindl Status: 1)
+  Email 'dr.susanne.heuermann@web.de' used by: (10170 Susanne Heuermann Status: 1), (9071 Tim Heuermann Status: 1)
+  Email 'kpharms@t-online.de' used by: (10053 Katja Harms Status: 1), (10052 Klaus Harms Status: 1)
+  Email 'riemer.doerte@icloud.com' used by: (10051 Dörte Riemer Status: 1), (10050 Holger Riemer Status: 1)
+  Email 'markus.skubski@gmx.de' used by: (9932 Markus Skubski Status: 1), (8793 Sabine Skubski Status: 1)
+  Email 'a.r.dannenberg@gmail.com' used by: (9861 Rainer Dannenberg Status: 1), (9860 Anja Dannenberg Status: 1)
+  Email 'helmut.zahn@berlin.de' used by: (9794 Andrea Schlager Status: 1), (9793 Helmut Zahn Status: 1)
+  Email 'hofmannu@aol.com' used by: (9791 Uwe Hofmann Status: 1), (5177 Elke Hofmann Status: 1)
+  Email 'nicole68@online.de' used by: (9744 Karl-Heinz Schaefer Status: 1), (3818 Nicole Schaefer Status: 1)
+  Email 'marc-sandra@freenet.de' used by: (9722 Sandra Naujokat Status: 1), (9721 Marc Naujokat Status: 1)
+  Email 'mara@hovawart-von-der-duennebecke.de' used by: (9284 Stefan Noack Status: 1), (4430 Christiane Noack Status: 1)
+  Email 'schumacher@everhan.de' used by: (9279 Wolfgang Everhan Status: 1), (4790 Antje Schumacher Status: 1)
+  Email 'frieg@web.de' used by: (9276 Gabriele Frieg Status: 1), (9270 Sven Ehrich Status: 1)
+  Email 'wweiske@gmx.de' used by: (9134 Heidi Weiske Status: 1), (9133 Wolfgang Weiske Status: 1)
+  Email 'loeschner-neuenhagen@arcor.de' used by: (9126 Peter Löschner Status: 1), (8939 Marina Löschner Status: 1)
+  Email 'goedde-rheine@t-online.de' used by: (5260 Martina Gödde-Trescher Status: 1), (5259 Jürgen Gödde Status: 1)
+  Email 'heikefliss71@gmail.com' used by: (5231 Adolf Bruns Status: 1), (5208 Heike Bruns Status: 1)
+  Email 'thomas-irene.mirkes@t-online.de' used by: (5183 Thomas Mirkes Status: 1), (5104 Irene Kapeller-Mirkes Status: 1)
+  Email 'wschaden@gmx.de' used by: (5018 Wiltrud Schaden Status: 1), (4842 Winfried Schaden Status: 1)
+  Email 'sabine.bieber@t-online.de' used by: (5009 Christian Bieber Status: 1), (4927 Sabine Bieber Status: 1)
+  Email 'ronja@hexenbuche.de' used by: (4507 Karina Hanspach Status: 1), (4362 Kai Hanspach Status: 1)
+  Email 'michaele.schwenz@gmx.de' used by: (4473 Michaele Schwenz Status: 1), (4275 Engelbert Schwenz Status: 1)
+  Email 'arstuewe@web.de' used by: (3741 Reinhard Stüwe Status: 1), (3731 Astrid Stüwe Status: 1)
+  Email 'hesigrist@sunrise.ch' used by: (3333 Esther Sigrist Status: 1), (3332 Heini Sigrist Status: 1)
+  Email 'info@hovawarte-oberpfaelzer-land.de' used by: (3315 Astrid Wünsch Status: 1), (3314 Joachim Wünsch Status: 1)
+  Email 'familie@gericke-bruchsal.de' used by: (3200 Elke Gericke Status: 1), (3188 Frank Gericke Status: 1)
+  Email 'dzoller@t-online.de' used by: (3158 Dagmar Zoller Status: 1), (2892 Eberhard Zoller Status: 1)
+  Email 'blacky18@freenet.de' used by: (3097 Andreas Hartl Status: 1), (2969 Christina Stöckl Status: 1)
+  Email 'jschoerner@t-online.de' used by: (2656 Ingrid Schörner Status: 1), (2655 Josef Schörner Status: 1)
+  Email 'sud-schulze@web.de' used by: (2482 Detlef Schulze Status: 1), (2341 Sabine Schulze Status: 1)
+  Email 'raven-arnold@t-online.de' used by: (2458 Frank Arnold Status: 1), (2120 Karin Raven-Arnold Status: 1)
+  Email 'spjoerdening@t-online.de' used by: (2444 Peter Jördening Status: 1), (2443 Swantje Jördening Status: 1)
+  Email 'info@von-den-nornen.de' used by: (2438 Egbert Meyer Status: 1), (1715 Martina Rahnfeld Status: 1)
+  Email 'frienau@aol.com' used by: (2416 Frank Rienau Status: 1), (2254 Anja Rienau Status: 1)
+  Email 'sabine.ingo@freenet.de' used by: (2125 Ingo Busche Status: 1), (2034 Sabine Busche Status: 1)
+  Email 'w-t-h-@gmx.de' used by: (1939 Werner Thomas Status: 1), (1647 Jutta Thomas Status: 1)
+  Email 'ortwin.klose@t-online.de' used by: (1805 Ortwin Klose Status: 1), (1789 Heinke Klose Status: 1)
+  Email 'info@kb-jantz.de' used by: (913 Renate Jantz Status: 1), (215 Gerhard Jantz Status: 1)
+  Email 'von_ginas_vier_linden@gmx.de' used by: (556 Marina Gliem Status: 1), (150 Wolfgang Gliem Status: 1)
+  Email 'jatzak@googlemail.com' used by: (533 Mirko Jatzak Status: 1), (417 Antje Jatzak Status: 1)
+
+TEST FAILED: Validation failed: 202 invalid emails, 54 duplicate emails among active members.
+Traceback (most recent call last):
+  File "/work/projekte/hzd/hzd-relaunch-2026/kestra/prod/flows/run_verification.py", line 235, in <module>
+    verify_csv_data()
+  File "/work/projekte/hzd/hzd-relaunch-2026/kestra/prod/flows/run_verification.py", line 122, in verify_csv_data
+    raise Exception(f"Validation failed: {invalid_count} invalid emails, {duplicate_count} duplicate emails among active members.")
+Exception: Validation failed: 202 invalid emails, 54 duplicate emails among active members.

@@ -357,6 +357,26 @@ type ComponentPersonalAddress {
   City: String
 }
 
+input ComponentPermissionRestrictionFiltersInput {
+  Public: BooleanFilterInput
+  Authenticated: BooleanFilterInput
+  and: [ComponentPermissionRestrictionFiltersInput]
+  or: [ComponentPermissionRestrictionFiltersInput]
+  not: ComponentPermissionRestrictionFiltersInput
+}
+
+input ComponentPermissionRestrictionInput {
+  id: ID
+  Public: Boolean
+  Authenticated: Boolean
+}
+
+type ComponentPermissionRestriction {
+  id: ID!
+  Public: Boolean!
+  Authenticated: Boolean!
+}
+
 type ComponentPermissionGroups {
   id: ID!
   Any: Boolean
@@ -396,6 +416,13 @@ input ComponentLinksActionButtonFiltersInput {
   not: ComponentLinksActionButtonFiltersInput
 }
 
+input ComponentLinksActionButtonInput {
+  id: ID
+  Label: String
+  Link: String
+  Primary: Boolean
+}
+
 type ComponentLinksActionButton {
   id: ID!
   Label: String
@@ -415,6 +442,24 @@ type ComponentLayoutSos {
   ShowSOS: Boolean!
   SosTitle: String
   SosLink: String
+}
+
+enum ENUM_COMPONENTLAYOUTPADDING_TOP {
+  small
+  middle
+  large
+}
+
+enum ENUM_COMPONENTLAYOUTPADDING_BOTTOM {
+  small
+  middle
+  large
+}
+
+type ComponentLayoutPadding {
+  id: ID!
+  Top: ENUM_COMPONENTLAYOUTPADDING_TOP
+  Bottom: ENUM_COMPONENTLAYOUTPADDING_BOTTOM
 }
 
 input ComponentLayoutFooterInput {
@@ -460,6 +505,38 @@ input ComponentLayoutColorThemeInput {
 type ComponentLayoutColorTheme {
   id: ID!
   ShortName: ENUM_COMPONENTLAYOUTCOLORTHEME_SHORTNAME
+}
+
+input ComponentColumnsTextColumnFiltersInput {
+  ColumnHeadline: StringFilterInput
+  ColumnText: StringFilterInput
+  BulletItems: ComponentColumnsColumnItemFiltersInput
+  ColumnActionButton: ComponentLinksActionButtonFiltersInput
+  and: [ComponentColumnsTextColumnFiltersInput]
+  or: [ComponentColumnsTextColumnFiltersInput]
+  not: ComponentColumnsTextColumnFiltersInput
+}
+
+type ComponentColumnsTextColumn {
+  id: ID!
+  ColumnHeadline: String
+  ColumnText: String
+  BulletItems(filters: ComponentColumnsColumnItemFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [ComponentColumnsColumnItem]
+  ColumnActionButton: ComponentLinksActionButton
+}
+
+input ComponentColumnsColumnItemFiltersInput {
+  Headline: StringFilterInput
+  ItemBody: StringFilterInput
+  and: [ComponentColumnsColumnItemFiltersInput]
+  or: [ComponentColumnsColumnItemFiltersInput]
+  not: ComponentColumnsColumnItemFiltersInput
+}
+
+type ComponentColumnsColumnItem {
+  id: ID!
+  Headline: String
+  ItemBody: String
 }
 
 type ComponentFormTextArea {
@@ -623,38 +700,6 @@ type ComponentFormBooleanChoice {
   BCRequiredValue: Boolean
 }
 
-input ComponentColumnsTextColumnFiltersInput {
-  ColumnHeadline: StringFilterInput
-  ColumnText: StringFilterInput
-  BulletItems: ComponentColumnsColumnItemFiltersInput
-  ColumnActionButton: ComponentLinksActionButtonFiltersInput
-  and: [ComponentColumnsTextColumnFiltersInput]
-  or: [ComponentColumnsTextColumnFiltersInput]
-  not: ComponentColumnsTextColumnFiltersInput
-}
-
-type ComponentColumnsTextColumn {
-  id: ID!
-  ColumnHeadline: String
-  ColumnText: String
-  BulletItems(filters: ComponentColumnsColumnItemFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [ComponentColumnsColumnItem]
-  ColumnActionButton: ComponentLinksActionButton
-}
-
-input ComponentColumnsColumnItemFiltersInput {
-  Headline: StringFilterInput
-  ItemBody: StringFilterInput
-  and: [ComponentColumnsColumnItemFiltersInput]
-  or: [ComponentColumnsColumnItemFiltersInput]
-  not: ComponentColumnsColumnItemFiltersInput
-}
-
-type ComponentColumnsColumnItem {
-  id: ID!
-  Headline: String
-  ItemBody: String
-}
-
 input ComponentCalendarCalendarDocumentFiltersInput {
   Description: StringFilterInput
   VisibleFrom: DateTimeFilterInput
@@ -720,6 +765,26 @@ type ComponentBreedingGeoLocation {
   lng: Float!
 }
 
+input ComponentBreedingDogDocumentFiltersInput {
+  Description: StringFilterInput
+  and: [ComponentBreedingDogDocumentFiltersInput]
+  or: [ComponentBreedingDogDocumentFiltersInput]
+  not: ComponentBreedingDogDocumentFiltersInput
+}
+
+input ComponentBreedingDogDocumentInput {
+  id: ID
+  Description: String
+  MediaFile: [ID]
+}
+
+type ComponentBreedingDogDocument {
+  id: ID!
+  Description: String
+  MediaFile_connection(filters: UploadFileFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): UploadFileRelationResponseCollection
+  MediaFile(filters: UploadFileFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [UploadFile]!
+}
+
 enum ENUM_COMPONENTBLOCKSTEXTCOLUMNSSECTION_TEXTCOLUMNSODDEVEN {
   Odd
   Even
@@ -732,6 +797,7 @@ type ComponentBlocksTextColumnsSection {
   TextColumn(filters: ComponentColumnsTextColumnFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [ComponentColumnsTextColumn]
   TextColumnsOddEven: ENUM_COMPONENTBLOCKSTEXTCOLUMNSSECTION_TEXTCOLUMNSODDEVEN
   TextColumnsAnchor: String
+  Padding: ComponentLayoutPadding
 }
 
 enum ENUM_COMPONENTBLOCKSTEASERTEXTWITHIMAGE_IMAGEPOSITION {
@@ -788,6 +854,7 @@ type ComponentBlocksSlideItem {
 enum ENUM_COMPONENTBLOCKSSIMPLEHEROSECTION_HEROLAYOUT {
   Image_left
   Image_right
+  full_width
 }
 
 type ComponentBlocksSimpleHeroSection {
@@ -806,7 +873,7 @@ type ComponentBlocksSimpleHeroSection {
 type ComponentBlocksSimpleCtaSection {
   id: ID!
   CtaHeadline: String
-  CtaInfoText: String
+  CtaInfoText: JSON
   CtaActionButton(filters: ComponentLinksActionButtonFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [ComponentLinksActionButton]
   CtaBackgroundImage: UploadFile
   SimpleCtaAnchor: String
@@ -819,11 +886,12 @@ enum ENUM_COMPONENTBLOCKSRICHTEXTSECTION_RICHTEXTODDEVEN {
 
 type ComponentBlocksRichTextSection {
   id: ID!
-  Title: String!
+  Title: String
   Subtitle: String
   RichTextContent: String
   RichTextOddEven: ENUM_COMPONENTBLOCKSRICHTEXTSECTION_RICHTEXTODDEVEN
   RichTextAnchor: String
+  RichTextPadding: ComponentLayoutPadding
 }
 
 type ComponentBlocksNewsArticlesSection {
@@ -864,6 +932,27 @@ type ComponentBlocksEmailAddresses {
   id: ID!
   Email: String!
   DisplayName: String
+}
+
+input ComponentBlocksDocumentBundleFiltersInput {
+  BundleName: StringFilterInput
+  BundleDocument: ComponentBlocksBundleDocumentsFiltersInput
+  and: [ComponentBlocksDocumentBundleFiltersInput]
+  or: [ComponentBlocksDocumentBundleFiltersInput]
+  not: ComponentBlocksDocumentBundleFiltersInput
+}
+
+type ComponentBlocksDocumentBundle {
+  id: ID!
+  BundleName: String
+  BundleDocument(filters: ComponentBlocksBundleDocumentsFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [ComponentBlocksBundleDocuments]
+}
+
+type ComponentBlocksDocumentBundleSection {
+  id: ID!
+  DBSName: String
+  DBSDescription: String
+  DocumentBundle(filters: ComponentBlocksDocumentBundleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [ComponentBlocksDocumentBundle]
 }
 
 type ComponentBlocksContactMailerSection {
@@ -918,6 +1007,19 @@ type ComponentBlocksCardItem {
   BackgroundImage: UploadFile
   ColorTheme: ComponentLayoutColorTheme
   ActionButton: ComponentLinksActionButton
+}
+
+input ComponentBlocksBundleDocumentsFiltersInput {
+  Name: StringFilterInput
+  and: [ComponentBlocksBundleDocumentsFiltersInput]
+  or: [ComponentBlocksBundleDocumentsFiltersInput]
+  not: ComponentBlocksBundleDocumentsFiltersInput
+}
+
+type ComponentBlocksBundleDocuments {
+  id: ID!
+  Name: String
+  Document: UploadFile
 }
 
 input UploadFileFiltersInput {
@@ -1328,6 +1430,7 @@ input HzdPluginDogFiltersInput {
   cStudBookNumber: StringFilterInput
   cStudBookNumberFather: StringFilterInput
   cStudBookNumberMother: StringFilterInput
+  DogDocument: ComponentBreedingDogDocumentFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   publishedAt: DateTimeFilterInput
@@ -1362,6 +1465,8 @@ input HzdPluginDogInput {
   cStudBookNumber: String
   cStudBookNumberFather: String
   cStudBookNumberMother: String
+  Images: [ID]
+  DogDocument: [ComponentBreedingDogDocumentInput]
   publishedAt: DateTime
 }
 
@@ -1392,6 +1497,9 @@ type HzdPluginDog {
   cStudBookNumber: String
   cStudBookNumberFather: String
   cStudBookNumberMother: String
+  Images_connection(filters: UploadFileFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): UploadFileRelationResponseCollection
+  Images(filters: UploadFileFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [UploadFile]!
+  DogDocument(filters: ComponentBreedingDogDocumentFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [ComponentBreedingDogDocument]
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -1406,6 +1514,7 @@ input HzdPluginBreederFiltersInput {
   documentId: IDFilterInput
   kennelName: StringFilterInput
   breedingLicenseSince: DateFilterInput
+  Disable: BooleanFilterInput
   IsActive: BooleanFilterInput
   litters: HzdPluginLitterFiltersInput
   BreedersIntroduction: StringFilterInput
@@ -1416,6 +1525,10 @@ input HzdPluginBreederFiltersInput {
   Address: ComponentPersonalAddressFiltersInput
   InternalNotes: StringFilterInput
   GeoLocation: ComponentBreedingGeoLocationFiltersInput
+  BreedersIntroDraft: StringFilterInput
+  isDirty: BooleanFilterInput
+  owner_member: UsersPermissionsUserFiltersInput
+  BreederEmail: StringFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   publishedAt: DateTimeFilterInput
@@ -1427,6 +1540,7 @@ input HzdPluginBreederFiltersInput {
 input HzdPluginBreederInput {
   kennelName: String
   breedingLicenseSince: Date
+  Disable: Boolean
   IsActive: Boolean
   litters: [ID]
   BreedersIntroduction: String
@@ -1438,6 +1552,10 @@ input HzdPluginBreederInput {
   Address: ComponentPersonalAddressInput
   InternalNotes: String
   GeoLocation: ComponentBreedingGeoLocationInput
+  BreedersIntroDraft: String
+  isDirty: Boolean
+  owner_member: ID
+  BreederEmail: String
   publishedAt: DateTime
 }
 
@@ -1445,6 +1563,7 @@ type HzdPluginBreeder {
   documentId: ID!
   kennelName: String
   breedingLicenseSince: Date
+  Disable: Boolean
   IsActive: Boolean
   litters_connection(filters: HzdPluginLitterFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): HzdPluginLitterRelationResponseCollection
   litters(filters: HzdPluginLitterFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [HzdPluginLitter]!
@@ -1457,6 +1576,10 @@ type HzdPluginBreeder {
   Address: ComponentPersonalAddress
   InternalNotes: String
   GeoLocation: ComponentBreedingGeoLocation
+  BreedersIntroDraft: String
+  isDirty: Boolean
+  owner_member: UsersPermissionsUser
+  BreederEmail: String
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -1493,6 +1616,7 @@ input HzdPluginLitterFiltersInput {
   StatusMessageDraft: StringFilterInput
   StatusMessageDirtyFlag: BooleanFilterInput
   OrderLetter: StringFilterInput
+  DisplayName: StringFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   publishedAt: DateTimeFilterInput
@@ -1520,6 +1644,7 @@ input HzdPluginLitterInput {
   StatusMessageDirtyFlag: Boolean
   OrderLetter: String
   PuppyImage: ID
+  DisplayName: String
   publishedAt: DateTime
 }
 
@@ -1543,6 +1668,7 @@ type HzdPluginLitter {
   StatusMessageDirtyFlag: Boolean
   OrderLetter: String!
   PuppyImage: UploadFile
+  DisplayName: String
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -1786,6 +1912,7 @@ input ContactGroupFiltersInput {
   ContactGroupName: StringFilterInput
   GroupDescription: JSONFilterInput
   contacts: ContactFiltersInput
+  DetailsLink: ComponentLinksActionButtonFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   publishedAt: DateTimeFilterInput
@@ -1798,6 +1925,8 @@ input ContactGroupInput {
   ContactGroupName: String
   GroupDescription: JSON
   contacts: [ID]
+  DetailsLink: [ComponentLinksActionButtonInput]
+  GroupImage: ID
   publishedAt: DateTime
 }
 
@@ -1807,6 +1936,8 @@ type ContactGroup {
   GroupDescription: JSON
   contacts_connection(filters: ContactFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): ContactRelationResponseCollection
   contacts(filters: ContactFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [Contact]!
+  DetailsLink(filters: ComponentLinksActionButtonFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [ComponentLinksActionButton]
+  GroupImage: UploadFile
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -1912,6 +2043,7 @@ input GlobalLayoutInput {
   Impressum: ID
   PrivacyPolicy: ID
   SOS: ComponentLayoutSosInput
+  page: ID
   publishedAt: DateTime
 }
 
@@ -1929,6 +2061,7 @@ type GlobalLayout {
   Impressum: Page
   PrivacyPolicy: UploadFile
   SOS: ComponentLayoutSos
+  page: Page
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -1938,6 +2071,8 @@ input HzdSettingInput {
   DefaultAvatarB: ID
   DefaultAvatarSM: ID
   DefaultAvatarS: ID
+  DefaultBreederAvatar: ID
+  DefaultLitterAvatar: ID
   publishedAt: DateTime
 }
 
@@ -1946,6 +2081,8 @@ type HzdSetting {
   DefaultAvatarB: UploadFile
   DefaultAvatarSM: UploadFile
   DefaultAvatarS: UploadFile
+  DefaultBreederAvatar: UploadFile
+  DefaultLitterAvatar: UploadFile
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -2267,7 +2404,7 @@ type OrderItemEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union PageSectionsDynamicZone = ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksRichTextSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTextColumnsSection | ComponentBlocksImageGallerySection | ComponentBlocksSimpleCtaSection | ComponentBlocksNewsArticlesSection | ComponentBlocksContactGroupSection | ComponentBlocksContactMailerSection | ComponentBlocksSimpleHeroSection | Error
+union PageSectionsDynamicZone = ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksRichTextSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTextColumnsSection | ComponentBlocksImageGallerySection | ComponentBlocksSimpleCtaSection | ComponentBlocksNewsArticlesSection | ComponentBlocksContactGroupSection | ComponentBlocksContactMailerSection | ComponentBlocksSimpleHeroSection | ComponentBlocksDocumentBundleSection | Error
 
 scalar PageSectionsDynamicZoneInput
 
@@ -2277,6 +2414,8 @@ input PageFiltersInput {
   title: StringFilterInput
   SEO: ComponentSeoSeoFiltersInput
   ColorTheme: ComponentLayoutColorThemeFiltersInput
+  Restriction: ComponentPermissionRestrictionFiltersInput
+  LogoBackground: BooleanFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   publishedAt: DateTimeFilterInput
@@ -2291,6 +2430,8 @@ input PageInput {
   SEO: [ComponentSeoSeoInput]
   Sections: [PageSectionsDynamicZoneInput!]
   ColorTheme: ComponentLayoutColorThemeInput
+  Restriction: ComponentPermissionRestrictionInput
+  LogoBackground: Boolean
   publishedAt: DateTime
 }
 
@@ -2301,6 +2442,8 @@ type Page {
   SEO(filters: ComponentSeoSeoFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [ComponentSeoSeo]
   Sections: [PageSectionsDynamicZone]
   ColorTheme: ComponentLayoutColorTheme
+  Restriction: ComponentPermissionRestriction
+  LogoBackground: Boolean
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -2443,7 +2586,7 @@ type SupplementalDocumentGroupEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
+union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBreedingDogDocument | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksDocumentBundle | ComponentBlocksDocumentBundleSection | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | ComponentBlocksBundleDocuments | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
 
 input FileInfoInput {
   name: String
