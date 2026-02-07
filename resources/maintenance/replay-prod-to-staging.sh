@@ -69,6 +69,12 @@ restore_stage() {
       psql -h "$PG_HOST" -U "$PG_USER" -d "$PG_STAGE_DB" \
         -c "GRANT ALL PRIVILEGES ON SCHEMA public TO $PG_STAGE_USER;"
 
+
+    docker run --rm -it -e PGPASSWORD="$PG_PASSWORD" --network "$PG_NETWORK" \
+      pgvector/pgvector:pg17 \
+      psql -h "$PG_HOST" -U "$PG_USER" -d "$PG_STAGE_DB" \
+      -c "ALTER SCHEMA public OWNER TO $PG_STAGE_USER;"
+
     docker run --rm -it -e PGPASSWORD="$PG_PASSWORD" --network "$PG_NETWORK" \
       -v ./transfer:/transfer \
       pgvector/pgvector:pg17 \
