@@ -148,15 +148,16 @@ export default async function ArticlesCategoryPage({ params, searchParams }: Pag
 					<h1 className='text-4xl font-bold text-gray-900 md:text-5xl'>
 						{category.CategoryName}
 					</h1>
-					{category.CategoryTeaserText && (
-						<p className='mt-4 text-xl text-gray-600'>
-							{category.CategoryTeaserText}
-						</p>
-					)}
 					{category.CategoryDescription && (
-						<p className='mt-4 text-gray-600'>
-							{category.CategoryDescription}
-						</p>
+						<div
+							className='prose prose-xl mx-auto mb-10 max-w-[800px] text-center dark:prose-invert [&_p]:my-2'
+							style={{
+								color: theme.textColor,
+								'--tw-prose-body': theme.textColor,
+								'--tw-prose-headings': theme.headlineColor,
+							} as React.CSSProperties}
+							dangerouslySetInnerHTML={{ __html: category.CategoryDescription }}
+						/>
 					)}
 				</div>
 			</SectionContainer>

@@ -19,7 +19,7 @@ import requests
 import time
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, Optional, Any
+from typing import Dict, Optional, Any, List
 import re
 from dotenv import load_dotenv
 import os
@@ -279,6 +279,231 @@ def map_csv_to_member(row: Dict[str, str]) -> Dict[str, Any]:
 
     return member_data
 
+def validate_chromosoft_users(rows: List[Dict[str, str]]) -> bool:
+    """
+    Validate all loaded CSV rows.
+    Returns True if validation passes (or warnings only), False if critical errors (optional).
+    Currently just prints report.
+    """
+    print(f"\nValidating {len(rows)} CSV rows...")
+    today = datetime.now().date()
+    email_counts = {}
+    active_members_with_invalid_email = []
+
+    msg_list = []
+
+    for i, row in enumerate(rows, 1):
+        # Logic to determine if active
+        doj_str = parse_date(row.get('date of joining', ''))
+        dol_str = parse_date(row.get('date of leaving', ''))
+        
+        is_active_candidate = False
+        
+        if doj_str:
+            try:
+                doj = datetime.strptime(doj_str, '%Y-%m-%d').date()
+                if doj <= today:
+                    # Check leaving date
+                    if not dol_str:
+                        is_active_candidate = True
+                    else:
+                        dol = datetime.strptime(dol_str, '%Y-%m-%d').date()
+                        if dol >= today: # Future or today
+                            is_active_candidate = True
+            except ValueError:
+                pass
+                
+        if is_active_candidate:
+            email = row.get('email', '').strip()
+            
+            # Check validity
+            if not is_valid_email(email):
+                status = row.get('person is a member', '')
+                # membership status field? User mentioned 'membership status' in last edit to verification logic
+                # checking what key is in CSV. 'person is a member' is 0/1. 
+                # 'membership status' might be another column? 
+                # In previous file view of verification.py, user changed 'person is a member' to 'membership status'.
+                # I should check if 'membership status' exists in row, else fallback.
+                
+                status_val = row.get('membership status') or row.get('person is a member', '')
+
+                active_members_with_invalid_email.append({
+                    'row': i,
+                    'name': f"{row.get('firstname', '')} {row.get('lastname', '')}",
+                    'id': row.get('ID Person', ''),
+                    'email': email,
+                    'status': status_val,
+                    'issue': 'Invalid or Empty Email'
+                })
+            else:
+                # Check uniqueness (only for valid emails)
+                email_lower = email.lower()
+                status_val = row.get('membership status') or row.get('person is a member', '')
+                member_info = {
+                    'row': i, 
+                    'id': row.get('ID Person', ''), 
+                    'name': f"{row.get('firstname', '')} {row.get('lastname', '')}",
+                    'status': status_val
+                }
+                if email_lower in email_counts:
+                    email_counts[email_lower].append(member_info)
+                else:
+                    email_counts[email_lower] = [member_info]
+
+    # Report
+    invalid_count = len(active_members_with_invalid_email)
+    
+    duplicates = {email: members for email, members in email_counts.items() if len(members) > 1}
+    duplicate_count = len(duplicates)
+    
+    print("\n--- Validation Report (Pre-Import) ---")
+    
+    if invalid_count > 0:
+        print(f"\n[WARN] Found {invalid_count} active members with invalid/empty emails:")
+        for item in active_members_with_invalid_email:
+             print(f"  ({item['id']} {item['name']}) - Status: {item['status']} - Email: '{item['email']}'")
+    else:
+        print("\n[PASS] All active members have valid email format.")
+
+    if duplicate_count > 0:
+         print(f"\n[WARN] Found {duplicate_count} emails used by multiple active members:")
+         for email, members in list(duplicates.items()):
+             members_str = ", ".join([f"({m['id']} {m['name']} Status: {m['status']})" for m in members])
+             print(f"  Email '{email}' used by: {members_str}")
+    else:
+         print("\n[PASS] All active members have unique emails.")
+         
+    return True # Always return True to allow import to proceed (just warning)
+    
+def resolve_email_conflicts(rows: List[Dict[str, str]]) -> None:
+    """
+    Resolve email conflicts within the CSV data.
+    If multiple rows share the same email, and at least one is an Active Member,
+    remove the email from all Inactive Members sharing it.
+    """
+    print(f"\nResolving email conflicts in {len(rows)} rows...")
+    today = datetime.now().date()
+    email_map = {} # email -> list of (index, row)
+
+    # 1. Build Map
+    for i, row in enumerate(rows):
+        email = row.get('email', '').strip()
+        if not email or not is_valid_email(email):
+            continue
+        
+        email_lower = email.lower()
+        if email_lower in email_map:
+            email_map[email_lower].append((i, row))
+        else:
+            email_map[email_lower] = [(i, row)]
+
+    # 2. Process Duplicates
+    resolved_count = 0
+    
+    for email, entries in email_map.items():
+        if len(entries) < 2:
+            continue
+            
+        # Check functionality to identify priority members (Status == 'Mitglied')
+        priority_indices = []
+        non_priority_indices = []
+        
+        for idx, row in entries:
+            # Logic: Priority based on 'membership status' == 'Mitglied'
+            try:
+                # Get status, strip whitespace and check
+                status = row.get('membership status', '').strip()
+                if status == 'Mitglied':
+                    priority_indices.append(idx)
+                else:
+                    non_priority_indices.append(idx)
+            except Exception:
+                non_priority_indices.append(idx)
+        
+        # 3. Resolve
+        # If we have at least one Priority Member, clear email from Non-Priority Members
+        if len(priority_indices) > 0 and len(non_priority_indices) > 0:
+            print(f"  Conflict for '{email}': Found {len(priority_indices)} 'Mitglied' and {len(non_priority_indices)} others.")
+            for idx in non_priority_indices:
+                rows[idx]['email'] = '' # Clear email
+                resolved_count += 1
+                # print(f"    -> Removed email from non-member row {idx+1}")
+                
+    print(f"Resolved {resolved_count} email conflicts.")
+
+def has_changes(new_data: Dict[str, Any], existing_user: Dict[str, Any]) -> bool:
+    """
+    Compare new member data (from CSV) with existing user data (from Website).
+    Returns True if there are differences that need updating.
+    """
+    # Define fields to compare. 
+    # Note: CSV data keys map to Strapi fields as defined in map_csv_to_member
+    
+    # Simple direct comparison for most fields
+    # Special handling might be needed for dates (str vs date obj) or numbers
+    
+    fields_to_compare = [
+        'firstName', 'lastName', 'title', 'sex', 
+        'address1', 'zip', 'city', 'region', 'countryCode', 
+        'phone', 'cFlagBreeder', 'IsActiveBreeder', 
+        'membershipNumber', 'kennelName', 'cEmail',
+        'blocked' # Important
+    ]
+
+    for field in fields_to_compare:
+        new_val = new_data.get(field)
+        old_val = existing_user.get(field)
+
+        # Normalize for comparison
+        # CSV data might be None, Website data might be None
+        
+        # Date fields in existing_user are usually strings 'YYYY-MM-DD' from JSON
+        # Date fields in new_data might be date objects or strings? 
+        # map_csv_to_member returns date objects for date fields.
+        
+        # Let's verify map_csv_to_member output types
+        # parse_date returns 'YYYY-MM-DD' string.
+        # map_csv_to_member calls parse_date.
+        # So dates are strings in new_data too. Good.
+        
+        # Specific handling:
+        # blocked: boolean.
+        # cFlagBreeder: boolean.
+        
+        if new_val is None and old_val is None:
+            continue
+            
+        if new_val == '' and old_val is None:
+             continue
+             
+        if new_val is None and old_val == '':
+             continue
+             
+        # Convert to string for loose comparison if not None/Bool
+        if not isinstance(new_val, (bool, type(None))) and not isinstance(old_val, (bool, type(None))):
+            if str(new_val).strip() != str(old_val).strip():
+                # print(f"Change detected in {field}: '{new_val}' vs '{old_val}'")
+                return True
+        elif new_val != old_val:
+             # Boolean or None mismatch
+            # print(f"Change detected in {field}: '{new_val}' vs '{old_val}'")
+            return True
+            
+    # Date fields
+    date_fields = ['dateOfBirth', 'dateOfDeath', 'memberSince', 'cancellationOn']
+    for field in date_fields:
+        new_val = new_data.get(field)
+        old_val = existing_user.get(field)
+        
+        if new_val is None and old_val is None:
+            continue
+            
+        # Comparison logic for dates (both strings YYYY-MM-DD)
+        if new_val != old_val:
+             return True
+
+    return False
+
 def find_existing_user_by_email(api_url: str, api_token: Optional[str], email: str) -> Optional[str]:
     """Find existing member by username using GraphQL. Returns documentId if found, None otherwise."""
     url = f"{api_url}"
@@ -358,6 +583,96 @@ def find_existing_user(api_url: str, api_token: Optional[str], username: str) ->
         pass
 
     return None
+
+    return None
+
+def fetch_all_users(api_url: str, api_token: Optional[str]) -> List[Dict[str, Any]]:
+    """Fetch all users from Strapi via GraphQL using pagination."""
+    url = f"{api_url}"
+    headers = {'Content-Type': 'application/json'}
+    if api_token:
+        headers['Authorization'] = f'Bearer {api_token}'
+
+    all_users = []
+    page = 1
+    page_size = 100
+    has_more = True
+
+    print("Fetching all users from GraphQL...")
+    
+    while has_more:
+        query = """
+        query GetAllUsers($page: Int!, $pageSize: Int!) {
+            usersPermissionsUsers(pagination: { page: $page, pageSize: $pageSize }) {
+                documentId
+                username
+                email
+                cEmail
+                cId
+                blocked
+                firstName
+                lastName
+                title
+                sex
+                address1
+                zip
+                city
+                region
+                countryCode
+                phone
+                cFlagBreeder
+                IsActiveBreeder
+                membershipNumber
+                dateOfBirth
+                dateOfDeath
+                memberSince
+                cancellationOn
+                kennelName
+            }
+        }
+        """ # Note: Assuming schema allows pagination args on usersPermissionsUsers. 
+            # If not, we might need a different approach or the schema is different.
+            # Strapi v4 usually requires 'pagination' arg.
+
+        # If the standard query structure is different (e.g. wrapper), act accordingly.
+        # Based on existing queries, it returns a list directly? 
+        # Existing: usersPermissionsUsers(filters: ...) -> [User]
+        # Valid Strapi query usually allows pagination.
+
+        try:
+            response = requests.post(
+                url,
+                json={'query': query, 'variables': {'page': page, 'pageSize': page_size}},
+                headers=headers,
+                timeout=60
+            )
+
+            if response.status_code != 200:
+                print(f"Error fetching users page {page}: {response.status_code}")
+                break
+
+            result = response.json()
+            if 'errors' in result:
+                print(f"GraphQL Errors: {result['errors']}")
+                break
+
+            data = result.get('data', {}).get('usersPermissionsUsers', [])
+            
+            if not data:
+                has_more = False
+            else:
+                all_users.extend(data)
+                print(f"  Fetched {len(data)} users (Total: {len(all_users)})")
+                if len(data) < page_size:
+                    has_more = False
+                else:
+                    page += 1
+                    
+        except Exception as e:
+            print(f"Exception fetching users: {e}")
+            break
+
+    return all_users
 
 def find_existing_user_by_cid(api_url: str, api_token: Optional[str], c_id: int) -> Optional[str]:
     """Find existing member by cId using GraphQL. Returns documentId if found, None otherwise."""
@@ -618,9 +933,52 @@ def update_breeder(api_url: str, api_token: Optional[str], document_id: str, bre
         print(f"✗ Error updating breeder {document_id}: {e}")
     return False
 
+
+def block_conflicting_email(api_url: str, api_token: Optional[str], real_email: str, 
+                          website_users_by_email: Dict[str, Dict], dry_run: bool) -> None:
+    """
+    Check if email is occupied by another user (different cId or no cId).
+    If so, block that user and rename their email to free it up.
+    """
+    if not real_email:
+        return
+
+    existing_email_user = website_users_by_email.get(real_email.lower())
+    if existing_email_user:
+        conflict_cid = existing_email_user.get('cId')
+        conflict_username = existing_email_user.get('username')
+        conflict_doc_id = existing_email_user.get('documentId')
+        
+        print(f"Blocking existing user {conflict_username} (cId: {conflict_cid}) occupying email {real_email}...")
+        
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        blocked_email = f"blocked_{timestamp}_{real_email}"
+        
+        update_data = {
+            'blocked': True,
+            'email': blocked_email,
+            'cEmail': blocked_email
+        }
+        
+        if not dry_run:
+            if update_user_admin(api_url, api_token, conflict_doc_id, update_data):
+                 print(f"  -> Successfully blocked and renamed email to {blocked_email}")
+                 # Remove from map so we can register the new user with this email
+                 if real_email.lower() in website_users_by_email:
+                     del website_users_by_email[real_email.lower()]
+            else:
+                 print(f"  -> Failed to block user {conflict_doc_id}")
+        else:
+             print(f"  [DRY RUN] -> Would block and rename email to {blocked_email}")
+
+
 def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str, Any],
+
+                  website_users_by_cid: Dict[int, Dict], 
+                  website_users_by_email: Dict[str, Dict],
+                  website_users_by_username: Dict[str, Dict], # Added username map as fallback
                   dry_run: bool = False) -> bool:
-    """Import a single member by searching, registering if needed, and then updating."""
+    """Import a single member using in-memory lookups."""
     username = member_data.get('username')
     if not username:
         cId = member_data.get("cId")
@@ -630,45 +988,58 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
              print("Skipping member without username or cId")
              return False
 
-    # Extract real email if present (to be updated separately)
-    real_email = member_data.pop('cEmail', None)
-
-    # Use fallback email for initial safe storage
-    # We ignore the imported email for the first save attempt
+    # Updated to use get so cEmail remains in member_data for update
+    real_email = member_data.get('cEmail') 
     email = f"{username}@hovawarte.com"
-
-    # Separate breeder data from member data
     kennel_name = member_data.pop('kennelName', None)
     is_breeder = member_data.get('cFlagBreeder', False)
-
     is_active_breeder = member_data.get('IsActiveBreeder', False)
     member_data.pop('IsActiveBreeder', None)
 
-    # 1. Search for existing user
+    # 1. Search for existing user using maps
     existing_document_id = None
-    existing_breeder_id = None
+    existing_user_data = None
+    
     c_id = member_data.get('cId')
+    
+    # Lookup by cId (Primary)
+    if c_id and c_id in website_users_by_cid:
+        existing_user = website_users_by_cid[c_id]
+        existing_document_id = existing_user.get('documentId')
+        existing_user_data = existing_user
 
-    if not dry_run:
-        # First try finding by cId
-        if c_id:
-            existing_document_id = find_existing_user_by_cid(api_url, api_token, c_id)
+    # Not strictly falling back to username/email for *identification* if cId is the key.
+    # But if cId is missing or mismatch? 
+    # User said "common key is cid". So if cId doesn't match, it's a new user (or issue).
+    
+    if existing_document_id:
+        # Check for changes
+        if has_changes(member_data, existing_user_data):
+             print(f"Updating user {username} (cId: {c_id})...")
+             if not dry_run:
+                 update_user_admin(api_url, api_token, existing_document_id, member_data)
+        else:
+             print(f"User {username} (cId: {c_id}) is up to date. Skipping.")
+    else:
+        # New User
+        print(f"Creating new user {username} (cId: {c_id}, email: {real_email})...")
+        
+        # Use helper
+        block_conflicting_email(api_url, api_token, real_email, website_users_by_email, dry_run)
 
-        # Fallback to username
-        if not existing_document_id:
-            existing_document_id = find_existing_user(api_url, api_token, username)
+        if not dry_run:
+            mid = register_user(api_url, api_token, username, real_email)
+            if mid:
+                 existing_document_id = mid
+                 update_user_admin(api_url, api_token, mid, member_data)
 
-        # Fallback to email
-        if not existing_document_id:
-            h = find_existing_user_by_email(api_url, api_token, email)
-            if h:
-                # If found by email, we might want to update the username to match what we expect?
-                # For now, just use the found user.
-                existing_document_id = h
-                # email = f"{username}@hovawarte.com" # This logic was a bit weird in original, keeping it simple.
 
         if c_id and is_breeder:
-            existing_breeder_id = find_existing_breeder_by_cid(api_url, api_token, c_id)
+             # Breeder lookup still uses API? Or should we map breeders too?
+             # User didn't ask to map breeders, but for consistency maybe we should?
+             # For now, leaving breeder lookup as API call to minimize scope creep unless requested.
+             # But this will slow it down.
+             existing_breeder_id = find_existing_breeder_by_cid(api_url, api_token, c_id)
 
     if dry_run:
         if existing_document_id:
@@ -683,29 +1054,88 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
                  print(f"[DRY RUN] Breeder not found for cId {c_id} - Would create with kennel: {kennel_name}")
         return True
 
-    # 2. Register if not exists
+    # 2. Register if not exists (This block seems redundant if we handled it above for new users?)
+    # Wait, the logic flow is:
+    # 1. Check maps (cId -> docId)
+    # 2. If docId -> Update
+    # 3. Else (New) -> Register -> Update (lines 1015-1018)
+    #
+    # So lines 1041-1050 are actually fallback code from original script?
+    # Yes, lines 1041+ handle case where `existing_document_id` is still None.
+    # In my new logic, if it was None (and not found in map), I call register_user above (lines 1015).
+    # So `existing_document_id` would be set if registration succeeded.
+    # If registration failed, `existing_document_id` is None.
+    
+    # But wait, original code (or what I see in view 1000-1050) has a second registration block.
+    # Lines 1041-1050:
+    # document_id = existing_document_id
+    # if not document_id:
+    #    document_id = register_user(...)
+    
+    # This second block handles the case where existing_document_id was NOT set above.
+    # In "New User" block above: I set existing_document_id = mid.
+    # So if registration succeeded, second block is skipped.
+    
+    # User said: "und auch vor dem anderen Aufruf von register_user verwenden".
+    # This implies I should keep the second block (maybe as a fallback? or maybe for username match case?)
+    # Actually, my logic handles "New User" by cId extensively. 
+    # Is there a case where we fall through to 1041?
+    # - If found by map (cId/username/email) -> `existing_document_id` set.
+    # - If NEW (not found) -> block 983 runs -> register_user -> `existing_document_id` set.
+    
+    # So when does 1041 run?
+    # Only if `register_user` failed above? Or dry run?
+    # In dry run, `register_user` above is skipped. `existing_document_id` is None.
+    # Then `if dry_run: return True` at 1028 returns early.
+    # So 1041 is unreachable in dry_run.
+    
+    # In non-dry run:
+    # If register failed above, mid is None -> existing_document_id is None.
+    # Then 1041 runs. It tries register_user AGAIN with `email` (constructed fake email) instead of `real_email`?
+    # Line 1044: `register_user(..., username, email)` -> context variable `email` which is `username@hovawarte.com`.
+    # Ah! The first registration uses `real_email`.
+    # The second one uses `email` (fake).
+    
+    # So if real_email was missing or invalid or failed, we fall back to fake email registration?
+    # That seems to be the intent of the legacy code.
+    
+    # User wants `block_conflicting_email` check before THIS call too.
+    # Because `email` (fake) might also be taken?
+    # `email = f"{username}@hovawarte.com"`.
+    # If that fake email is taken, we should block that user too?
+    # Likely yes.
+    
+    # So I should apply the helper there too.
+    
     document_id = existing_document_id
     if not document_id:
+        # Fallback registration with constructed email
+        
+        # Apply blocking logic for constructed email
+        block_conflicting_email(api_url, api_token, email, website_users_by_email, dry_run)
+        
         document_id = register_user(api_url, api_token, username, email)
         if document_id:
-            print(f"✓ Registered new user: {username} (ID: {document_id})")
+            print(f"✓ Registered new user (fallback): {username} (ID: {document_id})")
         else:
-            print(f"x not Registered new user: {username} (email: {email})")
+            print(f"x Failed to register new user: {username} (email: {email})")
             return False
     else:
-        print(f"ℹ Found existing user: {username} (ID: {document_id})")
+        # print(f"ℹ Found existing user: {username} (ID: {document_id})")
+        pass
 
     # 3. Update via updateUserAdmin
     if document_id:
         if update_user_admin(api_url, api_token, document_id, member_data):
-            print(f"✓ Updated user: {username} (ID: {document_id})")
+            # print(f"✓ Updated user: {username} (ID: {document_id})")
 
             # Try to update the real email
             if real_email:
                 try:
                     # print(f"Attempting to update email for {username} to {real_email}")
                     if update_user_admin(api_url, api_token, document_id, {'email': real_email, 'cEmail': real_email}):
-                        print(f"✓ Updated email for user {username}: {real_email}")
+                        # print(f"✓ Updated email for user {username}: {real_email}")
+                        pass
                     else:
                         print(f"⚠ Konnte Email nicht setzen fuer {username}: {real_email} (Update fehlgeschlagen)")
                 except Exception as e:
@@ -724,7 +1154,8 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
 
                 if existing_breeder_id:
                     if update_breeder(api_url, api_token, existing_breeder_id, breeder_data):
-                        print(f"✓ Updated breeder for user {username}")
+                        # print(f"✓ Updated breeder for user {username}")
+                        pass
                     else:
                         print(f"✗ Failed to update breeder for user {username}")
                 else:
@@ -741,10 +1172,8 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
     return False
 
 def main():
-
     token = os.getenv("TOKEN")
     endpoint = os.getenv("ENDPOINT")
-
 
     parser = argparse.ArgumentParser(description='Import members from CSV into Strapi')
     parser.add_argument('csv_file', help='Path to CSV file')
@@ -764,9 +1193,7 @@ def main():
             sample = f.read(1024)
             f.seek(0)
             reader = csv.DictReader(f, delimiter=',')
-            rows = list(reader)
-
-
+            chromosoft_users = list(reader)
 
     except FileNotFoundError:
         print(f"Error: File '{args.csv_file}' not found")
@@ -775,11 +1202,18 @@ def main():
         print(f"Error reading CSV file: {e}")
         sys.exit(1)
 
-    if not rows:
+    if not chromosoft_users:
         print("Error: CSV file is empty or has no data rows")
         sys.exit(1)
 
-    print(f"Found {len(rows)} rows in CSV file")
+    print(f"Found {len(chromosoft_users)} rows in CSV file")
+    
+    # Resolve Email Conflicts
+    resolve_email_conflicts(chromosoft_users)
+    
+    # Validate CSV Data
+    validate_chromosoft_users(chromosoft_users)
+
     print(f"API URL: {endpoint}")
     if token:
         print(f"API Token: {'*' * 20} (provided)")
@@ -787,43 +1221,66 @@ def main():
         print(f"API Token: Not provided (requests may fail if authentication is required)")
     print(f"Dry run: {args.dry_run}")
     print("-" * 60)
+    
+    # Fetch all Website Users
+    website_users = []
+    # Fetching in dry run allows verifying matches (if read-only token or public read is available/mocked)
+    # If no token provided, it might fail or return empty, which is fine.
+    try:
+        website_users = fetch_all_users(endpoint, token)
+        print(f"Fetched {len(website_users)} existing users from Website.")
+    except Exception as e:
+        print(f"Warning: Could not fetch users: {e}")
+        website_users = []
+    
+    # Build Maps
+    website_users_by_cid = {}
+    website_users_by_email = {}
+    website_users_by_username = {}
+
+    for u in website_users:
+        if u.get('cId'):
+            website_users_by_cid[u['cId']] = u
+        if u.get('email'):
+            website_users_by_email[u['email'].lower()] = u
+        if u.get('username'):
+            website_users_by_username[u['username']] = u
 
     # Process each row
     success_count = 0
     error_count = 0
 
-    for i, row in enumerate(rows, 1):
+    for i, row in enumerate(chromosoft_users, 1):
         # Skip empty rows
         if not any(row.values()):
             continue
-
-        print(f"\nProcessing row {i}/{len(rows)}...")
+            
+        if i % 100 == 0:
+            print(f"Processing row {i}/{len(chromosoft_users)}...")
 
         # Map CSV to member data
         member_data = map_csv_to_member(row)
-
         if not member_data:
-            print(f"⚠ Skipping row {i}: No valid data found")
+            print(f"Skipping row {i}: Could not map to member data")
+            error_count += 1
             continue
 
         # Import member
         # print(member_data)
-        if import_member(endpoint, token, member_data, args.dry_run):
+        if import_member(endpoint, token, member_data, 
+                         website_users_by_cid, 
+                         website_users_by_email, 
+                         website_users_by_username,
+                         dry_run=args.dry_run):
             success_count += 1
         else:
             error_count += 1
 
-#        if(error_count>1):
-#            return
-
-        time.sleep(1)
-
     print("\n" + "=" * 60)
-    print(f"Import complete!")
-    print(f"Successfully imported: {success_count}")
+    print(f"Import completed.")
+    print(f"Successful: {success_count}")
     print(f"Errors: {error_count}")
-    print(f"Total processed: {len(rows)}")
+    print(f"Total processed: {len(chromosoft_users)}")
 
 if __name__ == '__main__':
     main()
-

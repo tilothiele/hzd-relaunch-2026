@@ -197,6 +197,8 @@ export const GET_LAYOUT = `
 					MaxArticles
 								news_article_category {
 									documentId
+									CategoryName
+									CategoryDescription
 								}
 						NewsArticlesAnchor
 					}
@@ -454,6 +456,8 @@ export const GET_INDEX_PAGE = `
 				MaxArticles
 							news_article_category {
 								documentId
+								CategoryName
+								CategoryDescription
 							}
 					NewsArticlesAnchor
 				}
