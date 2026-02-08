@@ -2010,9 +2010,7 @@ export interface PluginUsersPermissionsUser
       'plugin::users-permissions.user'
     > &
       Schema.Attribute.Private;
-    membershipNumber: Schema.Attribute.Integer &
-      Schema.Attribute.Required &
-      Schema.Attribute.Unique;
+    membershipNumber: Schema.Attribute.Integer & Schema.Attribute.Unique;
     memberSince: Schema.Attribute.Date;
     password: Schema.Attribute.Password &
       Schema.Attribute.Private &

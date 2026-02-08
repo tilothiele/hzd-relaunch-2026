@@ -374,7 +374,71 @@ def validate_chromosoft_users(rows: List[Dict[str, str]]) -> bool:
          print("\n[PASS] All active members have unique emails.")
          
     return True # Always return True to allow import to proceed (just warning)
+
+    # Check for duplicate membership numbers
+    membership_counts = {}
+    for i, row in enumerate(rows, 1):
+        mem_no = row.get('membership number', '').strip()
+        if not mem_no or mem_no == '-':
+            continue
+            
+        member_info = {
+            'row': i,
+            'id': row.get('ID Person', ''),
+            'name': f"{row.get('firstname', '')} {row.get('lastname', '')}"
+        }
+        
+        if mem_no in membership_counts:
+            membership_counts[mem_no].append(member_info)
+        else:
+            membership_counts[mem_no] = [member_info]
+            
+    duplicate_membership = {no: members for no, members in membership_counts.items() if len(members) > 1}
+    duplicate_mem_count = len(duplicate_membership)
     
+    if duplicate_mem_count > 0:
+         print(f"\n[WARN] Found {duplicate_mem_count} membership numbers used by multiple members:")
+         for mem_no, members in list(duplicate_membership.items()):
+             members_str = ", ".join([f"({m['id']} {m['name']})" for m in members])
+             print(f"  Membership No '{mem_no}' used by: {members_str}")
+    else:
+         print("\n[PASS] All membership numbers are unique.")
+
+    return True
+    
+def sanitize_chromosoft_users(rows: List[Dict[str, str]]) -> None:
+    """
+    Sanitize CSV data before processing.
+    Removes 'membership number' if it is '-' or < 100.
+    """
+    print(f"Sanitizing {len(rows)} rows...")
+    sanitized_count = 0
+    for row in rows:
+        mem_no_str = row.get('membership number', '')
+        if not mem_no_str:
+            continue
+            
+        mem_no_str = mem_no_str.strip()
+        should_clear = False
+        
+        if mem_no_str == '-':
+            should_clear = True
+        else:
+            # Check if it's a number < 100
+            try:
+                # Use parse_integer or direct int conversion if simple
+                mem_no = int(mem_no_str)
+                if mem_no < 100:
+                    should_clear = True
+            except ValueError:
+                should_clear = True
+        
+        if should_clear:
+            row['membership number'] = ''
+            sanitized_count += 1
+            
+    print(f"Sanitized {sanitized_count} invalid membership numbers (Cleared values < 100 or '-').")
+
 def resolve_email_conflicts(rows: List[Dict[str, str]]) -> None:
     """
     Resolve email conflicts within the CSV data.
@@ -620,14 +684,11 @@ def fetch_all_users(api_url: str, api_token: Optional[str]) -> List[Dict[str, An
                 region
                 countryCode
                 phone
-                cFlagBreeder
-                IsActiveBreeder
                 membershipNumber
                 dateOfBirth
                 dateOfDeath
                 memberSince
                 cancellationOn
-                kennelName
             }
         }
         """ # Note: Assuming schema allows pagination args on usersPermissionsUsers. 
@@ -649,6 +710,7 @@ def fetch_all_users(api_url: str, api_token: Optional[str]) -> List[Dict[str, An
 
             if response.status_code != 200:
                 print(f"Error fetching users page {page}: {response.status_code}")
+                print(response.json())
                 break
 
             result = response.json()
@@ -673,6 +735,80 @@ def fetch_all_users(api_url: str, api_token: Optional[str]) -> List[Dict[str, An
             break
 
     return all_users
+
+def fetch_all_breeders(api_url: str, api_token: Optional[str]) -> Dict[str, Dict[str, Any]]:
+    """
+    Fetch all breeders from Strapi via GraphQL using pagination.
+    Returns a dictionary mapping user documentId to breeder data.
+    """
+    url = f"{api_url}"
+    headers = {'Content-Type': 'application/json'}
+    if api_token:
+        headers['Authorization'] = f'Bearer {api_token}'
+
+    breeder_map = {}
+    page = 1
+    page_size = 100
+    has_more = True
+
+    print("Fetching all breeders from GraphQL...")
+    
+    while has_more:
+        query = """
+        query GetAllBreeders($page: Int!, $pageSize: Int!) {
+            hzdPluginBreeders(pagination: { page: $page, pageSize: $pageSize }) {
+                documentId
+                IsActive
+                member {
+                    documentId
+                }
+            }
+        }
+        """
+
+        try:
+            response = requests.post(
+                url,
+                json={'query': query, 'variables': {'page': page, 'pageSize': page_size}},
+                headers=headers,
+                timeout=60
+            )
+
+            if response.status_code != 200:
+                print(f"Error fetching breeders page {page}: {response.status_code}")
+                break
+
+            result = response.json()
+            if 'errors' in result:
+                print(f"GraphQL Errors (Breeders): {result['errors']}")
+                break
+
+            data = result.get('data', {}).get('hzdPluginBreeders', [])
+            
+            if not data:
+                has_more = False
+            else:
+                for breeder in data:
+                    member = breeder.get('member')
+                    if member and member.get('documentId'):
+                        user_doc_id = member.get('documentId')
+                        breeder_map[user_doc_id] = {
+                            'breederId': breeder.get('documentId'),
+                            'IsActive': breeder.get('IsActive', False),
+                            'cFlagBreeder': True
+                        }
+                
+                print(f"  Fetched {len(data)} breeders (Total mapped: {len(breeder_map)})")
+                if len(data) < page_size:
+                    has_more = False
+                else:
+                    page += 1
+                    
+        except Exception as e:
+            print(f"Exception fetching breeders: {e}")
+            break
+
+    return breeder_map
 
 def find_existing_user_by_cid(api_url: str, api_token: Optional[str], c_id: int) -> Optional[str]:
     """Find existing member by cId using GraphQL. Returns documentId if found, None otherwise."""
@@ -979,18 +1115,30 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
                   website_users_by_username: Dict[str, Dict], # Added username map as fallback
                   dry_run: bool = False) -> bool:
     """Import a single member using in-memory lookups."""
+    c_id = member_data.get('cId')
     username = member_data.get('username')
     if not username:
-        cId = member_data.get("cId")
-        if cId:
-             username = f"user-{cId}"
+        # cId = member_data.get("cId") # Removed redundant get
+        if c_id:
+             username = f"user-{c_id}"
         else:
              print("Skipping member without username or cId")
              return False
 
     # Updated to use get so cEmail remains in member_data for update
     real_email = member_data.get('cEmail') 
-    email = f"{username}@hovawarte.com"
+    
+    # If member is blocked, delete/replace email with dummy to free it up
+    if member_data.get('blocked'):
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        # Use a dummy email format
+        dummy_email = f"deleted_{timestamp}_{username}@hovawarte.invalid"
+        member_data['cEmail'] = dummy_email
+        real_email = dummy_email
+        if 'email' in member_data:
+            member_data['email'] = dummy_email
+
+    email = f"user-{c_id}@hovawarte.com" if c_id else f"{username}@hovawarte.com"
     kennel_name = member_data.pop('kennelName', None)
     is_breeder = member_data.get('cFlagBreeder', False)
     is_active_breeder = member_data.get('IsActiveBreeder', False)
@@ -999,6 +1147,7 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
     # 1. Search for existing user using maps
     existing_document_id = None
     existing_user_data = None
+    existing_breeder_id = None # Ensure initialization to avoid UnboundLocalError
     
     c_id = member_data.get('cId')
     
@@ -1007,6 +1156,7 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
         existing_user = website_users_by_cid[c_id]
         existing_document_id = existing_user.get('documentId')
         existing_user_data = existing_user
+        existing_breeder_id = existing_user.get('breederDocumentId', None) # Initialize with existing breeder ID if available
 
     # Not strictly falling back to username/email for *identification* if cId is the key.
     # But if cId is missing or mismatch? 
@@ -1207,6 +1357,9 @@ def main():
         sys.exit(1)
 
     print(f"Found {len(chromosoft_users)} rows in CSV file")
+
+    # Sanitize CSV Data
+    sanitize_chromosoft_users(chromosoft_users)
     
     # Resolve Email Conflicts
     resolve_email_conflicts(chromosoft_users)
@@ -1229,8 +1382,24 @@ def main():
     try:
         website_users = fetch_all_users(endpoint, token)
         print(f"Fetched {len(website_users)} existing users from Website.")
+        
+        # Fetch Breeders and map to users
+        breeder_info_map = fetch_all_breeders(endpoint, token)
+        
+        # Enrich users with breeder flags
+        for user in website_users:
+            doc_id = user.get('documentId')
+            if doc_id and doc_id in breeder_info_map:
+                b_info = breeder_info_map[doc_id]
+                user['cFlagBreeder'] = True
+                user['IsActiveBreeder'] = b_info['IsActive']
+                user['breederDocumentId'] = b_info.get('breederId')
+            else:
+                user['cFlagBreeder'] = False
+                user['IsActiveBreeder'] = False
+                
     except Exception as e:
-        print(f"Warning: Could not fetch users: {e}")
+        print(f"Warning: Could not fetch users/breeders: {e}")
         website_users = []
     
     # Build Maps
