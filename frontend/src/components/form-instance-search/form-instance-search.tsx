@@ -6,11 +6,13 @@ import Link from 'next/link'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import { fetchGraphQL } from '@/lib/graphql-client'
 import { SEARCH_FORMS, COUNT_FORM_INSTANCES } from '@/lib/graphql/queries'
-import type { Form, FormSearchResult, FormInstanceSearchResult } from '@/types'
+import type { Form, FormSearchResult, FormInstanceSearchResult, AuthUser } from '@/types'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 
 interface FormsInstanceSearchProps {
 	strapiBaseUrl: string
+	user: AuthUser | null
+	isAuthenticated: boolean
 }
 
 type PageSize = 5 | 10 | 20
@@ -20,7 +22,7 @@ interface FormWithCount extends Form {
 	latestInstanceCreatedAt?: string | null
 }
 
-export function FormsInstanceSearch({ strapiBaseUrl }: FormsInstanceSearchProps) {
+export function FormsInstanceSearch({ strapiBaseUrl, user, isAuthenticated }: FormsInstanceSearchProps) {
 	const [formNameFilter, setFormNameFilter] = useState('')
 	const [page, setPage] = useState(1)
 	const [pageSize, setPageSize] = useState<PageSize>(10)
@@ -106,7 +108,7 @@ export function FormsInstanceSearch({ strapiBaseUrl }: FormsInstanceSearchProps)
 	}, [strapiBaseUrl])
 
 	const searchForms = useCallback(async () => {
-		if (!strapiBaseUrl) {
+		if (!strapiBaseUrl || !isAuthenticated || !user?.documentId) {
 			return
 		}
 
@@ -116,11 +118,21 @@ export function FormsInstanceSearch({ strapiBaseUrl }: FormsInstanceSearchProps)
 		try {
 			const filterConditions: Array<Record<string, unknown>> = []
 
+			// Filter nach Formular-Name
 			if (formNameFilter.trim()) {
 				filterConditions.push({
 					Name: { containsi: formNameFilter.trim() },
 				})
 			}
+
+			// Filter nach EventAdmin (nur Formulare des aktuellen Users anzeigen)
+			filterConditions.push({
+				EventAdmin: {
+					documentId: {
+						eq: user.documentId
+					}
+				}
+			})
 
 			const variables: Record<string, unknown> = {
 				pagination: {
@@ -171,7 +183,7 @@ export function FormsInstanceSearch({ strapiBaseUrl }: FormsInstanceSearchProps)
 		} finally {
 			setIsLoading(false)
 		}
-	}, [strapiBaseUrl, formNameFilter, page, pageSize, loadFormInstanceCounts])
+	}, [strapiBaseUrl, formNameFilter, page, pageSize, loadFormInstanceCounts, isAuthenticated, user])
 
 	useEffect(() => {
 		void searchForms()
@@ -190,6 +202,10 @@ export function FormsInstanceSearch({ strapiBaseUrl }: FormsInstanceSearchProps)
 		setPageSize(event.target.value as PageSize)
 		setPage(1)
 	}, [])
+
+	if (!isAuthenticated) {
+		return null
+	}
 
 	return (
 		<SectionContainer>

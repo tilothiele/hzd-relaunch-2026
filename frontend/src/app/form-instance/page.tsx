@@ -72,7 +72,7 @@ export default function FormInstancePage() {
 		>
 			<SectionContainer variant='max-width'>
 				<div className='flex min-h-[50vh] items-center justify-center py-12'>
-					<FormsInstanceSearch strapiBaseUrl={baseUrl} />
+					<FormsInstanceSearch strapiBaseUrl={baseUrl} user={user} isAuthenticated={isAuthenticated} />
 				</div>
 			</SectionContainer>
 		</MainPageStructure>
