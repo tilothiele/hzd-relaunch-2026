@@ -306,7 +306,7 @@ export function LoginControls({
 									: 'text-gray-600 hover:text-gray-900'
 									}`}
 							>
-								Passwort vergessen
+								neues Passwort
 							</button>
 						</div>
 					</div>
