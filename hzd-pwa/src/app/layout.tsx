@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "./variables.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HZD Relaunch 2026",
-  description: "HZD Relaunch 2026 PWA",
+  title: "HZD-App",
+  description: "HZD-App PWA",
   manifest: "/manifest.json",
 };
 

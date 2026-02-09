@@ -1,0 +1,50 @@
+:root {
+    /* Stephanie Colors */
+    --color-goldbeige: #EED9B3;
+    --color-goldbraun: #bfa468;
+    --color-kapitaensblau: #1f3067;
+    --color-erdbraun: #1c1612;
+    --color-schiefergrau: #2B2B2B;
+    --color-saharabeige: #F6F1E9;
+    --color-himmelblau: #5fa3d6;
+
+    --background: #ffffff;
+    --foreground: #171717;
+
+    /* Primary HZD Colors */
+    --primary: #1f3067;
+    /* Blue */
+    --primary-foreground: #ffffff;
+
+    --secondary: #bfa468;
+    /* Gold/Beige */
+    --secondary-foreground: #1f3067;
+
+    --accent: #f5f5f5;
+    --accent-foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Stephanie Colors */
+        --color-goldbeige: #EED9B3;
+        --color-goldbraun: #bfa468;
+        --color-kapitaensblau: #1f3067;
+        --color-erdbraun: #1c1612;
+        --color-schiefergrau: #2B2B2B;
+        --color-saharabeige: #F6F1E9;
+        --color-himmelblau: #5fa3d6;
+
+        --background: #0a0a0a;
+        --foreground: #ededed;
+
+        --primary: #1f3067;
+        --primary-foreground: #ffffff;
+
+        --secondary: #bfa468;
+        --secondary-foreground: #000000;
+
+        --accent: #262626;
+        --accent-foreground: #ededed;
+    }
+}
