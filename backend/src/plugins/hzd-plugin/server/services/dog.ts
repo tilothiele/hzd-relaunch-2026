@@ -15,9 +15,9 @@ const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: numbe
 	const a =
 		Math.sin(dLat / 2) * Math.sin(dLat / 2) +
 		Math.cos((lat1 * Math.PI) / 180) *
-			Math.cos((lat2 * Math.PI) / 180) *
-			Math.sin(dLon / 2) *
-			Math.sin(dLon / 2)
+		Math.cos((lat2 * Math.PI) / 180) *
+		Math.sin(dLon / 2) *
+		Math.sin(dLon / 2)
 	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 	return R * c
 }
@@ -32,7 +32,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
 
 			// Wenn keine Geolocation-Parameter, normale Suche
 			if (!lat || !lng) {
-				return (service as any).find(ctx)
+				return (service as any).find(ctx.query)
 			}
 
 			// Extrahiere normale Filter aus Query

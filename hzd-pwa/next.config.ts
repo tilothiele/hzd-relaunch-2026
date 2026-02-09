@@ -11,6 +11,18 @@ const pwaConfig = withPWA({
 const nextConfig: NextConfig = {
   /* config options here */
   output: "standalone",
+  async rewrites() {
+    return [
+      {
+        source: "/api/proxy/:path*",
+        destination: `${process.env.STRAPI_BASE_URL}/api/:path*`,
+      },
+      {
+        source: "/uploads/:path*",
+        destination: `${process.env.STRAPI_BASE_URL}/uploads/:path*`,
+      },
+    ];
+  },
 };
 
 export default pwaConfig(nextConfig);

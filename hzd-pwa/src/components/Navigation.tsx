@@ -12,6 +12,7 @@ export default function Navigation() {
         { name: "Meine Körbewertungen", href: "/meine-koerboegen" },
         { name: "Hunde", href: "/hunde" },
         { name: "Veranstaltungen", href: "/veranstaltungen" },
+        { name: "Synchronization", href: "/synchronization" },
     ];
 
     return (

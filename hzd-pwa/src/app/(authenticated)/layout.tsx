@@ -3,12 +3,17 @@ import Image from "next/image";
 import { logout } from "@/actions/auth";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import { cookies } from "next/headers";
 
-export default function AuthenticatedLayout({
+export default async function AuthenticatedLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
+    const cookieStore = await cookies();
+    const userCookie = cookieStore.get("user");
+    const user = userCookie ? JSON.parse(userCookie.value) : null;
+
     return (
         <div className="flex min-h-screen flex-col font-[family-name:var(--font-geist-sans)] text-[var(--color-kapitaensblau)]">
             <header className="flex w-full items-center justify-between p-4 shadow-sm z-10 relative bg-[var(--color-goldbeige)] text-[var(--color-kapitaensblau)]">
@@ -26,11 +31,18 @@ export default function AuthenticatedLayout({
 
                 <Navigation />
 
-                <form action={logout}>
-                    <button type="submit" className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-red-600 text-white gap-2 hover:bg-red-700 text-sm h-10 px-4">
-                        Abmelden
-                    </button>
-                </form>
+                <div className="flex items-center gap-4">
+                    {user?.firstName && user?.lastName && (
+                        <span className="text-sm font-medium hidden md:block">
+                            {user.firstName} {user.lastName}
+                        </span>
+                    )}
+                    <form action={logout}>
+                        <button type="submit" className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-red-600 text-white gap-2 hover:bg-red-700 text-sm h-10 px-4">
+                            Abmelden
+                        </button>
+                    </form>
+                </div>
             </header>
 
             <main className="flex flex-1 flex-col p-4 sm:p-8">
