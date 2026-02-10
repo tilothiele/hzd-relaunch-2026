@@ -51,8 +51,10 @@ async function syncUserGeolocations(strapi: Core.Strapi): Promise<void> {
 		const zip = user.zip.trim()
 		strapi.log.info(`[Geolocation Sync] Processing user ${user.id} with ZIP: ${zip}`)
 
+
 		// Fetch geolocation
-		const geoResult = await geolocationService.getGeoLocationByZip(zip)
+		const countryCode = user.countryCode === 'D' || !user.countryCode ? 'DE' : user.countryCode
+		const geoResult = await geolocationService.getGeoLocationByZip(zip, countryCode)
 
 		if (geoResult) {
 			// Update user with GeoLocation
@@ -139,7 +141,11 @@ async function syncGeolocations(strapi: Core.Strapi): Promise<void> {
 			}
 
 			// Fetch geolocation
-			const geoResult = await geolocationService.getGeoLocationByZip(zip)
+			let countryCode = breederWithZip.Address.CountryCode
+			if (!countryCode || countryCode === 'D') {
+				countryCode = 'DE'
+			}
+			const geoResult = await geolocationService.getGeoLocationByZip(zip, countryCode)
 
 			if (geoResult) {
 				// Update breeder with GeoLocation

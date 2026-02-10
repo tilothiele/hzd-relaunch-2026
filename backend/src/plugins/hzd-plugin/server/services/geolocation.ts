@@ -12,6 +12,7 @@
  */
 
 import type { Core } from '@strapi/strapi'
+import Bottleneck from 'bottleneck';
 
 export interface GeoLocationResult {
 	lat: number
@@ -28,6 +29,13 @@ const NOMINATIM_USER_AGENT =
 const NOMINATIM_EMAIL = process.env.NOMINATIM_EMAIL
 // Optional artificial delay (ms) to be nicer to the service (recommended: 1000ms)
 const NOMINATIM_DELAY_MS = Number(process.env.NOMINATIM_DELAY_MS || 1000)
+
+// Create a rate limiter to ensure we don't hit Nominatim too hard
+// Nominatim usage policy requires max 1 request per second
+const limiter = new Bottleneck({
+	minTime: NOMINATIM_DELAY_MS,
+	maxConcurrent: 1, // Strictly one request at a time
+});
 
 /**
  * Get geolocation by ZIP code using OpenStreetMap Nominatim API
@@ -63,76 +71,76 @@ async function getGeoLocationByZip(zip: string, countryCode: string): Promise<Ge
 		console.error(`[Geolocation Service] Error reading from DB cache:`, dbError);
 	}
 
-	try {
-		// Be gentle - Nominatim requires rate limiting (max 1 request per second)
-		if (NOMINATIM_DELAY_MS > 0) {
-			await new Promise((resolve) => setTimeout(resolve, NOMINATIM_DELAY_MS))
-		}
-
-		// Use Nominatim API to geocode ZIP code
-		const searchParams = new URLSearchParams({
-			postalcode: cleanZip,
-			countrycodes: cleanCountry.toLowerCase(),
-			format: 'json',
-			limit: '1',
-			addressdetails: '0', // We only need coordinates
-		})
-		if (NOMINATIM_EMAIL) {
-			searchParams.set('email', NOMINATIM_EMAIL)
-		}
-		const url = `${NOMINATIM_BASE_URL}?${searchParams.toString()}`
-
-		console.log(`[Geolocation Service] Fetching geolocation for: ${zipKey}`)
-
-		const response = await fetch(url, {
-			headers: {
-				'User-Agent': NOMINATIM_USER_AGENT, // required by Nominatim
-				Accept: 'application/json',
-			},
-		})
-
-		if (!response.ok) {
-			console.error(`[Geolocation Service] HTTP error! status: ${response.status} for: ${zipKey}`)
-			return null
-		}
-
-		const data = await response.json()
-
-		if (!Array.isArray(data) || data.length === 0) {
-			console.warn(`[Geolocation Service] No results found for: ${zipKey}`)
-			return null
-		}
-
-		const result = data[0]
-		const lat = parseFloat(result.lat)
-		const lng = parseFloat(result.lon)
-
-		if (isNaN(lat) || isNaN(lng)) {
-			console.error(`[Geolocation Service] Invalid coordinates for: ${zipKey}`, { lat: result.lat, lon: result.lon })
-			return null
-		}
-
-		// Cache the result in DB
+	// Schedule the API call through the rate limiter
+	return limiter.schedule(async () => {
 		try {
-			await strapi.documents(uid).create({
-				data: {
-					Key: zipKey,
-					lat,
-					lng
+			// Use Nominatim API to geocode ZIP code
+			const searchParams = new URLSearchParams({
+				postalcode: cleanZip,
+				countrycodes: cleanCountry.toLowerCase(),
+				format: 'json',
+				limit: '1',
+				addressdetails: '0', // We only need coordinates
+			})
+			if (NOMINATIM_EMAIL) {
+				searchParams.set('email', NOMINATIM_EMAIL)
+			}
+			const url = `${NOMINATIM_BASE_URL}?${searchParams.toString()}`
+
+			console.log(`[Geolocation Service] Fetching geolocation for: ${zipKey}`)
+
+			const response = await fetch(url, {
+				headers: {
+					'User-Agent': NOMINATIM_USER_AGENT, // required by Nominatim
+					Accept: 'application/json',
 				},
-				status: 'published'
-			});
-		} catch (saveError) {
-			console.error(`[Geolocation Service] Error saving to DB cache:`, saveError);
+			})
+
+			if (!response.ok) {
+				console.error(`[Geolocation Service] HTTP error! status: ${response.status} for: ${zipKey}`)
+				return null
+			}
+
+			const data = await response.json()
+
+			console.log(`[Geolocation Service] Response for ${zipKey}:`, data);
+
+			if (!Array.isArray(data) || data.length === 0) {
+				console.warn(`[Geolocation Service] No results found for: ${zipKey}`)
+				return null
+			}
+
+			const result = data[0]
+			const lat = parseFloat(result.lat)
+			const lng = parseFloat(result.lon)
+
+			if (isNaN(lat) || isNaN(lng)) {
+				console.error(`[Geolocation Service] Invalid coordinates for: ${zipKey}`, { lat: result.lat, lon: result.lon })
+				return null
+			}
+
+			// Cache the result in DB
+			try {
+				await strapi.documents(uid).create({
+					data: {
+						Key: zipKey,
+						lat,
+						lng
+					},
+					status: 'published'
+				});
+			} catch (saveError) {
+				console.error(`[Geolocation Service] Error saving to DB cache:`, saveError);
+			}
+
+			console.log(`[Geolocation Service] Successfully geocoded and cached: ${zipKey} -> lat: ${lat}, lng: ${lng}`)
+
+			return { lat, lng }
+		} catch (error) {
+			console.error(`[Geolocation Service] Error fetching geolocation for ${zipKey}:`, error)
+			return null
 		}
-
-		console.log(`[Geolocation Service] Successfully geocoded and cached: ${zipKey} -> lat: ${lat}, lng: ${lng}`)
-
-		return { lat, lng }
-	} catch (error) {
-		console.error(`[Geolocation Service] Error fetching geolocation for ${zipKey}:`, error)
-		return null
-	}
+	});
 }
 
 /**
