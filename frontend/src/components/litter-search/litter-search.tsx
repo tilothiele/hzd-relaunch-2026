@@ -14,6 +14,7 @@ import { theme } from '@/themes'
 import { ViewToggle } from '@/components/common/view-toggle'
 import { LitterCard } from '@/components/litter-search/litter-card'
 import { LitterDetailView } from '@/components/litter-search/litter-detail-view'
+import { calculateDistance } from '@/lib/geo-utils'
 import { useLitters, type LitterStatus, type PageSize } from '@/hooks/use-litters'
 import { SubmitButton } from '@/components/ui/submit-button'
 
@@ -24,54 +25,15 @@ interface LitterSearchProps {
 
 
 
-// Deutschland grobe Grenzen: Lat 47-55, Lon 5-15
-const GERMANY_BOUNDS = {
-	minLat: 47.0,
-	maxLat: 55.0,
-	minLng: 5.0,
-	maxLng: 15.0,
-}
-
-/**
- * Generiert deterministische Fake-Koordinaten basierend auf der documentId
- * Dies stellt sicher, dass jeder Wurf immer die gleichen Koordinaten hat
- */
-function generateFakeLocationForLitter(documentId: string): GeoLocation {
-	let hash = 0
-	for (let i = 0; i < documentId.length; i++) {
-		const char = documentId.charCodeAt(i)
-		hash = ((hash << 5) - hash) + char
-		hash = hash & hash // Convert to 32bit integer
-	}
-	const normalizedHash = Math.abs(hash) / 2147483647
-	const lat = GERMANY_BOUNDS.minLat + normalizedHash * (GERMANY_BOUNDS.maxLat - GERMANY_BOUNDS.minLat)
-	const lng = GERMANY_BOUNDS.minLng + (1 - normalizedHash) * (GERMANY_BOUNDS.maxLng - GERMANY_BOUNDS.minLng)
-	return { lat, lng }
-}
-
-/**
- * Berechnet die Entfernung zwischen zwei Koordinaten in Kilometern (Haversine-Formel)
- */
-function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
-	const R = 6371 // Erdradius in Kilometern
-	const dLat = (lat2 - lat1) * Math.PI / 180
-	const dLng = (lng2 - lng1) * Math.PI / 180
-	const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-		Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-		Math.sin(dLng / 2) * Math.sin(dLng / 2)
-	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-	return R * c
-}
-
 /**
  * Ermittelt die Position eines Wurfs (real oder fake)
  */
-function getLitterLocation(litter: Litter): { lat: number; lng: number } {
+function getLitterLocation(litter: Litter): { lat: number; lng: number } | null {
 	const breederLocation = litter.breeder?.GeoLocation
 	if (breederLocation && breederLocation.lat && breederLocation.lng) {
 		return { lat: breederLocation.lat, lng: breederLocation.lng }
 	}
-	return generateFakeLocationForLitter(litter.documentId)
+	return null
 }
 
 const getStatusLabel = (status: Litter['LitterStatus']) => {
@@ -190,34 +152,39 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 	}, [])
 
 	// Konvertiere Würfe in MapItems
-	const mapItems = useMemo<MapItem[]>(() => litters.map((litter) => {
-		const breeder = litter.breeder
-		const location = getLitterLocation(litter)
+	const mapItems = useMemo<MapItem[]>(() => {
+		return litters
+			.map((litter) => {
+				const location = getLitterLocation(litter)
+				if (!location) return null
 
-		const orderLetter = litter.OrderLetter ?? ''
-		const kennelName = breeder?.kennelName ?? 'Unbekannt'
-		const title = `${orderLetter}-Wurf: ${kennelName}`
+				const breeder = litter.breeder
+				const orderLetter = litter.OrderLetter ?? ''
+				const kennelName = breeder?.kennelName ?? 'Unbekannt'
+				const title = `${orderLetter}-Wurf: ${kennelName}`
 
-		return {
-			id: litter.documentId,
-			position: [location.lat, location.lng],
-			title,
-			popupContent: (
-				<div>
-					<strong>{title}</strong>
-					{litter.dateOfBirth ? (
-						<div>Geboren: {formatDate(litter.dateOfBirth)}</div>
-					) : litter.expectedDateOfBirth ? (
-						<div>Erwartet: {formatDate(litter.expectedDateOfBirth)}</div>
-					) : null}
-					<div>Status: {getStatusLabel(litter.LitterStatus)}</div>
-					{breeder?.member?.zip && (
-						<div>PLZ: {breeder.member.zip}</div>
-					)}
-				</div>
-			)
-		}
-	}), [litters, formatDate])
+				return {
+					id: litter.documentId,
+					position: [location.lat, location.lng],
+					title,
+					popupContent: (
+						<div>
+							<strong>{title}</strong>
+							{litter.dateOfBirth ? (
+								<div>Geboren: {formatDate(litter.dateOfBirth)}</div>
+							) : litter.expectedDateOfBirth ? (
+								<div>Erwartet: {formatDate(litter.expectedDateOfBirth)}</div>
+							) : null}
+							<div>Status: {getStatusLabel(litter.LitterStatus)}</div>
+							{breeder?.member?.zip && (
+								<div>PLZ: {breeder.member.zip}</div>
+							)}
+						</div>
+					)
+				}
+			})
+			.filter((item) => item !== null) as MapItem[]
+	}, [litters, formatDate])
 
 	// Handle View Mode vs Detail Mode
 	if (selectedLitter) {
@@ -543,12 +510,14 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 										let distance: number | null = null
 										if (userLocation) {
 											const location = getLitterLocation(litter)
-											distance = calculateDistance(
-												userLocation.lat,
-												userLocation.lng,
-												location.lat,
-												location.lng
-											)
+											if (location) {
+												distance = calculateDistance(
+													userLocation.lat,
+													userLocation.lng,
+													location.lat,
+													location.lng
+												)
+											}
 										}
 
 										return (

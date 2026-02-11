@@ -17,12 +17,7 @@ import type { Dog, GeoLocation, HzdSetting } from '@/types'
 import { SubmitButton } from '@/components/ui/submit-button'
 
 // Deutschland grobe Grenzen: Lat 47-55, Lon 5-15
-const GERMANY_BOUNDS = {
-	minLat: 47.0,
-	maxLat: 55.0,
-	minLng: 5.0,
-	maxLng: 15.0,
-}
+// Deutschland grobe Grenzen entfernt
 
 import { calculateAge, formatDate } from '@/lib/date-utils'
 
@@ -37,43 +32,6 @@ function getColorLabel(color: string | null | undefined): string {
 	}
 }
 
-/**
- * Generiert deterministische Fake-Koordinaten basierend auf der documentId
- * Dies stellt sicher, dass jeder Hund immer die gleichen Koordinaten hat
- */
-function generateFakeLocationForDog(documentId: string): GeoLocation {
-	// Verwende einen einfachen Hash der documentId, um deterministische Werte zu erhalten
-	let hash = 0
-	for (let i = 0; i < documentId.length; i++) {
-		const char = documentId.charCodeAt(i)
-		hash = ((hash << 5) - hash) + char
-		hash = hash & hash // Convert to 32bit integer
-	}
-
-	// Normalisiere den Hash auf 0-1 Bereich
-	const normalizedHash = Math.abs(hash) / 2147483647
-
-	// Generiere Koordinaten innerhalb Deutschlands
-	const lat = GERMANY_BOUNDS.minLat + normalizedHash * (GERMANY_BOUNDS.maxLat - GERMANY_BOUNDS.minLat)
-	const lng = GERMANY_BOUNDS.minLng + (1 - normalizedHash) * (GERMANY_BOUNDS.maxLng - GERMANY_BOUNDS.minLng)
-
-	return { lat, lng }
-}
-
-/**
- * Erweitert Hunde mit Fake-Koordinaten, wenn keine Location vorhanden ist
- */
-function enrichDogsWithFakeLocations(dogs: Dog[]): Dog[] {
-	return dogs.map((dog) => {
-		if (!dog.Location) {
-			return {
-				...dog,
-				Location: generateFakeLocationForDog(dog.documentId),
-			}
-		}
-		return dog
-	})
-}
 
 interface DogSearchProps {
 	strapiBaseUrl?: string | null
@@ -149,8 +107,7 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 		setSelectedDog(null)
 	}, [])
 
-	// Erweitere Hunde mit Fake-Koordinaten, wenn keine Location vorhanden ist
-	const enrichedDogs = useMemo(() => enrichDogsWithFakeLocations(dogs), [dogs])
+	// Fake-Koordinaten entfernt -> Verwende dogs direkt
 
 	useEffect(() => {
 		if (hasSearched && page > 0) {
@@ -159,19 +116,29 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 	}, [page, hasSearched, searchDogs])
 
 	// Konvertiere Hunde in MapItems
-	const mapItems = useMemo<MapItem[]>(() => enrichedDogs.map((dog) => ({
-		id: dog.documentId,
-		position: [dog.Location!.lat!, dog.Location!.lng!],
-		title: dog.fullKennelName ?? dog.givenName ?? 'Unbekannt',
-		popupContent: (
-			<div>
-				<strong>{dog.fullKennelName ?? dog.givenName ?? 'Unbekannt'}</strong>
-				{dog.givenName && dog.fullKennelName ? (
-					<div>{dog.givenName}</div>
-				) : null}
-			</div>
-		)
-	})), [enrichedDogs])
+	const mapItems = useMemo<MapItem[]>(() => {
+		return dogs
+			.map((dog) => {
+				if (!dog.Location || typeof dog.Location.lat !== 'number' || typeof dog.Location.lng !== 'number') {
+					return null
+				}
+
+				return {
+					id: dog.documentId,
+					position: [dog.Location.lat, dog.Location.lng],
+					title: dog.fullKennelName ?? dog.givenName ?? 'Unbekannt',
+					popupContent: (
+						<div>
+							<strong>{dog.fullKennelName ?? dog.givenName ?? 'Unbekannt'}</strong>
+							{dog.givenName && dog.fullKennelName ? (
+								<div>{dog.givenName}</div>
+							) : null}
+						</div>
+					)
+				}
+			})
+			.filter((item) => item !== null) as MapItem[]
+	}, [dogs])
 
 	const totalPages = pageCount
 	const currentPage = page
@@ -376,7 +343,7 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 							</div>
 						))}
 					</div>
-				) : enrichedDogs.length > 0 ? (
+				) : dogs.length > 0 ? (
 					<>
 						{totalPages > 1 ? (
 							<Box className='mb-6 flex items-center justify-center'>
@@ -409,7 +376,7 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 						) : null}
 						<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
 							{viewMode === 'cards' ? (
-								enrichedDogs.map((dog) => (
+								dogs.map((dog) => (
 									<DogCard
 										key={dog.documentId}
 										dog={dog}
@@ -434,7 +401,7 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 												</TableRow>
 											</TableHead>
 											<TableBody>
-												{enrichedDogs.map((dog) => {
+												{dogs.map((dog) => {
 													let distance: number | null = null
 													if (userLocation && dog.Location && typeof dog.Location.lat === 'number' && typeof dog.Location.lng === 'number') {
 														distance = calculateDistance(
