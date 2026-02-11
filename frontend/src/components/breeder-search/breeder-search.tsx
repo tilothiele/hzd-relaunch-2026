@@ -165,7 +165,7 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 	// Konvertiere Züchter in MapItems
 	const mapItems = useMemo<MapItem[]>(() => {
 		return breeders
-			.map(breeder => {
+			.map((breeder): MapItem | null => {
 				const lat = breeder.member?.locationLat
 				const lng = breeder.member?.locationLng
 
@@ -175,7 +175,7 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 
 				return {
 					id: breeder.documentId,
-					position: [lat, lng],
+					position: [lat, lng] as [number, number],
 					title: breeder.kennelName || 'Unbekannt',
 					popupContent: (
 						<div>
