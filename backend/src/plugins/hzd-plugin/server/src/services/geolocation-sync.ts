@@ -22,15 +22,13 @@ let lastRunDuration: number | null = null
 async function syncUserGeolocations(strapi: Core.Strapi): Promise<void> {
 	// Find all users with ZIP but no GeoLocation at once
 	const allUsers = await strapi.query('plugin::users-permissions.user').findMany({
-		populate: {
-			geoLocation: true,
-		},
+		// No populate needed for scalar locationLat/locationLng
 	})
 
 	// Filter users that have ZIP but no GeoLocation
 	const usersToProcess = allUsers.filter((u) => {
 		const hasZip = u.zip && u.zip.trim().length > 0
-		const hasNoGeo = !u.geoLocation || !u.geoLocation.lat || !u.geoLocation.lng
+		const hasNoGeo = !u.locationLat || !u.locationLng
 		return hasZip && hasNoGeo
 	})
 
@@ -61,10 +59,8 @@ async function syncUserGeolocations(strapi: Core.Strapi): Promise<void> {
 			await strapi.documents('plugin::users-permissions.user').update({
 				documentId: user.documentId,
 				data: {
-					geoLocation: {
-						lat: geoResult.lat,
-						lng: geoResult.lng,
-					},
+					locationLat: geoResult.lat,
+					locationLng: geoResult.lng,
 				} as any,
 			})
 

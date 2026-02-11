@@ -113,11 +113,6 @@
         "preset": "defaultHtml"
       }
     },
-    "Location": {
-      "type": "component",
-      "component": "breeding.geo-location",
-      "repeatable": false
-    },
     "owner": {
       "type": "relation",
       "relation": "oneToOne",

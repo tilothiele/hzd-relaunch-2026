@@ -24,7 +24,8 @@ export default {
           zip: String
           city: String
           phone: String
-          geoLocation: ComponentBreedingGeoLocation
+          locationLat: Float
+          locationLng: Float
         }
 
         extend type UsersPermissionsUser {
@@ -36,8 +37,9 @@ export default {
           zip: String
           city: String
           phone: String
-          geoLocation: ComponentBreedingGeoLocation
-        }
+          locationLat: Float
+          locationLng: Float
+         }
       `,
 
       resolvers: {
@@ -67,8 +69,11 @@ export default {
           phone: {
             resolve: (parent: any) => parent.phone || null,
           },
-          geoLocation: {
-            resolve: (parent: any) => parent.geoLocation || null,
+          locationLat: {
+            resolve: (parent: any) => parent.locationLat || null,
+          },
+          locationLng: {
+            resolve: (parent: any) => parent.locationLng || null,
           },
         },
         UsersPermissionsUser: {
@@ -96,8 +101,11 @@ export default {
           phone: {
             resolve: (parent: any) => parent.phone || null,
           },
-          geoLocation: {
-            resolve: (parent: any) => parent.geoLocation || null,
+          locationLat: {
+            resolve: (parent: any) => parent.locationLat || null,
+          },
+          locationLng: {
+            resolve: (parent: any) => parent.locationLng || null,
           },
         },
       },
@@ -105,61 +113,26 @@ export default {
         ...userAdminSchema.resolversConfig,
         // The me query itself requires authentication (handled by the original resolver)
         // Extended fields inherit auth from parent query
-        'UsersPermissionsMe.firstName': {
-          auth: false, // Inherit auth from parent query
-        },
-        'UsersPermissionsMe.lastName': {
-          auth: false,
-        },
-        'UsersPermissionsMe.address1': {
-          auth: false,
-        },
-        'UsersPermissionsMe.address2': {
-          auth: false,
-        },
-        'UsersPermissionsMe.countryCode': {
-          auth: false,
-        },
-        'UsersPermissionsMe.zip': {
-          auth: false,
-        },
-        'UsersPermissionsMe.city': {
-          auth: false,
-        },
-        'UsersPermissionsMe.phone': {
-          auth: false,
-        },
-        'UsersPermissionsMe.geoLocation': {
-          auth: false,
-        },
-        'UsersPermissionsUser.firstName': {
-          auth: false,
-        },
-        'UsersPermissionsUser.lastName': {
-          auth: false,
-        },
-        'UsersPermissionsUser.address1': {
-          auth: false,
-        },
-        'UsersPermissionsUser.address2': {
-          auth: false,
-        },
-        'UsersPermissionsUser.countryCode': {
-          auth: false,
-        },
-        'UsersPermissionsUser.zip': {
-          auth: false,
-        },
-        'UsersPermissionsUser.city': {
-          auth: false,
-        },
-        'UsersPermissionsUser.phone': {
-          auth: false,
-        },
-        'UsersPermissionsUser.geoLocation': {
-          auth: false,
-        },
-
+        'UsersPermissionsMe.firstName': { auth: false },
+        'UsersPermissionsMe.lastName': { auth: false },
+        'UsersPermissionsMe.address1': { auth: false },
+        'UsersPermissionsMe.address2': { auth: false },
+        'UsersPermissionsMe.countryCode': { auth: false },
+        'UsersPermissionsMe.zip': { auth: false },
+        'UsersPermissionsMe.city': { auth: false },
+        'UsersPermissionsMe.phone': { auth: false },
+        'UsersPermissionsMe.locationLat': { auth: false },
+        'UsersPermissionsMe.locationLng': { auth: false },
+        'UsersPermissionsUser.firstName': { auth: false },
+        'UsersPermissionsUser.lastName': { auth: false },
+        'UsersPermissionsUser.address1': { auth: false },
+        'UsersPermissionsUser.address2': { auth: false },
+        'UsersPermissionsUser.countryCode': { auth: false },
+        'UsersPermissionsUser.zip': { auth: false },
+        'UsersPermissionsUser.city': { auth: false },
+        'UsersPermissionsUser.phone': { auth: false },
+        'UsersPermissionsUser.locationLat': { auth: false },
+        'UsersPermissionsUser.locationLng': { auth: false },
       },
     });
 
@@ -184,9 +157,12 @@ export default {
           if (typeof data.zip === 'string' && data.zip.trim() !== '') {
             const geo = strapi.plugin('hzd-plugin')?.service('geolocation');
             if (geo) {
-              const result = await geo.getGeoLocationByZip(data.zip);
+              // Default to DE if not provided, for now.
+              const countryCode = data.countryCode || 'DE';
+              const result = await geo.getGeoLocationByZip(data.zip, countryCode);
               if (result) {
-                data.geoLocation = { lat: result.lat, lng: result.lng };
+                data.locationLat = result.lat;
+                data.locationLng = result.lng;
               }
             }
           }

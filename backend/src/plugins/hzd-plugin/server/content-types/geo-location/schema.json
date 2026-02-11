@@ -17,11 +17,11 @@
             "unique": true
         },
         "lat": {
-            "type": "decimal",
+            "type": "float",
             "required": false
         },
         "lng": {
-            "type": "decimal",
+            "type": "float",
             "required": false
         }
     }

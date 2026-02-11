@@ -1380,7 +1380,6 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     Disable: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
-    GeoLocation: Schema.Attribute.Component<'breeding.geo-location', false>;
     InternalNotes: Schema.Attribute.Text;
     IsActive: Schema.Attribute.Boolean;
     isDirty: Schema.Attribute.Boolean;
@@ -1468,7 +1467,6 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
       'plugin::hzd-plugin.dog'
     > &
       Schema.Attribute.Private;
-    Location: Schema.Attribute.Component<'breeding.geo-location', false>;
     MemosDraft: Schema.Attribute.RichText &
       Schema.Attribute.CustomField<
         'plugin::ckeditor5.CKEditor',
@@ -1519,8 +1517,8 @@ export interface PluginHzdPluginGeoLocation
     Key: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Unique;
-    lat: Schema.Attribute.Decimal;
-    lng: Schema.Attribute.Decimal;
+    lat: Schema.Attribute.Float;
+    lng: Schema.Attribute.Float;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -2002,7 +2000,6 @@ export interface PluginUsersPermissionsUser
       }>;
     firstName: Schema.Attribute.String;
     form: Schema.Attribute.Relation<'manyToOne', 'api::form.form'>;
-    geoLocation: Schema.Attribute.Component<'breeding.geo-location', false>;
     lastName: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -2010,6 +2007,8 @@ export interface PluginUsersPermissionsUser
       'plugin::users-permissions.user'
     > &
       Schema.Attribute.Private;
+    locationLat: Schema.Attribute.Decimal;
+    locationLng: Schema.Attribute.Decimal;
     membershipNumber: Schema.Attribute.Integer & Schema.Attribute.Unique;
     memberSince: Schema.Attribute.Date;
     password: Schema.Attribute.Password &

@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-02-11T15:17:00.970Z"
+    "x-generation-date": "2026-02-11T16:43:46.084Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -12293,8 +12293,13 @@
                         "Süd"
                       ]
                     },
-                    "geoLocation": {
-                      "$ref": "#/components/schemas/BreedingGeoLocationComponent"
+                    "locationLng": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "locationLat": {
+                      "type": "number",
+                      "format": "float"
                     },
                     "DisplayName": {
                       "type": "string"
@@ -13316,29 +13321,6 @@
               "Ja",
               "Erforderlich"
             ]
-          }
-        }
-      },
-      "BreedingGeoLocationComponent": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              }
-            ]
-          },
-          "lat": {
-            "type": "number",
-            "format": "float"
-          },
-          "lng": {
-            "type": "number",
-            "format": "float"
           }
         }
       },
@@ -15163,8 +15145,13 @@
                   "Süd"
                 ]
               },
-              "geoLocation": {
-                "$ref": "#/components/schemas/BreedingGeoLocationComponent"
+              "locationLng": {
+                "type": "number",
+                "format": "float"
+              },
+              "locationLat": {
+                "type": "number",
+                "format": "float"
               },
               "DisplayName": {
                 "type": "string"
@@ -17794,8 +17781,13 @@
                         "Süd"
                       ]
                     },
-                    "geoLocation": {
-                      "$ref": "#/components/schemas/BreedingGeoLocationComponent"
+                    "locationLng": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "locationLat": {
+                      "type": "number",
+                      "format": "float"
                     },
                     "DisplayName": {
                       "type": "string"
@@ -19968,8 +19960,13 @@
                     "Süd"
                   ]
                 },
-                "geoLocation": {
-                  "$ref": "#/components/schemas/BreedingGeoLocationComponent"
+                "locationLng": {
+                  "type": "number",
+                  "format": "float"
+                },
+                "locationLat": {
+                  "type": "number",
+                  "format": "float"
                 },
                 "DisplayName": {
                   "type": "string"
@@ -21362,8 +21359,13 @@
                         "Süd"
                       ]
                     },
-                    "geoLocation": {
-                      "$ref": "#/components/schemas/BreedingGeoLocationComponent"
+                    "locationLng": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "locationLat": {
+                      "type": "number",
+                      "format": "float"
                     },
                     "DisplayName": {
                       "type": "string"
@@ -30063,8 +30065,13 @@
                             "Süd"
                           ]
                         },
-                        "geoLocation": {
-                          "$ref": "#/components/schemas/BreedingGeoLocationComponent"
+                        "locationLng": {
+                          "type": "number",
+                          "format": "float"
+                        },
+                        "locationLat": {
+                          "type": "number",
+                          "format": "float"
                         },
                         "DisplayName": {
                           "type": "string"
@@ -38759,8 +38766,13 @@
                             "Süd"
                           ]
                         },
-                        "geoLocation": {
-                          "$ref": "#/components/schemas/BreedingGeoLocationComponent"
+                        "locationLng": {
+                          "type": "number",
+                          "format": "float"
+                        },
+                        "locationLat": {
+                          "type": "number",
+                          "format": "float"
                         },
                         "DisplayName": {
                           "type": "string"

@@ -174,10 +174,12 @@
       ],
       "configurable": false
     },
-    "geoLocation": {
-      "type": "component",
-      "component": "breeding.geo-location",
-      "repeatable": false,
+    "locationLng": {
+      "type": "float",
+      "configurable": false
+    },
+    "locationLat": {
+      "type": "float",
       "configurable": false
     },
     "DisplayName": {
