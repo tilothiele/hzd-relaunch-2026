@@ -57,7 +57,7 @@ export function LitterCard({ litter, strapiBaseUrl, hzdSetting, distance, format
     const motherName = litter.mother?.fullKennelName ?? litter.mother?.givenName ?? 'Unbekannt'
     const stuntDogName = litter.stuntDog?.fullKennelName ?? litter.stuntDog?.givenName
 
-    console.log(litter?.breeder)
+
     return (
         <div
             key={litter.documentId}

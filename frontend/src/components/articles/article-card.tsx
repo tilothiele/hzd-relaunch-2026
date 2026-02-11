@@ -28,7 +28,7 @@ export function ArticleCard({
                 }`}
         >
             {imageUrl && (
-                <div className={`relative overflow-hidden ${featured ? 'aspect-[21/9]' : 'aspect-video'}`}>
+                <div className={`relative overflow-hidden aspect-[4/3]`}>
                     <Image
                         src={imageUrl}
                         alt={article.Image?.alternativeText || article.Headline || 'Artikelbild'}

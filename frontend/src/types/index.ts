@@ -414,8 +414,9 @@ export interface Dog {
 		countryCode?: string | null
 		phone?: string | null
 		email?: string | null
+		locationLat?: number | null
+		locationLng?: number | null
 	} | null
-	Location?: GeoLocation | null
 	cFertile?: boolean | null
 	Exhibitions?: string | null
 	BreedSurvey?: string | null
@@ -468,7 +469,9 @@ export interface Breeder {
 		address2?: string | null
 		zip?: string | null
 		countryCode?: string | null
-		geoLocation?: GeoLocation | null
+
+		locationLat?: number | null
+		locationLng?: number | null
 	} | null
 	IsActive?: boolean | null
 	Disable?: boolean | null
@@ -478,7 +481,6 @@ export interface Breeder {
 	WebsiteUrl?: string | null
 	WebsiteUrlDraft?: string | null
 	InternalNotes?: string | null
-	GeoLocation?: GeoLocation | null
 	avatar?: Image | null
 	Address?: Address | null
 	BreederEmail?: string | null

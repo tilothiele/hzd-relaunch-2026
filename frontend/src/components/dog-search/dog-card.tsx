@@ -168,12 +168,12 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 	let distance: number | null = null
 	let isDistanceExceeded = false
 
-	if (userLocation && dog.Location && typeof dog.Location.lat === 'number' && typeof dog.Location.lng === 'number') {
+	if (userLocation && typeof dog.owner?.locationLat === 'number' && typeof dog.owner?.locationLng === 'number') {
 		distance = calculateDistance(
 			userLocation.lat,
 			userLocation.lng,
-			dog.Location.lat,
-			dog.Location.lng,
+			dog.owner.locationLat,
+			dog.owner.locationLng,
 		)
 
 		// Prüfe, ob die Entfernung größer als das eingestellte Kriterium ist

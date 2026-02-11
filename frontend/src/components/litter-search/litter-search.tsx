@@ -29,9 +29,9 @@ interface LitterSearchProps {
  * Ermittelt die Position eines Wurfs (real oder fake)
  */
 function getLitterLocation(litter: Litter): { lat: number; lng: number } | null {
-	const breederLocation = litter.breeder?.GeoLocation
-	if (breederLocation && breederLocation.lat && breederLocation.lng) {
-		return { lat: breederLocation.lat, lng: breederLocation.lng }
+	const member = litter.breeder?.member
+	if (typeof member?.locationLat === 'number' && typeof member?.locationLng === 'number') {
+		return { lat: member.locationLat, lng: member.locationLng }
 	}
 	return null
 }

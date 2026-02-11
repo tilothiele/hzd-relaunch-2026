@@ -165,20 +165,29 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 	// Konvertiere Züchter in MapItems
 	const mapItems = useMemo<MapItem[]>(() => {
 		return breeders
-			.filter(breeder => breeder.member?.geoLocation?.lat && breeder.member?.geoLocation?.lng)
-			.map(breeder => ({
-				id: breeder.documentId,
-				position: [breeder.member!.geoLocation!.lat, breeder.member!.geoLocation!.lng],
-				title: breeder.kennelName || 'Unbekannt',
-				popupContent: (
-					<div>
-						<strong>{breeder.kennelName}</strong>
-						{breeder.member?.firstName && breeder.member?.lastName && (
-							<div>{breeder.member.firstName} {breeder.member.lastName}</div>
-						)}
-					</div>
-				),
-			}))
+			.map(breeder => {
+				const lat = breeder.member?.locationLat
+				const lng = breeder.member?.locationLng
+
+				if (typeof lat !== 'number' || typeof lng !== 'number') {
+					return null
+				}
+
+				return {
+					id: breeder.documentId,
+					position: [lat, lng],
+					title: breeder.kennelName || 'Unbekannt',
+					popupContent: (
+						<div>
+							<strong>{breeder.kennelName}</strong>
+							{breeder.member?.firstName && breeder.member?.lastName && (
+								<div>{breeder.member.firstName} {breeder.member.lastName}</div>
+							)}
+						</div>
+					),
+				}
+			})
+			.filter((item): item is MapItem => item !== null)
 	}, [breeders])
 
 	const totalPages = pageCount
@@ -383,12 +392,12 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 										{breeders.map((breeder) => {
 											const memberName = ((breeder.member?.firstName || '') + ' ' + (breeder.member?.lastName || '')).trim()
 											let distance: number | null = null
-											if (userLocation && breeder.member?.geoLocation && typeof breeder.member.geoLocation.lat === 'number' && typeof breeder.member.geoLocation.lng === 'number') {
+											if (userLocation && typeof breeder.member?.locationLat === 'number' && typeof breeder.member?.locationLng === 'number') {
 												distance = calculateDistance(
 													userLocation.lat,
 													userLocation.lng,
-													breeder.member.geoLocation.lat,
-													breeder.member.geoLocation.lng
+													breeder.member.locationLat,
+													breeder.member.locationLng
 												)
 											}
 

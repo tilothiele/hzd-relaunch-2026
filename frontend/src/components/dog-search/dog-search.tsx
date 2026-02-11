@@ -119,13 +119,16 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 	const mapItems = useMemo<MapItem[]>(() => {
 		return dogs
 			.map((dog) => {
-				if (!dog.Location || typeof dog.Location.lat !== 'number' || typeof dog.Location.lng !== 'number') {
+				const lat = dog.owner?.locationLat
+				const lng = dog.owner?.locationLng
+
+				if (typeof lat !== 'number' || typeof lng !== 'number') {
 					return null
 				}
 
 				return {
 					id: dog.documentId,
-					position: [dog.Location.lat, dog.Location.lng],
+					position: [lat, lng],
 					title: dog.fullKennelName ?? dog.givenName ?? 'Unbekannt',
 					popupContent: (
 						<div>
@@ -403,12 +406,12 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 											<TableBody>
 												{dogs.map((dog) => {
 													let distance: number | null = null
-													if (userLocation && dog.Location && typeof dog.Location.lat === 'number' && typeof dog.Location.lng === 'number') {
+													if (userLocation && typeof dog.owner?.locationLat === 'number' && typeof dog.owner?.locationLng === 'number') {
 														distance = calculateDistance(
 															userLocation.lat,
 															userLocation.lng,
-															dog.Location.lat,
-															dog.Location.lng,
+															dog.owner.locationLat,
+															dog.owner.locationLng,
 														)
 													}
 

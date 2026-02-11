@@ -46,12 +46,12 @@ export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, max
 	const member = breeder.member
 
 	let distance: number | null = null
-	if (userLocation && member?.geoLocation && typeof member.geoLocation.lat === 'number' && typeof member.geoLocation.lng === 'number') {
+	if (userLocation && typeof member?.locationLat === 'number' && typeof member?.locationLng === 'number') {
 		distance = calculateDistance(
 			userLocation.lat,
 			userLocation.lng,
-			member.geoLocation.lat,
-			member.geoLocation.lng
+			member.locationLat,
+			member.locationLng
 		)
 	}
 
@@ -61,7 +61,7 @@ export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, max
 			style={{ minHeight: '120px' }}
 			onClick={onClick}
 		>
-			<div className='relative h-48 w-full shrink-0 bg-gray-100 sm:h-auto sm:w-48'>
+			<div className='relative w-full shrink-0 bg-gray-100 sm:w-48 aspect-[4/3]'>
 				<Image
 					src={resolveMediaUrl(
 						breeder.avatar || hzdSetting?.DefaultBreederAvatar,

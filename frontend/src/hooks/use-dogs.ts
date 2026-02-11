@@ -151,23 +151,7 @@ export function useDogs(options: UseDogsOptions = {}) {
 				: []
 			console.log('Fetched dogs:', dogsArray) // Debugging color issue
 
-			// Process dogs (calculate distance, etc.)
-			let processedDogs = dogsArray
-			if (userLocation) {
-				processedDogs = dogsArray.map(dog => {
-					if (dog.Location) {
-						// Calculate distance if location is available
-						// Note: This logic seems to be handled in the component or elsewhere, 
-						// but keeping it consistent with previous logic if any processing was done.
-						// Actually, looking at previous code, there was no processing here, just assignment.
-						// But wait, the previous code had `enrichDogsWithFakeLocations` which was removed or not shown in the snippet?
-						// Ah, I see `enrichDogsWithFakeLocations` in a previous `view_file` of `dog-search.tsx`, not `use-dogs.ts`.
-						// Here it just sets the dogs.
-						return dog
-					}
-					return dog
-				})
-			}
+
 
 			setDogs(dogsArray) // Using the raw array as before, assuming processing happens in component or is not needed here
 

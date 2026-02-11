@@ -875,6 +875,8 @@ export const SEARCH_DOGS = `
 					documentId
 					firstName
 					lastName
+					locationLat
+					locationLng
 				}
 				withersHeight
 				Exhibitions
@@ -912,6 +914,8 @@ export const SEARCH_DOGS = `
 					owner {
 						firstName
 						lastName
+						locationLat
+						locationLng
 					}
 					father {
 						documentId
@@ -922,6 +926,8 @@ export const SEARCH_DOGS = `
 						owner {
 							firstName
 							lastName
+							locationLat
+							locationLng
 						}
 						father {
 							documentId
@@ -932,6 +938,8 @@ export const SEARCH_DOGS = `
 							owner {
 								firstName
 								lastName
+								locationLat
+								locationLng
 							}
 						}
 						mother {
@@ -943,6 +951,8 @@ export const SEARCH_DOGS = `
 							owner {
 								firstName
 								lastName
+								locationLat
+								locationLng
 							}
 						}
 					}
@@ -955,6 +965,8 @@ export const SEARCH_DOGS = `
 						owner {
 							firstName
 							lastName
+							locationLat
+							locationLng
 						}
 						father {
 							documentId
@@ -965,6 +977,8 @@ export const SEARCH_DOGS = `
 							owner {
 								firstName
 								lastName
+								locationLat
+								locationLng
 							}
 						}
 						mother {
@@ -976,6 +990,8 @@ export const SEARCH_DOGS = `
 							owner {
 								firstName
 								lastName
+								locationLat
+								locationLng
 							}
 						}
 					}
@@ -989,6 +1005,8 @@ export const SEARCH_DOGS = `
 					owner {
 						firstName
 						lastName
+						locationLat
+						locationLng
 					}
 					father {
 						documentId
@@ -999,6 +1017,8 @@ export const SEARCH_DOGS = `
 						owner {
 							firstName
 							lastName
+							locationLat
+							locationLng
 						}
 						father {
 							documentId
@@ -1009,6 +1029,8 @@ export const SEARCH_DOGS = `
 							owner {
 								firstName
 								lastName
+								locationLat
+								locationLng
 							}
 						}
 						mother {
@@ -1020,6 +1042,8 @@ export const SEARCH_DOGS = `
 							owner {
 								firstName
 								lastName
+								locationLat
+								locationLng
 							}
 						}
 					}
@@ -1032,6 +1056,8 @@ export const SEARCH_DOGS = `
 						owner {
 							firstName
 							lastName
+							locationLat
+							locationLng
 						}
 						father {
 							documentId
@@ -1042,6 +1068,8 @@ export const SEARCH_DOGS = `
 							owner {
 								firstName
 								lastName
+								locationLat
+								locationLng
 							}
 						}
 						mother {
@@ -1053,6 +1081,8 @@ export const SEARCH_DOGS = `
 							owner {
 								firstName
 								lastName
+								locationLat
+								locationLng
 							}
 						}
 					}
@@ -1068,12 +1098,10 @@ export const SEARCH_DOGS = `
 					countryCode
 					phone
 					email
+					locationLat
+					locationLng
 				}
 				cFertile
-				Location {
-					lat
-					lng
-				}
 		  		avatar {
 					url
 					alternativeText
@@ -1115,10 +1143,8 @@ export const SEARCH_BREEDERS = `
 					address2
 					zip
 					countryCode
-					geoLocation {
-						lat
-						lng
-					}
+					locationLat
+					locationLng
 				}
 				WebsiteUrl
 				avatar {
@@ -1207,10 +1233,8 @@ export const SEARCH_LITTERS = `
 						address2
 						zip
 						countryCode
-					}
-					GeoLocation {
-						lat
-						lng
+						locationLat
+						locationLng
 					}
 				}
 				mother {
@@ -1224,10 +1248,7 @@ export const SEARCH_LITTERS = `
 					microchipNo
 					Exhibitions
 					BreedSurvey
-					Location {
-						lat
-						lng
-					}
+
 					avatar {
 						url
 						alternativeText
@@ -1246,10 +1267,7 @@ export const SEARCH_LITTERS = `
 					microchipNo
 					Exhibitions
 					BreedSurvey
-					Location {
-						lat
-						lng
-					}
+
 					avatar {
 						url
 						alternativeText

@@ -357,6 +357,34 @@ type ComponentPersonalAddress {
   City: String
 }
 
+input ComponentPermissionRestrictionFiltersInput {
+  Public: BooleanFilterInput
+  Authenticated: BooleanFilterInput
+  and: [ComponentPermissionRestrictionFiltersInput]
+  or: [ComponentPermissionRestrictionFiltersInput]
+  not: ComponentPermissionRestrictionFiltersInput
+}
+
+input ComponentPermissionRestrictionInput {
+  id: ID
+  Public: Boolean
+  Authenticated: Boolean
+}
+
+type ComponentPermissionRestriction {
+  id: ID!
+  Public: Boolean!
+  Authenticated: Boolean!
+}
+
+type ComponentPermissionGroups {
+  id: ID!
+  Any: Boolean
+  Member: Boolean
+  HeadOfEvent: Boolean
+  BreedWarden: Boolean
+}
+
 input ComponentLinksPartnerlLinkFiltersInput {
   PartnerLinkUrl: StringFilterInput
   AltText: StringFilterInput
@@ -400,34 +428,6 @@ type ComponentLinksActionButton {
   Label: String
   Link: String
   Primary: Boolean
-}
-
-input ComponentPermissionRestrictionFiltersInput {
-  Public: BooleanFilterInput
-  Authenticated: BooleanFilterInput
-  and: [ComponentPermissionRestrictionFiltersInput]
-  or: [ComponentPermissionRestrictionFiltersInput]
-  not: ComponentPermissionRestrictionFiltersInput
-}
-
-input ComponentPermissionRestrictionInput {
-  id: ID
-  Public: Boolean
-  Authenticated: Boolean
-}
-
-type ComponentPermissionRestriction {
-  id: ID!
-  Public: Boolean!
-  Authenticated: Boolean!
-}
-
-type ComponentPermissionGroups {
-  id: ID!
-  Any: Boolean
-  Member: Boolean
-  HeadOfEvent: Boolean
-  BreedWarden: Boolean
 }
 
 input ComponentLayoutSosInput {
@@ -743,26 +743,6 @@ type ComponentBreedingPuppyAmount {
   id: ID!
   Total: Int
   Available: Int
-}
-
-input ComponentBreedingGeoLocationFiltersInput {
-  lat: FloatFilterInput
-  lng: FloatFilterInput
-  and: [ComponentBreedingGeoLocationFiltersInput]
-  or: [ComponentBreedingGeoLocationFiltersInput]
-  not: ComponentBreedingGeoLocationFiltersInput
-}
-
-input ComponentBreedingGeoLocationInput {
-  id: ID
-  lat: Float
-  lng: Float
-}
-
-type ComponentBreedingGeoLocation {
-  id: ID!
-  lat: Float!
-  lng: Float!
 }
 
 input ComponentBreedingDogDocumentFiltersInput {
@@ -1298,7 +1278,8 @@ input UsersPermissionsUserFiltersInput {
   membershipNumber: IntFilterInput
   form: FormFiltersInput
   region: StringFilterInput
-  geoLocation: ComponentBreedingGeoLocationFiltersInput
+  locationLng: FloatFilterInput
+  locationLat: FloatFilterInput
   DisplayName: StringFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
@@ -1337,7 +1318,8 @@ input UsersPermissionsUserInput {
   membershipNumber: Int
   form: ID
   region: ENUM_USERSPERMISSIONSUSER_REGION
-  geoLocation: ComponentBreedingGeoLocationInput
+  locationLng: Float
+  locationLat: Float
   DisplayName: String
   publishedAt: DateTime
   password: String
@@ -1370,10 +1352,11 @@ type UsersPermissionsUser {
   memberSince: Date
   cancellationOn: Date
   cancellationDueDate: Date
-  membershipNumber: Int!
+  membershipNumber: Int
   form: Form
   region: ENUM_USERSPERMISSIONSUSER_REGION
-  geoLocation: ComponentBreedingGeoLocation
+  locationLng: Float
+  locationLat: Float
   DisplayName: String
   createdAt: DateTime
   updatedAt: DateTime
@@ -1421,7 +1404,6 @@ input HzdPluginDogFiltersInput {
   cOwnerId: IntFilterInput
   MemosDraft: StringFilterInput
   MemosReleased: StringFilterInput
-  Location: ComponentBreedingGeoLocationFiltersInput
   owner: UsersPermissionsUserFiltersInput
   breeder: HzdPluginBreederFiltersInput
   Exhibitions: StringFilterInput
@@ -1456,7 +1438,6 @@ input HzdPluginDogInput {
   cOwnerId: Int
   MemosDraft: String
   MemosReleased: String
-  Location: ComponentBreedingGeoLocationInput
   owner: ID
   breeder: ID
   Exhibitions: String
@@ -1488,7 +1469,6 @@ type HzdPluginDog {
   cOwnerId: Int
   MemosDraft: String
   MemosReleased: String
-  Location: ComponentBreedingGeoLocation
   owner: UsersPermissionsUser
   breeder: HzdPluginBreeder
   Exhibitions: String
@@ -1524,7 +1504,6 @@ input HzdPluginBreederFiltersInput {
   WebsiteUrlDraft: StringFilterInput
   Address: ComponentPersonalAddressFiltersInput
   InternalNotes: StringFilterInput
-  GeoLocation: ComponentBreedingGeoLocationFiltersInput
   BreedersIntroDraft: StringFilterInput
   isDirty: BooleanFilterInput
   owner_member: UsersPermissionsUserFiltersInput
@@ -1551,7 +1530,6 @@ input HzdPluginBreederInput {
   WebsiteUrlDraft: String
   Address: ComponentPersonalAddressInput
   InternalNotes: String
-  GeoLocation: ComponentBreedingGeoLocationInput
   BreedersIntroDraft: String
   isDirty: Boolean
   owner_member: ID
@@ -1575,7 +1553,6 @@ type HzdPluginBreeder {
   WebsiteUrlDraft: String
   Address: ComponentPersonalAddress
   InternalNotes: String
-  GeoLocation: ComponentBreedingGeoLocation
   BreedersIntroDraft: String
   isDirty: Boolean
   owner_member: UsersPermissionsUser
@@ -1706,8 +1683,8 @@ input HzdPluginGeoLocationInput {
 type HzdPluginGeoLocation {
   documentId: ID!
   Key: String!
-  lat: Float!
-  lng: Float!
+  lat: Float
+  lng: Float
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -2586,7 +2563,7 @@ type SupplementalDocumentGroupEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBreedingDogDocument | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksDocumentBundle | ComponentBlocksDocumentBundleSection | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | ComponentBlocksBundleDocuments | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
+union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingDogDocument | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksDocumentBundle | ComponentBlocksDocumentBundleSection | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | ComponentBlocksBundleDocuments | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
 
 input FileInfoInput {
   name: String
@@ -2610,7 +2587,8 @@ type UsersPermissionsMe {
   zip: String
   city: String
   phone: String
-  geoLocation: ComponentBreedingGeoLocation
+  locationLat: Float
+  locationLng: Float
 }
 
 type UsersPermissionsMeRole {
