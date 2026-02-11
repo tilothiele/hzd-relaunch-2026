@@ -65,6 +65,13 @@ async function getGeoLocationByZip(zip: string, countryCode: string): Promise<Ge
 		if (cachedEntries && cachedEntries.length > 0) {
 			const cached = cachedEntries[0];
 			console.log(`[Geolocation Service] DB Cache hit for: ${zipKey}`);
+
+			// Check for negative cache (null coordinates)
+			if (cached.lat === null || cached.lng === null) {
+				console.log(`[Geolocation Service] Negative cache hit for: ${zipKey}`);
+				return null;
+			}
+
 			return { lat: Number(cached.lat), lng: Number(cached.lng) };
 		}
 	} catch (dbError) {
@@ -98,6 +105,20 @@ async function getGeoLocationByZip(zip: string, countryCode: string): Promise<Ge
 
 			if (!response.ok) {
 				console.error(`[Geolocation Service] HTTP error! status: ${response.status} for: ${zipKey}`)
+
+				// If 404, we treat it as "not found" and cache it negatively
+				if (response.status === 404) {
+					try {
+						await strapi.documents(uid).create({
+							data: { Key: zipKey, lat: null, lng: null },
+							status: 'published'
+						});
+						console.log(`[Geolocation Service] Cached negative result (404) for: ${zipKey}`);
+					} catch (saveError) {
+						console.error(`[Geolocation Service] Error saving negative cache (404) to DB:`, saveError);
+					}
+				}
+
 				return null
 			}
 
@@ -107,6 +128,18 @@ async function getGeoLocationByZip(zip: string, countryCode: string): Promise<Ge
 
 			if (!Array.isArray(data) || data.length === 0) {
 				console.warn(`[Geolocation Service] No results found for: ${zipKey}`)
+
+				// Cache negative result (empty search)
+				try {
+					await strapi.documents(uid).create({
+						data: { Key: zipKey, lat: null, lng: null },
+						status: 'published'
+					});
+					console.log(`[Geolocation Service] Cached negative result (empty) for: ${zipKey}`);
+				} catch (saveError) {
+					console.error(`[Geolocation Service] Error saving negative cache (empty) to DB:`, saveError);
+				}
+
 				return null
 			}
 

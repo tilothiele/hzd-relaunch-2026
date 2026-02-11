@@ -13,6 +13,7 @@
     "strapi": "strapi",
     "test:geolocation": "npx ts-node --transpile-only scripts/debug-geolocation.ts",
     "test:geolocation-sync": "npx ts-node --transpile-only scripts/debug-geolocation-sync.ts",
+    "test:geolocation-negative": "npx ts-node --transpile-only scripts/debug-geolocation-negative.ts",
     "upgrade": "npx @strapi/upgrade latest",
     "upgrade:dry": "npx @strapi/upgrade latest --dry"
   },

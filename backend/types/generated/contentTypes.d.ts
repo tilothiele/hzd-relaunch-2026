@@ -1519,8 +1519,8 @@ export interface PluginHzdPluginGeoLocation
     Key: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Unique;
-    lat: Schema.Attribute.Decimal & Schema.Attribute.Required;
-    lng: Schema.Attribute.Decimal & Schema.Attribute.Required;
+    lat: Schema.Attribute.Decimal;
+    lng: Schema.Attribute.Decimal;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
