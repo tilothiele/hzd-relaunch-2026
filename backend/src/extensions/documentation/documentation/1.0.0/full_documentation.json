@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-02-11T16:43:46.084Z"
+    "x-generation-date": "2026-02-12T07:18:21.627Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -22762,6 +22762,9 @@
                     },
                     {
                       "$ref": "#/components/schemas/BlocksDocumentBundleSectionComponent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/BlocksTableOfContentSectionComponent"
                     }
                   ]
                 },
@@ -22780,7 +22783,8 @@
                     "blocks.contact-group-section": "#/components/schemas/BlocksContactGroupSectionComponent",
                     "blocks.contact-mailer-section": "#/components/schemas/BlocksContactMailerSectionComponent",
                     "blocks.simple-hero-section": "#/components/schemas/BlocksSimpleHeroSectionComponent",
-                    "blocks.document-bundle-section": "#/components/schemas/BlocksDocumentBundleSectionComponent"
+                    "blocks.document-bundle-section": "#/components/schemas/BlocksDocumentBundleSectionComponent",
+                    "blocks.table-of-content-section": "#/components/schemas/BlocksTableOfContentSectionComponent"
                   }
                 }
               },
@@ -25853,6 +25857,36 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/BlocksDocumentBundleComponent"
+            }
+          }
+        }
+      },
+      "BlocksTableOfContentSectionComponent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "__component": {
+            "type": "string",
+            "enum": [
+              "blocks.table-of-content-section"
+            ]
+          },
+          "TocHeadline": {
+            "type": "string"
+          },
+          "TocLink": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LinksActionButtonComponent"
             }
           }
         }
@@ -37228,6 +37262,9 @@
                     },
                     {
                       "$ref": "#/components/schemas/BlocksDocumentBundleSectionComponent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/BlocksTableOfContentSectionComponent"
                     }
                   ]
                 },
@@ -37246,7 +37283,8 @@
                     "blocks.contact-group-section": "#/components/schemas/BlocksContactGroupSectionComponent",
                     "blocks.contact-mailer-section": "#/components/schemas/BlocksContactMailerSectionComponent",
                     "blocks.simple-hero-section": "#/components/schemas/BlocksSimpleHeroSectionComponent",
-                    "blocks.document-bundle-section": "#/components/schemas/BlocksDocumentBundleSectionComponent"
+                    "blocks.document-bundle-section": "#/components/schemas/BlocksDocumentBundleSectionComponent",
+                    "blocks.table-of-content-section": "#/components/schemas/BlocksTableOfContentSectionComponent"
                   }
                 }
               },
@@ -37385,6 +37423,9 @@
                 },
                 {
                   "$ref": "#/components/schemas/BlocksDocumentBundleSectionComponent"
+                },
+                {
+                  "$ref": "#/components/schemas/BlocksTableOfContentSectionComponent"
                 }
               ]
             },
@@ -37403,7 +37444,8 @@
                 "blocks.contact-group-section": "#/components/schemas/BlocksContactGroupSectionComponent",
                 "blocks.contact-mailer-section": "#/components/schemas/BlocksContactMailerSectionComponent",
                 "blocks.simple-hero-section": "#/components/schemas/BlocksSimpleHeroSectionComponent",
-                "blocks.document-bundle-section": "#/components/schemas/BlocksDocumentBundleSectionComponent"
+                "blocks.document-bundle-section": "#/components/schemas/BlocksDocumentBundleSectionComponent",
+                "blocks.table-of-content-section": "#/components/schemas/BlocksTableOfContentSectionComponent"
               }
             }
           },
@@ -37539,6 +37581,9 @@
                       },
                       {
                         "$ref": "#/components/schemas/BlocksDocumentBundleSectionComponent"
+                      },
+                      {
+                        "$ref": "#/components/schemas/BlocksTableOfContentSectionComponent"
                       }
                     ]
                   },
@@ -37557,7 +37602,8 @@
                       "blocks.contact-group-section": "#/components/schemas/BlocksContactGroupSectionComponent",
                       "blocks.contact-mailer-section": "#/components/schemas/BlocksContactMailerSectionComponent",
                       "blocks.simple-hero-section": "#/components/schemas/BlocksSimpleHeroSectionComponent",
-                      "blocks.document-bundle-section": "#/components/schemas/BlocksDocumentBundleSectionComponent"
+                      "blocks.document-bundle-section": "#/components/schemas/BlocksDocumentBundleSectionComponent",
+                      "blocks.table-of-content-section": "#/components/schemas/BlocksTableOfContentSectionComponent"
                     }
                   }
                 },

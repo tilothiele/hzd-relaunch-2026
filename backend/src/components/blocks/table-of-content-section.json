@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_blocks_table_of_content_sections",
+  "info": {
+    "displayName": "TableOfContentSection"
+  },
+  "options": {},
+  "attributes": {
+    "TocHeadline": {
+      "type": "string"
+    },
+    "TocLink": {
+      "type": "component",
+      "component": "links.action-button",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}

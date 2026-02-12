@@ -215,7 +215,13 @@ export interface DocumentBundleSection {
 	DocumentBundleAnchor?: string | null
 }
 
-export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | SimpleCtaSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection | DocumentBundleSection
+export interface TableOfContentSection {
+	__typename: 'ComponentBlocksTableOfContentSection'
+	TocHeadline?: string | null
+	TocLink?: ActionButton[] | null
+}
+
+export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | SimpleCtaSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection | DocumentBundleSection | TableOfContentSection
 
 export type PageSection = StartpageSection
 

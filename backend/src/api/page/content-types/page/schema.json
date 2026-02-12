@@ -37,7 +37,8 @@
         "blocks.contact-group-section",
         "blocks.contact-mailer-section",
         "blocks.simple-hero-section",
-        "blocks.document-bundle-section"
+        "blocks.document-bundle-section",
+        "blocks.table-of-content-section"
       ]
     },
     "ColorTheme": {

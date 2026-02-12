@@ -538,6 +538,14 @@ export const GET_INDEX_PAGE = `
  					ShowLog
 					FadingBorder
  				}
+				... on ComponentBlocksTableOfContentSection {
+					TocHeadline
+					TocLink {
+						Label
+						Link
+						Primary
+					}
+				}
 			}
 		}
 	}
@@ -847,6 +855,14 @@ export const GET_PAGE_BY_SLUG = `
 										size
 									}
 								}
+							}
+						}
+						... on ComponentBlocksTableOfContentSection {
+							TocHeadline
+							TocLink {
+								Label
+								Link
+								Primary
 							}
 						}
 					}

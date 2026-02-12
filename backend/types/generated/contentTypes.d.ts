@@ -1124,6 +1124,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.contact-mailer-section',
         'blocks.simple-hero-section',
         'blocks.document-bundle-section',
+        'blocks.table-of-content-section',
       ]
     >;
     SEO: Schema.Attribute.Component<'seo.seo', true>;
@@ -2007,8 +2008,8 @@ export interface PluginUsersPermissionsUser
       'plugin::users-permissions.user'
     > &
       Schema.Attribute.Private;
-    locationLat: Schema.Attribute.Decimal;
-    locationLng: Schema.Attribute.Decimal;
+    locationLat: Schema.Attribute.Float;
+    locationLng: Schema.Attribute.Float;
     membershipNumber: Schema.Attribute.Integer & Schema.Attribute.Unique;
     memberSince: Schema.Attribute.Date;
     password: Schema.Attribute.Password &

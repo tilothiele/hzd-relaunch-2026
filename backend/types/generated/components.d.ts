@@ -255,6 +255,17 @@ export interface BlocksSupplementalDocumentGroupSection
   };
 }
 
+export interface BlocksTableOfContentSection extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_table_of_content_sections';
+  info: {
+    displayName: 'TableOfContentSection';
+  };
+  attributes: {
+    TocHeadline: Schema.Attribute.String;
+    TocLink: Schema.Attribute.Component<'links.action-button', true>;
+  };
+}
+
 export interface BlocksTeaserTextWithImage extends Struct.ComponentSchema {
   collectionName: 'components_blocks_teaser_text_with_images';
   info: {
@@ -715,6 +726,7 @@ declare module '@strapi/strapi' {
       'blocks.simple-hero-section': BlocksSimpleHeroSection;
       'blocks.slide-item': BlocksSlideItem;
       'blocks.supplemental-document-group-section': BlocksSupplementalDocumentGroupSection;
+      'blocks.table-of-content-section': BlocksTableOfContentSection;
       'blocks.teaser-text-with-image': BlocksTeaserTextWithImage;
       'blocks.text-columns-section': BlocksTextColumnsSection;
       'breeding.dog-document': BreedingDogDocument;
