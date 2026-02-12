@@ -1147,6 +1147,11 @@ export const SEARCH_BREEDERS = `
 				kennelName
 				breedingLicenseSince
 				IsActive
+				owner_member {
+					documentId
+					firstName
+					lastName
+				}
 				member {
 					documentId
 					firstName

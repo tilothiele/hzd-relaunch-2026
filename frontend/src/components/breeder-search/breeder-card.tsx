@@ -1,7 +1,11 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import { Card, CardMedia, CardContent, Table, TableBody, TableRow, TableCell, Box, Tooltip } from '@mui/material'
+import PersonIcon from '@mui/icons-material/Person'
+import PhoneIcon from '@mui/icons-material/Phone'
 import type { Breeder, HzdSetting } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 
@@ -33,19 +37,13 @@ function formatDate(dateString: string | null | undefined): string {
 	}
 }
 
-function getRegionLabel(region: string | null | undefined): string {
-	if (!region) {
-		return '-'
-	}
-
-	return region
-}
-
 export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, maxDistance, hzdSetting }: BreederCardProps) {
 	const kennelName = breeder.kennelName ?? 'Kein Zwingername bekannt'
 	const member = breeder.member
 
 	let distance: number | null = null
+	let isDistanceExceeded = false
+
 	if (userLocation && typeof member?.locationLat === 'number' && typeof member?.locationLng === 'number') {
 		distance = calculateDistance(
 			userLocation.lat,
@@ -53,15 +51,36 @@ export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, max
 			member.locationLat,
 			member.locationLng
 		)
+
+		if (maxDistance && maxDistance !== '' && typeof maxDistance === 'number' && distance > maxDistance) {
+			isDistanceExceeded = true
+		} else if (maxDistance && maxDistance !== '' && typeof maxDistance === 'string' && distance > parseInt(maxDistance)) {
+			isDistanceExceeded = true
+		}
 	}
 
 	return (
-		<div
-			className='flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md sm:flex-row cursor-pointer'
-			style={{ minHeight: '120px' }}
+		<Card
+			sx={{
+				'&:hover': {
+					boxShadow: 3,
+				},
+				cursor: onClick ? 'pointer' : 'default',
+			}}
 			onClick={onClick}
 		>
-			<div className='relative w-full shrink-0 bg-gray-100 sm:w-48 aspect-[4/3]'>
+			<CardMedia
+				component='div'
+				sx={{
+					position: 'relative',
+					width: '100%',
+					aspectRatio: '4 / 3',
+					cursor: onClick ? 'pointer' : 'default',
+					'&:hover': {
+						opacity: onClick ? 0.9 : 1,
+					},
+				}}
+			>
 				<Image
 					src={resolveMediaUrl(
 						breeder.avatar || hzdSetting?.DefaultBreederAvatar,
@@ -69,78 +88,213 @@ export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, max
 					) || '/static-images/placeholder/user-avatar.png'}
 					alt={kennelName}
 					fill
-					className='object-cover'
+					style={{ objectFit: 'cover' }}
 					unoptimized
-					sizes='(max-width: 640px) 100vw, 192px'
+					sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
 				/>
-			</div>
+			</CardMedia>
 
-			<div className='flex flex-1 flex-col p-4'>
-				<div className='mb-3 flex justify-between items-start'>
-					<h3 className='text-lg font-semibold text-gray-900'>
-						{breeder.WebsiteUrl ? (
-							<a
-								href={breeder.WebsiteUrl}
-								target='_blank'
-								rel='noopener noreferrer'
-								className='hover:underline inline-flex items-center gap-1 transition-colors'
-								style={{ color: 'var(--color-submit-button)' }}
-								onClick={(e) => e.stopPropagation()}
+			<CardContent>
+				<Table size='small'>
+					<TableBody>
+						{/* Zwingername */}
+						<TableRow>
+							<TableCell
+								sx={{
+									width: 48,
+									paddingLeft: '1em',
+									paddingRight: '1em',
+									verticalAlign: 'middle',
+								}}
 							>
-								{kennelName}
-								<OpenInNewIcon sx={{ fontSize: 16 }} />
-							</a>
-						) : (
-							kennelName
-						)}
-					</h3>
-					{distance !== null && (
-						<span className='rounded bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700'>
-							~{Math.round(distance)} km
-						</span>
-					)}
-				</div>
-				<div className='space-y-2 text-sm text-gray-600'>
-					{breeder.breedingLicenseSince ? (
-						<p>
-							<strong>Zuchterlaubnis seit:</strong> {formatDate(breeder.breedingLicenseSince)}
-						</p>
-					) : null}
-					{member?.firstName && member?.lastName ? (
-						<p>
-							<strong>Züchter:</strong> {member.firstName} {member.lastName}
-						</p>
-					) : null}
-					{member?.region ? (
-						<p>
-							<strong>Region:</strong> {getRegionLabel(member.region)}
-						</p>
-					) : null}
-					{member?.phone ? (
-						<p>
-							<strong>Telefon:</strong> {member.phone}
-						</p>
-					) : null}
-					{member?.address1 || member?.address2 ? (
-						<p>
-							<strong>Adresse:</strong>{' '}
-							{[member.address1, member.address2].filter(Boolean).join(', ')}
-						</p>
-					) : null}
-					{member?.zip || member?.countryCode ? (
-						<p>
-							<strong>PLZ / Land:</strong>{' '}
-							{[member.zip, member.countryCode].filter(Boolean).join(' / ')}
-						</p>
-					) : null}
+								<Tooltip title='Zwingername' arrow>
+									<Box sx={{ width: 20, height: 20, position: 'relative', cursor: 'help' }}>
+										<Image
+											src='/icons/zucht-icon-zwinger-hzd-hovawart-zuchtgemeinschaft.png'
+											alt='Zwingername'
+											fill
+											className='object-contain'
+											unoptimized
+										/>
+									</Box>
+								</Tooltip>
+							</TableCell>
+							<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary', fontWeight: 'bold' }}>
+								{breeder.WebsiteUrl ? (
+									<Link
+										href={breeder.WebsiteUrl}
+										target='_blank'
+										rel='noopener noreferrer'
+										className='hover:underline inline-flex items-center gap-1 transition-colors'
+										style={{ color: 'var(--color-submit-button)' }}
+										onClick={(e) => e.stopPropagation()}
+									>
+										{kennelName}
+										<OpenInNewIcon sx={{ fontSize: 14 }} />
+									</Link>
+								) : (
+									kennelName
+								)}
+							</TableCell>
+						</TableRow>
 
-				</div>
-			</div>
-		</div>
+						{/* Zuchterlaubnis seit */}
+						{breeder.breedingLicenseSince && (
+							<TableRow>
+								<TableCell
+									sx={{
+										width: 48,
+										paddingLeft: '1em',
+										paddingRight: '1em',
+										verticalAlign: 'middle',
+									}}
+								>
+									<Tooltip title='Zuchterlaubnis seit' arrow>
+										<Box sx={{ width: 20, height: 20, position: 'relative', cursor: 'help' }}>
+											<Image
+												src='/icons/zucht-icon-zulassung-hzd-hovawart-zuchtgemeinschaft.png'
+												alt='Zuchterlaubnis seit'
+												fill
+												className='object-contain'
+												unoptimized
+											/>
+										</Box>
+									</Tooltip>
+								</TableCell>
+								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
+									Seit {formatDate(breeder.breedingLicenseSince)}
+								</TableCell>
+							</TableRow>
+						)}
+
+						{/* Züchter Name */}
+						{/* Züchter Name */}
+						{(breeder.owner_member?.firstName && breeder.owner_member?.lastName) ? (
+							<TableRow>
+								<TableCell
+									sx={{
+										width: 48,
+										paddingLeft: '1em',
+										paddingRight: '1em',
+										verticalAlign: 'middle',
+									}}
+								>
+									<Tooltip title='Züchter' arrow>
+										<PersonIcon sx={{ fontSize: 20, color: 'text.secondary', cursor: 'help' }} />
+									</Tooltip>
+								</TableCell>
+								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
+									{breeder.owner_member.firstName} {breeder.owner_member.lastName}
+								</TableCell>
+							</TableRow>
+						) : (member?.firstName && member?.lastName ? (
+							<TableRow>
+								<TableCell
+									sx={{
+										width: 48,
+										paddingLeft: '1em',
+										paddingRight: '1em',
+										verticalAlign: 'middle',
+									}}
+								>
+									<Tooltip title='Züchter' arrow>
+										<PersonIcon sx={{ fontSize: 20, color: 'text.secondary', cursor: 'help' }} />
+									</Tooltip>
+								</TableCell>
+								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
+									{member.firstName} {member.lastName}
+								</TableCell>
+							</TableRow>
+						) : null)}
+
+						{/* Ort / PLZ */}
+						{(member?.zip || member?.city || member?.countryCode) && (
+							<TableRow>
+								<TableCell
+									sx={{
+										width: 48,
+										paddingLeft: '1em',
+										paddingRight: '1em',
+										verticalAlign: 'middle',
+									}}
+								>
+									<Tooltip title='Ort' arrow>
+										<Box sx={{ width: 20, height: 20, position: 'relative', cursor: 'help' }}>
+											<Image
+												src='/icons/zucht-icon-position-hzd-hovawart-zuchtgemeinschaft.png'
+												alt='Ort'
+												fill
+												className='object-contain'
+												unoptimized
+											/>
+										</Box>
+									</Tooltip>
+								</TableCell>
+								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
+									{[member.zip, member.city].filter(Boolean).join(' ')}
+									{member.countryCode && member.countryCode !== 'DE' && ` (${member.countryCode})`}
+								</TableCell>
+							</TableRow>
+						)}
+
+						{/* Telefon */}
+						{member?.phone && (
+							<TableRow>
+								<TableCell
+									sx={{
+										width: 48,
+										paddingLeft: '1em',
+										paddingRight: '1em',
+										verticalAlign: 'middle',
+									}}
+								>
+									<Tooltip title='Telefon' arrow>
+										<PhoneIcon sx={{ fontSize: 20, color: 'text.secondary', cursor: 'help' }} />
+									</Tooltip>
+								</TableCell>
+								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
+									{member.phone}
+								</TableCell>
+							</TableRow>
+						)}
+
+						{/* Entfernung */}
+						{distance !== null && (
+							<TableRow>
+								<TableCell
+									sx={{
+										width: 48,
+										paddingLeft: '1em',
+										paddingRight: '1em',
+										verticalAlign: 'middle',
+									}}
+								>
+									<Tooltip title='Entfernung' arrow>
+										<Box sx={{ width: 20, height: 20, position: 'relative', cursor: 'help' }}>
+											<Image
+												src='/icons/zucht-icon-position-hzd-hovawart-zuchtgemeinschaft.png'
+												alt='Entfernung'
+												fill
+												className='object-contain'
+												unoptimized
+											/>
+										</Box>
+									</Tooltip>
+								</TableCell>
+								<TableCell
+									sx={{
+										fontSize: '0.875rem',
+										color: isDistanceExceeded ? 'error.main' : 'text.secondary',
+										fontWeight: isDistanceExceeded ? 'bold' : 'normal',
+									}}
+								>
+									{Math.round(distance)} km
+								</TableCell>
+							</TableRow>
+						)}
+					</TableBody>
+				</Table>
+			</CardContent>
+		</Card>
 	)
 }
-
-
-
-
-
