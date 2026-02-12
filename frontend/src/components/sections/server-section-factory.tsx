@@ -13,6 +13,7 @@ import { NewsArticlesSectionComponent } from './news-articles-section/news-artic
 import { ContactMailerSectionComponent } from './contact-mailer-section/contact-mailer-section'
 import { SimpleHeroSectionComponent } from './simple-hero-section/simple-hero-section'
 import { DocumentBundleSectionComponent } from './document-bundle-section/document-bundle-section'
+import { TableOfContentSectionComponent } from './table-of-content-section/table-of-content-section'
 
 interface RenderSectionParams {
 	section: StartpageSection
@@ -145,6 +146,14 @@ function renderSection({
 					key={key}
 					section={section}
 					strapiBaseUrl={strapiBaseUrl}
+					theme={theme}
+				/>
+			)
+		case 'ComponentBlocksTableOfContentSection':
+			return (
+				<TableOfContentSectionComponent
+					key={key}
+					section={section as any}
 					theme={theme}
 				/>
 			)
