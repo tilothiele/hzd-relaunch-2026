@@ -2,6 +2,7 @@
 
 import { Box, Typography } from '@mui/material'
 import Link from 'next/link'
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import type { TableOfContentSection } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 
@@ -63,8 +64,11 @@ export function TableOfContentSectionComponent({ section, theme }: TableOfConten
                                     style={{
                                         color: theme.submitButtonColor,
                                         textDecoration: 'none',
+                                        display: 'flex',
+                                        alignItems: 'center',
                                     }}
                                 >
+                                    <KeyboardArrowRightIcon fontSize='small' />
                                     {link.Label}
                                 </Link>
                             )
