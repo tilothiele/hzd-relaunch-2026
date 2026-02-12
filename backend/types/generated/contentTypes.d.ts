@@ -503,7 +503,7 @@ export interface ApiCalendarCalendar extends Struct.CollectionTypeSchema {
   };
   attributes: {
     ColorSchema: Schema.Attribute.Enumeration<
-      ['Violet', 'Gruen', 'Pink', 'Rot', 'Gelb']
+      ['Violet', 'Gruen', 'Pink', 'Rot', 'Gelb', 'Hellgrau']
     > &
       Schema.Attribute.Required;
     createdAt: Schema.Attribute.DateTime;

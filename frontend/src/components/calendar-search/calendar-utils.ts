@@ -32,6 +32,10 @@ export function getColorBySchema(colorSchema: Calendar['ColorSchema']): { backgr
             backgroundColor: '#A8267D',
             textColor: '#ffffff',
         },
+        Hellgrau: {
+            backgroundColor: '#d1d5db',
+            textColor: '#000000',
+        },
     }
 
     const normalizedSchema = colorSchema.trim()

@@ -17,14 +17,15 @@
     },
     "ColorSchema": {
       "type": "enumeration",
+      "required": true,
       "enum": [
         "Violet",
         "Gruen",
         "Pink",
         "Rot",
-        "Gelb"
-      ],
-      "required": true
+        "Gelb",
+        "Hellgrau"
+      ]
     }
   }
 }
