@@ -35,20 +35,25 @@ export function NewsArticleList({ articles, strapiBaseUrl, theme }: NewsArticleL
     const filteredArticles = articles.filter((article) => {
         if (!article.DateOfPublication) return false
         const date = new Date(article.DateOfPublication)
-        return date.getFullYear() === selectedYear
+        const year = date.getFullYear()
+        return year === selectedYear || year === selectedYear - 1
     })
 
-    const handlePrevYear = () => {
+    // Left button: Go to Past (Decrease Year)
+    const handleOlderYears = () => {
         if (selectedYear > currentYear - MAX_LOOKBACK_YEARS) {
             setSelectedYear(selectedYear - 1)
         }
     }
 
-    const handleNextYear = () => {
+    // Right button: Go to Future (Increase Year)
+    const handleNewerYears = () => {
         if (selectedYear < currentYear) {
             setSelectedYear(selectedYear + 1)
         }
     }
+
+
 
 
 
@@ -57,9 +62,9 @@ export function NewsArticleList({ articles, strapiBaseUrl, theme }: NewsArticleL
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <IconButton
-                        onClick={handlePrevYear}
+                        onClick={handleOlderYears}
                         disabled={selectedYear <= currentYear - MAX_LOOKBACK_YEARS}
-                        aria-label="Previous Year"
+                        aria-label="Older Years"
                         sx={{
                             color: theme.buttonColor,
                             '&.Mui-disabled': { color: theme.drawerText + '80' }
@@ -68,12 +73,12 @@ export function NewsArticleList({ articles, strapiBaseUrl, theme }: NewsArticleL
                         <ChevronLeftIcon />
                     </IconButton>
                     <Typography variant="h6" sx={{ color: theme.headlineColor, fontWeight: 'bold' }}>
-                        {selectedYear}
+                        {selectedYear - 1} / {selectedYear}
                     </Typography>
                     <IconButton
-                        onClick={handleNextYear}
+                        onClick={handleNewerYears}
                         disabled={selectedYear >= currentYear}
-                        aria-label="Next Year"
+                        aria-label="Newer Years"
                         sx={{
                             color: theme.buttonColor,
                             '&.Mui-disabled': { color: theme.drawerText + '80' }
@@ -90,6 +95,10 @@ export function NewsArticleList({ articles, strapiBaseUrl, theme }: NewsArticleL
                     Keine Beiträge für das Jahr {selectedYear} gefunden.
                 </Typography>
             )}
+
+            <Typography variant="body1" sx={{ textAlign: 'center', py: 4, color: theme.textColor }}>
+                Testzeile.
+            </Typography>
 
             {viewMode === 'cards' ? (
                 <Box sx={{

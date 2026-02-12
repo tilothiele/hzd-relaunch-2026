@@ -76,8 +76,8 @@ function Pagination({ currentPage, totalPages, baseUrl }: { currentPage: number;
 export default async function ArticlesCategoryPage({ params, searchParams }: PageProps) {
 	const { slug } = await params
 	const { page: pageParam } = await searchParams
-	const currentPage = pageParam ? parseInt(pageParam, 10) : 1
-	const pageSize = 12
+	const currentPage = 1 // Always fetch from page 1 for client-side filtering
+	const pageSize = 100 // Fetch all/many articles
 
 	const { globalLayout, baseUrl, error: layoutError } = await fetchGlobalLayout()
 	const theme = globalTheme
@@ -197,11 +197,6 @@ export default async function ArticlesCategoryPage({ params, searchParams }: Pag
 								articles={articles}
 								strapiBaseUrl={baseUrl}
 								theme={theme}
-							/>
-							<Pagination
-								currentPage={currentPage}
-								totalPages={totalPages}
-								baseUrl={`/articles/${slug}`}
 							/>
 						</>
 					) : (
