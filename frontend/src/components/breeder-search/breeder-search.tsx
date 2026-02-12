@@ -197,7 +197,7 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 		<div className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em' }}>
 			<div className='w-full max-w-6xl'>
 				{/* Karten-Toggle */}
-				<Box className='mb-4 rounded-lg bg-white p-4 shadow-md'>
+				<Box className='mb-4 rounded-lg bg-white p-4 shadow-md' sx={{ display: 'flex', justifyContent: 'flex-end' }}>
 					<FormControlLabel
 						control={
 							<Switch

@@ -161,7 +161,7 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 		<div className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em' }}>
 			<div id='dog-suchmaske' className='grid w-full max-w-6xl gap-6'>
 				{/* Karten-Toggle */}
-				<Box className='rounded-lg bg-white p-4 shadow-md'>
+				<Box className='rounded-lg bg-white p-4 shadow-md' sx={{ display: 'flex', justifyContent: 'flex-end' }}>
 					<FormControlLabel
 						control={
 							<Switch

@@ -216,7 +216,7 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 	return (
 		<div className='container mx-auto px-4 py-8 animate-in fade-in duration-300'>
 			<Box className='mb-8 rounded-lg bg-white p-6 shadow-md'>
-				<Box className='mb-6 rounded border border-gray-100 bg-gray-50/50 p-2'>
+				<Box className='mb-6 rounded border border-gray-100 bg-gray-50/50 p-2' sx={{ display: 'flex', justifyContent: 'flex-end' }}>
 					<FormControlLabel
 						control={
 							<Switch
