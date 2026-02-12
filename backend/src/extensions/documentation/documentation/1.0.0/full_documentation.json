@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-02-12T12:36:15.952Z"
+    "x-generation-date": "2026-02-12T12:50:00.692Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -10564,7 +10564,8 @@
           "data": {
             "required": [
               "Name",
-              "ColorSchema"
+              "ColorSchema",
+              "Ord"
             ],
             "type": "object",
             "properties": {
@@ -10581,6 +10582,9 @@
                   "Gelb",
                   "Hellgrau"
                 ]
+              },
+              "Ord": {
+                "type": "integer"
               },
               "locale": {
                 "type": "string"
@@ -10642,7 +10646,8 @@
         "type": "object",
         "required": [
           "Name",
-          "ColorSchema"
+          "ColorSchema",
+          "Ord"
         ],
         "properties": {
           "id": {
@@ -10671,6 +10676,9 @@
               "Gelb",
               "Hellgrau"
             ]
+          },
+          "Ord": {
+            "type": "integer"
           },
           "createdAt": {
             "type": "string",
@@ -11098,6 +11106,9 @@
                     "Hellgrau"
                   ]
                 },
+                "Ord": {
+                  "type": "integer"
+                },
                 "createdAt": {
                   "type": "string",
                   "format": "date-time"
@@ -11412,6 +11423,9 @@
                   "Gelb",
                   "Hellgrau"
                 ]
+              },
+              "Ord": {
+                "type": "integer"
               },
               "createdAt": {
                 "type": "string",

@@ -580,6 +580,7 @@ export interface Calendar {
 	documentId: string
 	Name?: string | null
 	ColorSchema?: string | null
+	Ord?: number | null
 }
 
 export interface CalendarItem {

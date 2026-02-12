@@ -26,6 +26,11 @@
         "Gelb",
         "Hellgrau"
       ]
+    },
+    "Ord": {
+      "type": "integer",
+      "required": true,
+      "unique": true
     }
   }
 }

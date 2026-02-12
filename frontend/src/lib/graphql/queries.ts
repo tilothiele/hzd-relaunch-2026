@@ -1304,10 +1304,11 @@ export const SEARCH_LITTERS = `
 
 export const GET_CALENDARS = `
 	query GetCalendars {
-		calendars {
+		calendars(sort: ["Ord:asc", "Name:asc"], pagination: { limit: 100 }) {
 			documentId
 			Name
 			ColorSchema
+			Ord
 		}
 	}
 `
@@ -1345,6 +1346,7 @@ query SearchCalendarItems($filters: CalendarEntryFiltersInput , $pagination: Pag
 				documentId
 				Name
 				ColorSchema
+				Ord
 			}
 			VisibleFrom
 			VisibleTo

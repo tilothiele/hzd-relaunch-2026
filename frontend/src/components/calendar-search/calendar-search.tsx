@@ -118,6 +118,12 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 			)
 
 			const calendarsArray = Array.isArray(data.calendars) ? data.calendars : []
+			calendarsArray.sort((a, b) => {
+				const ordA = a.Ord ?? 999
+				const ordB = b.Ord ?? 999
+				if (ordA !== ordB) return ordA - ordB
+				return (a.Name ?? '').localeCompare(b.Name ?? '')
+			})
 			setCalendars(calendarsArray)
 			// Default: Alle Kalender auswählen
 			setSelectedCalendarIds(new Set(calendarsArray.map((cal) => cal.documentId)))
