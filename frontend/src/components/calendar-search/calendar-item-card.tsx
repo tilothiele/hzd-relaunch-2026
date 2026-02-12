@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Paper, Box, Typography, Button } from '@mui/material'
 import type { CalendarItem } from '@/types'
-import { getCalendarColors, formatDateRange } from './calendar-utils'
+import { getCalendarColors, formatDateRange } from '@/lib/calendar-utils'
 import { ExternalRegistrationLink, InternalRegistrationLink } from '@/components/calendar/registration-links'
 import { CalendarDetailsModal } from './calendar-details-modal'
 import { BlocksRenderer } from '@strapi/blocks-react-renderer'

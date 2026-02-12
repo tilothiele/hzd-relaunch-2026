@@ -26,79 +26,7 @@ interface CalendarColors {
  * Mappt ColorSchema Enumeration-Werte (vom GraphQL Backend) auf konkrete Farben
  * Enumeration-Werte: Gelb, Gruen, Pink, Rot, Violet
  */
-function getColorBySchema(colorSchema: Calendar['ColorSchema']): { backgroundColor: string; textColor: string } {
-	if (!colorSchema) {
-		return {
-			backgroundColor: '#6b7280',
-			textColor: '#ffffff',
-		}
-	}
-
-	// Mapping basierend auf ColorSchema Enumeration-Werten vom GraphQL Backend
-	const colorMap: Record<string, { backgroundColor: string; textColor: string }> = {
-		Gelb: {
-			backgroundColor: '#FAD857',
-			textColor: '#000000',
-		},
-		Gruen: {
-			backgroundColor: '#10b981',
-			textColor: '#ffffff',
-		},
-		Pink: {
-			backgroundColor: '#ec4899',
-			textColor: '#ffffff',
-		},
-		Rot: {
-			backgroundColor: '#ef4444',
-			textColor: '#ffffff',
-		},
-		Violet: {
-			backgroundColor: '#A8267D',
-			textColor: '#ffffff',
-		},
-	}
-
-	// Prüfe ob ColorSchema ein bekannter Enumeration-Wert ist
-	const normalizedSchema = colorSchema.trim()
-	if (colorMap[normalizedSchema]) {
-		return colorMap[normalizedSchema]
-	}
-
-	// Fallback: Wenn ColorSchema ein Hex-Code oder anderer Wert ist, verwende ihn direkt
-	// Textfarbe basierend auf Helligkeit der Hintergrundfarbe
-	const textColor = getContrastTextColor(colorSchema)
-	return {
-		backgroundColor: colorSchema,
-		textColor,
-	}
-}
-
-/**
- * Weist jedem Kalender Hintergrund- und Textfarbe basierend auf ColorSchema Enumeration zu
- */
-function getCalendarColors(calendar: Calendar): CalendarColors {
-	return getColorBySchema(calendar.ColorSchema)
-}
-
-/**
- * Bestimmt die passende Textfarbe basierend auf der Helligkeit der Hintergrundfarbe
- */
-function getContrastTextColor(backgroundColor: string): string {
-	// Entferne # falls vorhanden
-	const hex = backgroundColor.replace('#', '')
-
-	// Konvertiere zu RGB
-	const r = parseInt(hex.substring(0, 2), 16)
-	const g = parseInt(hex.substring(2, 4), 16)
-	const b = parseInt(hex.substring(4, 6), 16)
-
-	// Berechne relative Luminanz (Formel nach WCAG)
-	const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
-
-	// Wenn Luminanz > 0.5, ist der Hintergrund hell -> dunkler Text
-	// Wenn Luminanz <= 0.5, ist der Hintergrund dunkel -> heller Text
-	return luminance > 0.5 ? '#000000' : '#ffffff'
-}
+import { getCalendarColors, formatDate } from '@/lib/calendar-utils'
 
 export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 	const [calendars, setCalendars] = useState<Calendar[]>([])
@@ -198,7 +126,7 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				},
 				{
 					Date: {
-				lte: todayIso,
+						lte: todayIso,
 					},
 				},
 				{
@@ -219,7 +147,7 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				filters: {
 					and: filterConditions,
 				},
-		sort: ['Date:desc'],
+				sort: ['Date:desc'],
 			}
 
 			const data = await fetchGraphQL<CalendarItemSearchResult>(
@@ -382,21 +310,7 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 		})
 	}, [calendarItems, getPrimaryDate])
 
-	const formatDate = useCallback((dateString: string | null | undefined) => {
-		if (!dateString) {
-			return 'Kein Datum'
-		}
-		try {
-			const date = new Date(dateString)
-			return date.toLocaleDateString('de-DE', {
-				year: 'numeric',
-				month: 'long',
-				day: 'numeric',
-			})
-		} catch {
-			return dateString
-		}
-	}, [])
+
 
 	const backgroundColor = theme?.evenBgColor ?? '#f9fafb'
 

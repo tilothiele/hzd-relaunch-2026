@@ -9,7 +9,7 @@ import type { ThemeDefinition } from '@/themes'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { ExternalRegistrationLink, InternalRegistrationLink } from '@/components/calendar/registration-links'
 
-import { getColorBySchema, getCalendarColors, formatDateRange } from './calendar-utils'
+import { getCalendarColors } from '@/lib/calendar-utils'
 import { CalendarItemCard } from './calendar-item-card'
 
 interface CalendarSearchProps {

@@ -3,7 +3,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import DescriptionIcon from '@mui/icons-material/Description'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import type { CalendarItem } from '@/types'
-import { formatDateRange } from './calendar-utils'
+import { formatDateRange } from '@/lib/calendar-utils'
 import { BlocksRenderer } from '@strapi/blocks-react-renderer'
 
 interface CalendarDetailsModalProps {

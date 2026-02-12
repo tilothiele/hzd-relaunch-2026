@@ -313,7 +313,7 @@ export function DrawerMenuComponent({ drawerMenu, theme, user }: DrawerMenuProps
                         }}
                     >
                         <Typography variant='h6' sx={{ fontWeight: 800, color: theme.drawerText, letterSpacing: '-0.02em' }}>
-                            Kurzmenü
+                            Powermenü
                         </Typography>
                         <IconButton onClick={toggleDrawer(false)} size='small'>
                             <CloseIcon />

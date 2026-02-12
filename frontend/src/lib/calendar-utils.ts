@@ -36,6 +36,18 @@ export function getColorBySchema(colorSchema: Calendar['ColorSchema']): { backgr
             backgroundColor: '#d1d5db',
             textColor: '#000000',
         },
+        Hellblau: {
+            backgroundColor: '#3b82f6',
+            textColor: '#ffffff',
+        },
+        Dunkelblau: {
+            backgroundColor: '#1e3a8a',
+            textColor: '#ffffff',
+        },
+        Orange: {
+            backgroundColor: '#f97316',
+            textColor: '#ffffff',
+        },
     }
 
     const normalizedSchema = colorSchema.trim()
@@ -43,6 +55,7 @@ export function getColorBySchema(colorSchema: Calendar['ColorSchema']): { backgr
         return colorMap[normalizedSchema]
     }
 
+    // Fallback if specific schema not found but valid hex or color code provided
     const textColor = getContrastTextColor(colorSchema)
     return {
         backgroundColor: colorSchema,
@@ -65,6 +78,7 @@ export function getContrastTextColor(backgroundColor: string): string {
     const r = parseInt(hex.substring(0, 2), 16)
     const g = parseInt(hex.substring(2, 4), 16)
     const b = parseInt(hex.substring(4, 6), 16)
+    // Relative luminance calculation
     const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
     return luminance > 0.5 ? '#000000' : '#ffffff'
 }
