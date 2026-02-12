@@ -24,13 +24,13 @@ export function DogPedigreeTab({ dog }: DogPedigreeTabProps) {
 				<div className='mb-1 font-bold text-gray-900'>
 					{dog.fullKennelName || dog.givenName}
 				</div>
-				<div className='text-gray-600'>
+				{/* <div className='text-gray-600'>
 					{dog.owner ? (
 						<span>
 							Besitzer: {dog.owner.firstName} {dog.owner.lastName}
 						</span>
 					) : null}
-				</div>
+				</div> */}
 				<div className='text-gray-600'>
 					{dog.dateOfBirth ? (
 						<span>* {formatDate(dog.dateOfBirth)}</span>

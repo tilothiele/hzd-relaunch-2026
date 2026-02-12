@@ -74,12 +74,6 @@ export function DogDetailView({ dog, strapiBaseUrl, hzdSetting, onBack }: DogDet
                     <DogDataTab dog={dog} strapiBaseUrl={strapiBaseUrl} hzdSetting={hzdSetting} />
                 </section>
 
-                {/* 2. Pedigree */}
-                <section>
-                    <SectionHeader title="Pedigree" />
-                    <DogPedigreeTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
-                </section>
-
                 {/* 3. Besitzer */}
                 <section>
                     <SectionHeader title="Besitzer" />
@@ -108,6 +102,11 @@ export function DogDetailView({ dog, strapiBaseUrl, hzdSetting, onBack }: DogDet
                 <section>
                     <SectionHeader title="Dokumente" />
                     <DogDocumentsTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
+                </section>
+
+                <section>
+                    <SectionHeader title="Abstammung" />
+                    <DogPedigreeTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
                 </section>
 
             </div>

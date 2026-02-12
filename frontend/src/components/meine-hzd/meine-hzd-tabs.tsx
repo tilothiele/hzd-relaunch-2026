@@ -31,12 +31,12 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 			}
 
 			try {
-				console.log('Fetching breeder for user:', user.documentId)
+				//console.log('Fetching breeder for user:', user.documentId)
 				const data = await fetchGraphQL<BreederSearchResult>(GET_BREEDER_BY_USER, {
 					variables: { userId: user.documentId },
 					baseUrl: strapiBaseUrl,
 				})
-				console.log('Breeder fetch result:', data)
+				//console.log('Breeder fetch result:', data)
 
 				if (data?.hzdPluginBreeders_connection?.nodes?.length) {
 					setBreeder(data.hzdPluginBreeders_connection.nodes[0])

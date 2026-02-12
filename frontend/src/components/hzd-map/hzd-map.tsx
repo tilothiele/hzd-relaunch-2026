@@ -91,7 +91,7 @@ function ResizeTrigger({ height }: { height: number }) {
 export function HzdMap({ isVisible, items, userLocation, height = '400px' }: HzdMapProps) {
     const [isMounted, setIsMounted] = useState(false)
     const [isMapReady, setIsMapReady] = useState(false)
-    const [grayIcon, setGrayIcon] = useState<LeafletIcon | null>(null)
+    const [userIcon, setUserIcon] = useState<LeafletIcon | null>(null)
     const [mapHeight, setMapHeight] = useState<number>(
         typeof height === 'string' ? parseInt(height) : height
     )
@@ -156,18 +156,18 @@ export function HzdMap({ isVisible, items, userLocation, height = '400px' }: Hzd
                 shadowUrl: '/static-images/map/marker-shadow.png',
             })
 
-            // Graues Icon für User-Location laden
+            // Rotes Icon für User-Location laden
             if (userLocation) {
                 const icon = L.icon({
-                    iconUrl: '/static-images/map/marker-icon-grey.png',
-                    iconRetinaUrl: '/static-images/map/marker-icon-2x-grey.png',
+                    iconUrl: '/static-images/map/marker-icon-red.png',
+                    iconRetinaUrl: '/static-images/map/marker-icon-2x-red.png',
                     shadowUrl: '/static-images/map/marker-shadow.png',
                     iconSize: [25, 41],
                     iconAnchor: [12, 41],
                     popupAnchor: [1, -34],
                     shadowSize: [41, 41],
                 })
-                setGrayIcon(icon)
+                setUserIcon(icon)
             }
         }
 
@@ -257,8 +257,8 @@ export function HzdMap({ isVisible, items, userLocation, height = '400px' }: Hzd
                 />
                 <MapReady onReady={() => setIsMapReady(true)} />
                 <ResizeTrigger height={mapHeight} />
-                {userPosition && isMapReady && grayIcon && (
-                    <UserLocationMarker position={userPosition} icon={grayIcon} />
+                {userPosition && isMapReady && userIcon && (
+                    <UserLocationMarker position={userPosition} icon={userIcon} />
                 )}
                 {items.map((item) => (
                     <Marker key={item.id} position={item.position}>
