@@ -30,6 +30,7 @@ function renderSection({
 	key,
 	logo,
 }: RenderSectionParams) {
+	console.log('Server Factory Rendering:', section.__typename)
 	switch (section.__typename) {
 		case 'ComponentBlocksNewsArticlesSection':
 			return (

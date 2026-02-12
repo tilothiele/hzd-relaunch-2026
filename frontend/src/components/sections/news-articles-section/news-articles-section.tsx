@@ -17,9 +17,11 @@ export async function NewsArticlesSectionComponent({
     theme,
 }: NewsArticlesSectionComponentProps) {
     const articles = await fetchNewsArticles({
-        limit: section.MaxArticles ?? 3,
+        limit: 100, // Fetch more articles to allow client-side filtering by year
         categoryDocumentId: section.news_article_category?.documentId,
     })
+
+    console.log('NewsArticlesSectionComponent fetched:', articles.length, 'articles')
 
     if (!articles.length) {
         return null
