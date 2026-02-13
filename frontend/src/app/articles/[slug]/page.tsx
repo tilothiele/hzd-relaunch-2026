@@ -139,7 +139,7 @@ export default async function ArticlesCategoryPage({ params, searchParams }: Pag
 
 			{/* Category Header */}
 			<SectionContainer variant='max-width'>
-				<div className='py-12'>
+				<div className='py-3'>
 					{category.ContentSections && category.ContentSections.length === 0 && (
 						<h1
 							className='text-4xl font-bold md:text-5xl'
