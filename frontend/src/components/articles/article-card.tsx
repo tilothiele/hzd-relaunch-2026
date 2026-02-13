@@ -3,16 +3,21 @@ import Link from 'next/link'
 import type { NewsArticle } from '@/types'
 import { formattedDateOfPublication } from '@/lib/article-utils'
 
+import { ActionButton } from '@/components/ui/action-button'
+import type { ThemeDefinition } from '@/themes'
+
 interface ArticleCardProps {
     article: NewsArticle
     strapiBaseUrl: string
     featured?: boolean
+    theme?: ThemeDefinition
 }
 
 export function ArticleCard({
     article,
     strapiBaseUrl,
-    featured = false
+    featured = false,
+    theme
 }: ArticleCardProps) {
     const formattedDate = formattedDateOfPublication(article)
     const pubDate = article.DateOfPublication || article.publishedAt || undefined
@@ -21,14 +26,15 @@ export function ArticleCard({
         ? (article.Image.url.startsWith('http') ? article.Image.url : `${strapiBaseUrl}${article.Image.url}`)
         : null
 
+    const articleLink = `/article${article.Slug}`
+
     return (
-        <Link
-            href={`/article${article.Slug}`}
+        <div
             className={`group block overflow-hidden rounded-lg bg-white shadow-md transition-all hover:shadow-xl ${featured ? 'md:flex md:flex-row' : ''
                 }`}
         >
             {imageUrl && (
-                <div className={`relative overflow-hidden aspect-[4/3] ${featured ? 'w-full md:w-1/2' : ''}`}>
+                <Link href={articleLink} className={`relative block overflow-hidden aspect-[4/3] ${featured ? 'w-full md:w-1/2' : ''}`}>
                     <Image
                         src={imageUrl}
                         alt={article.Image?.alternativeText || article.Headline || 'Artikelbild'}
@@ -36,7 +42,7 @@ export function ArticleCard({
                         className='object-cover transition-transform duration-300 group-hover:scale-105'
                         unoptimized
                     />
-                </div>
+                </Link>
             )}
             <div className={`p-6 ${featured ? 'flex w-full flex-col justify-center md:w-1/2' : ''}`}>
                 {formattedDate && (
@@ -44,11 +50,13 @@ export function ArticleCard({
                         {formattedDate}
                     </time>
                 )}
-                <h3 className={`mt-2 font-bold text-gray-900 ${featured ? 'text-2xl md:text-3xl' : 'text-xl'}`}>
-                    {article.Headline}
-                </h3>
+                <Link href={articleLink} className='block'>
+                    <h3 className={`mt-2 font-bold ${featured ? 'text-2xl md:text-3xl' : 'text-xl'}`}>
+                        {article.Headline}
+                    </h3>
+                </Link>
                 {article.SubHeadline && (
-                    <p className={`mt-2 text-gray-600 ${featured ? 'text-lg' : 'text-base'}`}>
+                    <p className={`mt-2 ${featured ? 'text-lg' : 'text-base'}`}>
                         {article.SubHeadline}
                     </p>
                 )}
@@ -57,13 +65,17 @@ export function ArticleCard({
                         {article.TeaserText}
                     </p>
                 )}
-                <div className='mt-4 inline-flex items-center text-sm font-medium text-blue-600 group-hover:text-blue-700'>
-                    Weiterlesen
-                    <svg className='ml-2 h-4 w-4 transition-transform group-hover:translate-x-1' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
-                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
-                    </svg>
+                <div className='mt-4'>
+                    <ActionButton
+                        actionButton={{
+                            Label: 'Weiterlesen',
+                            Link: articleLink,
+                            Primary: true
+                        }}
+                        theme={theme}
+                    />
                 </div>
             </div>
-        </Link>
+        </div>
     )
 }

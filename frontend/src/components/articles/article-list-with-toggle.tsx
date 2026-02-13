@@ -99,6 +99,7 @@ export function ArticleListWithToggle({ articles, strapiBaseUrl, theme }: Articl
                             key={article.documentId}
                             article={article}
                             strapiBaseUrl={strapiBaseUrl}
+                            theme={theme}
                         />
                     ))}
                 </div>

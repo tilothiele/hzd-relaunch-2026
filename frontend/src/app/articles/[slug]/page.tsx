@@ -182,6 +182,7 @@ export default async function ArticlesCategoryPage({ params, searchParams }: Pag
 									article={article}
 									strapiBaseUrl={baseUrl}
 									featured={true}
+									theme={theme}
 								/>
 							))}
 						</div>
