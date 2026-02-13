@@ -930,11 +930,11 @@ export interface ApiNewsArticleCategoryNewsArticleCategory
           preset: 'defaultHtml';
         }
       >;
-    CategoryImage: Schema.Attribute.Media<
-      'images' | 'files' | 'videos' | 'audios'
-    >;
     CategoryName: Schema.Attribute.String;
     CategoryTeaserText: Schema.Attribute.Text;
+    ContentSections: Schema.Attribute.DynamicZone<
+      ['blocks.simple-hero-section', 'blocks.text-columns-section']
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

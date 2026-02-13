@@ -4,6 +4,7 @@ import { MainPageStructure } from '../../main-page-structure'
 import { theme as globalTheme } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { fetchCategoryBySlug, fetchArticlesByCategory } from '@/lib/server/fetch-articles-by-category'
+import { renderServerSections } from '@/components/sections/server-section-factory'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import NotFoundSection from '@/components/sections/not-found-section/not-found-section'
 import { ArticleCard } from '@/components/articles/article-card'
@@ -128,26 +129,26 @@ export default async function ArticlesCategoryPage({ params, searchParams }: Pag
 			theme={theme}
 			pageTitle={pageTitle}
 		>
+			{/* Dynamic Content Sections */}
+			{renderServerSections({
+				sections: category.ContentSections,
+				strapiBaseUrl: baseUrl,
+				theme: theme,
+				logo: globalLayout?.Logo
+			})}
+
 			{/* Category Header */}
 			<SectionContainer variant='max-width'>
 				<div className='py-12'>
-					{category.CategoryImage?.url && (
-						<div className='relative mb-8 aspect-[21/9] w-full overflow-hidden rounded-lg'>
-							<Image
-								src={category.CategoryImage.url.startsWith('http')
-									? category.CategoryImage.url
-									: `${baseUrl}${category.CategoryImage.url}`}
-								alt={category.CategoryImage.alternativeText || category.CategoryName || 'Kategoriebild'}
-								fill
-								className='object-cover'
-								priority
-								unoptimized
-							/>
-						</div>
+					{category.ContentSections && category.ContentSections.length === 0 && (
+						<h1
+							className='text-4xl font-bold md:text-5xl'
+							style={{ color: theme.headlineColor }}
+						>
+							{category.CategoryName}
+						</h1>
 					)}
-					<h1 className='text-4xl font-bold text-gray-900 md:text-5xl'>
-						{category.CategoryName}
-					</h1>
+
 					{category.CategoryDescription && (
 						<div
 							className='prose prose-xl mx-auto mb-10 max-w-[800px] text-center dark:prose-invert [&_p]:my-2'
@@ -164,14 +165,17 @@ export default async function ArticlesCategoryPage({ params, searchParams }: Pag
 
 			{/* Featured Articles */}
 			{featuredArticles.length > 0 && (
-				<SectionContainer variant='max-width' backgroundColor='#f9fafb'>
+				<SectionContainer variant='max-width'>
 					<div className='py-12'>
 						{category.FeatureTitle && (
-							<h2 className='mb-8 text-3xl font-bold text-gray-900'>
+							<h2
+								className='mb-8 text-3xl font-bold'
+								style={{ color: theme.headlineColor }}
+							>
 								{category.FeatureTitle}
 							</h2>
 						)}
-						<div className='grid gap-8 md:grid-cols-2'>
+						<div className='grid gap-8 grid-cols-1'>
 							{featuredArticles.map((article) => (
 								<ArticleCard
 									key={article.documentId}
@@ -188,9 +192,6 @@ export default async function ArticlesCategoryPage({ params, searchParams }: Pag
 			{/* All Articles */}
 			<SectionContainer variant='max-width'>
 				<div className='py-12'>
-					<h2 className='mb-8 text-3xl font-bold text-gray-900'>
-						Alle Artikel
-					</h2>
 					{articles.length > 0 ? (
 						<>
 							<ArticleListWithToggle

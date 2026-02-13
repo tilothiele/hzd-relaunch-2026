@@ -57,14 +57,10 @@ export async function fetchArticlesByCategory({
                 page,
                 pageSize,
             },
+            featuredFilter
         }
 
-        // Only add featuredFilter if it's explicitly set
-        if (featuredFilter !== null && featuredFilter !== undefined) {
-            variables.featuredFilter = featuredFilter
-        }
-
-        const data = await fetchGraphQLServer<ArticlesByCategoryResult>(
+        const data = await fetchGraphQLServer<any>(
             GET_NEWS_ARTICLES_BY_CATEGORY,
             {
                 baseUrl,
@@ -72,7 +68,7 @@ export async function fetchArticlesByCategory({
             },
         )
 
-        return data.newsArticleCategories?.[0]?.news_articles ?? []
+        return data.newsArticles ?? []
     } catch (error) {
         console.error('Error fetching articles by category:', error)
         return []

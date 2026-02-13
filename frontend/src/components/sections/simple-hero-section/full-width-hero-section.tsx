@@ -57,25 +57,28 @@ export function FullWidthHeroSectionComponent({
                     transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
                 }}
             >
+
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
                     <Image
                         src={imageUrl}
                         alt={imageAlt}
                         fill
-                        className="object-cover"
+                        className="object-cover object-center"
                         priority
                         unoptimized
                     />
                 </div>
 
-                {/* Backdrop Gradient: Transparent top -> Dark bottom */}
-                <div
-                    className="absolute inset-0 z-10"
-                    style={{
-                        background: 'linear-gradient(to top, var(--color-backdrop-gradient) 0%, transparent 50%)'
-                    }}
-                />
+                {/* Backdrop Gradient: Transparent top -> Dark bottom - only shown if there is content */}
+                {(headline || teaserText || actionButton) ? (
+                    <div
+                        className="absolute inset-0 z-10"
+                        style={{
+                            background: 'linear-gradient(to top, var(--color-backdrop-gradient) 0%, transparent 50%)'
+                        }}
+                    />
+                ) : null}
 
                 {/* Content */}
                 <div className="container relative z-20 mx-auto px-6 pb-11 md:px-12 lg:pb-20">

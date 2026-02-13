@@ -357,6 +357,34 @@ type ComponentPersonalAddress {
   City: String
 }
 
+input ComponentPermissionRestrictionFiltersInput {
+  Public: BooleanFilterInput
+  Authenticated: BooleanFilterInput
+  and: [ComponentPermissionRestrictionFiltersInput]
+  or: [ComponentPermissionRestrictionFiltersInput]
+  not: ComponentPermissionRestrictionFiltersInput
+}
+
+input ComponentPermissionRestrictionInput {
+  id: ID
+  Public: Boolean
+  Authenticated: Boolean
+}
+
+type ComponentPermissionRestriction {
+  id: ID!
+  Public: Boolean!
+  Authenticated: Boolean!
+}
+
+type ComponentPermissionGroups {
+  id: ID!
+  Any: Boolean
+  Member: Boolean
+  HeadOfEvent: Boolean
+  BreedWarden: Boolean
+}
+
 input ComponentLinksPartnerlLinkFiltersInput {
   PartnerLinkUrl: StringFilterInput
   AltText: StringFilterInput
@@ -477,34 +505,6 @@ input ComponentLayoutColorThemeInput {
 type ComponentLayoutColorTheme {
   id: ID!
   ShortName: ENUM_COMPONENTLAYOUTCOLORTHEME_SHORTNAME
-}
-
-input ComponentPermissionRestrictionFiltersInput {
-  Public: BooleanFilterInput
-  Authenticated: BooleanFilterInput
-  and: [ComponentPermissionRestrictionFiltersInput]
-  or: [ComponentPermissionRestrictionFiltersInput]
-  not: ComponentPermissionRestrictionFiltersInput
-}
-
-input ComponentPermissionRestrictionInput {
-  id: ID
-  Public: Boolean
-  Authenticated: Boolean
-}
-
-type ComponentPermissionRestriction {
-  id: ID!
-  Public: Boolean!
-  Authenticated: Boolean!
-}
-
-type ComponentPermissionGroups {
-  id: ID!
-  Any: Boolean
-  Member: Boolean
-  HeadOfEvent: Boolean
-  BreedWarden: Boolean
 }
 
 type ComponentFormTextArea {
@@ -843,6 +843,12 @@ enum ENUM_COMPONENTBLOCKSSIMPLEHEROSECTION_HEROLAYOUT {
   full_width
 }
 
+enum ENUM_COMPONENTBLOCKSSIMPLEHEROSECTION_HEIGHT {
+  small
+  medium
+  tall
+}
+
 type ComponentBlocksSimpleHeroSection {
   id: ID!
   HeroAnchor: String
@@ -854,6 +860,7 @@ type ComponentBlocksSimpleHeroSection {
   FullWidth: Boolean!
   ShowLog: Boolean!
   FadingBorder: Boolean!
+  Height: ENUM_COMPONENTBLOCKSSIMPLEHEROSECTION_HEIGHT
 }
 
 type ComponentBlocksSimpleCtaSection {
@@ -1707,12 +1714,14 @@ enum ENUM_CALENDAR_COLORSCHEMA {
   Pink
   Rot
   Gelb
+  Hellgrau
 }
 
 input CalendarFiltersInput {
   documentId: IDFilterInput
   Name: StringFilterInput
   ColorSchema: StringFilterInput
+  Ord: IntFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   publishedAt: DateTimeFilterInput
@@ -1724,6 +1733,7 @@ input CalendarFiltersInput {
 input CalendarInput {
   Name: String
   ColorSchema: ENUM_CALENDAR_COLORSCHEMA
+  Ord: Int
   publishedAt: DateTime
 }
 
@@ -1731,6 +1741,7 @@ type Calendar {
   documentId: ID!
   Name: String!
   ColorSchema: ENUM_CALENDAR_COLORSCHEMA!
+  Ord: Int!
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -2262,6 +2273,10 @@ type NewsArticleRelationResponseCollection {
   nodes: [NewsArticle!]!
 }
 
+union NewsArticleCategoryContentSectionsDynamicZone = ComponentBlocksSimpleHeroSection | ComponentBlocksTextColumnsSection | Error
+
+scalar NewsArticleCategoryContentSectionsDynamicZoneInput
+
 input NewsArticleCategoryFiltersInput {
   documentId: IDFilterInput
   CategoryName: StringFilterInput
@@ -2284,8 +2299,8 @@ input NewsArticleCategoryInput {
   CategoryTeaserText: String
   FeatureTitle: String
   news_articles: [ID]
-  CategoryImage: ID
   CategoryDescription: String
+  ContentSections: [NewsArticleCategoryContentSectionsDynamicZoneInput!]
   publishedAt: DateTime
 }
 
@@ -2297,8 +2312,8 @@ type NewsArticleCategory {
   FeatureTitle: String
   news_articles_connection(filters: NewsArticleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): NewsArticleRelationResponseCollection
   news_articles(filters: NewsArticleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [NewsArticle]!
-  CategoryImage: UploadFile
   CategoryDescription: String
+  ContentSections: [NewsArticleCategoryContentSectionsDynamicZone]
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -2569,7 +2584,7 @@ type SupplementalDocumentGroupEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingDogDocument | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTableOfContentSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksDocumentBundle | ComponentBlocksDocumentBundleSection | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | ComponentBlocksBundleDocuments | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
+union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingDogDocument | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTableOfContentSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksDocumentBundle | ComponentBlocksDocumentBundleSection | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | ComponentBlocksBundleDocuments | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
 
 input FileInfoInput {
   name: String

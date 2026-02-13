@@ -774,6 +774,7 @@ export interface NewsArticleCategory {
 	FeatureTitle?: string | null
 	CategoryDescription?: string | null
 	CategoryImage?: Image | null
+	ContentSections?: PageSection[] | null
 }
 
 export interface NewsArticle {

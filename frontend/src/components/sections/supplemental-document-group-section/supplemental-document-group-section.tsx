@@ -94,19 +94,11 @@ export function SupplementalDocumentGroupSectionComponent({
 			paddingTop='2em'
 			paddingBottom='2em'
 		>
-			<Container maxWidth='md'>
+			<Container className="pb-5">
 				{section.GroupHeadline ? (
-					<Typography
-						variant='h3'
-						component='h3'
-						sx={{
-							mb: 3,
-							fontWeight: 700,
-							color: 'text.primary',
-						}}
-					>
+					<h2>
 						{section.GroupHeadline}
-					</Typography>
+					</h2>
 				) : null}
 				{groupName && !section.GroupHeadline ? (
 					<Typography
@@ -217,11 +209,11 @@ export function SupplementalDocumentGroupSectionComponent({
 																	size='small'
 																	startIcon={<DownloadIcon />}
 																	sx={{
-																		backgroundColor: '#facc15',
-																		color: 'text.primary',
+																		backgroundColor: theme.buttonColor ?? 'var(--color-main-base)',
+																		color: theme.buttonTextColor ?? 'var(--color-main-contrast-text)',
 																		fontWeight: 600,
 																		'&:hover': {
-																			backgroundColor: '#eab308',
+																			backgroundColor: theme.buttonHoverColor ?? 'var(--color-main-hover)',
 																		},
 																	}}
 																>

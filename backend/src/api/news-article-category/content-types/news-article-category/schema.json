@@ -32,22 +32,19 @@
       "target": "api::news-article.news-article",
       "mappedBy": "category"
     },
-    "CategoryImage": {
-      "type": "media",
-      "multiple": false,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ]
-    },
     "CategoryDescription": {
       "type": "customField",
       "customField": "plugin::ckeditor5.CKEditor",
       "options": {
         "preset": "defaultHtml"
       }
+    },
+    "ContentSections": {
+      "type": "dynamiczone",
+      "components": [
+        "blocks.simple-hero-section",
+        "blocks.text-columns-section"
+      ]
     }
   }
 }

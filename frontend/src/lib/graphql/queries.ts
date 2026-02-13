@@ -276,6 +276,7 @@ export const GET_LAYOUT = `
 	 					FullWidth
 	 					ShowLog
 						FadingBorder
+						Height
 	 				}
 				}
 			}
@@ -537,6 +538,7 @@ export const GET_INDEX_PAGE = `
  					FullWidth
  					ShowLog
 					FadingBorder
+					Height
  				}
 				... on ComponentBlocksTableOfContentSection {
 					TocHeadline
@@ -830,6 +832,7 @@ export const GET_PAGE_BY_SLUG = `
  							FullWidth
  							ShowLog
 							FadingBorder
+							Height
  						}
 						... on ComponentBlocksNewsArticlesSection {
 							MaxArticles
@@ -1811,43 +1814,87 @@ export const GET_NEWS_ARTICLE_CATEGORY_BY_SLUG = `
 			CategoryTeaserText
 			FeatureTitle
 			CategoryDescription
-			CategoryImage {
-				url
-				alternativeText
-				width
-				height
-				caption
-				previewUrl
+			ContentSections {
+				__typename
+				... on ComponentBlocksSimpleHeroSection {
+					HeroAnchor
+					HeroHeadline
+					HeroTeaser
+					HeroImage {
+						url
+						alternativeText
+						width
+						height
+						caption
+						previewUrl
+					}
+					HeroLayout
+					HeroCta {
+						Label
+						Link
+						Primary
+					}
+					FullWidth
+					ShowLog
+					FadingBorder
+					Height
+				}
+				... on ComponentBlocksTextColumnsSection {
+					TextColumnsOddEven
+					TextColumnsHeadline
+					TextColumnsSubHeadline
+					TextColumn {
+						id
+						ColumnHeadline
+						ColumnText
+						ColumnActionButton {
+							Label
+							Link
+							Primary
+						}
+						BulletItems {
+							id
+							Headline
+							ItemBody
+						}
+					}
+					TextColumnsAnchor
+					Padding {
+						Top
+						Bottom
+					}
+				}
 			}
+
 		}
 	}
 `
 
 export const GET_NEWS_ARTICLES_BY_CATEGORY = `
 	query GetNewsArticlesByCategory($categoryId: ID!, $pagination: PaginationArg, $featuredFilter: Boolean) {
-		newsArticleCategories(filters: { documentId: { eq: $categoryId } }, pagination: { pageSize: 1 }) {
+		newsArticles(
+			filters: { 
+				category: { documentId: { eq: $categoryId } }
+				FeaturedArticle: { eq: $featuredFilter } 
+			}
+			pagination: $pagination
+			sort: ["publishedAt:desc"]
+		) {
 			documentId
-			news_articles(
-				filters: { FeaturedArticle: { eq: $featuredFilter } }
-				pagination: $pagination
-				sort: ["publishedAt:desc"]
-			) {
-				documentId
-				Headline
-				SubHeadline
-				TeaserText
-				Slug
-				DateOfPublication
-				publishedAt
-				FeaturedArticle
-				Image {
-					url
-					alternativeText
-					width
-					height
-					caption
-					previewUrl
-				}
+			Headline
+			SubHeadline
+			TeaserText
+			Slug
+			DateOfPublication
+			publishedAt
+			FeaturedArticle
+			Image {
+				url
+				alternativeText
+				width
+				height
+				caption
+				previewUrl
 			}
 		}
 	}

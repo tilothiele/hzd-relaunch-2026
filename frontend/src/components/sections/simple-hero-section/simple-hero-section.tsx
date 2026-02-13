@@ -55,9 +55,9 @@ export function SimpleHeroSectionComponent({
 
     const height = section.Height ?? 'tall'
     const minHeightClass = {
-        small: 'min-h-[250px]',
-        medium: 'min-h-[375px]',
-        tall: 'min-h-[500px]',
+        small: 'min-h-[300px] md:min-h-[350px] lg:min-h-[400px]',
+        medium: 'min-h-[450px] md:min-h-[525px] lg:min-h-[600px]',
+        tall: 'min-h-[600px] md:min-h-[700px] lg:min-h-[800px]',
     }[height]
 
     return (
@@ -77,6 +77,7 @@ export function SimpleHeroSectionComponent({
                     transition: 'opacity 0.8s ease-out, transform 0.8s ease-out',
                 }}
             >
+
                 {/* Logo - precisely 2rem from top */}
                 {section.ShowLog && logo ? (
                     <div

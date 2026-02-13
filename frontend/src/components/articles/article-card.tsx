@@ -24,11 +24,11 @@ export function ArticleCard({
     return (
         <Link
             href={`/article${article.Slug}`}
-            className={`group block overflow-hidden rounded-lg bg-white shadow-md transition-all hover:shadow-xl ${featured ? 'md:col-span-2' : ''
+            className={`group block overflow-hidden rounded-lg bg-white shadow-md transition-all hover:shadow-xl ${featured ? 'md:flex md:flex-row' : ''
                 }`}
         >
             {imageUrl && (
-                <div className={`relative overflow-hidden aspect-[4/3]`}>
+                <div className={`relative overflow-hidden aspect-[4/3] ${featured ? 'w-full md:w-1/2' : ''}`}>
                     <Image
                         src={imageUrl}
                         alt={article.Image?.alternativeText || article.Headline || 'Artikelbild'}
@@ -38,7 +38,7 @@ export function ArticleCard({
                     />
                 </div>
             )}
-            <div className='p-6'>
+            <div className={`p-6 ${featured ? 'flex w-full flex-col justify-center md:w-1/2' : ''}`}>
                 {formattedDate && (
                     <time className='text-sm text-gray-500' dateTime={pubDate}>
                         {formattedDate}
