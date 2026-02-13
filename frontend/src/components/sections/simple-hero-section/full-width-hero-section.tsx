@@ -34,6 +34,13 @@ export function FullWidthHeroSectionComponent({
         return null
     }
 
+    const height = section.Height ?? 'tall'
+    const heightClass = {
+        small: 'h-[300px] md:h-[350px] lg:h-[400px]',
+        medium: 'h-[450px] md:h-[525px] lg:h-[600px]',
+        tall: 'h-[600px] md:h-[700px] lg:h-[800px]',
+    }[height]
+
     return (
         <SectionContainer
             variant="full-width"
@@ -43,7 +50,7 @@ export function FullWidthHeroSectionComponent({
         >
             <div
                 ref={elementRef}
-                className="hero relative flex h-[600px] w-full flex-col justify-end overflow-hidden md:h-[700px] lg:h-[800px]"
+                className={`hero relative flex w-full flex-col justify-end overflow-hidden ${heightClass}`}
                 style={{
                     opacity: isVisible ? 1 : 0,
                     transform: isVisible ? 'translateY(0)' : 'translateY(20px)',

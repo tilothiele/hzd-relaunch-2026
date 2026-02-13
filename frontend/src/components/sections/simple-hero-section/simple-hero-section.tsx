@@ -53,6 +53,13 @@ export function SimpleHeroSectionComponent({
     const isImageLeft = layout === 'Image_left'
     const isFullWidth = section.FullWidth ?? false
 
+    const height = section.Height ?? 'tall'
+    const minHeightClass = {
+        small: 'min-h-[250px]',
+        medium: 'min-h-[375px]',
+        tall: 'min-h-[500px]',
+    }[height]
+
     return (
         <SectionContainer
             variant={isFullWidth ? 'full-width' : 'max-width'}
@@ -63,7 +70,7 @@ export function SimpleHeroSectionComponent({
         >
             <div
                 ref={elementRef}
-                className="hero relative flex min-h-[500px] flex-col overflow-hidden md:flex-row"
+                className={`hero relative flex flex-col overflow-hidden md:flex-row ${minHeightClass}`}
                 style={{
                     opacity: isVisible ? 1 : 0,
                     transform: isVisible ? 'translateY(0)' : 'translateY(20px)',

@@ -159,6 +159,7 @@ export interface SimpleHeroSection {
 	FullWidth?: boolean | null
 	ShowLog?: boolean | null
 	FadingBorder?: boolean | null
+	Height?: 'small' | 'medium' | 'tall' | null
 }
 
 export interface ContactGroupSection {
