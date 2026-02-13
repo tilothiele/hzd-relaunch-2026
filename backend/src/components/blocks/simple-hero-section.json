@@ -54,6 +54,14 @@
       "type": "boolean",
       "required": true,
       "default": true
+    },
+    "Height": {
+      "type": "enumeration",
+      "enum": [
+        "small",
+        "medium",
+        "tall"
+      ]
     }
   },
   "config": {}

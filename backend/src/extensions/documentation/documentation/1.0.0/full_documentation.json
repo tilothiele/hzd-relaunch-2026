@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-02-12T21:29:53.685Z"
+    "x-generation-date": "2026-02-13T15:17:08.611Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -25630,6 +25630,14 @@
           },
           "FadingBorder": {
             "type": "boolean"
+          },
+          "Height": {
+            "type": "string",
+            "enum": [
+              "small",
+              "medium",
+              "tall"
+            ]
           }
         }
       },

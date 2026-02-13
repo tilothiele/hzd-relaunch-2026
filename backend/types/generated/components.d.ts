@@ -209,6 +209,7 @@ export interface BlocksSimpleHeroSection extends Struct.ComponentSchema {
     FullWidth: Schema.Attribute.Boolean &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<true>;
+    Height: Schema.Attribute.Enumeration<['small', 'medium', 'tall']>;
     HeroAnchor: Schema.Attribute.String;
     HeroCta: Schema.Attribute.Component<'links.action-button', false>;
     HeroHeadline: Schema.Attribute.String & Schema.Attribute.Required;
