@@ -28,7 +28,7 @@
     /* drawer-menu - ok */
     --color-drawer-text: var(--color-hzd-blau);
     --color-drawer-background: var(--color-saharabeige);
-    --color-drawer-handle: var(--color-goldbeige);
+    --color-drawer-handle: var(--color-hzd-blau);
 
     /* header/footer - ok */
     --color-header-footer-text: var(--color-hzd-blau);
