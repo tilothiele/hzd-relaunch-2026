@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { NewsArticle } from '@/types'
 import { formattedDateOfPublication } from '@/lib/article-utils'
+import { resolveTagColors } from '@/lib/color-utils'
 
 import { ActionButton } from '@/components/ui/action-button'
 import type { ThemeDefinition } from '@/themes'
@@ -28,6 +29,8 @@ export function ArticleCard({
 
     const articleLink = `/article${article.Slug}`
 
+    console.log(article.news_article_tags)
+
     return (
         <div
             className={`group block overflow-hidden rounded-lg bg-white shadow-md transition-all hover:shadow-xl ${featured ? 'md:flex md:flex-row' : ''
@@ -45,11 +48,32 @@ export function ArticleCard({
                 </Link>
             )}
             <div className={`p-6 ${featured ? 'flex w-full flex-col justify-center md:w-1/2' : ''}`}>
-                {formattedDate && (
-                    <time className='text-sm text-gray-500' dateTime={pubDate}>
-                        {formattedDate}
-                    </time>
-                )}
+                <div className='flex flex-wrap items-center gap-2'>
+                    {formattedDate && (
+                        <time className='text-sm text-gray-500' dateTime={pubDate}>
+                            {formattedDate}
+                        </time>
+                    )}
+                    {article.news_article_tags && article.news_article_tags.length > 0 && (
+                        <div className='flex flex-wrap gap-2'>
+                            {article.news_article_tags.map((tag) => {
+                                const { color, backgroundColor } = resolveTagColors(tag)
+                                return (
+                                    <span
+                                        key={tag.Label}
+                                        className='rounded-full px-2 py-0.5 text-xs font-semibold'
+                                        style={{
+                                            backgroundColor,
+                                            color
+                                        }}
+                                    >
+                                        {tag.Label}
+                                    </span>
+                                )
+                            })}
+                        </div>
+                    )}
+                </div>
                 <Link href={articleLink} className='block'>
                     <h3 className={`mt-2 font-bold ${featured ? 'text-2xl md:text-3xl' : 'text-xl'}`}>
                         {article.Headline}
@@ -73,8 +97,10 @@ export function ArticleCard({
                             Primary: true
                         }}
                         theme={theme}
+                        size='small'
                     />
                 </div>
+
             </div>
         </div>
     )

@@ -1576,6 +1576,11 @@ export const GET_NEWS_ARTICLES = `
 			category {
 				CategoryName
 			}
+			news_article_tags {
+				Label
+				TagColorHexCode
+				TagBgColorHexCode
+			}
 		}
 	}
 `
@@ -1613,6 +1618,11 @@ export const GET_NEWS_ARTICLE_BY_SLUG = `
 			category {
 				documentId
 				CategoryName
+			}
+			news_article_tags {
+				Label
+				TagColorHexCode
+				TagBgColorHexCode
 			}
 			NewsContentSections {
 				__typename
@@ -1895,6 +1905,11 @@ export const GET_NEWS_ARTICLES_BY_CATEGORY = `
 				height
 				caption
 				previewUrl
+			}
+			news_article_tags {
+				Label
+				TagColorHexCode
+				TagBgColorHexCode
 			}
 		}
 	}

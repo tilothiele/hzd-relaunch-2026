@@ -357,34 +357,6 @@ type ComponentPersonalAddress {
   City: String
 }
 
-input ComponentPermissionRestrictionFiltersInput {
-  Public: BooleanFilterInput
-  Authenticated: BooleanFilterInput
-  and: [ComponentPermissionRestrictionFiltersInput]
-  or: [ComponentPermissionRestrictionFiltersInput]
-  not: ComponentPermissionRestrictionFiltersInput
-}
-
-input ComponentPermissionRestrictionInput {
-  id: ID
-  Public: Boolean
-  Authenticated: Boolean
-}
-
-type ComponentPermissionRestriction {
-  id: ID!
-  Public: Boolean!
-  Authenticated: Boolean!
-}
-
-type ComponentPermissionGroups {
-  id: ID!
-  Any: Boolean
-  Member: Boolean
-  HeadOfEvent: Boolean
-  BreedWarden: Boolean
-}
-
 input ComponentLinksPartnerlLinkFiltersInput {
   PartnerLinkUrl: StringFilterInput
   AltText: StringFilterInput
@@ -430,81 +402,32 @@ type ComponentLinksActionButton {
   Primary: Boolean
 }
 
-input ComponentLayoutSosInput {
+input ComponentPermissionRestrictionFiltersInput {
+  Public: BooleanFilterInput
+  Authenticated: BooleanFilterInput
+  and: [ComponentPermissionRestrictionFiltersInput]
+  or: [ComponentPermissionRestrictionFiltersInput]
+  not: ComponentPermissionRestrictionFiltersInput
+}
+
+input ComponentPermissionRestrictionInput {
   id: ID
-  ShowSOS: Boolean
-  SosTitle: String
-  SosLink: String
+  Public: Boolean
+  Authenticated: Boolean
 }
 
-type ComponentLayoutSos {
+type ComponentPermissionRestriction {
   id: ID!
-  ShowSOS: Boolean!
-  SosTitle: String
-  SosLink: String
+  Public: Boolean!
+  Authenticated: Boolean!
 }
 
-enum ENUM_COMPONENTLAYOUTPADDING_TOP {
-  small
-  middle
-  large
-}
-
-enum ENUM_COMPONENTLAYOUTPADDING_BOTTOM {
-  small
-  middle
-  large
-}
-
-type ComponentLayoutPadding {
+type ComponentPermissionGroups {
   id: ID!
-  Top: ENUM_COMPONENTLAYOUTPADDING_TOP
-  Bottom: ENUM_COMPONENTLAYOUTPADDING_BOTTOM
-}
-
-input ComponentLayoutFooterInput {
-  id: ID
-  PraesidiumName: String
-  PraesidiumOrt: String
-  PraesidiumTelefon: String
-  ItProjektleitungName: String
-  ItProjektleitungOrt: String
-  ItProjektleitungTelefon: String
-}
-
-type ComponentLayoutFooter {
-  id: ID!
-  PraesidiumName: String
-  PraesidiumOrt: String
-  PraesidiumTelefon: String
-  ItProjektleitungName: String
-  ItProjektleitungOrt: String
-  ItProjektleitungTelefon: String
-}
-
-enum ENUM_COMPONENTLAYOUTCOLORTHEME_SHORTNAME {
-  A
-  B
-  C
-  D
-  E
-}
-
-input ComponentLayoutColorThemeFiltersInput {
-  ShortName: StringFilterInput
-  and: [ComponentLayoutColorThemeFiltersInput]
-  or: [ComponentLayoutColorThemeFiltersInput]
-  not: ComponentLayoutColorThemeFiltersInput
-}
-
-input ComponentLayoutColorThemeInput {
-  id: ID
-  ShortName: ENUM_COMPONENTLAYOUTCOLORTHEME_SHORTNAME
-}
-
-type ComponentLayoutColorTheme {
-  id: ID!
-  ShortName: ENUM_COMPONENTLAYOUTCOLORTHEME_SHORTNAME
+  Any: Boolean
+  Member: Boolean
+  HeadOfEvent: Boolean
+  BreedWarden: Boolean
 }
 
 type ComponentFormTextArea {
@@ -666,6 +589,83 @@ type ComponentFormBooleanChoice {
   BCRequired: Boolean
   BCDefaultValue: Boolean
   BCRequiredValue: Boolean
+}
+
+input ComponentLayoutSosInput {
+  id: ID
+  ShowSOS: Boolean
+  SosTitle: String
+  SosLink: String
+}
+
+type ComponentLayoutSos {
+  id: ID!
+  ShowSOS: Boolean!
+  SosTitle: String
+  SosLink: String
+}
+
+enum ENUM_COMPONENTLAYOUTPADDING_TOP {
+  small
+  middle
+  large
+}
+
+enum ENUM_COMPONENTLAYOUTPADDING_BOTTOM {
+  small
+  middle
+  large
+}
+
+type ComponentLayoutPadding {
+  id: ID!
+  Top: ENUM_COMPONENTLAYOUTPADDING_TOP
+  Bottom: ENUM_COMPONENTLAYOUTPADDING_BOTTOM
+}
+
+input ComponentLayoutFooterInput {
+  id: ID
+  PraesidiumName: String
+  PraesidiumOrt: String
+  PraesidiumTelefon: String
+  ItProjektleitungName: String
+  ItProjektleitungOrt: String
+  ItProjektleitungTelefon: String
+}
+
+type ComponentLayoutFooter {
+  id: ID!
+  PraesidiumName: String
+  PraesidiumOrt: String
+  PraesidiumTelefon: String
+  ItProjektleitungName: String
+  ItProjektleitungOrt: String
+  ItProjektleitungTelefon: String
+}
+
+enum ENUM_COMPONENTLAYOUTCOLORTHEME_SHORTNAME {
+  A
+  B
+  C
+  D
+  E
+}
+
+input ComponentLayoutColorThemeFiltersInput {
+  ShortName: StringFilterInput
+  and: [ComponentLayoutColorThemeFiltersInput]
+  or: [ComponentLayoutColorThemeFiltersInput]
+  not: ComponentLayoutColorThemeFiltersInput
+}
+
+input ComponentLayoutColorThemeInput {
+  id: ID
+  ShortName: ENUM_COMPONENTLAYOUTCOLORTHEME_SHORTNAME
+}
+
+type ComponentLayoutColorTheme {
+  id: ID!
+  ShortName: ENUM_COMPONENTLAYOUTCOLORTHEME_SHORTNAME
 }
 
 input ComponentColumnsTextColumnFiltersInput {
@@ -2219,6 +2219,7 @@ input NewsArticleFiltersInput {
   Slug: StringFilterInput
   SEO: ComponentSeoSeoFiltersInput
   category: NewsArticleCategoryFiltersInput
+  news_article_tags: NewsArticleTagFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   publishedAt: DateTimeFilterInput
@@ -2241,6 +2242,7 @@ input NewsArticleInput {
   SEO: ComponentSeoSeoInput
   category: ID
   NewsContentSections: [NewsArticleNewsContentSectionsDynamicZoneInput!]
+  news_article_tags: [ID]
   publishedAt: DateTime
 }
 
@@ -2259,6 +2261,8 @@ type NewsArticle {
   SEO: ComponentSeoSeo
   category: NewsArticleCategory
   NewsContentSections: [NewsArticleNewsContentSectionsDynamicZone]
+  news_article_tags_connection(filters: NewsArticleTagFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): NewsArticleTagRelationResponseCollection
+  news_article_tags(filters: NewsArticleTagFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [NewsArticleTag]!
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -2322,6 +2326,49 @@ type NewsArticleCategory {
 type NewsArticleCategoryEntityResponseCollection {
   nodes: [NewsArticleCategory!]!
   pageInfo: Pagination!
+}
+
+input NewsArticleTagFiltersInput {
+  documentId: IDFilterInput
+  Label: StringFilterInput
+  TagColorHexCode: StringFilterInput
+  TagBgColorHexCode: StringFilterInput
+  news_articles: NewsArticleFiltersInput
+  createdAt: DateTimeFilterInput
+  updatedAt: DateTimeFilterInput
+  publishedAt: DateTimeFilterInput
+  and: [NewsArticleTagFiltersInput]
+  or: [NewsArticleTagFiltersInput]
+  not: NewsArticleTagFiltersInput
+}
+
+input NewsArticleTagInput {
+  Label: String
+  TagColorHexCode: String
+  TagBgColorHexCode: String
+  news_articles: [ID]
+  publishedAt: DateTime
+}
+
+type NewsArticleTag {
+  documentId: ID!
+  Label: String!
+  TagColorHexCode: String
+  TagBgColorHexCode: String
+  news_articles_connection(filters: NewsArticleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): NewsArticleRelationResponseCollection
+  news_articles(filters: NewsArticleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [NewsArticle]!
+  createdAt: DateTime
+  updatedAt: DateTime
+  publishedAt: DateTime
+}
+
+type NewsArticleTagEntityResponseCollection {
+  nodes: [NewsArticleTag!]!
+  pageInfo: Pagination!
+}
+
+type NewsArticleTagRelationResponseCollection {
+  nodes: [NewsArticleTag!]!
 }
 
 enum ENUM_ORDER_ORDERSTATUS {
@@ -2584,7 +2631,7 @@ type SupplementalDocumentGroupEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingDogDocument | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTableOfContentSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksDocumentBundle | ComponentBlocksDocumentBundleSection | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | ComponentBlocksBundleDocuments | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
+union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingDogDocument | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTableOfContentSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksDocumentBundle | ComponentBlocksDocumentBundleSection | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | ComponentBlocksBundleDocuments | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | NewsArticleTag | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
 
 input FileInfoInput {
   name: String
@@ -2723,6 +2770,9 @@ type Query {
   newsArticleCategory(documentId: ID!, status: PublicationStatus = PUBLISHED): NewsArticleCategory
   newsArticleCategories_connection(filters: NewsArticleCategoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): NewsArticleCategoryEntityResponseCollection
   newsArticleCategories(filters: NewsArticleCategoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [NewsArticleCategory]!
+  newsArticleTag(documentId: ID!, status: PublicationStatus = PUBLISHED): NewsArticleTag
+  newsArticleTags_connection(filters: NewsArticleTagFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): NewsArticleTagEntityResponseCollection
+  newsArticleTags(filters: NewsArticleTagFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [NewsArticleTag]!
   order(documentId: ID!, status: PublicationStatus = PUBLISHED): Order
   orders_connection(filters: OrderFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): OrderEntityResponseCollection
   orders(filters: OrderFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Order]!
@@ -2800,6 +2850,9 @@ type Mutation {
   createNewsArticleCategory(status: PublicationStatus = PUBLISHED, data: NewsArticleCategoryInput!): NewsArticleCategory
   updateNewsArticleCategory(documentId: ID!, status: PublicationStatus = PUBLISHED, data: NewsArticleCategoryInput!): NewsArticleCategory
   deleteNewsArticleCategory(documentId: ID!): DeleteMutationResponse
+  createNewsArticleTag(status: PublicationStatus = PUBLISHED, data: NewsArticleTagInput!): NewsArticleTag
+  updateNewsArticleTag(documentId: ID!, status: PublicationStatus = PUBLISHED, data: NewsArticleTagInput!): NewsArticleTag
+  deleteNewsArticleTag(documentId: ID!): DeleteMutationResponse
   createOrder(status: PublicationStatus = PUBLISHED, data: OrderInput!): Order
   updateOrder(documentId: ID!, status: PublicationStatus = PUBLISHED, data: OrderInput!): Order
   deleteOrder(documentId: ID!): DeleteMutationResponse

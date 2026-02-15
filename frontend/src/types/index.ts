@@ -791,4 +791,9 @@ export interface NewsArticle {
 	SEO?: SEO | null
 	category?: NewsArticleCategory | null
 	NewsContentSections?: PageSection[] | null
+	news_article_tags?: {
+		Label?: string | null
+		TagColorHexCode?: string | null
+		TagBgColorHexCode?: string | null
+	}[] | null
 }

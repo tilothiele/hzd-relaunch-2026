@@ -74,6 +74,12 @@
         "blocks.contact-group-section",
         "blocks.card-section"
       ]
+    },
+    "news_article_tags": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::news-article-tag.news-article-tag",
+      "inversedBy": "news_articles"
     }
   }
 }

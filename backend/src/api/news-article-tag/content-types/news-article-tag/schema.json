@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "news_article_tags",
+  "info": {
+    "singularName": "news-article-tag",
+    "pluralName": "news-article-tags",
+    "displayName": "NewsArticleTag"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Label": {
+      "type": "string",
+      "minLength": 3,
+      "required": true
+    },
+    "TagColorHexCode": {
+      "type": "string"
+    },
+    "TagBgColorHexCode": {
+      "type": "string"
+    },
+    "news_articles": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::news-article.news-article",
+      "mappedBy": "news_article_tags"
+    }
+  }
+}

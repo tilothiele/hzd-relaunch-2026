@@ -7,9 +7,10 @@ import type { ThemeDefinition } from '@/themes'
 interface ActionButtonProps {
 	actionButton: ActionButtonType
 	theme?: ThemeDefinition | null
+	size?: 'small' | 'medium'
 }
 
-export function ActionButton({ actionButton, theme }: ActionButtonProps) {
+export function ActionButton({ actionButton, theme, size = 'medium' }: ActionButtonProps) {
 	if (!actionButton?.Link || actionButton.Link.trim() === '') {
 		return null
 	}
@@ -33,13 +34,16 @@ export function ActionButton({ actionButton, theme }: ActionButtonProps) {
 	// Prüfe ob es ein interner oder externer Link ist
 	const isExternalLink = actionButton.Link.startsWith('http://') || actionButton.Link.startsWith('https://')
 
+	const padding = size === 'small' ? '3px 12px' : '6px 24px'
+	const fontSize = size === 'small' ? '0.8rem' : '1.15rem'
+
 	const baseStyles: React.CSSProperties = {
 		display: 'inline-flex',
 		alignItems: 'center',
 		justifyContent: 'center',
 		borderRadius: '999px',
-		padding: '6px 24px', // Reduced padding to match ~20% height reduction request (was 10px)
-		fontSize: '1.15rem',
+		padding,
+		fontSize,
 		fontWeight: 400,
 		textDecoration: 'none',
 		transition: 'all 0.2s ease-in-out',

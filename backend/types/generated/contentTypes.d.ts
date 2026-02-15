@@ -959,6 +959,45 @@ export interface ApiNewsArticleCategoryNewsArticleCategory
   };
 }
 
+export interface ApiNewsArticleTagNewsArticleTag
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'news_article_tags';
+  info: {
+    displayName: 'NewsArticleTag';
+    pluralName: 'news-article-tags';
+    singularName: 'news-article-tag';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    Label: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        minLength: 3;
+      }>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::news-article-tag.news-article-tag'
+    > &
+      Schema.Attribute.Private;
+    news_articles: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::news-article.news-article'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    TagBgColorHexCode: Schema.Attribute.String;
+    TagColorHexCode: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
   collectionName: 'news_articles';
   info: {
@@ -990,6 +1029,10 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
       'api::news-article.news-article'
     > &
       Schema.Attribute.Private;
+    news_article_tags: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::news-article-tag.news-article-tag'
+    >;
     NewsContentSections: Schema.Attribute.DynamicZone<
       [
         'blocks.text-columns-section',
@@ -2072,6 +2115,7 @@ declare module '@strapi/strapi' {
       'api::local-cummunity.local-cummunity': ApiLocalCummunityLocalCummunity;
       'api::merchandising-product.merchandising-product': ApiMerchandisingProductMerchandisingProduct;
       'api::news-article-category.news-article-category': ApiNewsArticleCategoryNewsArticleCategory;
+      'api::news-article-tag.news-article-tag': ApiNewsArticleTagNewsArticleTag;
       'api::news-article.news-article': ApiNewsArticleNewsArticle;
       'api::order-item.order-item': ApiOrderItemOrderItem;
       'api::order.order': ApiOrderOrder;

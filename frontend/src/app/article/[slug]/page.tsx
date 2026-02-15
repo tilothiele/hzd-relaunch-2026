@@ -7,6 +7,7 @@ import { SectionContainer } from '@/components/sections/section-container/sectio
 import NotFoundSection from '@/components/sections/not-found-section/not-found-section'
 import { MarkAsRead } from '@/components/news/mark-as-read'
 import { formattedDate } from '@/lib/article-utils'
+import { resolveTagColors } from '@/lib/color-utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,6 +25,7 @@ function ArticleHeader({
     author,
     publishedAt,
     image,
+    tags,
     strapiBaseUrl,
     theme
 }: {
@@ -32,6 +34,7 @@ function ArticleHeader({
     author?: string | null
     publishedAt?: string | null
     image?: { url: string; alternativeText?: string | null; width?: number | null; height?: number | null } | null
+    tags?: { Label?: string | null; TagColorHexCode?: string | null; TagBgColorHexCode?: string | null }[] | null
     strapiBaseUrl: string
     theme: ThemeDefinition
 }) {
@@ -59,6 +62,25 @@ function ArticleHeader({
                         <p className='text-sm opacity-80' style={{ color: 'inherit' }}>
                             von {author}
                         </p>
+                    )}
+                    {tags && tags.length > 0 && (
+                        <div className='mt-4 flex flex-wrap gap-2'>
+                            {tags.map((tag) => {
+                                const { color, backgroundColor } = resolveTagColors(tag)
+                                return (
+                                    <span
+                                        key={tag.Label}
+                                        className='rounded-full px-3 py-1 text-xs font-semibold'
+                                        style={{
+                                            backgroundColor,
+                                            color
+                                        }}
+                                    >
+                                        {tag.Label}
+                                    </span>
+                                )
+                            })}
+                        </div>
                     )}
                 </div>
 
@@ -159,6 +181,7 @@ export default async function ArticlePage({ params }: PageProps) {
                     author={article.Author}
                     publishedAt={article.DateOfPublication || article.publishedAt}
                     image={article.Image}
+                    tags={article.news_article_tags}
                     strapiBaseUrl={baseUrl}
                     theme={theme}
                 />

@@ -14,6 +14,11 @@ export interface NewsArticle {
     category?: {
         CategoryName?: string | null
     } | null
+    news_article_tags?: {
+        Label?: string | null
+        TagColorHexCode?: string | null
+        TagBgColorHexCode?: string | null
+    }[] | null
 }
 
 interface NewsArticlesResponse {

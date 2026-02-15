@@ -6,6 +6,7 @@ import Image from 'next/image'
 import type { NewsArticle } from '@/lib/server/news-utils'
 import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
+import { resolveTagColors } from '@/lib/color-utils'
 
 interface NewsCardListViewProps {
     article: NewsArticle
@@ -78,6 +79,30 @@ export function NewsCardListView({ article, strapiBaseUrl, theme, isUnread }: Ne
                                     {formattedDate}
                                 </Typography>
                             )}
+                            {article.news_article_tags && article.news_article_tags.length > 0 && (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                    {article.news_article_tags.map((tag) => {
+                                        const { color, backgroundColor } = resolveTagColors(tag)
+                                        return (
+                                            <Box
+                                                key={tag.Label}
+                                                component="span"
+                                                sx={{
+                                                    backgroundColor,
+                                                    color,
+                                                    px: 1,
+                                                    py: 0.25,
+                                                    borderRadius: 1,
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: 600,
+                                                }}
+                                            >
+                                                {tag.Label}
+                                            </Box>
+                                        )
+                                    })}
+                                </Box>
+                            )}
                         </Box>
                     </Box>
 
@@ -111,6 +136,8 @@ export function NewsCardListView({ article, strapiBaseUrl, theme, isUnread }: Ne
                             {article.TeaserText}
                         </Typography>
                     )}
+
+
                 </CardContent>
             </Card>
         </Link>
