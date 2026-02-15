@@ -1,3 +1,4 @@
+export { };
 
 const STRAPI_URL = 'http://localhost:1337/graphql';
 
@@ -9,6 +10,7 @@ query GetNewsArticles {
         news_article_tags {
             Label
             TagColorHexCode
+            TagBgColorHexCode
         }
     }
 }
@@ -42,7 +44,7 @@ async function verifyTagsDirectly() {
         articles.forEach((article: any) => {
             console.log(`Article: ${article.Headline}`);
             if (article.news_article_tags && article.news_article_tags.length > 0) {
-                console.log('  Tags:', article.news_article_tags.map((t: any) => `${t.Label} (${t.TagColorHexCode})`).join(', '));
+                console.log('  Tags:', article.news_article_tags.map((t: any) => `${t.Label} (${t.TagColorHexCode}, ${t.TagBgColorHexCode})`).join(', '));
             } else {
                 console.log('  No tags found.');
             }
