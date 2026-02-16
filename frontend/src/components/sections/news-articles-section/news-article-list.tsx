@@ -96,10 +96,6 @@ export function NewsArticleList({ articles, strapiBaseUrl, theme }: NewsArticleL
                 </Typography>
             )}
 
-            <Typography variant="body1" sx={{ textAlign: 'center', py: 4, color: theme.textColor }}>
-                Testzeile.
-            </Typography>
-
             {viewMode === 'cards' ? (
                 <Box sx={{
                     display: 'grid',
