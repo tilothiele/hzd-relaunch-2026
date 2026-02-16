@@ -40,20 +40,22 @@ export async function NewsArticlesSectionComponent({
             paddingBottom='3em'
         >
             <Box sx={{ width: '100%' }}>
-                <Typography
-                    variant='h4'
-                    component='h1'
-                    sx={{
-                        textAlign: 'center',
-                        fontWeight: 700,
-                        mb: 2,
-                        color: theme.headlineColor
-                    }}
-                >
-                    {section.news_article_category?.CategoryName ?? 'Aktuelles'}
-                </Typography>
+                {!section.HideCategoryName && (
+                    <Typography
+                        variant='h4'
+                        component='h1'
+                        sx={{
+                            textAlign: 'center',
+                            fontWeight: 700,
+                            mb: 2,
+                            color: theme.headlineColor
+                        }}
+                    >
+                        {section.news_article_category?.CategoryName ?? 'Aktuelles'}
+                    </Typography>
+                )}
 
-                {section.news_article_category?.CategoryDescription && (
+                {!section.HideCategoryDescription && section.news_article_category?.CategoryDescription && (
                     <div
                         className='prose prose-xl mx-auto mb-10 max-w-[800px] text-center dark:prose-invert [&_p]:my-2'
                         style={{

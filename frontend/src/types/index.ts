@@ -186,13 +186,11 @@ export interface ContactMailerSection {
 export interface NewsArticlesSection {
 	__typename: 'ComponentBlocksNewsArticlesSection'
 	id: string
-	MaxArticles?: number | null
-	news_article_category?: {
-		documentId: string
-		CategoryName?: string | null
-		CategoryDescription?: string | null
-	} | null
-	NewsArticlesAnchor?: string | null
+	MaxArticles: number
+	news_article_category?: NewsArticleCategory
+	NewsArticlesAnchor?: string
+	HideCategoryName?: boolean
+	HideCategoryDescription?: boolean
 }
 
 export interface BundleDocuments {

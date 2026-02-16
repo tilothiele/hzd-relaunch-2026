@@ -18,6 +18,12 @@
     },
     "NewsArticlesAnchor": {
       "type": "string"
+    },
+    "HideCategoryName": {
+      "type": "boolean"
+    },
+    "HideCategoryDescription": {
+      "type": "boolean"
     }
   },
   "config": {}

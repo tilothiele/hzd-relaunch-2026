@@ -194,13 +194,15 @@ export const GET_LAYOUT = `
 						SimpleCtaAnchor
 					}
 					... on ComponentBlocksNewsArticlesSection {
-					MaxArticles
-								news_article_category {
-									documentId
-									CategoryName
-									CategoryDescription
-								}
+						MaxArticles
+						news_article_category {
+							documentId
+							CategoryName
+							CategoryDescription
+						}
 						NewsArticlesAnchor
+						HideCategoryName
+						HideCategoryDescription
 					}
 					... on ComponentBlocksContactGroupSection {
 						ContactGroup {
@@ -454,13 +456,15 @@ export const GET_INDEX_PAGE = `
 					SimpleCtaAnchor
 				}
 				... on ComponentBlocksNewsArticlesSection {
-				MaxArticles
-							news_article_category {
-								documentId
-								CategoryName
-								CategoryDescription
-							}
+					MaxArticles
+					news_article_category {
+						documentId
+						CategoryName
+						CategoryDescription
+					}
 					NewsArticlesAnchor
+					HideCategoryName
+					HideCategoryDescription
 				}
 				... on ComponentBlocksContactGroupSection {
 					ContactGroup {
@@ -842,6 +846,8 @@ export const GET_PAGE_BY_SLUG = `
 								CategoryDescription
 							}
 							NewsArticlesAnchor
+							HideCategoryName
+							HideCategoryDescription
 						}
 						... on ComponentBlocksDocumentBundleSection {
 							DBSName

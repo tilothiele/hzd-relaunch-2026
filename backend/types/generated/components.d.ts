@@ -150,6 +150,8 @@ export interface BlocksNewsArticlesSection extends Struct.ComponentSchema {
     displayName: 'NewsArticlesSection';
   };
   attributes: {
+    HideCategoryDescription: Schema.Attribute.Boolean;
+    HideCategoryName: Schema.Attribute.Boolean;
     MaxArticles: Schema.Attribute.Integer;
     MaxFeaturedArticles: Schema.Attribute.Integer;
     news_article_category: Schema.Attribute.Relation<
