@@ -712,7 +712,7 @@ export interface Form {
 		documentId: string
 		firstName?: string | null
 		lastName?: string | null
-	} | null
+	}[] | null
 	InclPrivacyPolicy?: boolean | null
 	ThankYouMessage?: string | null
 	FormFields?: FormField[] | null
