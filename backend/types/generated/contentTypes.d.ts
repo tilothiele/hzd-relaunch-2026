@@ -443,6 +443,7 @@ export interface ApiCalendarEntryCalendarEntry
   };
   attributes: {
     AnmeldeLink: Schema.Attribute.String;
+    AnmeldeLinkVisibleFrom: Schema.Attribute.DateTime;
     calendar: Schema.Attribute.Relation<'oneToOne', 'api::calendar.calendar'>;
     CalendarDocument: Schema.Attribute.Component<
       'calendar.calendar-document',
@@ -456,6 +457,7 @@ export interface ApiCalendarEntryCalendarEntry
     Description: Schema.Attribute.Text;
     DueDate: Schema.Attribute.DateTime;
     ErgebnisLink: Schema.Attribute.String;
+    ErgebnisLinkVisibleFrom: Schema.Attribute.DateTime;
     ErgebnisText: Schema.Attribute.RichText &
       Schema.Attribute.CustomField<
         'plugin::ckeditor5.CKEditor',

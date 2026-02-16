@@ -83,6 +83,12 @@
       "options": {
         "preset": "defaultHtml"
       }
+    },
+    "AnmeldeLinkVisibleFrom": {
+      "type": "datetime"
+    },
+    "ErgebnisLinkVisibleFrom": {
+      "type": "datetime"
     }
   }
 }

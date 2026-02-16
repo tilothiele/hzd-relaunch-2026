@@ -192,11 +192,11 @@ export function FormComponent({ form, privacyPolicy, strapiBaseUrl }: FormCompon
 					}
 					label={
 						<>
-							Ich stimme der{' '}
+							Ich habe die{' '}
 							<Link href={privacyPolicyUrl} target='_blank' rel='noopener noreferrer' underline='hover'>
-								Datenschutzerklärung
+								Datenschutzbestimmungen
 							</Link>{' '}
-							zu
+							zur Kenntnis genommen
 						</>
 					}
 					sx={{ mt: 1 }}

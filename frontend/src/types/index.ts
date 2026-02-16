@@ -609,6 +609,8 @@ export interface CalendarItem {
 	VisibleFrom?: string | null
 	VisibleTo?: string | null
 	DueDate?: string | null
+	AnmeldeLinkVisibleFrom?: string | null
+	ErgebnisLinkVisibleFrom?: string | null
 	createdAt?: string | null
 	updatedAt?: string | null
 	publishedAt?: string | null

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Paper, Box, Typography, Button } from '@mui/material'
 import type { CalendarItem } from '@/types'
 import { getCalendarColors, formatDateRange } from '@/lib/calendar-utils'
-import { ExternalRegistrationLink, InternalRegistrationLink } from '@/components/calendar/registration-links'
+import { ExternalRegistrationLink, InternalRegistrationLink, ResultLink } from '@/components/calendar/registration-links'
 import { CalendarDetailsModal } from './calendar-details-modal'
 import { BlocksRenderer } from '@strapi/blocks-react-renderer'
 
@@ -16,8 +16,30 @@ export function CalendarItemCard({ item, index, registrationOpen }: CalendarItem
     const [isModalOpen, setIsModalOpen] = useState(false)
     const calendarColors = item.calendar ? getCalendarColors(item.calendar) : null
     const isEven = index % 2 === 0
+    const now = Date.now()
 
     const hasExtraDetails = !!(item.LongDescription || (item.CalendarDocument && item.CalendarDocument.some(doc => doc.MediaFile?.url)))
+
+    // Logic for AnmeldeLink visibility
+    const isAnmeldeLinkVisible = () => {
+        if (!item.AnmeldeLink) return false
+        if (!registrationOpen) return false
+
+        if (item.AnmeldeLinkVisibleFrom && new Date(item.AnmeldeLinkVisibleFrom).getTime() > now) return false
+
+        return true
+    }
+
+    // Logic for ErgebnisLink visibility
+    const isErgebnisLinkVisible = () => {
+        if (!item.ErgebnisLink) return false
+        if (!item.ErgebnisLinkVisibleFrom) return true // Default visible if no start date set? Or hidden? User said "nur nach...". Usually implies if set check it. If not set, usually visible? "nur nach... angezeigt werden" -> if null, maybe always? or never? Assuming always visible if not restricted, logic for optional dates. "diese Datum sind optional". So if null -> visible.
+
+        return new Date(item.ErgebnisLinkVisibleFrom).getTime() <= now
+    }
+
+    const showAnmeldeLink = isAnmeldeLinkVisible()
+    const showErgebnisLink = isErgebnisLinkVisible()
 
     return (
         <>
@@ -83,11 +105,14 @@ export function CalendarItemCard({ item, index, registrationOpen }: CalendarItem
                                     Details
                                 </Button>
                             ) : null}
-                            {registrationOpen && item.AnmeldeLink ? (
+                            {showAnmeldeLink && item.AnmeldeLink ? (
                                 <ExternalRegistrationLink href={item.AnmeldeLink} />
                             ) : null}
                             {registrationOpen && item.form?.documentId ? (
                                 <InternalRegistrationLink href={`/anmeldung/${item.form.documentId}`} />
+                            ) : null}
+                            {showErgebnisLink && item.ErgebnisLink ? (
+                                <ResultLink href={item.ErgebnisLink} />
                             ) : null}
                         </Box>
                     </Box>
@@ -163,11 +188,14 @@ export function CalendarItemCard({ item, index, registrationOpen }: CalendarItem
                                 Details
                             </Button>
                         ) : null}
-                        {registrationOpen && item.AnmeldeLink ? (
+                        {showAnmeldeLink && item.AnmeldeLink ? (
                             <ExternalRegistrationLink href={item.AnmeldeLink} />
                         ) : null}
                         {registrationOpen && item.form?.documentId ? (
                             <InternalRegistrationLink href={`/anmeldung/${item.form.documentId}`} />
+                        ) : null}
+                        {showErgebnisLink && item.ErgebnisLink ? (
+                            <ResultLink href={item.ErgebnisLink} />
                         ) : null}
                     </Box>
                 </Box>

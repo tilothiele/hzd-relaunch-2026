@@ -23,6 +23,7 @@ import type {
 	StandardIdentifier,
 } from '@/types'
 import { CountryCodeInput } from './country-code-input'
+import { BlocksRenderer } from '@strapi/blocks-react-renderer'
 
 export function renderFormField(
 	field: FormField,
@@ -186,8 +187,14 @@ export function renderFormField(
 			const staticText = field as StaticText
 			return (
 				<Box key={uniqueKey} sx={{ mb: 2 }}>
-					<Typography variant='body2' sx={{ whiteSpace: 'pre-wrap' }}>
-						{staticText.StaticContent ?? ''}
+					<Typography variant='body2' component='div' sx={{
+						'& p': { mb: 1, lineHeight: 1.5 },
+						'& ul, & ol': { mb: 1, pl: 3 },
+						'& a': { color: 'primary.main', textDecoration: 'underline' }
+					}}>
+						{staticText.StaticContent ? (
+							<BlocksRenderer content={staticText.StaticContent as any} />
+						) : null}
 					</Typography>
 				</Box>
 			)

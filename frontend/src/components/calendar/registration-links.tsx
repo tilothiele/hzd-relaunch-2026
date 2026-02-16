@@ -57,7 +57,20 @@ export function InternalRegistrationLink({ href, sx }: RegistrationLinkProps) {
 	)
 }
 
-
+export function ResultLink({ href, sx }: RegistrationLinkProps) {
+	return (
+		<MuiLink
+			href={href}
+			target='_blank'
+			rel='noopener noreferrer'
+			underline='hover'
+			sx={{ ...linkSx, ...sx }}
+		>
+			Ergebnisse
+			<OpenInNewIcon sx={{ fontSize: '0.875rem' }} />
+		</MuiLink>
+	)
+}
 
 
 

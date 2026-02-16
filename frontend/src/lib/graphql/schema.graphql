@@ -1782,6 +1782,8 @@ input CalendarEntryFiltersInput {
   DueDate: DateTimeFilterInput
   ErgebnisText: StringFilterInput
   LongDescription: StringFilterInput
+  AnmeldeLinkVisibleFrom: DateTimeFilterInput
+  ErgebnisLinkVisibleFrom: DateTimeFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   publishedAt: DateTimeFilterInput
@@ -1807,6 +1809,8 @@ input CalendarEntryInput {
   DueDate: DateTime
   ErgebnisText: String
   LongDescription: String
+  AnmeldeLinkVisibleFrom: DateTime
+  ErgebnisLinkVisibleFrom: DateTime
   publishedAt: DateTime
 }
 
@@ -1828,6 +1832,8 @@ type CalendarEntry {
   DueDate: DateTime
   ErgebnisText: String
   LongDescription: String
+  AnmeldeLinkVisibleFrom: DateTime
+  ErgebnisLinkVisibleFrom: DateTime
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime

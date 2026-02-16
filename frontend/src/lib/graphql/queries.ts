@@ -1365,6 +1365,8 @@ query SearchCalendarItems($filters: CalendarEntryFiltersInput , $pagination: Pag
 			VisibleFrom
 			VisibleTo
 			DueDate
+			AnmeldeLinkVisibleFrom
+			ErgebnisLinkVisibleFrom
 			createdAt
 			updatedAt
 			publishedAt

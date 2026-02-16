@@ -85,7 +85,7 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 									<div><Link href='/impressum' className='text-sm transition-colors hover:text-yellow-400 underline'>
 										Impressum
 									</Link></div>
-									<div><Link href='/datenschutz' className='text-sm transition-colors hover:text-yellow-400 underline'>
+									<div><Link href={resolveMediaUrl(globalLayout?.PrivacyPolicy, strapiBaseUrl) ?? '/datenschutz'} className='text-sm transition-colors hover:text-yellow-400 underline'>
 										Datenschutz
 									</Link></div>
 									<div><Link href='/cookie-einstellungen' className='text-sm transition-colors hover:text-yellow-400 underline'>
