@@ -376,7 +376,8 @@ export interface AuthUser {
 	zip?: string | null
 	city?: string | null
 	phone?: string | null
-	geoLocation?: GeoLocation | null
+	locationLat?: number | null
+	locationLng?: number | null
 }
 
 export interface PuppyAmount {

@@ -8,6 +8,8 @@ import { fetchGraphQL } from '@/lib/graphql-client'
 import { SEARCH_FORMS, COUNT_FORM_INSTANCES } from '@/lib/graphql/queries'
 import type { Form, FormSearchResult, FormInstanceSearchResult, AuthUser } from '@/types'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
+import { ActionButton } from '@/components/ui/action-button'
+import { useTheme } from '@/hooks/use-theme'
 
 interface FormsInstanceSearchProps {
 	strapiBaseUrl: string
@@ -23,6 +25,7 @@ interface FormWithCount extends Form {
 }
 
 export function FormsInstanceSearch({ strapiBaseUrl, user, isAuthenticated }: FormsInstanceSearchProps) {
+	const { theme } = useTheme()
 	const [formNameFilter, setFormNameFilter] = useState('')
 	const [page, setPage] = useState(1)
 	const [pageSize, setPageSize] = useState<PageSize>(10)
@@ -230,24 +233,19 @@ export function FormsInstanceSearch({ strapiBaseUrl, user, isAuthenticated }: Fo
 						/>
 					</Box>
 					<Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-						<Button
-							variant='contained'
+						<ActionButton
+							actionButton={{
+								Label: isLoading ? 'Suche...' : 'Suchen',
+								Primary: true,
+							}}
 							onClick={handleSearch}
 							disabled={isLoading}
-							sx={{
-								backgroundColor: '#facc15',
-								color: '#565757',
-								'&:hover': {
-									backgroundColor: '#e6b800',
-								},
-								'&:disabled': {
-									backgroundColor: '#d1d5db',
-									color: '#9ca3af',
-								},
+							theme={theme}
+							style={{
+								padding: '5px 20px',
+								fontSize: '0.92rem',
 							}}
-						>
-							{isLoading ? 'Suche...' : 'Suchen'}
-						</Button>
+						/>
 					</Box>
 				</Box>
 

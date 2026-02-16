@@ -8,10 +8,17 @@ interface ActionButtonProps {
 	actionButton: ActionButtonType
 	theme?: ThemeDefinition | null
 	size?: 'small' | 'medium'
+	onClick?: () => void
+	disabled?: boolean
+	type?: 'button' | 'submit' | 'reset'
+	className?: string
+	style?: React.CSSProperties
 }
 
-export function ActionButton({ actionButton, theme, size = 'medium' }: ActionButtonProps) {
-	if (!actionButton?.Link || actionButton.Link.trim() === '') {
+export function ActionButton({ actionButton, theme, size = 'medium', onClick, disabled, type = 'button', className, style }: ActionButtonProps) {
+	const hasLink = actionButton?.Link && actionButton.Link.trim() !== ''
+
+	if (!hasLink && !onClick) {
 		return null
 	}
 
@@ -32,7 +39,7 @@ export function ActionButton({ actionButton, theme, size = 'medium' }: ActionBut
 		: (theme?.secondaryButtonHoverColor ?? 'var(--color-action-secondary-hover)')
 
 	// Prüfe ob es ein interner oder externer Link ist
-	const isExternalLink = actionButton.Link.startsWith('http://') || actionButton.Link.startsWith('https://')
+	const isExternalLink = hasLink && (actionButton.Link!.startsWith('http://') || actionButton.Link!.startsWith('https://'))
 
 	const padding = size === 'small' ? '3px 12px' : '6px 24px'
 	const fontSize = size === 'small' ? '0.8rem' : '1.15rem'
@@ -47,11 +54,13 @@ export function ActionButton({ actionButton, theme, size = 'medium' }: ActionBut
 		fontWeight: 400,
 		textDecoration: 'none',
 		transition: 'all 0.2s ease-in-out',
-		cursor: 'pointer',
-		lineHeight: 1.5
+		cursor: disabled ? 'not-allowed' : 'pointer',
+		lineHeight: 1.5,
+		border: 'none',
+		outline: 'none',
+		opacity: disabled ? 0.6 : 1,
 	}
 
-	// Determine specific styles based on variant
 	// Determine specific styles based on variant
 	const specificStyles: React.CSSProperties = {
 		backgroundColor: buttonColor,
@@ -62,21 +71,38 @@ export function ActionButton({ actionButton, theme, size = 'medium' }: ActionBut
 	const allStyles: any = {
 		...baseStyles,
 		...specificStyles,
+		...style,
 		'--button-hover-color': hoverColor,
 	}
 
-	const hoverClass = `shadow-lg hover:shadow-xl hover:!bg-[var(--button-hover-color)] hover:!border-[var(--button-hover-color)] hover:!text-white hover:!font-medium transition-all duration-200`
+	const hoverClass = disabled
+		? ''
+		: `shadow-lg hover:shadow-xl hover:!bg-[var(--button-hover-color)] hover:!border-[var(--button-hover-color)] hover:!text-white hover:!font-medium transition-all duration-200`
 
-	console.log(hoverClass)
+	const combinedClassName = `${hoverClass} ${className ?? ''}`.trim()
+
+	if (onClick) {
+		return (
+			<button
+				type={type}
+				onClick={onClick}
+				disabled={disabled}
+				style={allStyles}
+				className={combinedClassName}
+			>
+				{label}
+			</button>
+		)
+	}
 
 	if (isExternalLink) {
 		return (
 			<a
-				href={actionButton.Link}
+				href={actionButton.Link!}
 				target='_blank'
 				rel='noopener noreferrer'
 				style={allStyles}
-				className={hoverClass}
+				className={combinedClassName}
 			>
 				{label}
 			</a>
@@ -85,9 +111,9 @@ export function ActionButton({ actionButton, theme, size = 'medium' }: ActionBut
 
 	return (
 		<Link
-			href={actionButton.Link}
+			href={actionButton.Link!}
 			style={allStyles}
-			className={hoverClass}
+			className={combinedClassName}
 		>
 			{label}
 		</Link>

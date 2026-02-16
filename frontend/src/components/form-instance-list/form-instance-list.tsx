@@ -7,13 +7,15 @@ import PrintIcon from '@mui/icons-material/Print'
 import { fetchGraphQL } from '@/lib/graphql-client'
 import { COUNT_FORM_INSTANCES } from '@/lib/graphql/queries'
 import type { Form, FormInstance, FormInstanceSearchResult } from '@/types'
+import type { ThemeDefinition } from '@/themes'
 
 interface FormInstanceListProps {
 	form: Form
 	strapiBaseUrl: string
+	theme?: ThemeDefinition
 }
 
-export function FormInstanceList({ form, strapiBaseUrl }: FormInstanceListProps) {
+export function FormInstanceList({ form, strapiBaseUrl, theme }: FormInstanceListProps) {
 	const [formInstances, setFormInstances] = useState<FormInstance[]>([])
 	const [isLoading, setIsLoading] = useState(false)
 	const [error, setError] = useState<Error | null>(null)
@@ -225,10 +227,20 @@ export function FormInstanceList({ form, strapiBaseUrl }: FormInstanceListProps)
 								window.open(`/printable-form-instance/${form.documentId}`, '_blank')
 							}}
 							sx={{
-								backgroundColor: '#facc15',
-								color: '#565757',
+								backgroundColor: theme?.buttonColor || 'var(--color-action-primary)',
+								color: theme?.buttonTextColor || 'var(--color-action-primary-text)',
+								borderRadius: '999px',
+								padding: '6px 24px',
+								textTransform: 'none',
+								fontSize: '1.15rem',
+								fontWeight: 400,
+								boxShadow: 'none',
+								border: `1px solid ${theme?.buttonColor || 'var(--color-action-primary)'}`,
 								'&:hover': {
-									backgroundColor: '#e6b800',
+									backgroundColor: theme?.buttonHoverColor || 'var(--color-action-main-hover)',
+									borderColor: theme?.buttonHoverColor || 'var(--color-action-main-hover)',
+									boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05)',
+									color: '#fff',
 								},
 							}}
 						>
@@ -239,10 +251,20 @@ export function FormInstanceList({ form, strapiBaseUrl }: FormInstanceListProps)
 							startIcon={<DownloadIcon />}
 							onClick={handleDownloadCSV}
 							sx={{
-								backgroundColor: '#facc15',
-								color: '#565757',
+								backgroundColor: theme?.buttonColor || 'var(--color-action-primary)',
+								color: theme?.buttonTextColor || 'var(--color-action-primary-text)',
+								borderRadius: '999px',
+								padding: '6px 24px',
+								textTransform: 'none',
+								fontSize: '1.15rem',
+								fontWeight: 400,
+								boxShadow: 'none',
+								border: `1px solid ${theme?.buttonColor || 'var(--color-action-primary)'}`,
 								'&:hover': {
-									backgroundColor: '#e6b800',
+									backgroundColor: theme?.buttonHoverColor || 'var(--color-action-main-hover)',
+									borderColor: theme?.buttonHoverColor || 'var(--color-action-main-hover)',
+									boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05)',
+									color: '#fff',
 								},
 							}}
 						>

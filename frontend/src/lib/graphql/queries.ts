@@ -1475,11 +1475,8 @@ export const GET_ME = `
 			zip
 			city
 			phone
-			geoLocation {
-				id
-				lat
-				lng
-			}
+			locationLat
+			locationLng
 		}
 	}
 `

@@ -13,6 +13,53 @@ export default (plugin: any) => {
 
 		strapi.log.info('[User Ext] Bootstrap: extending JWT service and patching user document service')
 
+		// Extend User Controller to fix /api/me returning ID instead of DocumentID
+		if (plugin.controllers?.user) {
+			const originalMe = plugin.controllers.user.me
+
+			plugin.controllers.user.me = async (ctx: any) => {
+				const user = ctx.state.user
+
+				if (!user) {
+					return ctx.unauthorized()
+				}
+
+				try {
+					// Use Document Service to fetch user by ID (integer)
+					// In Strapi 5, documentId is the main identifier, but auth uses ID (integer)
+					const userEntity = await strapi.documents('plugin::users-permissions.user').findFirst({
+						where: { id: user.id },
+						populate: ['role', 'member'], // Standard populate + member
+					})
+
+					if (!userEntity) {
+						return ctx.notFound('User not found')
+					}
+
+					// Sanitize output
+					// Manual sanitization to ensure documentId is preserved if sanitizeOutput strips it (it shouldn't in v5, but purely safety)
+					const sanitizedUser = await strapi.contentAPI.sanitize.output(
+						userEntity,
+						strapi.getModel('plugin::users-permissions.user'),
+						{ auth: ctx.state.auth }
+					)
+
+					// Force documentId from entity if missing in sanitized output (safeguard)
+					if (!sanitizedUser.documentId && userEntity.documentId) {
+						sanitizedUser.documentId = userEntity.documentId
+					}
+
+					ctx.body = sanitizedUser
+				} catch (err) {
+					strapi.log.error('[User Ext] Error in custom me controller:', err)
+					// Fallback to original controller if something fails
+					return originalMe(ctx)
+				}
+			}
+
+			strapi.log.info('[User Ext] ✓ User Controller extended (me endpoint patch)')
+		}
+
 		// Extend JWT Service
 		try {
 			const jwtService = strapi.plugin('users-permissions')?.service('jwt')

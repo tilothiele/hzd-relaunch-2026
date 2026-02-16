@@ -63,7 +63,7 @@ export default async function FormInstanceFormIdPage({ params }: FormInstanceFor
 				paddingBottom='1em'
 			>
 				{form ? (
-					<FormInstanceList form={form} strapiBaseUrl={baseUrl || ''} />
+					<FormInstanceList form={form} strapiBaseUrl={baseUrl || ''} theme={theme} />
 				) : (
 					<div className='flex min-h-[50vh] items-center justify-center px-4 text-center text-sm text-gray-600'>
 						<p>Formular mit ID "{formId}" konnte nicht geladen werden.</p>
