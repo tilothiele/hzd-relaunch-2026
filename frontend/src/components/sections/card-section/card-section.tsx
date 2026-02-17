@@ -127,7 +127,6 @@ export function CardSectionComponent({
 				{cards.map((card, index) => {
 					const key = card.id ?? card.Headline ?? `card-${index}`
 					const imageUrl = resolveMediaUrl(card.BackgroundImage, strapiBaseUrl)
-					const themeColor = getThemeColor()
 					const currentCardTheme = globalTheme
 
 					return (
@@ -147,7 +146,7 @@ export function CardSectionComponent({
 									flexDirection: 'column',
 									overflow: 'hidden',
 									backgroundColor: theme.cardsBackground,
-									color: theme.cardsText,
+									//color: theme.cardsText,
 									boxShadow: 3,
 									borderTopLeftRadius: 0,
 									borderTopRightRadius: 0,
@@ -206,7 +205,7 @@ export function CardSectionComponent({
 												component='h3'
 												sx={{
 													fontWeight: 600,
-													color: theme.imageCardSectionText,
+													color: theme.cardsTextHeadline,
 													textAlign: 'center',
 													mb: 2,
 												}}
@@ -218,7 +217,7 @@ export function CardSectionComponent({
 											<Typography
 												variant='body2'
 												sx={{
-													color: theme.cardsText,
+													color: theme.cardsTextSubheadline,
 													opacity: 0.9,
 													textAlign: 'center',
 													mb: 2,
@@ -233,6 +232,7 @@ export function CardSectionComponent({
 													display: 'flex',
 													justifyContent: 'center',
 													mb: 2,
+													color: theme.cardsText,
 												}}
 											>
 												<ActionButton

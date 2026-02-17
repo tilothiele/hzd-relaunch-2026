@@ -24,6 +24,8 @@ export interface ThemeDefinition {
 	evenBgColor: string
 	cardsBackground: string
 	cardsText: string
+	cardsTextHeadline: string
+	cardsTextSubheadline: string
 	heroSlideShowText: string
 
 	submitButtonColor: string
@@ -69,6 +71,8 @@ export const theme: ThemeDefinition = {
 	evenBgColor: 'var(--color-white)',
 
 	cardsBackground: 'var(--color-cards-background)',
+	cardsTextHeadline: 'var(--color-cards-text-headline)',
+	cardsTextSubheadline: 'var(--color-cards-text-subheadline)',
 	cardsText: 'var(--color-cards-text)',
 }
 

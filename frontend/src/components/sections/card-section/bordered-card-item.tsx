@@ -51,7 +51,7 @@ export function BorderedCardItem({ card, strapiBaseUrl, theme, isUnread }: Borde
                 {card.Headline && (
                     <h3
                         style={{
-                            color: theme.cardsText,
+                            color: theme.cardsTextHeadline,
                             fontWeight: isUnread ? 900 : 700,
                             lineHeight: 1.2,
                             margin: 0
@@ -64,7 +64,7 @@ export function BorderedCardItem({ card, strapiBaseUrl, theme, isUnread }: Borde
                 {card.Subheadline && (
                     <p
                         style={{
-                            color: theme.cardsText,
+                            color: theme.cardsTextSubheadline,
                             lineHeight: 1.6,
                             fontSize: '1rem', // ~body1
                             margin: 0

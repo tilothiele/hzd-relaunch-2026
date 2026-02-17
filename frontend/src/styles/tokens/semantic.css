@@ -51,7 +51,7 @@
 
     --color-odd-section-background: var(--color-saharabeige);
 
-    --color-text: var(--color-hzd-blau);
+    --color-text: var(--color-hzd-text);
     --color-text-headline: var(--color-hzd-blau);
     --color-text-subheadline: var(--color-hzd-blau);
 
@@ -60,7 +60,9 @@
     --color-negative-text-subheadline: var(--color-saharabeige);
 
     --color-cards-background: var(--color-saharabeige);
-    --color-cards-text: var(--color-hzd-blau);
+    --color-cards-text: var(--color-hzd-text);
+    --color-cards-text-headline: var(--color-hzd-blau);
+    --color-cards-text-subheadline: var(--color-hzd-blau);
 
 
 }
