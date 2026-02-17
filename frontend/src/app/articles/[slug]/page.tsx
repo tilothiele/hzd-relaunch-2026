@@ -118,14 +118,6 @@ export default async function ArticlesCategoryPage({ params, searchParams }: Pag
 		featuredFilter: false,
 	})
 
-	// Debug logging
-	if (articles.length > 0) {
-		console.log('ArticlesCategoryPage article[0] tags:', articles[0].news_article_tags)
-	}
-	if (featuredArticles.length > 0) {
-		console.log('ArticlesCategoryPage featured[0] tags:', featuredArticles[0].news_article_tags)
-	}
-
 	const pageTitle = category.CategoryName || 'Artikel'
 	// Note: This is a simplified pagination - ideally we'd get total count from API
 	const totalPages = articles.length === pageSize ? currentPage + 1 : currentPage

@@ -144,12 +144,12 @@ export function TextColumnsSectionComponent({
 		>
 			<div className="w-full max-w-[1200px]">
 				{section.TextColumnsHeadline ? (
-					<h2 className='mb-3 text-3xl'>
+					<h2 className='mb-3 text-3xl' style={{ color: theme.headlineColor }}>
 						{section.TextColumnsHeadline}
 					</h2>
 				) : null}
 				{section.TextColumnsSubHeadline ? (
-					<h3 className='mb-4 text-2xl'>
+					<h3 className='mb-4 text-2xl' style={{ color: theme.headlineColor }}>
 						{section.TextColumnsSubHeadline}
 					</h3>
 				) : null}
@@ -179,13 +179,17 @@ export function TextColumnsSectionComponent({
 							>
 								<div className="flex flex-col">
 									{columnHeadline ? (
-										<h5 className='mt-3 mb-2'>{columnHeadline}</h5>
+										<h5 className='mt-3 mb-2' style={{ color: theme.headlineColor }}>{columnHeadline}</h5>
 									) : null}
 
 									{columnText ? (
 										<div
 											className="prose max-w-none dark:prose-invert [&_p]:my-2"
-											style={{ color: 'inherit' }}
+											style={{
+												color: theme.textColor,
+												'--tw-prose-body': theme.textColor,
+												'--tw-prose-headings': theme.headlineColor,
+											} as React.CSSProperties}
 											dangerouslySetInnerHTML={{ __html: columnText }}
 										/>
 									) : null}

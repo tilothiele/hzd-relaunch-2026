@@ -50,11 +50,11 @@ function ArticleHeader({
                             {fmtDate}
                         </time>
                     )}
-                    <h1 className='text-4xl font-bold tracking-tight md:text-5xl' style={{ color: 'inherit' }}>
+                    <h1 className='text-4xl font-bold tracking-tight md:text-5xl' style={{ color: theme.headlineColor }}>
                         {headline}
                     </h1>
                     {subHeadline && (
-                        <p className='text-xl opacity-90' style={{ color: 'inherit' }}>
+                        <p className='text-xl opacity-90' style={{ color: theme.textColor }}>
                             {subHeadline}
                         </p>
                     )}

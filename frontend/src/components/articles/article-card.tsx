@@ -33,8 +33,9 @@ export function ArticleCard({
 
     return (
         <div
-            className={`group block overflow-hidden rounded-lg bg-white shadow-md transition-all hover:shadow-xl ${featured ? 'md:flex md:flex-row' : ''
+            className={`group block overflow-hidden rounded-lg shadow-md transition-all hover:shadow-xl ${featured ? 'md:flex md:flex-row' : ''
                 }`}
+            style={{ backgroundColor: theme?.cardsBackground || 'var(--color-cards-background)' }}
         >
             {imageUrl && (
                 <Link href={articleLink} className={`relative block overflow-hidden aspect-[4/3] ${featured ? 'w-full md:w-1/2' : ''}`}>
@@ -75,17 +76,26 @@ export function ArticleCard({
                     )}
                 </div>
                 <Link href={articleLink} className='block'>
-                    <h3 className={`mt-2 font-bold ${featured ? 'text-2xl md:text-3xl' : 'text-xl'}`}>
+                    <h3
+                        className={`mt-2 font-bold ${featured ? 'text-2xl md:text-3xl' : 'text-xl'}`}
+                        style={{ color: theme?.cardsTextHeadline || 'var(--color-cards-text-headline)' }}
+                    >
                         {article.Headline}
                     </h3>
                 </Link>
                 {article.SubHeadline && (
-                    <p className={`mt-2 ${featured ? 'text-lg' : 'text-base'}`}>
+                    <p
+                        className={`mt-2 ${featured ? 'text-lg' : 'text-base'}`}
+                        style={{ color: theme?.cardsTextSubheadline || 'var(--color-cards-text-subheadline)' }}
+                    >
                         {article.SubHeadline}
                     </p>
                 )}
                 {article.TeaserText && (
-                    <p className='mt-3 line-clamp-3 text-gray-600'>
+                    <p
+                        className='mt-3 line-clamp-3'
+                        style={{ color: theme?.cardsText || 'var(--color-cards-text)' }}
+                    >
                         {article.TeaserText}
                     </p>
                 )}

@@ -43,7 +43,8 @@ export function NewsCard({ article, strapiBaseUrl, theme, isUnread }: NewsCardPr
                     boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
                 },
                 position: 'relative',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                backgroundColor: theme.cardsBackground
             }}
         >
             {imageUrl && (
@@ -114,7 +115,7 @@ export function NewsCard({ article, strapiBaseUrl, theme, isUnread }: NewsCardPr
                         variant="h6"
                         component="h3"
                         sx={{
-                            color: theme.textColor,
+                            color: theme.cardsTextHeadline,
                             fontWeight: 900,
                             lineHeight: 1.3,
                             mb: 1,
@@ -131,7 +132,7 @@ export function NewsCard({ article, strapiBaseUrl, theme, isUnread }: NewsCardPr
                     <Typography
                         variant="body2"
                         sx={{
-                            color: theme.textColor,
+                            color: theme.cardsText,
                             display: '-webkit-box',
                             WebkitLineClamp: 3,
                             WebkitBoxOrient: 'vertical',

@@ -40,6 +40,7 @@ export function NewsCardListView({ article, strapiBaseUrl, theme, isUnread }: Ne
                         transform: 'translateY(-2px)',
                         boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                     },
+                    backgroundColor: theme.cardsBackground
                 }}
             >
                 {imageUrl && (
@@ -110,7 +111,7 @@ export function NewsCardListView({ article, strapiBaseUrl, theme, isUnread }: Ne
                         variant="h6"
                         component="h3"
                         sx={{
-                            color: theme.textColor,
+                            color: theme.cardsTextHeadline,
                             fontWeight: 800,
                             lineHeight: 1.2,
                             mb: 1,
@@ -125,7 +126,7 @@ export function NewsCardListView({ article, strapiBaseUrl, theme, isUnread }: Ne
                         <Typography
                             variant="body2"
                             sx={{
-                                color: theme.textColor,
+                                color: theme.cardsText,
                                 display: '-webkit-box',
                                 WebkitLineClamp: 2,
                                 WebkitBoxOrient: 'vertical',
