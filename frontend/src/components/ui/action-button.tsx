@@ -51,7 +51,7 @@ export function ActionButton({ actionButton, theme, size = 'medium', onClick, di
 		borderRadius: '999px',
 		padding,
 		fontSize,
-		fontWeight: 400,
+		fontWeight: 500,
 		textDecoration: 'none',
 		transition: 'all 0.2s ease-in-out',
 		cursor: disabled ? 'not-allowed' : 'pointer',
@@ -77,7 +77,7 @@ export function ActionButton({ actionButton, theme, size = 'medium', onClick, di
 
 	const hoverClass = disabled
 		? ''
-		: `shadow-lg hover:shadow-xl hover:!bg-[var(--button-hover-color)] hover:!border-[var(--button-hover-color)] hover:!text-white hover:!font-medium transition-all duration-200`
+		: `shadow-lg hover:shadow-xl hover:!bg-[var(--button-hover-color)] hover:!border-[var(--button-hover-color)] hover:!text-white transition-all duration-200`
 
 	const combinedClassName = `${hoverClass} ${className ?? ''}`.trim()
 
