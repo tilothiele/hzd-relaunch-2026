@@ -148,28 +148,30 @@ export function LitterCard({ litter, strapiBaseUrl, hzdSetting, distance, format
                                 <td className="py-2 align-top">{stuntDogName}</td>
                             </tr>
                         )}
-                        {litter.dateOfManting && (
+                        {litter.LitterStatus === 'Planned' && litter.plannedDateOfBirth && (
                             <tr className="border-b border-gray-100 last:border-0">
-                                <td className="py-2 font-bold align-top">Deckdatum:</td>
-                                <td className="py-2 align-top">{formatDate(litter.dateOfManting)}</td>
+                                <td className="py-2 font-bold align-top">Gep. Wurfdatum:</td>
+                                <td className="py-2 align-top">
+                                    {new Date(litter.plannedDateOfBirth).toLocaleDateString('de-DE', { month: '2-digit', year: 'numeric' })}
+                                </td>
                             </tr>
                         )}
-                        {litter.expectedDateOfBirth && (
+                        {litter.LitterStatus !== 'Littered' && litter.expectedDateOfBirth && (
                             <tr className="border-b border-gray-100 last:border-0">
-                                <td className="py-2 font-bold align-top">Erw. Geburtsdatum:</td>
+                                <td className="py-2 font-bold align-top">Erw. Wurfdatum:</td>
                                 <td className="py-2 align-top">{formatDate(litter.expectedDateOfBirth)}</td>
                             </tr>
                         )}
                         {litter.dateOfBirth && (
                             <tr className="border-b border-gray-100 last:border-0">
-                                <td className="py-2 font-bold align-top">Geburtsdatum:</td>
+                                <td className="py-2 font-bold align-top">Wurfdatum:</td>
                                 <td className="py-2 align-top">{formatDate(litter.dateOfBirth)}</td>
                             </tr>
                         )}
                     </tbody>
                 </table>
             </div>
-            {(litter.AmountRS || litter.AmountRSM || litter.AmountRB || litter.AmountHS || litter.AmountHSM || litter.AmountHB) ? (
+            {(litter.LitterStatus === 'Littered') && (litter.AmountRS || litter.AmountRSM || litter.AmountRB || litter.AmountHS || litter.AmountHSM || litter.AmountHB) ? (
                 <div className='mt-3 space-y-1 border-t border-gray-200 pt-2'>
                     <table className="w-full">
                         <thead>

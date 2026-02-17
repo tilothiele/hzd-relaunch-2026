@@ -927,6 +927,7 @@ export const SEARCH_DOGS = `
 				}
 				cFertile
 				MemosReleased
+				Disabled
 				breeder {
 					BreedersIntroduction
 				}
@@ -1203,7 +1204,7 @@ export const SEARCH_LITTERS = `
 		) {
 			nodes {
 				documentId
-				dateOfManting
+				plannedDateOfBirth
 				expectedDateOfBirth
 				dateOfBirth
 				LitterStatus
@@ -2010,7 +2011,7 @@ export const GET_LITTERS_BY_BREEDER = `
 			nodes {
 				documentId
 				OrderLetter
-				dateOfManting
+				plannedDateOfBirth
 				dateOfBirth
 				expectedDateOfBirth
 				LitterStatus

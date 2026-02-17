@@ -528,6 +528,39 @@ export interface ApiCalendarCalendar extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiChampionChampion extends Struct.CollectionTypeSchema {
+  collectionName: 'champions';
+  info: {
+    displayName: 'Champion';
+    pluralName: 'champions';
+    singularName: 'champion';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    ChampionshipName: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    DateOfChampionship: Schema.Attribute.Date;
+    hzd_plugin_dog: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::hzd-plugin.dog'
+    >;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::champion.champion'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiContactGroupContactGroup
   extends Struct.CollectionTypeSchema {
   collectionName: 'contact_groups';
@@ -1498,6 +1531,7 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
     cStudBookNumberMother: Schema.Attribute.String;
     dateOfBirth: Schema.Attribute.Date;
     dateOfDeath: Schema.Attribute.Date;
+    Disabled: Schema.Attribute.Boolean;
     DogDocument: Schema.Attribute.Component<'breeding.dog-document', true>;
     Exhibitions: Schema.Attribute.Text;
     father: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.dog'>;
@@ -1611,7 +1645,6 @@ export interface PluginHzdPluginLitter extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     dateOfBirth: Schema.Attribute.Date;
-    dateOfManting: Schema.Attribute.Date;
     DisplayName: Schema.Attribute.String;
     expectedDateOfBirth: Schema.Attribute.Date;
     LitterStatus: Schema.Attribute.Enumeration<
@@ -1631,6 +1664,7 @@ export interface PluginHzdPluginLitter extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 1;
       }>;
+    plannedDateOfBirth: Schema.Attribute.Date;
     publishedAt: Schema.Attribute.DateTime;
     PuppyImage: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios'
@@ -2107,6 +2141,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::calendar-entry.calendar-entry': ApiCalendarEntryCalendarEntry;
       'api::calendar.calendar': ApiCalendarCalendar;
+      'api::champion.champion': ApiChampionChampion;
       'api::contact-group.contact-group': ApiContactGroupContactGroup;
       'api::contact.contact': ApiContactContact;
       'api::form-instance.form-instance': ApiFormInstanceFormInstance;

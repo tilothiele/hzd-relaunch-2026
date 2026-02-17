@@ -31,7 +31,7 @@
       "relation": "oneToOne",
       "target": "plugin::hzd-plugin.dog"
     },
-    "dateOfManting": {
+    "plannedDateOfBirth": {
       "type": "date"
     },
     "expectedDateOfBirth": {

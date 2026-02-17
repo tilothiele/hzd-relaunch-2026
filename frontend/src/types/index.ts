@@ -427,6 +427,7 @@ export interface Dog {
 	Exhibitions?: string | null
 	BreedSurvey?: string | null
 	withersHeight?: string | null
+	Disabled?: boolean | null
 	BreedersIntroduction?: string | null
 	MemosReleased?: string | null
 	breeder?: {
@@ -507,7 +508,7 @@ export interface BreederSearchResult {
 
 export interface Litter {
 	documentId: string
-	dateOfManting?: string | null
+	plannedDateOfBirth?: string | null
 	expectedDateOfBirth?: string | null
 	dateOfBirth?: string | null
 	LitterStatus: 'Planned' | 'Manted' | 'Littered' | 'Closed'

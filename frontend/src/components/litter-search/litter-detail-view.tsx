@@ -185,14 +185,17 @@ export function LitterDetailView({
                 <section>
                     <SectionHeader title="Allgemein" />
                     <div className="rounded-lg bg-gray-50 px-6 py-2">
-                        {litter.dateOfManting && (
-                            <DetailRow label="Deckdatum" value={formatDate(litter.dateOfManting)} />
+                        {litter.LitterStatus === 'Planned' && litter.plannedDateOfBirth && (
+                            <DetailRow
+                                label="Gep. Wurfdatum"
+                                value={new Date(litter.plannedDateOfBirth).toLocaleDateString('de-DE', { month: '2-digit', year: 'numeric' })}
+                            />
                         )}
-                        {litter.expectedDateOfBirth && (
-                            <DetailRow label="Erwartetes Geburtsdatum" value={formatDate(litter.expectedDateOfBirth)} />
+                        {litter.LitterStatus !== 'Littered' && litter.expectedDateOfBirth && (
+                            <DetailRow label="Erw. Wurfdatum" value={formatDate(litter.expectedDateOfBirth)} />
                         )}
                         {litter.dateOfBirth && (
-                            <DetailRow label="Geburtsdatum" value={formatDate(litter.dateOfBirth)} />
+                            <DetailRow label="Wurfdatum" value={formatDate(litter.dateOfBirth)} />
                         )}
                         <DetailRow label="Status" value={getStatusLabel(litter.LitterStatus)} />
                         {distance !== null && (
@@ -244,7 +247,7 @@ export function LitterDetailView({
                 )}
 
                 {/* 3. Welpen Statistik */}
-                {(litter.AmountRS || litter.AmountRSM || litter.AmountRB || litter.AmountHS || litter.AmountHSM || litter.AmountHB) && (
+                {isLittered && (litter.AmountRS || litter.AmountRSM || litter.AmountRB || litter.AmountHS || litter.AmountHSM || litter.AmountHB) && (
                     <section>
                         <SectionHeader title="Welpen" />
                         <div className='mb-6 space-y-2 pt-4'>

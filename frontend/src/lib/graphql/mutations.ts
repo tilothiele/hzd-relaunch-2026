@@ -33,6 +33,34 @@ export const UPDATE_LITTER = `
 			documentId
 			LitterStatus
 			StatusMessageDraft
+			OrderLetter
+			plannedDateOfBirth
+			expectedDateOfBirth
+			dateOfBirth
+			mother { documentId fullKennelName }
+			stuntDog { documentId fullKennelName }
+			AmountRS { Total Available }
+			AmountRSM { Total Available }
+			AmountRB { Total Available }
+			AmountHS { Total Available }
+			AmountHSM { Total Available }
+			AmountHB { Total Available }
+		}
+	}
+`
+
+export const CREATE_LITTER = `
+	mutation CreateLitter($data: HzdPluginLitterInput!) {
+		createHzdPluginLitter(data: $data) {
+			documentId
+			LitterStatus
+			StatusMessageDraft
+			OrderLetter
+			plannedDateOfBirth
+			expectedDateOfBirth
+			dateOfBirth
+			mother { documentId fullKennelName }
+			stuntDog { documentId fullKennelName }
 			AmountRS { Total Available }
 			AmountRSM { Total Available }
 			AmountRB { Total Available }

@@ -1,0 +1,26 @@
+{
+  "kind": "collectionType",
+  "collectionName": "champions",
+  "info": {
+    "singularName": "champion",
+    "pluralName": "champions",
+    "displayName": "Champion"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "ChampionshipName": {
+      "type": "string"
+    },
+    "DateOfChampionship": {
+      "type": "date"
+    },
+    "hzd_plugin_dog": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::hzd-plugin.dog"
+    }
+  }
+}
