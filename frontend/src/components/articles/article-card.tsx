@@ -97,7 +97,6 @@ export function ArticleCard({
                             Primary: true
                         }}
                         theme={theme}
-                        size='small'
                     />
                 </div>
 
