@@ -1955,7 +1955,7 @@ export const GET_SITEMAP_DATA = `
 
 export const GET_BREEDER_BY_USER = `
 	query GetBreederByUser($userId: ID!) {
-		hzdPluginBreeders_connection(filters: { member: { documentId: { eq: $userId } } }) {
+		hzdPluginBreeders_connection(filters: { owner_member: { documentId: { eq: $userId } } }) {
 			nodes {
 				documentId
 				kennelName
