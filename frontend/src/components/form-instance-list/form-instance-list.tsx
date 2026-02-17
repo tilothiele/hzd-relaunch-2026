@@ -215,7 +215,7 @@ export function FormInstanceList({ form, strapiBaseUrl, theme }: FormInstanceLis
 	return (
 		<Box className='flex flex-col gap-4 py-4'>
 			<Box className='flex items-center justify-between mb-4'>
-				<Typography variant='h5' className='font-bold text-gray-900'>
+				<Typography variant='h5' className='font-bold' sx={{ color: theme?.headlineColor }}>
 					{form.Name || 'Unbenanntes Formular'}
 				</Typography>
 				{formInstances.length > 0 && !isLoading ? (
@@ -230,10 +230,11 @@ export function FormInstanceList({ form, strapiBaseUrl, theme }: FormInstanceLis
 								backgroundColor: theme?.buttonColor || 'var(--color-action-primary)',
 								color: theme?.buttonTextColor || 'var(--color-action-primary-text)',
 								borderRadius: '999px',
-								padding: '6px 24px',
+								padding: '4.96px 19.85px',
 								textTransform: 'none',
-								fontSize: '1.15rem',
+								fontSize: '0.95rem',
 								fontWeight: 400,
+								lineHeight: 1.5,
 								boxShadow: 'none',
 								border: `1px solid ${theme?.buttonColor || 'var(--color-action-primary)'}`,
 								'&:hover': {
@@ -254,10 +255,11 @@ export function FormInstanceList({ form, strapiBaseUrl, theme }: FormInstanceLis
 								backgroundColor: theme?.buttonColor || 'var(--color-action-primary)',
 								color: theme?.buttonTextColor || 'var(--color-action-primary-text)',
 								borderRadius: '999px',
-								padding: '6px 24px',
+								padding: '4.96px 19.85px',
 								textTransform: 'none',
-								fontSize: '1.15rem',
+								fontSize: '0.95rem',
 								fontWeight: 400,
+								lineHeight: 1.5,
 								boxShadow: 'none',
 								border: `1px solid ${theme?.buttonColor || 'var(--color-action-primary)'}`,
 								'&:hover': {
