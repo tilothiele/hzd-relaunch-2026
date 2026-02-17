@@ -118,6 +118,7 @@ export function NewsCard({ article, strapiBaseUrl, theme, isUnread }: NewsCardPr
                             color: theme.cardsTextHeadline,
                             fontWeight: 900,
                             lineHeight: 1.3,
+                            fontSize: '1.25rem',
                             mb: 1,
                             '&:hover': {
                                 textDecoration: 'underline'
@@ -152,7 +153,6 @@ export function NewsCard({ article, strapiBaseUrl, theme, isUnread }: NewsCardPr
                             Primary: true
                         }}
                         theme={theme}
-                        size='small'
                     />
                 </Box>
             </CardContent>
