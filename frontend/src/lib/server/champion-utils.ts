@@ -8,7 +8,7 @@ export async function fetchChampions(page = 1, pageSize = 20) {
         query GetChampions($pagination: PaginationArg) {
             champions(sort: ["DateOfChampionship:desc"], pagination: $pagination) {
                 documentId
-                ChampionshipName
+                ChampionshipTitles
                 DateOfChampionship
                 ChampinAvatar {
                     url

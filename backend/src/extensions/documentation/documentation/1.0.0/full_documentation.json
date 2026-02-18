@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-02-18T15:53:53.880Z"
+    "x-generation-date": "2026-02-18T20:25:57.924Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -14387,9 +14387,7 @@
           "data": {
             "type": "object",
             "properties": {
-              "ChampionshipName": {
-                "type": "string"
-              },
+              "ChampionshipTitles": {},
               "DateOfChampionship": {
                 "type": "string",
                 "format": "date"
@@ -14488,9 +14486,7 @@
           "documentId": {
             "type": "string"
           },
-          "ChampionshipName": {
-            "type": "string"
-          },
+          "ChampionshipTitles": {},
           "DateOfChampionship": {
             "type": "string",
             "format": "date"
@@ -17582,9 +17578,7 @@
                 "documentId": {
                   "type": "string"
                 },
-                "ChampionshipName": {
-                  "type": "string"
-                },
+                "ChampionshipTitles": {},
                 "DateOfChampionship": {
                   "type": "string",
                   "format": "date"

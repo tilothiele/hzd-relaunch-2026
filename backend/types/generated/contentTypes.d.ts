@@ -542,7 +542,7 @@ export interface ApiChampionChampion extends Struct.CollectionTypeSchema {
     ChampinAvatar: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios'
     >;
-    ChampionshipName: Schema.Attribute.String;
+    ChampionshipTitles: Schema.Attribute.Blocks;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

@@ -222,7 +222,7 @@ export interface TableOfContentSection {
 
 export interface Champion {
 	documentId: string
-	ChampionshipName?: string | null
+	ChampionshipTitles?: BlocksContent | null
 	DateOfChampionship?: string | null
 	ChampinAvatar?: Image | null
 	hzd_plugin_dog?: Dog | null

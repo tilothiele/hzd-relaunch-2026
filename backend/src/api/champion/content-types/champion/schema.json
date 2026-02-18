@@ -11,8 +11,8 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "ChampionshipName": {
-      "type": "string"
+    "ChampionshipTitles": {
+      "type": "blocks"
     },
     "DateOfChampionship": {
       "type": "date"

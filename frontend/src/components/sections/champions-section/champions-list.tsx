@@ -7,6 +7,7 @@ import { getMoreChampions } from '@/lib/server/champion-actions'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { Avatar, Box, CircularProgress, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, IconButton } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
+import { BlocksRenderer } from '@strapi/blocks-react-renderer'
 
 interface ChampionsListProps {
     initialChampions: any[]
@@ -104,7 +105,6 @@ export function ChampionsList({
                                     <TableCell sx={{ color: theme.textColor, fontWeight: 'bold' }}>Hund/Titel</TableCell>
                                     <TableCell sx={{ color: theme.textColor, fontWeight: 'bold' }}>Züchter</TableCell>
                                     <TableCell sx={{ color: theme.textColor, fontWeight: 'bold' }}>Besitzer</TableCell>
-                                    <TableCell sx={{ color: theme.textColor, fontWeight: 'bold' }}>Datum</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -112,10 +112,6 @@ export function ChampionsList({
                                     const dogName = champion.hzd_plugin_dog?.fullKennelName
                                         ? `${champion.hzd_plugin_dog.givenName} ${champion.hzd_plugin_dog.fullKennelName}`
                                         : (champion.hzd_plugin_dog?.givenName || 'Unbekannter Name')
-
-                                    const formattedDate = champion.DateOfChampionship
-                                        ? new Date(champion.DateOfChampionship).toLocaleDateString('de-DE')
-                                        : 'Kein Datum'
 
                                     return (
                                         <TableRow
@@ -141,8 +137,12 @@ export function ChampionsList({
                                                 <Typography sx={{ color: theme.textColor, fontSize: '1.1rem', fontWeight: 'bold' }}>
                                                     {dogName}
                                                 </Typography>
-                                                <Typography sx={{ color: theme.textColor, fontSize: '0.9rem' }}>
-                                                    {champion.ChampionshipName}
+                                                <Typography variant="body2" component="div" sx={{ color: theme.textColor, fontSize: '0.9rem' }}>
+                                                    {champion.ChampionshipTitles ? (
+                                                        <BlocksRenderer content={champion.ChampionshipTitles} />
+                                                    ) : (
+                                                        '-'
+                                                    )}
                                                 </Typography>
                                             </TableCell>
                                             <TableCell sx={{ color: theme.textColor }}>
@@ -161,9 +161,6 @@ export function ChampionsList({
                                                         {champion.hzd_plugin_dog.owner.city && `, ${champion.hzd_plugin_dog.owner.city}`}
                                                     </>
                                                 ) : '-'}
-                                            </TableCell>
-                                            <TableCell sx={{ color: theme.textColor }}>
-                                                {formattedDate}
                                             </TableCell>
                                         </TableRow>
                                     )
