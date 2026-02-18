@@ -26,6 +26,19 @@ export async function fetchChampions(page = 1, pageSize = 20) {
                         width
                         height
                     }
+                    owner {
+                        firstName
+                        lastName
+                        city
+                    }
+                    breeder {
+                        kennelName
+                        member {
+                            firstName
+                            lastName
+                            city
+                        }
+                    }
                 }
             }
         }

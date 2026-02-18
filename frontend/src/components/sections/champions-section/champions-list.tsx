@@ -98,6 +98,15 @@ export function ChampionsList({
                     </Typography>
                     <TableContainer component={Paper} elevation={0} sx={{ bgcolor: 'transparent', boxShadow: 'none' }}>
                         <Table sx={{ minWidth: 650 }} aria-label={`Champions ${year}`}>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell sx={{ color: theme.textColor, fontWeight: 'bold' }}>Bild</TableCell>
+                                    <TableCell sx={{ color: theme.textColor, fontWeight: 'bold' }}>Hund/Titel</TableCell>
+                                    <TableCell sx={{ color: theme.textColor, fontWeight: 'bold' }}>Züchter</TableCell>
+                                    <TableCell sx={{ color: theme.textColor, fontWeight: 'bold' }}>Besitzer</TableCell>
+                                    <TableCell sx={{ color: theme.textColor, fontWeight: 'bold' }}>Datum</TableCell>
+                                </TableRow>
+                            </TableHead>
                             <TableBody>
                                 {groupedChampions[year].map((champion: any) => {
                                     const dogName = champion.hzd_plugin_dog?.fullKennelName
@@ -128,11 +137,30 @@ export function ChampionsList({
                                                     }}
                                                 />
                                             </TableCell>
-                                            <TableCell sx={{ color: theme.textColor, fontSize: '1.1rem', fontWeight: 500 }}>
-                                                {dogName}
+                                            <TableCell>
+                                                <Typography sx={{ color: theme.textColor, fontSize: '1.1rem', fontWeight: 'bold' }}>
+                                                    {dogName}
+                                                </Typography>
+                                                <Typography sx={{ color: theme.textColor, fontSize: '0.9rem' }}>
+                                                    {champion.ChampionshipName}
+                                                </Typography>
                                             </TableCell>
                                             <TableCell sx={{ color: theme.textColor }}>
-                                                {champion.ChampionshipName}
+                                                {champion.hzd_plugin_dog?.breeder?.kennelName || '-'}
+                                                {champion.hzd_plugin_dog?.breeder?.member && (
+                                                    <Typography component="div" variant="body2" sx={{ fontSize: '0.85rem', opacity: 0.8 }}>
+                                                        {`${champion.hzd_plugin_dog.breeder.member.firstName || ''} ${champion.hzd_plugin_dog.breeder.member.lastName || ''}`}
+                                                        {champion.hzd_plugin_dog.breeder.member.city && `, ${champion.hzd_plugin_dog.breeder.member.city}`}
+                                                    </Typography>
+                                                )}
+                                            </TableCell>
+                                            <TableCell sx={{ color: theme.textColor }}>
+                                                {champion.hzd_plugin_dog?.owner ? (
+                                                    <>
+                                                        {`${champion.hzd_plugin_dog.owner.firstName || ''} ${champion.hzd_plugin_dog.owner.lastName || ''}`}
+                                                        {champion.hzd_plugin_dog.owner.city && `, ${champion.hzd_plugin_dog.owner.city}`}
+                                                    </>
+                                                ) : '-'}
                                             </TableCell>
                                             <TableCell sx={{ color: theme.textColor }}>
                                                 {formattedDate}
