@@ -158,7 +158,7 @@ export function HeaderNavigation({
             </div>
 
             {/* Center Section: Navigation Menu */}
-            <div className='flex flex-1 justify-center'>
+            <div className='flex items-center justify-end px-4'>
                 <NavigationMenu
                     menuItems={menuItems}
                     theme={{
@@ -169,7 +169,7 @@ export function HeaderNavigation({
             </div>
 
             {/* Right Section: Social Links + Login */}
-            <div className='flex flex-1 items-center justify-end gap-4'>
+            <div className='flex items-center justify-end gap-4'>
                 <SocialLinks
                     socialLinkFB={globalLayout?.SocialLinkFB}
                     socialLinkYT={globalLayout?.SocialLinkYT}

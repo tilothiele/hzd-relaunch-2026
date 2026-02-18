@@ -68,7 +68,7 @@ function DesktopMenuItem({
 							sx={{
 								color: theme.headerFooterTextColor,
 								fontSize: '1.25rem',
-								fontWeight: 600,
+								fontWeight: 700,
 								textTransform: 'none',
 								paddingRight: 0.5,
 								'&:hover': {
@@ -298,7 +298,7 @@ function DesktopMenuItem({
 				sx={{
 					color: theme.headerFooterTextColor,
 					fontSize: '1.25rem',
-					fontWeight: 600,
+					fontWeight: 700,
 					textTransform: 'none',
 					'&:hover': {
 						fontWeight: 700,

@@ -31,7 +31,7 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 		<footer
 			style={{
 				backgroundColor: theme.footerBackground,
-				color: theme.headerFooterTextColor,
+				color: theme.textColor,
 			}}
 			className='w-full pt-1'
 		>
