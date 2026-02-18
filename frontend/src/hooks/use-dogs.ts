@@ -24,6 +24,7 @@ interface DogsFilters {
 	userLocation?: { lat: number; lng: number }
 	ownerDocumentId?: string
 	sort?: string[]
+	maxAge?: number
 }
 
 interface DogsPagination {
@@ -72,6 +73,7 @@ export function useDogs(options: UseDogsOptions = {}) {
 	const userLocation = filters.userLocation
 	const page = pagination.page ?? 1
 	const pageSize = pagination.pageSize ?? 10
+	const maxAge = filters.maxAge
 
 	const searchDogs = useCallback(async () => {
 		if (!baseUrl || baseUrl.trim().length === 0) {
@@ -119,6 +121,15 @@ export function useDogs(options: UseDogsOptions = {}) {
 			if (ownerDocumentId) {
 				filterConditions.push({
 					owner: { documentId: { eq: ownerDocumentId } },
+				})
+			}
+
+			if (maxAge) {
+				const date = new Date()
+				date.setFullYear(date.getFullYear() - maxAge)
+				const dateString = date.toISOString().split('T')[0]
+				filterConditions.push({
+					dateOfBirth: { gte: dateString },
 				})
 			}
 

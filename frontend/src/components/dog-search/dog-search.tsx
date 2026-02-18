@@ -64,6 +64,7 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 		chipNoFilter,
 		maxDistance: maxDistance === '' ? undefined : maxDistance,
 		userLocation: userLocation || undefined,
+		maxAge: 15, // Filter out dogs older than 15 years
 	}), [nameFilter, sexFilter, colorFilter, chipNoFilter, maxDistance, userLocation])
 
 	const {
