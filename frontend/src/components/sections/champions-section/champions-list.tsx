@@ -5,7 +5,7 @@ import type { ThemeDefinition } from '@/themes'
 import type { HzdSetting } from '@/types'
 import { getMoreChampions } from '@/lib/server/champion-actions'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
-import { Avatar, Box, CircularProgress, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, IconButton } from '@mui/material'
+import { Avatar, Box, CircularProgress, Typography, Dialog, IconButton } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { BlocksRenderer } from '@strapi/blocks-react-renderer'
 
@@ -97,77 +97,83 @@ export function ChampionsList({
                     >
                         {year}
                     </Typography>
-                    <TableContainer component={Paper} elevation={0} sx={{ bgcolor: 'transparent', boxShadow: 'none' }}>
-                        <Table sx={{ minWidth: 650 }} aria-label={`Champions ${year}`}>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell sx={{ color: theme.textColor, fontWeight: 'bold' }}>Bild</TableCell>
-                                    <TableCell sx={{ color: theme.textColor, fontWeight: 'bold' }}>Hund/Titel</TableCell>
-                                    <TableCell sx={{ color: theme.textColor, fontWeight: 'bold' }}>Züchter</TableCell>
-                                    <TableCell sx={{ color: theme.textColor, fontWeight: 'bold' }}>Besitzer</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
+                    {/* Tailwind CSS Table */}
+                    <div className="w-full overflow-x-auto">
+                        <table className="min-w-full text-left border-collapse" aria-label={`Champions ${year}`}>
+                            <thead>
+                                <tr className="border-b" style={{ borderColor: theme.buttonColor }}>
+                                    <th className="p-2 font-bold" style={{ color: theme.textColor }}>Bild</th>
+                                    <th className="p-2 font-bold" style={{ color: theme.textColor }}>Hund/Titel</th>
+                                    <th className="p-2 font-bold" style={{ color: theme.textColor }}>Züchter</th>
+                                    <th className="p-2 font-bold" style={{ color: theme.textColor }}>Besitzer</th>
+                                </tr>
+                            </thead>
+                            <tbody>
                                 {groupedChampions[year].map((champion: any, index: number) => {
                                     const dogName = champion.hzd_plugin_dog?.fullKennelName
                                         ? `${champion.hzd_plugin_dog.givenName} ${champion.hzd_plugin_dog.fullKennelName}`
                                         : (champion.hzd_plugin_dog?.givenName || 'Unbekannter Name')
 
                                     return (
-                                        <TableRow
+                                        <tr
                                             key={champion.documentId}
-                                            sx={{
-                                                '&:last-child td, &:last-child th': { border: 0 },
-                                                bgcolor: index % 2 === 0 ? theme.cardsBackground : 'white'
+                                            style={{
+                                                backgroundColor: index % 2 === 0 ? theme.cardsBackground : 'white'
                                             }}
                                         >
-                                            <TableCell sx={{ p: 0, width: 120 }}>
-                                                <Avatar
-                                                    src={getAvatarUrl(champion)}
-                                                    alt={dogName}
-                                                    sx={{ width: 120, height: 90, cursor: 'pointer' }}
-                                                    variant="square"
+                                            <td className="w-[144px] p-0 align-top leading-none">
+                                                <div
+                                                    className="w-[144px] h-[108px] cursor-pointer block relative overflow-hidden"
                                                     onClick={() => {
                                                         const url = getAvatarUrl(champion)
                                                         if (url) setSelectedImage(url)
                                                     }}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Typography sx={{ color: theme.textColor, fontSize: '1.1rem', fontWeight: 'bold' }}>
+                                                >
+                                                    {/* Using standard img for absolute control or keeping Avatar if it behaves */}
+                                                    <Avatar
+                                                        src={getAvatarUrl(champion)}
+                                                        alt={dogName}
+                                                        sx={{ width: 144, height: 108 }}
+                                                        variant="square"
+                                                        imgProps={{ style: { objectFit: 'cover', width: '100%', height: '100%', display: 'block' } }}
+                                                    />
+                                                </div>
+                                            </td>
+                                            <td className="py-2 pr-2 pl-6 align-top">
+                                                <div className="text-[1.1rem] font-bold" style={{ color: theme.textColor }}>
                                                     {dogName}
-                                                </Typography>
-                                                <Typography variant="body2" component="div" sx={{ color: theme.textColor, fontSize: '0.9rem' }}>
+                                                </div>
+                                                <div className="text-[0.9rem]" style={{ color: theme.textColor }}>
                                                     {champion.ChampionshipTitles ? (
                                                         <BlocksRenderer content={champion.ChampionshipTitles} />
                                                     ) : (
                                                         '-'
                                                     )}
-                                                </Typography>
-                                            </TableCell>
-                                            <TableCell sx={{ color: theme.textColor }}>
+                                                </div>
+                                            </td>
+                                            <td className="p-2 align-top" style={{ color: theme.textColor }}>
                                                 {champion.hzd_plugin_dog?.breeder?.kennelName || '-'}
                                                 {champion.hzd_plugin_dog?.breeder?.member && (
-                                                    <Typography component="div" variant="body2" sx={{ fontSize: '0.85rem', opacity: 0.8 }}>
+                                                    <div className="text-[0.85rem] opacity-80">
                                                         {`${champion.hzd_plugin_dog.breeder.member.firstName || ''} ${champion.hzd_plugin_dog.breeder.member.lastName || ''}`}
                                                         {champion.hzd_plugin_dog.breeder.member.city && `, ${champion.hzd_plugin_dog.breeder.member.city}`}
-                                                    </Typography>
+                                                    </div>
                                                 )}
-                                            </TableCell>
-                                            <TableCell sx={{ color: theme.textColor }}>
+                                            </td>
+                                            <td className="p-2 align-top" style={{ color: theme.textColor }}>
                                                 {champion.hzd_plugin_dog?.owner ? (
                                                     <>
                                                         {`${champion.hzd_plugin_dog.owner.firstName || ''} ${champion.hzd_plugin_dog.owner.lastName || ''}`}
                                                         {champion.hzd_plugin_dog.owner.city && `, ${champion.hzd_plugin_dog.owner.city}`}
                                                     </>
                                                 ) : '-'}
-                                            </TableCell>
-                                        </TableRow>
+                                            </td>
+                                        </tr>
                                     )
                                 })}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                            </tbody>
+                        </table>
+                    </div>
                 </Box>
             ))}
 
