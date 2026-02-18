@@ -14,6 +14,7 @@ import { ContactMailerSectionComponent } from './contact-mailer-section/contact-
 import { SimpleHeroSectionComponent } from './simple-hero-section/simple-hero-section'
 import { DocumentBundleSectionComponent } from './document-bundle-section/document-bundle-section'
 import { TableOfContentSectionComponent } from './table-of-content-section/table-of-content-section'
+import { ChampionsSectionComponent } from './champions-section/champions-section'
 
 interface RenderSectionParams {
 	section: StartpageSection
@@ -21,6 +22,7 @@ interface RenderSectionParams {
 	theme: ThemeDefinition
 	key: string
 	logo?: any // Add logo prop
+	hzdSetting?: any // Add hzdSetting prop
 }
 
 function renderSection({
@@ -29,6 +31,7 @@ function renderSection({
 	theme,
 	key,
 	logo,
+	hzdSetting,
 }: RenderSectionParams) {
 	//console.log('Server Factory Rendering:', section.__typename)
 	switch (section.__typename) {
@@ -158,6 +161,15 @@ function renderSection({
 					theme={theme}
 				/>
 			)
+		case 'ComponentBlocksChampionsSection':
+			return (
+				<ChampionsSectionComponent
+					key={key}
+					section={section as any}
+					theme={theme}
+					hzdSetting={hzdSetting}
+				/>
+			)
 		default:
 			return null
 	}
@@ -168,11 +180,13 @@ export function renderServerSections({
 	strapiBaseUrl,
 	theme,
 	logo,
+	hzdSetting,
 }: {
 	sections: StartpageSection[] | null | undefined
 	strapiBaseUrl: string
 	theme: ThemeDefinition
 	logo?: any // Add logo prop
+	hzdSetting?: any // Add hzdSetting prop
 }) {
 	if (!sections?.length) {
 		return null
@@ -181,7 +195,7 @@ export function renderServerSections({
 	return sections
 		.map((section, index) => {
 			const key = `${section.__typename}-${index}`
-			return renderSection({ section, strapiBaseUrl, theme, key, logo })
+			return renderSection({ section, strapiBaseUrl, theme, key, logo, hzdSetting })
 		})
 		.filter((node) => node !== null)
 }

@@ -280,6 +280,10 @@ export const GET_LAYOUT = `
 						FadingBorder
 						Height
 	 				}
+					... on ComponentBlocksChampionsSection {
+						__typename
+						id
+					}
 				}
 			}
 		}
@@ -309,6 +313,12 @@ export const GET_LAYOUT = `
 				height
 			}
 			DefaultLitterAvatar {
+				url
+				alternativeText
+				width
+				height
+			}
+			DefaultChanpionAvatar {
 				url
 				alternativeText
 				width
@@ -544,6 +554,10 @@ export const GET_INDEX_PAGE = `
 					FadingBorder
 					Height
  				}
+				... on ComponentBlocksChampionsSection {
+					__typename
+					id
+				}
 				... on ComponentBlocksTableOfContentSection {
 					TocHeadline
 					TocLink {
@@ -873,6 +887,10 @@ export const GET_PAGE_BY_SLUG = `
 								Link
 								Primary
 							}
+						}
+						... on ComponentBlocksChampionsSection {
+							__typename
+							id
 						}
 					}
 				}
@@ -1447,6 +1465,33 @@ export const GET_FORM_BY_DOCUMENT_ID = `
 					City
 					CountryCode
 					Phone
+				}
+			}
+		}
+	}
+`
+
+export const GET_CHAMPIONS = `
+	query GetChampions {
+		champions(sort: ["DateOfChampionship:desc"], pagination: { pageSize: 100 }) {
+			documentId
+			ChampionshipName
+			DateOfChampionship
+			ChampinAvatar {
+				url
+				alternativeText
+				width
+				height
+			}
+			hzd_plugin_dog {
+				documentId
+				givenName
+				fullKennelName
+				avatar {
+					url
+					alternativeText
+					width
+					height
 				}
 			}
 		}

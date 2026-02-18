@@ -25,6 +25,7 @@ import {
     faVenusMars,
     faBullhorn,
     faPoll,
+    faAward,
     faFile,
     faComment,
     faBone,
@@ -91,7 +92,8 @@ const iconMap: Record<string, any> = {
     'fa-lock-open': faLockOpen,
     'fa-home': faHouse,
     'fa-newspaper': faNewspaper,
-    'fa-users': faUserGroup
+    'fa-users': faUserGroup,
+    'fa-award': faAward,
 }
 
 const getIcon = (iconName?: string) => {

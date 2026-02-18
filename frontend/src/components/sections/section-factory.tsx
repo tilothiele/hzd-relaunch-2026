@@ -17,6 +17,7 @@ import { ContactMailerSectionComponent } from './contact-mailer-section/contact-
 import { SimpleHeroSectionComponent } from './simple-hero-section/simple-hero-section'
 import { TableOfContentSectionComponent } from './table-of-content-section/table-of-content-section'
 
+
 interface RenderStartpageSectionsParams {
 	sections: StartpageSection[] | null | undefined
 	strapiBaseUrl: string
@@ -157,6 +158,7 @@ function renderStartpageSection({
 					theme={theme}
 				/>
 			)
+
 		default:
 			return null
 	}

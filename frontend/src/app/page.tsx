@@ -51,7 +51,8 @@ export default async function Home() {
 		sections,
 		strapiBaseUrl: baseUrl,
 		theme,
-		logo: globalLayout?.Logo
+		logo: globalLayout?.Logo,
+		hzdSetting: globalLayout?.HzdSetting
 	})
 
 	return (

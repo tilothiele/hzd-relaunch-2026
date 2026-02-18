@@ -220,7 +220,20 @@ export interface TableOfContentSection {
 	TocLink?: ActionButton[] | null
 }
 
-export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | SimpleCtaSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection | DocumentBundleSection | TableOfContentSection
+export interface Champion {
+	documentId: string
+	ChampionshipName?: string | null
+	DateOfChampionship?: string | null
+	ChampinAvatar?: Image | null
+	hzd_plugin_dog?: Dog | null
+}
+
+export interface ChampionsSection {
+	__typename: 'ComponentBlocksChampionsSection'
+	id: string
+}
+
+export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | SimpleCtaSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection | DocumentBundleSection | TableOfContentSection | ChampionsSection
 
 export type PageSection = StartpageSection
 
@@ -260,6 +273,7 @@ export interface HzdSetting {
 	DefaultAvatarB?: Image | null
 	DefaultBreederAvatar?: Image | null
 	DefaultLitterAvatar?: Image | null
+	DefaultChanpionAvatar?: Image | null
 }
 
 export interface GlobalLayout {

@@ -48,6 +48,14 @@ export interface BlocksCardSection extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksChampionsSection extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_champions_sections';
+  info: {
+    displayName: 'ChampionsSection';
+  };
+  attributes: {};
+}
+
 export interface BlocksContactGroupSection extends Struct.ComponentSchema {
   collectionName: 'components_blocks_contact_group_sections';
   info: {
@@ -715,6 +723,7 @@ declare module '@strapi/strapi' {
       'blocks.bundle-documents': BlocksBundleDocuments;
       'blocks.card-item': BlocksCardItem;
       'blocks.card-section': BlocksCardSection;
+      'blocks.champions-section': BlocksChampionsSection;
       'blocks.contact-group-section': BlocksContactGroupSection;
       'blocks.contact-mailer-section': BlocksContactMailerSection;
       'blocks.document-bundle': BlocksDocumentBundle;

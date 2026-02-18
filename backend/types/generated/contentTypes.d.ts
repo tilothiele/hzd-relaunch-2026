@@ -539,6 +539,9 @@ export interface ApiChampionChampion extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    ChampinAvatar: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
     ChampionshipName: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -793,6 +796,9 @@ export interface ApiHzdSettingHzdSetting extends Struct.SingleTypeSchema {
       'images' | 'files' | 'videos' | 'audios'
     >;
     DefaultBreederAvatar: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
+    DefaultChanpionAvatar: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios'
     >;
     DefaultLitterAvatar: Schema.Attribute.Media<
@@ -1206,6 +1212,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.simple-hero-section',
         'blocks.document-bundle-section',
         'blocks.table-of-content-section',
+        'blocks.champions-section',
       ]
     >;
     SEO: Schema.Attribute.Component<'seo.seo', true>;

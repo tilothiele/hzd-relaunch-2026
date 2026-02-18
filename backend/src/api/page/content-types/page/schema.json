@@ -38,7 +38,8 @@
         "blocks.contact-mailer-section",
         "blocks.simple-hero-section",
         "blocks.document-bundle-section",
-        "blocks.table-of-content-section"
+        "blocks.table-of-content-section",
+        "blocks.champions-section"
       ]
     },
     "ColorTheme": {

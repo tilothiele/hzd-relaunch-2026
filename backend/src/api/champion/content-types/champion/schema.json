@@ -21,6 +21,16 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "plugin::hzd-plugin.dog"
+    },
+    "ChampinAvatar": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
     }
   }
 }
