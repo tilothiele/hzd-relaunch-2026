@@ -108,7 +108,7 @@ export function ChampionsList({
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {groupedChampions[year].map((champion: any) => {
+                                {groupedChampions[year].map((champion: any, index: number) => {
                                     const dogName = champion.hzd_plugin_dog?.fullKennelName
                                         ? `${champion.hzd_plugin_dog.givenName} ${champion.hzd_plugin_dog.fullKennelName}`
                                         : (champion.hzd_plugin_dog?.givenName || 'Unbekannter Name')
@@ -122,7 +122,7 @@ export function ChampionsList({
                                             key={champion.documentId}
                                             sx={{
                                                 '&:last-child td, &:last-child th': { border: 0 },
-                                                bgcolor: theme.cardsBackground || 'transparent'
+                                                bgcolor: index % 2 === 0 ? theme.cardsBackground : 'white'
                                             }}
                                         >
                                             <TableCell sx={{ p: 0, width: 120 }}>
