@@ -72,7 +72,7 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 							</div>
 							<hr
 								style={{
-									borderColor: '#FAD857',
+									borderColor: 'var(--color-hzd-blau)',
 									marginTop: '1rem',
 									marginBottom: '1rem',
 								}}
@@ -190,12 +190,12 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 			<div
 				className='w-full text-center'
 				style={{
-					backgroundColor: '#FAD857',
+					backgroundColor: 'var(--color-copyright-background)',
 				}}
 			>
 				<p
 					style={{
-						color: '#0A0A0A',
+						color: 'var(--color-copyright-text)',
 						paddingTop: '.5em',
 						paddingBottom: '.5em',
 						fontSize: '0.875em',

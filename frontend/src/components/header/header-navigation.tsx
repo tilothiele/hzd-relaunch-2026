@@ -11,6 +11,8 @@ import { resolveMediaUrl } from './logo-utils'
 import { DrawerMenuComponent } from './drawer-menu'
 import { cn } from '@/lib/utils'
 import HomeIcon from '@mui/icons-material/Home'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faShareNodes } from '@fortawesome/free-solid-svg-icons'
 
 interface LoginCredentials {
     identifier: string
@@ -170,6 +172,9 @@ export function HeaderNavigation({
 
             {/* Right Section: Social Links + Login */}
             <div className='flex items-center justify-end gap-4'>
+                <div className="opacity-50 cursor-not-allowed" title="Teilen (demnächst verfügbar)">
+                    <FontAwesomeIcon icon={faShareNodes} size='xl' style={{ color: theme.socialIcon }} />
+                </div>
                 <SocialLinks
                     socialLinkFB={globalLayout?.SocialLinkFB}
                     socialLinkYT={globalLayout?.SocialLinkYT}

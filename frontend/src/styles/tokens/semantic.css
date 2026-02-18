@@ -64,5 +64,7 @@
     --color-cards-text-headline: var(--color-hzd-blau);
     --color-cards-text-subheadline: var(--color-hzd-blau);
 
+    --color-copyright-background: var(--color-hzd-blau);
+    --color-copyright-text: white;
 
 }
