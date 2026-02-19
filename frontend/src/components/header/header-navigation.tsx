@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import type { AuthUser, GlobalLayout } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import Image from 'next/image'
@@ -11,8 +12,7 @@ import { resolveMediaUrl } from './logo-utils'
 import { DrawerMenuComponent } from './drawer-menu'
 import { cn } from '@/lib/utils'
 import HomeIcon from '@mui/icons-material/Home'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faShareNodes } from '@fortawesome/free-solid-svg-icons'
+import FacebookShare from '@/components/ui/facebook-share-1'
 
 interface LoginCredentials {
     identifier: string
@@ -46,6 +46,14 @@ export function HeaderNavigation({
     isScrolled,
     logoBackground,
 }: HeaderNavigationProps) {
+    const [currentUrl, setCurrentUrl] = useState<string>('')
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setCurrentUrl(window.location.href)
+        }
+    }, [])
+
     const logoSrc = resolveMediaUrl(globalLayout?.Logo, strapiBaseUrl ?? '')
     const logoAlt = globalLayout?.Logo?.alternativeText ?? 'HZD Logo'
     const menuItems = globalLayout?.Menu?.items ?? []
@@ -172,9 +180,7 @@ export function HeaderNavigation({
 
             {/* Right Section: Social Links + Login */}
             <div className='flex items-center justify-end gap-4'>
-                <div className="opacity-50 cursor-not-allowed" title="Teilen (demnächst verfügbar)">
-                    <FontAwesomeIcon icon={faShareNodes} size='xl' style={{ color: theme.socialIcon }} />
-                </div>
+                {currentUrl && <FacebookShare url={currentUrl} />}
                 <SocialLinks
                     socialLinkFB={globalLayout?.SocialLinkFB}
                     socialLinkYT={globalLayout?.SocialLinkYT}
