@@ -110,9 +110,7 @@ export function ChampionsList({
                             </thead>
                             <tbody>
                                 {groupedChampions[year].map((champion: any, index: number) => {
-                                    const dogName = champion.hzd_plugin_dog?.fullKennelName
-                                        ? `${champion.hzd_plugin_dog.givenName} ${champion.hzd_plugin_dog.fullKennelName}`
-                                        : (champion.hzd_plugin_dog?.givenName || 'Unbekannter Name')
+                                    const dogName = champion.hzd_plugin_dog?.fullKennelName || champion.hzd_plugin_dog?.givenName || 'Unbekannter Name'
 
                                     return (
                                         <tr
@@ -140,7 +138,7 @@ export function ChampionsList({
                                                 </div>
                                             </td>
                                             <td className="py-2 pr-2 pl-6 align-top">
-                                                <div className="text-[1.1rem] font-bold" style={{ color: theme.textColor }}>
+                                                <div className="font-bold" style={{ color: theme.textColor }}>
                                                     {dogName}
                                                 </div>
                                                 <div className="text-[0.9rem]" style={{ color: theme.textColor }}>
