@@ -28,6 +28,7 @@ type SortField = 'kennelName' | 'member.lastName' | 'member.zip' | 'member.city'
 
 export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps) {
 	const [nameFilter, setNameFilter] = useState('')
+	const [nameInput, setNameInput] = useState('')
 	const [page, setPage] = useState(1)
 	const [pageSize, setPageSize] = useState<PageSize>(10)
 	const [breeders, setBreeders] = useState<Breeder[]>([])
@@ -126,13 +127,21 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 	}, [strapiBaseUrl, nameFilter, page, pageSize, sortField, sortDirection])
 
 	useEffect(() => {
+		const timer = setTimeout(() => {
+			setNameFilter(nameInput)
+		}, 500)
+		return () => clearTimeout(timer)
+	}, [nameInput])
+
+	useEffect(() => {
 		void searchBreeders()
 	}, [searchBreeders])
 
 	const handleSearch = useCallback(() => {
+		setNameFilter(nameInput)
 		setPage(1)
 		void searchBreeders()
-	}, [searchBreeders])
+	}, [nameInput, searchBreeders])
 
 	const handlePageSizeChange = useCallback((newPageSize: PageSize) => {
 		setPageSize(newPageSize)
@@ -231,8 +240,8 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 				)}
 
 				<BreederSearchForm
-					nameFilter={nameFilter}
-					onNameFilterChange={setNameFilter}
+					nameFilter={nameInput}
+					onNameFilterChange={setNameInput}
 					onSearch={handleSearch}
 					isLoading={isLoading}
 				/>

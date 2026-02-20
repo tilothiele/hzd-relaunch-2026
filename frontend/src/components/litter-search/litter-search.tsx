@@ -74,7 +74,9 @@ const renderStatusBadge = (status: Litter['LitterStatus'], small = false) => {
 
 export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 	const [breederFilter, setBreederFilter] = useState('')
+	const [breederInput, setBreederInput] = useState('')
 	const [motherFilter, setMotherFilter] = useState('')
+	const [motherInput, setMotherInput] = useState('')
 	const [statusFilter, setStatusFilter] = useState<LitterStatus>('')
 	const [orderLetterFilter, setOrderLetterFilter] = useState('')
 	const [selectedMaleColors, setSelectedMaleColors] = useState<string[]>(['S', 'SM', 'B'])
@@ -114,13 +116,29 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 
 
 	useEffect(() => {
+		const timer = setTimeout(() => {
+			setBreederFilter(breederInput)
+		}, 500)
+		return () => clearTimeout(timer)
+	}, [breederInput])
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setMotherFilter(motherInput)
+		}, 500)
+		return () => clearTimeout(timer)
+	}, [motherInput])
+
+	useEffect(() => {
 		void searchLitters()
 	}, [searchLitters])
 
 	const handleSearch = useCallback(() => {
+		setBreederFilter(breederInput)
+		setMotherFilter(motherInput)
 		setPage(1)
 		void searchLitters()
-	}, [searchLitters])
+	}, [breederInput, motherInput, searchLitters])
 
 	const handlePageSizeChange = useCallback((newPageSize: PageSize) => {
 		setPageSize(newPageSize)
@@ -252,8 +270,8 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 
 					<TextField
 						label='Züchter'
-						value={breederFilter}
-						onChange={(e) => setBreederFilter(e.target.value)}
+						value={breederInput}
+						onChange={(e) => setBreederInput(e.target.value)}
 						onKeyDown={(e) => {
 							if (e.key === 'Enter') {
 								handleSearch()
@@ -266,8 +284,8 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 
 					<TextField
 						label='Mutter'
-						value={motherFilter}
-						onChange={(e) => setMotherFilter(e.target.value)}
+						value={motherInput}
+						onChange={(e) => setMotherInput(e.target.value)}
 						onKeyDown={(e) => {
 							if (e.key === 'Enter') {
 								handleSearch()
