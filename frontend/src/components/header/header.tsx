@@ -59,32 +59,34 @@ export function Header({
 		: theme.headerBackground
 
 	return (
-		<header
-			style={{
-				backgroundColor: headerBg,
-				color: theme.headerFooterTextColor,
-			}}
-			className={cn(
-				'w-full transition-all duration-300',
-				isStickyTransparent && 'sticky top-0 z-[100] backdrop-blur-md shadow-sm'
-			)}
-		>
+		<>
 			{announcements && announcements.length > 0 && (
 				<AnnouncementSlider announcements={announcements} theme={theme} />
 			)}
-			<HeaderNavigation
-				globalLayout={globalLayout}
-				strapiBaseUrl={strapiBaseUrl}
-				theme={theme}
-				isAuthenticated={isAuthenticated}
-				user={user}
-				onLogin={onLogin}
-				onLogout={onLogout}
-				isAuthenticating={isAuthenticating}
-				error={error}
-				isScrolled={isScrolled}
-				logoBackground={logoBackground}
-			/>
-		</header>
+			<header
+				style={{
+					backgroundColor: headerBg,
+					color: theme.headerFooterTextColor,
+				}}
+				className={cn(
+					'w-full transition-all duration-300',
+					isStickyTransparent && 'sticky top-0 z-[100] backdrop-blur-md shadow-sm'
+				)}
+			>
+				<HeaderNavigation
+					globalLayout={globalLayout}
+					strapiBaseUrl={strapiBaseUrl}
+					theme={theme}
+					isAuthenticated={isAuthenticated}
+					user={user}
+					onLogin={onLogin}
+					onLogout={onLogout}
+					isAuthenticating={isAuthenticating}
+					error={error}
+					isScrolled={isScrolled}
+					logoBackground={logoBackground}
+				/>
+			</header>
+		</>
 	)
 }
