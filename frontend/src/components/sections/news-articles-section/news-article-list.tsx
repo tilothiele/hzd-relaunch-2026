@@ -10,7 +10,9 @@ import { Box } from '@mui/material'
 import { ViewToggle } from '@/components/common/view-toggle'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
-import { IconButton, Typography } from '@mui/material'
+import { IconButton, Typography, TextField } from '@mui/material'
+import SearchIcon from '@mui/icons-material/Search'
+import InputAdornment from '@mui/material/InputAdornment'
 
 const MAX_LOOKBACK_YEARS = 5
 
@@ -25,6 +27,8 @@ export function NewsArticleList({ articles, strapiBaseUrl, theme }: NewsArticleL
     const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
     const currentYear = new Date().getFullYear()
     const [selectedYear, setSelectedYear] = useState(currentYear)
+    const [searchInput, setSearchInput] = useState('')
+    const [searchQuery, setSearchQuery] = useState('')
 
     console.log('NewsArticleList rendering', { selectedYear, currentYear, articlesCount: articles.length })
 
@@ -32,11 +36,28 @@ export function NewsArticleList({ articles, strapiBaseUrl, theme }: NewsArticleL
         getReadArticles().then(setReadArticles).catch(console.error)
     }, [])
 
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setSearchQuery(searchInput)
+        }, 500)
+        return () => clearTimeout(timer)
+    }, [searchInput])
+
     const filteredArticles = articles.filter((article) => {
         if (!article.DateOfPublication) return false
         const date = new Date(article.DateOfPublication)
         const year = date.getFullYear()
-        return year === selectedYear || year === selectedYear - 1
+        const yearMatch = year === selectedYear || year === selectedYear - 1
+
+        if (!yearMatch) return false
+
+        if (!searchQuery.trim()) return true
+
+        const query = searchQuery.toLowerCase().trim()
+        const headlineMatch = article.Headline?.toLowerCase().includes(query) ?? false
+        const subheadlineMatch = article.SubHeadline?.toLowerCase().includes(query) ?? false
+
+        return headlineMatch || subheadlineMatch
     })
 
     // Left button: Go to Past (Decrease Year)
@@ -59,7 +80,7 @@ export function NewsArticleList({ articles, strapiBaseUrl, theme }: NewsArticleL
 
     return (
         <Box sx={{ width: '100%' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, gap: 2, mb: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <IconButton
                         onClick={handleOlderYears}
@@ -87,6 +108,31 @@ export function NewsArticleList({ articles, strapiBaseUrl, theme }: NewsArticleL
                         <ChevronRightIcon />
                     </IconButton>
                 </Box>
+
+                <TextField
+                    size="small"
+                    placeholder="Suche in Beiträgen..."
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    sx={{
+                        maxWidth: { sm: '300px' },
+                        flexGrow: 1,
+                        '& .MuiOutlinedInput-root': {
+                            backgroundColor: 'white',
+                            '& fieldset': { borderColor: theme.buttonColor + '40' },
+                            '&:hover fieldset': { borderColor: theme.buttonColor },
+                            '&.Mui-focused fieldset': { borderColor: theme.buttonColor },
+                        }
+                    }}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon sx={{ color: theme.buttonColor }} />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
+
                 <ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
             </Box>
 

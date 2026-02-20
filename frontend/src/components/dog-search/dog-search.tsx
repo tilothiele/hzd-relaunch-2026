@@ -40,6 +40,7 @@ interface DogSearchProps {
 
 export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 	const [nameFilter, setNameFilter] = useState('')
+	const [nameInput, setNameInput] = useState('')
 	const [sexFilter, setSexFilter] = useState<SexFilter>('')
 	const [colorFilter, setColorFilter] = useState<ColorFilter>('')
 	const [chipNoFilter, setChipNoFilter] = useState('')
@@ -84,10 +85,11 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 	})
 
 	const handleSearch = useCallback(() => {
+		setNameFilter(nameInput)
 		setPage(1)
 		setHasSearched(true)
 		void searchDogs()
-	}, [searchDogs])
+	}, [nameInput, searchDogs])
 
 	const handlePageSizeChange = useCallback((newPageSize: PageSize) => {
 		setPageSize(newPageSize)
@@ -107,6 +109,13 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 	const handleBackToSearch = useCallback(() => {
 		setSelectedDog(null)
 	}, [])
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setNameFilter(nameInput)
+		}, 500)
+		return () => clearTimeout(timer)
+	}, [nameInput])
 
 	// Fake-Koordinaten entfernt -> Verwende dogs direkt
 
@@ -223,8 +232,8 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 					<Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: 3 }}>
 						<TextField
 							label='Name'
-							value={nameFilter}
-							onChange={(e) => setNameFilter(e.target.value)}
+							value={nameInput}
+							onChange={(e) => setNameInput(e.target.value)}
 							onKeyDown={(e) => {
 								if (e.key === 'Enter') {
 									handleSearch()
