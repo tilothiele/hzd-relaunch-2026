@@ -35,7 +35,8 @@ import {
     faFileLines as faReport,
     faUserGroup,
     faPaw,
-    faEnvelope
+    faEnvelope,
+    faSliders
 } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import type { Menu as MenuType, MenuItem as MenuItemType, AuthUser } from '@/types'
@@ -94,6 +95,7 @@ const iconMap: Record<string, any> = {
     'fa-newspaper': faNewspaper,
     'fa-users': faUserGroup,
     'fa-award': faAward,
+    'fa-sliders': faSliders,
 }
 
 const getIcon = (iconName?: string) => {
