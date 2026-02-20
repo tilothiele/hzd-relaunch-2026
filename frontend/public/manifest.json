@@ -1,0 +1,25 @@
+{
+    "id": "/",
+    "name": "Hovawart Zuchtgemeinschaft Deutschland",
+    "short_name": "HZD",
+    "description": "Hovawart Zuchtgemeinschaft Deutschland e.V. - Relaunch 2026",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#4560AA",
+    "icons": [
+        {
+            "src": "/logos/HZD-logo256-hovawart-zuchtgemeinschaft-deutschland.png",
+            "sizes": "256x256",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/logos/HZD-logo512-hovawart-zuchtgemeinschaft-deutschland.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "orientation": "portrait"
+}

@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import Script from 'next/script';
 import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
@@ -9,12 +9,22 @@ import { TestBanner } from '@/components/test-banner/test-banner'
 
 config.autoAddCss = false
 
+export const viewport: Viewport = {
+	themeColor: '#4560AA',
+}
+
 export const metadata: Metadata = {
 	title: {
 		default: 'Hovawart Zuchtgemeinschaft Deutschland e.V.',
 		template: 'Hovawart Zuchtgemeinschaft Deutschland e.V. - %s',
 	},
 	description: 'Herzlich willkommen bei der Hovawart Zuchtgemeinschaft Deutschland e.V.',
+	manifest: '/manifest.json',
+	appleWebApp: {
+		capable: true,
+		statusBarStyle: 'default',
+		title: 'HZD',
+	},
 }
 
 export default async function RootLayout({
@@ -36,6 +46,14 @@ export default async function RootLayout({
 						strategy="afterInteractive"
 					/>
 				)}
+				<meta name="application-name" content="HZD" />
+				<meta name="apple-mobile-web-app-capable" content="yes" />
+				<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+				<meta name="apple-mobile-web-app-title" content="HZD" />
+				<meta name="format-detection" content="telephone=no" />
+				<meta name="mobile-web-app-capable" content="yes" />
+				<meta name="theme-color" content="#4560AA" />
+				<link rel="apple-touch-icon" href="/logos/HZD-logo256-hovawart-zuchtgemeinschaft-deutschland.png" />
 			</head>
 			<body className='antialiased'>
 				<TestBanner />

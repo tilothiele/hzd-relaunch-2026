@@ -9,6 +9,8 @@ import { useAuth } from '@/hooks/use-auth'
 import { theme as globalTheme } from '@/themes'
 import type { ThemeDefinition } from '@/themes'
 import { renderStartpageSections } from '@/components/sections/section-factory'
+import { PushNotificationManager } from '@/components/ui/push-notification-manager'
+import { SectionContainer } from '@/components/sections/section-container/section-container'
 
 const textSkeletonKeys = [
 	'text-primary',
@@ -109,6 +111,9 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 			}}>
 				{content}
 			</main>
+			<SectionContainer variant="max-width">
+				<PushNotificationManager />
+			</SectionContainer>
 			<Footer
 				globalLayout={homepage}
 				strapiBaseUrl={strapiBaseUrl}
