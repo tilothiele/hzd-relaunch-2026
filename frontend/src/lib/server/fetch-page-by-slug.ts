@@ -9,6 +9,7 @@ interface PageQueryResult {
 interface LayoutData {
 	globalLayout: GlobalLayout
 	hzdSetting?: GlobalLayout['HzdSetting']
+	announcements?: GlobalLayout['announcements']
 }
 
 export interface PageBySlugResult {
@@ -29,6 +30,7 @@ export async function fetchGlobalLayout(): Promise<{ globalLayout: GlobalLayout 
 
 		if (layoutData.globalLayout) {
 			layoutData.globalLayout.HzdSetting = layoutData.hzdSetting ?? null
+			layoutData.globalLayout.announcements = layoutData.announcements ?? null
 		}
 
 		return {
@@ -77,6 +79,7 @@ export async function fetchPageBySlug(slug: string): Promise<PageBySlugResult> {
 
 		if (layoutData.globalLayout) {
 			layoutData.globalLayout.HzdSetting = layoutData.hzdSetting ?? null
+			layoutData.globalLayout.announcements = layoutData.announcements ?? null
 		}
 
 		return {

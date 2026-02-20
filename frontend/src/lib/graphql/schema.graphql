@@ -293,70 +293,6 @@ type ComponentSeoSeo {
   ExcludeFromSitemap: Boolean
 }
 
-input ComponentPersonalShippingAddressFiltersInput {
-  Name: StringFilterInput
-  AdditionalName: StringFilterInput
-  Street: StringFilterInput
-  CountryCode: StringFilterInput
-  ZipCode: StringFilterInput
-  City: StringFilterInput
-  and: [ComponentPersonalShippingAddressFiltersInput]
-  or: [ComponentPersonalShippingAddressFiltersInput]
-  not: ComponentPersonalShippingAddressFiltersInput
-}
-
-input ComponentPersonalShippingAddressInput {
-  id: ID
-  Name: String
-  AdditionalName: String
-  Street: String
-  CountryCode: String
-  ZipCode: String
-  City: String
-}
-
-type ComponentPersonalShippingAddress {
-  id: ID!
-  Name: String
-  AdditionalName: String
-  Street: String
-  CountryCode: String
-  ZipCode: String
-  City: String
-}
-
-input ComponentPersonalAddressFiltersInput {
-  FullName: StringFilterInput
-  Address1: StringFilterInput
-  Address2: StringFilterInput
-  CountryCode: StringFilterInput
-  Zip: StringFilterInput
-  City: StringFilterInput
-  and: [ComponentPersonalAddressFiltersInput]
-  or: [ComponentPersonalAddressFiltersInput]
-  not: ComponentPersonalAddressFiltersInput
-}
-
-input ComponentPersonalAddressInput {
-  id: ID
-  FullName: String
-  Address1: String
-  Address2: String
-  CountryCode: String
-  Zip: String
-  City: String
-}
-
-type ComponentPersonalAddress {
-  id: ID!
-  FullName: String
-  Address1: String
-  Address2: String
-  CountryCode: String!
-  Zip: String
-  City: String
-}
-
 input ComponentPermissionRestrictionFiltersInput {
   Public: BooleanFilterInput
   Authenticated: BooleanFilterInput
@@ -428,6 +364,70 @@ type ComponentLinksActionButton {
   Label: String
   Link: String
   Primary: Boolean
+}
+
+input ComponentPersonalShippingAddressFiltersInput {
+  Name: StringFilterInput
+  AdditionalName: StringFilterInput
+  Street: StringFilterInput
+  CountryCode: StringFilterInput
+  ZipCode: StringFilterInput
+  City: StringFilterInput
+  and: [ComponentPersonalShippingAddressFiltersInput]
+  or: [ComponentPersonalShippingAddressFiltersInput]
+  not: ComponentPersonalShippingAddressFiltersInput
+}
+
+input ComponentPersonalShippingAddressInput {
+  id: ID
+  Name: String
+  AdditionalName: String
+  Street: String
+  CountryCode: String
+  ZipCode: String
+  City: String
+}
+
+type ComponentPersonalShippingAddress {
+  id: ID!
+  Name: String
+  AdditionalName: String
+  Street: String
+  CountryCode: String
+  ZipCode: String
+  City: String
+}
+
+input ComponentPersonalAddressFiltersInput {
+  FullName: StringFilterInput
+  Address1: StringFilterInput
+  Address2: StringFilterInput
+  CountryCode: StringFilterInput
+  Zip: StringFilterInput
+  City: StringFilterInput
+  and: [ComponentPersonalAddressFiltersInput]
+  or: [ComponentPersonalAddressFiltersInput]
+  not: ComponentPersonalAddressFiltersInput
+}
+
+input ComponentPersonalAddressInput {
+  id: ID
+  FullName: String
+  Address1: String
+  Address2: String
+  CountryCode: String
+  Zip: String
+  City: String
+}
+
+type ComponentPersonalAddress {
+  id: ID!
+  FullName: String
+  Address1: String
+  Address2: String
+  CountryCode: String!
+  Zip: String
+  City: String
 }
 
 input ComponentLayoutSosInput {
@@ -1717,6 +1717,41 @@ type HzdPluginGeoLocationEntityResponseCollection {
   pageInfo: Pagination!
 }
 
+input AnnouncementFiltersInput {
+  documentId: IDFilterInput
+  AnnouncementContent: StringFilterInput
+  LinkUrl: StringFilterInput
+  VisibilityDays: IntFilterInput
+  createdAt: DateTimeFilterInput
+  updatedAt: DateTimeFilterInput
+  publishedAt: DateTimeFilterInput
+  and: [AnnouncementFiltersInput]
+  or: [AnnouncementFiltersInput]
+  not: AnnouncementFiltersInput
+}
+
+input AnnouncementInput {
+  AnnouncementContent: String
+  LinkUrl: String
+  VisibilityDays: Int
+  publishedAt: DateTime
+}
+
+type Announcement {
+  documentId: ID!
+  AnnouncementContent: String!
+  LinkUrl: String
+  VisibilityDays: Int!
+  createdAt: DateTime
+  updatedAt: DateTime
+  publishedAt: DateTime
+}
+
+type AnnouncementEntityResponseCollection {
+  nodes: [Announcement!]!
+  pageInfo: Pagination!
+}
+
 enum ENUM_CALENDAR_COLORSCHEMA {
   Violet
   Gruen
@@ -2685,7 +2720,7 @@ type SupplementalDocumentGroupEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingDogDocument | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTableOfContentSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksDocumentBundle | ComponentBlocksDocumentBundleSection | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksChampionsSection | ComponentBlocksCardSection | ComponentBlocksCardItem | ComponentBlocksBundleDocuments | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Champion | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | NewsArticleTag | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
+union GenericMorph = ComponentSeoSeo | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingDogDocument | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTableOfContentSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksDocumentBundle | ComponentBlocksDocumentBundleSection | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksChampionsSection | ComponentBlocksCardSection | ComponentBlocksCardItem | ComponentBlocksBundleDocuments | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Announcement | Calendar | CalendarEntry | Champion | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | NewsArticleTag | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
 
 input FileInfoInput {
   name: String
@@ -2791,6 +2826,9 @@ type Query {
   hzdPluginGeoLocation(documentId: ID!, status: PublicationStatus = PUBLISHED): HzdPluginGeoLocation
   hzdPluginGeoLocations_connection(filters: HzdPluginGeoLocationFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): HzdPluginGeoLocationEntityResponseCollection
   hzdPluginGeoLocations(filters: HzdPluginGeoLocationFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [HzdPluginGeoLocation]!
+  announcement(documentId: ID!, status: PublicationStatus = PUBLISHED): Announcement
+  announcements_connection(filters: AnnouncementFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): AnnouncementEntityResponseCollection
+  announcements(filters: AnnouncementFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Announcement]!
   calendar(documentId: ID!, status: PublicationStatus = PUBLISHED): Calendar
   calendars_connection(filters: CalendarFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): CalendarEntityResponseCollection
   calendars(filters: CalendarFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Calendar]!
@@ -2871,6 +2909,9 @@ type Mutation {
   createHzdPluginGeoLocation(status: PublicationStatus = PUBLISHED, data: HzdPluginGeoLocationInput!): HzdPluginGeoLocation
   updateHzdPluginGeoLocation(documentId: ID!, status: PublicationStatus = PUBLISHED, data: HzdPluginGeoLocationInput!): HzdPluginGeoLocation
   deleteHzdPluginGeoLocation(documentId: ID!): DeleteMutationResponse
+  createAnnouncement(status: PublicationStatus = PUBLISHED, data: AnnouncementInput!): Announcement
+  updateAnnouncement(documentId: ID!, status: PublicationStatus = PUBLISHED, data: AnnouncementInput!): Announcement
+  deleteAnnouncement(documentId: ID!): DeleteMutationResponse
   createCalendar(status: PublicationStatus = PUBLISHED, data: CalendarInput!): Calendar
   updateCalendar(documentId: ID!, status: PublicationStatus = PUBLISHED, data: CalendarInput!): Calendar
   deleteCalendar(documentId: ID!): DeleteMutationResponse

@@ -3,6 +3,7 @@ import type { ThemeDefinition } from '@/themes'
 import { cn } from '@/lib/utils'
 import { useEffect, useState } from 'react'
 import { HeaderNavigation } from './header-navigation'
+import { AnnouncementSlider } from './announcement-slider'
 
 interface LoginCredentials {
 	identifier: string
@@ -21,6 +22,7 @@ interface HeaderProps {
 	error?: string | null
 	pageTitle?: string | null
 	logoBackground?: boolean | null
+	announcements?: GlobalLayout['announcements']
 }
 
 export function Header({
@@ -35,6 +37,7 @@ export function Header({
 	error,
 	pageTitle,
 	logoBackground,
+	announcements,
 }: HeaderProps) {
 	const [isScrolled, setIsScrolled] = useState(false)
 
@@ -66,6 +69,9 @@ export function Header({
 				isStickyTransparent && 'sticky top-0 z-[100] backdrop-blur-md shadow-sm'
 			)}
 		>
+			{announcements && announcements.length > 0 && (
+				<AnnouncementSlider announcements={announcements} theme={theme} />
+			)}
 			<HeaderNavigation
 				globalLayout={globalLayout}
 				strapiBaseUrl={strapiBaseUrl}

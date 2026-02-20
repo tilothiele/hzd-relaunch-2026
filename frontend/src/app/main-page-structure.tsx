@@ -100,6 +100,7 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 				onLogout={handleLogout}
 				isAuthenticating={isAuthenticating}
 				error={authError}
+				announcements={homepage.announcements}
 			/>
 			<main className='flex flex-col' style={{
 				color: '#000000',

@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic'
 interface LayoutData {
 	globalLayout: GlobalLayout
 	hzdSetting?: GlobalLayout['HzdSetting']
+	announcements?: GlobalLayout['announcements']
 }
 
 export default async function Home() {
@@ -21,8 +22,9 @@ export default async function Home() {
 		baseUrl = getStrapiBaseUrl()
 		const data = await fetchGraphQLServer<LayoutData>(GET_LAYOUT, { baseUrl })
 		globalLayout = data.globalLayout
-		if (globalLayout && data.hzdSetting) {
-			globalLayout.HzdSetting = data.hzdSetting
+		if (globalLayout) {
+			globalLayout.HzdSetting = data.hzdSetting ?? null
+			globalLayout.announcements = data.announcements ?? null
 		}
 	} catch (err) {
 		error = err instanceof Error ? err : new Error('Fehler beim Laden der Seite.')

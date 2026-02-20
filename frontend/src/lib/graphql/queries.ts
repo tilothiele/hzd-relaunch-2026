@@ -318,12 +318,14 @@ export const GET_LAYOUT = `
 				width
 				height
 			}
-			DefaultChanpionAvatar {
-				url
-				alternativeText
-				width
-				height
-			}
+		}
+		announcements(status: PUBLISHED) {
+			documentId
+			AnnouncementContent
+			LinkUrl
+			VisibilityDays
+			publishedAt
+			createdAt
 		}
 	}
 `

@@ -1,5 +1,14 @@
 import type { BlocksContent } from '@strapi/blocks-react-renderer'
 
+export interface Announcement {
+	documentId: string
+	AnnouncementContent: string
+	LinkUrl?: string | null
+	VisibilityDays: number
+	publishedAt?: string | null
+	createdAt?: string | null
+}
+
 export interface ComponentLayoutPadding {
 	Top: 'small' | 'middle' | 'large' | null
 	Bottom: 'small' | 'middle' | 'large' | null
@@ -291,6 +300,7 @@ export interface GlobalLayout {
 	PartnerLink?: PartnerLink[] | null
 	PrivacyPolicy?: Image | null
 	page?: Page | null
+	announcements?: Announcement[] | null
 }
 
 export interface ComponentLayoutSOS {
@@ -581,6 +591,7 @@ export interface IndexPageQueryResult {
 export interface GlobalLayoutQueryResult {
 	globalLayout: GlobalLayout
 	hzdSetting?: HzdSetting | null
+	announcements?: Announcement[] | null
 }
 
 export interface ContactsQueryResult {
