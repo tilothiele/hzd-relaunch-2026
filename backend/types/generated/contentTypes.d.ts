@@ -439,7 +439,7 @@ export interface ApiAnnouncementAnnouncement
     singularName: 'announcement';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     AnnouncementContent: Schema.Attribute.Text &
@@ -1265,6 +1265,84 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+  };
+}
+
+export interface ApiPhotoboxImageCollectionPhotoboxImageCollection
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'photobox_image_collections';
+  info: {
+    displayName: 'PhotoboxImageCollection';
+    pluralName: 'photobox-image-collections';
+    singularName: 'photobox-image-collection';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    CollectionDescription: Schema.Attribute.Text;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::photobox-image-collection.photobox-image-collection'
+    > &
+      Schema.Attribute.Private;
+    Location: Schema.Attribute.String;
+    photogapher: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    photos: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::photobox-image.photobox-image'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiPhotoboxImagePhotoboxImage
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'photobox_images';
+  info: {
+    displayName: 'PhotoboxImage';
+    pluralName: 'photobox-images';
+    singularName: 'photobox-image';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::photobox-image.photobox-image'
+    > &
+      Schema.Attribute.Private;
+    origin: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    photobox_image_collection: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::photobox-image-collection.photobox-image-collection'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    RenderedPersons: Schema.Attribute.Text;
+    ReneredDogs: Schema.Attribute.Text;
+    S3Path: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    UserMessage: Schema.Attribute.Text;
   };
 }
 
@@ -2243,6 +2321,8 @@ declare module '@strapi/strapi' {
       'api::order-item.order-item': ApiOrderItemOrderItem;
       'api::order.order': ApiOrderOrder;
       'api::page.page': ApiPagePage;
+      'api::photobox-image-collection.photobox-image-collection': ApiPhotoboxImageCollectionPhotoboxImageCollection;
+      'api::photobox-image.photobox-image': ApiPhotoboxImagePhotoboxImage;
       'api::regional-unit.regional-unit': ApiRegionalUnitRegionalUnit;
       'api::subscription.subscription': ApiSubscriptionSubscription;
       'api::supplemental-document-group.supplemental-document-group': ApiSupplementalDocumentGroupSupplementalDocumentGroup;

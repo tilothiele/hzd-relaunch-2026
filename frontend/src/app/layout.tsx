@@ -23,7 +23,12 @@ export const metadata: Metadata = {
 	appleWebApp: {
 		capable: true,
 		statusBarStyle: 'default',
-		title: 'HZD',
+		title: 'HZD Hovawart',
+	},
+	icons: {
+		icon: '/logos/HZD-logo256-hovawart-zuchtgemeinschaft-deutschland.png',
+		shortcut: '/logos/HZD-logo256-hovawart-zuchtgemeinschaft-deutschland.png',
+		apple: '/logos/HZD-logo256-hovawart-zuchtgemeinschaft-deutschland.png',
 	},
 }
 
@@ -53,7 +58,6 @@ export default async function RootLayout({
 				<meta name="format-detection" content="telephone=no" />
 				<meta name="mobile-web-app-capable" content="yes" />
 				<meta name="theme-color" content="#4560AA" />
-				<link rel="apple-touch-icon" href="/logos/HZD-logo256-hovawart-zuchtgemeinschaft-deutschland.png" />
 			</head>
 			<body className='antialiased'>
 				<TestBanner />

@@ -2109,3 +2109,39 @@ export const GET_ALL_SUBSCRIPTIONS = `
 `
 
 
+
+export const GET_MY_PHOTOBOX_IMAGES = `
+	query GetMyPhotoboxImages($userId: ID!) {
+		photoboxImages(filters: { origin: { documentId: { eq: $userId } } }, sort: ["createdAt:desc"]) {
+			documentId
+			S3Path
+			RenderedPersons
+			ReneredDogs
+			UserMessage
+			photobox_image_collection {
+				documentId
+				CollectionDescription
+			}
+			createdAt
+		}
+	}
+`
+
+export const GET_MY_PHOTOBOX_COLLECTIONS = `
+	query GetMyPhotoboxCollections($userId: ID!) {
+		photoboxImageCollections(filters: { photogapher: { documentId: { eq: $userId } } }, sort: ["createdAt:desc"]) {
+			documentId
+			CollectionDescription
+			Location
+			createdAt
+			photos {
+				documentId
+				S3Path
+				RenderedPersons
+				ReneredDogs
+				UserMessage
+				createdAt
+			}
+		}
+	}
+`

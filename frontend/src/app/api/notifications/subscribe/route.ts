@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
             client.setHeader('Authorization', `Bearer ${token}`);
         }
 
-        console.log(`[API Subscribe][GET][${timestamp}] Checking for existing subscription: ${endpoint}`);
         const data = await client.request<any>(GET_SUBSCRIPTION_BY_ENDPOINT, { endpoint });
 
         return NextResponse.json(data)
@@ -37,8 +36,6 @@ export async function POST(request: NextRequest) {
     const timestamp = new Date().toISOString();
     try {
         const subscription = await request.json()
-
-        console.log(`[API Subscribe][${timestamp}] Incoming subscription/update:`, JSON.stringify(subscription, null, 2));
 
         if (!subscription || !subscription.endpoint) {
             console.error(`[API Subscribe][${timestamp}] Error: Invalid subscription data`);
@@ -67,13 +64,11 @@ export async function POST(request: NextRequest) {
 
         let result;
         if (existingSub) {
-            console.log(`[API Subscribe][${timestamp}] Updating existing subscription: ${existingSub.documentId}`);
             result = await client.request(UPDATE_SUBSCRIPTION, {
                 documentId: existingSub.documentId,
                 data: variableData
             });
         } else {
-            console.log(`[API Subscribe][${timestamp}] Creating new subscription`);
             result = await client.request(CREATE_SUBSCRIPTION, {
                 data: variableData
             });

@@ -1,0 +1,38 @@
+{
+  "kind": "collectionType",
+  "collectionName": "photobox_images",
+  "info": {
+    "singularName": "photobox-image",
+    "pluralName": "photobox-images",
+    "displayName": "PhotoboxImage"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "S3Path": {
+      "type": "string"
+    },
+    "origin": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "RenderedPersons": {
+      "type": "text"
+    },
+    "ReneredDogs": {
+      "type": "text"
+    },
+    "UserMessage": {
+      "type": "text"
+    },
+    "photobox_image_collection": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::photobox-image-collection.photobox-image-collection",
+      "inversedBy": "photos"
+    }
+  }
+}

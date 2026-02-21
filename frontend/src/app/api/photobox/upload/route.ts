@@ -1,7 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+import { GraphQLClient } from 'graphql-request'
+import { CREATE_PHOTOBOX_IMAGE } from '@/lib/graphql/mutations'
 
 const strapiBaseUrl = process.env.STRAPI_BASE_URL || process.env.NEXT_PUBLIC_STRAPI_BASE_URL || 'http://localhost:1337'
-const tikEmail = process.env.TIK_EMAIL || 'tik-service@hzd-hovawarte.de'
+
+// S3 Configuration
+const s3Config = {
+    endpoint: process.env.S3_ENDPOINT,
+    region: process.env.S3_REGION || 'auto',
+    credentials: {
+        accessKeyId: process.env.S3_PHOTOBOX_ACCESS_KEY || '',
+        secretAccessKey: process.env.S3_PHOTOBOX_SECRET_KEY || '',
+    },
+    forcePathStyle: true, // Often needed for custom S3 endpoints like MinIO or R2
+}
+
+const s3Client = new S3Client(s3Config)
+const bucketName = process.env.S3_PHOTOBOX_BUCKET || ''
 
 export async function POST(request: NextRequest) {
     try {
@@ -9,43 +25,73 @@ export async function POST(request: NextRequest) {
         const image = formData.get('image') as File
         const persons = formData.get('persons') as string
         const dogs = formData.get('dogs') as string
+        const message = formData.get('message') as string
+        const collectionId = formData.get('collectionId') as string
+        const token = formData.get('token') as string
 
         if (!image) {
             return NextResponse.json({ message: 'Kein Bild empfangen.' }, { status: 400 })
         }
 
-        console.log(`[PhotoBox API] Received upload: ${image.name} (${image.size} bytes)`)
-        console.log(`[PhotoBox API] Persons: ${persons || 'n/a'}`)
-        console.log(`[PhotoBox API] Dogs: ${dogs || 'n/a'}`)
+        if (!collectionId) {
+            return NextResponse.json({ message: 'Keine Collection ID empfangen.' }, { status: 400 })
+        }
 
-        // Logic for forwarding to Strapi or Email
-        // Since we don't have a direct PhotoBox content type in Strapi yet, 
-        // we use the email API to notify TIK.
+        if (!token) {
+            return NextResponse.json({ message: 'Nicht authentifiziert.' }, { status: 401 })
+        }
 
-        // Note: For a real file attachment, Strapi Email API needs careful configuration.
-        // For now, we simulate the success and log the data.
-
-        /* 
-        const strapiEmailResponse = await fetch(`${strapiBaseUrl}/api/email`, {
-            method: 'POST',
-            body: JSON.stringify({
-                to: tikEmail,
-                subject: 'Neues Foto aus der HZD PhotoBox',
-                text: `Ein neues Foto wurde hochgeladen.\n\nPersonen: ${persons || 'Keine Angabe'}\nHunde: ${dogs || 'Keine Angabe'}\n\nDatei: ${image.name}`,
-                // Attachments would go here if supported by the email provider setup
-            })
+        // 1. Get current user documentId via GraphQL
+        const gqlEndpoint = `${strapiBaseUrl.replace(/\/$/, '')}/graphql`
+        const gqlClient = new GraphQLClient(gqlEndpoint, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
         })
-        */
 
-        // Placeholder for real upload logic (e.g. uploading to Strapi Media Library first)
-        // const strapiMediaResponse = await fetch(...) 
+        const meResult = await gqlClient.request<{ me: { documentId: string } }>(`
+            query { me { documentId } }
+        `)
+
+        const userDocumentId = meResult.me.documentId
+
+        // 2. Upload to S3
+        const bytes = await image.arrayBuffer()
+        const buffer = Buffer.from(bytes)
+
+        // Path: documentid(collection)/dateineme-des-bildes
+        const s3Path = `${collectionId}/${image.name}`
+
+        console.log(`[PhotoBox API] Uploading to S3: ${s3Path} (${buffer.length} bytes)`)
+
+        await s3Client.send(new PutObjectCommand({
+            Bucket: bucketName,
+            Key: s3Path,
+            Body: buffer,
+            ContentType: image.type,
+        }))
+
+        // 3. Create PhotoboxImage in Strapi
+        console.log(`[PhotoBox API] Creating record in Strapi for user ${userDocumentId}`)
+
+        await gqlClient.request(CREATE_PHOTOBOX_IMAGE, {
+            data: {
+                S3Path: s3Path, // Storing only the relative path (collectionId/filename)
+                origin: userDocumentId,
+                RenderedPersons: persons,
+                ReneredDogs: dogs,
+                UserMessage: message || '',
+                photobox_image_collection: collectionId,
+                publishedAt: new Date().toISOString()
+            }
+        })
 
         return NextResponse.json({
-            message: 'Upload erfolgreich verarbeitet.',
+            message: 'Foto erfolgreich gespeichert.',
             details: {
                 fileName: image.name,
-                persons: persons,
-                dogs: dogs
+                s3Path: s3Path,
+                collectionId: collectionId
             }
         }, { status: 200 })
 

@@ -3,6 +3,7 @@ import { DogSearch } from '@/components/dog-search/dog-search'
 import { theme as globalTheme } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { PhotoBoxManager } from '@/components/ui/photo-box-manager'
+import { AuthGuard } from '@/components/auth-guard/auth-guard'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,7 +30,19 @@ export default async function DogsPage() {
         >
             <section className="py-12 bg-gray-50/50 min-h-[70vh]">
                 <div className="container mx-auto px-4">
-                    <PhotoBoxManager />
+                    <AuthGuard
+                        fallback={
+                            <div className="max-w-md mx-auto bg-white p-8 rounded-xl shadow-sm border border-gray-100 text-center">
+                                <h2 className="text-xl font-bold mb-4 text-[#4560AA]">Zugriff eingeschränkt</h2>
+                                <p className="text-gray-600 mb-6">Inhalte sind nur für angemeldete Benutzer zugänglich.</p>
+                                <p className="text-[#4560AA] font-medium">
+                                    Bitte über den Link oben anmelden.
+                                </p>
+                            </div>
+                        }
+                    >
+                        <PhotoBoxManager />
+                    </AuthGuard>
                 </div>
             </section>
         </MainPageStructure>

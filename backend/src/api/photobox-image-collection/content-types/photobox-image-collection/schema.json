@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "photobox_image_collections",
+  "info": {
+    "singularName": "photobox-image-collection",
+    "pluralName": "photobox-image-collections",
+    "displayName": "PhotoboxImageCollection"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "CollectionDescription": {
+      "type": "text"
+    },
+    "Location": {
+      "type": "string"
+    },
+    "photogapher": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "photos": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::photobox-image.photobox-image",
+      "mappedBy": "photobox_image_collection"
+    }
+  }
+}

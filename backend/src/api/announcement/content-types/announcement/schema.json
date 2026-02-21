@@ -7,7 +7,7 @@
     "displayName": "Announcement"
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {

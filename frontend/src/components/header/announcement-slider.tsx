@@ -45,6 +45,7 @@ export function AnnouncementSlider({ announcements, theme }: AnnouncementSliderP
                 modules={[Autoplay, A11y, Keyboard, Navigation, EffectFade]}
                 slidesPerView={1}
                 effect="fade"
+                fadeEffect={{ crossFade: true }}
                 speed={700}
                 loop={validAnnouncements.length > 1}
                 autoplay={{

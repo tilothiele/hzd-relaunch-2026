@@ -133,3 +133,39 @@ export const UPDATE_SUBSCRIPTION = `
 		}
 	}
 `
+
+export const CREATE_PHOTOBOX_COLLECTION = `
+	mutation CreatePhotoboxCollection($data: PhotoboxImageCollectionInput!) {
+		createPhotoboxImageCollection(data: $data) {
+			documentId
+			CollectionDescription
+			Location
+			photogapher { documentId username }
+		}
+	}
+`
+
+export const CREATE_PHOTOBOX_IMAGE = `
+	mutation CreatePhotoboxImage($data: PhotoboxImageInput!) {
+		createPhotoboxImage(data: $data) {
+			documentId
+			S3Path
+			RenderedPersons
+			ReneredDogs
+			UserMessage
+			origin { documentId username }
+			photobox_image_collection { documentId CollectionDescription }
+		}
+	}
+`
+
+export const UPDATE_PHOTOBOX_IMAGE = `
+	mutation UpdatePhotoboxImage($documentId: ID!, $data: PhotoboxImageInput!) {
+		updatePhotoboxImage(documentId: $documentId, data: $data) {
+			documentId
+			RenderedPersons
+			ReneredDogs
+			UserMessage
+		}
+	}
+`

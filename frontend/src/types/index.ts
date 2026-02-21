@@ -844,3 +844,27 @@ export interface Subscription {
 	channels?: ChannelSubscriptions | null
 	publishedAt?: string | null
 }
+
+export interface PhotoboxImageCollection {
+	documentId: string
+	CollectionDescription?: string | null
+	Location?: string | null
+	photogapher?: AuthUser | null
+	photos?: PhotoboxImage[] | null
+	createdAt?: string | null
+	updatedAt?: string | null
+	publishedAt?: string | null
+}
+
+export interface PhotoboxImage {
+	documentId: string
+	S3Path?: string | null
+	origin?: AuthUser | null
+	RenderedPersons?: string | null
+	ReneredDogs?: string | null
+	UserMessage?: string | null
+	photobox_image_collection?: PhotoboxImageCollection | null
+	createdAt?: string | null
+	updatedAt?: string | null
+	publishedAt?: string | null
+}
