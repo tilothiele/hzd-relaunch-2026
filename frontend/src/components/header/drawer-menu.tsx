@@ -38,6 +38,7 @@ import {
     faEnvelope,
     faSliders,
     faBell,
+    faCamera,
 } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import type { Menu as MenuType, MenuItem as MenuItemType, AuthUser } from '@/types'
@@ -98,6 +99,7 @@ const iconMap: Record<string, any> = {
     'fa-award': faAward,
     'fa-sliders': faSliders,
     'fa-bell': faBell,
+    'fa-camera': faCamera,
 }
 
 const getIcon = (iconName?: string) => {
