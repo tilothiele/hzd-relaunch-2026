@@ -2,6 +2,7 @@ import { MainPageStructure } from '../main-page-structure'
 import { DogSearch } from '@/components/dog-search/dog-search'
 import { theme as globalTheme } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
+import { PhotoBoxManager } from '@/components/ui/photo-box-manager'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,12 +27,11 @@ export default async function DogsPage() {
             theme={theme}
             pageTitle='HZD PhotoBox'
         >
-            <div className='flex min-h-[50vh] items-center justify-center px-4 text-center text-sm text-gray-600'>
-                <h1>HZD PhotoBox</h1>
-                <p>Hier entsteht die HZD PhotoBox</p>
-                <p>Du kannst hier Fotos vom Desktop oder direkt vom Handy hochladen und an das TIK senden.</p>
-                <p>So unterstützt du die Berichterstattung direkt von der Veranstaltung.</p>
-            </div>
+            <section className="py-12 bg-gray-50/50 min-h-[70vh]">
+                <div className="container mx-auto px-4">
+                    <PhotoBoxManager />
+                </div>
+            </section>
         </MainPageStructure>
     )
 }
