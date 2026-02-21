@@ -13,6 +13,8 @@ import { DrawerMenuComponent } from './drawer-menu'
 import { cn } from '@/lib/utils'
 import HomeIcon from '@mui/icons-material/Home'
 import FacebookShare from '@/components/ui/facebook-share-1'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faBell } from '@fortawesome/free-solid-svg-icons'
 
 interface LoginCredentials {
     identifier: string
@@ -47,10 +49,20 @@ export function HeaderNavigation({
     logoBackground,
 }: HeaderNavigationProps) {
     const [currentUrl, setCurrentUrl] = useState<string>('')
+    const [isNotificationActive, setIsNotificationActive] = useState<boolean>(true)
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
             setCurrentUrl(window.location.href)
+
+            // Check if push notifications are active
+            if ('serviceWorker' in navigator && 'PushManager' in window) {
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.pushManager.getSubscription().then(sub => {
+                        setIsNotificationActive(!!sub)
+                    }).catch(() => setIsNotificationActive(true))
+                }).catch(() => setIsNotificationActive(true))
+            }
         }
     }, [])
 
@@ -181,6 +193,15 @@ export function HeaderNavigation({
             {/* Right Section: Social Links + Login */}
             <div className='flex items-center justify-end gap-4'>
                 {currentUrl && <FacebookShare url={currentUrl} />}
+                {!isNotificationActive && (
+                    <Link
+                        href='/notification-settings'
+                        title='Benachrichtigungen hier aktivieren'
+                        className='flex items-center justify-center transition-transform hover:scale-110 ml-1'
+                    >
+                        <FontAwesomeIcon icon={faBell} size='xl' style={{ color: '#ff0000' }} />
+                    </Link>
+                )}
                 <SocialLinks
                     socialLinkFB={globalLayout?.SocialLinkFB}
                     socialLinkYT={globalLayout?.SocialLinkYT}

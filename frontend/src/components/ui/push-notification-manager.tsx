@@ -68,7 +68,6 @@ export function PushNotificationManager() {
                 ...sub.toJSON(),
                 channels: channels
             };
-            console.log('[PushNotificationManager] Subscribing with payload:', subPayload);
 
             const response = await fetch('/api/notifications/subscribe', {
                 method: 'POST',
@@ -78,7 +77,6 @@ export function PushNotificationManager() {
                 body: JSON.stringify(subPayload),
             })
 
-            console.log('[PushNotificationManager] Server response status:', response.status);
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}))
@@ -86,13 +84,9 @@ export function PushNotificationManager() {
                 throw new Error(errorData.error || 'Failed to save subscription on server')
             }
 
-            const responseData = await response.json();
-            console.log(`[PushNotificationManager][${new Date().toISOString()}] Server response data:`, responseData);
-
             setSubscription(sub)
             setIsSubscribed(true)
             setMessage({ type: 'success', text: `Benachrichtigungen erfolgreich aktiviert! (${new Date().toLocaleTimeString()})` })
-            console.log(`[PushNotificationManager][${new Date().toISOString()}] Push subscription successful and saved to server`)
         } catch (error) {
             console.error('Failed to subscribe to push notifications:', error)
             setMessage({
@@ -186,7 +180,7 @@ export function PushNotificationManager() {
         <div className="p-6 bg-white rounded-lg shadow-md border border-gray-100">
             <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
                 <FontAwesomeIcon icon={faBell} className="text-[#4560AA]" />
-                Push-Benachrichtigungen
+                Benachrichtigungen
             </h3>
 
             {message && (
@@ -201,7 +195,7 @@ export function PushNotificationManager() {
                 <div className="flex items-center justify-between mb-4">
                     <h4 className="font-bold text-gray-800 flex items-center gap-2">
                         <FontAwesomeIcon icon={faSliders} className="text-[#4560AA] text-sm" />
-                        Meine Interessensgebiete
+                        Info-Kanäle
                     </h4>
                     {isSubscribed && (
                         <button

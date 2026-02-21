@@ -9,14 +9,14 @@ export function PushNotificationSender() {
     const [isLoading, setIsLoading] = useState(false)
     const [status, setStatus] = useState<{ type: 'success' | 'error', text: string } | null>(null)
     const [channels, setChannels] = useState<Record<string, boolean>>({
-        aktuelles: true,
-        berichte: true,
-        hovipedia: true,
-        welpen: true,
-        terminkalender: true,
-        ergebnisse: true,
-        notvermittlungen: true,
-        testnachrichten: false
+        aktuelles: false,
+        berichte: false,
+        hovipedia: false,
+        welpen: false,
+        terminkalender: false,
+        ergebnisse: false,
+        notvermittlungen: false,
+        testnachrichten: true
     })
 
     const channelLabels: Record<string, string> = {
