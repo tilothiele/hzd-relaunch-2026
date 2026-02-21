@@ -1,9 +1,10 @@
 'use client'
 
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Autoplay, A11y, Keyboard, Navigation } from 'swiper/modules'
+import { Autoplay, A11y, Keyboard, Navigation, EffectFade } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
+import 'swiper/css/effect-fade'
 import type { Announcement } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import Link from 'next/link'
@@ -41,8 +42,10 @@ export function AnnouncementSlider({ announcements, theme }: AnnouncementSliderP
             }}
         >
             <Swiper
-                modules={[Autoplay, A11y, Keyboard, Navigation]}
+                modules={[Autoplay, A11y, Keyboard, Navigation, EffectFade]}
                 slidesPerView={1}
+                effect="fade"
+                speed={700}
                 loop={validAnnouncements.length > 1}
                 autoplay={{
                     delay: 5000,
