@@ -1313,6 +1313,40 @@ export interface ApiRegionalUnitRegionalUnit
   };
 }
 
+export interface ApiSubscriptionSubscription
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'subscriptions';
+  info: {
+    displayName: 'Subscription';
+    pluralName: 'subscriptions';
+    singularName: 'subscription';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    auth: Schema.Attribute.String & Schema.Attribute.Required;
+    channels: Schema.Attribute.JSON;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    endpoint: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::subscription.subscription'
+    > &
+      Schema.Attribute.Private;
+    p256dh: Schema.Attribute.Text & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiSupplementalDocumentGroupSupplementalDocumentGroup
   extends Struct.CollectionTypeSchema {
   collectionName: 'supplemental_document_groups';
@@ -2210,6 +2244,7 @@ declare module '@strapi/strapi' {
       'api::order.order': ApiOrderOrder;
       'api::page.page': ApiPagePage;
       'api::regional-unit.regional-unit': ApiRegionalUnitRegionalUnit;
+      'api::subscription.subscription': ApiSubscriptionSubscription;
       'api::supplemental-document-group.supplemental-document-group': ApiSupplementalDocumentGroupSupplementalDocumentGroup;
       'api::supplemental-document.supplemental-document': ApiSupplementalDocumentSupplementalDocument;
       'plugin::content-releases.release': PluginContentReleasesRelease;

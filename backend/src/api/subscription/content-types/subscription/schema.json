@@ -1,0 +1,31 @@
+{
+  "kind": "collectionType",
+  "collectionName": "subscriptions",
+  "info": {
+    "singularName": "subscription",
+    "pluralName": "subscriptions",
+    "displayName": "Subscription"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "endpoint": {
+      "type": "text",
+      "required": true,
+      "unique": true
+    },
+    "p256dh": {
+      "type": "text",
+      "required": true
+    },
+    "auth": {
+      "type": "string",
+      "required": true
+    },
+    "channels": {
+      "type": "json"
+    }
+  }
+}

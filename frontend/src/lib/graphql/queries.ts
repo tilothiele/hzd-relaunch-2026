@@ -2084,4 +2084,28 @@ export const GET_LITTERS_BY_BREEDER = `
 	}
 `
 
+export const GET_SUBSCRIPTION_BY_ENDPOINT = `
+	query GetSubscriptionByEndpoint($endpoint: String!) {
+		subscriptions(filters: { endpoint: { eq: $endpoint } }) {
+			documentId
+			endpoint
+			p256dh
+			auth
+			channels
+		}
+	}
+`
+
+export const GET_ALL_SUBSCRIPTIONS = `
+	query GetAllSubscriptions {
+		subscriptions(pagination: { limit: -1 }) {
+			documentId
+			endpoint
+			p256dh
+			auth
+			channels
+		}
+	}
+`
+
 

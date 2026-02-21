@@ -2,6 +2,7 @@ import { MainPageStructure } from '../main-page-structure'
 import { theme as globalTheme } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { PushNotificationManager } from '@/components/ui/push-notification-manager'
+import { PushNotificationSender } from '@/components/ui/push-notification-sender'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 
 export const dynamic = 'force-dynamic'
@@ -29,6 +30,7 @@ export default async function DogsPage() {
         >
             <SectionContainer variant='max-width' paddingTop='2em' paddingBottom='4em'>
                 <PushNotificationManager />
+                <PushNotificationSender />
             </SectionContainer>
         </MainPageStructure>
     )

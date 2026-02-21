@@ -103,3 +103,33 @@ export const CHANGE_PASSWORD = `
 	}
 }
 `
+
+export const CREATE_SUBSCRIPTION = `
+	mutation CreateSubscription($data: SubscriptionInput!) {
+		createSubscription(data: $data) {
+			documentId
+			endpoint
+			p256dh
+			auth
+			channels
+		}
+	}
+`
+
+export const DELETE_SUBSCRIPTION = `
+	mutation DeleteSubscription($documentId: ID!) {
+		deleteSubscription(documentId: $documentId) {
+			documentId
+		}
+	}
+`
+
+export const UPDATE_SUBSCRIPTION = `
+	mutation UpdateSubscription($documentId: ID!, $data: SubscriptionInput!) {
+		updateSubscription(documentId: $documentId, data: $data) {
+			documentId
+			endpoint
+			channels
+		}
+	}
+`

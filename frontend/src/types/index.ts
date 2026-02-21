@@ -824,3 +824,23 @@ export interface NewsArticle {
 		TagBgColorHexCode?: string | null
 	}[] | null
 }
+
+export interface ChannelSubscriptions {
+	aktuelles: boolean
+	berichte: boolean
+	hovipedia: boolean
+	welpen: boolean
+	terminkalender: boolean
+	ergebnisse: boolean
+	notvermittlungen: boolean
+	testnachrichten: boolean
+}
+
+export interface Subscription {
+	documentId: string
+	endpoint: string
+	p256dh?: string | null
+	auth?: string | null
+	channels?: ChannelSubscriptions | null
+	publishedAt?: string | null
+}

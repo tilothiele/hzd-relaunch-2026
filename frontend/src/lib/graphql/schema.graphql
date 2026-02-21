@@ -267,6 +267,70 @@ input JSONFilterInput {
   between: [JSON]
 }
 
+input ComponentPersonalShippingAddressFiltersInput {
+  Name: StringFilterInput
+  AdditionalName: StringFilterInput
+  Street: StringFilterInput
+  CountryCode: StringFilterInput
+  ZipCode: StringFilterInput
+  City: StringFilterInput
+  and: [ComponentPersonalShippingAddressFiltersInput]
+  or: [ComponentPersonalShippingAddressFiltersInput]
+  not: ComponentPersonalShippingAddressFiltersInput
+}
+
+input ComponentPersonalShippingAddressInput {
+  id: ID
+  Name: String
+  AdditionalName: String
+  Street: String
+  CountryCode: String
+  ZipCode: String
+  City: String
+}
+
+type ComponentPersonalShippingAddress {
+  id: ID!
+  Name: String
+  AdditionalName: String
+  Street: String
+  CountryCode: String
+  ZipCode: String
+  City: String
+}
+
+input ComponentPersonalAddressFiltersInput {
+  FullName: StringFilterInput
+  Address1: StringFilterInput
+  Address2: StringFilterInput
+  CountryCode: StringFilterInput
+  Zip: StringFilterInput
+  City: StringFilterInput
+  and: [ComponentPersonalAddressFiltersInput]
+  or: [ComponentPersonalAddressFiltersInput]
+  not: ComponentPersonalAddressFiltersInput
+}
+
+input ComponentPersonalAddressInput {
+  id: ID
+  FullName: String
+  Address1: String
+  Address2: String
+  CountryCode: String
+  Zip: String
+  City: String
+}
+
+type ComponentPersonalAddress {
+  id: ID!
+  FullName: String
+  Address1: String
+  Address2: String
+  CountryCode: String!
+  Zip: String
+  City: String
+}
+
 input ComponentSeoSeoFiltersInput {
   TitleTag: StringFilterInput
   MetaDescription: StringFilterInput
@@ -364,70 +428,6 @@ type ComponentLinksActionButton {
   Label: String
   Link: String
   Primary: Boolean
-}
-
-input ComponentPersonalShippingAddressFiltersInput {
-  Name: StringFilterInput
-  AdditionalName: StringFilterInput
-  Street: StringFilterInput
-  CountryCode: StringFilterInput
-  ZipCode: StringFilterInput
-  City: StringFilterInput
-  and: [ComponentPersonalShippingAddressFiltersInput]
-  or: [ComponentPersonalShippingAddressFiltersInput]
-  not: ComponentPersonalShippingAddressFiltersInput
-}
-
-input ComponentPersonalShippingAddressInput {
-  id: ID
-  Name: String
-  AdditionalName: String
-  Street: String
-  CountryCode: String
-  ZipCode: String
-  City: String
-}
-
-type ComponentPersonalShippingAddress {
-  id: ID!
-  Name: String
-  AdditionalName: String
-  Street: String
-  CountryCode: String
-  ZipCode: String
-  City: String
-}
-
-input ComponentPersonalAddressFiltersInput {
-  FullName: StringFilterInput
-  Address1: StringFilterInput
-  Address2: StringFilterInput
-  CountryCode: StringFilterInput
-  Zip: StringFilterInput
-  City: StringFilterInput
-  and: [ComponentPersonalAddressFiltersInput]
-  or: [ComponentPersonalAddressFiltersInput]
-  not: ComponentPersonalAddressFiltersInput
-}
-
-input ComponentPersonalAddressInput {
-  id: ID
-  FullName: String
-  Address1: String
-  Address2: String
-  CountryCode: String
-  Zip: String
-  City: String
-}
-
-type ComponentPersonalAddress {
-  id: ID!
-  FullName: String
-  Address1: String
-  Address2: String
-  CountryCode: String!
-  Zip: String
-  City: String
 }
 
 input ComponentLayoutSosInput {
@@ -2630,6 +2630,44 @@ type RegionalUnitEntityResponseCollection {
   pageInfo: Pagination!
 }
 
+input SubscriptionFiltersInput {
+  documentId: IDFilterInput
+  endpoint: StringFilterInput
+  p256dh: StringFilterInput
+  auth: StringFilterInput
+  channels: JSONFilterInput
+  createdAt: DateTimeFilterInput
+  updatedAt: DateTimeFilterInput
+  publishedAt: DateTimeFilterInput
+  and: [SubscriptionFiltersInput]
+  or: [SubscriptionFiltersInput]
+  not: SubscriptionFiltersInput
+}
+
+input SubscriptionInput {
+  endpoint: String
+  p256dh: String
+  auth: String
+  channels: JSON
+  publishedAt: DateTime
+}
+
+type Subscription {
+  documentId: ID!
+  endpoint: String!
+  p256dh: String!
+  auth: String!
+  channels: JSON
+  createdAt: DateTime
+  updatedAt: DateTime
+  publishedAt: DateTime
+}
+
+type SubscriptionEntityResponseCollection {
+  nodes: [Subscription!]!
+  pageInfo: Pagination!
+}
+
 input SupplementalDocumentFiltersInput {
   documentId: IDFilterInput
   Name: StringFilterInput
@@ -2720,7 +2758,7 @@ type SupplementalDocumentGroupEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union GenericMorph = ComponentSeoSeo | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingDogDocument | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTableOfContentSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksDocumentBundle | ComponentBlocksDocumentBundleSection | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksChampionsSection | ComponentBlocksCardSection | ComponentBlocksCardItem | ComponentBlocksBundleDocuments | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Announcement | Calendar | CalendarEntry | Champion | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | NewsArticleTag | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
+union GenericMorph = ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentSeoSeo | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingDogDocument | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTableOfContentSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksDocumentBundle | ComponentBlocksDocumentBundleSection | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksChampionsSection | ComponentBlocksCardSection | ComponentBlocksCardItem | ComponentBlocksBundleDocuments | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Announcement | Calendar | CalendarEntry | Champion | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | NewsArticleTag | Order | OrderItem | Page | RegionalUnit | Subscription | SupplementalDocument | SupplementalDocumentGroup
 
 input FileInfoInput {
   name: String
@@ -2880,6 +2918,9 @@ type Query {
   regionalUnit(documentId: ID!, status: PublicationStatus = PUBLISHED): RegionalUnit
   regionalUnits_connection(filters: RegionalUnitFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): RegionalUnitEntityResponseCollection
   regionalUnits(filters: RegionalUnitFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [RegionalUnit]!
+  subscription(documentId: ID!, status: PublicationStatus = PUBLISHED): Subscription
+  subscriptions_connection(filters: SubscriptionFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): SubscriptionEntityResponseCollection
+  subscriptions(filters: SubscriptionFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Subscription]!
   supplementalDocument(documentId: ID!, status: PublicationStatus = PUBLISHED): SupplementalDocument
   supplementalDocuments_connection(filters: SupplementalDocumentFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): SupplementalDocumentEntityResponseCollection
   supplementalDocuments(filters: SupplementalDocumentFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [SupplementalDocument]!
@@ -2966,6 +3007,9 @@ type Mutation {
   createRegionalUnit(status: PublicationStatus = PUBLISHED, data: RegionalUnitInput!): RegionalUnit
   updateRegionalUnit(documentId: ID!, status: PublicationStatus = PUBLISHED, data: RegionalUnitInput!): RegionalUnit
   deleteRegionalUnit(documentId: ID!): DeleteMutationResponse
+  createSubscription(status: PublicationStatus = PUBLISHED, data: SubscriptionInput!): Subscription
+  updateSubscription(documentId: ID!, status: PublicationStatus = PUBLISHED, data: SubscriptionInput!): Subscription
+  deleteSubscription(documentId: ID!): DeleteMutationResponse
   createSupplementalDocument(status: PublicationStatus = PUBLISHED, data: SupplementalDocumentInput!): SupplementalDocument
   updateSupplementalDocument(documentId: ID!, status: PublicationStatus = PUBLISHED, data: SupplementalDocumentInput!): SupplementalDocument
   deleteSupplementalDocument(documentId: ID!): DeleteMutationResponse
