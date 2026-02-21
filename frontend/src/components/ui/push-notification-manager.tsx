@@ -180,7 +180,7 @@ export function PushNotificationManager() {
         <div className="p-6 bg-white rounded-lg shadow-md border border-gray-100">
             <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
                 <FontAwesomeIcon icon={faBell} className="text-[#4560AA]" />
-                Benachrichtigungen
+                Benachrichtigungen vom Hovawarte Zuchtverein Deutschland e.V.
             </h3>
 
             {message && (

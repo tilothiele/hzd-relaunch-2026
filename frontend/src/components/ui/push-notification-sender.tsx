@@ -78,7 +78,7 @@ export function PushNotificationSender() {
     }
 
     return (
-        <div className="p-6 bg-white rounded-lg shadow-md border border-gray-100 mt-8">
+        <div className="p-6 bg-red-50 rounded-lg shadow-md border border-red-100 mt-8">
             <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
                 <FontAwesomeIcon icon={faPaperPlane} className="text-[#4560AA]" />
                 Push-Benachrichtigung senden (Admin)
