@@ -9,7 +9,9 @@ export function PushNotificationManager() {
     const [isSubscribed, setIsSubscribed] = useState(false)
     const [subscription, setSubscription] = useState<PushSubscription | null>(null)
     const [isLoading, setIsLoading] = useState(false)
-    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+    const [isIOS, setIsIOS] = useState(false)
+    const [isStandalone, setIsStandalone] = useState(false)
+    const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info', text: string } | null>(null)
     const [channels, setChannels] = useState<Record<string, boolean>>({
         aktuelles: true,
         berichte: true,
@@ -22,9 +24,18 @@ export function PushNotificationManager() {
     })
 
     useEffect(() => {
-        if ('serviceWorker' in navigator && 'PushManager' in window) {
-            setIsSupported(true)
-            checkSubscription()
+        if (typeof window !== 'undefined') {
+            const isApple = /iPad|iPhone|iPod/.test(navigator.userAgent)
+            setIsIOS(isApple)
+
+            // Check if app is in standalone mode (PWA)
+            const isInstalled = window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone
+            setIsStandalone(!!isInstalled)
+
+            if ('serviceWorker' in navigator && 'PushManager' in window) {
+                setIsSupported(true)
+                checkSubscription()
+            }
         }
     }, [])
 
@@ -54,9 +65,23 @@ export function PushNotificationManager() {
     }
 
     async function subscribe() {
+        if (isIOS && !isStandalone) {
+            setMessage({
+                type: 'info',
+                text: 'Um Benachrichtigungen auf dem iPhone zu erhalten, füge diese Seite bitte zuerst über das "Teilen"-Menü zum Home-Bildschirm hinzu.'
+            })
+            return
+        }
+
         setIsLoading(true)
         setMessage(null)
         try {
+            // Explicitly request permission first (required by some browsers/OS)
+            const permission = await Notification.requestPermission()
+            if (permission !== 'granted') {
+                throw new Error('Benachrichtigungen wurden blockiert. Bitte erlaube sie in deinen Browsereinstellungen.')
+            }
+
             const registration = await navigator.serviceWorker.ready
             const sub = await registration.pushManager.subscribe({
                 userVisibleOnly: true,
@@ -184,7 +209,9 @@ export function PushNotificationManager() {
             </h3>
 
             {message && (
-                <div className={`mb-6 p-4 rounded-lg text-sm font-medium border ${message.type === 'success' ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100'
+                <div className={`mb-6 p-4 rounded-lg text-sm font-medium border ${message.type === 'success' ? 'bg-green-50 text-green-700 border-green-100' :
+                        message.type === 'info' ? 'bg-blue-50 text-[#4560AA] border-blue-100' :
+                            'bg-red-50 text-red-700 border-red-100'
                     }`}>
                     {message.text}
                 </div>
