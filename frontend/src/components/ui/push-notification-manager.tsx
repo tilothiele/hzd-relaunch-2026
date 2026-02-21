@@ -197,7 +197,7 @@ export function PushNotificationManager() {
         testnachrichten: 'Testnachrichten'
     }
 
-    if (!isSupported) {
+    if (!isSupported && !isIOS) {
         return null
     }
 
@@ -210,8 +210,8 @@ export function PushNotificationManager() {
 
             {message && (
                 <div className={`mb-6 p-4 rounded-lg text-sm font-medium border ${message.type === 'success' ? 'bg-green-50 text-green-700 border-green-100' :
-                        message.type === 'info' ? 'bg-blue-50 text-[#4560AA] border-blue-100' :
-                            'bg-red-50 text-red-700 border-red-100'
+                    message.type === 'info' ? 'bg-blue-50 text-[#4560AA] border-blue-100' :
+                        'bg-red-50 text-red-700 border-red-100'
                     }`}>
                     {message.text}
                 </div>
@@ -258,7 +258,19 @@ export function PushNotificationManager() {
             </div>
 
             <div className="pt-6 border-t border-gray-100">
-                {isSubscribed ? (
+                {!isSupported && isIOS ? (
+                    <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl">
+                        <p className="text-sm text-[#4560AA] font-bold mb-2">iPhone erkannt</p>
+                        <p className="text-sm text-gray-700 leading-relaxed">
+                            Um Benachrichtigungen auf deinem iPhone zu erhalten, musst du diese Seite zuerst zum Home-Bildschirm hinzufügen:
+                        </p>
+                        <ol className="mt-3 text-sm text-gray-700 list-decimal list-inside space-y-2">
+                            <li>Klicke unten im Browser auf das <span className="font-bold">Teilen-Icon</span> (Quadrat mit Pfeil nach oben).</li>
+                            <li>Wähle <span className="font-bold">"Zum Home-Bildschirm"</span>.</li>
+                            <li>Öffne die App dann von deinem Home-Bildschirm.</li>
+                        </ol>
+                    </div>
+                ) : isSubscribed ? (
                     <div className="flex flex-col gap-4">
                         <div className="flex items-center justify-between">
                             <p className="text-sm text-green-600 font-medium flex items-center gap-2">

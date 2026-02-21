@@ -49,7 +49,7 @@ export function HeaderNavigation({
     logoBackground,
 }: HeaderNavigationProps) {
     const [currentUrl, setCurrentUrl] = useState<string>('')
-    const [isNotificationActive, setIsNotificationActive] = useState<boolean>(true)
+    const [isNotificationActive, setIsNotificationActive] = useState<boolean>(false)
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -60,8 +60,12 @@ export function HeaderNavigation({
                 navigator.serviceWorker.ready.then(registration => {
                     registration.pushManager.getSubscription().then(sub => {
                         setIsNotificationActive(!!sub)
-                    }).catch(() => setIsNotificationActive(true))
-                }).catch(() => setIsNotificationActive(true))
+                    }).catch(() => setIsNotificationActive(false))
+                }).catch(() => setIsNotificationActive(false))
+            } else {
+                // If PushManager is not supported (e.g. on iOS Safari not in standalone)
+                // we keep it as false to show the prompt icon
+                setIsNotificationActive(false)
             }
         }
     }, [])
