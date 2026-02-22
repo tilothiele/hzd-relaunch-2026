@@ -8,11 +8,11 @@ services:
     volumes:
       - filestore:/var/www/html/filestore
       - ./config.php:/var/www/html/include/config.php
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.rs.rule=Host(`resourcespace.app.tilothiele.de`)"
-      - "traefik.http.routers.rs.entrypoints=websecure"
-      - "traefik.http.routers.rs.tls.certresolver=letsencrypt"
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.routers.rs.rule=Host(`resourcespace.app.tilothiele.de`)"
+#      - "traefik.http.routers.rs.entrypoints=websecure"
+#      - "traefik.http.routers.rs.tls.certresolver=letsencrypt"
 
       # Wichtig: interner Port von ResourceSpace
       - "traefik.http.services.rs.loadbalancer.server.port=80"
