@@ -3,8 +3,8 @@ services:
     build: .
     container_name: resourcespace
     restart: unless-stopped
-    depends_on:
-      - mariadb
+#    depends_on:
+#      - mariadb
     volumes:
       - filestore:/var/www/html/filestore
       - ./config.php:/var/www/html/include/config.php
@@ -14,21 +14,21 @@ services:
 #    ports:
 #      - "80:80"
 
-  mariadb:
-    image: mariadb
-    container_name: mariadb
-    restart: unless-stopped
-    env_file:
-      - db.env
-    volumes:
-      - mariadb:/var/lib/mysql
-    networks:
-      - backend
+#  mariadb:
+#    image: mariadb
+#    container_name: mariadb
+#    restart: unless-stopped
+#    env_file:
+#      - db.env
+#    volumes:
+#      - mariadb:/var/lib/mysql
+#    networks:
+#      - backend
 
 networks:
   frontend:
   backend:
 
 volumes:
-  mariadb:
+#  mariadb:
   filestore:
