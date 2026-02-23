@@ -1,3 +1,4 @@
+version: "3.9"
 services:
   resourcespace:
     build: .
@@ -8,17 +9,8 @@ services:
     volumes:
       - filestore:/var/www/html/filestore
 #      - ./config.php:/var/www/html/include/config.php
-#    labels:
-#      - "traefik.enable=true"
-#      - "traefik.http.routers.rs.rule=Host(`resourcespace.app.tilothiele.de`)"
-#      - "traefik.http.routers.rs.entrypoints=websecure"
-#      - "traefik.http.routers.rs.tls.certresolver=letsencrypt"
-
-      # Wichtig: interner Port von ResourceSpace
-#      - "traefik.http.services.rs.loadbalancer.server.port=80"
     networks:
-      - frontend
-      - backend
+      - coolify
 #    ports:
 #      - "80:80"
 
@@ -34,8 +26,8 @@ services:
 #      - backend
 
 networks:
-  frontend:
-  backend:
+  coolify:
+    external: true
 
 volumes:
 #  mariadb:
