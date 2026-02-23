@@ -7,7 +7,7 @@ services:
 #      - mariadb
     volumes:
       - filestore:/var/www/html/filestore
-      - ./config.php:/var/www/html/include/config.php
+#      - ./config.php:/var/www/html/include/config.php
 #    labels:
 #      - "traefik.enable=true"
 #      - "traefik.http.routers.rs.rule=Host(`resourcespace.app.tilothiele.de`)"
