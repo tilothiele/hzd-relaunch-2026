@@ -43,7 +43,6 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 	const [nameInput, setNameInput] = useState('')
 	const [sexFilter, setSexFilter] = useState<SexFilter>('')
 	const [colorFilter, setColorFilter] = useState<ColorFilter>('')
-	const [chipNoFilter, setChipNoFilter] = useState('')
 	const [zipCode, setZipCode] = useState('')
 	const [zipLocation, setZipLocation] = useState<{ lat: number; lng: number } | null>(null)
 	const [maxDistance, setMaxDistance] = useState<DistanceFilter>('')
@@ -62,11 +61,10 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 		nameFilter,
 		sexFilter,
 		colorFilter,
-		chipNoFilter,
 		maxDistance: maxDistance === '' ? undefined : maxDistance,
 		userLocation: userLocation || undefined,
 		maxAge: 15, // Filter out dogs older than 15 years
-	}), [nameFilter, sexFilter, colorFilter, chipNoFilter, maxDistance, userLocation])
+	}), [nameFilter, sexFilter, colorFilter, maxDistance, userLocation])
 
 	const {
 		dogs,
@@ -271,19 +269,6 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 							</Select>
 						</FormControl>
 
-						<TextField
-							label='Chipnummer'
-							value={chipNoFilter}
-							onChange={(e) => setChipNoFilter(e.target.value)}
-							onKeyDown={(e) => {
-								if (e.key === 'Enter') {
-									handleSearch()
-								}
-							}}
-							placeholder='Chipnummer'
-							fullWidth
-							size='small'
-						/>
 					</Box>
 
 

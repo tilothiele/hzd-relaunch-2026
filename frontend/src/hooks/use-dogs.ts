@@ -19,7 +19,6 @@ interface DogsFilters {
 	nameFilter?: string
 	sexFilter?: SexFilter
 	colorFilter?: ColorFilter
-	chipNoFilter?: string
 	maxDistance?: DistanceFilter
 	userLocation?: { lat: number; lng: number }
 	ownerDocumentId?: string
@@ -66,7 +65,6 @@ export function useDogs(options: UseDogsOptions = {}) {
 	const nameFilter = filters.nameFilter ?? ''
 	const sexFilter = filters.sexFilter ?? ''
 	const colorFilter = filters.colorFilter ?? ''
-	const chipNoFilter = filters.chipNoFilter ?? ''
 	const maxDistance = filters.maxDistance ?? ''
 	const ownerDocumentId = filters.ownerDocumentId
 	const sort = filters.sort
@@ -112,11 +110,6 @@ export function useDogs(options: UseDogsOptions = {}) {
 				})
 			}
 
-			if (chipNoFilter.trim()) {
-				filterConditions.push({
-					microchipNo: { containsi: chipNoFilter.trim() },
-				})
-			}
 
 			if (ownerDocumentId) {
 				filterConditions.push({
@@ -186,7 +179,7 @@ export function useDogs(options: UseDogsOptions = {}) {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [baseUrl, nameFilter, sexFilter, colorFilter, chipNoFilter, ownerDocumentId, JSON.stringify(sort), page, pageSize])
+	}, [baseUrl, nameFilter, sexFilter, colorFilter, ownerDocumentId, JSON.stringify(sort), page, pageSize])
 
 	useEffect(() => {
 		if (autoLoad && baseUrl && baseUrl.trim().length > 0) {
