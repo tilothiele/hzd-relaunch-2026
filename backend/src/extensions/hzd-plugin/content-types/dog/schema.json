@@ -35,6 +35,9 @@
       "type": "string",
       "maxLength": 30
     },
+    "stuntLicenseSince": {
+      "type": "date"
+    },
     "dateOfBirth": {
       "type": "date"
     },
@@ -62,32 +65,12 @@
     "father": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "plugin::hzd-plugin.dog",
-      "conditions": {
-        "visible": {
-          "==": [
-            {
-              "var": "sex"
-            },
-            "M"
-          ]
-        }
-      }
+      "target": "plugin::hzd-plugin.dog"
     },
     "mother": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "plugin::hzd-plugin.dog",
-      "conditions": {
-        "visible": {
-          "==": [
-            {
-              "var": "sex"
-            },
-            "F"
-          ]
-        }
-      }
+      "target": "plugin::hzd-plugin.dog"
     },
     "cId": {
       "type": "integer",
@@ -98,6 +81,41 @@
     },
     "cOwnerId": {
       "type": "integer"
+    },
+    "SOD1": {
+      "type": "enumeration",
+      "enum": [
+        "N_N",
+        "N_DM",
+        "DM_DM"
+      ],
+      "private": true
+    },
+    "HD": {
+      "type": "enumeration",
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ],
+      "private": true
+    },
+    "Genprofil": {
+      "type": "boolean",
+      "private": true
+    },
+    "EyesCheck": {
+      "type": "boolean",
+      "private": true
+    },
+    "HeartCheck": {
+      "type": "boolean",
+      "private": true
+    },
+    "ColorCheck": {
+      "type": "boolean",
+      "private": true
     },
     "MemosDraft": {
       "type": "customField",
@@ -117,6 +135,11 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "plugin::users-permissions.user"
+    },
+    "Location": {
+      "type": "component",
+      "component": "breeding.geo-location",
+      "repeatable": false
     },
     "breeder": {
       "type": "relation",

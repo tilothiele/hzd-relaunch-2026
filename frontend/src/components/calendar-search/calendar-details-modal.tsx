@@ -5,14 +5,16 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import type { CalendarItem } from '@/types'
 import { formatDateRange } from '@/lib/calendar-utils'
 import { BlocksRenderer } from '@strapi/blocks-react-renderer'
+import { resolveMediaUrl } from '@/components/header/logo-utils'
 
 interface CalendarDetailsModalProps {
     item: CalendarItem
     isOpen: boolean
     onClose: () => void
+    strapiBaseUrl?: string | null
 }
 
-export function CalendarDetailsModal({ item, isOpen, onClose }: CalendarDetailsModalProps) {
+export function CalendarDetailsModal({ item, isOpen, onClose, strapiBaseUrl }: CalendarDetailsModalProps) {
     const documents = item.CalendarDocument?.filter(doc => doc.MediaFile?.url) ?? []
 
     return (
@@ -109,7 +111,7 @@ export function CalendarDetailsModal({ item, isOpen, onClose }: CalendarDetailsM
                                         <ListItemText
                                             primary={
                                                 <Link
-                                                    href={media.url}
+                                                    href={resolveMediaUrl(media, strapiBaseUrl) || '#'}
                                                     target='_blank'
                                                     rel='noopener noreferrer'
                                                     sx={{

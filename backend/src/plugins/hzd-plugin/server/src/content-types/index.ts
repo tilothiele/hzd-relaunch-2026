@@ -33,7 +33,7 @@ const dogLifecycles = {
 
         if (ownerId) {
             const owner = await strapi.entityService.findOne('plugin::users-permissions.user', ownerId);
-            if (owner && owner.locationLat && owner.locationLng) {
+            if (owner && (owner.locationLat !== undefined && owner.locationLat !== null) && (owner.locationLng !== undefined && owner.locationLng !== null)) {
                 data.Location = {
                     lat: owner.locationLat,
                     lng: owner.locationLng
@@ -90,7 +90,7 @@ const dogLifecycles = {
 
             console.log('HZD-PLUGIN: owner data', owner);
 
-            if (owner && owner.locationLat && owner.locationLng) {
+            if (owner && (owner.locationLat !== undefined && owner.locationLat !== null) && (owner.locationLng !== undefined && owner.locationLng !== null)) {
                 // Strictly construct the component data
                 const newLocation: any = {
                     lat: owner.locationLat,

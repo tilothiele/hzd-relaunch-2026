@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-02-21T20:27:42.239Z"
+    "x-generation-date": "2026-02-23T20:56:46.947Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -17964,6 +17964,10 @@
               "microchipNo": {
                 "type": "string"
               },
+              "stuntLicenseSince": {
+                "type": "string",
+                "format": "date"
+              },
               "dateOfBirth": {
                 "type": "string",
                 "format": "date"
@@ -18034,6 +18038,35 @@
               },
               "cOwnerId": {
                 "type": "integer"
+              },
+              "SOD1": {
+                "type": "string",
+                "enum": [
+                  "N_N",
+                  "N_DM",
+                  "DM_DM"
+                ]
+              },
+              "HD": {
+                "type": "string",
+                "enum": [
+                  "A1",
+                  "A2",
+                  "B1",
+                  "B2"
+                ]
+              },
+              "Genprofil": {
+                "type": "boolean"
+              },
+              "EyesCheck": {
+                "type": "boolean"
+              },
+              "HeartCheck": {
+                "type": "boolean"
+              },
+              "ColorCheck": {
+                "type": "boolean"
               },
               "MemosDraft": {
                 "type": "string"
@@ -18992,6 +19025,9 @@
                     }
                   }
                 }
+              },
+              "Location": {
+                "$ref": "#/components/schemas/BreedingGeoLocationComponent"
               },
               "breeder": {
                 "type": "object",
@@ -20497,6 +20533,29 @@
           },
           "meta": {
             "type": "object"
+          }
+        }
+      },
+      "BreedingGeoLocationComponent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "lat": {
+            "type": "number",
+            "format": "float"
+          },
+          "lng": {
+            "type": "number",
+            "format": "float"
           }
         }
       },

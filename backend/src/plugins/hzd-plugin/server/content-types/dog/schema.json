@@ -62,32 +62,12 @@
     "father": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "plugin::hzd-plugin.dog",
-      "conditions": {
-        "visible": {
-          "==": [
-            {
-              "var": "sex"
-            },
-            "F"
-          ]
-        }
-      }
+      "target": "plugin::hzd-plugin.dog"
     },
     "mother": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "plugin::hzd-plugin.dog",
-      "conditions": {
-        "visible": {
-          "==": [
-            {
-              "var": "sex"
-            },
-            "F"
-          ]
-        }
-      }
+      "target": "plugin::hzd-plugin.dog"
     },
     "cId": {
       "type": "integer",

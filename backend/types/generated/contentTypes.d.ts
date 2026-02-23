@@ -1685,6 +1685,7 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
     cFertile: Schema.Attribute.Boolean;
     cId: Schema.Attribute.Integer & Schema.Attribute.Unique;
     color: Schema.Attribute.Enumeration<['S', 'SM', 'B']>;
+    ColorCheck: Schema.Attribute.Boolean & Schema.Attribute.Private;
     cOwnerId: Schema.Attribute.Integer;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1697,15 +1698,20 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
     Disabled: Schema.Attribute.Boolean;
     DogDocument: Schema.Attribute.Component<'breeding.dog-document', true>;
     Exhibitions: Schema.Attribute.Text;
+    EyesCheck: Schema.Attribute.Boolean & Schema.Attribute.Private;
     father: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.dog'>;
     fullKennelName: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 500;
       }>;
+    Genprofil: Schema.Attribute.Boolean & Schema.Attribute.Private;
     givenName: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 100;
       }>;
+    HD: Schema.Attribute.Enumeration<['A1', 'A2', 'B1', 'B2']> &
+      Schema.Attribute.Private;
+    HeartCheck: Schema.Attribute.Boolean & Schema.Attribute.Private;
     Images: Schema.Attribute.Media<'images', true>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -1713,6 +1719,7 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
       'plugin::hzd-plugin.dog'
     > &
       Schema.Attribute.Private;
+    Location: Schema.Attribute.Component<'breeding.geo-location', false>;
     MemosDraft: Schema.Attribute.RichText &
       Schema.Attribute.CustomField<
         'plugin::ckeditor5.CKEditor',
@@ -1738,6 +1745,9 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
     >;
     publishedAt: Schema.Attribute.DateTime;
     sex: Schema.Attribute.Enumeration<['M', 'F']>;
+    SOD1: Schema.Attribute.Enumeration<['N_N', 'N_DM', 'DM_DM']> &
+      Schema.Attribute.Private;
+    stuntLicenseSince: Schema.Attribute.Date;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

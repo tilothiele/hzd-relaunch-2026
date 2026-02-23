@@ -423,6 +423,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 								key={item.documentId}
 								item={item}
 								index={index}
+								strapiBaseUrl={strapiBaseUrl}
 								registrationOpen={isRegistrationOpen(item)}
 							/>
 						))}

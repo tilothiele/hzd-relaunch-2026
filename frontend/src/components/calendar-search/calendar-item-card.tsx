@@ -10,9 +10,10 @@ interface CalendarItemCardProps {
     item: CalendarItem
     index: number
     registrationOpen: boolean
+    strapiBaseUrl?: string | null
 }
 
-export function CalendarItemCard({ item, index, registrationOpen }: CalendarItemCardProps) {
+export function CalendarItemCard({ item, index, registrationOpen, strapiBaseUrl }: CalendarItemCardProps) {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const calendarColors = item.calendar ? getCalendarColors(item.calendar) : null
     const isEven = index % 2 === 0
@@ -205,6 +206,7 @@ export function CalendarItemCard({ item, index, registrationOpen }: CalendarItem
                 item={item}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
+                strapiBaseUrl={strapiBaseUrl}
             />
         </>
     )
