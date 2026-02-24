@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils'
 import HomeIcon from '@mui/icons-material/Home'
 import FacebookShare from '@/components/ui/facebook-share-1'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBell } from '@fortawesome/free-solid-svg-icons'
+import { faBell, faCalendar } from '@fortawesome/free-solid-svg-icons'
 
 interface LoginCredentials {
     identifier: string
@@ -73,16 +73,35 @@ export function HeaderNavigation({
     const logoSrc = resolveMediaUrl(globalLayout?.Logo, strapiBaseUrl ?? '')
     const logoAlt = globalLayout?.Logo?.alternativeText ?? 'HZD Logo'
     const menuItems = globalLayout?.Menu?.items ?? []
-    const logoWidth = 80
-    const logoHeight = 80
+
+    // Logo Sizing Logic
+    // Base: 158px (100%)
+    // Mobile Base: 50% (79px)
+    // Absolute Min: 30% (47.4px)
+    // Desktop Scrolled: 40% (63.2px) -> existing was 63px
+
+    const logoBaseSize = 158
+    const logoMinSize = logoBaseSize * 0.3 // 47.4px
+
+    // We use a CSS variable for the logo size to handle fluid scaling and scroll state smoothly
+    // Scaling from 158px (100%) down to 47.4px (30%) at 1000px width
+    // Formula: size = 0.25 * width - 203px (hits ~158 at 1440 and ~47 at 1000)
+    const logoSizeStyle = {
+        '--logo-size': isScrolled
+            ? `${logoMinSize}px` // Min size when scrolled
+            : `clamp(${logoMinSize}px, calc(0.25 * 100vw - 203px), ${logoBaseSize}px)`,
+    } as React.CSSProperties
 
     // Logo Background Logic
-    const logoContainerStyle = logoBackground ? {
-        backgroundColor: 'var(--color-logo-background-face)',
-        padding: isScrolled ? '6px 12px' : '15px 30px',
-        borderRadius: '0',
-        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-    } : {}
+    const logoContainerStyle = {
+        ...(logoBackground ? {
+            backgroundColor: 'var(--color-logo-background-face)',
+            padding: isScrolled ? '6px 12px' : '15px 30px',
+            borderRadius: '0',
+            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+        } : {}),
+        ...logoSizeStyle
+    }
 
     const logoContainerClass = logoBackground
         ? 'transition-all duration-500 ease-in-out'
@@ -98,57 +117,19 @@ export function HeaderNavigation({
                     user={user}
                 />
 
-                {/* Desktop Logo */}
+                {/* Unified Logo */}
                 <Link
                     href='/'
                     className={cn(
-                        'absolute -top-8 left-12 z-[110] hidden md:flex items-center justify-center transition-opacity hover:opacity-80',
+                        'absolute z-[110] flex items-center justify-center transition-all duration-500 ease-in-out hover:opacity-80',
+                        isScrolled
+                            ? 'top-1/2 -translate-y-1/2 left-10 md:left-12'
+                            : '-top-8 left-12'
                     )}
                     aria-label='Zur Startseite'
                 >
-                    <div
-                        style={logoContainerStyle}
-                        className={cn('flex items-center justify-center', logoContainerClass)}
-                    >
-                        {logoSrc ? (
-                            <Image
-                                src={logoSrc}
-                                alt={logoAlt}
-                                width={logoWidth}
-                                height={logoHeight}
-                                className={cn(
-                                    'mb-1 object-contain transition-all duration-500 ease-in-out',
-                                    isScrolled ? 'h-[63px] w-[63px]' : 'h-[158px] w-[158px]'
-                                )}
-                                unoptimized
-                                priority
-                            />
-                        ) : (
-                            <span className='text-lg font-semibold tracking-wide text-center'>
-                                HZD
-                            </span>
-                        )}
-                    </div>
-                </Link>
-
-                {/* Mobile Logo / Home Icon */}
-                <Link
-                    href='/'
-                    className={cn(
-                        'absolute z-[110] flex md:hidden items-center justify-center transition-all duration-300 hover:opacity-80',
-                        isScrolled
-                            ? 'top-1/2 -translate-y-1/2 left-10'
-                            : 'max-[500px]:top-1/2 max-[500px]:-translate-y-1/2 max-[500px]:left-10 -top-8 left-12'
-                    )}
-                    aria-label='Zur Startseite'
-                >
-                    {/* Show Logo when NOT scrolled AND width >= 500px */}
-                    <div className={cn(
-                        'transition-opacity duration-300',
-                        isScrolled
-                            ? 'opacity-0 pointer-events-none absolute'
-                            : 'opacity-100 max-[500px]:opacity-0 max-[500px]:pointer-events-none max-[500px]:absolute'
-                    )}>
+                    {/* Logo Image */}
+                    <div className='transition-all duration-500 ease-in-out opacity-100'>
                         <div
                             style={logoContainerStyle}
                             className={cn('flex items-center justify-center', logoContainerClass)}
@@ -157,9 +138,14 @@ export function HeaderNavigation({
                                 <Image
                                     src={logoSrc}
                                     alt={logoAlt}
-                                    width={logoWidth}
-                                    height={logoHeight}
-                                    className='mb-1 h-[111px] w-[111px] object-contain'
+                                    width={logoBaseSize}
+                                    height={logoBaseSize}
+                                    style={{
+                                        // Use mobile size if < 768px (md breakpoint)
+                                        height: 'var(--logo-size)',
+                                        width: 'var(--logo-size)',
+                                    }}
+                                    className='mb-1 object-contain transition-all duration-500 ease-in-out'
                                     unoptimized
                                     priority
                                 />
@@ -170,21 +156,11 @@ export function HeaderNavigation({
                             )}
                         </div>
                     </div>
-
-                    {/* Show Home Icon when scrolled OR width < 500px */}
-                    <div className={cn(
-                        'transition-opacity duration-300',
-                        isScrolled
-                            ? 'opacity-100'
-                            : 'opacity-0 pointer-events-none absolute max-[500px]:opacity-100 max-[500px]:static max-[500px]:pointer-events-auto'
-                    )}>
-                        <HomeIcon sx={{ fontSize: 32, color: theme.headerFooterTextColor }} />
-                    </div>
                 </Link>
             </div>
 
-            {/* Center Section: Navigation Menu */}
-            <div className='flex items-center justify-end px-4'>
+            {/* Right Section: Navigation Menu + Utilities */}
+            <div className='flex items-center justify-end gap-2 md:gap-4' style={{ color: theme.headerFooterIcons }}>
                 <NavigationMenu
                     menuItems={menuItems}
                     theme={{
@@ -192,38 +168,55 @@ export function HeaderNavigation({
                         headerFooterTextColor: theme.headerFooterTextColor,
                     }}
                 />
-            </div>
 
-            {/* Right Section: Social Links + Login */}
-            <div className='flex items-center justify-end gap-4'>
                 {currentUrl && <FacebookShare url={currentUrl} />}
+
+                <Link
+                    href='/calendar'
+                    title='Veranstaltungskalender'
+                    className='flex items-center justify-center transition-transform hover:scale-110'
+                >
+                    <FontAwesomeIcon
+                        icon={faCalendar}
+                        className='text-[20px] md:text-[24px]' // Using font-size for responsiveness
+                        style={{ color: theme.headerFooterIcons }}
+                    />
+                </Link>
+
                 {!isNotificationActive && (
                     <Link
                         href='/notification-settings'
                         title='Benachrichtigungen hier aktivieren'
-                        className='flex items-center justify-center transition-transform hover:scale-110 ml-1'
+                        className='flex items-center justify-center transition-transform hover:scale-110'
                     >
-                        <FontAwesomeIcon icon={faBell} size='xl' style={{ color: '#ff0000' }} />
+                        <FontAwesomeIcon
+                            icon={faBell}
+                            className='text-[20px] md:text-[24px]' // Using font-size for responsiveness
+                            style={{ color: '#ff0000' }}
+                        />
                     </Link>
                 )}
-                <SocialLinks
-                    socialLinkFB={globalLayout?.SocialLinkFB}
-                    socialLinkYT={globalLayout?.SocialLinkYT}
-                    theme={theme}
-                />
-                {globalLayout?.SOS?.ShowSOS && (
-                    <Link
-                        href={globalLayout.SOS.SosLink ?? '#'}
-                        title={globalLayout.SOS.SosTitle ?? 'SOS'}
-                        className='flex items-center justify-center rounded-[16px] px-3 h-6 text-sm font-bold shadow-sm animate-pulse'
-                        style={{
-                            backgroundColor: theme.submitButtonColor,
-                            color: theme.submitButtonTextColor,
-                        }}
-                    >
-                        SOS
-                    </Link>
-                )}
+
+                <div className='hidden md:flex items-center gap-4'>
+                    <SocialLinks
+                        socialLinkFB={globalLayout?.SocialLinkFB}
+                        theme={theme}
+                    />
+                    {globalLayout?.SOS?.ShowSOS && (
+                        <Link
+                            href={globalLayout.SOS.SosLink ?? '#'}
+                            title={globalLayout.SOS.SosTitle ?? 'SOS'}
+                            className='flex items-center justify-center rounded-[16px] px-3 h-6 text-sm font-bold shadow-sm animate-pulse'
+                            style={{
+                                backgroundColor: theme.submitButtonColor,
+                                color: theme.submitButtonTextColor,
+                            }}
+                        >
+                            SOS
+                        </Link>
+                    )}
+                </div>
+
                 <LoginControls
                     isAuthenticated={isAuthenticated}
                     user={user}

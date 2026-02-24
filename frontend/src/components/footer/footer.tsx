@@ -20,8 +20,8 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 
 	const logoSrc = resolveMediaUrl(logoImage, strapiBaseUrl) ?? ''
 	const logoAlt = logoImage?.alternativeText ?? 'Hovawart logo'
-	const logoWidth = 150
-	const logoHeight = 150
+	const logoWidth = 120
+	const logoHeight = 120
 
 	const partnerLinks = globalLayout?.PartnerLink ?? []
 	const firstPartnerLink = partnerLinks[0]
@@ -58,13 +58,13 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 						<div>
 							<div className='grid grid-cols-2 gap-2 px-2'>
 								<div>
-									<p className='font-bold' style={{ color: theme.headerFooterTextColor }}>Präsidium</p>
+									<p className='font-bold' style={{ color: theme.headerFooterIcons }}>Präsidium</p>
 									<div className='text-sm'>{globalLayout?.Footer?.PraesidiumName}</div>
 									<div className='text-sm'>{globalLayout?.Footer?.PraesidiumOrt}</div>
 									<div className='text-sm'>{globalLayout?.Footer?.PraesidiumTelefon}</div>
 								</div>
 								<div>
-									<p className='font-bold' style={{ color: theme.headerFooterTextColor }}>IT-Projektleitung</p>
+									<p className='font-bold' style={{ color: theme.headerFooterIcons }}>IT-Projektleitung</p>
 									<div className='text-sm'>{globalLayout?.Footer?.ItProjektleitungName}</div>
 									<div className='text-sm'>{globalLayout?.Footer?.ItProjektleitungOrt}</div>
 									<div className='text-sm'>{globalLayout?.Footer?.ItProjektleitungTelefon}</div>
@@ -79,7 +79,7 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 							/>
 							<div className='mt-4 grid grid-cols-2 gap-2'>
 								<div className='flex justify-center gap-4'>
-									<SocialLinks socialLinkFB={globalLayout?.SocialLinkFB} socialLinkYT={globalLayout?.SocialLinkYT} theme={theme} />
+									<SocialLinks socialLinkFB={globalLayout?.SocialLinkFB} theme={theme} />
 								</div>
 								<div>
 									<div><Link href='/impressum' className='text-sm transition-colors hover:text-yellow-400 underline'>
@@ -136,7 +136,7 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 						) : null}
 					</div>
 					<div>
-						<p className='text-center font-semibold' style={{ color: theme.headerFooterTextColor }}>
+						<p className='text-center font-semibold' style={{ color: theme.headerFooterIcons }}>
 							Unsere Partner
 						</p>
 						<div className='flex flex-col items-center' style={{ gap: '1rem' }}>

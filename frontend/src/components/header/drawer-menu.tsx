@@ -152,7 +152,7 @@ export function DrawerMenuComponent({ drawerMenu, theme, user }: DrawerMenuProps
                             <IconButton
                                 edge="end"
                                 onClick={(e) => handleSubmenuToggle(e, label)}
-                                sx={{ color: theme.drawerText, mr: 1 }}
+                                sx={{ color: theme.drawerIcons, mr: 1 }}
                             >
                                 {isSubOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                             </IconButton>
@@ -175,7 +175,7 @@ export function DrawerMenuComponent({ drawerMenu, theme, user }: DrawerMenuProps
                         }}
                     >
                         {level === 0 && (
-                            <ListItemIcon sx={{ minWidth: 40, color: theme.drawerText }}>
+                            <ListItemIcon sx={{ minWidth: 40, color: theme.drawerIcons }}>
                                 <FontAwesomeIcon icon={getIcon(icon)} />
                             </ListItemIcon>
                         )}
@@ -190,7 +190,6 @@ export function DrawerMenuComponent({ drawerMenu, theme, user }: DrawerMenuProps
                             }
                             primaryTypographyProps={{
                                 fontWeight: level === 0 ? 600 : 400,
-                                fontSize: level === 0 ? '1rem' : '0.8rem',
                                 color: level === 0 ? theme.drawerText : 'var(--color-text)',
                             }}
                         />

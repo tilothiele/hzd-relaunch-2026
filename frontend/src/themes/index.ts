@@ -3,6 +3,7 @@ export interface ThemeDefinition {
 	footerBackground: string
 
 	drawerText: string
+	drawerIcons: string
 	drawerBackground: string
 	drawerHandle: string
 
@@ -20,6 +21,7 @@ export interface ThemeDefinition {
 	secondaryButtonHoverColor: string
 
 	headerFooterTextColor: string
+	headerFooterIcons: string
 	oddBgColor: string
 	evenBgColor: string
 	cardsBackground: string
@@ -40,6 +42,7 @@ export const theme: ThemeDefinition = {
 	drawerText: 'var(--color-drawer-text)',
 	drawerBackground: 'var(--color-drawer-background)',
 	drawerHandle: 'var(--color-drawer-handle)',
+	drawerIcons: 'var(--color-drawer-icons)',
 
 	submitButtonColor: 'var(--color-submit-button)',
 	submitButtonTextColor: 'var(--color-submit-button-text)',
@@ -47,6 +50,7 @@ export const theme: ThemeDefinition = {
 	headerBackground: 'var(--color-header-footer-background)',
 	footerBackground: 'var(--color-header-footer-background)',
 	headerFooterTextColor: 'var(--color-header-footer-text)',
+	headerFooterIcons: 'var(--color-header-footer-icons)',
 
 	imageCardSectionText: 'var(--color-image-card-section-text)',
 
