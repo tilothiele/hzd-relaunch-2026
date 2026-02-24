@@ -1,8 +1,6 @@
 'use client'
 
-import { Button, Box, Typography, IconButton, Tooltip } from '@mui/material'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import CloseIcon from '@mui/icons-material/Close'
+import { Button, Box, Typography } from '@mui/material'
 import { DogDataTab } from './dog-detail-modal/dog-data-tab'
 import { resolveDogImage } from '@/lib/dog-utils'
 import { DogPedigreeTab } from './dog-detail-modal/dog-pedigree-tab'
@@ -11,6 +9,7 @@ import { DogPersonalWordsTab } from './dog-detail-modal/dog-personal-words-tab'
 import { DogImagesTab } from './dog-detail-modal/dog-images-tab'
 import { DogPerformanceTab } from './dog-detail-modal/dog-performance-tab'
 import { DogDocumentsTab } from './dog-detail-modal/dog-documents-tab'
+import { BackButton } from '@/components/ui/back-button'
 
 import type { Dog, HzdSetting } from '@/types'
 import { theme } from '@/themes'
@@ -26,17 +25,13 @@ interface DogDetailViewProps {
 export function DogDetailView({ dog, strapiBaseUrl, hzdSetting, onBack }: DogDetailViewProps) {
     const fullName = dog.fullKennelName ?? dog.givenName ?? 'Unbekannt'
 
-    // Helper to render a Section Header with Close Button
+    // Helper to render a Section Header with Back Button
     const SectionHeader = ({ title }: { title: string }) => (
         <Box sx={{ borderBottom: '2px solid #e5e7eb', pb: 1, mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant='h5' component='h2'>
+            <Typography variant='h5' component='h2' sx={{ fontWeight: 700 }}>
                 {title}
             </Typography>
-            <Tooltip title="Zurück zur Suchliste">
-                <IconButton onClick={onBack} size="small" sx={{ color: theme.submitButtonColor }}>
-                    <CloseIcon />
-                </IconButton>
-            </Tooltip>
+            <BackButton onClick={onBack} />
         </Box>
     )
 

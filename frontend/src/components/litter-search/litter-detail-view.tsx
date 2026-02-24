@@ -1,12 +1,12 @@
 'use client'
 
-import { Box, Typography, IconButton, Tooltip } from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
+import { Box, Typography } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import Image from 'next/image'
 import type { Litter, HzdSetting } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { theme } from '@/themes'
+import { BackButton } from '@/components/ui/back-button'
 
 interface LitterDetailViewProps {
     litter: Litter
@@ -67,17 +67,13 @@ export function LitterDetailView({
     const motherName = litter.mother?.fullKennelName ?? litter.mother?.givenName ?? 'Unbekannt'
     const stuntDogName = litter.stuntDog?.fullKennelName ?? litter.stuntDog?.givenName
 
-    // Helper to render a Section Header with Close Button
+    // Helper to render a Section Header with Back Button
     const SectionHeader = ({ title }: { title: string }) => (
         <Box sx={{ borderBottom: '2px solid #e5e7eb', pb: 1, mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant='h5' component='h2'>
+            <Typography variant='h5' component='h2' sx={{ fontWeight: 700 }}>
                 {title}
             </Typography>
-            <Tooltip title="Zurück zur Suchliste">
-                <IconButton onClick={onBack} size="small" sx={{ color: theme.submitButtonColor }}>
-                    <CloseIcon />
-                </IconButton>
-            </Tooltip>
+            <BackButton onClick={onBack} />
         </Box>
     )
 
@@ -158,9 +154,10 @@ export function LitterDetailView({
                 <h1 className='text-3xl font-bold text-gray-900 md:text-4xl mb-4'>
                     {orderLetter}-Wurf: {kennelName}
                 </h1>
-                <div className="mb-6">
+                <div className="mb-4">
                     {renderStatusBadge(litter.LitterStatus)}
                 </div>
+
 
                 {/* Images Logic */}
                 <div className='w-full max-w-5xl mx-auto'>

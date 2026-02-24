@@ -6,12 +6,10 @@ import type { ThemeDefinition } from '@/themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import { NavigationMenu } from '@/components/ui/navigation-menu'
-import { SocialLinks } from './social-links'
 import { LoginControls } from './login-controls'
 import { resolveMediaUrl } from './logo-utils'
 import { DrawerMenuComponent } from './drawer-menu'
 import { cn } from '@/lib/utils'
-import HomeIcon from '@mui/icons-material/Home'
 import FacebookShare from '@/components/ui/facebook-share-1'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBell, faCalendar } from '@fortawesome/free-solid-svg-icons'
@@ -198,10 +196,6 @@ export function HeaderNavigation({
                 )}
 
                 <div className='hidden md:flex items-center gap-4'>
-                    <SocialLinks
-                        socialLinkFB={globalLayout?.SocialLinkFB}
-                        theme={theme}
-                    />
                     {globalLayout?.SOS?.ShowSOS && (
                         <Link
                             href={globalLayout.SOS.SosLink ?? '#'}
