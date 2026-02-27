@@ -7,6 +7,8 @@ import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { theme as globalTheme } from '@/themes'
 import { ImageGalleryView } from '@/components/image-gallery/image-gallery-view'
 
+export const dynamic = 'force-dynamic'
+
 export default async function ImageGalleryPage() {
     const strapiBaseUrl = process.env.STRAPI_BASE_URL || ''
     const { globalLayout, baseUrl, error: layoutError } = await fetchGlobalLayout()
