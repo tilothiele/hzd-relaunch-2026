@@ -41,8 +41,8 @@ export function ActionButton({ actionButton, theme, size = 'medium', onClick, di
 	// Prüfe ob es ein interner oder externer Link ist
 	const isExternalLink = hasLink && (actionButton.Link!.startsWith('http://') || actionButton.Link!.startsWith('https://'))
 
-	const padding = size === 'small' ? '2.48px 9.92px' : '4.96px 19.85px'
-	const fontSize = size === 'small' ? '0.66rem' : '0.95rem'
+	const padding = size === 'small' ? '2.98px 11.9px' : '5.95px 23.82px'
+	const fontSize = size === 'small' ? '0.79rem' : '1.14rem'
 
 	const baseStyles: React.CSSProperties = {
 		display: 'inline-flex',

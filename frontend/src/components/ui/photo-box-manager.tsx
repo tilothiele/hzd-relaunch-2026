@@ -8,8 +8,20 @@ import { PhotoBoxList } from './photo-box-list'
 
 type Tab = 'upload' | 'list'
 
-export function PhotoBoxManager() {
+interface PhotoBoxManagerProps {
+    maxCollections?: number
+    maxPhotosPerCollection?: number
+    maxPhotoSizeMB?: number
+}
+
+export function PhotoBoxManager({
+    maxCollections = 5,
+    maxPhotosPerCollection = 10,
+    maxPhotoSizeMB = 10
+}: PhotoBoxManagerProps) {
     const [activeTab, setActiveTab] = useState<Tab>('upload')
+    const [collectionsCount, setCollectionsCount] = useState(0)
+    const [selectedCollectionPhotosCount, setSelectedCollectionPhotosCount] = useState(0)
 
     return (
         <div className="max-w-2xl mx-auto p-4 sm:p-8 bg-white rounded-2xl shadow-xl border border-gray-100">
@@ -26,8 +38,8 @@ export function PhotoBoxManager() {
                 <button
                     onClick={() => setActiveTab('upload')}
                     className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-bold text-sm transition-all ${activeTab === 'upload'
-                            ? 'bg-white text-[#4560AA] shadow-sm'
-                            : 'text-gray-500 hover:text-gray-700'
+                        ? 'bg-white text-[#4560AA] shadow-sm'
+                        : 'text-gray-500 hover:text-gray-700'
                         }`}
                 >
                     <FontAwesomeIcon icon={faCamera} />
@@ -36,8 +48,8 @@ export function PhotoBoxManager() {
                 <button
                     onClick={() => setActiveTab('list')}
                     className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-bold text-sm transition-all ${activeTab === 'list'
-                            ? 'bg-white text-[#4560AA] shadow-sm'
-                            : 'text-gray-500 hover:text-gray-700'
+                        ? 'bg-white text-[#4560AA] shadow-sm'
+                        : 'text-gray-500 hover:text-gray-700'
                         }`}
                 >
                     <FontAwesomeIcon icon={faImages} />
@@ -47,7 +59,17 @@ export function PhotoBoxManager() {
 
             {/* Tab Content */}
             <div className="animate-in fade-in duration-500">
-                {activeTab === 'upload' ? <PhotoBoxUploader /> : <PhotoBoxList />}
+                {activeTab === 'upload' ? (
+                    <PhotoBoxUploader
+                        maxPhotosPerCollection={maxPhotosPerCollection}
+                        maxPhotoSizeMB={maxPhotoSizeMB}
+                        maxCollections={maxCollections}
+                    />
+                ) : (
+                    <PhotoBoxList
+                        maxCollections={maxCollections}
+                    />
+                )}
             </div>
         </div>
     )

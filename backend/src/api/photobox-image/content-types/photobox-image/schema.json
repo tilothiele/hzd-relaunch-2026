@@ -33,6 +33,16 @@
       "relation": "manyToOne",
       "target": "api::photobox-image-collection.photobox-image-collection",
       "inversedBy": "photos"
+    },
+    "Thumbnail": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
     }
   }
 }

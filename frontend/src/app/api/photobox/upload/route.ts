@@ -33,6 +33,11 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ message: 'Kein Bild empfangen.' }, { status: 400 })
         }
 
+        const maxSizeMB = Number(process.env.STRAPI_PUBLIC_MAX_PHOTO_SIZE_MB || 10)
+        if (image.size > maxSizeMB * 1024 * 1024) {
+            return NextResponse.json({ message: `Das Foto ist zu groß. Maximale Größe ist ${maxSizeMB}MB.` }, { status: 400 })
+        }
+
         if (!collectionId) {
             return NextResponse.json({ message: 'Keine Collection ID empfangen.' }, { status: 400 })
         }

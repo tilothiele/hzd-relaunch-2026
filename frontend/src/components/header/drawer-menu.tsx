@@ -39,6 +39,8 @@ import {
     faSliders,
     faBell,
     faCamera,
+    faDog,
+    faImage,
 } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import type { Menu as MenuType, MenuItem as MenuItemType, AuthUser } from '@/types'
@@ -100,6 +102,8 @@ const iconMap: Record<string, any> = {
     'fa-sliders': faSliders,
     'fa-bell': faBell,
     'fa-camera': faCamera,
+    'fa-dog': faDog,
+    'fa-image': faImage,
 }
 
 const getIcon = (iconName?: string) => {
@@ -189,7 +193,9 @@ export function DrawerMenuComponent({ drawerMenu, theme, user }: DrawerMenuProps
                                 </Box>
                             }
                             primaryTypographyProps={{
-                                fontWeight: level === 0 ? 600 : 400,
+                                fontWeight: 400,
+                                fontSize: '1em',
+                                lineHeight: 1,
                                 color: level === 0 ? theme.drawerText : 'var(--color-text)',
                             }}
                         />
@@ -319,7 +325,7 @@ export function DrawerMenuComponent({ drawerMenu, theme, user }: DrawerMenuProps
                             mb: 1
                         }}
                     >
-                        <Typography variant='h6' sx={{ fontWeight: 800, color: theme.drawerText, letterSpacing: '-0.02em' }}>
+                        <Typography variant='h6' sx={{ fontWeight: 400, color: theme.drawerText, letterSpacing: '-0.02em' }}>
                             Powermenü
                         </Typography>
                         <IconButton onClick={toggleDrawer(false)} size='small'>

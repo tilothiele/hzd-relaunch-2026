@@ -868,3 +868,20 @@ export interface PhotoboxImage {
 	updatedAt?: string | null
 	publishedAt?: string | null
 }
+
+export interface GalleryImage {
+	documentId: string
+	GalleryImageMedia?: Image | null
+	Photographer?: AuthUser | null
+	ImageDescription?: string | null
+	DateOfSubmission?: string | null
+	DateOfPicture: string
+	FeaturedImage?: boolean | null
+	createdAt?: string | null
+	updatedAt?: string | null
+	publishedAt?: string | null
+}
+
+export interface GalleryImagesQueryResult {
+	galleryImages: GalleryImage[]
+}

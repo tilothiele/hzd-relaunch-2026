@@ -218,9 +218,9 @@ export function LoginControls({
 				>
 					<FontAwesomeIcon
 						icon={faUser}
-						style={{ fontSize: '1.25rem', color: theme.loginIcon }}
+						style={{ fontSize: '1.2em', color: theme.loginIcon }}
 					/>
-					<span style={{ fontSize: '1.25rem', color: theme.headerFooterTextColor, fontWeight: 600 }}>
+					<span style={{ fontSize: '1.2em', color: theme.headerFooterTextColor, fontWeight: 400 }}>
 						{userLabel}
 					</span>
 				</div>
@@ -258,11 +258,11 @@ export function LoginControls({
 				type='button'
 				onClick={toggleFormVisibility}
 				className='flex items-center gap-2 transition-colors hover:text-yellow-400'
-				style={{ color: theme.headerFooterTextColor, fontSize: '1.25rem', fontWeight: 600 }}
+				style={{ color: theme.headerFooterTextColor, fontSize: '1.2em', fontWeight: 400 }}
 				aria-expanded={isFormVisible}
 				aria-controls='login-form'
 			>
-				<FontAwesomeIcon icon={faUser} style={{ color: theme.headerFooterTextColor, fontSize: '1.25rem' }} />
+				<FontAwesomeIcon icon={faUser} style={{ color: theme.headerFooterTextColor, fontSize: '1.2em' }} />
 				{isAuthenticating ? (
 					<span className='flex items-center gap-2'>
 						<FontAwesomeIcon icon={faSpinner} spin />

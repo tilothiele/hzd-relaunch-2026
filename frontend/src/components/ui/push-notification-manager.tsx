@@ -192,6 +192,7 @@ export function PushNotificationManager() {
         hovipedia: 'Hovipedia',
         welpen: 'Welpen',
         terminkalender: 'Terminkalender',
+        galerie: 'Galerie',
         ergebnisse: 'Ergebnisse',
         notvermittlungen: 'Notvermittlungen',
         testnachrichten: 'Testnachrichten'

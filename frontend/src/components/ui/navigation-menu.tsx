@@ -67,12 +67,12 @@ function DesktopMenuItem({
 							href={item.url}
 							sx={{
 								color: theme.headerFooterTextColor,
-								fontSize: '1.25rem',
-								fontWeight: 700,
+								fontSize: '1.2em',
+								fontWeight: 400,
 								textTransform: 'none',
 								paddingRight: 0.5,
 								'&:hover': {
-									fontWeight: 700,
+									fontWeight: 400,
 									backgroundColor: 'transparent',
 								},
 							}}
@@ -84,8 +84,8 @@ function DesktopMenuItem({
 							variant='body1'
 							sx={{
 								color: theme.headerFooterTextColor,
-								fontSize: '1.25rem',
-								fontWeight: 600,
+								fontSize: '1.2em',
+								fontWeight: 400,
 								paddingLeft: '16px',
 							}}
 						>
@@ -100,7 +100,7 @@ function DesktopMenuItem({
 							color: theme.headerFooterTextColor,
 							padding: '4px',
 							'&:hover': {
-								fontWeight: 700
+								fontWeight: 400
 							},
 						}}
 					>
@@ -297,11 +297,11 @@ function DesktopMenuItem({
 				href={item.url}
 				sx={{
 					color: theme.headerFooterTextColor,
-					fontSize: '1.25rem',
-					fontWeight: 700,
+					fontSize: '1.2em',
+					fontWeight: 400,
 					textTransform: 'none',
 					'&:hover': {
-						fontWeight: 700,
+						fontWeight: 400,
 					},
 				}}
 			>
@@ -315,8 +315,8 @@ function DesktopMenuItem({
 			variant='body1'
 			sx={{
 				color: theme.headerFooterTextColor,
-				fontSize: '1.25rem',
-				fontWeight: 600,
+				fontSize: '1.2em',
+				fontWeight: 400,
 				padding: '6px 16px',
 			}}
 		>

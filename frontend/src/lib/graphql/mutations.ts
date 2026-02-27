@@ -169,3 +169,18 @@ export const UPDATE_PHOTOBOX_IMAGE = `
 		}
 	}
 `
+export const DELETE_PHOTOBOX_IMAGE = `
+	mutation DeletePhotoboxImage($documentId: ID!) {
+		deletePhotoboxImage(documentId: $documentId) {
+			documentId
+		}
+	}
+`
+
+export const DELETE_PHOTOBOX_COLLECTION = `
+	mutation DeletePhotoboxCollection($documentId: ID!) {
+		deletePhotoboxImageCollection(documentId: $documentId) {
+			documentId
+		}
+	}
+`

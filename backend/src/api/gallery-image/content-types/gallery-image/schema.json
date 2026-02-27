@@ -1,0 +1,43 @@
+{
+  "kind": "collectionType",
+  "collectionName": "gallery_images",
+  "info": {
+    "singularName": "gallery-image",
+    "pluralName": "gallery-images",
+    "displayName": "GalleryImage"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "GalleryImageMedia": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "Photographer": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "ImageDescription": {
+      "type": "text"
+    },
+    "DateOfSubmission": {
+      "type": "date"
+    },
+    "DateOfPicture": {
+      "type": "date",
+      "required": true
+    },
+    "FeaturedImage": {
+      "type": "boolean"
+    }
+  }
+}

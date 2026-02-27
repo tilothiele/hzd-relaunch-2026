@@ -6,8 +6,20 @@ import { faUpload, faUser, faDog, faTrash, faPaperPlane, faLock, faCommentAlt } 
 import Image from 'next/image'
 import { PhotoBoxCollectionSelector } from './photo-box-collection-selector'
 
-export function PhotoBoxUploader() {
-    const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
+interface PhotoBoxUploaderProps {
+    maxPhotosPerCollection?: number
+    maxPhotoSizeMB?: number
+    maxCollections?: number
+}
+
+export function PhotoBoxUploader({
+    maxPhotosPerCollection = 10,
+    maxPhotoSizeMB = 10,
+    maxCollections = 5
+}: PhotoBoxUploaderProps) {
+    const [selectedCollection, setSelectedCollection] = useState<any | null>(null)
+    const selectedCollectionId = selectedCollection?.documentId
+    const currentPhotosCount = selectedCollection?.photos?.length || 0
     const [selectedImage, setSelectedImage] = useState<File | null>(null)
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
     const [persons, setPersons] = useState('')
@@ -21,6 +33,13 @@ export function PhotoBoxUploader() {
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
         if (file) {
+            const sizeMB = file.size / (1024 * 1024)
+            if (sizeMB > maxPhotoSizeMB) {
+                setStatus({ type: 'error', text: `Das Foto ist zu groß. Maximale Größe ist ${maxPhotoSizeMB}MB.` })
+                if (fileInputRef.current) fileInputRef.current.value = ''
+                return
+            }
+
             setSelectedImage(file)
             const reader = new FileReader()
             reader.onloadend = () => {
@@ -48,6 +67,11 @@ export function PhotoBoxUploader() {
         }
         if (!selectedImage) {
             setStatus({ type: 'error', text: 'Bitte wähle zuerst ein Foto aus.' })
+            return
+        }
+
+        if (currentPhotosCount >= maxPhotosPerCollection) {
+            setStatus({ type: 'error', text: `Limit erreicht: Diese Collection darf maximal ${maxPhotosPerCollection} Fotos enthalten.` })
             return
         }
 
@@ -95,7 +119,8 @@ export function PhotoBoxUploader() {
             <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100 ring-1 ring-gray-50">
                 <PhotoBoxCollectionSelector
                     activeCollectionId={selectedCollectionId}
-                    onCollectionChange={setSelectedCollectionId}
+                    onCollectionChange={setSelectedCollection}
+                    maxCollections={maxCollections}
                 />
             </div>
 
@@ -113,12 +138,26 @@ export function PhotoBoxUploader() {
                     <div className="relative">
                         {!previewUrl ? (
                             <div
-                                onClick={() => selectedCollectionId && fileInputRef.current?.click()}
+                                onClick={() => selectedCollection && fileInputRef.current?.click()}
                                 className="group cursor-pointer border-2 border-dashed border-gray-200 hover:border-[#4560AA] rounded-2xl p-12 transition-all duration-300 flex flex-col items-center justify-center bg-gray-50 hover:bg-blue-50/30 overflow-hidden relative"
                             >
                                 <FontAwesomeIcon icon={faUpload} className="text-4xl text-gray-300 group-hover:text-[#4560AA] mb-4 transition-colors" />
                                 <span className="text-gray-500 group-hover:text-[#4560AA] font-black transition-colors text-center">Foto aufnehmen oder auswählen</span>
-                                <p className="text-[10px] text-gray-400 mt-2 font-black">Max. 50MB • JPG, PNG</p>
+                                <div className="flex flex-col items-center gap-1 mt-2">
+                                    <p className="text-[10px] text-gray-400 font-black">Max. {maxPhotoSizeMB}MB • JPG, PNG</p>
+                                    <p className="text-[10px] text-[#4560AA] font-black uppercase tracking-wider">
+                                        Fotos: {currentPhotosCount} / {maxPhotosPerCollection}
+                                    </p>
+                                </div>
+
+                                {currentPhotosCount >= maxPhotosPerCollection && (
+                                    <div className="absolute inset-0 bg-gray-100/10 backdrop-blur-[1px] flex items-center justify-center">
+                                        <div className="bg-red-50 px-4 py-2 rounded-full shadow-lg flex items-center gap-2 border border-red-100">
+                                            <FontAwesomeIcon icon={faLock} className="text-red-500 text-xs" />
+                                            <span className="text-[10px] font-black text-red-500 uppercase">Limit erreicht: {maxPhotosPerCollection} Fotos</span>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {!selectedCollectionId && (
                                     <div className="absolute inset-0 bg-gray-100/10 backdrop-blur-[1px] flex items-center justify-center">

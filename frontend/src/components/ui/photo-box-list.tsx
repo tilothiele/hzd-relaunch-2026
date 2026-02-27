@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faImages, faCircleNotch, faUser, faDog, faCalendarAlt, faChevronRight, faArrowLeft, faFolderOpen, faTimes, faEdit, faSave, faBan, faCommentAlt } from '@fortawesome/free-solid-svg-icons'
+import { faImages, faCircleNotch, faUser, faDog, faCalendarAlt, faChevronRight, faArrowLeft, faFolderOpen, faTimes, faEdit, faSave, faBan, faCommentAlt, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { fetchGraphQL } from '@/lib/graphql-client'
 import { GET_MY_PHOTOBOX_COLLECTIONS } from '@/lib/graphql/queries'
-import { UPDATE_PHOTOBOX_IMAGE } from '@/lib/graphql/mutations'
+import { UPDATE_PHOTOBOX_IMAGE, DELETE_PHOTOBOX_IMAGE, DELETE_PHOTOBOX_COLLECTION } from '@/lib/graphql/mutations'
 import { useAuth } from '@/hooks/use-auth'
 import type { PhotoboxImageCollection } from '@/types'
 import Image from 'next/image'
 
-export function PhotoBoxList() {
+interface PhotoBoxListProps {
+    maxCollections?: number
+}
+
+export function PhotoBoxList({ maxCollections = 5 }: PhotoBoxListProps) {
     const { user } = useAuth()
     const [collections, setCollections] = useState<PhotoboxImageCollection[]>([])
     const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
@@ -96,6 +100,38 @@ export function PhotoBoxList() {
         }
     }
 
+    const handleDeleteImage = async (imgId: string) => {
+        if (!window.confirm('Möchtest du dieses Foto wirklich löschen?')) return
+        try {
+            await fetchGraphQL(DELETE_PHOTOBOX_IMAGE, {
+                variables: { documentId: imgId }
+            })
+            // Update local state
+            setCollections(prev => prev.map(col => ({
+                ...col,
+                photos: col.photos?.filter(p => p.documentId !== imgId)
+            })))
+        } catch (error) {
+            console.error('Error deleting image:', error)
+            alert('Fehler beim Löschen des Fotos.')
+        }
+    }
+
+    const handleDeleteCollection = async (e: React.MouseEvent, colId: string) => {
+        e.stopPropagation()
+        if (!window.confirm('Möchtest du diese leere Collection wirklich löschen?')) return
+        try {
+            await fetchGraphQL(DELETE_PHOTOBOX_COLLECTION, {
+                variables: { documentId: colId }
+            })
+            // Update local state
+            setCollections(prev => prev.filter(c => c.documentId !== colId))
+        } catch (error) {
+            console.error('Error deleting collection:', error)
+            alert('Fehler beim Löschen der Collection.')
+        }
+    }
+
     const selectedCollection = collections.find(c => c.documentId === selectedCollectionId)
 
     // --- Render Helpers ---
@@ -170,13 +206,22 @@ export function PhotoBoxList() {
                                     >
 
                                         {!isEditing && (
-                                            <button
-                                                onClick={(e) => { e.stopPropagation(); startEditing(img); }}
-                                                className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-white/90 backdrop-blur shadow-sm flex items-center justify-center text-gray-400 hover:text-[#4560AA] transition-all opacity-0 group-hover:opacity-100"
-                                                title="Bearbeiten"
-                                            >
-                                                <FontAwesomeIcon icon={faEdit} size="xs" />
-                                            </button>
+                                            <div className="absolute top-4 right-4 z-20 flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); startEditing(img); }}
+                                                    className="w-8 h-8 rounded-full bg-white/90 backdrop-blur shadow-sm flex items-center justify-center text-gray-400 hover:text-[#4560AA] transition-all"
+                                                    title="Bearbeiten"
+                                                >
+                                                    <FontAwesomeIcon icon={faEdit} size="xs" />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleDeleteImage(img.documentId); }}
+                                                    className="w-8 h-8 rounded-full bg-white/90 backdrop-blur shadow-sm flex items-center justify-center text-gray-400 hover:text-red-500 transition-all"
+                                                    title="Löschen"
+                                                >
+                                                    <FontAwesomeIcon icon={faTrash} size="xs" />
+                                                </button>
+                                            </div>
                                         )}
 
                                         <div
@@ -321,6 +366,11 @@ export function PhotoBoxList() {
                             Wähle eine Collection, um die Fotos anzusehen
                         </p>
                     </div>
+                    <div className="bg-blue-50 px-4 py-2 rounded-2xl border border-blue-100">
+                        <p className="text-[10px] font-black text-[#4560AA] uppercase tracking-widest text-center">
+                            Collections: <span className="text-gray-900">{collections.length}</span> / {maxCollections}
+                        </p>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -351,7 +401,16 @@ export function PhotoBoxList() {
                                             <FontAwesomeIcon icon={faFolderOpen} size="3x" />
                                         </div>
                                     )}
-                                    <div className="absolute top-4 right-4 z-10">
+                                    <div className="absolute top-4 right-4 z-10 flex gap-2">
+                                        {photoCount === 0 && (
+                                            <button
+                                                onClick={(e) => handleDeleteCollection(e, col.documentId)}
+                                                className="bg-white/95 backdrop-blur shadow-sm w-7 h-7 rounded-full text-gray-400 hover:text-red-500 transition-all flex items-center justify-center"
+                                                title="Leere Collection löschen"
+                                            >
+                                                <FontAwesomeIcon icon={faTrash} size="xs" />
+                                            </button>
+                                        )}
                                         <span className="bg-white/95 backdrop-blur shadow-sm px-3 py-1.5 rounded-full text-[10px] font-black text-[#4560AA] uppercase tracking-widest">
                                             {photoCount} {photoCount === 1 ? 'Foto' : 'Fotos'}
                                         </span>

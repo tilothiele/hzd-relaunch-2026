@@ -2145,3 +2145,28 @@ export const GET_MY_PHOTOBOX_COLLECTIONS = `
 		}
 	}
 `
+
+export const GET_GALLERY_IMAGES = `
+	query GetGalleryImages {
+		galleryImages(sort: ["DateOfSubmission:desc"], status: PUBLISHED) {
+			documentId
+			GalleryImageMedia {
+				url
+				alternativeText
+				width
+				height
+				caption
+				previewUrl
+			}
+			Photographer {
+				firstName
+				lastName
+				username
+			}
+			ImageDescription
+			DateOfSubmission
+			DateOfPicture
+			FeaturedImage
+		}
+	}
+`

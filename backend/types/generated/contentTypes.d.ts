@@ -772,6 +772,45 @@ export interface ApiFormForm extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiGalleryImageGalleryImage
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'gallery_images';
+  info: {
+    displayName: 'GalleryImage';
+    pluralName: 'gallery-images';
+    singularName: 'gallery-image';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    DateOfPicture: Schema.Attribute.Date & Schema.Attribute.Required;
+    DateOfSubmission: Schema.Attribute.Date;
+    FeaturedImage: Schema.Attribute.Boolean;
+    GalleryImageMedia: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
+    ImageDescription: Schema.Attribute.Text;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::gallery-image.gallery-image'
+    > &
+      Schema.Attribute.Private;
+    Photographer: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
   collectionName: 'global_layouts';
   info: {
@@ -1339,6 +1378,7 @@ export interface ApiPhotoboxImagePhotoboxImage
     RenderedPersons: Schema.Attribute.Text;
     ReneredDogs: Schema.Attribute.Text;
     S3Path: Schema.Attribute.String;
+    Thumbnail: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -2320,6 +2360,7 @@ declare module '@strapi/strapi' {
       'api::contact.contact': ApiContactContact;
       'api::form-instance.form-instance': ApiFormInstanceFormInstance;
       'api::form.form': ApiFormForm;
+      'api::gallery-image.gallery-image': ApiGalleryImageGalleryImage;
       'api::global-layout.global-layout': ApiGlobalLayoutGlobalLayout;
       'api::hzd-setting.hzd-setting': ApiHzdSettingHzdSetting;
       'api::index-page.index-page': ApiIndexPageIndexPage;

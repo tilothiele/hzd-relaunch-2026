@@ -10,11 +10,16 @@ import { faPlus, faFolderOpen, faLocationDot, faCircleNotch } from '@fortawesome
 import type { PhotoboxImageCollection } from '@/types'
 
 interface PhotoBoxCollectionSelectorProps {
-    onCollectionChange: (collectionId: string | null) => void
+    onCollectionChange: (collection: PhotoboxImageCollection | null) => void
     activeCollectionId: string | null
+    maxCollections?: number
 }
 
-export function PhotoBoxCollectionSelector({ onCollectionChange, activeCollectionId }: PhotoBoxCollectionSelectorProps) {
+export function PhotoBoxCollectionSelector({
+    onCollectionChange,
+    activeCollectionId,
+    maxCollections = 5
+}: PhotoBoxCollectionSelectorProps) {
     const { user } = useAuth()
     const [collections, setCollections] = useState<PhotoboxImageCollection[]>([])
     const [isLoading, setIsLoading] = useState(true)
@@ -70,7 +75,7 @@ export function PhotoBoxCollectionSelector({ onCollectionChange, activeCollectio
             if (result.createPhotoboxImageCollection) {
                 const newCollection = result.createPhotoboxImageCollection
                 setCollections(prev => [newCollection, ...prev])
-                onCollectionChange(newCollection.documentId)
+                onCollectionChange(newCollection)
                 setShowModal(false)
                 setDescription('')
                 setLocation('')
@@ -97,11 +102,13 @@ export function PhotoBoxCollectionSelector({ onCollectionChange, activeCollectio
 
                 <button
                     type="button"
+                    disabled={collections.length >= maxCollections}
                     onClick={() => setShowModal(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 hover:border-[#4560AA] hover:text-[#4560AA] rounded-xl text-sm font-black transition-all shadow-sm active:scale-95"
+                    className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 enabled:hover:border-[#4560AA] enabled:hover:text-[#4560AA] rounded-xl text-sm font-black transition-all shadow-sm enabled:active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title={collections.length >= maxCollections ? `Maximale Anzahl von ${maxCollections} Collections erreicht` : 'Neue Collection erstellen'}
                 >
                     <FontAwesomeIcon icon={faPlus} className="text-xs" />
-                    Neue Collection
+                    {collections.length >= maxCollections ? 'Limit erreicht' : 'Neue Collection'}
                 </button>
             </div>
 
@@ -121,7 +128,7 @@ export function PhotoBoxCollectionSelector({ onCollectionChange, activeCollectio
                         <button
                             key={col.documentId}
                             type="button"
-                            onClick={() => onCollectionChange(col.documentId)}
+                            onClick={() => onCollectionChange(col)}
                             className={`p-4 rounded-xl border-2 text-left transition-all relative overflow-hidden group ${activeCollectionId === col.documentId
                                 ? 'border-[#4560AA] bg-blue-50/50 shadow-md ring-2 ring-blue-100'
                                 : 'border-gray-50 bg-gray-50 hover:border-gray-200 hover:bg-gray-100/50'

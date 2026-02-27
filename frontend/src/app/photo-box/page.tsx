@@ -41,7 +41,11 @@ export default async function DogsPage() {
                             </div>
                         }
                     >
-                        <PhotoBoxManager />
+                        <PhotoBoxManager
+                            maxCollections={Number(process.env.STRAPI_PUBLIC_MAX_COLLECTIONS_PER_USER || 5)}
+                            maxPhotosPerCollection={Number(process.env.STRAPI_PUBLIC_MAX_PHOTOS_PER_COLLECTION || 10)}
+                            maxPhotoSizeMB={Number(process.env.STRAPI_PUBLIC_MAX_PHOTO_SIZE_MB || 10)}
+                        />
                     </AuthGuard>
                 </div>
             </section>
