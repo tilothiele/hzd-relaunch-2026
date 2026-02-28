@@ -24,7 +24,22 @@ Sie können Bilder von ihrem lokalen System als Datei hochladen. Sie können auc
 ### Ich finde den Link nicht - wie komme ich zur Photobox?
 Sie müssen eingeloggt sein, um die Photobox nutzen zu können. Links im Powermenü finden Sie das Kamerasymbol.
 
+### Kamera-Klick und hochladen - das ist alles?
+Ja, fast. Da die Bilder veröffentlich werden, müssen Sie noch bestätigen, dass Sie die Rechte an den Bildern haben und dass die abgebildeten Personen damit einverstanden sind, dass die Bilder veröffentlicht werden. Teilen Sie uns auch noch mit, welche Hunde oder Personen auf den Bildern zu sehen sind und wo die Bilder entstanden sind. Das erleichtert uns die Arbeit. Wir sind alle Ehrenamtlich tätig und haben nicht immer die Zeit, die Informationen über die Bilder im Nachhinein zu recherchieren. Die Photobox erleichtert uns die Arbeit ungemein, da diese wichtige Informationen direkt in unserem System gespeichert werden. Vielen, vielen Dank dafür!
+
 ### Ich bin nicht HZD-Mitglied - kann ich die Photobox nutzen?
 Nein, die Photobox ist nur für HZD-Mitglieder verfügbar.
 
-... es kommt mehr
+## Benachrichtigungen
+
+### Was sind Benachrichtigungen und wozu sind sie gut?
+Benachrichtigungen (alias Push-Notifications) sind kurze Nachrichten, die Sie erhalten, wenn es Neuigkeiten gibt, die für Sie relevant sind. Sie können sich für verschiedene Arten von Benachrichtigungen anmelden und festlegen, wie Sie diese erhalten möchten. Sie müssen somit nicht mehr ständig die Website besuchen, um auf dem Laufenden zu bleiben.
+
+### Wie kann ich mich für Benachrichtigungen anmelden?
+Wenn Sie die Rote Glocke in der Kopfzeile sehen, haben Sie sich noch nicht für Benachrichtigungen angemeldet. Klicken Sie auf die Glocke und folgen Sie den Anweisungen. Sie werden dann gefragt, ob und welche Benachrichtigungen Sie erhalten möchten.
+
+### Kann ich die Benachrichtigungen wieder abbestellen (wenn sie mich z.B. nerven)?
+Ja, natürlich. Sie können den Umfang der Benachrichtigungen jederzeit anpassen oder diese komplett abbestellen. Klicken Sie dazu im Powermenü auf das Glockensymbol und folgen Sie den Anweisungen.
+
+
+Haben Sie weitere Fragen? Dann schreiben Sie uns eine EMail an hovawarte.tik@hovawarte.com
