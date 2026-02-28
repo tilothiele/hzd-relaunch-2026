@@ -206,6 +206,13 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 					{currentYear}
 					{' '}
 					{globalLayout?.Copyright}
+					{process.env.NEXT_PUBLIC_APP_VERSION && (
+						<span style={{ marginLeft: '1em', opacity: 0.8 }}>
+							<a href="/changelog">
+								v{process.env.NEXT_PUBLIC_APP_VERSION}
+							</a>
+						</span>
+					)}
 				</p>
 			</div>
 		</footer>

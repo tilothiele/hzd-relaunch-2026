@@ -41,6 +41,7 @@ import {
     faCamera,
     faDog,
     faImage,
+    faLifeRing
 } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import type { Menu as MenuType, MenuItem as MenuItemType, AuthUser } from '@/types'
@@ -104,6 +105,7 @@ const iconMap: Record<string, any> = {
     'fa-camera': faCamera,
     'fa-dog': faDog,
     'fa-image': faImage,
+    'fa-life-ring': faLifeRing,
 }
 
 const getIcon = (iconName?: string) => {

@@ -1,5 +1,6 @@
 import type { NextConfig } from 'next'
 import withSerwistInit from '@serwist/next'
+import pkg from './package.json'
 
 const withSerwist = withSerwistInit({
 	swSrc: 'src/app/sw.ts',
@@ -24,6 +25,9 @@ const nextConfig: NextConfig = {
 				pathname: '/uploads/**',
 			},
 		],
+	},
+	env: {
+		NEXT_PUBLIC_APP_VERSION: pkg.version,
 	},
 	output: 'standalone'
 }

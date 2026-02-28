@@ -5,6 +5,7 @@ import { ThemeProvider } from '@mui/material/styles'
 // import CssBaseline from '@mui/material/CssBaseline'
 import { muiTheme } from '@/lib/mui-theme'
 import { AuthProvider } from '@/contexts/auth-context'
+import { PwaUpdater } from '@/components/pwa/pwa-updater'
 
 export function Providers({ children }: PropsWithChildren) {
 	return (
@@ -12,6 +13,7 @@ export function Providers({ children }: PropsWithChildren) {
 			{/* <CssBaseline /> */}
 			<AuthProvider>
 				{children}
+				<PwaUpdater />
 			</AuthProvider>
 		</ThemeProvider>
 	)

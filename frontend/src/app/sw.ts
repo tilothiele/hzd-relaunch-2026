@@ -1,4 +1,7 @@
 import { type PrecacheEntry, Serwist, StaleWhileRevalidate, CacheFirst, ExpirationPlugin } from "serwist";
+import pkg from "../../package.json";
+
+const VERSION = pkg.version;
 
 declare const self: ServiceWorkerGlobalScope & {
     __SW_MANIFEST: (PrecacheEntry | string)[] | undefined;
@@ -52,4 +55,13 @@ self.addEventListener("push", (event) => {
 self.addEventListener("notificationclick", (event) => {
     event.notification.close();
     event.waitUntil(self.clients.openWindow(event.notification.data.url));
+});
+
+self.addEventListener("message", (event) => {
+    if (event.data && event.data.type === "SKIP_WAITING") {
+        self.skipWaiting();
+    }
+    if (event.data && event.data.type === "GET_VERSION") {
+        event.ports[0].postMessage({ version: VERSION });
+    }
 });
