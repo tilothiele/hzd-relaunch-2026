@@ -106,7 +106,7 @@ export function MarkdownContainer({ content, theme, className = "" }: MarkdownCo
                     padding-left: 2.5rem;
                 }
                 .faq-page h3::before {
-                    content: "Q:";
+                    content: "F:";
                     color: ${accentColor};
                     position: absolute;
                     left: 0;
