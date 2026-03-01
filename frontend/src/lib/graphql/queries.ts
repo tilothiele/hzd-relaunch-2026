@@ -2140,6 +2140,10 @@ export const GET_MY_PHOTOBOX_COLLECTIONS = `
 				RenderedPersons
 				ReneredDogs
 				UserMessage
+				Thumbnail {
+					url
+					formats
+				}
 				createdAt
 			}
 		}
@@ -2167,6 +2171,21 @@ export const GET_GALLERY_IMAGES = `
 			DateOfSubmission
 			DateOfPicture
 			FeaturedImage
+		}
+	}
+`
+
+export const GET_PHOTOBOX_IMAGE = `
+	query GetPhotoboxImage($documentId: ID!) {
+		photoboxImage(documentId: $documentId) {
+			documentId
+			S3Path
+			origin {
+				documentId
+			}
+			Thumbnail {
+				documentId
+			}
 		}
 	}
 `

@@ -50,6 +50,46 @@ export function PhotoBoxUploader({
         }
     }
 
+    const resizeImage = (file: File, maxWidth: number, maxHeight: number): Promise<Blob> => {
+        return new Promise((resolve, reject) => {
+            const image = new window.Image()
+            image.src = URL.createObjectURL(file)
+            image.onload = () => {
+                let width = image.width
+                let height = image.height
+
+                if (width > maxWidth || height > maxHeight) {
+                    if (width > height) {
+                        height *= maxWidth / width
+                        width = maxWidth
+                    } else {
+                        width *= maxHeight / height
+                        height = maxHeight
+                    }
+                }
+
+                const canvas = document.createElement('canvas')
+                canvas.width = width
+                canvas.height = height
+                const ctx = canvas.getContext('2d')
+                if (!ctx) {
+                    reject(new Error('Canvas context could not be created'))
+                    return
+                }
+
+                ctx.drawImage(image, 0, 0, width, height)
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        resolve(blob)
+                    } else {
+                        reject(new Error('Canvas to Blob conversion failed'))
+                    }
+                }, 'image/jpeg', 0.85)
+            }
+            image.onerror = (error) => reject(error)
+        })
+    }
+
     const resetForm = () => {
         setSelectedImage(null)
         setPreviewUrl(null)
@@ -61,11 +101,13 @@ export function PhotoBoxUploader({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+
+        const imageToUpload = selectedImage
         if (!selectedCollectionId) {
             setStatus({ type: 'error', text: 'Bitte wähle zuerst eine Collection aus.' })
             return
         }
-        if (!selectedImage) {
+        if (!imageToUpload) {
             setStatus({ type: 'error', text: 'Bitte wähle zuerst ein Foto aus.' })
             return
         }
@@ -78,20 +120,24 @@ export function PhotoBoxUploader({
         setIsUploading(true)
         setStatus(null)
 
-        const formData = new FormData()
-        formData.append('image', selectedImage)
-        formData.append('persons', persons)
-        formData.append('dogs', dogs)
-        formData.append('message', message)
-        formData.append('collectionId', selectedCollectionId)
-
-        // Get token from auth state if available
-        const token = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('hzd_auth_state') || '{}').token : null
-        if (token) {
-            formData.append('token', token)
-        }
-
         try {
+            // Resize image before upload
+            const resizedBlob = await resizeImage(imageToUpload, 1024, 1024)
+            const resizedFile = new File([resizedBlob], imageToUpload.name, { type: 'image/jpeg' })
+
+            const formData = new FormData()
+            formData.append('image', resizedFile)
+            formData.append('persons', persons)
+            formData.append('dogs', dogs)
+            formData.append('message', message)
+            formData.append('collectionId', selectedCollectionId)
+
+            // Get token from auth state if available
+            const token = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('hzd_auth_state') || '{}').token : null
+            if (token) {
+                formData.append('token', token)
+            }
+
             const response = await fetch('/api/photobox/upload', {
                 method: 'POST',
                 body: formData,

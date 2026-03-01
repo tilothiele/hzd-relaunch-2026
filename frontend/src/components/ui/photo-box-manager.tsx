@@ -12,12 +12,14 @@ interface PhotoBoxManagerProps {
     maxCollections?: number
     maxPhotosPerCollection?: number
     maxPhotoSizeMB?: number
+    strapiBaseUrl?: string
 }
 
 export function PhotoBoxManager({
     maxCollections = 5,
     maxPhotosPerCollection = 10,
-    maxPhotoSizeMB = 10
+    maxPhotoSizeMB = 10,
+    strapiBaseUrl
 }: PhotoBoxManagerProps) {
     const [activeTab, setActiveTab] = useState<Tab>('upload')
     const [collectionsCount, setCollectionsCount] = useState(0)
@@ -68,6 +70,7 @@ export function PhotoBoxManager({
                 ) : (
                     <PhotoBoxList
                         maxCollections={maxCollections}
+                        strapiBaseUrl={strapiBaseUrl}
                     />
                 )}
             </div>

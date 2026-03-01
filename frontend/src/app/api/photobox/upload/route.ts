@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ message: 'Nicht authentifiziert.' }, { status: 401 })
         }
 
-        // 1. Get current user documentId via GraphQL
+        // 1. Get current user documentId and username via GraphQL
         const gqlEndpoint = `${strapiBaseUrl.replace(/\/$/, '')}/graphql`
         const gqlClient = new GraphQLClient(gqlEndpoint, {
             headers: {
@@ -54,16 +54,54 @@ export async function POST(request: NextRequest) {
             },
         })
 
-        const meResult = await gqlClient.request<{ me: { documentId: string } }>(`
-            query { me { documentId } }
+        const meResult = await gqlClient.request<{ me: { documentId: string, username: string, firstName?: string, lastName?: string } }>(`
+            query { me { documentId username firstName lastName } }
         `)
 
-        const userDocumentId = meResult.me.documentId
+        const { documentId: userDocumentId, firstName, lastName } = meResult.me
+        const displayName = [firstName, lastName].filter(Boolean).join(' ') || meResult.me.username
 
-        // 2. Upload to S3
+        // 2. Upload to Strapi Media Library
         const bytes = await image.arrayBuffer()
         const buffer = Buffer.from(bytes)
 
+        const strapiFormData = new FormData()
+        const blob = new Blob([buffer], { type: image.type })
+        strapiFormData.append('files', blob, image.name)
+
+        // Add caption metadata
+        const caption = `${displayName} - ${message || 'Keine Nachricht'} - ${persons || 'Keine Personen'} - ${dogs || 'Keine Hunde'}`
+        strapiFormData.append('fileInfo', JSON.stringify({
+            caption: caption,
+            alternativeText: `Bilderspende von ${displayName}`
+        }))
+
+        console.log(`[PhotoBox API] Uploading to Strapi Media Library (root) with caption: ${caption}`)
+        const strapiUploadRes = await fetch(`${strapiBaseUrl.replace(/\/$/, '')}/api/upload`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+            body: strapiFormData
+        })
+
+        let mediaId: string | number | null = null
+        if (strapiUploadRes.ok) {
+            try {
+                const uploadData = await strapiUploadRes.json()
+                if (Array.isArray(uploadData) && uploadData.length > 0) {
+                    mediaId = uploadData[0].id
+                    console.log(`[PhotoBox API] Strapi media uploaded successfully, ID: ${mediaId}`)
+                }
+            } catch (e) {
+                console.error('[PhotoBox API] Failed to parse Strapi upload response:', e)
+            }
+        } else {
+            const errorText = await strapiUploadRes.text()
+            console.error('[PhotoBox API] Strapi media upload failed:', errorText)
+        }
+
+        // 4. Upload to S3
         // Path: documentid(collection)/dateineme-des-bildes
         const s3Path = `${collectionId}/${image.name}`
 
@@ -76,27 +114,32 @@ export async function POST(request: NextRequest) {
             ContentType: image.type,
         }))
 
-        // 3. Create PhotoboxImage in Strapi
-        console.log(`[PhotoBox API] Creating record in Strapi for user ${userDocumentId}`)
+        // 5. Create PhotoboxImage in Strapi
+        console.log(`[PhotoBox API] Creating record in Strapi for user ${userDocumentId}, Collection: ${collectionId}`)
 
-        await gqlClient.request(CREATE_PHOTOBOX_IMAGE, {
+        const mutationResponse = await gqlClient.request(CREATE_PHOTOBOX_IMAGE, {
             data: {
-                S3Path: s3Path, // Storing only the relative path (collectionId/filename)
+                S3Path: s3Path,
                 origin: userDocumentId,
                 RenderedPersons: persons,
                 ReneredDogs: dogs,
                 UserMessage: message || '',
                 photobox_image_collection: collectionId,
+                Thumbnail: mediaId,
                 publishedAt: new Date().toISOString()
             }
         })
+
+        console.log('[PhotoBox API] Mutation response:', JSON.stringify(mutationResponse, null, 2))
 
         return NextResponse.json({
             message: 'Foto erfolgreich gespeichert.',
             details: {
                 fileName: image.name,
                 s3Path: s3Path,
-                collectionId: collectionId
+                collectionId: collectionId,
+                mediaId: mediaId,
+                record: (mutationResponse as any)?.createPhotoboxImage
             }
         }, { status: 200 })
 

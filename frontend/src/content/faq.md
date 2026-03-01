@@ -31,6 +31,11 @@ Sie können Bilder von ihrem lokalen System als Datei hochladen. Sie können auc
 ### Ich finde den Link nicht - wie komme ich zur Photobox?
 Sie müssen eingeloggt sein, um die Photobox nutzen zu können. Links im Powermenü finden Sie das Kamerasymbol.
 
+### Muss ich bei der Aufnahme etwas beachten?
+- zu 90% sind für die Website Aufnahmen im Querformat geeignet.
+- Die Aufnahmen sollten möglichst hochwertig sein. D.h. gerade in den wichtigen Bereichen muss das Motiv scharf abgebildet sein.
+- Achten Sie auf eine gute Ausleuchtung. 
+
 ### Kamera-Klick und hochladen - das ist alles?
 Ja - fast. Da die Bilder veröffentlich werden, müssen Sie noch bestätigen, dass Sie die Rechte an den Bildern haben und dass die abgebildeten Personen damit einverstanden sind, dass die Bilder veröffentlicht werden. Teilen Sie uns auch noch mit, welche Hunde und/oder Personen auf den Bildern zu sehen sind und wo bzw. in welchem Rahmen die Bilder entstanden sind. Das erleichtert uns die Arbeit. Wir sind alle Ehrenamtlich tätig und haben nicht immer die Zeit, diese wichtigen Informationen im Nachhinein zu recherchieren. Die Photobox erleichtert uns die Arbeit ungemein, da diese wichtige Informationen direkt in unserem System gespeichert werden. Vielen, vielen Dank dafür!
 

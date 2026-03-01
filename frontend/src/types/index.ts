@@ -21,6 +21,7 @@ export interface Image {
 	height?: number | null
 	caption?: string | null
 	previewUrl?: string | null
+	formats?: any | null
 }
 
 export interface ActionButton {
@@ -864,6 +865,7 @@ export interface PhotoboxImage {
 	ReneredDogs?: string | null
 	UserMessage?: string | null
 	photobox_image_collection?: PhotoboxImageCollection | null
+	Thumbnail?: Image | null
 	createdAt?: string | null
 	updatedAt?: string | null
 	publishedAt?: string | null

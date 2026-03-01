@@ -7,13 +7,15 @@ import { UPDATE_PHOTOBOX_IMAGE, DELETE_PHOTOBOX_IMAGE, DELETE_PHOTOBOX_COLLECTIO
 import { useAuth } from '@/hooks/use-auth'
 import type { PhotoboxImageCollection } from '@/types'
 import Image from 'next/image'
+import { resolveMediaUrl } from '@/components/header/logo-utils'
 
 interface PhotoBoxListProps {
     maxCollections?: number
+    strapiBaseUrl?: string
 }
 
-export function PhotoBoxList({ maxCollections = 5 }: PhotoBoxListProps) {
-    const { user } = useAuth()
+export function PhotoBoxList({ maxCollections = 5, strapiBaseUrl }: PhotoBoxListProps) {
+    const { user, authState } = useAuth()
     const [collections, setCollections] = useState<PhotoboxImageCollection[]>([])
     const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(true)
@@ -103,9 +105,20 @@ export function PhotoBoxList({ maxCollections = 5 }: PhotoBoxListProps) {
     const handleDeleteImage = async (imgId: string) => {
         if (!window.confirm('Möchtest du dieses Foto wirklich löschen?')) return
         try {
-            await fetchGraphQL(DELETE_PHOTOBOX_IMAGE, {
-                variables: { documentId: imgId }
+            const response = await fetch('/api/photobox/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    documentId: imgId,
+                    token: authState.token
+                })
             })
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}))
+                throw new Error(errorData.message || 'Fehler beim Löschen des Fotos.')
+            }
+
             // Update local state
             setCollections(prev => prev.map(col => ({
                 ...col,
@@ -113,7 +126,7 @@ export function PhotoBoxList({ maxCollections = 5 }: PhotoBoxListProps) {
             })))
         } catch (error) {
             console.error('Error deleting image:', error)
-            alert('Fehler beim Löschen des Fotos.')
+            alert(error instanceof Error ? error.message : 'Fehler beim Löschen des Fotos.')
         }
     }
 
@@ -133,6 +146,40 @@ export function PhotoBoxList({ maxCollections = 5 }: PhotoBoxListProps) {
     }
 
     const selectedCollection = collections.find(c => c.documentId === selectedCollectionId)
+
+    const getImageUrl = (img: any, preferOriginal = false) => {
+        // Fallback-Logik für die Base URL auf Client-Seite
+        const effectiveBaseUrl = (typeof window !== 'undefined' ? (process.env.NEXT_PUBLIC_STRAPI_URL || process.env.NEXT_PUBLIC_STRAPI_BASE_URL) : '') || strapiBaseUrl;
+
+        if (img.Thumbnail) {
+            const formats = img.Thumbnail.formats
+            let path = img.Thumbnail.url
+            if (!preferOriginal) {
+                path = formats?.thumbnail?.url || formats?.small?.url || formats?.medium?.url || img.Thumbnail.url
+            }
+
+            // Falls die URL schon vollqualifiziert ist, aber intern (z.B. http://strapi:1337)
+            if (typeof window !== 'undefined' && path.startsWith('http') && path.includes('//strapi:1337')) {
+                path = path.replace('//strapi:1337', '//localhost:1337')
+            }
+
+            let resolved = resolveMediaUrl({ ...img.Thumbnail, url: path }, effectiveBaseUrl)
+
+            // Falls das Resultat immer noch intern ist
+            if (typeof window !== 'undefined' && resolved?.includes('//strapi:1337')) {
+                resolved = resolved.replace('//strapi:1337', '//localhost:1337')
+            }
+
+            return resolved
+        }
+
+        // Fallback auf S3 für alte Bilder oder falls Strapi-Thumbnail fehlt
+        if (img.S3Path) {
+            return `/api/photobox/image?path=${encodeURIComponent(img.S3Path)}`
+        }
+
+        return null
+    }
 
     // --- Render Helpers ---
 
@@ -228,18 +275,17 @@ export function PhotoBoxList({ maxCollections = 5 }: PhotoBoxListProps) {
                                             className={`relative aspect-[4/3] overflow-hidden bg-gray-100 cursor-zoom-in group/img ${isEditing ? 'sm:w-1/2 lg:w-2/5 sm:h-full' : ''
                                                 }`}
                                             onClick={() => {
-                                                if (img.S3Path) {
-                                                    handleOpenLightbox(img.S3Path)
-                                                }
+                                                const url = getImageUrl(img, true)
+                                                if (url) handleOpenLightbox(url)
                                             }}
                                         >
                                             {/* Skeleton Loader Overlay */}
                                             <div className="absolute inset-0 bg-gray-200 animate-pulse" />
 
-                                            {img.S3Path ? (
+                                            {getImageUrl(img) ? (
                                                 <Image
                                                     unoptimized
-                                                    src={`/api/photobox/image?path=${encodeURIComponent(img.S3Path)}`}
+                                                    src={getImageUrl(img)!}
                                                     alt="Hochgeladenes Foto"
                                                     fill
                                                     className="object-cover transition-transform duration-1000 group-hover/img:scale-110 relative z-0"
@@ -388,10 +434,10 @@ export function PhotoBoxList({ maxCollections = 5 }: PhotoBoxListProps) {
                                     {/* Skeleton Loader Overlay */}
                                     <div className="absolute inset-0 bg-gray-200 animate-pulse" />
 
-                                    {lastPhoto?.S3Path ? (
+                                    {lastPhoto && getImageUrl(lastPhoto) ? (
                                         <Image
                                             unoptimized
-                                            src={`/api/photobox/image?path=${encodeURIComponent(lastPhoto.S3Path)}`}
+                                            src={getImageUrl(lastPhoto)!}
                                             alt={col.CollectionDescription || 'Collection'}
                                             fill
                                             className="object-cover transition-transform duration-700 group-hover:scale-105 relative z-0"
@@ -470,7 +516,7 @@ export function PhotoBoxList({ maxCollections = 5 }: PhotoBoxListProps) {
                     <div className="relative w-full h-full max-w-5xl max-h-[90vh] p-4 flex items-center justify-center pointer-events-none">
                         <Image
                             unoptimized
-                            src={`/api/photobox/image?path=${encodeURIComponent(fullScreenImage)}`}
+                            src={fullScreenImage}
                             alt="Full screen photo"
                             className={`object-contain w-full h-full animate-in zoom-in-95 duration-500 pointer-events-auto transition-opacity duration-300 ${isLightboxLoading ? 'opacity-0' : 'opacity-100'}`}
                             width={1920}
