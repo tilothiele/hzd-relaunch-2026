@@ -16,7 +16,7 @@ export function getMenuItemIcon(menuItem: MenuItem, _user: AuthUser | null): str
 }
 
 export function getMenuItemEnabled(menuItem: MenuItem, _user: AuthUser | null): boolean {
-    if (menuItem.id == 'mitgliederbereich') {
+    if (menuItem.id == 'mitgliederbereich' || menuItem.id == 'photobox') {
         return _user != null
     }
     return true
