@@ -6,6 +6,7 @@ import { Snackbar, Alert, Button, Box, Typography, IconButton, Collapse } from '
 import CloseIcon from '@mui/icons-material/Close'
 import InfoIcon from '@mui/icons-material/Info'
 import RefreshIcon from '@mui/icons-material/Refresh'
+import { theme } from '@/themes'
 
 export function PwaUpdater() {
     const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null)
@@ -101,7 +102,7 @@ export function PwaUpdater() {
             <Alert
                 severity="info"
                 variant="filled"
-                icon={<RefreshIcon sx={{ color: 'white' }} />}
+                icon={<RefreshIcon sx={{ color: theme.buttonTextColor }} />}
                 action={
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Button
@@ -111,6 +112,7 @@ export function PwaUpdater() {
                             onClick={handleUpdate}
                             sx={{
                                 fontWeight: 'bold',
+                                color: theme.buttonTextColor,
                                 borderColor: 'rgba(255,255,255,0.5)',
                                 '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' }
                             }}
@@ -122,7 +124,7 @@ export function PwaUpdater() {
                             aria-label="close"
                             color="inherit"
                             onClick={handleClose}
-                            sx={{ opacity: 0.7 }}
+                            sx={{ opacity: 0.7, color: theme.buttonTextColor }}
                         >
                             <CloseIcon fontSize="small" />
                         </IconButton>
@@ -130,23 +132,23 @@ export function PwaUpdater() {
                 }
                 sx={{
                     width: '100%',
-                    backgroundColor: '#4560AA',
-                    color: 'white',
+                    backgroundColor: theme.buttonColor,
+                    color: theme.buttonTextColor,
                     borderRadius: 2,
                     boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
                     '& .MuiAlert-message': { width: '100%' }
                 }}
             >
                 <Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 0.5, color: theme.buttonTextColor }}>
                         Neue Version verfügbar!
                     </Typography>
-                    <Typography variant="body2" sx={{ opacity: 0.9, mb: 1 }}>
+                    <Typography variant="body2" sx={{ opacity: 0.9, mb: 1, color: theme.buttonTextColor }}>
                         Ein Update für die HZD App ist bereit.
-                        <Box component="span" sx={{ display: 'block', mt: 0.5, fontSize: '0.75rem', opacity: 0.8 }}>
-                            Aktuell: v{currentVersion} &rarr; Neu: v{availableVersion || '...'}
+                        <Box component="span" sx={{ display: 'block', mt: 0.5, fontSize: '0.75rem', opacity: 0.8, color: theme.buttonTextColor }}>
+                            Neu: v{availableVersion || '...'}
                         </Box>
-                        <Box component="span" sx={{ display: 'block', mt: 0.2, fontSize: '0.7rem', opacity: 0.6, fontStyle: 'italic' }}>
+                        <Box component="span" sx={{ display: 'block', mt: 0.2, fontSize: '0.7rem', opacity: 0.6, fontStyle: 'italic', color: theme.buttonTextColor }}>
                             (Version wird in package.json verwaltet)
                         </Box>
                     </Typography>
@@ -157,21 +159,28 @@ export function PwaUpdater() {
                                 size="small"
                                 color="inherit"
                                 onClick={() => setShowInstructions(!showInstructions)}
-                                startIcon={<InfoIcon sx={{ fontSize: '1rem !important' }} />}
+                                startIcon={<InfoIcon sx={{ fontSize: '1rem !important', color: theme.buttonTextColor }} />}
                                 sx={{
                                     textTransform: 'none',
                                     fontSize: '0.75rem',
                                     p: 0,
                                     minWidth: 0,
                                     opacity: 0.8,
+                                    color: theme.buttonTextColor,
                                     '&:hover': { bgcolor: 'transparent', opacity: 1 }
                                 }}
                             >
                                 {showInstructions ? 'Anleitung ausblenden' : 'Hilfe für iOS anzeigen'}
                             </Button>
                             <Collapse in={showInstructions}>
-                                <Box sx={{ mt: 1.5, p: 1.5, bgcolor: 'rgba(255,255,255,0.08)', borderRadius: 1, border: '1px solid rgba(255,255,255,0.1)' }}>
-                                    <Typography variant="caption" component="p" sx={{ lineHeight: 1.5, fontSize: '0.7rem' }}>
+                                <Box sx={{
+                                    mt: 1.5,
+                                    p: 1.5,
+                                    bgcolor: 'rgba(255,255,255,0.08)',
+                                    borderRadius: 1,
+                                    border: '1px solid rgba(255,255,255,0.1)'
+                                }}>
+                                    <Typography variant="caption" component="p" sx={{ lineHeight: 1.5, fontSize: '0.7rem', color: theme.buttonTextColor }}>
                                         Falls der Button nicht reagiert:<br />
                                         1. Schließe die App komplett (im App-Switcher nach oben wischen).<br />
                                         2. Öffne die App erneut.<br />
