@@ -211,6 +211,11 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 							<a href="/changelog">
 								v{process.env.NEXT_PUBLIC_APP_VERSION}
 							</a>
+							{process.env.NEXT_PUBLIC_BUILD_DATE && (
+								<span style={{ marginLeft: '0.5em' }}>
+									({process.env.NEXT_PUBLIC_BUILD_DATE})
+								</span>
+							)}
 						</span>
 					)}
 				</p>
