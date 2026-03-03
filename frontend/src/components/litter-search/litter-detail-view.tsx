@@ -1,12 +1,14 @@
 'use client'
 
-import { Box, Typography } from '@mui/material'
+import { Box, Typography, Modal, IconButton } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import CloseIcon from '@mui/icons-material/Close'
 import Image from 'next/image'
 import type { Litter, HzdSetting } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { theme } from '@/themes'
 import { BackButton } from '@/components/ui/back-button'
+import { useState } from 'react'
 
 interface LitterDetailViewProps {
     litter: Litter
@@ -61,6 +63,8 @@ export function LitterDetailView({
     onBack,
     formatDate,
 }: LitterDetailViewProps) {
+    const [zoomImage, setZoomImage] = useState<{ url: string; name: string } | null>(null)
+    const handleZoomClose = () => setZoomImage(null)
     const orderLetter = litter.OrderLetter ?? ''
     const kennelName = litter.breeder?.kennelName ?? 'Kein Zwingername bekannt'
     const breederMember = ((litter.breeder?.member?.firstName || '') + ' ' + (litter.breeder?.member?.lastName || '')).trim()
@@ -85,47 +89,72 @@ export function LitterDetailView({
         </div>
     )
 
-    const renderMotherImage = () => (
-        <div className='flex flex-col items-center'>
-            <div className='relative w-full aspect-[4/3] overflow-hidden rounded-md bg-gray-100 mb-2'>
-                <Image
-                    src={resolveMediaUrl(
-                        litter.mother?.avatar ||
-                        (litter.mother?.color === 'SM' ? hzdSetting?.DefaultAvatarSM :
-                            litter.mother?.color === 'B' ? hzdSetting?.DefaultAvatarB :
-                                hzdSetting?.DefaultAvatarS),
-                        strapiBaseUrl
-                    ) || ''}
-                    alt="Mutter"
-                    fill
-                    className='object-cover'
-                    unoptimized
-                />
-            </div>
-            <span className="font-semibold text-gray-700">Mutter: {motherName}</span>
-        </div>
-    )
+    const renderMotherImage = () => {
+        const url = resolveMediaUrl(
+            litter.mother?.avatar ||
+            (litter.mother?.color === 'SM' ? hzdSetting?.DefaultAvatarSM :
+                litter.mother?.color === 'B' ? hzdSetting?.DefaultAvatarB :
+                    hzdSetting?.DefaultAvatarS),
+            strapiBaseUrl
+        ) || ''
 
-    const renderFatherImage = () => (
-        <div className='flex flex-col items-center'>
-            <div className='relative w-full aspect-[4/3] overflow-hidden rounded-md bg-gray-100 mb-2'>
-                <Image
-                    src={resolveMediaUrl(
-                        litter.stuntDog?.avatar ||
-                        (litter.stuntDog?.color === 'SM' ? hzdSetting?.DefaultAvatarSM :
-                            litter.stuntDog?.color === 'B' ? hzdSetting?.DefaultAvatarB :
-                                hzdSetting?.DefaultAvatarS),
-                        strapiBaseUrl
-                    ) || ''}
-                    alt="Vater"
-                    fill
-                    className='object-cover'
-                    unoptimized
-                />
+        return (
+            <div className='flex flex-col items-center'>
+                <div
+                    className='relative w-full aspect-[4/3] overflow-hidden rounded-md bg-gray-100 mb-2 cursor-zoom-in group/img'
+                    onClick={() => setZoomImage({ url, name: motherName })}
+                >
+                    <Image
+                        src={url}
+                        alt="Mutter"
+                        fill
+                        className='object-cover transition-transform duration-300 group-hover/img:scale-105'
+                        unoptimized
+                    />
+                    <div className='absolute inset-0 bg-black/0 group-hover/img:bg-black/5 transition-colors flex items-center justify-center'>
+                        <div className='opacity-0 group-hover/img:opacity-100 transition-opacity bg-white/80 p-1.5 rounded-full shadow-md'>
+                            <OpenInNewIcon sx={{ fontSize: 18, color: 'action.active' }} />
+                        </div>
+                    </div>
+                </div>
+                <span className="font-semibold text-gray-700 text-sm md:text-base">Mutter: {motherName}</span>
             </div>
-            <span className="font-semibold text-gray-700">Vater: {stuntDogName || 'Unbekannt'}</span>
-        </div>
-    )
+        )
+    }
+
+    const renderFatherImage = () => {
+        const url = resolveMediaUrl(
+            litter.stuntDog?.avatar ||
+            (litter.stuntDog?.color === 'SM' ? hzdSetting?.DefaultAvatarSM :
+                litter.stuntDog?.color === 'B' ? hzdSetting?.DefaultAvatarB :
+                    hzdSetting?.DefaultAvatarS),
+            strapiBaseUrl
+        ) || ''
+        const name = stuntDogName || 'Unbekannt'
+
+        return (
+            <div className='flex flex-col items-center'>
+                <div
+                    className='relative w-full aspect-[4/3] overflow-hidden rounded-md bg-gray-100 mb-2 cursor-zoom-in group/img'
+                    onClick={() => setZoomImage({ url, name })}
+                >
+                    <Image
+                        src={url}
+                        alt="Vater"
+                        fill
+                        className='object-cover transition-transform duration-300 group-hover/img:scale-105'
+                        unoptimized
+                    />
+                    <div className='absolute inset-0 bg-black/0 group-hover/img:bg-black/5 transition-colors flex items-center justify-center'>
+                        <div className='opacity-0 group-hover/img:opacity-100 transition-opacity bg-white/80 p-1.5 rounded-full shadow-md'>
+                            <OpenInNewIcon sx={{ fontSize: 18, color: 'action.active' }} />
+                        </div>
+                    </div>
+                </div>
+                <span className="font-semibold text-gray-700 text-sm md:text-base">Vater: {name}</span>
+            </div>
+        )
+    }
 
     const renderPuppyImage = () => (
         <div className='flex flex-col items-center w-full max-w-4xl mx-auto'>
@@ -298,6 +327,71 @@ export function LitterDetailView({
                     </section>
                 )}
             </div>
+
+            {/* Image Zoom Modal */}
+            <Modal
+                open={!!zoomImage}
+                onClose={handleZoomClose}
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    p: 2,
+                    backdropFilter: 'blur(4px)',
+                    bgcolor: 'rgba(0, 0, 0, 0.7)'
+                }}
+            >
+                <Box sx={{ position: 'relative', maxWidth: '95vw', maxHeight: '95vh', outline: 'none' }}>
+                    <IconButton
+                        onClick={handleZoomClose}
+                        sx={{
+                            position: 'absolute',
+                            top: -16,
+                            right: -16,
+                            bgcolor: theme.footerBackground,
+                            color: theme.headerFooterTextColor,
+                            '&:hover': {
+                                bgcolor: theme.footerBackground,
+                                filter: 'brightness(90%)'
+                            },
+                            boxShadow: 2,
+                            zIndex: 1
+                        }}
+                        size='small'
+                    >
+                        <CloseIcon fontSize='small' />
+                    </IconButton>
+                    {zoomImage && (
+                        <Box sx={{
+                            position: 'relative',
+                            width: '90vw',
+                            maxWidth: '1000px',
+                            aspectRatio: '4/3',
+                            borderRadius: 2,
+                            overflow: 'hidden',
+                            bgcolor: 'black',
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}>
+                            <Box sx={{ position: 'relative', flexGrow: 1 }}>
+                                <Image
+                                    src={zoomImage.url}
+                                    alt={zoomImage.name}
+                                    fill
+                                    className='object-contain'
+                                    unoptimized
+                                    sizes='(max-width: 1000px) 90vw, 1000px'
+                                />
+                            </Box>
+                            <Box sx={{ bgcolor: theme.footerBackground, p: 2, textAlign: 'center', borderTop: '1px solid', borderColor: 'rgba(255,255,255,0.1)' }}>
+                                <Typography variant="h6" sx={{ fontWeight: 600, color: theme.headerFooterTextColor }}>
+                                    {zoomImage.name}
+                                </Typography>
+                            </Box>
+                        </Box>
+                    )}
+                </Box>
+            </Modal>
         </div>
     )
 }

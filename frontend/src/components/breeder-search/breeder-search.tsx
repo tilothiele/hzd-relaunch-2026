@@ -9,7 +9,7 @@ import { fetchGraphQL } from '@/lib/graphql-client'
 import { SEARCH_BREEDERS } from '@/lib/graphql/queries'
 import type { Breeder, BreederSearchResult, HzdSetting } from '@/types'
 import { BreederCard } from './breeder-card'
-import { BreederDetailsModal } from './breeder-details-modal'
+import { BreederDetailView } from './breeder-detail-view'
 import { BreederSearchForm } from './breeder-search-form'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { theme } from '@/themes'
@@ -38,7 +38,6 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 	const [pageCount, setPageCount] = useState(0)
 	const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
 	const [selectedBreeder, setSelectedBreeder] = useState<Breeder | null>(null)
-	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [showMap, setShowMap] = useState(false)
 	const [zipCode, setZipCode] = useState('')
 	const [zipLocation, setZipLocation] = useState<{ lat: number; lng: number } | null>(null)
@@ -154,11 +153,10 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 
 	const handleBreederClick = useCallback((breeder: Breeder) => {
 		setSelectedBreeder(breeder)
-		setIsModalOpen(true)
+		window.scrollTo({ top: 0, behavior: 'smooth' })
 	}, [])
 
-	const handleCloseModal = useCallback(() => {
-		setIsModalOpen(false)
+	const handleBackToSearch = useCallback(() => {
 		setSelectedBreeder(null)
 	}, [])
 
@@ -201,6 +199,17 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 
 	const totalPages = pageCount
 	const currentPage = page
+
+	if (selectedBreeder) {
+		return (
+			<BreederDetailView
+				breeder={selectedBreeder}
+				strapiBaseUrl={strapiBaseUrl}
+				hzdSetting={hzdSetting}
+				onBack={handleBackToSearch}
+			/>
+		)
+	}
 
 	return (
 		<div className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em' }}>
@@ -455,14 +464,6 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 					</div>
 				) : null}
 			</div>
-
-			<BreederDetailsModal
-				breeder={selectedBreeder}
-				open={isModalOpen}
-				onClose={handleCloseModal}
-				strapiBaseUrl={strapiBaseUrl}
-				hzdSetting={hzdSetting}
-			/>
 		</div>
 	)
 }
