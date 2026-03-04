@@ -5,6 +5,8 @@ import TestLogo from "./extensions/HZD-Logo-Test.png";
 import Favicon from "./extensions/favicon-32x32.png";
 import { layouts } from './src/layouts';
 
+import deTranslations from './extensions/translations/de.json';
+
 const isTest = process.env.STRAPI_ADMIN_TEST === 'true';
 
 
@@ -14,7 +16,7 @@ export default {
       // 'ar',
       // 'fr',
       // 'cs',
-      // 'de',
+      'de',
       // 'dk',
       // 'es',
       // 'he',
@@ -38,6 +40,9 @@ export default {
       // 'zh-Hans',
       // 'zh',
     ],
+    translations: {
+      de: deTranslations,
+    },
     auth: {
       logo: isTest ? TestLogo : Logo
     },
