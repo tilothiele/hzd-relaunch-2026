@@ -33,7 +33,12 @@ echo "=== Starte Backup für ${BACKUP_DATE} ==="
 
 echo "-> Sichere Dateibaum per SCP..."
 
+echo "-> Sichere Dateibaum per SCP..."
+
 sshpass -p ${JOOMLA_WEBSITE_SSH_PASS} scp -r \
+  -o IdentityAgent=none \
+  -o PubkeyAuthentication=no \
+  -o PreferredAuthentications=password,keyboard-interactive \
   -o StrictHostKeyChecking=no \
   -o UserKnownHostsFile=/dev/null \
   -P "${JOOMLA_WEBSITE_SSH_PORT}" \
