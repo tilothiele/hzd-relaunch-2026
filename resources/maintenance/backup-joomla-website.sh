@@ -33,7 +33,7 @@ echo "=== Starte Backup für ${BACKUP_DATE} ==="
 
 echo "-> Packe Dateibaum auf Remote-Host..."
 
-REMOTE_ARCHIVE="/tmp/joomla_files_${BACKUP_DATE}.tar.gz"
+REMOTE_ARCHIVE="/usr/home/httpsl/tmp/joomla_files_${BACKUP_DATE}.tar.gz"
 
 # 2.1 Archiv auf dem Remote-Host erstellen
 sshpass -p ${JOOMLA_WEBSITE_SSH_PASS} ssh \
