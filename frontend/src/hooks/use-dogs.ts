@@ -110,6 +110,13 @@ export function useDogs(options: UseDogsOptions = {}) {
 				})
 			}
 
+			filterConditions.push({
+				or: [
+					{ Disabled: { eq: false } },
+					{ Disabled: { null: true } },
+				],
+			})
+
 
 			if (ownerDocumentId) {
 				filterConditions.push({
