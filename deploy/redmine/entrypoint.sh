@@ -6,7 +6,7 @@ DB_CONFIG_FILE="/usr/src/redmine/config/database.yml"
 if [ ! -f "$DB_CONFIG_FILE" ]; then
   echo "Generating database.yml..."
 
-  cat > "$DB_CONFIG_FILE" <<EOF
+  cat <<EOF > "$DB_CONFIG_FILE"
 production:
   adapter: mysql2
   host: "${REDMINE_DB_HOST}"
@@ -30,7 +30,7 @@ if [ ! -f "$CONFIG_FILE" ]; then
 
   echo "Generating configuration.yml..."
 
-  cat > "$CONFIG_FILE" <<EOF2
+  cat <<EOF2 > "$CONFIG_FILE"
 default:
   # Outgoing emails configuration
   # See the examples below and the Rails guide for more configuration options:
@@ -221,6 +221,7 @@ production:
 # specific configuration options for development environment
 # that overrides the default ones
 development:
+
 EOF2
 
   cat "$CONFIG_FILE"
