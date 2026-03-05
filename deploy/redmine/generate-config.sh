@@ -1,13 +1,12 @@
-# = Redmine configuration file
-#
-# Each environment has its own configuration options.  If you are only
-# running in production, only the production block needs to be configured.
-# Environment specific configuration options override the default ones.
-#
-# Note that this file needs to be a valid YAML file.
-# DO NOT USE TABS! Use 2 spaces instead of tabs for indentation.
+#!/usr/bin/env bash
+set -e
 
-# default configuration options for all environments
+# Prüfen, ob notwendige Variablen gesetzt sind
+: "${REDMINE_SMTP_ADDRESS:?env var not set}"
+: "${REDMINE_SMTP_USER_NAME:?env var not set}"
+: "${REDMINE_SMTP_PASSWORD:?env var not set}"
+
+cat > configuration.yml <<EOF
 default:
   # Outgoing emails configuration
   # See the examples below and the Rails guide for more configuration options:
@@ -22,12 +21,12 @@ default:
     delivery_method: :smtp
     smtp_settings:
       enable_starttls_auto: true
-      address: "{{ smtp_address }}"
-      port: {{ smtp_port }}
-      domain: "{{ smtp_domain }}" # 'your.domain.com' for GoogleApps
+      address: "${REDMINE_SMTP_ADDRESS}"
+      port: "${REDMINE_SMTP_PORT}"
+      domain: "${REDMINE_SMTP_DOMAIN}" # 'your.domain.com' for GoogleApps
       authentication: :plain
-      user_name: "{{ smtp_username }}"
-      password: "{{ smtp_password }}"
+      user_name: "${REDMINE_SMTP_USER_NAME}"
+      password: "${REDMINE_SMTP_PASSWORD}"
   #
   # ==== Sendmail command
   #
@@ -198,3 +197,6 @@ production:
 # specific configuration options for development environment
 # that overrides the default ones
 development:
+EOF
+
+echo "config.yml generated."
