@@ -6,8 +6,10 @@ services:
     container_name: redmine
     restart: unless-stopped
 
-    ports:
-      - "${REDMINE_PORT:-8080}:3000"
+#    ports:
+#      - "${REDMINE_PORT:-8080}:3000"
+    networks:
+      - coolify
 
     environment:
       REDMINE_DB_MYSQL: ${REDMINE_DB_HOST}
@@ -31,6 +33,10 @@ services:
       - redmine_files:/usr/src/redmine/files
       - redmine_plugins:/usr/src/redmine/plugins
       - redmine_themes:/usr/src/redmine/public/themes
+
+networks:
+  coolify:
+    external: true
 
 volumes:
   redmine_files:
