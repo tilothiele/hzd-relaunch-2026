@@ -15,7 +15,7 @@ default:
       address: ${REDMINE_SMTP_ADDRESS}
       port: ${REDMINE_SMTP_PORT}
       domain: ${REDMINE_SMTP_DOMAIN}
-      authentication: :plain
+      authentication: ${REDMINE_SMTP_AUTHENTICATION}
       user_name: ${REDMINE_SMTP_USER_NAME}
       password: ${REDMINE_SMTP_PASSWORD}
   #
