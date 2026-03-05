@@ -12,6 +12,7 @@ default:
     delivery_method: :smtp
     smtp_settings:
       enable_starttls_auto: false
+      ssl: true
       address: ${REDMINE_SMTP_ADDRESS}
       port: ${REDMINE_SMTP_PORT}
       domain: ${REDMINE_SMTP_DOMAIN}
