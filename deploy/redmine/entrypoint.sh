@@ -6,7 +6,7 @@ DB_CONFIG_FILE="/usr/src/redmine/config/database.yml"
 if [ ! -f "$DB_CONFIG_FILE" ]; then
   echo "Generating database.yml..."
 
-  cat > "$CONFIG_FILE" <<EOF
+  cat > "$DB_CONFIG_FILE" <<EOF
 production:
   adapter: mysql2
   host: "${REDMINE_DB_HOST}"
