@@ -127,6 +127,7 @@ export function PhotoBoxUploader({
 
             const formData = new FormData()
             formData.append('image', resizedFile)
+            formData.append('originalImage', imageToUpload)
             formData.append('persons', persons)
             formData.append('dogs', dogs)
             formData.append('message', message)

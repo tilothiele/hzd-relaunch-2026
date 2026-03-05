@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
     try {
         const formData = await request.formData()
         const image = formData.get('image') as File
+        const originalImage = (formData.get('originalImage') as File) || image
         const persons = formData.get('persons') as string
         const dogs = formData.get('dogs') as string
         const message = formData.get('message') as string
@@ -65,6 +66,10 @@ export async function POST(request: NextRequest) {
         const bytes = await image.arrayBuffer()
         const buffer = Buffer.from(bytes)
 
+        // Also prepare original image for S3
+        const originalBytes = await originalImage.arrayBuffer()
+        const originalBuffer = Buffer.from(originalBytes)
+
         const strapiFormData = new FormData()
         const blob = new Blob([buffer], { type: image.type })
         strapiFormData.append('files', blob, image.name)
@@ -105,13 +110,13 @@ export async function POST(request: NextRequest) {
         // Path: documentid(collection)/dateineme-des-bildes
         const s3Path = `${collectionId}/${image.name}`
 
-        console.log(`[PhotoBox API] Uploading to S3: ${s3Path} (${buffer.length} bytes)`)
+        console.log(`[PhotoBox API] Uploading to S3: ${s3Path} (${originalBuffer.length} bytes)`)
 
         await s3Client.send(new PutObjectCommand({
             Bucket: bucketName,
             Key: s3Path,
-            Body: buffer,
-            ContentType: image.type,
+            Body: originalBuffer,
+            ContentType: originalImage.type,
         }))
 
         // 5. Create PhotoboxImage in Strapi
