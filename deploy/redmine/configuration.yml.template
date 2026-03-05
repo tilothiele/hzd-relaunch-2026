@@ -11,7 +11,7 @@ default:
   email_delivery:
     delivery_method: :smtp
     smtp_settings:
-      enable_starttls_auto: true
+      enable_starttls_auto: false
       address: ${REDMINE_SMTP_ADDRESS}
       port: ${REDMINE_SMTP_PORT}
       domain: ${REDMINE_SMTP_DOMAIN}
