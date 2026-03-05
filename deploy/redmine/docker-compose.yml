@@ -29,7 +29,6 @@ services:
       REDMINE_SMTP_ENABLE_STARTTLS_AUTO: ${REDMINE_SMTP_STARTTLS}
 
     volumes:
-      - ./configuration.yml:/usr/src/redmine/config/configuration.yml:ro
       - redmine_files:/usr/src/redmine/files
       - redmine_plugins:/usr/src/redmine/plugins
       - redmine_themes:/usr/src/redmine/public/themes
