@@ -683,7 +683,7 @@ export const GET_PAGE_BY_SLUG = `
 								documentId
 								Name
 								SortOrd
-								supplemental_documents {
+								supplemental_documents(pagination: { pageSize: 50 }) {
 									documentId
 									Name
 									Description
@@ -1714,7 +1714,7 @@ export const GET_NEWS_ARTICLE_BY_SLUG = `
 						documentId
 						Name
 						SortOrd
-						supplemental_documents {
+						supplemental_documents(pagination: { pageSize: 50 }) {
 							documentId
 							Name
 							Description
