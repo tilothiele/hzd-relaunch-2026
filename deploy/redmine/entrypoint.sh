@@ -1,9 +1,31 @@
 #!/bin/bash
 set -e
 
+DB_CONFIG_FILE="/usr/src/redmine/config/database.yml"
+
+if [ ! -f "$DB_CONFIG_FILE" ]; then
+  echo "Generating database.yml..."
+
+  cat > "$CONFIG_FILE" <<EOF
+production:
+  adapter: mysql2
+  host: "${REDMINE_DB_HOST}"
+  port: "${REDMINE_DB_PORT}"
+  username: "${REDMINE_DB_USER}"
+  password: "${REDMINE_DB_PASSWORD}"
+  database: "${REDMINE_DB_NAME}"
+  encoding: "utf8"
+EOF
+
+  echo "database.yml generated."
+
+fi
+
 CONFIG_FILE="/usr/src/redmine/config/configuration.yml"
 
 if [ ! -f "$CONFIG_FILE" ]; then
+
+
   echo "Generating configuration.yml..."
 
   cat > "$CONFIG_FILE" <<EOF
