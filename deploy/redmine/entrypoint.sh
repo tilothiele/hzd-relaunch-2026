@@ -17,6 +17,8 @@ production:
   encoding: "utf8"
 EOF
 
+  cat "$DB_CONFIG_FILE"
+
   echo "database.yml generated."
 
 fi
@@ -220,6 +222,8 @@ production:
 # that overrides the default ones
 development:
 EOF2
+
+  cat "$CONFIG_FILE"
 
   echo "configuration.yml generated."
 fi
