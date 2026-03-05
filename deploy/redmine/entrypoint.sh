@@ -28,7 +28,7 @@ if [ ! -f "$CONFIG_FILE" ]; then
 
   echo "Generating configuration.yml..."
 
-  cat > "$CONFIG_FILE" <<EOF
+  cat > "$CONFIG_FILE" <<EOF2
 default:
   # Outgoing emails configuration
   # See the examples below and the Rails guide for more configuration options:
@@ -45,7 +45,7 @@ default:
       enable_starttls_auto: true
       address: "${REDMINE_SMTP_ADDRESS}"
       port: "${REDMINE_SMTP_PORT}"
-      domain: "${REDMINE_SMTP_DOMAIN}" # 'your.domain.com' for GoogleApps
+      domain: "${REDMINE_SMTP_DOMAIN}"
       authentication: :plain
       user_name: "${REDMINE_SMTP_USER_NAME}"
       password: "${REDMINE_SMTP_PASSWORD}"
@@ -219,7 +219,7 @@ production:
 # specific configuration options for development environment
 # that overrides the default ones
 development:
-EOF
+EOF2
 
   echo "configuration.yml generated."
 fi
