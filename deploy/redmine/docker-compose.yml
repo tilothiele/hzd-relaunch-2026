@@ -2,10 +2,9 @@ version: "3.9"
 
 services:
   redmine:
-    image: redmine:${REDMINE_VERSION:-6}
     container_name: redmine
     restart: unless-stopped
-
+    build: .
 #    ports:
 #      - "${REDMINE_PORT:-8080}:3000"
     networks:

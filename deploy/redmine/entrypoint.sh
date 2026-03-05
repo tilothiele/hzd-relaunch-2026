@@ -1,12 +1,12 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -e
 
-# Prüfen, ob notwendige Variablen gesetzt sind
-: "${REDMINE_SMTP_ADDRESS:?env var not set}"
-: "${REDMINE_SMTP_USER_NAME:?env var not set}"
-: "${REDMINE_SMTP_PASSWORD:?env var not set}"
+CONFIG_FILE="/usr/src/redmine/config/configuration.yml"
 
-cat > configuration.yml <<EOF
+if [ ! -f "$CONFIG_FILE" ]; then
+  echo "Generating configuration.yml..."
+
+  cat > "$CONFIG_FILE" <<EOF
 default:
   # Outgoing emails configuration
   # See the examples below and the Rails guide for more configuration options:
@@ -199,4 +199,7 @@ production:
 development:
 EOF
 
-echo "config.yml generated."
+  echo "configuration.yml generated."
+fi
+
+exec "$@"
