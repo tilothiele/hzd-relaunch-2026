@@ -1,0 +1,8 @@
+production:
+  adapter: mysql2
+  host: "${REDMINE_DB_HOST}"
+  port: "${REDMINE_DB_PORT}"
+  username: "${REDMINE_DB_USER}"
+  password: "${REDMINE_DB_PASSWORD}"
+  database: "${REDMINE_DB_NAME}"
+  encoding: "utf8"
