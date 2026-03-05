@@ -12,12 +12,12 @@ default:
     delivery_method: :smtp
     smtp_settings:
       enable_starttls_auto: true
-      address: "${REDMINE_SMTP_ADDRESS}"
-      port: "${REDMINE_SMTP_PORT}"
-      domain: "${REDMINE_SMTP_DOMAIN}"
+      address: ${REDMINE_SMTP_ADDRESS}
+      port: ${REDMINE_SMTP_PORT}
+      domain: ${REDMINE_SMTP_DOMAIN}
       authentication: :plain
-      user_name: "${REDMINE_SMTP_USER_NAME}"
-      password: "${REDMINE_SMTP_PASSWORD}"
+      user_name: ${REDMINE_SMTP_USER_NAME}
+      password: ${REDMINE_SMTP_PASSWORD}
   #
   # ==== Sendmail command
   #
