@@ -5,13 +5,15 @@ set -euo pipefail
 # 0. .env laden
 #############################################
 
-if [ ! -f ".env" ]; then
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+if [ ! -f "$SCRIPT_DIR/.env" ]; then
   echo "Fehler: .env Datei nicht gefunden!"
   exit 1
 fi
 
 set -o allexport
-source .env
+source "$SCRIPT_DIR/.env"
 set +o allexport
 
 #############################################
