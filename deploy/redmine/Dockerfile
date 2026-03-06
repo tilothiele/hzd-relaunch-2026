@@ -4,7 +4,7 @@ COPY entrypoint.sh /entrypoint.sh
 COPY database.yml.template /database.yml.template
 COPY configuration.yml.template /configuration.yml.template
 RUN apt-get update \
-    && apt-get install -y gettext \
+    && apt-get install -y gettext cron \
     && chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
