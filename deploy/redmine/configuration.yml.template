@@ -19,6 +19,8 @@ default:
       authentication: :${REDMINE_SMTP_AUTH}
       user_name: ${REDMINE_SMTP_USER_NAME}
       password: ${REDMINE_SMTP_PASSWORD}
+      headers:
+        reply_to: ${SUPPORT_MAIL_USERNAME}
   #
   # ==== Sendmail command
   #
