@@ -9,10 +9,9 @@ module ProjectMailOverride
         if @project && @project.module_enabled?(:project_mail_override) && User.current.allowed_to?(:manage_project_mail_settings, @project)
           # Check if tab already exists (e.g. from hook)
           unless tabs.any? { |t| t[:name] == 'mail_override' }
-            puts "--- [ProjectMailOverride] ProjectsHelperPatch adding tab ---"
             tabs << {
               name: 'mail_override',
-              label: 'Mail Override',
+              label: :label_mail_override,
               partial: 'project_mail_settings/settings'
             }
           end

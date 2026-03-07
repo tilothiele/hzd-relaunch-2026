@@ -17,27 +17,15 @@ module ProjectMailOverride
       private
 
       def add_tab(context)
-        puts "--- [ProjectMailOverride] hook triggered (method: add_tab) ---"
         project = context[:project]
-        
-        unless project
-          puts "--- [ProjectMailOverride] No project in context! ---"
-          return
-        end
-
-        enabled = project.module_enabled?(:project_mail_override)
-        puts "--- [ProjectMailOverride] Project: #{project.identifier}, Module Enabled: #{enabled} ---"
-        
-        return unless enabled
-        
-        puts "--- [ProjectMailOverride] Adding settings tab ---"
+        return unless project && project.module_enabled?(:project_mail_override)
 
         tabs = context[:tabs]
         return unless tabs
 
         tabs << {
           name: 'mail_override',
-          label: 'Mail Override',
+          label: :label_mail_override,
           partial: 'project_mail_settings/settings'
         }
       end
