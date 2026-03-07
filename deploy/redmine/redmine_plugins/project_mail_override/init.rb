@@ -4,7 +4,7 @@ require_relative 'lib/project_mail_override/mailer_patch'
 
 Redmine::Plugin.register :project_mail_override do
   name 'Project Mail Override'
-  author 'Example'
+  author '<Tilo Thiele> t.thiele@hovawarte.com'
   description 'Override From and Reply-To per project'
   version '0.0.1'
   requires_redmine version_or_higher: '6.0.0'
@@ -24,4 +24,8 @@ Rails.configuration.to_prepare do
   Project.class_eval do
     has_one :project_mail_setting, dependent: :destroy
   end
+end
+
+Rails.configuration.to_prepare do
+  require_dependency 'project_mail_override/hooks'
 end
