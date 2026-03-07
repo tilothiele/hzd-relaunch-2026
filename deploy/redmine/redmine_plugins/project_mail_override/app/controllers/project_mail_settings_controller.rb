@@ -5,7 +5,7 @@ class ProjectMailSettingsController < ApplicationController
   def update
     setting = @project.project_mail_setting || @project.build_project_mail_setting
 
-    if setting.update(params.require(:project_mail_setting).permit(:from_address, :reply_to_address))
+    if setting.update(params.require(:project_mail_setting).permit(:from_address, :reply_to_address, :send_notification_on_create))
       flash[:notice] = 'Mail settings updated'
     end
 

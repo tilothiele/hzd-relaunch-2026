@@ -1,5 +1,3 @@
-<h2>MAIL OVERRIDE TEST</h2>
-
 <%
 mail_setting = @project.project_mail_setting || @project.build_project_mail_setting
 %>
@@ -28,6 +26,13 @@ mail_setting = @project.project_mail_setting || @project.build_project_mail_sett
          name="project_mail_setting[reply_to_address]"
          value="<%= mail_setting.reply_to_address %>"
          size="60">
+</p>
+
+<p>
+  <label>
+    <%= check_box_tag 'project_mail_setting[send_notification_on_create]', '1', mail_setting.send_notification_on_create %>
+    Send Notification on create Ticket
+  </label>
 </p>
 
 </div>
