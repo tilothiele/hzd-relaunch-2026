@@ -7,7 +7,8 @@ COPY receive_imap.sh.template /receive_imap.sh.template
 
 RUN apt-get update \
     && apt-get install -y gettext cron \
-    && chmod +x /entrypoint.sh
+    && chmod +x /entrypoint.sh \
+    && tree /usr/src/redmine
 
 COPY redmine_plugins/project_mail_override /usr/src/redmine/plugins/project_mail_override
 
