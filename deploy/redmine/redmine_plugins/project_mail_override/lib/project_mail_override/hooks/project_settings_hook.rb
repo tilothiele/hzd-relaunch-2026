@@ -1,13 +1,23 @@
-# plugins/project_mail_override/lib/project_mail_override/hooks/project_settings_hook.rb
-puts "--- [ProjectMailOverride] ProjectSettingsHook file loading ---"
-
 module ProjectMailOverride
   module Hooks
     class ProjectSettingsHook < Redmine::Hook::ViewListener
-      puts "--- [ProjectMailOverride] ProjectSettingsHook class defined ---"
-      
+      def self.instance
+        @instance ||= new
+      end
+
+      # Try both hook names for Redmine 5/6 compatibility
       def view_projects_settings_tabs(context = {})
-        puts "--- [ProjectMailOverride] view_projects_settings_tabs hook triggered ---"
+        add_tab(context)
+      end
+
+      def helper_projects_settings_tabs(context = {})
+        add_tab(context)
+      end
+
+      private
+
+      def add_tab(context)
+        puts "--- [ProjectMailOverride] hook triggered (method: add_tab) ---"
         project = context[:project]
         
         unless project
@@ -22,14 +32,14 @@ module ProjectMailOverride
         
         puts "--- [ProjectMailOverride] Adding settings tab ---"
 
-        tabs = context[:tabs] || []
+        tabs = context[:tabs]
+        return unless tabs
+
         tabs << {
           name: 'mail_override',
           label: 'Mail Override',
           partial: 'project_mail_settings/settings'
         }
-        # Redmine uses the return value or the modified array in some versions
-        return tabs
       end
     end
   end

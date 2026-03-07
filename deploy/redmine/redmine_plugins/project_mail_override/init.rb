@@ -27,9 +27,9 @@ def apply_project_mail_override_patches
   
   begin
     require "project_mail_override/hooks/project_settings_hook"
-    # Explicit registration for Redmine 6
-    Redmine::Hook.add_listener(ProjectMailOverride::Hooks::ProjectSettingsHook)
-    puts "--- [ProjectMailOverride] Hook registered ---"
+    # Explicit registration for Redmine 6 using an INSTANCE
+    Redmine::Hook.add_listener(ProjectMailOverride::Hooks::ProjectSettingsHook.instance)
+    puts "--- [ProjectMailOverride] Hook registered (instance) ---"
   rescue LoadError => e
     puts "--- [ProjectMailOverride] Error loading hook: #{e.message} ---"
   rescue => e
