@@ -20,9 +20,7 @@ Rails.configuration.to_prepare do
   Project.class_eval do
     has_one :project_mail_setting, dependent: :destroy
   end
-end
 
-Rails.configuration.to_prepare do
   require_dependency 'project_mail_override/hooks/project_settings_hook'
   ProjectMailOverride::Hooks::ProjectSettingsHook.new
 end
