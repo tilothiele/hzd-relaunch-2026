@@ -4,18 +4,30 @@ module ProjectMailOverride
       puts "--- [ProjectMailOverride] MailerPatch module loaded ---"
       def mail(headers = {}, &block)
         puts "--- [ProjectMailOverride] Mailer#mail called ---"
-        project = headers[:project]
-# ...
-
+        
+        # Try to find project from headers or instance variable (Redmine convention)
+        project = headers[:project] || @project
+        
         if project
           setting = project.project_mail_setting
-
           if setting
-            headers[:from] = setting.effective_from if setting.effective_from.present?
-            headers[:reply_to] = setting.effective_reply_to if setting.effective_reply_to.present?
+            # Use lowercase keys for ActionMailer compatibility
+            if setting.effective_from.present?
+              puts "--- [ProjectMailOverride] Overriding FROM: #{setting.effective_from} ---"
+              headers[:from] = setting.effective_from
+            end
+            
+            if setting.effective_reply_to.present?
+              puts "--- [ProjectMailOverride] Overriding REPLY_TO: #{setting.effective_reply_to} ---"
+              headers[:reply_to] = setting.effective_reply_to
+            end
           end
+        else
+          puts "--- [ProjectMailOverride] No project found in Mailer context ---"
         end
 
+        # Call super which will do the reverse_merge! in Redmine's Mailer
+        # If we set headers[:from], reverse_merge! should not overwrite it.
         super(headers, &block)
       end
     end
