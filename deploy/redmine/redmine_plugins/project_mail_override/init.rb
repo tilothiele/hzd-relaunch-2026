@@ -17,15 +17,25 @@ Redmine::Plugin.register :project_mail_override do
   end
 end
 
-Rails.application.config.to_prepare do
-  puts "--- [ProjectMailOverride] to_prepare running ---"
+def apply_patches
+  return if @patches_applied
+  puts "--- [ProjectMailOverride] applying patches ---"
   Rails.logger.info "[ProjectMailOverride] configured plugin and hooks begin"
 
   require "project_mail_override/mailer_patch"
   require "project_mail_override/hooks/project_settings_hook"
+
   # Ensure the hook is initialized
   ProjectMailOverride::Hooks::ProjectSettingsHook.instance
 
   Rails.logger.info "[ProjectMailOverride] configured plugin and hooks end"
+  @patches_applied = true
+end
 
+if Rails.application.initialized?
+  apply_patches
+else
+  Rails.application.config.to_prepare do
+    apply_patches
+  end
 end
