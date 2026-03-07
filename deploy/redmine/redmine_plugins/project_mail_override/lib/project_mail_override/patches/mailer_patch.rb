@@ -1,7 +1,7 @@
-# plugins/project_mail_override/lib/project_mail_override/patches/mailer_patch.rb
 module ProjectMailOverride
   module Patches
     module MailerPatch
+      puts "--- [ProjectMailOverride] MailerPatch module loaded ---"
       def mail(headers = {}, &block)
         puts "--- [ProjectMailOverride] Mailer#mail called ---"
         project = headers[:project]

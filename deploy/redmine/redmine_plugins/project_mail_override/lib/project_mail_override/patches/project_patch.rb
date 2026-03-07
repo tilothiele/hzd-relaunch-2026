@@ -1,7 +1,7 @@
-# plugins/project_mail_override/lib/project_mail_override/patches/project_patch.rb
 module ProjectMailOverride
   module Patches
     module ProjectPatch
+      puts "--- [ProjectMailOverride] ProjectPatch module loaded ---"
       def self.prepended(base)
         puts "--- [ProjectMailOverride] ProjectPatch prepended ---"
         base.class_eval do

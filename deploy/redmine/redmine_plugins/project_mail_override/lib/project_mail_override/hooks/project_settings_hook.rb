@@ -4,6 +4,8 @@ puts "--- [ProjectMailOverride] ProjectSettingsHook file loading ---"
 module ProjectMailOverride
   module Hooks
     class ProjectSettingsHook < Redmine::Hook::ViewListener
+      puts "--- [ProjectMailOverride] ProjectSettingsHook class defined ---"
+      
       def view_projects_settings_tabs(context = {})
         puts "--- [ProjectMailOverride] view_projects_settings_tabs hook called ---"
         Rails.logger.info "[ProjectMailOverride] Hook called"
