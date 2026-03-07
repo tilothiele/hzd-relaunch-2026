@@ -1,4 +1,6 @@
 # plugins/project_mail_override/lib/project_mail_override/hooks/project_settings_hook.rb
+puts "--- [ProjectMailOverride] ProjectSettingsHook file loading ---"
+
 module ProjectMailOverride
   module Hooks
     class ProjectSettingsHook < Redmine::Hook::ViewListener

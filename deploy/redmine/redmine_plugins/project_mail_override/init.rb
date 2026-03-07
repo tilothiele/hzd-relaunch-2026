@@ -18,11 +18,14 @@ Redmine::Plugin.register :project_mail_override do
 end
 
 # Add lib to load path
-lib_dir = File.join(File.dirname(__FILE__), 'lib')
+lib_dir = File.expand_path('../lib', __FILE__)
+puts "--- [ProjectMailOverride] lib_dir: #{lib_dir} ---"
 $LOAD_PATH.unshift(lib_dir) unless $LOAD_PATH.include?(lib_dir)
 
 # Initialize hook
+puts "--- [ProjectMailOverride] Requiring hook ---"
 require "project_mail_override/hooks/project_settings_hook"
+puts "--- [ProjectMailOverride] Hook required ---"
 
 # Apply patches using on_load for better performance and reliability
 ActiveSupport.on_load(:active_record) do
