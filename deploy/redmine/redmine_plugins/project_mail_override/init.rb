@@ -1,7 +1,7 @@
 # plugins/project_mail_override/init.rb
 
 require_relative 'lib/project_mail_override/mailer_patch'
-require_relative 'lib/project_mail_override/hooks'
+require_relative 'lib/project_mail_override/project_settings_hook'
 
 Redmine::Plugin.register :project_mail_override do
   name 'Project Mail Override'
