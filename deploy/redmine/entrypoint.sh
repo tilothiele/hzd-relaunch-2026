@@ -16,5 +16,9 @@ crontab -u redmine -l 2>/dev/null | { cat; echo "$CMD"; } | crontab -u redmine -
 
 service cron start
 
+cd /usr/src/redmine || exit 1
+bundle exec rake db:migrate RAILS_ENV=production
+bundle exec rake redmine:plugins:migrate RAILS_ENV=production
+
 exec "$@"
 
