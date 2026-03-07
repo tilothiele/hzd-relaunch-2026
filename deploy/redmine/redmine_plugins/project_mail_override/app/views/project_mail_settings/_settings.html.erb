@@ -30,6 +30,7 @@ mail_setting = @project.project_mail_setting || @project.build_project_mail_sett
 
 <p>
   <label>
+    <%= hidden_field_tag 'project_mail_setting[send_notification_on_create]', '0' %>
     <%= check_box_tag 'project_mail_setting[send_notification_on_create]', '1', mail_setting.send_notification_on_create %>
     <%= l(:label_send_notification_on_create) %>
   </label>
