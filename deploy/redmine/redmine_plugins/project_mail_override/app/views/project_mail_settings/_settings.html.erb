@@ -2,27 +2,36 @@
 mail_setting = @project.project_mail_setting || @project.build_project_mail_setting
 %>
 
-<%= form_with(model: mail_setting,
-              url: project_mail_settings_path(@project),
-              method: :put,
-              local: true) do |f| %>
+<%= form_with(
+      url: project_mail_settings_path(@project),
+      method: :put,
+      local: true
+    ) do %>
 
 <div class="box tabular">
 
-  <p>
-    <%= f.label :from_address, "From address" %><br>
-    <%= f.text_field :from_address, size: 60 %><br>
-    <em>Leer = Systemwert (<%= Setting.mail_from %>)</em>
-  </p>
+<p>
+  <label for="from_address">From address</label><br>
+  <input type="text"
+         name="project_mail_setting[from_address]"
+         value="<%= mail_setting.from_address %>"
+         size="60">
+  <br>
+  <em>Leer = Systemwert (<%= Setting.mail_from %>)</em>
+</p>
 
-  <p>
-    <%= f.label :reply_to_address, "Reply-To address" %><br>
-    <%= f.text_field :reply_to_address, size: 60 %><br>
-    <em>Leer = kein Override</em>
-  </p>
+<p>
+  <label for="reply_to_address">Reply-To address</label><br>
+  <input type="text"
+         name="project_mail_setting[reply_to_address]"
+         value="<%= mail_setting.reply_to_address %>"
+         size="60">
+</p>
 
 </div>
 
-<%= submit_tag l(:button_save) %>
+<p>
+  <%= submit_tag l(:button_save) %>
+</p>
 
 <% end %>
