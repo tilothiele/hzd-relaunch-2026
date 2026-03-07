@@ -1,5 +1,8 @@
 # plugins/project_mail_override/init.rb
 
+puts "--- [ProjectMailOverride] init.rb loaded ---"
+Rails.logger.info "[ProjectMailOverride] init.rb loaded"
+
 Redmine::Plugin.register :project_mail_override do
   name 'Project Mail Override'
   author '<Tilo Thiele> t.thiele@hovawarte.com'
@@ -23,9 +26,11 @@ require "project_mail_override/hooks/project_settings_hook"
 
 # Apply patches using on_load for better performance and reliability
 ActiveSupport.on_load(:active_record) do
+  puts "--- [ProjectMailOverride] active_record on_load ---"
   require "project_mail_override/patches/project_patch"
 end
 
 ActiveSupport.on_load(:action_mailer) do
+  puts "--- [ProjectMailOverride] action_mailer on_load ---"
   require "project_mail_override/patches/mailer_patch"
 end

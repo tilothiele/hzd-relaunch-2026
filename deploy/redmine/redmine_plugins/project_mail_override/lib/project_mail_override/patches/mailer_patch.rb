@@ -3,7 +3,9 @@ module ProjectMailOverride
   module Patches
     module MailerPatch
       def mail(headers = {}, &block)
+        puts "--- [ProjectMailOverride] Mailer#mail called ---"
         project = headers[:project]
+# ...
 
         if project
           setting = project.project_mail_setting
