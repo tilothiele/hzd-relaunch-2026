@@ -1,10 +1,5 @@
 # plugins/project_mail_override/init.rb
 
-puts "--- [ProjectMailOverride] init.rb loaded ---"
-Rails.logger.info "[ProjectMailOverride] init.rb is being loaded"
-puts "--- [ProjectMailOverride] Rails.application.initialized? = #{Rails.application.initialized?}"
-puts "--- [ProjectMailOverride] Rails.env = #{Rails.env}"
-
 Redmine::Plugin.register :project_mail_override do
   name 'Project Mail Override'
   author '<Tilo Thiele> t.thiele@hovawarte.com'
@@ -18,34 +13,19 @@ Redmine::Plugin.register :project_mail_override do
                require: :member
   end
 end
+
 # Add lib to load path
 lib_dir = File.join(File.dirname(__FILE__), 'lib')
 $LOAD_PATH.unshift(lib_dir) unless $LOAD_PATH.include?(lib_dir)
 
-def apply_patches
-  return if @patches_applied
-  puts "--- [ProjectMailOverride] applying patches ---"
-  Rails.logger.info "[ProjectMailOverride] configured plugin and hooks begin"
+# Initialize hook
+require "project_mail_override/hooks/project_settings_hook"
 
-  require "project_mail_override/mailer_patch"
-  require "project_mail_override/hooks/project_settings_hook"
-
-  # Ensure the hook is initialized
-  ProjectMailOverride::Hooks::ProjectSettingsHook.instance
-
-  Rails.logger.info "[ProjectMailOverride] configured plugin and hooks end"
-  @patches_applied = true
+# Apply patches using on_load for better performance and reliability
+ActiveSupport.on_load(:active_record) do
+  require "project_mail_override/patches/project_patch"
 end
 
-if Rails.application.initialized?
-  apply_patches
-else
-  Rails.application.config.to_prepare do
-    apply_patches
-  end
-
-  # Fallback for some environments
-  Rails.application.config.after_initialize do
-    apply_patches
-  end
+ActiveSupport.on_load(:action_mailer) do
+  require "project_mail_override/patches/mailer_patch"
 end
