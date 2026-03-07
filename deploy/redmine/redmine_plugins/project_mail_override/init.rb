@@ -23,4 +23,7 @@ Rails.configuration.to_prepare do
 
   require_dependency 'project_mail_override/hooks/project_settings_hook'
   ProjectMailOverride::Hooks::ProjectSettingsHook.new
+
+  Rails.logger.info "[ProjectMailOverride] configured plugin and hooks"
+
 end
