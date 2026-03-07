@@ -2,6 +2,8 @@
 
 puts "--- [ProjectMailOverride] init.rb loaded ---"
 Rails.logger.info "[ProjectMailOverride] init.rb is being loaded"
+puts "--- [ProjectMailOverride] Rails.application.initialized? = #{Rails.application.initialized?}"
+puts "--- [ProjectMailOverride] Rails.env = #{Rails.env}"
 
 Redmine::Plugin.register :project_mail_override do
   name 'Project Mail Override'
@@ -36,6 +38,11 @@ if Rails.application.initialized?
   apply_patches
 else
   Rails.application.config.to_prepare do
+    apply_patches
+  end
+
+  # Fallback for some environments
+  Rails.application.config.after_initialize do
     apply_patches
   end
 end
