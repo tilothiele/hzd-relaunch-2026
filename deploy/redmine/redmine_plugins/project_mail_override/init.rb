@@ -18,6 +18,9 @@ Redmine::Plugin.register :project_mail_override do
                require: :member
   end
 end
+# Add lib to load path
+lib_dir = File.join(File.dirname(__FILE__), 'lib')
+$LOAD_PATH.unshift(lib_dir) unless $LOAD_PATH.include?(lib_dir)
 
 def apply_patches
   return if @patches_applied
