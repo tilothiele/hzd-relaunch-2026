@@ -1,5 +1,8 @@
 # plugins/project_mail_override/init.rb
 
+puts "--- [ProjectMailOverride] init.rb loaded ---"
+Rails.logger.info "[ProjectMailOverride] init.rb is being loaded"
+
 Redmine::Plugin.register :project_mail_override do
   name 'Project Mail Override'
   author '<Tilo Thiele> t.thiele@hovawarte.com'
@@ -14,16 +17,14 @@ Redmine::Plugin.register :project_mail_override do
   end
 end
 
-Rails.configuration.to_prepare do
+Rails.application.config.to_prepare do
+  puts "--- [ProjectMailOverride] to_prepare running ---"
   Rails.logger.info "[ProjectMailOverride] configured plugin and hooks begin"
 
-  require_dependency 'project'
-  Project.class_eval do
-    has_one :project_mail_setting, dependent: :destroy
-  end
-
-  require_dependency 'project_mail_override/hooks/project_settings_hook'
-  ProjectMailOverride::Hooks::ProjectSettingsHook.new
+  require "project_mail_override/mailer_patch"
+  require "project_mail_override/hooks/project_settings_hook"
+  # Ensure the hook is initialized
+  ProjectMailOverride::Hooks::ProjectSettingsHook.instance
 
   Rails.logger.info "[ProjectMailOverride] configured plugin and hooks end"
 
