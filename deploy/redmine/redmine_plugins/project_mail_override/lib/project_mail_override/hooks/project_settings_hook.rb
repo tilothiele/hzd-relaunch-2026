@@ -1,5 +1,6 @@
 module ProjectMailOverride
   module Hooks
+    puts "--- [ProjectMailOverride] ProjectSettingsHook file loading ---"
     class ProjectSettingsHook < Redmine::Hook::ViewListener
       def self.instance
         @instance ||= new

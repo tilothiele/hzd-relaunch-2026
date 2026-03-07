@@ -1,5 +1,6 @@
 module ProjectMailOverride
   module Hooks
+    puts "--- [ProjectMailOverride] IssueHook file loading ---"
     class IssueHook < Redmine::Hook::Listener
       def controller_issues_new_after_save(context = {})
         puts "--- [ProjectMailOverride] controller_issues_new_after_save hook triggered ---"
