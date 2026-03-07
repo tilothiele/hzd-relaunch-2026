@@ -5,7 +5,7 @@ module ProjectMailOverride
         context[:tabs] << {
           name: 'mail_override',
           label: 'Mail Override',
-          action: :manage_project,
+          action: :manage_project_mail_settings,
           partial: 'project_mail_settings/settings'
         }
       end
