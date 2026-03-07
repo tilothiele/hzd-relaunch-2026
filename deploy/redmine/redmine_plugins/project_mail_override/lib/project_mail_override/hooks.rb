@@ -1,10 +1,14 @@
-# plugins/project_mail_override/lib/project_mail_override/hooks.rb
-
 module ProjectMailOverride
   module Hooks
     class ProjectSettingsHook < Redmine::Hook::ViewListener
-      render_on :view_projects_settings_tabs,
-                partial: 'project_mail_settings/form'
+      def view_projects_settings_tabs(context = {})
+        context[:tabs] << {
+          name: 'mail_override',
+          label: 'Mail Override',
+          action: :manage_project,
+          partial: 'project_mail_settings/settings'
+        }
+      end
     end
   end
 end
