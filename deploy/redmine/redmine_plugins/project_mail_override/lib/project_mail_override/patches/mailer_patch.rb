@@ -5,29 +5,37 @@ module ProjectMailOverride
       def mail(headers = {}, &block)
         puts "--- [ProjectMailOverride] Mailer#mail called ---"
         
-        # Try to find project from headers or instance variable (Redmine convention)
-        project = headers[:project] || @project
+        # Try to find project from various sources common in Redmine Mailer methods
+        project = headers[:project]
+        project ||= @project
+        project ||= @issue.project if @issue.respond_to?(:project)
+        project ||= @journal.project if @journal.respond_to?(:project)
+        project ||= @journal.journalized.project if @journal && @journal.respond_to?(:journalized) && @journal.journalized.respond_to?(:project)
+        project ||= @message.project if @message.respond_to?(:project)
+        project ||= @wiki_content.project if @wiki_content.respond_to?(:project)
         
         if project
+          puts "--- [ProjectMailOverride] Detected context project: #{project.identifier} ---"
           setting = project.project_mail_setting
           if setting
-            # Use lowercase keys for ActionMailer compatibility
+            # Aggressively override both Symbol and String keys to win against reverse_merge!
             if setting.effective_from.present?
               puts "--- [ProjectMailOverride] Overriding FROM: #{setting.effective_from} ---"
               headers[:from] = setting.effective_from
+              headers['From'] = setting.effective_from
             end
             
             if setting.effective_reply_to.present?
-              puts "--- [ProjectMailOverride] Overriding REPLY_TO: #{setting.effective_reply_to} ---"
+              puts "--- [ProjectMailOverride] Overriding REPLY-TO: #{setting.effective_reply_to} ---"
               headers[:reply_to] = setting.effective_reply_to
+              headers['Reply-To'] = setting.effective_reply_to
+              headers['Reply-to'] = setting.effective_reply_to
             end
           end
         else
-          puts "--- [ProjectMailOverride] No project found in Mailer context ---"
+          puts "--- [ProjectMailOverride] FAILED to detect project context in Mailer#mail ---"
         end
 
-        # Call super which will do the reverse_merge! in Redmine's Mailer
-        # If we set headers[:from], reverse_merge! should not overwrite it.
         super(headers, &block)
       end
     end
