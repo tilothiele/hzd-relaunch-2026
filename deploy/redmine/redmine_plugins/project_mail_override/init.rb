@@ -1,15 +1,14 @@
 # plugins/project_mail_override/init.rb
 
-puts "--- [ProjectMailOverride] init.rb loaded ---"
-Rails.logger.info "[ProjectMailOverride] init.rb loaded"
+puts "--- [ProjectMailOverride] init.rb evaluation start ---"
 
 Redmine::Plugin.register :project_mail_override do
   name 'Project Mail Override'
   author '<Tilo Thiele> t.thiele@hovawarte.com'
   description 'Override From and Reply-To per project'
   version '0.0.1'
-  requires_redmine version_or_higher: '6.0.0'
-
+  requires_redmine version_or_higher: '5.0.0'
+  
   project_module :project_mail_override do
     permission :manage_project_mail_settings,
                { project_mail_settings: [:edit, :update] },
@@ -18,25 +17,47 @@ Redmine::Plugin.register :project_mail_override do
 end
 
 # Add lib to load path
-lib_dir = File.join(File.dirname(__FILE__), 'lib')
-puts "--- [ProjectMailOverride] lib_dir: #{lib_dir} ---"
+lib_dir = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib_dir) unless $LOAD_PATH.include?(lib_dir)
 
-# Initialize hook
-hook_file = File.join(lib_dir, 'project_mail_override', 'hooks', 'project_settings_hook.rb')
-puts "--- [ProjectMailOverride] Checking hook_file: #{hook_file} exists? #{File.exist?(hook_file)} ---"
+# Define initialization logic
+def apply_project_mail_override_patches
+  return if @project_mail_override_patches_applied
+  puts "--- [ProjectMailOverride] apply_project_mail_override_patches start ---"
+  
+  begin
+    require "project_mail_override/hooks/project_settings_hook"
+    # Explicit registration for Redmine 6
+    Redmine::Hook.add_listener(ProjectMailOverride::Hooks::ProjectSettingsHook)
+    puts "--- [ProjectMailOverride] Hook registered ---"
+  rescue LoadError => e
+    puts "--- [ProjectMailOverride] Error loading hook: #{e.message} ---"
+  rescue => e
+    puts "--- [ProjectMailOverride] Unexpected error loading hook: #{e.message} ---"
+  end
 
-puts "--- [ProjectMailOverride] Requiring hook ---"
-require "project_mail_override/hooks/project_settings_hook"
-puts "--- [ProjectMailOverride] Hook path in $LOADED_FEATURES: #{$LOADED_FEATURES.grep(/project_settings_hook/).first} ---"
+  begin
+    require "project_mail_override/patches/project_patch"
+    require "project_mail_override/patches/mailer_patch"
+    puts "--- [ProjectMailOverride] Patches required ---"
+  rescue LoadError => e
+    puts "--- [ProjectMailOverride] Error loading patches: #{e.message} ---"
+  rescue => e
+    puts "--- [ProjectMailOverride] Unexpected error loading patches: #{e.message} ---"
+  end
 
-# Apply patches using on_load for better performance and reliability
-ActiveSupport.on_load(:active_record) do
-  puts "--- [ProjectMailOverride] active_record on_load ---"
-  require "project_mail_override/patches/project_patch"
+  @project_mail_override_patches_applied = true
+  puts "--- [ProjectMailOverride] apply_project_mail_override_patches end ---"
 end
 
-ActiveSupport.on_load(:action_mailer) do
-  puts "--- [ProjectMailOverride] action_mailer on_load ---"
-  require "project_mail_override/patches/mailer_patch"
+# Run initialization in two possible spots to ensure it fires in any environment
+Rails.application.config.to_prepare do
+  apply_project_mail_override_patches
 end
+
+# Fallback for some production server configurations
+ActiveSupport.on_load(:after_initialize) do
+  apply_project_mail_override_patches
+end
+
+puts "--- [ProjectMailOverride] init.rb evaluation end ---"
