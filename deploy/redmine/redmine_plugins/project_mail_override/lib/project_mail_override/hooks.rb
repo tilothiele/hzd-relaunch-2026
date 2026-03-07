@@ -15,6 +15,8 @@ module ProjectMailOverride
         }
 
         Rails.logger.info "[ProjectMailOverride] Tab added: #{tabs.map { |t| t[:name] }}"
+
+        context[:tabs] = tabs
       end
     end
   end
