@@ -7,10 +7,20 @@ module ProjectMailOverride
       puts "--- [ProjectMailOverride] ProjectSettingsHook class defined ---"
       
       def view_projects_settings_tabs(context = {})
+        puts "--- [ProjectMailOverride] view_projects_settings_tabs hook triggered ---"
         project = context[:project]
-        return unless project && project.module_enabled?(:project_mail_override)
         
-        puts "--- [ProjectMailOverride] Adding settings tab for project #{project.identifier} ---"
+        unless project
+          puts "--- [ProjectMailOverride] No project in context! ---"
+          return
+        end
+
+        enabled = project.module_enabled?(:project_mail_override)
+        puts "--- [ProjectMailOverride] Project: #{project.identifier}, Module Enabled: #{enabled} ---"
+        
+        return unless enabled
+        
+        puts "--- [ProjectMailOverride] Adding settings tab ---"
 
         tabs = context[:tabs] || []
         tabs << {
