@@ -28,5 +28,5 @@ Rails.configuration.to_prepare do
 end
 
 Rails.configuration.to_prepare do
-  require_dependency 'project_mail_override/hooks'
+  require_dependency 'project_mail_override/project_settings_hook'
 end
