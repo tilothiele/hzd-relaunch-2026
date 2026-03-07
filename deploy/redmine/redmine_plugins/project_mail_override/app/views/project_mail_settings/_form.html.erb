@@ -1,18 +1,9 @@
-<%# app/views/project_mail_settings/_form.html.erb %>
-<%# muss ein FormBuilder für das Projekt haben %>
+<%
+tabs = [{
+  name: 'mail_override',
+  label: 'Mail Override',
+  partial: 'project_mail_settings/settings',
+}]
+%>
 
-<%= form_with(model: @mail_setting, url: project_mail_settings_path(@project), local: true) do |f| %>
-  <p>
-    <%= f.label :from_address, "From" %><br>
-    <%= f.text_field :from_address %><br>
-    <em>Leer = Systemwert</em>
-  </p>
-
-  <p>
-    <%= f.label :reply_to_address, "Reply-To" %><br>
-    <%= f.text_field :reply_to_address %><br>
-    <em>Leer = kein Override</em>
-  </p>
-
-  <%= f.submit 'Speichern' %>
-<% end %>
+<%= tabs_for_project_settings(@project, tabs) %>
