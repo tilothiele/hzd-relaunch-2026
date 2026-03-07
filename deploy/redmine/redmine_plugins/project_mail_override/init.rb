@@ -1,5 +1,8 @@
 # plugins/project_mail_override/init.rb
 
+require_dependency 'project_mail_override/hooks/project_settings_hook'
+ProjectMailOverride::Hooks::ProjectSettingsHook.new
+
 Redmine::Plugin.register :project_mail_override do
   name 'Project Mail Override'
   author '<Tilo Thiele> t.thiele@hovawarte.com'
@@ -21,8 +24,6 @@ Rails.configuration.to_prepare do
     has_one :project_mail_setting, dependent: :destroy
   end
 
-  require_dependency 'project_mail_override/hooks/project_settings_hook'
-  ProjectMailOverride::Hooks::ProjectSettingsHook.new
 
   Rails.logger.info "[ProjectMailOverride] configured plugin and hooks"
 
