@@ -1,4 +1,5 @@
 en:
   label_mail_override: "Mail Override"
+  label_send_notification_on_create: "Send Notification on create Ticket"
   permission_manage_project_mail_settings: "Manage project mail settings"
   project_module_project_mail_override: "Mail Override"
