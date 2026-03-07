@@ -7,16 +7,19 @@ module ProjectMailOverride
       puts "--- [ProjectMailOverride] ProjectSettingsHook class defined ---"
       
       def view_projects_settings_tabs(context = {})
-        puts "--- [ProjectMailOverride] view_projects_settings_tabs hook called ---"
-        Rails.logger.info "[ProjectMailOverride] Hook called"
+        project = context[:project]
+        return unless project && project.module_enabled?(:project_mail_override)
+        
+        puts "--- [ProjectMailOverride] Adding settings tab for project #{project.identifier} ---"
 
-        tabs = context[:tabs] ||= []
+        tabs = context[:tabs] || []
         tabs << {
           name: 'mail_override',
           label: 'Mail Override',
           partial: 'project_mail_settings/settings'
         }
-        context[:tabs] = tabs
+        # Redmine uses the return value or the modified array in some versions
+        return tabs
       end
     end
   end
