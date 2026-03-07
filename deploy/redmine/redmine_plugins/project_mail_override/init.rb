@@ -1,8 +1,5 @@
 # plugins/project_mail_override/init.rb
 
-require_relative 'lib/project_mail_override/mailer_patch'
-require_relative 'lib/project_mail_override/project_settings_hook'
-
 Redmine::Plugin.register :project_mail_override do
   name 'Project Mail Override'
   author '<Tilo Thiele> t.thiele@hovawarte.com'
@@ -16,8 +13,6 @@ Redmine::Plugin.register :project_mail_override do
                require: :member
   end
 end
-
-# init.rb ergänzen
 
 Rails.configuration.to_prepare do
   require_dependency 'project'
