@@ -14,6 +14,9 @@ export PATH=/usr/local/bundle/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/
 cd /usr/src/redmine || exit 1
 
 export BUNDLE_APP_CONFIG=/usr/local/bundle
-export SECRET_KEY_BASE=...
+export SECRET_KEY_BASE=${SECRET_KEY_BASE}
+export SUPPORT_MAIL_HOST=${SUPPORT_MAIL_HOST}
+export SUPPORT_MAIL_USERNAME=${SUPPORT_MAIL_USERNAME}
+export SUPPORT_MAIL_PASSWORD=${SUPPORT_MAIL_PASSWORD}
 
 rake -f ./Rakefile redmine:email:receive_imap RAILS_ENV="production" host=$SUPPORT_MAIL_HOST username=$SUPPORT_MAIL_USERNAME password="$SUPPORT_MAIL_PASSWORD" unknown_user=create project=support allow_override=from no_permission_check=1 no_account_notice=1
