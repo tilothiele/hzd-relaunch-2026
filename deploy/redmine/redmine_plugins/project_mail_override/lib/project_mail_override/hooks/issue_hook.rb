@@ -2,51 +2,43 @@ module ProjectMailOverride
   module Hooks
     puts "--- [ProjectMailOverride] IssueHook file loading ---"
     class IssueHook < Redmine::Hook::Listener
+      def controller_issues_new_before_save(context = {})
+        log_hook("controller_issues_new_before_save", context)
+      end
+
       def controller_issues_new_after_save(context = {})
-        puts "--- [ProjectMailOverride] controller_issues_new_after_save hook triggered ---"
+        log_hook("controller_issues_new_after_save", context)
+        
         issue = context[:issue]
-        unless issue
-          puts "--- [ProjectMailOverride] No issue in context ---"
-          return
-        end
+        return unless issue && issue.id
 
         project = issue.project
-        unless project
-          puts "--- [ProjectMailOverride] Issue #{issue.id} has no project ---"
-          return
-        end
-
-        puts "--- [ProjectMailOverride] Processing issue #{issue.id} in project #{project.identifier} ---"
-
-        unless project.module_enabled?(:project_mail_override)
-          puts "--- [ProjectMailOverride] Module not enabled for project ---"
-          return
-        end
+        return unless project && project.module_enabled?(:project_mail_override)
 
         setting = project.project_mail_setting
-        unless setting
-          puts "--- [ProjectMailOverride] No mail setting found for project ---"
-          return
-        end
-
-        puts "--- [ProjectMailOverride] send_notification_on_create: #{setting.send_notification_on_create} ---"
-        return unless setting.send_notification_on_create?
+        return unless setting
+        
+        # Check if method exists (in case of missing migration)
+        return unless setting.respond_to?(:send_notification_on_create?) && setting.send_notification_on_create?
 
         creator = issue.author
         if creator && creator.active?
-          puts "--- [ProjectMailOverride] Sending notification to creator: #{creator.login} ---"
+          Rails.logger.info "[ProjectMailOverride] Sending creation notification to #{creator.login}"
           begin
-            # Redmine 6 uses deliver_now or just deliver depending on config
-            # But let's check Rails 7 ActionMailer
             Mailer.issue_add(issue, [creator], []).deliver_now
-            puts "--- [ProjectMailOverride] Notification delivered ---"
+            Rails.logger.info "[ProjectMailOverride] Notification delivered"
           rescue => e
-            puts "--- [ProjectMailOverride] Error sending notification: #{e.message} ---"
             Rails.logger.error "[ProjectMailOverride] Error sending notification: #{e.message}"
           end
-        else
-          puts "--- [ProjectMailOverride] Creator not found or not active ---"
         end
+      end
+
+      private
+
+      def log_hook(name, context)
+        msg = "--- [ProjectMailOverride] #{name} hook triggered (Issue: #{context[:issue]&.id || 'new'}) ---"
+        puts msg
+        Rails.logger.info msg
       end
     end
   end
