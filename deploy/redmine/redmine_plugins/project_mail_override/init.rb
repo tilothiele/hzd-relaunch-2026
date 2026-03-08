@@ -25,10 +25,8 @@ def apply_project_mail_override_patches
   begin
     puts "--- [ProjectMailOverride] Loading hooks ---"
     require "project_mail_override/hooks/project_settings_hook"
-    require "project_mail_override/hooks/issue_hook"
     # Registration as CLASS for Redmine
     Redmine::Hook.add_listener(ProjectMailOverride::Hooks::ProjectSettingsHook)
-    Redmine::Hook.add_listener(ProjectMailOverride::Hooks::IssueHook)
     puts "--- [ProjectMailOverride] Hooks registered (class) ---"
   rescue => e
     puts "--- [ProjectMailOverride] Error loading hook: #{e.message} ---"
@@ -40,6 +38,7 @@ def apply_project_mail_override_patches
     require "project_mail_override/patches/project_patch"
     require "project_mail_override/patches/mailer_patch"
     require "project_mail_override/patches/projects_helper_patch"
+    require "project_mail_override/patches/issue_patch"
   rescue => e
     Rails.logger.error "[ProjectMailOverride] Error loading patches: #{e.message}"
   end
