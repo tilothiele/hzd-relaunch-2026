@@ -1,6 +1,7 @@
 module ProjectMailOverride
   module Patches
     module IssuePatch
+      puts "--- [ProjectMailOverride] IssuePatch module loaded ---"
       def self.prepended(base)
         base.class_eval do
           after_create_commit :send_project_mail_override_notification
