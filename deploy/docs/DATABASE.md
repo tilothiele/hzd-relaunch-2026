@@ -1,5 +1,6 @@
+# Postgres
 
-Datenbank anlegen:
+Postgres Datenbank anlegen (hier z.B. kestra):
 
 ```
 sudo -u postgres psql
@@ -17,5 +18,6 @@ ALTER DATABASE kestra OWNER TO kestra;
 
 ALTER SCHEMA public OWNER TO kestra;
 
-
 ```
+
+# Mysql
