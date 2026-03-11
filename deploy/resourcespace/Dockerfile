@@ -57,6 +57,8 @@ RUN rm -f index.html \
  && chmod -R 777 include/
 
 
+COPY config.php.template /config.php.template
+
 # Copy custom entrypoint script
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

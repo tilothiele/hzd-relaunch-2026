@@ -8,22 +8,22 @@
 # Options may be copied from config.default.php and configured here.
 
 # MySQL database settings
-$mysql_server = 'gssgosw8osko8gko4kgosc0g';
-$mysql_username = 'resourcespace';
-$mysql_password = 'ilXwdmpc1JtlL3m8KJ3R';
-$mysql_db = 'resourcespace';
+$mysql_server = '${MYSQL_HOST}';
+$mysql_username = '${MYSQL_USER}';
+$mysql_password = '${MYSQL_PASS}';
+$mysql_db = '${MYSQL_DB}';
 
 $mysql_bin_path = '/usr/bin';
 
 # Base URL of the installation
-$baseurl = 'https://resourcespace.hovawarte.com';
+$baseurl = '${SERVICE_URL_RESOURCESPACE}';
 
 # Email settings
-$email_notify = 't.thiele@hovawarte.com';
-$email_from = 'noreply@hovawarte.com';
+$email_notify = '${EMAIL_NOTIFY}';
+$email_from = '${EMAIL_FROM}';
 # Secure keys
-$scramble_key = 'f61bd93d4725a60fcf0a73aec82b57e89b1a8901b4165ab3b933c5a391e8256c';
-$api_scramble_key = '93f11f9deb487dd9933c2b40c0baded25913364390eaa849a4421d65d3d9b22e';
+$scramble_key = '${SCRAMBLE_KEY}';
+$api_scramble_key = '${API_SCRAMBLE_KEY}';
 
 # Paths
 $imagemagick_path = '/usr/bin';
@@ -37,12 +37,12 @@ $defaultlanguage = 'de';
 #SMTP settings
 $use_smtp = true;
 $use_phpmailer = true;
-$smtp_secure = 'tls';
-$smtp_host = 'mail.your-server.de';
-$smtp_port = 993;
+$smtp_secure = '${SMTP_SECURE}';
+$smtp_host = '${SMTP_HOST}';
+$smtp_port = ${SMTP_PORT};
 $smtp_auth = true;
-$smtp_username = 't.thiele@hovawarte.com';
-$smtp_password = '84w9K9am18AndX72';
+$smtp_username = '${SMTP_USERNAME}';
+$smtp_password = '${SMTP_PASSWORD}';
 
 $homeanim_folder = 'filestore/system/slideshow_0fef059d91dc3a4';
 
