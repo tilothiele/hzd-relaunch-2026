@@ -3,7 +3,7 @@
 
 services:
   nextcloud:
-    image: nextcloud:33.0.0-fpm
+    image: nextcloud:33.0.0
     container_name: nextcloud
     restart: always
     networks:
