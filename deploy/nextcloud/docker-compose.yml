@@ -1,18 +1,28 @@
-version: '3'
 volumes:
- data:
- config:
+   nextcloud-config:
+   nextcloud-data:
+   nextcloud-apps:
+   nextcloud-custom_apps:
 services:
  nextcloud:
-  image: nextcloud
+  image: nextcloud:33.0.0-fpm
   container_name: nextcloud
   restart: always
-  ports:
-   - 8080:80
-  depends_on:
-   - nextcloud-db
+  networks:
+   - coolify
+  environment:
+   - POSTGRES_DB=${PG_NAME}
+   - POSTGRES_USER=${PG_USER}
+   - POSTGRES_PASSWORD=${PG_PASS}
+   - POSTGRES_HOST=${PG_HOST}
+   - NEXTCLOUD_TRUSTED_DOMAINS=cloud.hovawarte.com
+   - NEXTCLOUD_ADMIN_USER=${NC_ADMIN_USER}
+   - NEXTCLOUD_ADMIN_PASSWORD=${NC_ADMIN_PASSWORD}
   volumes:
-   - config:/var/www/html/config
-   - data:/var/www/html/data
-   - ./apps:/var/www/html/apps
-   - ./custom_apps:/var/www/html/custom_apps
+   - nextcloud-config:/var/www/html/config
+   - nextcloud-data:/var/www/html/data
+   - nextcloud-apps:/var/www/html/apps
+   - nextcloud-custom_apps:/var/www/html/custom_apps
+networks:
+ coolify:
+  external: true
