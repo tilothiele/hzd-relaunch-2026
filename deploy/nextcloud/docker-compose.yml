@@ -1,8 +1,3 @@
-volumes:
-   nextcloud-config:
-   nextcloud-data:
-   nextcloud-apps:
-   nextcloud-custom_apps:
 services:
  nextcloud:
   image: nextcloud:33.0.0-fpm
@@ -26,3 +21,8 @@ services:
 networks:
  coolify:
   external: true
+volumes:
+   nextcloud-config:
+   nextcloud-data:
+   nextcloud-apps:
+   nextcloud-custom_apps:
