@@ -1,0 +1,18 @@
+version: '3'
+volumes:
+ data:
+ config:
+services:
+ nextcloud:
+  image: nextcloud
+  container_name: nextcloud
+  restart: always
+  ports:
+   - 8080:80
+  depends_on:
+   - nextcloud-db
+  volumes:
+   - config:/var/www/html/config
+   - data:/var/www/html/data
+   - ./apps:/var/www/html/apps
+   - ./custom_apps:/var/www/html/custom_apps
