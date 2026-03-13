@@ -16,7 +16,7 @@ WORKDIR /usr/src/redmine/plugins
 RUN git clone https://github.com/enricohuang/redmine_mermaid.git
 WORKDIR /usr/src/redmine
 RUN bundle install \
-    && bundle exec rake assets:precompile RAILS_ENV=production
+    && bundle exec rake assets:precompile RAILS_ENV=production \
     && chown redmine.redmine /usr/src/redmine \
     && tree /usr/src/redmine/plugins
 
