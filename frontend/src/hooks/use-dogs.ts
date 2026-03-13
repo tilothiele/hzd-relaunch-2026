@@ -14,7 +14,7 @@ export type SexFilter = 'M' | 'F' | ''
 export type ColorFilter = 'S' | 'SM' | 'B' | ''
 export type DistanceFilter = '' | 50 | 100 | 300 | 800
 export type PageSize = 5 | 10 | 20
-export type HDLevel = 'a1' | 'a2' | 'b1' | 'b2' | ''
+export type HDLevel = 'A1' | 'A2' | 'B1' | 'B2' | ''
 export type SOD1Level = 'N_N' | 'N_DM' | 'DM_DM' | ''
 export type TriStateFilter = 'true' | 'false' | ''
 

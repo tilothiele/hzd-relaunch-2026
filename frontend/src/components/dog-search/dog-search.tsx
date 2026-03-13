@@ -291,10 +291,10 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 								onChange={(e) => setHdFilter(e.target.value as HDLevel)}
 							>
 								<MenuItem value=''>Egal</MenuItem>
-								<MenuItem value='a1'>A1</MenuItem>
-								<MenuItem value='a2'>A2</MenuItem>
-								<MenuItem value='b1'>B1</MenuItem>
-								<MenuItem value='b2'>B2</MenuItem>
+								<MenuItem value='A1'>A1</MenuItem>
+								<MenuItem value='A2'>A2</MenuItem>
+								<MenuItem value='B1'>B1</MenuItem>
+								<MenuItem value='B2'>B2</MenuItem>
 							</Select>
 						</FormControl>
 
