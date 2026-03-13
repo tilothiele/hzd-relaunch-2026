@@ -23,10 +23,10 @@ export function DogHealthTab({ dog }: DogHealthTabProps) {
             description: 'Hüftgelenksdysplasie'
         },
         {
-            label: 'Genprofil',
-            value: dog.Genprofil === true ? 'Ja' : dog.Genprofil === false ? 'Nein' : '-',
+            label: 'Genprofil (SOD1)',
+            value: dog.SOD1 ? dog.SOD1.replace('_', '/') : '-',
             icon: <FingerprintIcon sx={{ color: '#2563eb' }} />,
-            description: 'Genetisches Profil vorhanden'
+            description: 'Genetisches Profil (SOD1)'
         },
         {
             label: 'Augenuntersuchung',

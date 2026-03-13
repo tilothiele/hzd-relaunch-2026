@@ -462,6 +462,7 @@ export interface Dog {
 	avatar?: Image | null
 	DogDocument?: DogDocument[] | null
 	HD?: string | null
+	SOD1?: string | null
 	Genprofil?: boolean | null
 	EyesCheck?: boolean | null
 	HeartCheck?: boolean | null

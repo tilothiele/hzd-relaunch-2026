@@ -6,7 +6,7 @@ import { ViewToggle } from '@/components/common/view-toggle'
 
 import MaleIcon from '@mui/icons-material/Male'
 import FemaleIcon from '@mui/icons-material/Female'
-import { useDogs, type ColorFilter, type PageSize, type SexFilter, type DistanceFilter, type HDLevel, type TriStateFilter } from '@/hooks/use-dogs'
+import { useDogs, type ColorFilter, type PageSize, type SexFilter, type DistanceFilter, type HDLevel, type TriStateFilter, type SOD1Level } from '@/hooks/use-dogs'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
 import { theme } from '@/themes'
 
@@ -49,7 +49,7 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 	const [page, setPage] = useState(1)
 	const [pageSize, setPageSize] = useState<PageSize>(10)
 	const [hdFilter, setHdFilter] = useState<HDLevel>('')
-	const [genprofilFilter, setGenprofilFilter] = useState<TriStateFilter>('')
+	const [genprofilFilter, setGenprofilFilter] = useState<SOD1Level>('')
 	const [eyescheckFilter, setEyescheckFilter] = useState<TriStateFilter>('')
 	const [heartcheckFilter, setHeartcheckFilter] = useState<TriStateFilter>('')
 	const [colorcheckFilter, setColorcheckFilter] = useState<TriStateFilter>('')
@@ -299,15 +299,16 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 						</FormControl>
 
 						<FormControl fullWidth size='small'>
-							<InputLabel>Genprofil</InputLabel>
+							<InputLabel>Genprofil (SOD1)</InputLabel>
 							<Select
 								value={genprofilFilter}
-								label='Genprofil'
-								onChange={(e) => setGenprofilFilter(e.target.value as TriStateFilter)}
+								label='Genprofil (SOD1)'
+								onChange={(e) => setGenprofilFilter(e.target.value as SOD1Level)}
 							>
 								<MenuItem value=''>Egal</MenuItem>
-								<MenuItem value='true'>Ja</MenuItem>
-								<MenuItem value='false'>Nein</MenuItem>
+								<MenuItem value='N_N'>N/N</MenuItem>
+								<MenuItem value='N_DM'>N/DM</MenuItem>
+								<MenuItem value='DM_DM'>DM/DM</MenuItem>
 							</Select>
 						</FormControl>
 

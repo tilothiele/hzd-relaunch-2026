@@ -952,6 +952,7 @@ export const SEARCH_DOGS = `
 					BreedersIntroduction
 				}
 				HD
+				SOD1
 				Genprofil
 				EyesCheck
 				HeartCheck
