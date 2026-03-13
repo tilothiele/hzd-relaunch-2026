@@ -15,7 +15,8 @@ COPY redmine_plugins/project_mail_override /usr/src/redmine/plugins/project_mail
 WORKDIR /usr/src/redmine/plugins
 RUN git clone https://github.com/enricohuang/redmine_mermaid.git
 WORKDIR /usr/src/redmine
-RUN bundle install
+RUN bundle install \
+    && bundle exec rake redmine:plugins:assets RAILS_ENV=production
 
 RUN chown redmine.redmine /usr/src/redmine \
       && tree /usr/src/redmine/plugins
