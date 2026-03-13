@@ -9,6 +9,7 @@ import { DogPersonalWordsTab } from './dog-detail-modal/dog-personal-words-tab'
 import { DogImagesTab } from './dog-detail-modal/dog-images-tab'
 import { DogPerformanceTab } from './dog-detail-modal/dog-performance-tab'
 import { DogDocumentsTab } from './dog-detail-modal/dog-documents-tab'
+import { DogHealthTab } from './dog-detail-modal/dog-health-tab'
 import { BackButton } from '@/components/ui/back-button'
 
 import type { Dog, HzdSetting } from '@/types'
@@ -92,7 +93,13 @@ export function DogDetailView({ dog, strapiBaseUrl, hzdSetting, onBack }: DogDet
                     <SectionHeader title="Leistungen" />
                     <DogPerformanceTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
                 </section>
-
+ 
+                {/* Gesundheit */}
+                <section>
+                    <SectionHeader title="Gesundheit" />
+                    <DogHealthTab dog={dog} />
+                </section>
+ 
                 {/* 7. Dokumente */}
                 <section>
                     <SectionHeader title="Dokumente" />

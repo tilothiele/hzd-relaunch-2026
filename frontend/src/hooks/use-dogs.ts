@@ -14,6 +14,8 @@ export type SexFilter = 'M' | 'F' | ''
 export type ColorFilter = 'S' | 'SM' | 'B' | ''
 export type DistanceFilter = '' | 50 | 100 | 300 | 800
 export type PageSize = 5 | 10 | 20
+export type HDLevel = 'a1' | 'a2' | 'b1' | 'b2' | ''
+export type TriStateFilter = 'true' | 'false' | ''
 
 interface DogsFilters {
 	nameFilter?: string
@@ -24,6 +26,11 @@ interface DogsFilters {
 	ownerDocumentId?: string
 	sort?: string[]
 	maxAge?: number
+	hdFilter?: HDLevel
+	genprofilFilter?: TriStateFilter
+	eyescheckFilter?: TriStateFilter
+	heartcheckFilter?: TriStateFilter
+	colorcheckFilter?: TriStateFilter
 }
 
 interface DogsPagination {
@@ -72,6 +79,11 @@ export function useDogs(options: UseDogsOptions = {}) {
 	const page = pagination.page ?? 1
 	const pageSize = pagination.pageSize ?? 10
 	const maxAge = filters.maxAge
+	const hdFilter = filters.hdFilter
+	const genprofilFilter = filters.genprofilFilter
+	const eyescheckFilter = filters.eyescheckFilter
+	const heartcheckFilter = filters.heartcheckFilter
+	const colorcheckFilter = filters.colorcheckFilter
 
 	const searchDogs = useCallback(async () => {
 		if (!baseUrl || baseUrl.trim().length === 0) {
@@ -132,6 +144,36 @@ export function useDogs(options: UseDogsOptions = {}) {
 					dateOfBirth: { gte: dateString },
 				})
 			}
+ 
+			if (hdFilter) {
+				filterConditions.push({
+					HD: { eq: hdFilter },
+				})
+			}
+ 
+			if (genprofilFilter) {
+				filterConditions.push({
+					Genprofil: { eq: genprofilFilter === 'true' },
+				})
+			}
+ 
+			if (eyescheckFilter) {
+				filterConditions.push({
+					EyesCheck: { eq: eyescheckFilter === 'true' },
+				})
+			}
+ 
+			if (heartcheckFilter) {
+				filterConditions.push({
+					HeartCheck: { eq: heartcheckFilter === 'true' },
+				})
+			}
+ 
+			if (colorcheckFilter) {
+				filterConditions.push({
+					ColorCheck: { eq: colorcheckFilter === 'true' },
+				})
+			}
 
 			const variables: Record<string, unknown> = {
 				pagination: {
@@ -186,7 +228,7 @@ export function useDogs(options: UseDogsOptions = {}) {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [baseUrl, nameFilter, sexFilter, colorFilter, ownerDocumentId, JSON.stringify(sort), page, pageSize])
+	}, [baseUrl, nameFilter, sexFilter, colorFilter, ownerDocumentId, JSON.stringify(sort), page, pageSize, hdFilter, genprofilFilter, eyescheckFilter, heartcheckFilter, colorcheckFilter])
 
 	useEffect(() => {
 		if (autoLoad && baseUrl && baseUrl.trim().length > 0) {

@@ -951,6 +951,11 @@ export const SEARCH_DOGS = `
 				breeder {
 					BreedersIntroduction
 				}
+				HD
+				Genprofil
+				EyesCheck
+				HeartCheck
+				ColorCheck
 				father {
 					documentId
 					fullKennelName

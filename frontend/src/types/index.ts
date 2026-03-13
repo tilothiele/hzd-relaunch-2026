@@ -461,6 +461,11 @@ export interface Dog {
 	Images?: Image[] | null
 	avatar?: Image | null
 	DogDocument?: DogDocument[] | null
+	HD?: string | null
+	Genprofil?: boolean | null
+	EyesCheck?: boolean | null
+	HeartCheck?: boolean | null
+	ColorCheck?: boolean | null
 }
 
 export interface DogSearchResult {

@@ -6,7 +6,7 @@ import { ViewToggle } from '@/components/common/view-toggle'
 
 import MaleIcon from '@mui/icons-material/Male'
 import FemaleIcon from '@mui/icons-material/Female'
-import { useDogs, type ColorFilter, type PageSize, type SexFilter, type DistanceFilter } from '@/hooks/use-dogs'
+import { useDogs, type ColorFilter, type PageSize, type SexFilter, type DistanceFilter, type HDLevel, type TriStateFilter } from '@/hooks/use-dogs'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
 import { theme } from '@/themes'
 
@@ -48,6 +48,11 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 	const [maxDistance, setMaxDistance] = useState<DistanceFilter>('')
 	const [page, setPage] = useState(1)
 	const [pageSize, setPageSize] = useState<PageSize>(10)
+	const [hdFilter, setHdFilter] = useState<HDLevel>('')
+	const [genprofilFilter, setGenprofilFilter] = useState<TriStateFilter>('')
+	const [eyescheckFilter, setEyescheckFilter] = useState<TriStateFilter>('')
+	const [heartcheckFilter, setHeartcheckFilter] = useState<TriStateFilter>('')
+	const [colorcheckFilter, setColorcheckFilter] = useState<TriStateFilter>('')
 	const [showMap, setShowMap] = useState(false)
 	const [selectedDog, setSelectedDog] = useState<Dog | null>(null)
 	const [hasSearched, setHasSearched] = useState(false)
@@ -64,7 +69,12 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 		maxDistance: maxDistance === '' ? undefined : maxDistance,
 		userLocation: userLocation || undefined,
 		maxAge: 15, // Filter out dogs older than 15 years
-	}), [nameFilter, sexFilter, colorFilter, maxDistance, userLocation])
+		hdFilter,
+		genprofilFilter,
+		eyescheckFilter,
+		heartcheckFilter,
+		colorcheckFilter,
+	}), [nameFilter, sexFilter, colorFilter, maxDistance, userLocation, hdFilter, genprofilFilter, eyescheckFilter, heartcheckFilter, colorcheckFilter])
 
 	const {
 		dogs,
@@ -269,6 +279,76 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 							</Select>
 						</FormControl>
 
+					</Box>
+
+					{/* Zweite Zeile: Gesundheit */}
+					<Box sx={{ mt: 3, display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(5, 1fr)' }, gap: 3 }}>
+						<FormControl fullWidth size='small'>
+							<InputLabel>HD</InputLabel>
+							<Select
+								value={hdFilter}
+								label='HD'
+								onChange={(e) => setHdFilter(e.target.value as HDLevel)}
+							>
+								<MenuItem value=''>Egal</MenuItem>
+								<MenuItem value='a1'>A1</MenuItem>
+								<MenuItem value='a2'>A2</MenuItem>
+								<MenuItem value='b1'>B1</MenuItem>
+								<MenuItem value='b2'>B2</MenuItem>
+							</Select>
+						</FormControl>
+
+						<FormControl fullWidth size='small'>
+							<InputLabel>Genprofil</InputLabel>
+							<Select
+								value={genprofilFilter}
+								label='Genprofil'
+								onChange={(e) => setGenprofilFilter(e.target.value as TriStateFilter)}
+							>
+								<MenuItem value=''>Egal</MenuItem>
+								<MenuItem value='true'>Ja</MenuItem>
+								<MenuItem value='false'>Nein</MenuItem>
+							</Select>
+						</FormControl>
+
+						<FormControl fullWidth size='small'>
+							<InputLabel>Augenuntersuchung</InputLabel>
+							<Select
+								value={eyescheckFilter}
+								label='Augenuntersuchung'
+								onChange={(e) => setEyescheckFilter(e.target.value as TriStateFilter)}
+							>
+								<MenuItem value=''>Egal</MenuItem>
+								<MenuItem value='true'>Ja</MenuItem>
+								<MenuItem value='false'>Nein</MenuItem>
+							</Select>
+						</FormControl>
+
+						<FormControl fullWidth size='small'>
+							<InputLabel>Herzuntersuchung</InputLabel>
+							<Select
+								value={heartcheckFilter}
+								label='Herzuntersuchung'
+								onChange={(e) => setHeartcheckFilter(e.target.value as TriStateFilter)}
+							>
+								<MenuItem value=''>Egal</MenuItem>
+								<MenuItem value='true'>Ja</MenuItem>
+								<MenuItem value='false'>Nein</MenuItem>
+							</Select>
+						</FormControl>
+
+						<FormControl fullWidth size='small'>
+							<InputLabel>Farbcheck</InputLabel>
+							<Select
+								value={colorcheckFilter}
+								label='Farbcheck'
+								onChange={(e) => setColorcheckFilter(e.target.value as TriStateFilter)}
+							>
+								<MenuItem value=''>Egal</MenuItem>
+								<MenuItem value='true'>Ja</MenuItem>
+								<MenuItem value='false'>Nein</MenuItem>
+							</Select>
+						</FormControl>
 					</Box>
 
 
