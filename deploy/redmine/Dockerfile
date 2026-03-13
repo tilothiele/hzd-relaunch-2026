@@ -16,10 +16,9 @@ WORKDIR /usr/src/redmine/plugins
 RUN git clone https://github.com/enricohuang/redmine_mermaid.git
 WORKDIR /usr/src/redmine
 RUN bundle install \
-    && bundle exec rake redmine:plugins:assets RAILS_ENV=production
-
-RUN chown redmine.redmine /usr/src/redmine \
-      && tree /usr/src/redmine/plugins
+    && bundle exec rake assets:precompile RAILS_ENV=production
+    && chown redmine.redmine /usr/src/redmine \
+    && tree /usr/src/redmine/plugins
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["rails", "server", "-b", "0.0.0.0"]
