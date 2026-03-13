@@ -761,8 +761,8 @@ input ComponentBreedingGeoLocationInput {
 
 type ComponentBreedingGeoLocation {
   id: ID!
-  lat: Float!
-  lng: Float!
+  lat: Float
+  lng: Float
 }
 
 input ComponentBreedingDogDocumentFiltersInput {
@@ -821,6 +821,12 @@ type ComponentBlocksTeaserTextWithImage {
   TeaserAnchor: String
 }
 
+type ComponentBlocksTableOfContentSection {
+  id: ID!
+  TocHeadline: String
+  TocLink(filters: ComponentLinksActionButtonFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [ComponentLinksActionButton]
+}
+
 enum ENUM_COMPONENTBLOCKSSUPPLEMENTALDOCUMENTGROUPSECTION_SUPPLEMENTALSODDEVEN {
   Odd
   Even
@@ -857,6 +863,12 @@ enum ENUM_COMPONENTBLOCKSSIMPLEHEROSECTION_HEROLAYOUT {
   full_width
 }
 
+enum ENUM_COMPONENTBLOCKSSIMPLEHEROSECTION_HEIGHT {
+  small
+  medium
+  tall
+}
+
 type ComponentBlocksSimpleHeroSection {
   id: ID!
   HeroAnchor: String
@@ -868,6 +880,7 @@ type ComponentBlocksSimpleHeroSection {
   FullWidth: Boolean!
   ShowLog: Boolean!
   FadingBorder: Boolean!
+  Height: ENUM_COMPONENTBLOCKSSIMPLEHEROSECTION_HEIGHT
 }
 
 type ComponentBlocksSimpleCtaSection {
@@ -900,6 +913,8 @@ type ComponentBlocksNewsArticlesSection {
   MaxArticles: Int
   MaxFeaturedArticles: Int
   NewsArticlesAnchor: String
+  HideCategoryName: Boolean
+  HideCategoryDescription: Boolean
 }
 
 type ComponentBlocksItemList {
@@ -967,6 +982,10 @@ type ComponentBlocksContactGroupSection {
   id: ID!
   ContactGroup: ContactGroup
   ContactGroupAnchor: String
+}
+
+type ComponentBlocksChampionsSection {
+  id: ID!
 }
 
 enum ENUM_COMPONENTBLOCKSCARDSECTION_CARDCOLUMNSODDEVEN {
@@ -1298,7 +1317,8 @@ input UsersPermissionsUserFiltersInput {
   membershipNumber: IntFilterInput
   form: FormFiltersInput
   region: StringFilterInput
-  geoLocation: ComponentBreedingGeoLocationFiltersInput
+  locationLng: FloatFilterInput
+  locationLat: FloatFilterInput
   DisplayName: StringFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
@@ -1337,7 +1357,8 @@ input UsersPermissionsUserInput {
   membershipNumber: Int
   form: ID
   region: ENUM_USERSPERMISSIONSUSER_REGION
-  geoLocation: ComponentBreedingGeoLocationInput
+  locationLng: Float
+  locationLat: Float
   DisplayName: String
   publishedAt: DateTime
   password: String
@@ -1370,10 +1391,11 @@ type UsersPermissionsUser {
   memberSince: Date
   cancellationOn: Date
   cancellationDueDate: Date
-  membershipNumber: Int!
+  membershipNumber: Int
   form: Form
   region: ENUM_USERSPERMISSIONSUSER_REGION
-  geoLocation: ComponentBreedingGeoLocation
+  locationLng: Float
+  locationLat: Float
   DisplayName: String
   createdAt: DateTime
   updatedAt: DateTime
@@ -1404,11 +1426,25 @@ enum ENUM_HZDPLUGINDOG_COLOR {
   B
 }
 
+enum ENUM_HZDPLUGINDOG_SOD1 {
+  N_N
+  N_DM
+  DM_DM
+}
+
+enum ENUM_HZDPLUGINDOG_HD {
+  A1
+  A2
+  B1
+  B2
+}
+
 input HzdPluginDogFiltersInput {
   documentId: IDFilterInput
   givenName: StringFilterInput
   fullKennelName: StringFilterInput
   microchipNo: StringFilterInput
+  stuntLicenseSince: DateFilterInput
   dateOfBirth: DateFilterInput
   dateOfDeath: DateFilterInput
   sex: StringFilterInput
@@ -1419,10 +1455,16 @@ input HzdPluginDogFiltersInput {
   cId: IntFilterInput
   cBreederId: IntFilterInput
   cOwnerId: IntFilterInput
+  SOD1: StringFilterInput
+  HD: StringFilterInput
+  Genprofil: BooleanFilterInput
+  EyesCheck: BooleanFilterInput
+  HeartCheck: BooleanFilterInput
+  ColorCheck: BooleanFilterInput
   MemosDraft: StringFilterInput
   MemosReleased: StringFilterInput
-  Location: ComponentBreedingGeoLocationFiltersInput
   owner: UsersPermissionsUserFiltersInput
+  Location: ComponentBreedingGeoLocationFiltersInput
   breeder: HzdPluginBreederFiltersInput
   Exhibitions: StringFilterInput
   BreedSurvey: StringFilterInput
@@ -1431,6 +1473,7 @@ input HzdPluginDogFiltersInput {
   cStudBookNumberFather: StringFilterInput
   cStudBookNumberMother: StringFilterInput
   DogDocument: ComponentBreedingDogDocumentFiltersInput
+  Disabled: BooleanFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   publishedAt: DateTimeFilterInput
@@ -1444,6 +1487,7 @@ input HzdPluginDogInput {
   fullKennelName: String
   avatar: ID
   microchipNo: String
+  stuntLicenseSince: Date
   dateOfBirth: Date
   dateOfDeath: Date
   sex: ENUM_HZDPLUGINDOG_SEX
@@ -1454,10 +1498,16 @@ input HzdPluginDogInput {
   cId: Int
   cBreederId: Int
   cOwnerId: Int
+  SOD1: ENUM_HZDPLUGINDOG_SOD1
+  HD: ENUM_HZDPLUGINDOG_HD
+  Genprofil: Boolean
+  EyesCheck: Boolean
+  HeartCheck: Boolean
+  ColorCheck: Boolean
   MemosDraft: String
   MemosReleased: String
-  Location: ComponentBreedingGeoLocationInput
   owner: ID
+  Location: ComponentBreedingGeoLocationInput
   breeder: ID
   Exhibitions: String
   BreedSurvey: String
@@ -1467,6 +1517,7 @@ input HzdPluginDogInput {
   cStudBookNumberMother: String
   Images: [ID]
   DogDocument: [ComponentBreedingDogDocumentInput]
+  Disabled: Boolean
   publishedAt: DateTime
 }
 
@@ -1476,6 +1527,7 @@ type HzdPluginDog {
   fullKennelName: String
   avatar: UploadFile
   microchipNo: String
+  stuntLicenseSince: Date
   dateOfBirth: Date
   dateOfDeath: Date
   sex: ENUM_HZDPLUGINDOG_SEX
@@ -1486,10 +1538,16 @@ type HzdPluginDog {
   cId: Int
   cBreederId: Int
   cOwnerId: Int
+  SOD1: ENUM_HZDPLUGINDOG_SOD1
+  HD: ENUM_HZDPLUGINDOG_HD
+  Genprofil: Boolean
+  EyesCheck: Boolean
+  HeartCheck: Boolean
+  ColorCheck: Boolean
   MemosDraft: String
   MemosReleased: String
-  Location: ComponentBreedingGeoLocation
   owner: UsersPermissionsUser
+  Location: ComponentBreedingGeoLocation
   breeder: HzdPluginBreeder
   Exhibitions: String
   BreedSurvey: String
@@ -1500,6 +1558,7 @@ type HzdPluginDog {
   Images_connection(filters: UploadFileFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): UploadFileRelationResponseCollection
   Images(filters: UploadFileFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [UploadFile]!
   DogDocument(filters: ComponentBreedingDogDocumentFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [ComponentBreedingDogDocument]
+  Disabled: Boolean
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -1524,7 +1583,6 @@ input HzdPluginBreederFiltersInput {
   WebsiteUrlDraft: StringFilterInput
   Address: ComponentPersonalAddressFiltersInput
   InternalNotes: StringFilterInput
-  GeoLocation: ComponentBreedingGeoLocationFiltersInput
   BreedersIntroDraft: StringFilterInput
   isDirty: BooleanFilterInput
   owner_member: UsersPermissionsUserFiltersInput
@@ -1551,7 +1609,6 @@ input HzdPluginBreederInput {
   WebsiteUrlDraft: String
   Address: ComponentPersonalAddressInput
   InternalNotes: String
-  GeoLocation: ComponentBreedingGeoLocationInput
   BreedersIntroDraft: String
   isDirty: Boolean
   owner_member: ID
@@ -1575,7 +1632,6 @@ type HzdPluginBreeder {
   WebsiteUrlDraft: String
   Address: ComponentPersonalAddress
   InternalNotes: String
-  GeoLocation: ComponentBreedingGeoLocation
   BreedersIntroDraft: String
   isDirty: Boolean
   owner_member: UsersPermissionsUser
@@ -1602,7 +1658,7 @@ input HzdPluginLitterFiltersInput {
   breeder: HzdPluginBreederFiltersInput
   mother: HzdPluginDogFiltersInput
   stuntDog: HzdPluginDogFiltersInput
-  dateOfManting: DateFilterInput
+  plannedDateOfBirth: DateFilterInput
   expectedDateOfBirth: DateFilterInput
   dateOfBirth: DateFilterInput
   LitterStatus: StringFilterInput
@@ -1629,7 +1685,7 @@ input HzdPluginLitterInput {
   breeder: ID
   mother: ID
   stuntDog: ID
-  dateOfManting: Date
+  plannedDateOfBirth: Date
   expectedDateOfBirth: Date
   dateOfBirth: Date
   LitterStatus: ENUM_HZDPLUGINLITTER_LITTERSTATUS
@@ -1653,7 +1709,7 @@ type HzdPluginLitter {
   breeder: HzdPluginBreeder
   mother: HzdPluginDog
   stuntDog: HzdPluginDog
-  dateOfManting: Date
+  plannedDateOfBirth: Date
   expectedDateOfBirth: Date
   dateOfBirth: Date
   LitterStatus: ENUM_HZDPLUGINLITTER_LITTERSTATUS!
@@ -1706,8 +1762,8 @@ input HzdPluginGeoLocationInput {
 type HzdPluginGeoLocation {
   documentId: ID!
   Key: String!
-  lat: Float!
-  lng: Float!
+  lat: Float
+  lng: Float
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -1718,18 +1774,55 @@ type HzdPluginGeoLocationEntityResponseCollection {
   pageInfo: Pagination!
 }
 
+input AnnouncementFiltersInput {
+  documentId: IDFilterInput
+  AnnouncementContent: StringFilterInput
+  LinkUrl: StringFilterInput
+  VisibilityDays: IntFilterInput
+  createdAt: DateTimeFilterInput
+  updatedAt: DateTimeFilterInput
+  publishedAt: DateTimeFilterInput
+  and: [AnnouncementFiltersInput]
+  or: [AnnouncementFiltersInput]
+  not: AnnouncementFiltersInput
+}
+
+input AnnouncementInput {
+  AnnouncementContent: String
+  LinkUrl: String
+  VisibilityDays: Int
+  publishedAt: DateTime
+}
+
+type Announcement {
+  documentId: ID!
+  AnnouncementContent: String!
+  LinkUrl: String
+  VisibilityDays: Int!
+  createdAt: DateTime
+  updatedAt: DateTime
+  publishedAt: DateTime
+}
+
+type AnnouncementEntityResponseCollection {
+  nodes: [Announcement!]!
+  pageInfo: Pagination!
+}
+
 enum ENUM_CALENDAR_COLORSCHEMA {
   Violet
   Gruen
   Pink
   Rot
   Gelb
+  Hellgrau
 }
 
 input CalendarFiltersInput {
   documentId: IDFilterInput
   Name: StringFilterInput
   ColorSchema: StringFilterInput
+  Ord: IntFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   publishedAt: DateTimeFilterInput
@@ -1741,6 +1834,7 @@ input CalendarFiltersInput {
 input CalendarInput {
   Name: String
   ColorSchema: ENUM_CALENDAR_COLORSCHEMA
+  Ord: Int
   publishedAt: DateTime
 }
 
@@ -1748,6 +1842,7 @@ type Calendar {
   documentId: ID!
   Name: String!
   ColorSchema: ENUM_CALENDAR_COLORSCHEMA!
+  Ord: Int!
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -1786,6 +1881,8 @@ input CalendarEntryFiltersInput {
   DueDate: DateTimeFilterInput
   ErgebnisText: StringFilterInput
   LongDescription: StringFilterInput
+  AnmeldeLinkVisibleFrom: DateTimeFilterInput
+  ErgebnisLinkVisibleFrom: DateTimeFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   publishedAt: DateTimeFilterInput
@@ -1811,6 +1908,8 @@ input CalendarEntryInput {
   DueDate: DateTime
   ErgebnisText: String
   LongDescription: String
+  AnmeldeLinkVisibleFrom: DateTime
+  ErgebnisLinkVisibleFrom: DateTime
   publishedAt: DateTime
 }
 
@@ -1832,6 +1931,8 @@ type CalendarEntry {
   DueDate: DateTime
   ErgebnisText: String
   LongDescription: String
+  AnmeldeLinkVisibleFrom: DateTime
+  ErgebnisLinkVisibleFrom: DateTime
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -1839,6 +1940,43 @@ type CalendarEntry {
 
 type CalendarEntryEntityResponseCollection {
   nodes: [CalendarEntry!]!
+  pageInfo: Pagination!
+}
+
+input ChampionFiltersInput {
+  documentId: IDFilterInput
+  ChampionshipTitles: JSONFilterInput
+  DateOfChampionship: DateFilterInput
+  hzd_plugin_dog: HzdPluginDogFiltersInput
+  createdAt: DateTimeFilterInput
+  updatedAt: DateTimeFilterInput
+  publishedAt: DateTimeFilterInput
+  and: [ChampionFiltersInput]
+  or: [ChampionFiltersInput]
+  not: ChampionFiltersInput
+}
+
+input ChampionInput {
+  ChampionshipTitles: JSON
+  DateOfChampionship: Date
+  hzd_plugin_dog: ID
+  ChampinAvatar: ID
+  publishedAt: DateTime
+}
+
+type Champion {
+  documentId: ID!
+  ChampionshipTitles: JSON
+  DateOfChampionship: Date
+  hzd_plugin_dog: HzdPluginDog
+  ChampinAvatar: UploadFile
+  createdAt: DateTime
+  updatedAt: DateTime
+  publishedAt: DateTime
+}
+
+type ChampionEntityResponseCollection {
+  nodes: [Champion!]!
   pageInfo: Pagination!
 }
 
@@ -2025,6 +2163,49 @@ type FormInstanceEntityResponseCollection {
   pageInfo: Pagination!
 }
 
+input GalleryImageFiltersInput {
+  documentId: IDFilterInput
+  Photographer: UsersPermissionsUserFiltersInput
+  ImageDescription: StringFilterInput
+  DateOfSubmission: DateFilterInput
+  DateOfPicture: DateFilterInput
+  FeaturedImage: BooleanFilterInput
+  createdAt: DateTimeFilterInput
+  updatedAt: DateTimeFilterInput
+  publishedAt: DateTimeFilterInput
+  and: [GalleryImageFiltersInput]
+  or: [GalleryImageFiltersInput]
+  not: GalleryImageFiltersInput
+}
+
+input GalleryImageInput {
+  GalleryImageMedia: ID
+  Photographer: ID
+  ImageDescription: String
+  DateOfSubmission: Date
+  DateOfPicture: Date
+  FeaturedImage: Boolean
+  publishedAt: DateTime
+}
+
+type GalleryImage {
+  documentId: ID!
+  GalleryImageMedia: UploadFile
+  Photographer: UsersPermissionsUser
+  ImageDescription: String
+  DateOfSubmission: Date
+  DateOfPicture: Date!
+  FeaturedImage: Boolean
+  createdAt: DateTime
+  updatedAt: DateTime
+  publishedAt: DateTime
+}
+
+type GalleryImageEntityResponseCollection {
+  nodes: [GalleryImage!]!
+  pageInfo: Pagination!
+}
+
 enum ENUM_GLOBALLAYOUT_MENUSTYLE {
   Classic
   StickyTransparent
@@ -2073,6 +2254,7 @@ input HzdSettingInput {
   DefaultAvatarS: ID
   DefaultBreederAvatar: ID
   DefaultLitterAvatar: ID
+  DefaultChanpionAvatar: ID
   publishedAt: DateTime
 }
 
@@ -2083,6 +2265,7 @@ type HzdSetting {
   DefaultAvatarS: UploadFile
   DefaultBreederAvatar: UploadFile
   DefaultLitterAvatar: UploadFile
+  DefaultChanpionAvatar: UploadFile
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -2225,6 +2408,7 @@ input NewsArticleFiltersInput {
   Slug: StringFilterInput
   SEO: ComponentSeoSeoFiltersInput
   category: NewsArticleCategoryFiltersInput
+  news_article_tags: NewsArticleTagFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   publishedAt: DateTimeFilterInput
@@ -2247,6 +2431,7 @@ input NewsArticleInput {
   SEO: ComponentSeoSeoInput
   category: ID
   NewsContentSections: [NewsArticleNewsContentSectionsDynamicZoneInput!]
+  news_article_tags: [ID]
   publishedAt: DateTime
 }
 
@@ -2265,6 +2450,8 @@ type NewsArticle {
   SEO: ComponentSeoSeo
   category: NewsArticleCategory
   NewsContentSections: [NewsArticleNewsContentSectionsDynamicZone]
+  news_article_tags_connection(filters: NewsArticleTagFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): NewsArticleTagRelationResponseCollection
+  news_article_tags(filters: NewsArticleTagFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [NewsArticleTag]!
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -2278,6 +2465,10 @@ type NewsArticleEntityResponseCollection {
 type NewsArticleRelationResponseCollection {
   nodes: [NewsArticle!]!
 }
+
+union NewsArticleCategoryContentSectionsDynamicZone = ComponentBlocksSimpleHeroSection | ComponentBlocksTextColumnsSection | Error
+
+scalar NewsArticleCategoryContentSectionsDynamicZoneInput
 
 input NewsArticleCategoryFiltersInput {
   documentId: IDFilterInput
@@ -2301,8 +2492,8 @@ input NewsArticleCategoryInput {
   CategoryTeaserText: String
   FeatureTitle: String
   news_articles: [ID]
-  CategoryImage: ID
   CategoryDescription: String
+  ContentSections: [NewsArticleCategoryContentSectionsDynamicZoneInput!]
   publishedAt: DateTime
 }
 
@@ -2314,8 +2505,8 @@ type NewsArticleCategory {
   FeatureTitle: String
   news_articles_connection(filters: NewsArticleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): NewsArticleRelationResponseCollection
   news_articles(filters: NewsArticleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [NewsArticle]!
-  CategoryImage: UploadFile
   CategoryDescription: String
+  ContentSections: [NewsArticleCategoryContentSectionsDynamicZone]
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -2324,6 +2515,49 @@ type NewsArticleCategory {
 type NewsArticleCategoryEntityResponseCollection {
   nodes: [NewsArticleCategory!]!
   pageInfo: Pagination!
+}
+
+input NewsArticleTagFiltersInput {
+  documentId: IDFilterInput
+  Label: StringFilterInput
+  TagColorHexCode: StringFilterInput
+  TagBgColorHexCode: StringFilterInput
+  news_articles: NewsArticleFiltersInput
+  createdAt: DateTimeFilterInput
+  updatedAt: DateTimeFilterInput
+  publishedAt: DateTimeFilterInput
+  and: [NewsArticleTagFiltersInput]
+  or: [NewsArticleTagFiltersInput]
+  not: NewsArticleTagFiltersInput
+}
+
+input NewsArticleTagInput {
+  Label: String
+  TagColorHexCode: String
+  TagBgColorHexCode: String
+  news_articles: [ID]
+  publishedAt: DateTime
+}
+
+type NewsArticleTag {
+  documentId: ID!
+  Label: String!
+  TagColorHexCode: String
+  TagBgColorHexCode: String
+  news_articles_connection(filters: NewsArticleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): NewsArticleRelationResponseCollection
+  news_articles(filters: NewsArticleFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [NewsArticle]!
+  createdAt: DateTime
+  updatedAt: DateTime
+  publishedAt: DateTime
+}
+
+type NewsArticleTagEntityResponseCollection {
+  nodes: [NewsArticleTag!]!
+  pageInfo: Pagination!
+}
+
+type NewsArticleTagRelationResponseCollection {
+  nodes: [NewsArticleTag!]!
 }
 
 enum ENUM_ORDER_ORDERSTATUS {
@@ -2404,7 +2638,7 @@ type OrderItemEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union PageSectionsDynamicZone = ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksRichTextSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTextColumnsSection | ComponentBlocksImageGallerySection | ComponentBlocksSimpleCtaSection | ComponentBlocksNewsArticlesSection | ComponentBlocksContactGroupSection | ComponentBlocksContactMailerSection | ComponentBlocksSimpleHeroSection | ComponentBlocksDocumentBundleSection | Error
+union PageSectionsDynamicZone = ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksRichTextSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTextColumnsSection | ComponentBlocksImageGallerySection | ComponentBlocksSimpleCtaSection | ComponentBlocksNewsArticlesSection | ComponentBlocksContactGroupSection | ComponentBlocksContactMailerSection | ComponentBlocksSimpleHeroSection | ComponentBlocksDocumentBundleSection | ComponentBlocksTableOfContentSection | ComponentBlocksChampionsSection | Error
 
 scalar PageSectionsDynamicZoneInput
 
@@ -2454,6 +2688,95 @@ type PageEntityResponseCollection {
   pageInfo: Pagination!
 }
 
+input PhotoboxImageFiltersInput {
+  documentId: IDFilterInput
+  S3Path: StringFilterInput
+  origin: UsersPermissionsUserFiltersInput
+  RenderedPersons: StringFilterInput
+  ReneredDogs: StringFilterInput
+  UserMessage: StringFilterInput
+  photobox_image_collection: PhotoboxImageCollectionFiltersInput
+  createdAt: DateTimeFilterInput
+  updatedAt: DateTimeFilterInput
+  publishedAt: DateTimeFilterInput
+  and: [PhotoboxImageFiltersInput]
+  or: [PhotoboxImageFiltersInput]
+  not: PhotoboxImageFiltersInput
+}
+
+input PhotoboxImageInput {
+  S3Path: String
+  origin: ID
+  RenderedPersons: String
+  ReneredDogs: String
+  UserMessage: String
+  photobox_image_collection: ID
+  Thumbnail: ID
+  publishedAt: DateTime
+}
+
+type PhotoboxImage {
+  documentId: ID!
+  S3Path: String
+  origin: UsersPermissionsUser
+  RenderedPersons: String
+  ReneredDogs: String
+  UserMessage: String
+  photobox_image_collection: PhotoboxImageCollection
+  Thumbnail: UploadFile
+  createdAt: DateTime
+  updatedAt: DateTime
+  publishedAt: DateTime
+}
+
+type PhotoboxImageEntityResponseCollection {
+  nodes: [PhotoboxImage!]!
+  pageInfo: Pagination!
+}
+
+type PhotoboxImageRelationResponseCollection {
+  nodes: [PhotoboxImage!]!
+}
+
+input PhotoboxImageCollectionFiltersInput {
+  documentId: IDFilterInput
+  CollectionDescription: StringFilterInput
+  Location: StringFilterInput
+  photogapher: UsersPermissionsUserFiltersInput
+  photos: PhotoboxImageFiltersInput
+  createdAt: DateTimeFilterInput
+  updatedAt: DateTimeFilterInput
+  publishedAt: DateTimeFilterInput
+  and: [PhotoboxImageCollectionFiltersInput]
+  or: [PhotoboxImageCollectionFiltersInput]
+  not: PhotoboxImageCollectionFiltersInput
+}
+
+input PhotoboxImageCollectionInput {
+  CollectionDescription: String
+  Location: String
+  photogapher: ID
+  photos: [ID]
+  publishedAt: DateTime
+}
+
+type PhotoboxImageCollection {
+  documentId: ID!
+  CollectionDescription: String
+  Location: String
+  photogapher: UsersPermissionsUser
+  photos_connection(filters: PhotoboxImageFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): PhotoboxImageRelationResponseCollection
+  photos(filters: PhotoboxImageFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [PhotoboxImage]!
+  createdAt: DateTime
+  updatedAt: DateTime
+  publishedAt: DateTime
+}
+
+type PhotoboxImageCollectionEntityResponseCollection {
+  nodes: [PhotoboxImageCollection!]!
+  pageInfo: Pagination!
+}
+
 input RegionalUnitFiltersInput {
   documentId: IDFilterInput
   Name: StringFilterInput
@@ -2493,6 +2816,44 @@ type RegionalUnit {
 
 type RegionalUnitEntityResponseCollection {
   nodes: [RegionalUnit!]!
+  pageInfo: Pagination!
+}
+
+input SubscriptionFiltersInput {
+  documentId: IDFilterInput
+  endpoint: StringFilterInput
+  p256dh: StringFilterInput
+  auth: StringFilterInput
+  channels: JSONFilterInput
+  createdAt: DateTimeFilterInput
+  updatedAt: DateTimeFilterInput
+  publishedAt: DateTimeFilterInput
+  and: [SubscriptionFiltersInput]
+  or: [SubscriptionFiltersInput]
+  not: SubscriptionFiltersInput
+}
+
+input SubscriptionInput {
+  endpoint: String
+  p256dh: String
+  auth: String
+  channels: JSON
+  publishedAt: DateTime
+}
+
+type Subscription {
+  documentId: ID!
+  endpoint: String!
+  p256dh: String!
+  auth: String!
+  channels: JSON
+  createdAt: DateTime
+  updatedAt: DateTime
+  publishedAt: DateTime
+}
+
+type SubscriptionEntityResponseCollection {
+  nodes: [Subscription!]!
   pageInfo: Pagination!
 }
 
@@ -2586,7 +2947,7 @@ type SupplementalDocumentGroupEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBreedingDogDocument | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksDocumentBundle | ComponentBlocksDocumentBundleSection | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksCardSection | ComponentBlocksCardItem | ComponentBlocksBundleDocuments | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Calendar | CalendarEntry | Contact | ContactGroup | Form | FormInstance | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | Order | OrderItem | Page | RegionalUnit | SupplementalDocument | SupplementalDocumentGroup
+union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBreedingDogDocument | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTableOfContentSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksDocumentBundle | ComponentBlocksDocumentBundleSection | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksChampionsSection | ComponentBlocksCardSection | ComponentBlocksCardItem | ComponentBlocksBundleDocuments | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Announcement | Calendar | CalendarEntry | Champion | Contact | ContactGroup | Form | FormInstance | GalleryImage | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | NewsArticleTag | Order | OrderItem | Page | PhotoboxImage | PhotoboxImageCollection | RegionalUnit | Subscription | SupplementalDocument | SupplementalDocumentGroup
 
 input FileInfoInput {
   name: String
@@ -2610,7 +2971,8 @@ type UsersPermissionsMe {
   zip: String
   city: String
   phone: String
-  geoLocation: ComponentBreedingGeoLocation
+  locationLat: Float
+  locationLng: Float
 }
 
 type UsersPermissionsMeRole {
@@ -2691,12 +3053,18 @@ type Query {
   hzdPluginGeoLocation(documentId: ID!, status: PublicationStatus = PUBLISHED): HzdPluginGeoLocation
   hzdPluginGeoLocations_connection(filters: HzdPluginGeoLocationFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): HzdPluginGeoLocationEntityResponseCollection
   hzdPluginGeoLocations(filters: HzdPluginGeoLocationFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [HzdPluginGeoLocation]!
+  announcement(documentId: ID!, status: PublicationStatus = PUBLISHED): Announcement
+  announcements_connection(filters: AnnouncementFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): AnnouncementEntityResponseCollection
+  announcements(filters: AnnouncementFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Announcement]!
   calendar(documentId: ID!, status: PublicationStatus = PUBLISHED): Calendar
   calendars_connection(filters: CalendarFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): CalendarEntityResponseCollection
   calendars(filters: CalendarFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Calendar]!
   calendarEntry(documentId: ID!, status: PublicationStatus = PUBLISHED): CalendarEntry
   calendarEntries_connection(filters: CalendarEntryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): CalendarEntryEntityResponseCollection
   calendarEntries(filters: CalendarEntryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [CalendarEntry]!
+  champion(documentId: ID!, status: PublicationStatus = PUBLISHED): Champion
+  champions_connection(filters: ChampionFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): ChampionEntityResponseCollection
+  champions(filters: ChampionFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Champion]!
   contact(documentId: ID!, status: PublicationStatus = PUBLISHED): Contact
   contacts_connection(filters: ContactFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): ContactEntityResponseCollection
   contacts(filters: ContactFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Contact]!
@@ -2709,6 +3077,9 @@ type Query {
   formInstance(documentId: ID!, status: PublicationStatus = PUBLISHED): FormInstance
   formInstances_connection(filters: FormInstanceFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): FormInstanceEntityResponseCollection
   formInstances(filters: FormInstanceFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [FormInstance]!
+  galleryImage(documentId: ID!, status: PublicationStatus = PUBLISHED): GalleryImage
+  galleryImages_connection(filters: GalleryImageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): GalleryImageEntityResponseCollection
+  galleryImages(filters: GalleryImageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [GalleryImage]!
   globalLayout(status: PublicationStatus = PUBLISHED): GlobalLayout
   hzdSetting(status: PublicationStatus = PUBLISHED): HzdSetting
   indexPage(status: PublicationStatus = PUBLISHED): IndexPage
@@ -2724,6 +3095,9 @@ type Query {
   newsArticleCategory(documentId: ID!, status: PublicationStatus = PUBLISHED): NewsArticleCategory
   newsArticleCategories_connection(filters: NewsArticleCategoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): NewsArticleCategoryEntityResponseCollection
   newsArticleCategories(filters: NewsArticleCategoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [NewsArticleCategory]!
+  newsArticleTag(documentId: ID!, status: PublicationStatus = PUBLISHED): NewsArticleTag
+  newsArticleTags_connection(filters: NewsArticleTagFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): NewsArticleTagEntityResponseCollection
+  newsArticleTags(filters: NewsArticleTagFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [NewsArticleTag]!
   order(documentId: ID!, status: PublicationStatus = PUBLISHED): Order
   orders_connection(filters: OrderFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): OrderEntityResponseCollection
   orders(filters: OrderFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Order]!
@@ -2733,9 +3107,18 @@ type Query {
   page(documentId: ID!, status: PublicationStatus = PUBLISHED): Page
   pages_connection(filters: PageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): PageEntityResponseCollection
   pages(filters: PageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Page]!
+  photoboxImage(documentId: ID!, status: PublicationStatus = PUBLISHED): PhotoboxImage
+  photoboxImages_connection(filters: PhotoboxImageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): PhotoboxImageEntityResponseCollection
+  photoboxImages(filters: PhotoboxImageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [PhotoboxImage]!
+  photoboxImageCollection(documentId: ID!, status: PublicationStatus = PUBLISHED): PhotoboxImageCollection
+  photoboxImageCollections_connection(filters: PhotoboxImageCollectionFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): PhotoboxImageCollectionEntityResponseCollection
+  photoboxImageCollections(filters: PhotoboxImageCollectionFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [PhotoboxImageCollection]!
   regionalUnit(documentId: ID!, status: PublicationStatus = PUBLISHED): RegionalUnit
   regionalUnits_connection(filters: RegionalUnitFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): RegionalUnitEntityResponseCollection
   regionalUnits(filters: RegionalUnitFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [RegionalUnit]!
+  subscription(documentId: ID!, status: PublicationStatus = PUBLISHED): Subscription
+  subscriptions_connection(filters: SubscriptionFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): SubscriptionEntityResponseCollection
+  subscriptions(filters: SubscriptionFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Subscription]!
   supplementalDocument(documentId: ID!, status: PublicationStatus = PUBLISHED): SupplementalDocument
   supplementalDocuments_connection(filters: SupplementalDocumentFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): SupplementalDocumentEntityResponseCollection
   supplementalDocuments(filters: SupplementalDocumentFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [SupplementalDocument]!
@@ -2765,12 +3148,18 @@ type Mutation {
   createHzdPluginGeoLocation(status: PublicationStatus = PUBLISHED, data: HzdPluginGeoLocationInput!): HzdPluginGeoLocation
   updateHzdPluginGeoLocation(documentId: ID!, status: PublicationStatus = PUBLISHED, data: HzdPluginGeoLocationInput!): HzdPluginGeoLocation
   deleteHzdPluginGeoLocation(documentId: ID!): DeleteMutationResponse
+  createAnnouncement(status: PublicationStatus = PUBLISHED, data: AnnouncementInput!): Announcement
+  updateAnnouncement(documentId: ID!, status: PublicationStatus = PUBLISHED, data: AnnouncementInput!): Announcement
+  deleteAnnouncement(documentId: ID!): DeleteMutationResponse
   createCalendar(status: PublicationStatus = PUBLISHED, data: CalendarInput!): Calendar
   updateCalendar(documentId: ID!, status: PublicationStatus = PUBLISHED, data: CalendarInput!): Calendar
   deleteCalendar(documentId: ID!): DeleteMutationResponse
   createCalendarEntry(status: PublicationStatus = PUBLISHED, data: CalendarEntryInput!): CalendarEntry
   updateCalendarEntry(documentId: ID!, status: PublicationStatus = PUBLISHED, data: CalendarEntryInput!): CalendarEntry
   deleteCalendarEntry(documentId: ID!): DeleteMutationResponse
+  createChampion(status: PublicationStatus = PUBLISHED, data: ChampionInput!): Champion
+  updateChampion(documentId: ID!, status: PublicationStatus = PUBLISHED, data: ChampionInput!): Champion
+  deleteChampion(documentId: ID!): DeleteMutationResponse
   createContact(status: PublicationStatus = PUBLISHED, data: ContactInput!): Contact
   updateContact(documentId: ID!, status: PublicationStatus = PUBLISHED, data: ContactInput!): Contact
   deleteContact(documentId: ID!): DeleteMutationResponse
@@ -2783,6 +3172,9 @@ type Mutation {
   createFormInstance(status: PublicationStatus = PUBLISHED, data: FormInstanceInput!): FormInstance
   updateFormInstance(documentId: ID!, status: PublicationStatus = PUBLISHED, data: FormInstanceInput!): FormInstance
   deleteFormInstance(documentId: ID!): DeleteMutationResponse
+  createGalleryImage(status: PublicationStatus = PUBLISHED, data: GalleryImageInput!): GalleryImage
+  updateGalleryImage(documentId: ID!, status: PublicationStatus = PUBLISHED, data: GalleryImageInput!): GalleryImage
+  deleteGalleryImage(documentId: ID!): DeleteMutationResponse
   updateGlobalLayout(status: PublicationStatus = PUBLISHED, data: GlobalLayoutInput!): GlobalLayout
   deleteGlobalLayout: DeleteMutationResponse
   updateHzdSetting(status: PublicationStatus = PUBLISHED, data: HzdSettingInput!): HzdSetting
@@ -2801,6 +3193,9 @@ type Mutation {
   createNewsArticleCategory(status: PublicationStatus = PUBLISHED, data: NewsArticleCategoryInput!): NewsArticleCategory
   updateNewsArticleCategory(documentId: ID!, status: PublicationStatus = PUBLISHED, data: NewsArticleCategoryInput!): NewsArticleCategory
   deleteNewsArticleCategory(documentId: ID!): DeleteMutationResponse
+  createNewsArticleTag(status: PublicationStatus = PUBLISHED, data: NewsArticleTagInput!): NewsArticleTag
+  updateNewsArticleTag(documentId: ID!, status: PublicationStatus = PUBLISHED, data: NewsArticleTagInput!): NewsArticleTag
+  deleteNewsArticleTag(documentId: ID!): DeleteMutationResponse
   createOrder(status: PublicationStatus = PUBLISHED, data: OrderInput!): Order
   updateOrder(documentId: ID!, status: PublicationStatus = PUBLISHED, data: OrderInput!): Order
   deleteOrder(documentId: ID!): DeleteMutationResponse
@@ -2810,9 +3205,18 @@ type Mutation {
   createPage(status: PublicationStatus = PUBLISHED, data: PageInput!): Page
   updatePage(documentId: ID!, status: PublicationStatus = PUBLISHED, data: PageInput!): Page
   deletePage(documentId: ID!): DeleteMutationResponse
+  createPhotoboxImage(status: PublicationStatus = PUBLISHED, data: PhotoboxImageInput!): PhotoboxImage
+  updatePhotoboxImage(documentId: ID!, status: PublicationStatus = PUBLISHED, data: PhotoboxImageInput!): PhotoboxImage
+  deletePhotoboxImage(documentId: ID!): DeleteMutationResponse
+  createPhotoboxImageCollection(status: PublicationStatus = PUBLISHED, data: PhotoboxImageCollectionInput!): PhotoboxImageCollection
+  updatePhotoboxImageCollection(documentId: ID!, status: PublicationStatus = PUBLISHED, data: PhotoboxImageCollectionInput!): PhotoboxImageCollection
+  deletePhotoboxImageCollection(documentId: ID!): DeleteMutationResponse
   createRegionalUnit(status: PublicationStatus = PUBLISHED, data: RegionalUnitInput!): RegionalUnit
   updateRegionalUnit(documentId: ID!, status: PublicationStatus = PUBLISHED, data: RegionalUnitInput!): RegionalUnit
   deleteRegionalUnit(documentId: ID!): DeleteMutationResponse
+  createSubscription(status: PublicationStatus = PUBLISHED, data: SubscriptionInput!): Subscription
+  updateSubscription(documentId: ID!, status: PublicationStatus = PUBLISHED, data: SubscriptionInput!): Subscription
+  deleteSubscription(documentId: ID!): DeleteMutationResponse
   createSupplementalDocument(status: PublicationStatus = PUBLISHED, data: SupplementalDocumentInput!): SupplementalDocument
   updateSupplementalDocument(documentId: ID!, status: PublicationStatus = PUBLISHED, data: SupplementalDocumentInput!): SupplementalDocument
   deleteSupplementalDocument(documentId: ID!): DeleteMutationResponse

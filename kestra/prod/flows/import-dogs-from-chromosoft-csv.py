@@ -134,6 +134,12 @@ class ChromosoftDogRecord:
 	dam_studbook_number: str
 	sire_full_name: str
 	dam_full_name: str
+	hd: Optional[str]
+	sod1: Optional[str]
+	eyes_check: Optional[bool]
+	genprofil: Optional[bool]
+	heart_check: Optional[bool]
+	color_check: Optional[bool]
 
 
 class GraphQLClient:
@@ -320,9 +326,28 @@ def map_color_enum(raw: str) -> Optional[str]:
                return None
        return COLOR_ENUM_MAP.get(value) or COLOR_ENUM_MAP.get(value.upper())
 
+def map_hd_enum(hd_raw: str, hd_g_raw: str) -> Optional[str]:
+	val = (hd_raw or '').strip().upper()
+	val_g = (hd_g_raw or '').strip().upper()
+	for v in [val, val_g]:
+		if 'A1' in v: return 'A1'
+		if 'A2' in v: return 'A2'
+		if 'B1' in v: return 'B1'
+		if 'B2' in v: return 'B2'
+	return None
+
+def map_sod1_enum(sod1_raw: str) -> Optional[str]:
+	val = (sod1_raw or '').strip().upper()
+	if 'N/N' in val: return 'N_N'
+	if 'N/DM' in val: return 'N_DM'
+	if 'DM/DM' in val: return 'DM_DM'
+	return None
 
 
-def parse_bool_check(value: str) -> Optional[bool]:
+
+def parse_bool_check(value: Optional[str]) -> Optional[bool]:
+	if value is None:
+		return None
 	value = value.strip()
 	if not value or value == '-':
 		return None
@@ -362,7 +387,7 @@ def row_to_record(row: dict[str, str]) -> ChromosoftDogRecord:
 	# Zuerst versuche exakte Übereinstimmungen
 	for key in possible_keys:
 		if key in row:
-			kennel_name = row.get(key, '').strip()
+			kennel_name = (row.get(key) or '').strip()
 			if kennel_name:
 				break
 
@@ -376,26 +401,42 @@ def row_to_record(row: dict[str, str]) -> ChromosoftDogRecord:
 					if kennel_name:
 						break
 
+	hd_val = map_hd_enum(row.get('HD', ''), row.get('HD(G)', ''))
+	sod1_val = map_sod1_enum(row.get('Gentest SOD1', ''))
+	eyes_check = parse_bool_check(row.get('Augenuntersuchung', ''))
+	genprofil = parse_bool_check(row.get('DNA-Profil', ''))
+	heart_check = parse_bool_check(row.get('Herzuntersuchung', ''))
+	
+	d_lokus = parse_bool_check(row.get('D-Lokus', ''))
+	fellabweichung = parse_bool_check(row.get('Fellabweichung', ''))
+	color_check = d_lokus or fellabweichung or None
+
 	return ChromosoftDogRecord(
 		c_id=c_id_value,
-		given_name=row.get('Given Name', '').strip(),
-		full_name=row.get('Full Name', '').strip(),
+		given_name=(row.get('Given Name') or '').strip(),
+		full_name=(row.get('Full Name') or '').strip(),
 		breeder_id=parse_int(row.get('ID Breeder', '')),
 		owner_id=parse_int(row.get('ID Owner', '')),
-		chip_number=row.get('chip number', '').strip(),
-		sex=row.get('sex', '').strip(),
-		date_of_birth=row.get('date of birth', '').strip(),
-		date_of_death=row.get('date of death', '').strip(),
-		richterbericht=row.get('Richterbericht', '').strip(),
+		chip_number=(row.get('chip number') or '').strip(),
+		sex=(row.get('sex') or '').strip(),
+		date_of_birth=(row.get('date of birth') or '').strip(),
+		date_of_death=(row.get('date of death') or '').strip(),
+		richterbericht=(row.get('Richterbericht') or '').strip(),
 		breed_survey=breed_survey,
 		breeder_kennel_name=kennel_name,
-		color=row.get('color', '').strip(),
+		color=(row.get('color') or '').strip(),
 		fertile=row.get('fertile'),
-		studbook_number=row.get('studbook number', '').strip(),
-		sire_studbook_number=row.get('studbook number (sire)', '').strip(),
-		dam_studbook_number=row.get('studbook number (dam)', '').strip(),
-		sire_full_name=row.get('fullname (sire)', '').strip(),
-		dam_full_name=row.get('fullname (dam)', '').strip(),
+		studbook_number=(row.get('studbook number') or '').strip(),
+		sire_studbook_number=(row.get('studbook number (sire)') or '').strip(),
+		dam_studbook_number=(row.get('studbook number (dam)') or '').strip(),
+		sire_full_name=(row.get('fullname (sire)') or '').strip(),
+		dam_full_name=(row.get('fullname (dam)') or '').strip(),
+		hd=hd_val,
+		sod1=sod1_val,
+		eyes_check=eyes_check,
+		genprofil=genprofil,
+		heart_check=heart_check,
+		color_check=color_check,
 	)
 
 
@@ -439,6 +480,14 @@ def build_graphql_payload(
 		assign("cFertile", True)
 	else:
 		assign("cFertile", False)
+
+	# Health fields
+	assign('HD', record.hd)
+	assign('SOD1', record.sod1)
+	assign('EyesCheck', record.eyes_check)
+	assign('Genprofil', record.genprofil)
+	assign('HeartCheck', record.heart_check)
+	assign('ColorCheck', record.color_check)
 
 	# Verknüpfungen
 	# Breeder-Verknüpfung über breeder: ID (Relation zu HzdPluginBreeder)
