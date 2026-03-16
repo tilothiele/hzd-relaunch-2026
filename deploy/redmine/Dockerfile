@@ -23,8 +23,7 @@ WORKDIR /usr/src/redmine
 #RUN bundle exec rake assets:precompile RAILS_ENV=production
 RUN bundle install \
     && chown redmine.redmine /usr/src/redmine \
-    && chmod +t /usr/local/bundle/gems \
-    && tree /usr/src/redmine/plugins
+    && chmod +t /usr/local/bundle/gems
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["rails", "server", "-b", "0.0.0.0"]
