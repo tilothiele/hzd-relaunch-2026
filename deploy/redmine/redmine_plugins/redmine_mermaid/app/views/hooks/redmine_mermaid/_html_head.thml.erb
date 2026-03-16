@@ -1,0 +1,19 @@
+<%= stylesheet_link_tag 'mermaid', plugin: 'redmine_mermaid' %>
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+mermaid.initialize({ startOnLoad: false, theme: 'default' });
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeBlocks = document.querySelectorAll('pre > code[data-language="mermaid"]');
+  if (codeBlocks.length === 0) return;
+
+  const nodes = [];
+  codeBlocks.forEach(function(code) {
+    const pre = code.parentElement;
+    pre.className = 'mermaid';
+    pre.textContent = code.textContent;
+    nodes.push(pre);
+  });
+  mermaid.run({ nodes: nodes });
+});
+</script>
