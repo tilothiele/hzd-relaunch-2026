@@ -16,6 +16,13 @@ mermaid.registerIconPacks([
       fetch('https://unpkg.com/@iconify-json/simple-icons@1/icons.json').then((res) => res.json()),
   },
 ]);
+mermaid.registerIconPacks([
+  {
+    name: 'mdi',
+    loader: () =>
+      fetch('https://unpkg.com/@iconify-json/mdi@1/icons.json').then((res) => res.json()),
+  },
+]);
 document.addEventListener('DOMContentLoaded', function() {
   const codeBlocks = document.querySelectorAll('pre > code[data-language="mermaid"]');
   if (codeBlocks.length === 0) return;
