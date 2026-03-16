@@ -2,7 +2,13 @@
 <script type="module">
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 mermaid.initialize({ startOnLoad: false, theme: 'default' });
-
+mermaid.registerIconPacks([
+  {
+    name: 'logos',
+    loader: () =>
+      fetch('https://unpkg.com/@iconify-json/logos@1/icons.json').then((res) => res.json()),
+  },
+]);
 document.addEventListener('DOMContentLoaded', function() {
   const codeBlocks = document.querySelectorAll('pre > code[data-language="mermaid"]');
   if (codeBlocks.length === 0) return;
