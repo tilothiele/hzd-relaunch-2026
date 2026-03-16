@@ -14,8 +14,8 @@ COPY redmine_plugins/project_mail_override /usr/src/redmine/plugins/project_mail
 
 WORKDIR /usr/src/redmine/plugins
 RUN git clone https://github.com/enricohuang/redmine_mermaid.git \
-      && git clone https://github.com/suer/redmine_webhook.git \
-     rake redmine:plugins:migrate RAILS_ENV=production
+      && git clone https://github.com/suer/redmine_webhook.git
+RUN  rake redmine:plugins:migrate RAILS_ENV=production
 WORKDIR /usr/src/redmine
 #RUN bundle exec rake assets:precompile RAILS_ENV=production
 RUN bundle install \
