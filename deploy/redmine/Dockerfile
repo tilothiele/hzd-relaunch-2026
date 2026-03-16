@@ -6,7 +6,7 @@ COPY configuration.yml.template /configuration.yml.template
 COPY receive_imap.sh.template /receive_imap.sh.template
 
 RUN apt-get update \
-    && apt-get install -y gettext cron tree git \
+    && apt-get install -y gettext cron tree git build-essential pkg-config \
     && chmod +x /entrypoint.sh \
     && tree /usr/src/redmine
 
@@ -20,6 +20,7 @@ WORKDIR /usr/src/redmine
 #RUN bundle exec rake assets:precompile RAILS_ENV=production
 RUN bundle install \
     && chown redmine.redmine /usr/src/redmine \
+    && chmod +t /usr/local/bundle/gems \
     && tree /usr/src/redmine/plugins
 
 ENTRYPOINT ["/entrypoint.sh"]
