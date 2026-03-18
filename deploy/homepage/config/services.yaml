@@ -9,6 +9,21 @@
         description: Neue Website
         icon: https://hzd-backend.hovawarte.com/uploads/HZD_logo256_hovawart_zuchtgemeinschaft_deutschland_d1ad6876b0.png
 
+    - Relaunch-Staging:
+        href: https://hzd-relaunch-staging.app.tilothiele.de
+        description: Neue Website (Test)
+        icon: https://hzd-backend.hovawarte.com/uploads/HZD_logo256_hovawart_zuchtgemeinschaft_deutschland_d1ad6876b0.png
+
+    - Backend:
+        href: https://hzd-backend.hovawarte.com
+        description: Backend
+        icon: strapi.png
+
+    - Backend-Staging:
+        href: https://hzd-backend-staging.app.tilothiele.de
+        description: Backend (Test)
+        icon: strapi.png
+
 - Monitoring:
     - Umami:
         href: https://umami.hovwarte.com
