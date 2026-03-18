@@ -46,3 +46,8 @@
         description: Mediadatenbank
         icon: mdi-image-outline
 
+    - Paperless:
+        href: http://paperless.hovawarte.com
+        description: Paperless Dokumentenmanagement
+        icon: paperless.png
+
