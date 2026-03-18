@@ -8,43 +8,43 @@
 # Options may be copied from config.default.php and configured here.
 
 # MySQL database settings
-$mysql_server = '${MYSQL_HOST}';
-$mysql_username = '${MYSQL_USER}';
-$mysql_password = '${MYSQL_PASS}';
-$mysql_db = '${MYSQL_DB}';
+$$mysql_server = '${MYSQL_HOST}';
+$$mysql_username = '${MYSQL_USER}';
+$$mysql_password = '${MYSQL_PASS}';
+$$mysql_db = '${MYSQL_DB}';
 
-$mysql_bin_path = '/usr/bin';
+$$mysql_bin_path = '/usr/bin';
 
 # Base URL of the installation
-$baseurl = '${SERVICE_URL_RESOURCESPACE}';
+$$baseurl = '${SERVICE_URL_RESOURCESPACE}';
 
 # Email settings
-$email_notify = '${EMAIL_NOTIFY}';
-$email_from = '${EMAIL_FROM}';
+$$email_notify = '${EMAIL_NOTIFY}';
+$$email_from = '${EMAIL_FROM}';
 # Secure keys
-$scramble_key = '${SCRAMBLE_KEY}';
-$api_scramble_key = '${API_SCRAMBLE_KEY}';
+$$scramble_key = '${SCRAMBLE_KEY}';
+$$api_scramble_key = '${API_SCRAMBLE_KEY}';
 
 # Paths
-$imagemagick_path = '/usr/bin';
-$ghostscript_path = '/usr/bin';
-$ffmpeg_path = '/usr/bin';
-$exiftool_path = '/usr/bin';
-$pdftotext_path = '/usr/bin';
+$$imagemagick_path = '/usr/bin';
+$$ghostscript_path = '/usr/bin';
+$$ffmpeg_path = '/usr/bin';
+$$exiftool_path = '/usr/bin';
+$$pdftotext_path = '/usr/bin';
 
-$applicationname = 'ResourceSpace';
-$defaultlanguage = 'de';
+$$applicationname = 'ResourceSpace';
+$$defaultlanguage = 'de';
 #SMTP settings
-$use_smtp = true;
-$use_phpmailer = true;
-$smtp_secure = '${SMTP_SECURE}';
-$smtp_host = '${SMTP_HOST}';
-$smtp_port = ${SMTP_PORT};
-$smtp_auth = true;
-$smtp_username = '${SMTP_USERNAME}';
-$smtp_password = '${SMTP_PASSWORD}';
+$$use_smtp = true;
+$$use_phpmailer = true;
+$$smtp_secure = '${SMTP_SECURE}';
+$$smtp_host = '${SMTP_HOST}';
+$$smtp_port = ${SMTP_PORT};
+$$smtp_auth = true;
+$$smtp_username = '${SMTP_USERNAME}';
+$$smtp_password = '${SMTP_PASSWORD}';
 
-$homeanim_folder = 'filestore/system/slideshow_0fef059d91dc3a4';
+$$homeanim_folder = 'filestore/system/slideshow_0fef059d91dc3a4';
 
 /*
 
@@ -57,40 +57,40 @@ This provides a mechanism for enabling new features for new installations withou
 */
 
 // Set imagemagick default for new installs to expect the newer version with the sRGB bug fixed.
-$imagemagick_colorspace = "sRGB";
+$$imagemagick_colorspace = "sRGB";
 
-$contact_link=false;
-$themes_simple_view=true;
+$$contact_link=false;
+$$themes_simple_view=true;
 
-$stemming=true;
-$case_insensitive_username=true;
-$user_pref_user_management_notifications=true;
+$$stemming=true;
+$$case_insensitive_username=true;
+$$user_pref_user_management_notifications=true;
 
-$use_zip_extension=true;
-$collection_download=true;
+$$use_zip_extension=true;
+$$collection_download=true;
 
-$ffmpeg_preview_force = true;
-$ffmpeg_preview_extension = 'mp4';
-$ffmpeg_preview_options = '-f mp4 -b:v 1200k -b:a 64k -ac 1 -c:v libx264 -pix_fmt yuv420p -profile:v baseline -level 3 -c:a aac -strict -2';
+$$ffmpeg_preview_force = true;
+$$ffmpeg_preview_extension = 'mp4';
+$$ffmpeg_preview_options = '-f mp4 -b:v 1200k -b:a 64k -ac 1 -c:v libx264 -pix_fmt yuv420p -profile:v baseline -level 3 -c:a aac -strict -2';
 
-$daterange_search = true;
-$upload_then_edit = true;
+$$daterange_search = true;
+$$upload_then_edit = true;
 
-$purge_temp_folder_age=90;
-$filestore_evenspread=true;
+$$purge_temp_folder_age=90;
+$$filestore_evenspread=true;
 
-$comments_resource_enable=true;
+$$comments_resource_enable=true;
 
-$api_upload_urls = array();
+$$api_upload_urls = array();
 
-$use_native_input_for_date_field = true;
-$resource_view_use_pre = true;
+$$use_native_input_for_date_field = true;
+$$resource_view_use_pre = true;
 
-$sort_tabs = false;
-$maxyear_extends_current = 5;
-$thumbs_display_archive_state = true;
-$file_checksums = true;
-$hide_real_filepath = true;
-$annotate_enabled = true;
+$$sort_tabs = false;
+$$maxyear_extends_current = 5;
+$$thumbs_display_archive_state = true;
+$$file_checksums = true;
+$$hide_real_filepath = true;
+$$annotate_enabled = true;
 
-$plugins[] = "brand_guidelines";
+$$plugins[] = "brand_guidelines";
