@@ -5,7 +5,7 @@ color: slate
 layout:
   Website:
     style: row
-    columns: 2
+    columns: 3
   Werkzeuge:
     style: row
     columns: 3
