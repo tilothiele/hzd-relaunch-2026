@@ -9,6 +9,12 @@
         description: Neue Website
         icon: pi-hole.png
 
+- Monitoring:
+    - Umami:
+        href: https://umami.hovwarte.com
+        description: Umami Analytics
+        icon: nextcloud.png
+
 - Werkzeuge:
     - Nextcloud:
         href: https://cloud.hovwarte.com
