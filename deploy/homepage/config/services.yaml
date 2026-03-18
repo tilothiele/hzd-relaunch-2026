@@ -2,18 +2,18 @@
     - Joomla:
         href: https://hovwarte.com
         description: Alte Website
-        icon: portainer.png
+        icon: joomla.png
 
     - Relaunch:
         href: https://relaunch.hovwarte.com
         description: Neue Website
-        icon: pi-hole.png
+        icon: https://hzd-backend.hovawarte.com/uploads/HZD_logo256_hovawart_zuchtgemeinschaft_deutschland_d1ad6876b0.png
 
 - Monitoring:
     - Umami:
         href: https://umami.hovwarte.com
         description: Umami Analytics
-        icon: nextcloud.png
+        icon: umami.png
 
 - Werkzeuge:
     - Nextcloud:
@@ -29,5 +29,5 @@
     - Media:
         href: http://resourcespace.hovwarte.com
         description: Mediadatenbank
-        icon: redmine.png
+        icon: panorama-variant-outline.png
 
