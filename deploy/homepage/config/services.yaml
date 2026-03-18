@@ -1,0 +1,27 @@
+- Website:
+    - Joomla:
+        href: https://hovwarte.com
+        description: Alte Website
+        icon: portainer.png
+
+    - Relaunch:
+        href: https://relaunch.hovwarte.com
+        description: Neue Website
+        icon: pi-hole.png
+
+- Werkzeuge:
+    - Nextcloud:
+        href: https://cloud.hovwarte.com
+        description: Cloud Storage
+        icon: nextcloud.png
+
+    - Redmine:
+        href: http://redmine.hovwarte.com
+        description: Redmine Project Management
+        icon: redmine.png
+
+    - Media:
+        href: http://resourcespace.hovwarte.com
+        description: Mediadatenbank
+        icon: redmine.png
+

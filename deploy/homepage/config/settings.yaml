@@ -1,0 +1,11 @@
+title: HZD Dashboard
+theme: dark
+color: slate
+
+layout:
+  Website:
+    style: row
+    columns: 2
+  Werkzeuge:
+    style: row
+    columns: 3
