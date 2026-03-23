@@ -272,6 +272,7 @@ input ComponentSeoSeoFiltersInput {
   MetaDescription: StringFilterInput
   Keywords: StringFilterInput
   ExcludeFromSitemap: BooleanFilterInput
+  author: AuthorFiltersInput
   and: [ComponentSeoSeoFiltersInput]
   or: [ComponentSeoSeoFiltersInput]
   not: ComponentSeoSeoFiltersInput
@@ -283,6 +284,7 @@ input ComponentSeoSeoInput {
   MetaDescription: String
   Keywords: String
   ExcludeFromSitemap: Boolean
+  author: ID
 }
 
 type ComponentSeoSeo {
@@ -291,6 +293,7 @@ type ComponentSeoSeo {
   MetaDescription: String
   Keywords: String
   ExcludeFromSitemap: Boolean
+  author: Author
 }
 
 input ComponentPersonalShippingAddressFiltersInput {
@@ -1809,6 +1812,84 @@ type AnnouncementEntityResponseCollection {
   pageInfo: Pagination!
 }
 
+enum ENUM_AUTHOR_SEX {
+  Male
+  Female
+}
+
+input AuthorFiltersInput {
+  documentId: IDFilterInput
+  FirstName: StringFilterInput
+  LastName: StringFilterInput
+  AcademicTitle: StringFilterInput
+  EmailAddress: StringFilterInput
+  Phone: StringFilterInput
+  Profession: StringFilterInput
+  DateOfBirth: DateFilterInput
+  Sex: StringFilterInput
+  HzdMember: UsersPermissionsUserFiltersInput
+  Bio: StringFilterInput
+  AuthorIntroduction: StringFilterInput
+  DisplayName: StringFilterInput
+  Slug: StringFilterInput
+  ExternalPublication: ComponentLinksActionButtonFiltersInput
+  createdAt: DateTimeFilterInput
+  updatedAt: DateTimeFilterInput
+  publishedAt: DateTimeFilterInput
+  and: [AuthorFiltersInput]
+  or: [AuthorFiltersInput]
+  not: AuthorFiltersInput
+}
+
+input AuthorInput {
+  FirstName: String
+  LastName: String
+  AcademicTitle: String
+  EmailAddress: String
+  Phone: String
+  Avatar: ID
+  Profession: String
+  DateOfBirth: Date
+  Sex: ENUM_AUTHOR_SEX
+  HzdMember: ID
+  Bio: String
+  AuthorIntroduction: String
+  AuthorsImageGallery: [ID]
+  DisplayName: String
+  Slug: String
+  ExternalPublication: [ComponentLinksActionButtonInput]
+  publishedAt: DateTime
+}
+
+type Author {
+  documentId: ID!
+  FirstName: String
+  LastName: String
+  AcademicTitle: String
+  EmailAddress: String
+  Phone: String
+  Avatar: UploadFile
+  Profession: String
+  DateOfBirth: Date
+  Sex: ENUM_AUTHOR_SEX
+  HzdMember: UsersPermissionsUser
+  Bio: String
+  AuthorIntroduction: String
+  AuthorsImageGallery_connection(filters: UploadFileFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): UploadFileRelationResponseCollection
+  AuthorsImageGallery(filters: UploadFileFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [UploadFile]!
+  DisplayName: String
+  Slug: String!
+  ExternalPublication(filters: ComponentLinksActionButtonFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [ComponentLinksActionButton]
+  createdAt: DateTime
+  updatedAt: DateTime
+  publishedAt: DateTime
+}
+
+type AuthorEntityResponseCollection {
+  nodes: [Author!]!
+  pageInfo: Pagination!
+}
+
 enum ENUM_CALENDAR_COLORSCHEMA {
   Violet
   Gruen
@@ -2400,7 +2481,6 @@ input NewsArticleFiltersInput {
   Headline: StringFilterInput
   SubHeadline: StringFilterInput
   TeaserText: StringFilterInput
-  Author: StringFilterInput
   VisibleFrom: DateTimeFilterInput
   VisibleTo: DateTimeFilterInput
   DateOfPublication: DateFilterInput
@@ -2422,7 +2502,6 @@ input NewsArticleInput {
   SubHeadline: String
   TeaserText: String
   Image: ID
-  Author: String
   VisibleFrom: DateTime
   VisibleTo: DateTime
   DateOfPublication: Date
@@ -2441,7 +2520,6 @@ type NewsArticle {
   SubHeadline: String
   TeaserText: String
   Image: UploadFile
-  Author: String
   VisibleFrom: DateTime
   VisibleTo: DateTime
   DateOfPublication: Date
@@ -2947,7 +3025,7 @@ type SupplementalDocumentGroupEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBreedingDogDocument | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTableOfContentSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksDocumentBundle | ComponentBlocksDocumentBundleSection | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksChampionsSection | ComponentBlocksCardSection | ComponentBlocksCardItem | ComponentBlocksBundleDocuments | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Announcement | Calendar | CalendarEntry | Champion | Contact | ContactGroup | Form | FormInstance | GalleryImage | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | NewsArticleTag | Order | OrderItem | Page | PhotoboxImage | PhotoboxImageCollection | RegionalUnit | Subscription | SupplementalDocument | SupplementalDocumentGroup
+union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBreedingDogDocument | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTableOfContentSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksDocumentBundle | ComponentBlocksDocumentBundleSection | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksChampionsSection | ComponentBlocksCardSection | ComponentBlocksCardItem | ComponentBlocksBundleDocuments | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Announcement | Author | Calendar | CalendarEntry | Champion | Contact | ContactGroup | Form | FormInstance | GalleryImage | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | NewsArticleTag | Order | OrderItem | Page | PhotoboxImage | PhotoboxImageCollection | RegionalUnit | Subscription | SupplementalDocument | SupplementalDocumentGroup
 
 input FileInfoInput {
   name: String
@@ -3056,6 +3134,9 @@ type Query {
   announcement(documentId: ID!, status: PublicationStatus = PUBLISHED): Announcement
   announcements_connection(filters: AnnouncementFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): AnnouncementEntityResponseCollection
   announcements(filters: AnnouncementFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Announcement]!
+  author(documentId: ID!, status: PublicationStatus = PUBLISHED): Author
+  authors_connection(filters: AuthorFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): AuthorEntityResponseCollection
+  authors(filters: AuthorFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Author]!
   calendar(documentId: ID!, status: PublicationStatus = PUBLISHED): Calendar
   calendars_connection(filters: CalendarFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): CalendarEntityResponseCollection
   calendars(filters: CalendarFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Calendar]!
@@ -3151,6 +3232,9 @@ type Mutation {
   createAnnouncement(status: PublicationStatus = PUBLISHED, data: AnnouncementInput!): Announcement
   updateAnnouncement(documentId: ID!, status: PublicationStatus = PUBLISHED, data: AnnouncementInput!): Announcement
   deleteAnnouncement(documentId: ID!): DeleteMutationResponse
+  createAuthor(status: PublicationStatus = PUBLISHED, data: AuthorInput!): Author
+  updateAuthor(documentId: ID!, status: PublicationStatus = PUBLISHED, data: AuthorInput!): Author
+  deleteAuthor(documentId: ID!): DeleteMutationResponse
   createCalendar(status: PublicationStatus = PUBLISHED, data: CalendarInput!): Calendar
   updateCalendar(documentId: ID!, status: PublicationStatus = PUBLISHED, data: CalendarInput!): Calendar
   deleteCalendar(documentId: ID!): DeleteMutationResponse

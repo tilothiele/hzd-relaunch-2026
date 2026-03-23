@@ -28,9 +28,6 @@
         "files"
       ]
     },
-    "Author": {
-      "type": "string"
-    },
     "VisibleFrom": {
       "type": "datetime"
     },

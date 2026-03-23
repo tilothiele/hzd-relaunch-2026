@@ -783,6 +783,21 @@ export interface CreateFormInstanceResult {
 	}
 }
 
+export interface Author {
+	documentId: string
+	FirstName?: string | null
+	LastName?: string | null
+	DisplayName?: string | null
+	Slug?: string | null
+	Avatar?: Image | null
+	Profession?: string | null
+	AcademicTitle?: string | null
+	Sex?: 'Male' | 'Female' | null
+	Bio?: string | null
+	AuthorIntroduction?: string | null
+	ExternalPublication?: ActionButton[] | null
+}
+
 export interface SEO {
 	MetaTitle?: string | null
 	MetaDescription?: string | null
@@ -791,6 +806,7 @@ export interface SEO {
 	MetaRobots?: string | null
 	StructuredData?: unknown | null
 	MetaSocial?: MetaSocial[] | null
+	author?: Author | null
 }
 
 export interface MetaSocial {
@@ -817,7 +833,6 @@ export interface NewsArticle {
 	SubHeadline?: string | null
 	TeaserText?: string | null
 	Slug?: string | null
-	Author?: string | null
 	DateOfPublication?: string | null
 	publishedAt?: string | null
 	FeaturedArticle?: boolean | null

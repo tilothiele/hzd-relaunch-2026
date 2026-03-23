@@ -721,6 +721,7 @@ export interface SeoSeo extends Struct.ComponentSchema {
     displayName: 'SEO';
   };
   attributes: {
+    author: Schema.Attribute.Relation<'oneToOne', 'api::author.author'>;
     ExcludeFromSitemap: Schema.Attribute.Boolean;
     Keywords: Schema.Attribute.String;
     MetaDescription: Schema.Attribute.String;

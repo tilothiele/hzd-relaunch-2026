@@ -1,0 +1,96 @@
+{
+  "kind": "collectionType",
+  "collectionName": "authors",
+  "info": {
+    "singularName": "author",
+    "pluralName": "authors",
+    "displayName": "Author"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "FirstName": {
+      "type": "string"
+    },
+    "LastName": {
+      "type": "string"
+    },
+    "AcademicTitle": {
+      "type": "string"
+    },
+    "EmailAddress": {
+      "type": "email"
+    },
+    "Phone": {
+      "type": "string"
+    },
+    "Avatar": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "Profession": {
+      "type": "string"
+    },
+    "DateOfBirth": {
+      "type": "date"
+    },
+    "Sex": {
+      "type": "enumeration",
+      "enum": [
+        "Male",
+        "Female"
+      ]
+    },
+    "HzdMember": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "Bio": {
+      "type": "customField",
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultHtml"
+      }
+    },
+    "AuthorIntroduction": {
+      "type": "customField",
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultHtml"
+      }
+    },
+    "AuthorsImageGallery": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "DisplayName": {
+      "type": "string"
+    },
+    "Slug": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "regex": "^\\/.*"
+    },
+    "ExternalPublication": {
+      "type": "component",
+      "component": "links.action-button",
+      "repeatable": true
+    }
+  }
+}

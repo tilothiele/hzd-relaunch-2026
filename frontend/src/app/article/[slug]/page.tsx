@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import { MainPageStructure } from '../../main-page-structure'
 import { theme as globalTheme, type ThemeDefinition } from '@/themes'
 import { fetchNewsArticleBySlug, fetchGlobalLayout } from '@/lib/server/fetch-news-article-by-slug'
@@ -23,6 +24,7 @@ function ArticleHeader({
     headline,
     subHeadline,
     author,
+    authorSlug,
     publishedAt,
     image,
     tags,
@@ -32,6 +34,7 @@ function ArticleHeader({
     headline?: string | null
     subHeadline?: string | null
     author?: string | null
+    authorSlug?: string | null
     publishedAt?: string | null
     image?: { url: string; alternativeText?: string | null; width?: number | null; height?: number | null } | null
     tags?: { Label?: string | null; TagColorHexCode?: string | null; TagBgColorHexCode?: string | null }[] | null
@@ -60,7 +63,18 @@ function ArticleHeader({
                     )}
                     {author && (
                         <p className='text-sm opacity-80' style={{ color: 'inherit' }}>
-                            von {author}
+                            von {authorSlug ? (
+                                (() => {
+                                    const cleanSlug = authorSlug.startsWith('/') ? authorSlug.substring(1) : authorSlug
+                                    return (
+                                        <Link href={`/author/${cleanSlug}`} className="hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-sm" style={{ textDecorationColor: theme.buttonColor }}>
+                                            {author}
+                                        </Link>
+                                    )
+                                })()
+                            ) : (
+                                author
+                            )}
                         </p>
                     )}
                     {tags && tags.length > 0 && (
@@ -178,7 +192,8 @@ export default async function ArticlePage({ params }: PageProps) {
                 <ArticleHeader
                     headline={article.Headline}
                     subHeadline={article.SubHeadline}
-                    author={article.Author}
+                    author={article.SEO?.author?.DisplayName}
+                    authorSlug={article.SEO?.author?.Slug}
                     publishedAt={article.DateOfPublication || article.publishedAt}
                     image={article.Image}
                     tags={article.news_article_tags}

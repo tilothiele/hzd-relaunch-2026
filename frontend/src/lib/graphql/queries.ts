@@ -1660,7 +1660,6 @@ export const GET_NEWS_ARTICLE_BY_SLUG = `
 			SubHeadline
 			TeaserText
 			Slug
-			Author
 			DateOfPublication
 			publishedAt
 			Image {
@@ -1673,6 +1672,10 @@ export const GET_NEWS_ARTICLE_BY_SLUG = `
 			}
 			SEO {
 				MetaDescription
+				author {
+					DisplayName
+					Slug
+				}
 			}
 			category {
 				documentId
@@ -1969,6 +1972,37 @@ export const GET_NEWS_ARTICLES_BY_CATEGORY = `
 				Label
 				TagColorHexCode
 				TagBgColorHexCode
+			}
+		}
+	}
+`
+export const GET_AUTHOR_BY_SLUG = `
+	query GetAuthorBySlug($slug: String!) {
+		authors(filters: { Slug: { eq: $slug } }, pagination: { pageSize: 1 }) {
+			documentId
+			FirstName
+			LastName
+			AcademicTitle
+			DisplayName
+			Slug
+			EmailAddress
+			Phone
+			Sex
+			Profession
+			DateOfBirth
+			Bio
+			AuthorIntroduction
+			ExternalPublication {
+				Label
+				Link
+				Primary
+			}
+			Avatar {
+				url
+				alternativeText
+				width
+				height
+				caption
 			}
 		}
 	}

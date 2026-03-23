@@ -474,6 +474,72 @@ export interface ApiAnnouncementAnnouncement
   };
 }
 
+export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
+  collectionName: 'authors';
+  info: {
+    displayName: 'Author';
+    pluralName: 'authors';
+    singularName: 'author';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    AcademicTitle: Schema.Attribute.String;
+    AuthorIntroduction: Schema.Attribute.RichText &
+      Schema.Attribute.CustomField<
+        'plugin::ckeditor5.CKEditor',
+        {
+          preset: 'defaultHtml';
+        }
+      >;
+    AuthorsImageGallery: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios',
+      true
+    >;
+    Avatar: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    Bio: Schema.Attribute.RichText &
+      Schema.Attribute.CustomField<
+        'plugin::ckeditor5.CKEditor',
+        {
+          preset: 'defaultHtml';
+        }
+      >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    DateOfBirth: Schema.Attribute.Date;
+    DisplayName: Schema.Attribute.String;
+    EmailAddress: Schema.Attribute.Email;
+    ExternalPublication: Schema.Attribute.Component<
+      'links.action-button',
+      true
+    >;
+    FirstName: Schema.Attribute.String;
+    HzdMember: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    LastName: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::author.author'
+    > &
+      Schema.Attribute.Private;
+    Phone: Schema.Attribute.String;
+    Profession: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    Sex: Schema.Attribute.Enumeration<['Male', 'Female']>;
+    Slug: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiCalendarEntryCalendarEntry
   extends Struct.CollectionTypeSchema {
   collectionName: 'calendar_entries';
@@ -1133,7 +1199,6 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
-    Author: Schema.Attribute.String;
     category: Schema.Attribute.Relation<
       'manyToOne',
       'api::news-article-category.news-article-category'
@@ -2351,6 +2416,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::announcement.announcement': ApiAnnouncementAnnouncement;
+      'api::author.author': ApiAuthorAuthor;
       'api::calendar-entry.calendar-entry': ApiCalendarEntryCalendarEntry;
       'api::calendar.calendar': ApiCalendarCalendar;
       'api::champion.champion': ApiChampionChampion;
