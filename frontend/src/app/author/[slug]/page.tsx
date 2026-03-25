@@ -1,7 +1,10 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import { MainPageStructure } from '../../main-page-structure'
 import { theme as globalTheme } from '@/themes'
 import { fetchAuthorBySlug } from '@/lib/server/fetch-author-by-slug'
+import { fetchGraphQLServer } from '@/lib/server/graphql-client'
+import { GET_NEWS_ARTICLES_BY_AUTHOR_SLUG } from '@/lib/graphql/queries'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import NotFoundSection from '@/components/sections/not-found-section/not-found-section'
 
@@ -11,6 +14,14 @@ interface PageProps {
     params: Promise<{
         slug: string
     }>
+}
+
+interface AuthorArticlesQueryResult {
+    newsArticles?: Array<{
+        documentId: string
+        Headline?: string | null
+        Slug?: string | null
+    }> | null
 }
 
 export default async function AuthorPage({ params }: PageProps) {
@@ -57,6 +68,19 @@ export default async function AuthorPage({ params }: PageProps) {
 
     const theme = globalTheme
     const displayName = author.DisplayName || [author.AcademicTitle, author.FirstName, author.LastName].filter(Boolean).join(' ') || 'Autor'
+    const authorArticlesResult = await fetchGraphQLServer<AuthorArticlesQueryResult>(
+        GET_NEWS_ARTICLES_BY_AUTHOR_SLUG,
+        {
+            baseUrl,
+            variables: {
+                slug: slugParam,
+                pagination: { limit: 20 },
+            },
+        },
+    )
+    const authorArticles = (authorArticlesResult.newsArticles ?? []).filter(
+        (article) => article.Headline && article.Slug,
+    )
 
     return (
         <MainPageStructure
@@ -105,12 +129,37 @@ export default async function AuthorPage({ params }: PageProps) {
                         </p>
                     )}
 
-                    {author.Bio && (
+                    {(author.Bio || authorArticles.length > 0 || (author.ExternalPublication && author.ExternalPublication.length > 0)) && (
                         <div className="w-full max-w-3xl rounded-xl bg-white p-8 text-left shadow-md flex flex-col gap-4 mb-8">
-                            <h2 className="text-2xl font-semibold border-b pb-2" style={{ color: theme.headlineColor, borderColor: theme.buttonColor }}>
-                                Biografie
-                            </h2>
-                            <div className="prose prose-lg max-w-none text-gray-700" style={{ color: theme.textColor }} dangerouslySetInnerHTML={{ __html: author.Bio }} />
+                            {author.Bio && (
+                                <>
+                                    <h2 className="text-2xl font-semibold border-b pb-2" style={{ color: theme.headlineColor, borderColor: theme.buttonColor }}>
+                                        Biografie
+                                    </h2>
+                                    <div className="prose prose-lg max-w-none text-gray-700" style={{ color: theme.textColor }} dangerouslySetInnerHTML={{ __html: author.Bio }} />
+                                </>
+                            )}
+
+                            {authorArticles.length > 0 && (
+                                <div className="mt-4">
+                                    <h3 className="text-xl font-semibold mb-3" style={{ color: theme.headlineColor }}>
+                                        Beiträge von {displayName}
+                                    </h3>
+                                    <ul className="list-disc pl-5 space-y-2 text-left">
+                                        {authorArticles.map((article) => (
+                                            <li key={article.documentId}>
+                                                <Link
+                                                    href={`/article${article.Slug}`}
+                                                    className="hover:underline font-medium"
+                                                    style={{ color: theme.buttonColor }}
+                                                >
+                                                    {article.Headline}
+                                                </Link>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
 
                             {author.ExternalPublication && author.ExternalPublication.length > 0 && (
                                 <div className="mt-4">

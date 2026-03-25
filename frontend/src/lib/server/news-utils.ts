@@ -11,6 +11,15 @@ export interface NewsArticle {
     DateOfPublication?: string | null
     publishedAt?: string | null
     Image?: Image | null
+    SEO?: {
+        author?: {
+            DisplayName?: string | null
+            FirstName?: string | null
+            LastName?: string | null
+            AcademicTitle?: string | null
+            Slug?: string | null
+        } | null
+    } | null
     category?: {
         CategoryName?: string | null
     } | null

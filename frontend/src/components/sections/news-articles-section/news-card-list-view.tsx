@@ -1,6 +1,6 @@
 'use client'
 
-import { Card, CardContent, Typography, Box, Button } from '@mui/material'
+import { Card, CardContent, Typography, Box } from '@mui/material'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { NewsArticle } from '@/lib/server/news-utils'
@@ -17,6 +17,12 @@ interface NewsCardListViewProps {
 
 export function NewsCardListView({ article, strapiBaseUrl, theme, isUnread }: NewsCardListViewProps) {
     const imageUrl = resolveMediaUrl(article.Image, strapiBaseUrl)
+    const author = article.SEO?.author
+    const authorName = author?.DisplayName
+        || [author?.AcademicTitle, author?.FirstName, author?.LastName]
+            .filter(Boolean)
+            .join(' ')
+            .trim()
     const dateToUse = article.DateOfPublication || article.publishedAt
     const formattedDate = dateToUse
         ? new Date(dateToUse).toLocaleDateString('de-DE', {
@@ -135,6 +141,11 @@ export function NewsCardListView({ article, strapiBaseUrl, theme, isUnread }: Ne
                             }}
                         >
                             {article.TeaserText}
+                        </Typography>
+                    )}
+                    {authorName && (
+                        <Typography variant="caption" sx={{ color: 'text.secondary', mt: 0.5 }}>
+                            von {authorName}
                         </Typography>
                     )}
 

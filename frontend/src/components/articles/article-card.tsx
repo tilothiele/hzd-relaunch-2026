@@ -22,14 +22,18 @@ export function ArticleCard({
 }: ArticleCardProps) {
     const formattedDate = formattedDateOfPublication(article)
     const pubDate = article.DateOfPublication || article.publishedAt || undefined
+    const author = article.SEO?.author
+    const authorName = author?.DisplayName
+        || [author?.AcademicTitle, author?.FirstName, author?.LastName]
+            .filter(Boolean)
+            .join(' ')
+            .trim()
 
     const imageUrl = article.Image?.url
         ? (article.Image.url.startsWith('http') ? article.Image.url : `${strapiBaseUrl}${article.Image.url}`)
         : null
 
     const articleLink = `/article${article.Slug}`
-
-    console.log(article.news_article_tags)
 
     return (
         <div
@@ -97,6 +101,14 @@ export function ArticleCard({
                         style={{ color: theme?.cardsText || 'var(--color-cards-text)' }}
                     >
                         {article.TeaserText}
+                    </p>
+                )}
+                {authorName && (
+                    <p
+                        className='mt-2 text-sm'
+                        style={{ color: theme?.cardsText || 'var(--color-cards-text)' }}
+                    >
+                        von {authorName}
                     </p>
                 )}
                 <div className='mt-4'>

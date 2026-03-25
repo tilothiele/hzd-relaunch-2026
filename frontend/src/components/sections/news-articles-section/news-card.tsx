@@ -16,6 +16,12 @@ interface NewsCardProps {
 
 export function NewsCard({ article, strapiBaseUrl, theme, isUnread }: NewsCardProps) {
     const imageUrl = resolveMediaUrl(article.Image, strapiBaseUrl)
+    const author = article.SEO?.author
+    const authorName = author?.DisplayName
+        || [author?.AcademicTitle, author?.FirstName, author?.LastName]
+            .filter(Boolean)
+            .join(' ')
+            .trim()
     const dateToUse = article.DateOfPublication || article.publishedAt
     const formattedDate = dateToUse
         ? new Date(dateToUse).toLocaleDateString('de-DE', {
@@ -24,8 +30,6 @@ export function NewsCard({ article, strapiBaseUrl, theme, isUnread }: NewsCardPr
             year: 'numeric'
         })
         : null
-
-    console.log(article)
 
     const articleLink = `/article/${article.Slug}`
 
@@ -142,6 +146,11 @@ export function NewsCard({ article, strapiBaseUrl, theme, isUnread }: NewsCardPr
                         }}
                     >
                         {article.TeaserText}
+                    </Typography>
+                )}
+                {authorName && (
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                        von {authorName}
                     </Typography>
                 )}
 

@@ -171,6 +171,12 @@ export default async function ArticlePage({ params }: PageProps) {
 
     const sections = article.NewsContentSections || []
     const theme = globalTheme
+    const author = article.SEO?.author
+    const authorName = author?.DisplayName
+        || [author?.AcademicTitle, author?.FirstName, author?.LastName]
+            .filter(Boolean)
+            .join(' ')
+            .trim()
     const renderedSections = renderServerSections({ sections, strapiBaseUrl: baseUrl, theme })
 
     const pageTitle = article.SEO?.MetaTitle || article.Headline || 'Artikel'
@@ -192,7 +198,7 @@ export default async function ArticlePage({ params }: PageProps) {
                 <ArticleHeader
                     headline={article.Headline}
                     subHeadline={article.SubHeadline}
-                    author={article.SEO?.author?.DisplayName}
+                    author={authorName}
                     authorSlug={article.SEO?.author?.Slug}
                     publishedAt={article.DateOfPublication || article.publishedAt}
                     image={article.Image}

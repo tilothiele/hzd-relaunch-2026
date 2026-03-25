@@ -1633,6 +1633,15 @@ export const GET_NEWS_ARTICLES = `
 				caption
 				previewUrl
 			}
+				SEO {
+					author {
+						DisplayName
+						FirstName
+						LastName
+						AcademicTitle
+						Slug
+					}
+				}
 			category {
 				CategoryName
 			}
@@ -1675,6 +1684,9 @@ export const GET_NEWS_ARTICLE_BY_SLUG = `
 				MetaDescription
 				author {
 					DisplayName
+					FirstName
+					LastName
+					AcademicTitle
 					Slug
 				}
 			}
@@ -1969,6 +1981,15 @@ export const GET_NEWS_ARTICLES_BY_CATEGORY = `
 				caption
 				previewUrl
 			}
+			SEO {
+				author {
+					DisplayName
+					FirstName
+					LastName
+					AcademicTitle
+					Slug
+				}
+			}
 			news_article_tags {
 				Label
 				TagColorHexCode
@@ -2005,6 +2026,22 @@ export const GET_AUTHOR_BY_SLUG = `
 				height
 				caption
 			}
+		}
+	}
+`
+
+export const GET_NEWS_ARTICLES_BY_AUTHOR_SLUG = `
+	query GetNewsArticlesByAuthorSlug($slug: String!, $pagination: PaginationArg) {
+		newsArticles(
+			filters: { SEO: { author: { Slug: { eq: $slug } } } }
+			pagination: $pagination
+			sort: ["DateOfPublication:desc", "publishedAt:desc"]
+		) {
+			documentId
+			Headline
+			Slug
+			DateOfPublication
+			publishedAt
 		}
 	}
 `
