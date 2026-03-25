@@ -1,5 +1,6 @@
 import type { Core } from '@strapi/strapi';
 import userAdminSchema from './extensions/graphql/config/schema.graphql';
+import { calcPublishMyData, syncUserPublishMyData } from './utils/user-publish-data';
 
 
 export default {
@@ -190,6 +191,67 @@ export default {
     strapi.log.info(
       `Remote data transfer salt is ${salt}`
     );
+
+    strapi.db.lifecycles.subscribe({
+      models: ['plugin::users-permissions.user'],
+      async beforeCreate(event) {
+        if (event.params.data) {
+          event.params.data.publishMyData = await calcPublishMyData(event.params.data);
+        }
+      },
+      async beforeUpdate(event) {
+        if (event.params.data) {
+          event.params.data.publishMyData = await calcPublishMyData(event.params.data, event.params.where?.id);
+        }
+      }
+    });
+
+    strapi.db.lifecycles.subscribe({
+      models: ['plugin::hzd-plugin.dog'],
+      async afterCreate(event) {
+        const dogId = event.result?.id;
+        if (!dogId) return;
+        setTimeout(async () => {
+          try {
+            const dog = await strapi.db.query('plugin::hzd-plugin.dog').findOne({
+              where: { id: dogId },
+              populate: ['owner']
+            });
+            if (dog?.owner?.id) {
+              await syncUserPublishMyData(dog.owner.id);
+            }
+          } catch(err) { strapi.log.error(err); }
+        }, 100);
+      },
+      async beforeUpdate(event) {
+        try {
+          const oldDog = await strapi.db.query('plugin::hzd-plugin.dog').findOne({
+            where: event.params.where,
+            populate: ['owner']
+          });
+          (event as any).state = { oldOwnerId: oldDog?.owner?.id };
+        } catch(err) { strapi.log.error(err); }
+      },
+      async afterUpdate(event) {
+        const state = (event as any).state;
+        const oldOwnerId = state?.oldOwnerId;
+        const dogId = event.result?.id || event.params.where?.id;
+        
+        if (!dogId) return;
+        setTimeout(async () => {
+          try {
+            const dog = await strapi.db.query('plugin::hzd-plugin.dog').findOne({
+              where: { id: dogId },
+              populate: ['owner']
+            });
+            const newOwnerId = dog?.owner?.id;
+
+            if (oldOwnerId) await syncUserPublishMyData(oldOwnerId);
+            if (newOwnerId && newOwnerId !== oldOwnerId) await syncUserPublishMyData(newOwnerId);
+          } catch(err) { strapi.log.error(err); }
+        }, 100);
+      }
+    });
 
     const uid = 'api::form-instance.form-instance';
 

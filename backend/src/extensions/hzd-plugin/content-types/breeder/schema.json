@@ -81,10 +81,11 @@
     "isDirty": {
       "type": "boolean"
     },
-    "owner_member": {
+    "owner_members": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "plugin::users-permissions.user"
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user",
+      "mappedBy": "breeders"
     },
     "BreederEmail": {
       "type": "email"

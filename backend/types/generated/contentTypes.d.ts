@@ -1751,8 +1751,8 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
       'oneToOne',
       'plugin::users-permissions.user'
     >;
-    owner_member: Schema.Attribute.Relation<
-      'oneToOne',
+    owner_members: Schema.Attribute.Relation<
+      'manyToMany',
       'plugin::users-permissions.user'
     >;
     publishedAt: Schema.Attribute.DateTime;
@@ -2330,6 +2330,10 @@ export interface PluginUsersPermissionsUser
     address1: Schema.Attribute.String;
     address2: Schema.Attribute.String;
     blocked: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    breeders: Schema.Attribute.Relation<
+      'manyToMany',
+      'plugin::hzd-plugin.breeder'
+    >;
     cancellationDueDate: Schema.Attribute.Date;
     cancellationOn: Schema.Attribute.Date;
     cEmail: Schema.Attribute.String &
@@ -2378,6 +2382,7 @@ export interface PluginUsersPermissionsUser
     phone: Schema.Attribute.String;
     provider: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
+    publishMyData: Schema.Attribute.Boolean;
     region: Schema.Attribute.Enumeration<
       ['Nord', 'Ost', 'Mitte', 'West', 'S\u00FCd']
     >;

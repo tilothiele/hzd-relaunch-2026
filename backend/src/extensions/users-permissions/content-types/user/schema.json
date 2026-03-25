@@ -185,6 +185,15 @@
     "DisplayName": {
       "type": "string",
       "configurable": false
+    },
+    "publishMyData": {
+      "type": "boolean"
+    },
+    "breeders": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::hzd-plugin.breeder",
+      "inversedBy": "owner_members"
     }
   }
 }
