@@ -58,6 +58,33 @@ export default (plugin: any) => {
 			}
 
 			strapi.log.info('[User Ext] ✓ User Controller extended (me endpoint patch)')
+
+			// Extend find to sanitize output based on publishMyData
+			const originalFind = plugin.controllers.user.find;
+			if (originalFind) {
+				plugin.controllers.user.find = async (ctx: any) => {
+					await originalFind(ctx);
+					if (ctx.body && Array.isArray(ctx.body)) {
+						ctx.body = ctx.body.map((user: any) => {
+							if (user.publishMyData === true) return user;
+							return { id: user.id, documentId: user.documentId };
+						});
+					}
+				};
+			}
+
+			// Extend findOne to sanitize output based on publishMyData
+			const originalFindOne = plugin.controllers.user.findOne;
+			if (originalFindOne) {
+				plugin.controllers.user.findOne = async (ctx: any) => {
+					await originalFindOne(ctx);
+					if (ctx.body && ctx.body.publishMyData !== true) {
+						ctx.body = { id: ctx.body.id, documentId: ctx.body.documentId };
+					}
+				};
+			}
+			
+			strapi.log.info('[User Ext] ✓ User Controller extended (find & findOne privacy patch)')
 		}
 
 		// Extend JWT Service

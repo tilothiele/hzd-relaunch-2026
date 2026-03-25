@@ -7,7 +7,7 @@ export const UPDATE_BREEDER = `
 			BreedersIntroduction
 			BreedersIntroDraft
 			BreederEmail
-			owner_member {
+			owner_members {
 				documentId
 				firstName
 				lastName

@@ -102,9 +102,9 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack }
                             </p>
                         ) : null}
 
-                        {breeder.owner_member?.firstName && breeder.owner_member?.lastName ? (
+                        {breeder.owner_members && breeder.owner_members.length > 0 ? (
                             <p>
-                                <strong>Züchter:</strong> {breeder.owner_member.firstName} {breeder.owner_member.lastName}
+                                <strong>Züchter:</strong> {breeder.owner_members.map(om => [om.firstName, om.lastName].filter(Boolean).join(' ')).join(', ')}
                             </p>
                         ) : (member?.firstName && member?.lastName ? (
                             <p>
@@ -170,12 +170,12 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack }
                 ) : null}
 
                 {/* Dogs List Section */}
-                {breeder.owner_member?.documentId && (
+                {breeder.owner_members && breeder.owner_members.length > 0 && breeder.owner_members[0].documentId && (
                     <section>
                         <SectionHeader title="Zuchthunde" />
                         <Box sx={{ p: 2, bg: 'white', borderRadius: 2, border: '1px solid', borderColor: 'grey.100', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' }}>
                             <BreederDogsList
-                                ownerDocumentId={breeder.owner_member.documentId}
+                                ownerDocumentId={breeder.owner_members[0].documentId}
                                 strapiBaseUrl={strapiBaseUrl}
                                 hzdSetting={hzdSetting}
                             />

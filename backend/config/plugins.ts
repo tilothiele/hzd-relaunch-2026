@@ -45,10 +45,10 @@ export default ({ env }) => ({
     }
   },
   backup: {
-    enabled: env('BACKUP_ENABLE', false),
+    enabled: env.bool('BACKUP_ENABLE', false),
     config: {
       cronSchedule: env('BACKUP_CRON_EXPR', '0 * * * *'), // Run backup each hour
-      errorHandler: (error, strapi) => {
+      errorHandler: (error: any, strapi: any) => {
         console.log(error); // TODO ntfy integrieren
       },
       sqlite3Executable: env('SQLITE3_EXECUTABLE', 'sqlite3'),

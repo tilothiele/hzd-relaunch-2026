@@ -1183,7 +1183,7 @@ export const SEARCH_BREEDERS = `
 				kennelName
 				breedingLicenseSince
 				IsActive
-				owner_member {
+				owner_members {
 					documentId
 					firstName
 					lastName
@@ -2043,7 +2043,7 @@ export const GET_SITEMAP_DATA = `
 
 export const GET_BREEDER_BY_USER = `
 	query GetBreederByUser($userId: ID!) {
-		hzdPluginBreeders_connection(filters: { owner_member: { documentId: { eq: $userId } } }) {
+		hzdPluginBreeders_connection(filters: { owner_members: { documentId: { eq: $userId } } }) {
 			nodes {
 				documentId
 				kennelName
@@ -2057,7 +2057,7 @@ export const GET_BREEDER_BY_USER = `
 				isDirty
 				InternalNotes
 				BreederEmail
-				owner_member {
+				owner_members {
 					documentId
 					firstName
 					lastName

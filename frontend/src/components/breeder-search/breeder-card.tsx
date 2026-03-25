@@ -169,7 +169,7 @@ export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, max
 
 						{/* Züchter Name */}
 						{/* Züchter Name */}
-						{(breeder.owner_member?.firstName && breeder.owner_member?.lastName) ? (
+						{(breeder.owner_members && breeder.owner_members.length > 0) ? (
 							<TableRow>
 								<TableCell
 									sx={{
@@ -184,7 +184,7 @@ export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, max
 									</Tooltip>
 								</TableCell>
 								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-									{breeder.owner_member.firstName} {breeder.owner_member.lastName}
+									{breeder.owner_members.map(om => [om.firstName, om.lastName].filter(Boolean).join(' ')).join(', ')}
 								</TableCell>
 							</TableRow>
 						) : (member?.firstName && member?.lastName ? (

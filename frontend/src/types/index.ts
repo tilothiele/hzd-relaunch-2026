@@ -522,7 +522,7 @@ export interface Breeder {
 	avatar?: Image | null
 	Address?: Address | null
 	BreederEmail?: string | null
-	owner_member?: AuthUser | null
+	owner_members?: AuthUser[] | null
 }
 
 export interface BreederSearchResult {

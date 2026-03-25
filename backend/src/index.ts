@@ -134,6 +134,31 @@ export default {
         'UsersPermissionsUser.phone': { auth: false },
         'UsersPermissionsUser.locationLat': { auth: false },
         'UsersPermissionsUser.locationLng': { auth: false },
+        
+        'Query.usersPermissionsUsers': {
+          middlewares: [
+            async (resolve: any, parent: any, args: any, context: any, info: any) => {
+              const result = await resolve(parent, args, context, info);
+              if (result && Array.isArray(result.nodes)) {
+                result.nodes = result.nodes.map((user: any) => 
+                  user.publishMyData === true ? user : { id: user.id, documentId: user.documentId }
+                );
+              }
+              return result;
+            }
+          ]
+        },
+        'Query.usersPermissionsUser': {
+          middlewares: [
+            async (resolve: any, parent: any, args: any, context: any, info: any) => {
+              const result = await resolve(parent, args, context, info);
+              if (result && result.value && result.value.publishMyData !== true) {
+                result.value = { id: result.value.id, documentId: result.value.documentId };
+              }
+              return result;
+            }
+          ]
+        }
       },
     });
 

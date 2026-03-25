@@ -1323,6 +1323,8 @@ input UsersPermissionsUserFiltersInput {
   locationLng: FloatFilterInput
   locationLat: FloatFilterInput
   DisplayName: StringFilterInput
+  publishMyData: BooleanFilterInput
+  breeders: HzdPluginBreederFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   publishedAt: DateTimeFilterInput
@@ -1363,6 +1365,8 @@ input UsersPermissionsUserInput {
   locationLng: Float
   locationLat: Float
   DisplayName: String
+  publishMyData: Boolean
+  breeders: [ID]
   publishedAt: DateTime
   password: String
 }
@@ -1400,6 +1404,9 @@ type UsersPermissionsUser {
   locationLng: Float
   locationLat: Float
   DisplayName: String
+  publishMyData: Boolean
+  breeders_connection(filters: HzdPluginBreederFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): HzdPluginBreederRelationResponseCollection
+  breeders(filters: HzdPluginBreederFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [HzdPluginBreeder]!
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -1588,7 +1595,7 @@ input HzdPluginBreederFiltersInput {
   InternalNotes: StringFilterInput
   BreedersIntroDraft: StringFilterInput
   isDirty: BooleanFilterInput
-  owner_member: UsersPermissionsUserFiltersInput
+  owner_members: UsersPermissionsUserFiltersInput
   BreederEmail: StringFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
@@ -1614,7 +1621,7 @@ input HzdPluginBreederInput {
   InternalNotes: String
   BreedersIntroDraft: String
   isDirty: Boolean
-  owner_member: ID
+  owner_members: [ID]
   BreederEmail: String
   publishedAt: DateTime
 }
@@ -1637,7 +1644,8 @@ type HzdPluginBreeder {
   InternalNotes: String
   BreedersIntroDraft: String
   isDirty: Boolean
-  owner_member: UsersPermissionsUser
+  owner_members_connection(filters: UsersPermissionsUserFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): UsersPermissionsUserRelationResponseCollection
+  owner_members(filters: UsersPermissionsUserFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [UsersPermissionsUser]!
   BreederEmail: String
   createdAt: DateTime
   updatedAt: DateTime
@@ -1647,6 +1655,10 @@ type HzdPluginBreeder {
 type HzdPluginBreederEntityResponseCollection {
   nodes: [HzdPluginBreeder!]!
   pageInfo: Pagination!
+}
+
+type HzdPluginBreederRelationResponseCollection {
+  nodes: [HzdPluginBreeder!]!
 }
 
 enum ENUM_HZDPLUGINLITTER_LITTERSTATUS {

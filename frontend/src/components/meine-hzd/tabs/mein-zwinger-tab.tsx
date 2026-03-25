@@ -146,11 +146,15 @@ export function MeinZwingerTab({ breeder, strapiBaseUrl }: MeinZwingerTabProps) 
                 <Box sx={{ flex: 1 }}>
                     <Typography variant='h6' sx={{ mb: 2 }}>Mitgliedsadresse (Read-only)</Typography>
                     <Box sx={{ p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
-                        {breeder.owner_member && (
+                        {breeder.owner_members && breeder.owner_members.length > 0 && (
                             <Box sx={{ mb: 2, pb: 2, borderBottom: '1px solid #eee' }}>
-                                <Typography variant='subtitle2' color='text.secondary'>Verknüpftes Mitglied (Owner)</Typography>
-                                <Typography variant='body1'>{breeder.owner_member.firstName} {breeder.owner_member.lastName}</Typography>
-                                <Typography variant='body2' color='text.secondary'>{breeder.owner_member.email}</Typography>
+                                <Typography variant='subtitle2' color='text.secondary'>Verknüpfte Mitglieder (Owner)</Typography>
+                                {breeder.owner_members.map(om => (
+                                    <Box key={om.documentId} sx={{ mb: 1 }}>
+                                        <Typography variant='body1'>{om.firstName} {om.lastName}</Typography>
+                                        <Typography variant='body2' color='text.secondary'>{om.email}</Typography>
+                                    </Box>
+                                ))}
                             </Box>
                         )}
 

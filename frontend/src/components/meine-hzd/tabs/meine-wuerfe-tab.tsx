@@ -102,13 +102,13 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
     // Fetch breeding bitches (mothers)
     useEffect(() => {
         async function loadMothers() {
-            if (!breeder?.owner_member?.documentId) return
+            if (!breeder?.owner_members || breeder.owner_members.length === 0) return
             try {
                 const data = await fetchGraphQL<DogSearchResult>(SEARCH_DOGS, {
                     variables: {
                         filters: {
                             sex: { eq: 'F' },
-                            owner: { documentId: { eq: breeder.owner_member.documentId } },
+                            owner: { documentId: { in: breeder.owner_members.map(m => m.documentId).filter(Boolean) } },
                             cFertile: { eq: true }
                         },
                         pagination: { limit: 100 }
