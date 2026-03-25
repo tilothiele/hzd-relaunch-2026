@@ -2,6 +2,101 @@ import type { Core } from '@strapi/strapi';
 import userAdminSchema from './extensions/graphql/config/schema.graphql';
 import { calcPublishMyData, syncUserPublishMyData } from './utils/user-publish-data';
 
+/** Nur bei publishMyData === true volle User-Daten; sonst id/documentId (Ausnahme: Query.me → UsersPermissionsMe). */
+function redactUsersPermissionsUserNode(user: any) {
+	if (user == null) {
+		return user;
+	}
+	if (user.publishMyData === true) {
+		return user;
+	}
+	return { id: user.id, documentId: user.documentId };
+}
+
+/** usersPermissionsUsers liefert ein Array; *_connection liefert { nodes }. */
+function redactUsersPermissionsUsersQueryResult(result: any) {
+	if (!result) {
+		return result;
+	}
+	if (Array.isArray(result)) {
+		return result.map(redactUsersPermissionsUserNode);
+	}
+	if (Array.isArray(result.nodes)) {
+		result.nodes = result.nodes.map(redactUsersPermissionsUserNode);
+	}
+	return result;
+}
+
+const USER_CT_UID = 'plugin::users-permissions.user';
+const USER_GRAPHQL_NON_SCALAR_ATTRS = new Set([
+	'relation',
+	'media',
+	'component',
+	'dynamiczone',
+]);
+
+function canBypassUsersPermissionsPublishGate(context: any) {
+	const state = context?.state ?? context?.koaContext?.state;
+	if (!state) {
+		return false;
+	}
+	const { user, auth } = state;
+	return (
+		user?.isSuperAdmin === true ||
+		auth?.strategy?.name === 'api-token'
+	);
+}
+
+/**
+ * Strikte Sichtbarkeit für UsersPermissionsUser über alle Pfade (Liste, Einzelabruf,
+ * Populate): PII nur bei publishMyData === true. UsersPermissionsMe bleibt unverändert.
+ * Super-Admin / API-Token sehen weiterhin volle User-Daten (z. B. updateUserAdmin).
+ */
+function buildUsersPermissionsUserPublishAwareResolvers(strapi: Core.Strapi) {
+	const model = strapi.getModel(USER_CT_UID);
+	const resolvers: Record<string, { resolve: (parent: any, args: any, context: any) => any }> =
+		{};
+
+	for (const [attrName, rawAttr] of Object.entries(model.attributes)) {
+		const attr = rawAttr as { type?: string; private?: boolean };
+		if (attrName === 'id' || attrName === 'documentId') {
+			continue;
+		}
+		if (attr.private) {
+			continue;
+		}
+		if (attr.type && USER_GRAPHQL_NON_SCALAR_ATTRS.has(attr.type)) {
+			continue;
+		}
+
+		if (attrName === 'publishMyData') {
+			resolvers[attrName] = {
+				resolve: (parent: any) =>
+					parent?.publishMyData === undefined ||
+					parent?.publishMyData === null
+						? null
+						: parent.publishMyData,
+			};
+			continue;
+		}
+
+		resolvers[attrName] = {
+			resolve: (parent: any, _args: any, context: any) => {
+				if (canBypassUsersPermissionsPublishGate(context)) {
+					const value = parent[attrName];
+					return value === undefined ? null : value;
+				}
+				if (parent?.publishMyData !== true) {
+					return null;
+				}
+				const value = parent[attrName];
+				return value === undefined ? null : value;
+			},
+		};
+	}
+
+	return resolvers;
+}
 
 export default {
   /**
@@ -12,6 +107,14 @@ export default {
    */
   register({ strapi }: { strapi: Core.Strapi }) {
     const extensionService = strapi.plugin('graphql').service('extension');
+    const usersPermissionsUserPublishResolvers =
+      buildUsersPermissionsUserPublishAwareResolvers(strapi);
+    const usersPermissionsUserPublishResolversConfig = Object.fromEntries(
+      Object.keys(usersPermissionsUserPublishResolvers).map((field) => [
+        `UsersPermissionsUser.${field}`,
+        { auth: false },
+      ]),
+    );
 
     extensionService.use({
       typeDefs: `
@@ -77,38 +180,7 @@ export default {
             resolve: (parent: any) => parent.locationLng || null,
           },
         },
-        UsersPermissionsUser: {
-          firstName: {
-            resolve: (parent: any) => parent.firstName || null,
-          },
-          lastName: {
-            resolve: (parent: any) => parent.lastName || null,
-          },
-          address1: {
-            resolve: (parent: any) => parent.address1 || null,
-          },
-          address2: {
-            resolve: (parent: any) => parent.address2 || null,
-          },
-          countryCode: {
-            resolve: (parent: any) => parent.countryCode || null,
-          },
-          zip: {
-            resolve: (parent: any) => parent.zip || null,
-          },
-          city: {
-            resolve: (parent: any) => parent.city || null,
-          },
-          phone: {
-            resolve: (parent: any) => parent.phone || null,
-          },
-          locationLat: {
-            resolve: (parent: any) => parent.locationLat || null,
-          },
-          locationLng: {
-            resolve: (parent: any) => parent.locationLng || null,
-          },
-        },
+        UsersPermissionsUser: usersPermissionsUserPublishResolvers,
       },
       resolversConfig: {
         ...userAdminSchema.resolversConfig,
@@ -124,27 +196,21 @@ export default {
         'UsersPermissionsMe.phone': { auth: false },
         'UsersPermissionsMe.locationLat': { auth: false },
         'UsersPermissionsMe.locationLng': { auth: false },
-        'UsersPermissionsUser.firstName': { auth: false },
-        'UsersPermissionsUser.lastName': { auth: false },
-        'UsersPermissionsUser.address1': { auth: false },
-        'UsersPermissionsUser.address2': { auth: false },
-        'UsersPermissionsUser.countryCode': { auth: false },
-        'UsersPermissionsUser.zip': { auth: false },
-        'UsersPermissionsUser.city': { auth: false },
-        'UsersPermissionsUser.phone': { auth: false },
-        'UsersPermissionsUser.locationLat': { auth: false },
-        'UsersPermissionsUser.locationLng': { auth: false },
-        
+        ...usersPermissionsUserPublishResolversConfig,
+
         'Query.usersPermissionsUsers': {
           middlewares: [
             async (resolve: any, parent: any, args: any, context: any, info: any) => {
               const result = await resolve(parent, args, context, info);
-              if (result && Array.isArray(result.nodes)) {
-                result.nodes = result.nodes.map((user: any) => 
-                  user.publishMyData === true ? user : { id: user.id, documentId: user.documentId }
-                );
-              }
-              return result;
+              return redactUsersPermissionsUsersQueryResult(result);
+            }
+          ]
+        },
+        'Query.usersPermissionsUsers_connection': {
+          middlewares: [
+            async (resolve: any, parent: any, args: any, context: any, info: any) => {
+              const result = await resolve(parent, args, context, info);
+              return redactUsersPermissionsUsersQueryResult(result);
             }
           ]
         },
@@ -152,10 +218,7 @@ export default {
           middlewares: [
             async (resolve: any, parent: any, args: any, context: any, info: any) => {
               const result = await resolve(parent, args, context, info);
-              if (result && result.value && result.value.publishMyData !== true) {
-                result.value = { id: result.value.id, documentId: result.value.documentId };
-              }
-              return result;
+              return redactUsersPermissionsUserNode(result);
             }
           ]
         }
