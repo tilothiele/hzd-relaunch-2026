@@ -1,3 +1,4 @@
+import re
 import requests
 from typing import Dict, Optional, Any, List
 from dataclasses import dataclass, field
@@ -13,8 +14,8 @@ class Breeder:
 @dataclass
 class WebsiteUser:
     documentId: str
-    username: str
-    email: str
+    username: Optional[str] = None
+    email: Optional[str] = None
     cEmail: Optional[str] = None
     cId: Optional[int] = None
     blocked: bool = False
@@ -79,8 +80,6 @@ class WebsiteClient:
             query GetAllUsers($page: Int!, $pageSize: Int!) {
                 usersPermissionsUsers(pagination: { page: $page, pageSize: $pageSize }) {
                     documentId
-                    username
-                    email
                     cEmail
                     cId
                     blocked
@@ -188,6 +187,61 @@ class WebsiteClient:
                 else:
                     page += 1
         return breeder_map
+
+    def find_users_by_strapi_email(self, email: str) -> List[Dict[str, Any]]:
+        """Users whose Strapi-Loginfeld ``email`` dieser Adresse entspricht (eqi)."""
+        if not email or not str(email).strip():
+            return []
+        query = """
+        query FindUsersByStrapiEmail($e: String!) {
+            usersPermissionsUsers(filters: { email: { eqi: $e } }) {
+                documentId
+                cId
+            }
+        }
+        """
+        data = self._post(query, {'e': str(email).strip()})
+        if not data:
+            return []
+        return list(data.get('usersPermissionsUsers') or [])
+
+    def replacement_email_for_user(self, document_id: str, c_id: Optional[int]) -> str:
+        """Freie Login-Adresse für einen fremden User: user-<cId>@… oder eindeutig ohne cId."""
+        if c_id is not None:
+            return f'user-{c_id}@hovawarte.com'
+        safe = re.sub(r'[^a-zA-Z0-9]', '', document_id)[:20] or 'x'
+        return f'user-nocid-{safe}@hovawarte.com'
+
+    def reassign_conflicting_strapi_email(
+        self,
+        taken_email: str,
+        exclude_document_id: Optional[str] = None,
+    ) -> bool:
+        """
+        Alle User außer ``exclude_document_id``, die ``taken_email`` als Login-E-Mail nutzen,
+        auf user-<cId>@hovawarte.com (bzw. Fallback) umstellen. True, wenn mindestens ein
+        User erfolgreich geändert wurde.
+        """
+        candidates = self.find_users_by_strapi_email(taken_email)
+        if not candidates:
+            return False
+        changed_any = False
+        for u in candidates:
+            doc_id = u.get('documentId')
+            if not doc_id or doc_id == exclude_document_id:
+                continue
+            cid = u.get('cId')
+            replacement = self.replacement_email_for_user(doc_id, cid)
+            print(
+                f"  Email-Konflikt: User {doc_id} (cId={cid}) "
+                f'von "{taken_email}" -> "{replacement}"'
+            )
+            if self.update_user_admin(doc_id, {
+                'email': replacement,
+                'cEmail': replacement,
+            }):
+                changed_any = True
+        return changed_any
 
     def find_existing_user_by_cid(self, c_id: int) -> Optional[str]:
         query = """
