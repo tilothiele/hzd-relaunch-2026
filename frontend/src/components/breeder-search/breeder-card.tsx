@@ -40,6 +40,10 @@ function formatDate(dateString: string | null | undefined): string {
 export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, maxDistance, hzdSetting }: BreederCardProps) {
 	const kennelName = breeder.kennelName ?? 'Kein Zwingername bekannt'
 	const member = breeder.member
+	const memberFirstName = (member as { firstName?: string; firstname?: string } | null)?.firstName
+		?? (member as { firstName?: string; firstname?: string } | null)?.firstname
+	const memberLastName = (member as { lastName?: string; lastname?: string } | null)?.lastName
+		?? (member as { lastName?: string; lastname?: string } | null)?.lastname
 
 	let distance: number | null = null
 	let isDistanceExceeded = false
@@ -187,7 +191,7 @@ export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, max
 									{breeder.owner_members.map(om => [om.firstName, om.lastName].filter(Boolean).join(' ')).join(', ')}
 								</TableCell>
 							</TableRow>
-						) : (member?.firstName && member?.lastName ? (
+						) : (memberFirstName && memberLastName ? (
 							<TableRow>
 								<TableCell
 									sx={{
@@ -202,7 +206,7 @@ export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, max
 									</Tooltip>
 								</TableCell>
 								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-									{member.firstName} {member.lastName}
+									{memberFirstName} {memberLastName}
 								</TableCell>
 							</TableRow>
 						) : null)}

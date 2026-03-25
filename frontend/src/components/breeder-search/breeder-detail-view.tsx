@@ -43,6 +43,12 @@ function getRegionLabel(region: string | null | undefined): string {
 export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack }: BreederDetailViewProps) {
     const kennelName = breeder.kennelName ?? 'Kein Zwingername bekannt'
     const member = breeder.member
+    const ownerMemberNames = (breeder.owner_members ?? [])
+        .map((om) => {
+            const fullName = [om.firstName, om.lastName].filter(Boolean).join(' ').trim()
+            return fullName || om.username || ''
+        })
+        .filter(Boolean)
     const avatarUrl = resolveMediaUrl(
         breeder.avatar || hzdSetting?.DefaultBreederAvatar,
         strapiBaseUrl
@@ -102,10 +108,15 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack }
                             </p>
                         ) : null}
 
-                        {breeder.owner_members && breeder.owner_members.length > 0 ? (
-                            <p>
-                                <strong>Züchter:</strong> {breeder.owner_members.map(om => [om.firstName, om.lastName].filter(Boolean).join(' ')).join(', ')}
-                            </p>
+                        {ownerMemberNames.length > 0 ? (
+                            <div>
+                                <strong>Züchter:</strong>
+                                {ownerMemberNames.map((fullName, index) => (
+                                    <div key={`${fullName}-${index}`}>
+                                        {fullName}
+                                    </div>
+                                ))}
+                            </div>
                         ) : (member?.firstName && member?.lastName ? (
                             <p>
                                 <strong>Züchter:</strong> {member.firstName} {member.lastName}
