@@ -1205,6 +1205,7 @@ export const SEARCH_BREEDERS = `
 					locationLng
 				}
 				WebsiteUrl
+				BreedersIntroduction
 				avatar {
 					url
 					alternativeText
