@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState, useRef, type ChangeEvent, ty
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser, faRightFromBracket, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import type { AuthUser } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { fetchGraphQL } from '@/lib/graphql-client'
@@ -35,6 +36,7 @@ export function LoginControls({
 	error,
 	theme,
 }: LoginControlsProps) {
+	const router = useRouter()
 	const [isFormVisible, setIsFormVisible] = useState(false)
 	const [activeTab, setActiveTab] = useState<TabValue>('login')
 	const [identifier, setIdentifier] = useState('')
@@ -125,7 +127,8 @@ export function LoginControls({
 		setIsFormVisible(false)
 		setIsMenuOpen(false)
 		onLogout()
-	}, [onLogout])
+		router.refresh()
+	}, [onLogout, router])
 
 	const handleLoginSubmit = useCallback(async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
@@ -134,6 +137,7 @@ export function LoginControls({
 
 		try {
 			await onLogin({ identifier, password })
+			router.refresh()
 		} catch (submissionError) {
 			if (submissionError instanceof Error && submissionError.message) {
 				setLocalError(submissionError.message)
@@ -143,7 +147,7 @@ export function LoginControls({
 		} finally {
 			setPassword('')
 		}
-	}, [identifier, onLogin, password])
+	}, [identifier, onLogin, password, router])
 
 
 

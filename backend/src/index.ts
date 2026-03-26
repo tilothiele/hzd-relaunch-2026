@@ -1,31 +1,7 @@
 import type { Core } from '@strapi/strapi';
 import userAdminSchema from './extensions/graphql/config/schema.graphql';
 import { calcPublishMyData, syncUserPublishMyData } from './utils/user-publish-data';
-
-/** Nur bei publishMyData === true volle User-Daten; sonst id/documentId (Ausnahme: Query.me → UsersPermissionsMe). */
-function redactUsersPermissionsUserNode(user: any) {
-	if (user == null) {
-		return user;
-	}
-	if (user.publishMyData === true) {
-		return user;
-	}
-	return { id: user.id, documentId: user.documentId };
-}
-
-/** usersPermissionsUsers liefert ein Array; *_connection liefert { nodes }. */
-function redactUsersPermissionsUsersQueryResult(result: any) {
-	if (!result) {
-		return result;
-	}
-	if (Array.isArray(result)) {
-		return result.map(redactUsersPermissionsUserNode);
-	}
-	if (Array.isArray(result.nodes)) {
-		result.nodes = result.nodes.map(redactUsersPermissionsUserNode);
-	}
-	return result;
-}
+import { sanitizeUser, sanitizeUsers } from './utils/user-sanitize';
 
 const USER_CT_UID = 'plugin::users-permissions.user';
 const USER_GRAPHQL_NON_SCALAR_ATTRS = new Set([
@@ -202,7 +178,7 @@ export default {
           middlewares: [
             async (resolve: any, parent: any, args: any, context: any, info: any) => {
               const result = await resolve(parent, args, context, info);
-              return redactUsersPermissionsUsersQueryResult(result);
+              return sanitizeUsers(result);
             }
           ]
         },
@@ -210,7 +186,7 @@ export default {
           middlewares: [
             async (resolve: any, parent: any, args: any, context: any, info: any) => {
               const result = await resolve(parent, args, context, info);
-              return redactUsersPermissionsUsersQueryResult(result);
+              return sanitizeUsers(result);
             }
           ]
         },
@@ -218,7 +194,7 @@ export default {
           middlewares: [
             async (resolve: any, parent: any, args: any, context: any, info: any) => {
               const result = await resolve(parent, args, context, info);
-              return redactUsersPermissionsUserNode(result);
+              return sanitizeUser(result);
             }
           ]
         }

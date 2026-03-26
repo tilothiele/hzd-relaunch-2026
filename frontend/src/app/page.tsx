@@ -1,9 +1,10 @@
 import { MainPageStructure } from './main-page-structure'
 import { theme as globalTheme } from '@/themes'
 import { fetchGraphQLServer, getStrapiBaseUrl } from '@/lib/server/graphql-client'
-import { GET_LAYOUT } from '@/lib/graphql/queries'
+import { GET_LAYOUT, GET_ME } from '@/lib/graphql/queries'
 import { renderServerSections } from '@/components/sections/server-section-factory'
 import type { GlobalLayout } from '@/types'
+import { cookies } from 'next/headers'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,10 +14,17 @@ interface LayoutData {
 	announcements?: GlobalLayout['announcements']
 }
 
+interface MeData {
+	me?: {
+		documentId: string
+	} | null
+}
+
 export default async function Home() {
 	let globalLayout: GlobalLayout | null = null
 	let baseUrl: string = ''
 	let error: Error | null = null
+	let isAuthenticated = false
 
 	try {
 		baseUrl = getStrapiBaseUrl()
@@ -26,11 +34,40 @@ export default async function Home() {
 			globalLayout.HzdSetting = data.hzdSetting ?? null
 			globalLayout.announcements = data.announcements ?? null
 		}
+
+		const cookieStore = await cookies()
+		const tokenFromCookie = cookieStore.get('hzd_auth_token')?.value
+		const stateFromCookie = cookieStore.get('hzd_auth_state')?.value
+		let authToken: string | null = tokenFromCookie ?? null
+
+		if (!authToken && stateFromCookie) {
+			try {
+				const parsed = JSON.parse(stateFromCookie) as {
+					token?: string | { jwt?: string; token?: string } | null
+				}
+				authToken = typeof parsed.token === 'string'
+					? parsed.token
+					: (parsed.token?.jwt ?? parsed.token?.token ?? null)
+			} catch {
+				authToken = null
+			}
+		}
+
+		if (authToken) {
+			const meData = await fetchGraphQLServer<MeData>(GET_ME, {
+				baseUrl,
+				token: authToken,
+			})
+			isAuthenticated = Boolean(meData.me?.documentId)
+		}
 	} catch (err) {
 		error = err instanceof Error ? err : new Error('Fehler beim Laden der Seite.')
 	}
 
-	const sections = globalLayout?.page?.Sections ?? []
+	const page = isAuthenticated
+		? (globalLayout?.authenticated_page ?? globalLayout?.page)
+		: globalLayout?.page
+	const sections = page?.Sections ?? []
 
 	if (error) {
 		return (
@@ -62,7 +99,7 @@ export default async function Home() {
 			homepage={globalLayout}
 			strapiBaseUrl={baseUrl}
 			theme={theme}
-			logoBackground={globalLayout?.page?.LogoBackground}
+			logoBackground={page?.LogoBackground}
 		>
 			{renderedSections}
 		</MainPageStructure>

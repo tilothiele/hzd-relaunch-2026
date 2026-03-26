@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-03-26T13:36:12.262Z"
+    "x-generation-date": "2026-03-26T18:30:40.651Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -5742,329 +5742,6 @@
         ],
         "parameters": [],
         "operationId": "delete/hzd-setting"
-      }
-    },
-    "/index-page": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/IndexPageResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Index-page"
-        ],
-        "parameters": [
-          {
-            "name": "sort",
-            "in": "query",
-            "description": "Sort by attributes ascending (asc) or descending (desc)",
-            "deprecated": false,
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "pagination[withCount]",
-            "in": "query",
-            "description": "Return page/pageSize (default: true)",
-            "deprecated": false,
-            "required": false,
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "pagination[page]",
-            "in": "query",
-            "description": "Page number (default: 0)",
-            "deprecated": false,
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "pagination[pageSize]",
-            "in": "query",
-            "description": "Page size (default: 25)",
-            "deprecated": false,
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "pagination[start]",
-            "in": "query",
-            "description": "Offset value (default: 0)",
-            "deprecated": false,
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "pagination[limit]",
-            "in": "query",
-            "description": "Number of entities to return (default: 25)",
-            "deprecated": false,
-            "required": false,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "fields",
-            "in": "query",
-            "description": "Fields to return (ex: title,author)",
-            "deprecated": false,
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "populate",
-            "in": "query",
-            "description": "Relations to return",
-            "deprecated": false,
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "filters",
-            "in": "query",
-            "description": "Filters to apply",
-            "deprecated": false,
-            "required": false,
-            "schema": {
-              "type": "object",
-              "additionalProperties": true
-            },
-            "style": "deepObject"
-          },
-          {
-            "name": "locale",
-            "in": "query",
-            "description": "Locale to apply",
-            "deprecated": false,
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "operationId": "get/index-page"
-      },
-      "put": {
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/IndexPageResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Index-page"
-        ],
-        "parameters": [],
-        "operationId": "put/index-page",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/IndexPageRequest"
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Index-page"
-        ],
-        "parameters": [],
-        "operationId": "delete/index-page"
       }
     },
     "/local-cummunities": {
@@ -45115,6 +44792,17 @@
                 ],
                 "example": "string or id"
               },
+              "authenticated_page": {
+                "oneOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ],
+                "example": "string or id"
+              },
               "locale": {
                 "type": "string"
               },
@@ -46400,6 +46088,24 @@
               }
             }
           },
+          "authenticated_page": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ]
+              },
+              "documentId": {
+                "type": "string"
+              }
+            }
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -46860,6 +46566,24 @@
                   "$ref": "#/components/schemas/LayoutSosComponent"
                 },
                 "page": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ]
+                    },
+                    "documentId": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "authenticated_page": {
                   "type": "object",
                   "properties": {
                     "id": {
@@ -52289,433 +52013,6 @@
         "properties": {
           "data": {
             "$ref": "#/components/schemas/HzdSetting"
-          },
-          "meta": {
-            "type": "object"
-          }
-        }
-      },
-      "IndexPageRequest": {
-        "type": "object",
-        "required": [
-          "data"
-        ],
-        "properties": {
-          "data": {
-            "type": "object",
-            "properties": {
-              "SEO": {
-                "$ref": "#/components/schemas/SeoSeoComponent"
-              },
-              "Sections": {
-                "type": "array",
-                "items": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/BlocksRichTextSectionComponent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/BlocksHeroSectionSlideShowComponent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/BlocksCardSectionComponent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/BlocksTeaserTextWithImageComponent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/BlocksTextColumnsSectionComponent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/BlocksImageGallerySectionComponent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/BlocksSimpleCtaSectionComponent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/BlocksContactGroupSectionComponent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/BlocksNewsArticlesSectionComponent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/BlocksSupplementalDocumentGroupSectionComponent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/BlocksContactMailerSectionComponent"
-                    },
-                    {
-                      "$ref": "#/components/schemas/BlocksSimpleHeroSectionComponent"
-                    }
-                  ]
-                },
-                "discriminator": {
-                  "propertyName": "__component",
-                  "mapping": {
-                    "blocks.rich-text-section": "#/components/schemas/BlocksRichTextSectionComponent",
-                    "blocks.hero-section-slide-show": "#/components/schemas/BlocksHeroSectionSlideShowComponent",
-                    "blocks.card-section": "#/components/schemas/BlocksCardSectionComponent",
-                    "blocks.teaser-text-with-image": "#/components/schemas/BlocksTeaserTextWithImageComponent",
-                    "blocks.text-columns-section": "#/components/schemas/BlocksTextColumnsSectionComponent",
-                    "blocks.image-gallery-section": "#/components/schemas/BlocksImageGallerySectionComponent",
-                    "blocks.simple-cta-section": "#/components/schemas/BlocksSimpleCtaSectionComponent",
-                    "blocks.contact-group-section": "#/components/schemas/BlocksContactGroupSectionComponent",
-                    "blocks.news-articles-section": "#/components/schemas/BlocksNewsArticlesSectionComponent",
-                    "blocks.supplemental-document-group-section": "#/components/schemas/BlocksSupplementalDocumentGroupSectionComponent",
-                    "blocks.contact-mailer-section": "#/components/schemas/BlocksContactMailerSectionComponent",
-                    "blocks.simple-hero-section": "#/components/schemas/BlocksSimpleHeroSectionComponent"
-                  }
-                }
-              },
-              "locale": {
-                "type": "string"
-              },
-              "localizations": {
-                "type": "array",
-                "items": {
-                  "oneOf": [
-                    {
-                      "type": "integer"
-                    },
-                    {
-                      "type": "string"
-                    }
-                  ],
-                  "example": "string or id"
-                }
-              }
-            }
-          }
-        }
-      },
-      "IndexPageListResponse": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/IndexPage"
-            }
-          },
-          "meta": {
-            "type": "object",
-            "properties": {
-              "pagination": {
-                "type": "object",
-                "properties": {
-                  "page": {
-                    "type": "integer"
-                  },
-                  "pageSize": {
-                    "type": "integer",
-                    "minimum": 25
-                  },
-                  "pageCount": {
-                    "type": "integer",
-                    "maximum": 1
-                  },
-                  "total": {
-                    "type": "integer"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "IndexPage": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "number"
-              }
-            ]
-          },
-          "documentId": {
-            "type": "string"
-          },
-          "SEO": {
-            "$ref": "#/components/schemas/SeoSeoComponent"
-          },
-          "Sections": {
-            "type": "array",
-            "items": {
-              "anyOf": [
-                {
-                  "$ref": "#/components/schemas/BlocksRichTextSectionComponent"
-                },
-                {
-                  "$ref": "#/components/schemas/BlocksHeroSectionSlideShowComponent"
-                },
-                {
-                  "$ref": "#/components/schemas/BlocksCardSectionComponent"
-                },
-                {
-                  "$ref": "#/components/schemas/BlocksTeaserTextWithImageComponent"
-                },
-                {
-                  "$ref": "#/components/schemas/BlocksTextColumnsSectionComponent"
-                },
-                {
-                  "$ref": "#/components/schemas/BlocksImageGallerySectionComponent"
-                },
-                {
-                  "$ref": "#/components/schemas/BlocksSimpleCtaSectionComponent"
-                },
-                {
-                  "$ref": "#/components/schemas/BlocksContactGroupSectionComponent"
-                },
-                {
-                  "$ref": "#/components/schemas/BlocksNewsArticlesSectionComponent"
-                },
-                {
-                  "$ref": "#/components/schemas/BlocksSupplementalDocumentGroupSectionComponent"
-                },
-                {
-                  "$ref": "#/components/schemas/BlocksContactMailerSectionComponent"
-                },
-                {
-                  "$ref": "#/components/schemas/BlocksSimpleHeroSectionComponent"
-                }
-              ]
-            },
-            "discriminator": {
-              "propertyName": "__component",
-              "mapping": {
-                "blocks.rich-text-section": "#/components/schemas/BlocksRichTextSectionComponent",
-                "blocks.hero-section-slide-show": "#/components/schemas/BlocksHeroSectionSlideShowComponent",
-                "blocks.card-section": "#/components/schemas/BlocksCardSectionComponent",
-                "blocks.teaser-text-with-image": "#/components/schemas/BlocksTeaserTextWithImageComponent",
-                "blocks.text-columns-section": "#/components/schemas/BlocksTextColumnsSectionComponent",
-                "blocks.image-gallery-section": "#/components/schemas/BlocksImageGallerySectionComponent",
-                "blocks.simple-cta-section": "#/components/schemas/BlocksSimpleCtaSectionComponent",
-                "blocks.contact-group-section": "#/components/schemas/BlocksContactGroupSectionComponent",
-                "blocks.news-articles-section": "#/components/schemas/BlocksNewsArticlesSectionComponent",
-                "blocks.supplemental-document-group-section": "#/components/schemas/BlocksSupplementalDocumentGroupSectionComponent",
-                "blocks.contact-mailer-section": "#/components/schemas/BlocksContactMailerSectionComponent",
-                "blocks.simple-hero-section": "#/components/schemas/BlocksSimpleHeroSectionComponent"
-              }
-            }
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "publishedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "createdBy": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "oneOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "number"
-                  }
-                ]
-              },
-              "documentId": {
-                "type": "string"
-              }
-            }
-          },
-          "updatedBy": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "oneOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "number"
-                  }
-                ]
-              },
-              "documentId": {
-                "type": "string"
-              }
-            }
-          },
-          "locale": {
-            "type": "string"
-          },
-          "localizations": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "oneOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "number"
-                    }
-                  ]
-                },
-                "documentId": {
-                  "type": "string"
-                },
-                "SEO": {
-                  "$ref": "#/components/schemas/SeoSeoComponent"
-                },
-                "Sections": {
-                  "type": "array",
-                  "items": {
-                    "anyOf": [
-                      {
-                        "$ref": "#/components/schemas/BlocksRichTextSectionComponent"
-                      },
-                      {
-                        "$ref": "#/components/schemas/BlocksHeroSectionSlideShowComponent"
-                      },
-                      {
-                        "$ref": "#/components/schemas/BlocksCardSectionComponent"
-                      },
-                      {
-                        "$ref": "#/components/schemas/BlocksTeaserTextWithImageComponent"
-                      },
-                      {
-                        "$ref": "#/components/schemas/BlocksTextColumnsSectionComponent"
-                      },
-                      {
-                        "$ref": "#/components/schemas/BlocksImageGallerySectionComponent"
-                      },
-                      {
-                        "$ref": "#/components/schemas/BlocksSimpleCtaSectionComponent"
-                      },
-                      {
-                        "$ref": "#/components/schemas/BlocksContactGroupSectionComponent"
-                      },
-                      {
-                        "$ref": "#/components/schemas/BlocksNewsArticlesSectionComponent"
-                      },
-                      {
-                        "$ref": "#/components/schemas/BlocksSupplementalDocumentGroupSectionComponent"
-                      },
-                      {
-                        "$ref": "#/components/schemas/BlocksContactMailerSectionComponent"
-                      },
-                      {
-                        "$ref": "#/components/schemas/BlocksSimpleHeroSectionComponent"
-                      }
-                    ]
-                  },
-                  "discriminator": {
-                    "propertyName": "__component",
-                    "mapping": {
-                      "blocks.rich-text-section": "#/components/schemas/BlocksRichTextSectionComponent",
-                      "blocks.hero-section-slide-show": "#/components/schemas/BlocksHeroSectionSlideShowComponent",
-                      "blocks.card-section": "#/components/schemas/BlocksCardSectionComponent",
-                      "blocks.teaser-text-with-image": "#/components/schemas/BlocksTeaserTextWithImageComponent",
-                      "blocks.text-columns-section": "#/components/schemas/BlocksTextColumnsSectionComponent",
-                      "blocks.image-gallery-section": "#/components/schemas/BlocksImageGallerySectionComponent",
-                      "blocks.simple-cta-section": "#/components/schemas/BlocksSimpleCtaSectionComponent",
-                      "blocks.contact-group-section": "#/components/schemas/BlocksContactGroupSectionComponent",
-                      "blocks.news-articles-section": "#/components/schemas/BlocksNewsArticlesSectionComponent",
-                      "blocks.supplemental-document-group-section": "#/components/schemas/BlocksSupplementalDocumentGroupSectionComponent",
-                      "blocks.contact-mailer-section": "#/components/schemas/BlocksContactMailerSectionComponent",
-                      "blocks.simple-hero-section": "#/components/schemas/BlocksSimpleHeroSectionComponent"
-                    }
-                  }
-                },
-                "createdAt": {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                "updatedAt": {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                "publishedAt": {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                "createdBy": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "oneOf": [
-                        {
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ]
-                    },
-                    "documentId": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "updatedBy": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "oneOf": [
-                        {
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ]
-                    },
-                    "documentId": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "locale": {
-                  "type": "string"
-                },
-                "localizations": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "oneOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "number"
-                          }
-                        ]
-                      },
-                      "documentId": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "IndexPageResponse": {
-        "type": "object",
-        "properties": {
-          "data": {
-            "$ref": "#/components/schemas/IndexPage"
           },
           "meta": {
             "type": "object"

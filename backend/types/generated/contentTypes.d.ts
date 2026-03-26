@@ -888,6 +888,7 @@ export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    authenticated_page: Schema.Attribute.Relation<'oneToOne', 'api::page.page'>;
     Copyright: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -960,50 +961,6 @@ export interface ApiHzdSettingHzdSetting extends Struct.SingleTypeSchema {
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
-export interface ApiIndexPageIndexPage extends Struct.SingleTypeSchema {
-  collectionName: 'index_pages';
-  info: {
-    displayName: 'IndexPage';
-    pluralName: 'index-pages';
-    singularName: 'index-page';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::index-page.index-page'
-    > &
-      Schema.Attribute.Private;
-    publishedAt: Schema.Attribute.DateTime;
-    Sections: Schema.Attribute.DynamicZone<
-      [
-        'blocks.rich-text-section',
-        'blocks.hero-section-slide-show',
-        'blocks.card-section',
-        'blocks.teaser-text-with-image',
-        'blocks.text-columns-section',
-        'blocks.image-gallery-section',
-        'blocks.simple-cta-section',
-        'blocks.contact-group-section',
-        'blocks.news-articles-section',
-        'blocks.supplemental-document-group-section',
-        'blocks.contact-mailer-section',
-        'blocks.simple-hero-section',
-      ]
-    >;
-    SEO: Schema.Attribute.Component<'seo.seo', false>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -2432,7 +2389,6 @@ declare module '@strapi/strapi' {
       'api::gallery-image.gallery-image': ApiGalleryImageGalleryImage;
       'api::global-layout.global-layout': ApiGlobalLayoutGlobalLayout;
       'api::hzd-setting.hzd-setting': ApiHzdSettingHzdSetting;
-      'api::index-page.index-page': ApiIndexPageIndexPage;
       'api::local-cummunity.local-cummunity': ApiLocalCummunityLocalCummunity;
       'api::merchandising-product.merchandising-product': ApiMerchandisingProductMerchandisingProduct;
       'api::news-article-category.news-article-category': ApiNewsArticleCategoryNewsArticleCategory;

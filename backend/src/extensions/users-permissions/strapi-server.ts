@@ -1,5 +1,7 @@
 // Extend users-permissions plugin to inject geolocation via document service on create/update
 // and extend JWT service with member and officer_roles
+import { sanitizeUser, sanitizeUsers } from '../../utils/user-sanitize'
+
 export default (plugin: any) => {
 	// Store original bootstrap if it exists
 	const originalBootstrap = plugin.bootstrap
@@ -64,12 +66,7 @@ export default (plugin: any) => {
 			if (originalFind) {
 				plugin.controllers.user.find = async (ctx: any) => {
 					await originalFind(ctx);
-					if (ctx.body && Array.isArray(ctx.body)) {
-						ctx.body = ctx.body.map((user: any) => {
-							if (user.publishMyData === true) return user;
-							return { id: user.id, documentId: user.documentId };
-						});
-					}
+					ctx.body = sanitizeUsers(ctx.body)
 				};
 			}
 
@@ -78,9 +75,7 @@ export default (plugin: any) => {
 			if (originalFindOne) {
 				plugin.controllers.user.findOne = async (ctx: any) => {
 					await originalFindOne(ctx);
-					if (ctx.body && ctx.body.publishMyData !== true) {
-						ctx.body = { id: ctx.body.id, documentId: ctx.body.documentId };
-					}
+					ctx.body = sanitizeUser(ctx.body)
 				};
 			}
 			

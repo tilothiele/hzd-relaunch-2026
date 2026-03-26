@@ -301,6 +301,7 @@ export interface GlobalLayout {
 	PartnerLink?: PartnerLink[] | null
 	PrivacyPolicy?: Image | null
 	page?: Page | null
+	authenticated_page?: Page | null
 	announcements?: Announcement[] | null
 }
 

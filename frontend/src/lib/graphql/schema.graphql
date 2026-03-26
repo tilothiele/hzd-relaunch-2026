@@ -388,51 +388,6 @@ type ComponentPermissionGroups {
   BreedWarden: Boolean
 }
 
-input ComponentLinksPartnerlLinkFiltersInput {
-  PartnerLinkUrl: StringFilterInput
-  AltText: StringFilterInput
-  and: [ComponentLinksPartnerlLinkFiltersInput]
-  or: [ComponentLinksPartnerlLinkFiltersInput]
-  not: ComponentLinksPartnerlLinkFiltersInput
-}
-
-input ComponentLinksPartnerlLinkInput {
-  id: ID
-  Logo: ID
-  PartnerLinkUrl: String
-  AltText: String
-}
-
-type ComponentLinksPartnerlLink {
-  id: ID!
-  Logo: UploadFile
-  PartnerLinkUrl: String
-  AltText: String
-}
-
-input ComponentLinksActionButtonFiltersInput {
-  Label: StringFilterInput
-  Link: StringFilterInput
-  Primary: BooleanFilterInput
-  and: [ComponentLinksActionButtonFiltersInput]
-  or: [ComponentLinksActionButtonFiltersInput]
-  not: ComponentLinksActionButtonFiltersInput
-}
-
-input ComponentLinksActionButtonInput {
-  id: ID
-  Label: String
-  Link: String
-  Primary: Boolean
-}
-
-type ComponentLinksActionButton {
-  id: ID!
-  Label: String
-  Link: String
-  Primary: Boolean
-}
-
 input ComponentLayoutSosInput {
   id: ID
   ShowSOS: Boolean
@@ -508,6 +463,51 @@ input ComponentLayoutColorThemeInput {
 type ComponentLayoutColorTheme {
   id: ID!
   ShortName: ENUM_COMPONENTLAYOUTCOLORTHEME_SHORTNAME
+}
+
+input ComponentLinksPartnerlLinkFiltersInput {
+  PartnerLinkUrl: StringFilterInput
+  AltText: StringFilterInput
+  and: [ComponentLinksPartnerlLinkFiltersInput]
+  or: [ComponentLinksPartnerlLinkFiltersInput]
+  not: ComponentLinksPartnerlLinkFiltersInput
+}
+
+input ComponentLinksPartnerlLinkInput {
+  id: ID
+  Logo: ID
+  PartnerLinkUrl: String
+  AltText: String
+}
+
+type ComponentLinksPartnerlLink {
+  id: ID!
+  Logo: UploadFile
+  PartnerLinkUrl: String
+  AltText: String
+}
+
+input ComponentLinksActionButtonFiltersInput {
+  Label: StringFilterInput
+  Link: StringFilterInput
+  Primary: BooleanFilterInput
+  and: [ComponentLinksActionButtonFiltersInput]
+  or: [ComponentLinksActionButtonFiltersInput]
+  not: ComponentLinksActionButtonFiltersInput
+}
+
+input ComponentLinksActionButtonInput {
+  id: ID
+  Label: String
+  Link: String
+  Primary: Boolean
+}
+
+type ComponentLinksActionButton {
+  id: ID!
+  Label: String
+  Link: String
+  Primary: Boolean
 }
 
 type ComponentFormTextArea {
@@ -2318,6 +2318,7 @@ input GlobalLayoutInput {
   PrivacyPolicy: ID
   SOS: ComponentLayoutSosInput
   page: ID
+  authenticated_page: ID
   publishedAt: DateTime
 }
 
@@ -2336,6 +2337,7 @@ type GlobalLayout {
   PrivacyPolicy: UploadFile
   SOS: ComponentLayoutSos
   page: Page
+  authenticated_page: Page
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -2359,25 +2361,6 @@ type HzdSetting {
   DefaultBreederAvatar: UploadFile
   DefaultLitterAvatar: UploadFile
   DefaultChanpionAvatar: UploadFile
-  createdAt: DateTime
-  updatedAt: DateTime
-  publishedAt: DateTime
-}
-
-union IndexPageSectionsDynamicZone = ComponentBlocksRichTextSection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTextColumnsSection | ComponentBlocksImageGallerySection | ComponentBlocksSimpleCtaSection | ComponentBlocksContactGroupSection | ComponentBlocksNewsArticlesSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksContactMailerSection | ComponentBlocksSimpleHeroSection | Error
-
-scalar IndexPageSectionsDynamicZoneInput
-
-input IndexPageInput {
-  SEO: ComponentSeoSeoInput
-  Sections: [IndexPageSectionsDynamicZoneInput!]
-  publishedAt: DateTime
-}
-
-type IndexPage {
-  documentId: ID!
-  SEO: ComponentSeoSeo
-  Sections: [IndexPageSectionsDynamicZone]
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -3037,7 +3020,7 @@ type SupplementalDocumentGroupEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBreedingDogDocument | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTableOfContentSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksDocumentBundle | ComponentBlocksDocumentBundleSection | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksChampionsSection | ComponentBlocksCardSection | ComponentBlocksCardItem | ComponentBlocksBundleDocuments | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Announcement | Author | Calendar | CalendarEntry | Champion | Contact | ContactGroup | Form | FormInstance | GalleryImage | GlobalLayout | HzdSetting | IndexPage | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | NewsArticleTag | Order | OrderItem | Page | PhotoboxImage | PhotoboxImageCollection | RegionalUnit | Subscription | SupplementalDocument | SupplementalDocumentGroup
+union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBreedingDogDocument | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTableOfContentSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksDocumentBundle | ComponentBlocksDocumentBundleSection | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksChampionsSection | ComponentBlocksCardSection | ComponentBlocksCardItem | ComponentBlocksBundleDocuments | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Announcement | Author | Calendar | CalendarEntry | Champion | Contact | ContactGroup | Form | FormInstance | GalleryImage | GlobalLayout | HzdSetting | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | NewsArticleTag | Order | OrderItem | Page | PhotoboxImage | PhotoboxImageCollection | RegionalUnit | Subscription | SupplementalDocument | SupplementalDocumentGroup
 
 input FileInfoInput {
   name: String
@@ -3175,7 +3158,6 @@ type Query {
   galleryImages(filters: GalleryImageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [GalleryImage]!
   globalLayout(status: PublicationStatus = PUBLISHED): GlobalLayout
   hzdSetting(status: PublicationStatus = PUBLISHED): HzdSetting
-  indexPage(status: PublicationStatus = PUBLISHED): IndexPage
   localCummunity(documentId: ID!, status: PublicationStatus = PUBLISHED): LocalCummunity
   localCummunities_connection(filters: LocalCummunityFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): LocalCummunityEntityResponseCollection
   localCummunities(filters: LocalCummunityFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [LocalCummunity]!
@@ -3275,8 +3257,6 @@ type Mutation {
   deleteGlobalLayout: DeleteMutationResponse
   updateHzdSetting(status: PublicationStatus = PUBLISHED, data: HzdSettingInput!): HzdSetting
   deleteHzdSetting: DeleteMutationResponse
-  updateIndexPage(status: PublicationStatus = PUBLISHED, data: IndexPageInput!): IndexPage
-  deleteIndexPage: DeleteMutationResponse
   createLocalCummunity(status: PublicationStatus = PUBLISHED, data: LocalCummunityInput!): LocalCummunity
   updateLocalCummunity(documentId: ID!, status: PublicationStatus = PUBLISHED, data: LocalCummunityInput!): LocalCummunity
   deleteLocalCummunity(documentId: ID!): DeleteMutationResponse

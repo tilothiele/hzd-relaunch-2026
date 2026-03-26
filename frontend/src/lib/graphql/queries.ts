@@ -59,232 +59,10 @@ export const GET_LAYOUT = `
 				previewUrl
 			}
 			page {
-				LogoBackground
-				Sections {
-					__typename
-					... on ComponentBlocksRichTextSection {
-						Title
-						Subtitle
-						RichTextContent
-						RichTextOddEven
-						RichTextAnchor
-						RichTextPadding {
-							Top
-							Bottom
-						}
-					}
-					... on ComponentBlocksHeroSectionSlideShow {
-						Headline {
-							id
-							Headline
-							Subheadline
-							HeroImage {
-								url
-								alternativeText
-								width
-								height
-								caption
-								previewUrl
-							}
-							ActionButton {
-								Label
-								Link
-								Primary
-							}
-						}
-					}
-					... on ComponentBlocksCardSection {
-						CardHeadline
-						CardColumnsOddEven
-						CardLayout
-						CardItem {
-							id
-							Headline
-							Subheadline
-							TeaserText
-							BackgroundImage {
-								url
-								alternativeText
-								width
-								height
-								caption
-								previewUrl
-							}
-							ActionButton {
-								Label
-								Link
-								Primary
-							}
-						}
-						CardsAnchor
-					}
-					... on ComponentBlocksTeaserTextWithImage {
-						TeaserOddEven
-						TeaserHeadline
-						TeaserText
-						ImagePosition
-						Image {
-							url
-							alternativeText
-							width
-							height
-							caption
-							previewUrl
-						}
-						ActionButton {
-							Label
-							Link
-							Primary
-						}
-						TeaserAnchor
-					}
-					... on ComponentBlocksTextColumnsSection {
-						TextColumnsOddEven
-						TextColumnsHeadline
-						TextColumnsSubHeadline
-						TextColumn {
-							id
-							ColumnHeadline
-							ColumnText
-							ColumnActionButton {
-								Label
-								Link
-								Primary
-							}
-							BulletItems {
-								id
-								Headline
-								ItemBody
-							}
-						}
-						TextColumnsAnchor
-						Padding {
-							Top
-							Bottom
-						}
-					}
-					... on ComponentBlocksImageGallerySection {
-						GalleryHeadline
-						GalleryImages {
-							url
-							alternativeText
-							width
-							height
-							caption
-							previewUrl
-						}
-						ImageGalleryAnchor
-					}
-					... on ComponentBlocksSimpleCtaSection {
-						CtaHeadline
-						CtaInfoText
-						CtaBackgroundImage {
-							url
-							alternativeText
-							width
-							height
-							caption
-							previewUrl
-						}
-						CtaActionButton {
-							Label
-							Link
-							Primary
-						}
-						SimpleCtaAnchor
-					}
-					... on ComponentBlocksNewsArticlesSection {
-						MaxArticles
-						news_article_category {
-							documentId
-							CategoryName
-							CategoryDescription
-						}
-						NewsArticlesAnchor
-						HideCategoryName
-						HideCategoryDescription
-					}
-					... on ComponentBlocksContactGroupSection {
-						ContactGroup {
-							documentId
-							ContactGroupName
-							GroupImage {
-								url
-								alternativeText
-								width
-								height
-							}
-							GroupDescription
-							contacts(sort: ["position:asc"]) {
-								documentId
-								position
-								Headline
-								Name
-								Street
-								ZipCity
-								Phone
-								Email1
-								Email2
-								Introduction
-								avatar {
-									url
-									alternativeText
-									width
-									height
-									caption
-									previewUrl
-								}
-								member {
-									documentId
-								lastName
-								}
-							}
-							DetailsLink {
-								Label
-								Link
-								Primary
-							}
-						}
-						ContactGroupAnchor
-					}
-					... on ComponentBlocksContactMailerSection {
-						ContactMailerAnchor
-						ContactMailerHeadline
-						ContactMailerInfotext
-						ReceipientOptions {
-	 						id
-	 						Email
-	 						DisplayName
-	 					}
-	 				}
-	 				... on ComponentBlocksSimpleHeroSection {
-	 					HeroAnchor
-	 					HeroHeadline
-	 					HeroTeaser
-	 					HeroImage {
-	 						url
-	 						alternativeText
-	 						width
-	 						height
-	 						caption
-	 						previewUrl
-	 					}
-	 					HeroLayout
-	 					HeroCta {
-	 						Label
-	 						Link
-	 						Primary
-	 					}
-	 					FullWidth
-	 					ShowLog
-						FadingBorder
-						Height
-	 				}
-					... on ComponentBlocksChampionsSection {
-						__typename
-						id
-					}
-				}
+				...LayoutPageFields
+			}
+			authenticated_page {
+				...LayoutPageFields
 			}
 		}
 		hzdSetting {
@@ -326,6 +104,235 @@ export const GET_LAYOUT = `
 			VisibilityDays
 			publishedAt
 			createdAt
+		}
+	}
+
+	fragment LayoutPageFields on Page {
+		LogoBackground
+		Sections {
+			__typename
+			... on ComponentBlocksRichTextSection {
+				Title
+				Subtitle
+				RichTextContent
+				RichTextOddEven
+				RichTextAnchor
+				RichTextPadding {
+					Top
+					Bottom
+				}
+			}
+			... on ComponentBlocksHeroSectionSlideShow {
+				Headline {
+					id
+					Headline
+					Subheadline
+					HeroImage {
+						url
+						alternativeText
+						width
+						height
+						caption
+						previewUrl
+					}
+					ActionButton {
+						Label
+						Link
+						Primary
+					}
+				}
+			}
+			... on ComponentBlocksCardSection {
+				CardHeadline
+				CardColumnsOddEven
+				CardLayout
+				CardItem {
+					id
+					Headline
+					Subheadline
+					TeaserText
+					BackgroundImage {
+						url
+						alternativeText
+						width
+						height
+						caption
+						previewUrl
+					}
+					ActionButton {
+						Label
+						Link
+						Primary
+					}
+				}
+				CardsAnchor
+			}
+			... on ComponentBlocksTeaserTextWithImage {
+				TeaserOddEven
+				TeaserHeadline
+				TeaserText
+				ImagePosition
+				Image {
+					url
+					alternativeText
+					width
+					height
+					caption
+					previewUrl
+				}
+				ActionButton {
+					Label
+					Link
+					Primary
+				}
+				TeaserAnchor
+			}
+			... on ComponentBlocksTextColumnsSection {
+				TextColumnsOddEven
+				TextColumnsHeadline
+				TextColumnsSubHeadline
+				TextColumn {
+					id
+					ColumnHeadline
+					ColumnText
+					ColumnActionButton {
+						Label
+						Link
+						Primary
+					}
+					BulletItems {
+						id
+						Headline
+						ItemBody
+					}
+				}
+				TextColumnsAnchor
+				Padding {
+					Top
+					Bottom
+				}
+			}
+			... on ComponentBlocksImageGallerySection {
+				GalleryHeadline
+				GalleryImages {
+					url
+					alternativeText
+					width
+					height
+					caption
+					previewUrl
+				}
+				ImageGalleryAnchor
+			}
+			... on ComponentBlocksSimpleCtaSection {
+				CtaHeadline
+				CtaInfoText
+				CtaBackgroundImage {
+					url
+					alternativeText
+					width
+					height
+					caption
+					previewUrl
+				}
+				CtaActionButton {
+					Label
+					Link
+					Primary
+				}
+				SimpleCtaAnchor
+			}
+			... on ComponentBlocksNewsArticlesSection {
+				MaxArticles
+				news_article_category {
+					documentId
+					CategoryName
+					CategoryDescription
+				}
+				NewsArticlesAnchor
+				HideCategoryName
+				HideCategoryDescription
+			}
+			... on ComponentBlocksContactGroupSection {
+				ContactGroup {
+					documentId
+					ContactGroupName
+					GroupImage {
+						url
+						alternativeText
+						width
+						height
+					}
+					GroupDescription
+					contacts(sort: ["position:asc"]) {
+						documentId
+						position
+						Headline
+						Name
+						Street
+						ZipCity
+						Phone
+						Email1
+						Email2
+						Introduction
+						avatar {
+							url
+							alternativeText
+							width
+							height
+							caption
+							previewUrl
+						}
+						member {
+							documentId
+							lastName
+						}
+					}
+					DetailsLink {
+						Label
+						Link
+						Primary
+					}
+				}
+				ContactGroupAnchor
+			}
+			... on ComponentBlocksContactMailerSection {
+				ContactMailerAnchor
+				ContactMailerHeadline
+				ContactMailerInfotext
+				ReceipientOptions {
+					id
+					Email
+					DisplayName
+				}
+			}
+			... on ComponentBlocksSimpleHeroSection {
+				HeroAnchor
+				HeroHeadline
+				HeroTeaser
+				HeroImage {
+					url
+					alternativeText
+					width
+					height
+					caption
+					previewUrl
+				}
+				HeroLayout
+				HeroCta {
+					Label
+					Link
+					Primary
+				}
+				FullWidth
+				ShowLog
+				FadingBorder
+				Height
+			}
+			... on ComponentBlocksChampionsSection {
+				__typename
+				id
+			}
 		}
 	}
 `

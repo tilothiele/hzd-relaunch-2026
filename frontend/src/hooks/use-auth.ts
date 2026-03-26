@@ -21,6 +21,7 @@ interface StrapiAuthResponse {
 }
 
 const AUTH_STORAGE_KEY = 'hzd_auth_state'
+const AUTH_COOKIE_KEY = 'hzd_auth_token'
 
 function loadAuthState(): AuthState {
 	if (typeof window === 'undefined') {
@@ -51,8 +52,10 @@ function saveAuthState(state: AuthState) {
 	try {
 		if (state.token && state.user) {
 			localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(state))
+			document.cookie = `${AUTH_COOKIE_KEY}=${encodeURIComponent(state.token)}; path=/; max-age=2592000; samesite=lax`
 		} else {
 			localStorage.removeItem(AUTH_STORAGE_KEY)
+			document.cookie = `${AUTH_COOKIE_KEY}=; path=/; max-age=0; samesite=lax`
 		}
 	} catch {
 		// Ignore storage errors
