@@ -7,7 +7,7 @@ export function sanitizeUser(user: any): any {
 	if (publish === undefined || publish === null) {
 		publish = user.publishMyData;
 	}
-	
+
 	if (publish === true) {
 		return user
 	}

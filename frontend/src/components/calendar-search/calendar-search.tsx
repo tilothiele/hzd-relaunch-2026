@@ -156,11 +156,6 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 					},
 				},
 				{
-					Date: {
-						gte: todayIso,
-					},
-				},
-				{
 					or: [
 						{ VisibleFrom: { null: true } },
 						{ VisibleFrom: { lte: nowIso } },
@@ -178,6 +173,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				filters: {
 					and: filterConditions,
 				},
+				pagination: { limit: -1 },
 				sort: ['Date:asc'],
 			}
 
@@ -191,7 +187,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 
 			const itemsArray = Array.isArray(data.calendarEntries) ? data.calendarEntries : []
 			const nowTs = Date.now()
-			const visibleItems = itemsArray.filter((item) => isFutureEntry(item, nowTs) && isWithinVisibility(item, nowTs))
+			const visibleItems = itemsArray.filter((item) => isWithinVisibility(item, nowTs))
 			setAllCalendarItems(visibleItems)
 		} catch (err) {
 			// Fehler beim Laden aller Items ignorieren
@@ -217,11 +213,6 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 						documentId: {
 							in: Array.from(selectedCalendarIds),
 						},
-					},
-				},
-				{
-					Date: {
-						gte: todayIso,
 					},
 				},
 				{
@@ -251,6 +242,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				filters: {
 					and: filterConditions,
 				},
+					pagination: { limit: -1 },
 				sort: ['Date:asc'],
 			}
 
@@ -264,7 +256,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 
 			const itemsArray = Array.isArray(data.calendarEntries) ? data.calendarEntries : []
 			const nowTs = Date.now()
-			const visibleItems = itemsArray.filter((item) => isFutureEntry(item, nowTs) && isWithinVisibility(item, nowTs))
+				const visibleItems = itemsArray.filter((item) => isWithinVisibility(item, nowTs))
 			setCalendarItems(visibleItems)
 		} catch (err) {
 			const fetchError = err instanceof Error
