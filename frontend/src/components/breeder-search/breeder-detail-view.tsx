@@ -45,8 +45,7 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack }
     const member = breeder.member
     const ownerMemberNames = (breeder.owner_members ?? [])
         .map((om) => {
-            const fullName = [om.firstName, om.lastName].filter(Boolean).join(' ').trim()
-            return fullName || om.username || ''
+            return [om.firstName, om.lastName].filter(Boolean).join(' ').trim()
         })
         .filter(Boolean)
     const avatarUrl = resolveMediaUrl(

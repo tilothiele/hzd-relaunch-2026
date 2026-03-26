@@ -1185,7 +1185,6 @@ export const SEARCH_BREEDERS = `
 				IsActive
 				owner_members {
 					documentId
-					username
 					firstName
 					lastName
 				}
