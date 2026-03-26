@@ -35,6 +35,14 @@ export default [
       policies: [],
     },
   },
+  {
+    method: 'POST',
+    path: '/users/import/chromosoft',
+    handler: 'user-import.importCsv',
+    config: {
+      policies: [],
+    },
+  },
   ...dogRoutes,
   ...breederRoutes,
   ...litterRoutes,

@@ -4,6 +4,7 @@ import breeder from './breeder';
 import litter from './litter';
 import geolocationController from './geolocation';
 import geolocationSync from './geolocation-sync';
+import userImport from './user-import';
 
 export default {
   controller,
@@ -12,4 +13,5 @@ export default {
   litter,
   geolocation: geolocationController,
   'geolocation-sync': geolocationSync,
+  'user-import': userImport,
 };
