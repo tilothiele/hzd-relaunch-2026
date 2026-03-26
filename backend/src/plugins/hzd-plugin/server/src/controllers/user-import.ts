@@ -1,4 +1,6 @@
 import { promises as fs } from 'fs'
+import { tmpdir } from 'os'
+import path from 'path'
 
 interface ChromosoftUser {
 	cId: number
@@ -229,22 +231,91 @@ async function readRawStream(req: NodeJS.ReadableStream): Promise<string> {
 	return Buffer.concat(chunks).toString('utf8')
 }
 
+function createTimestamp() {
+	const now = new Date()
+	const yyyy = now.getFullYear()
+	const mm = String(now.getMonth() + 1).padStart(2, '0')
+	const dd = String(now.getDate()).padStart(2, '0')
+	const hh = String(now.getHours()).padStart(2, '0')
+	const mi = String(now.getMinutes()).padStart(2, '0')
+	const ss = String(now.getSeconds()).padStart(2, '0')
+	return `${yyyy}${mm}${dd}-${hh}${mi}${ss}`
+}
+
+async function ensureLogsFolder(log: (line: string) => void): Promise<number | null> {
+	try {
+		const byPath = await strapi.db.query('plugin::upload.folder').findOne({
+			where: { path: '/logs' },
+			select: ['id', 'path', 'name', 'pathId'],
+		})
+		if (byPath?.id) {
+			log(`Upload-Ordner gefunden (path=/logs): id=${byPath.id}, pathId=${byPath.pathId}`)
+			return byPath.id
+		}
+
+		const byName = await strapi.db.query('plugin::upload.folder').findOne({
+			where: { name: 'logs', parent: null },
+			select: ['id', 'path', 'name', 'pathId'],
+		})
+		if (byName?.id) {
+			log(`Upload-Ordner gefunden (name=logs): id=${byName.id}, path=${byName.path}`)
+			return byName.id
+		}
+
+		const highestPathId = await strapi.db.query('plugin::upload.folder').findOne({
+			select: ['pathId'],
+			orderBy: { pathId: 'desc' },
+		})
+		const nextPathId = (highestPathId?.pathId ?? 0) + 1
+
+		const created = await strapi.db.query('plugin::upload.folder').create({
+			data: {
+				name: 'logs',
+				path: '/logs',
+				pathId: nextPathId,
+				parent: null,
+			},
+			select: ['id', 'path', 'name', 'pathId'],
+		})
+
+		log(`Upload-Ordner erstellt: id=${created?.id}, path=/logs, pathId=${nextPathId}`)
+		return created?.id ?? null
+	} catch (err: any) {
+		log(`Upload-Ordner konnte nicht sichergestellt werden: ${err?.message || 'unbekannter Fehler'}`)
+		return null
+	}
+}
+
 const controller = () => ({
 	async importCsv(ctx: any) {
+		const startedAt = new Date()
+		const timestamp = createTimestamp()
+		const logFileName = `import-chromosoft-users-${timestamp}.log`
+		const logLines: string[] = []
+		const log = (line: string) => {
+			const at = new Date().toISOString()
+			logLines.push(`[${at}] ${line}`)
+		}
+
 		let csvContent = ''
 
 		const file = (ctx.request as any)?.files?.file
 		if (file?.filepath) {
 			csvContent = await fs.readFile(file.filepath, 'utf8')
+			log(`CSV aus Upload-Datei gelesen: ${file.originalFilename || file.name || 'unbekannt'}`)
 		} else if (typeof ctx.request?.body === 'string') {
 			csvContent = ctx.request.body
+			log('CSV aus raw request body gelesen')
 		} else if (typeof ctx.request?.body?.csv === 'string') {
 			csvContent = ctx.request.body.csv
+			log('CSV aus JSON-Feld "csv" gelesen')
 		} else {
 			csvContent = await readRawStream(ctx.req)
+			log('CSV aus Stream gelesen')
 		}
 
 		if (!csvContent || csvContent.trim() === '') {
+			log('Abbruch: CSV payload fehlt oder ist leer')
 			return ctx.badRequest('CSV payload fehlt oder ist leer')
 		}
 
@@ -252,8 +323,10 @@ const controller = () => ({
 		const chromosoftUsers = rows
 			.map(mapRowToChromosoftUser)
 			.filter((row): row is ChromosoftUser => row !== null)
+		log(`CSV geparst: ${rows.length} Zeilen, ${chromosoftUsers.length} importierbare Datensätze`)
 
 		if (chromosoftUsers.length === 0) {
+			log('Abbruch: Keine importierbaren Datensätze in CSV gefunden')
 			return ctx.badRequest('Keine importierbaren Datensätze in CSV gefunden')
 		}
 
@@ -266,12 +339,15 @@ const controller = () => ({
 		}
 
 		for (const cu of chromosoftUsers) {
+			log(`Starte Verarbeitung für cId=${cu.cId}, email=${cu.email ?? 'null'}`)
+
 			const wu1 = await strapi.db
 				.query('plugin::users-permissions.user')
 				.findOne({
 					where: { cId: cu.cId },
 					select: ['id', 'cId', 'documentId', 'email'],
 				})
+			log(`wu1 per cId gefunden: ${wu1 ? `id=${wu1.id}` : 'nein'}`)
 
 			if (cu.email) {
 				const wu2List = await strapi.db
@@ -280,14 +356,17 @@ const controller = () => ({
 						where: { email: cu.email },
 						select: ['id', 'cId', 'documentId', 'email'],
 					})
+				log(`wu2List per email gefunden: ${wu2List.length}`)
 
 				for (const duplicateUser of wu2List) {
 					if (wu1 && duplicateUser.id === wu1.id) {
+						log(`Email rewrite übersprungen für id=${duplicateUser.id} (ist wu1)`)
 						continue
 					}
 
 					const rewritten = generateStrapiMail(duplicateUser.cId || duplicateUser.id)
 					if (duplicateUser.email === rewritten) {
+						log(`Email rewrite übersprungen für id=${duplicateUser.id} (bereits ${rewritten})`)
 						continue
 					}
 
@@ -295,6 +374,7 @@ const controller = () => ({
 						where: { id: duplicateUser.id },
 						data: { email: rewritten },
 					})
+					log(`Email rewrite: user id=${duplicateUser.id} -> ${rewritten}`)
 
 					stats.emailsRewritten += 1
 				}
@@ -329,6 +409,7 @@ const controller = () => ({
 				region: cu.region,
 				countryCode: cu.country,
 			}
+			log(`User upsert payload cId=${cu.cId}: ${JSON.stringify(userData)}`)
 
 			let persistedUser = wu1
 			if (wu1) {
@@ -336,6 +417,7 @@ const controller = () => ({
 					where: { id: wu1.id },
 					data: userData,
 				})
+				log(`User aktualisiert: id=${wu1.id}, username=${username}, email=${targetEmail}`)
 				stats.usersUpdated += 1
 			} else {
 				persistedUser = await strapi.db
@@ -344,10 +426,12 @@ const controller = () => ({
 						data: userData,
 						select: ['id', 'cId', 'documentId', 'email'],
 					})
+				log(`User erstellt: id=${persistedUser?.id}, username=${username}, email=${targetEmail}`)
 				stats.usersCreated += 1
 			}
 
 			if (cu.personIsBreeder) {
+				log(`Breeder-Flag aktiv für cId=${cu.cId} -> Upsert breeder`)
 				const existingBreeder = await strapi.db
 					.query('plugin::hzd-plugin.breeder')
 					.findOne({
@@ -360,25 +444,95 @@ const controller = () => ({
 					kennelName: cu.breedingStation,
 					member: persistedUser?.id ?? wu1?.id,
 				}
+				log(`Breeder upsert payload cId=${cu.cId}: ${JSON.stringify(breederData)}`)
 
 				if (existingBreeder) {
 					await strapi.db.query('plugin::hzd-plugin.breeder').update({
 						where: { id: existingBreeder.id },
 						data: breederData,
 					})
+					log(`Breeder aktualisiert: id=${existingBreeder.id}, cId=${cu.cId}`)
 				} else {
 					await strapi.db.query('plugin::hzd-plugin.breeder').create({
 						data: breederData,
 					})
+					log(`Breeder erstellt: cId=${cu.cId}`)
 				}
 
 				stats.breedersUpserted += 1
+			} else {
+				log(`Breeder-Flag nicht aktiv für cId=${cu.cId}`)
 			}
+		}
+
+		const finishedAt = new Date()
+		log(
+			`Import abgeschlossen. Dauer=${finishedAt.getTime() - startedAt.getTime()}ms, total=${stats.total}, created=${stats.usersCreated}, updated=${stats.usersUpdated}, breeders=${stats.breedersUpserted}, rewrites=${stats.emailsRewritten}`,
+		)
+
+		const tempLogPath = path.join(tmpdir(), logFileName)
+		await fs.writeFile(tempLogPath, `${logLines.join('\n')}\n`, 'utf8')
+		let uploadedLog: any = null
+		let logUploadError: string | null = null
+
+		try {
+			const stat = await fs.stat(tempLogPath)
+			const logsFolderId = await ensureLogsFolder(log)
+
+			const uploadResult = await strapi
+				.plugin('upload')
+				.service('upload')
+				.upload({
+					data: {
+						fileInfo: {
+							name: logFileName,
+							alternativeText: 'Chromosoft User Import Log',
+							caption: `Chromosoft Import ${timestamp}`,
+						},
+						...(logsFolderId ? { folder: logsFolderId } : {}),
+					},
+					files: {
+						filepath: tempLogPath,
+						originalFilename: logFileName,
+						mimetype: 'text/plain',
+						size: stat.size,
+					},
+				})
+
+			uploadedLog = Array.isArray(uploadResult) ? uploadResult[0] : uploadResult
+			if (uploadedLog?.id && logsFolderId) {
+				await strapi.db.query('plugin::upload.file').update({
+					where: { id: uploadedLog.id },
+					data: {
+						folder: logsFolderId,
+						folderPath: '/logs',
+					},
+				})
+				log(
+					`Logdatei Ordner-Zuordnung erzwungen: fileId=${uploadedLog.id} -> folderId=${logsFolderId}, folderPath=/logs`,
+				)
+			}
+			log(
+				`Logdatei in Media hochgeladen: id=${uploadedLog?.id ?? 'n/a'}, url=${uploadedLog?.url ?? 'n/a'}`,
+			)
+		} catch (err: any) {
+			logUploadError = err?.message || 'unbekannter Fehler'
+			log(`Log-Upload fehlgeschlagen: ${logUploadError}`)
+		} finally {
+			await fs.unlink(tempLogPath).catch(() => null)
 		}
 
 		ctx.body = {
 			success: true,
 			stats,
+			log: uploadedLog
+				? {
+						id: uploadedLog.id,
+						name: uploadedLog.name,
+						url: uploadedLog.url,
+					}
+				: null,
+			logUploadError,
 		}
 	},
 })
