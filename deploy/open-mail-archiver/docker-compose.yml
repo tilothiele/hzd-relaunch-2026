@@ -5,6 +5,7 @@ services:
         image: logiclabshq/open-archiver:latest
         container_name: open-archiver
         restart: unless-stopped
+
 #        ports:
 #            - '3000:3000' # Frontend
 #        env_file:
@@ -36,8 +37,8 @@ services:
         image: valkey/valkey:8-alpine
         container_name: valkey
         restart: unless-stopped
-        command: valkey-server
-#        command: valkey-server --requirepass ${REDIS_PASSWORD}
+#        command: valkey-server
+        command: valkey-server --requirepass ${REDIS_PASSWORD}
         volumes:
             - valkeydata:/data
         networks:
