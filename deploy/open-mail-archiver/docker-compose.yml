@@ -73,4 +73,5 @@ networks:
     open-archiver-net:
         driver: bridge
     coolify-net:
+        name: coolify
         external: true
