@@ -13,7 +13,9 @@ services:
       - coolify
 #    ports:
 #      - "80:80"
-
+    labels:
+      - "diun.enable=true"
+      
 #  mariadb:
 #    image: mariadb
 #    container_name: mariadb

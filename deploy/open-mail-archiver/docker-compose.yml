@@ -19,6 +19,8 @@ services:
         networks:
             - open-archiver-net
             - coolify-net
+        labels:
+        - "diun.enable=true"
 
 #    postgres:
 #        image: postgres:17-alpine

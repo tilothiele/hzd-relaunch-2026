@@ -8,6 +8,8 @@ services:
       PGID: 1000 # optional, your group id
 #    ports:
 #      - 3000:3000
+    labels:
+      - "diun.enable=true"
     volumes:
       - ./config:/app/config # Make sure your local config directory exists
 #      - /var/run/docker.sock:/var/run/docker.sock:ro # optional, for docker integrations
