@@ -1,0 +1,38 @@
+services:
+  vaultwarden:
+# aktueller tag: 1.35.4
+    image: 'vaultwarden/server:${VAULTWARDEN_IMAGE_TAG}'
+    environment:
+      - SERVICE_URL_VAULTWARDEN
+      - 'DOMAIN=${SERVICE_URL_VAULTWARDEN}'
+      - 'DATABASE_URL=${VAULTWARDEN_DB_URL:-data/db.sqlite3}'
+      - 'SIGNUPS_ALLOWED=${SIGNUP_ALLOWED:-true}'
+      - 'ADMIN_TOKEN=${SERVICE_PASSWORD_64_ADMIN}'
+      - IP_HEADER=X-Forwarded-For
+      - 'PUSH_ENABLED=${PUSH_ENABLED:-false}'
+      - 'PUSH_INSTALLATION_ID=${PUSH_SERVICE_ID}'
+      - 'PUSH_INSTALLATION_KEY=${PUSH_SERVICE_KEY}'
+      - 'DOMAIN=${DOMAIN}'
+      - 'SMTP_HOST=${SMTP_HOST}'
+      - 'SMTP_FROM=${SMTP_FROM}'
+      - 'SMTP_FROM_NAME=${SMTP_FROM_NAME}'
+      - 'SMTP_SECURITY=${SMTP_SECURITY}'
+      - 'SMTP_PORT=${SMTP_PORT}'
+      - 'SMTP_USERNAME=${SMTP_USERNAME}'
+      - 'SMTP_PASSWORD=${SMTP_PASSWORD}'
+      - 'SMTP_TIMEOUT=${SMTP_TIMEOUT}'
+    volumes:
+      - 'vaultwarden-data:/data'
+      - ./templates:/data/templates
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - '-f'
+        - 'http://127.0.0.1:80'
+      interval: 2s
+      timeout: 10s
+      retries: 15
+
+volumes:
+  - vaultwarden-data
