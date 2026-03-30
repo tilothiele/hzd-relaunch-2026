@@ -33,5 +33,12 @@ services:
       interval: 2s
       timeout: 10s
       retries: 15
+    networks:
+      - coolify
+     
+networks:
+  coolify:
+    external: true
+
 volumes:
-  - vaultwarden_data
+  vaultwarden_data:
