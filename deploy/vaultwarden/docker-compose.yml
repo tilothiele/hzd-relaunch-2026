@@ -22,8 +22,8 @@ services:
       - 'SMTP_PASSWORD=${SMTP_PASSWORD}'
       - 'SMTP_TIMEOUT=${SMTP_TIMEOUT}'
     volumes:
-      - 'vaultwarden-data:/data'
-      - templates:/data/templates
+      - vaultwarden-data:/data
+      - ./templates:/data/templates
     healthcheck:
       test:
         - CMD
