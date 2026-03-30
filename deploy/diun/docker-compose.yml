@@ -1,0 +1,34 @@
+services:
+  diun:
+    image: crazymax/diun:latest
+    command: serve
+    volumes:
+      - diun_data:/data
+      - /etc/timezone:/etc/timezone"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      - "DIUN_WATCH_WORKERS=20"
+      - "DIUN_WATCH_SCHEDULE=0 */6 * * *"
+      - "DIUN_WATCH_JITTER=30s"
+      - "DIUN_PROVIDERS_DOCKER=true"
+      - LOG_LEVEL=info
+      - LOG_JSON=false
+      - DIUN_NOTIF_MAIL_HOST=${DIUN_NOTIF_MAIL_HOST}
+      - DIUN_NOTIF_MAIL_PORT=${DIUN_NOTIF_MAIL_PORT}
+#      - DIUN_NOTIF_MAIL_SSL=${DIUN_NOTIF_MAIL_SSL}
+#      - DIUN_NOTIF_MAIL_INSECURESKIPVERIFY=${DIUN_NOTIF_MAIL_INSECURESKIPVERIFY}
+      - DIUN_NOTIF_MAIL_LOCALNAME=${DIUN_NOTIF_MAIL_LOCALNAME}
+      - DIUN_NOTIF_MAIL_USERNAME=${DIUN_NOTIF_MAIL_USERNAME}
+#      - DIUN_NOTIF_MAIL_USERNAMEFILE=${DIUN_NOTIF_MAIL_USERNAMEFILE}
+      - DIUN_NOTIF_MAIL_PASSWORD=${DIUN_NOTIF_MAIL_PASSWORD}
+#      - DIUN_NOTIF_MAIL_PASSWORDFILE=${DIUN_NOTIF_MAIL_PASSWORDFILE}
+      - DIUN_NOTIF_MAIL_FROM=${DIUN_NOTIF_MAIL_FROM}
+      - DIUN_NOTIF_MAIL_TO=${DIUN_NOTIF_MAIL_TO}
+#      - DIUN_NOTIF_MAIL_TEMPLATETITLE=${DIUN_NOTIF_MAIL_TEMPLATETITLE}
+#      - DIUN_NOTIF_MAIL_TEMPLATEBODY=${DIUN_NOTIF_MAIL_TEMPLATEBODY}
+    labels:
+      - "diun.enable=true"
+    restart: always
+
+volumes:
+  diun_data:
