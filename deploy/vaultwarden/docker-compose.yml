@@ -22,7 +22,7 @@ services:
       - 'SMTP_PASSWORD=${SMTP_PASSWORD}'
       - 'SMTP_TIMEOUT=${SMTP_TIMEOUT}'
     volumes:
-      - vaultwarden-data:/data
+      - vaultwarden_data:/data
       - ./templates:/data/templates
     healthcheck:
       test:
@@ -35,4 +35,4 @@ services:
       retries: 15
 
 volumes:
-  - vaultwarden-data
+  - vaultwarden_data
