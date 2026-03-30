@@ -3,7 +3,7 @@
 
 services:
   nextcloud:
-    image: nextcloud:33.0.0
+    image: nextcloud:33.0.1
     container_name: nextcloud
     restart: always
     networks:
@@ -23,7 +23,7 @@ services:
     - nextcloud-custom_apps:/var/www/html/custom_apps
     labels:
       - "diun.enable=true"
-      
+
 networks:
  coolify:
   external: true
