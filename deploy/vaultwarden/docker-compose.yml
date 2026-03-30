@@ -36,7 +36,8 @@ services:
       retries: 15
     networks:
       - coolify
-     
+    labels:
+      - "diun.enable=true"
 networks:
   coolify:
     external: true
