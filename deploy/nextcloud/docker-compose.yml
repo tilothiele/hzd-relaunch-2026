@@ -19,7 +19,7 @@ services:
     volumes:
     - nextcloud-config:/var/www/html/config
     - nextcloud-data:/var/www/html/data
-    - nextcloud-apps:/var/www/html/apps
+#    - nextcloud-apps:/var/www/html/apps
     - nextcloud-custom_apps:/var/www/html/custom_apps
     labels:
       - "diun.enable=true"
