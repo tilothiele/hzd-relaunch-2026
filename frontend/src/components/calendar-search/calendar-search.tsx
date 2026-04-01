@@ -156,6 +156,11 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 					},
 				},
 				{
+					Date: {
+						gte: todayIso,
+					},
+				},
+				{
 					or: [
 						{ VisibleFrom: { null: true } },
 						{ VisibleFrom: { lte: nowIso } },
