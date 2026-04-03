@@ -123,6 +123,14 @@ backup_volumes() {
 mkdir -p $BASE_DIR
 rm -rf "$BASE_DIR/*"
 
+# Website
+dump_file = pg_dump_docker "$base_dir" "$PG_PROD_DB"
+backup_volumes_offen "$BASE_DIR" \
+    "hzd-backend-prod" "hzd-frontend-prod" -- \
+    "$dump_file" \
+    "iws80ks8w8g8ckogs84gggsw-hzd-strapi-prod" \
+    "kyno-backup-volume"
+
 # Vaultwarden
 backup_volumes "$BASE_DIR" \
     "vaultwarden-e0c4woggs40w4swo8w0kcw48-122151023460" \
@@ -135,13 +143,6 @@ backup_volumes "$BASE_DIR" \
     -- \
     "ikcc8gsgcco4o84oscsoss08_n8n-data"
 
-# Website
-#dump_file = pg_dump_docker "$base_dir" "$PG_PROD_DB"
-#backup_volumes_offen "backups" -- \
-#    "website-prod" -- \
-#    "$dump_file" \
-#    "iws80ks8w8g8ckogs84gggsw-hzd-strapi-prod" \
-#    "kyno-backup-volume"
 
 # Minuten und Sekunden berechnen
 minutes=$((SECONDS / 60))
