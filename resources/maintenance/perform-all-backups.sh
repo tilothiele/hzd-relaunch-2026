@@ -124,13 +124,13 @@ mkdir -p $BASE_DIR
 rm -rf "$BASE_DIR/*"
 
 # Vaultwarden
-backup_volumes "$BASE_DIR" -- \
+backup_volumes "$BASE_DIR" \
     "vaultwarden-e0c4woggs40w4swo8w0kcw48-122151023460" \
     -- \
     "e0c4woggs40w4swo8w0kcw48_vaultwarden-data"
 
 # n8n
-backup_volumes "$BASE_DIR" -- \
+backup_volumes "$BASE_DIR" \
     "n8n-ikcc8gsgcco4o84oscsoss08" \
     -- \
     "ikcc8gsgcco4o84oscsoss08_n8n-data"
