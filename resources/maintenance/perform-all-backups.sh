@@ -38,12 +38,22 @@ mysql_dump_docker() {
     local dbname="$2"
     local dumpfile="${3:-"${dbname}_$(date +%F).sql"}"
     local mysql_port="${MYSQL_PORT:-3306}"
-    echo "--- MySQL dump durchführen ---"
+    echo "--- MySQL/MariaDB dump durchführen ---"
+    # mariadb:11 liefert mariadb-dump (mysqldump fehlt oft im PATH); ohne sh -c,
+    # damit nicht der Image-Entrypoint dazwischenfunkt.
     docker run --rm -it -e MYSQL_PWD="$MYSQL_PASSWORD" --network "$MYSQL_NETWORK" \
       -v "$base_dir:/transfer" \
+      --entrypoint mariadb-dump \
       mariadb:11 \
-      sh -c "mysqldump --single-transaction --skip-lock-tables --quick -h \"$MYSQL_HOST\" -P \"$mysql_port\" -u \"$MYSQL_USER\" \"$dbname\" > \"/transfer/$dumpfile\"" \
-      || die "MySQL-Dump fehlgeschlagen (Datenbank: $dbname)"
+      --single-transaction \
+      --skip-lock-tables \
+      --quick \
+      -h "$MYSQL_HOST" \
+      -P "$mysql_port" \
+      -u "$MYSQL_USER" \
+      --result-file="/transfer/$dumpfile" \
+      "$dbname" \
+      || die "MySQL/MariaDB-Dump fehlgeschlagen (Datenbank: $dbname)"
 }
 
 # Sichert benannte Docker-Volumes als .tgz unter base_dir.
