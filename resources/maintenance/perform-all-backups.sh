@@ -41,7 +41,7 @@ mysql_dump_docker() {
     echo "--- MySQL dump durchführen ---"
     docker run --rm -it -e MYSQL_PWD="$MYSQL_PASSWORD" --network "$MYSQL_NETWORK" \
       -v "$base_dir:/transfer" \
-      mysql:8 \
+      mariadb:11 \
       sh -c "mysqldump --single-transaction --skip-lock-tables --quick -h \"$MYSQL_HOST\" -P \"$mysql_port\" -u \"$MYSQL_USER\" \"$dbname\" > \"/transfer/$dumpfile\"" \
       || die "MySQL-Dump fehlgeschlagen (Datenbank: $dbname)"
 }
