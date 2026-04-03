@@ -15,67 +15,127 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 
 
 pg_dump_docker() {
-    local dbname="$1"
-    local container="postgres"
+    local base_dir="$1"
+    local dbname="$2"
     local dumpfile="${dbname}_$(date +%F).sql"
-    echo "--- DB dump durchführen ---"
+    echo "--- PGSQL dump durchführen ---"
     docker run --rm -it -e PGPASSWORD="$PG_PASSWORD" --network "$PG_NETWORK" \
-      -v $BASE_DIR:/transfer \
+      -v "$base_dir:/transfer" \
       pgvector/pgvector:pg17 \
       pg_dump -h "$PG_HOST" -U "$PG_USER" -d "$dbname" -Fc -f "/transfer/$dumpfile"
+    return "$dumpfile"
 }
 
-backup_volumes_offen() {
-    local target_remote="$1"  # z.B. user@remotehost:/remote/backup
-    shift                      # die restlichen Parameter sind Volumes
-    local volumes=("$@")
-
-    if [[ -z "$target_remote" || "${#volumes[@]}" -eq 0 ]]; then
-        echo "Usage: backup_volumes_offen <user@host:/path> <volume1> [volume2 ...]"
-        return 1
-    fi
-
-    for vol in "${volumes[@]}"; do
-        echo "Starte Backup für Volume: $vol nach $target_remote"
-
-	if [[ "$vol" == /* ]]; then
-        	# Wert beginnt mit / → alle / durch - ersetzen und "dir" davor
-        	local prefix="dir${vol//\//-}"
-    	else
-        	# Sonst "vol-" davor
-        	local prefix="vol-$vol"
-    	fi
-
-        docker run --rm \
-            -v "$vol:/backup/data:ro" \
-	    -e SSH_HOST_NAME="$STORAGEBOX_HOST" \
-	    -e SSH_PORT="$STORAGEBOX_PORT" \
-	    -e SSH_REMOTE_PATH="$STORAGEBOX_DIR" \
-	    -e SSH_USER="$STORAGEBOX_USER" \
-	    -e SSH_PASSWORD="$STORAGEBOX_PASSWORD" \
-	    -e BACKUP_RETENTION_DAYS="10" \
-	    -e BACKUP_FILENAME="hzd-backup-%Y-%m-%dT%H-%M-%S-$prefix.{{ .Extension }}" \
-	    --entrypoint backup \
-            offen/docker-volume-backup:latest 
-
-        if [[ $? -ne 0 ]]; then
-            echo "Fehler beim Backup von $vol"
-        else
-            echo "Backup von $vol erfolgreich"
-        fi
-    done
-
-    echo "Alle Backups abgeschlossen."
+mysql_dump_docker() {
+    local base_dir="$1"
+    local dbname="$2"
+    local dumpfile="${dbname}_$(date +%F).sql"
+    local mysql_port="${MYSQL_PORT:-3306}"
+    echo "--- MySQL dump durchführen ---"
+    docker run --rm -it -e MYSQL_PWD="$MYSQL_PASSWORD" --network "$MYSQL_NETWORK" \
+      -v "$base_dir:/transfer" \
+      mysql:8 \
+      sh -c "mysqldump --single-transaction --skip-lock-tables --quick -h \"$MYSQL_HOST\" -P \"$mysql_port\" -u \"$MYSQL_USER\" \"$dbname\" > \"/transfer/$dumpfile\""
+    return "$dumpfile"
 }
+
+# Sichert benannte Docker-Volumes als .tgz unter base_dir.
+# Aufruf: backup_volumes <base_dir> <container1> [...] -- <volume1> [...]
+# (Container- und Volume-Liste durch -- getrennt; eine Seite darf leer sein:
+#  nur Volumes: backup_volumes "$DIR" -- vol1 vol2)
+backup_volumes() {
+	local base_dir="$1"
+	shift
+	local containers=()
+	while [[ $# -gt 0 && "$1" != "--" ]]; do
+		containers+=("$1")
+		shift
+	done
+	if [[ "${1:-}" == "--" ]]; then
+		shift
+	fi
+	local volumes=("$@")
+
+	_bv_ensure_start() {
+		trap - RETURN
+		if [[ ${#containers[@]} -eq 0 ]]; then
+			echo "(Keine Container — überspringe Start.)"
+			return 0
+		fi
+		echo "--- Container starten ---"
+		for c in "${containers[@]}"; do
+			echo "Starte Container: $c"
+			docker start "$c" || echo "Warnung: docker start $c fehlgeschlagen" >&2
+		done
+	}
+	trap '_bv_ensure_start' RETURN
+
+	mkdir -p "$base_dir"
+	echo "Volume-Backup: Zielverzeichnis $base_dir"
+
+	if [[ ${#containers[@]} -eq 0 ]]; then
+		echo "(Keine Container — überspringe Stopp.)"
+	else
+		echo "--- Container stoppen ---"
+		for c in "${containers[@]}"; do
+			echo "Stoppe Container: $c"
+			docker stop "$c" || echo "Warnung: docker stop $c fehlgeschlagen" >&2
+		done
+	fi
+
+	if [[ ${#volumes[@]} -eq 0 ]]; then
+		echo "(Keine Volumes — überspringe Archivierung.)"
+	else
+		echo "--- Volume-Backups (.tgz) ---"
+		for vol in "${volumes[@]}"; do
+            echo "Starte Backup für Volume: $vol nach $target_remote"
+
+            if [[ "$vol" == /* ]]; then
+                # Wert beginnt mit / → alle / durch - ersetzen und "dir" davor
+                local prefix="dir${vol//\//-}"
+            else
+                # Sonst "vol-" davor
+                local prefix="vol-$vol"
+            fi
+
+            docker run --rm \
+                -v "$vol:/backup/data:ro" \
+                -e SSH_HOST_NAME="$STORAGEBOX_HOST" \
+                -e SSH_PORT="$STORAGEBOX_PORT" \
+                -e SSH_REMOTE_PATH="$STORAGEBOX_DIR" \
+                -e SSH_USER="$STORAGEBOX_USER" \
+                -e SSH_PASSWORD="$STORAGEBOX_PASSWORD" \
+                -e BACKUP_RETENTION_DAYS="10" \
+                -e BACKUP_FILENAME="hzd-backup-%Y-%m-%dT%H-%M-%S-$prefix.{{ .Extension }}" \
+                --entrypoint backup \
+                offen/docker-volume-backup:latest
+
+            if [[ $? -ne 0 ]]; then
+                echo "Fehler beim Backup von $vol"
+            else
+                echo "Backup von $vol erfolgreich"
+            fi
+		done
+	fi
+}
+
 
 mkdir -p $BASE_DIR
 rm -rf "$BASE_DIR/*"
 
-pg_dump_docker $PG_PROD_DB
-pg_dump_docker kestra
-pg_dump_docker hzd_dolibarr_prod
-backup_volumes_offen "backups" "ts0k4g80gcgw4s0g804gow8w-hzd-dolibarr-prod-documents" "iws80ks8w8g8ckogs84gggsw-hzd-strapi-prod" "$BASE_DIR"
+# Vaultwarden
+backup_volumes_offen "$BASE_DIR" -- \
+    "vaultwarden-e0c4woggs40w4swo8w0kcw48-122151023460" \
+    -- \
+    "e0c4woggs40w4swo8w0kcw48_vaultwarden-data"
 
+# Website
+#dump_file = pg_dump_docker "$base_dir" "$PG_PROD_DB"
+#backup_volumes_offen "backups" -- \
+#    "website-prod" -- \
+#    "$dump_file" \
+#    "iws80ks8w8g8ckogs84gggsw-hzd-strapi-prod" \
+#    "kyno-backup-volume"
 
 # Minuten und Sekunden berechnen
 minutes=$((SECONDS / 60))
