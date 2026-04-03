@@ -17,13 +17,13 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 pg_dump_docker() {
     local base_dir="$1"
     local dbname="$2"
-    local dumpfile="${dbname}_$(date +%F).sql"
+    # Optional: 3. Argument = Dateiname unter base_dir (Default: ${dbname}_$(date +%F).sql)
+    local dumpfile="${3:-"${dbname}_$(date +%F).sql"}"
     echo "--- PGSQL dump durchführen ---"
     docker run --rm -it -e PGPASSWORD="$PG_PASSWORD" --network "$PG_NETWORK" \
       -v "$base_dir:/transfer" \
       pgvector/pgvector:pg17 \
       pg_dump -h "$PG_HOST" -U "$PG_USER" -d "$dbname" -Fc -f "/transfer/$dumpfile"
-    return "$dumpfile"
 }
 
 mysql_dump_docker() {
@@ -36,7 +36,6 @@ mysql_dump_docker() {
       -v "$base_dir:/transfer" \
       mysql:8 \
       sh -c "mysqldump --single-transaction --skip-lock-tables --quick -h \"$MYSQL_HOST\" -P \"$mysql_port\" -u \"$MYSQL_USER\" \"$dbname\" > \"/transfer/$dumpfile\""
-    return "$dumpfile"
 }
 
 # Sichert benannte Docker-Volumes als .tgz unter base_dir.
@@ -88,7 +87,7 @@ backup_volumes() {
 	else
 		echo "--- Volume-Backups (.tgz) ---"
 		for vol in "${volumes[@]}"; do
-            echo "Starte Backup für Volume: $vol nach $target_remote"
+			echo "Starte Backup für Volume: $vol (Ziel: $base_dir)"
 
             if [[ "$vol" == /* ]]; then
                 # Wert beginnt mit / → alle / durch - ersetzen und "dir" davor
@@ -123,13 +122,14 @@ backup_volumes() {
 mkdir -p $BASE_DIR
 rm -rf "$BASE_DIR/*"
 
-# Website
-dump_file = pg_dump_docker "$base_dir" "$PG_PROD_DB"
-backup_volumes_offen "$BASE_DIR" \
-    "hzd-backend-prod" "hzd-frontend-prod" -- \
-    "$dump_file" \
-    "iws80ks8w8g8ckogs84gggsw-hzd-strapi-prod" \
-    "kyno-backup-volume"
+# Website (Dump-Dateiname einmal festlegen, an pg_dump + backup_volumes)
+dump_file="${PG_PROD_DB}_$(date +%F).sql"
+pg_dump_docker "$BASE_DIR" "$PG_PROD_DB" "$dump_file"
+backup_volumes "$BASE_DIR" \
+	"hzd-backend-prod" "hzd-frontend-prod" -- \
+	"$BASE_DIR/$dump_file" \
+	"iws80ks8w8g8ckogs84gggsw-hzd-strapi-prod" \
+	"kyno-backup-volume"
 
 # Vaultwarden
 backup_volumes "$BASE_DIR" \
