@@ -24,7 +24,7 @@ pg_dump_docker() {
     local base_dir="$1"
     local dbname="$2"
     # Optional: 3. Argument = Dateiname unter base_dir (Default: ${dbname}_$(date +%F).sql)
-    local dumpfile="${3:-"${dbname}_$(date +%F).sql"}"
+    local dumpfile="${3:-"db_dump_${dbname}_$(date +%F).sql"}"
     echo "--- PGSQL dump durchführen ---"
     docker run --rm -it -e PGPASSWORD="$PG_PASSWORD" --network "$PG_NETWORK" \
       -v "$base_dir:/transfer" \
@@ -63,6 +63,8 @@ mysql_dump_docker() {
 backup_volumes() {
 	local base_dir="$1"
 	shift
+    local prefix1="$2"
+    shift
 	local containers=()
 	while [[ $# -gt 0 && "$1" != "--" ]]; do
 		containers+=("$1")
@@ -113,10 +115,10 @@ backup_volumes() {
 
             if [[ "$vol" == /* ]]; then
                 # Wert beginnt mit / → alle / durch - ersetzen und "dir" davor
-                local prefix="dir${vol//\//-}"
+                local prefix="${prefix1}-dir${vol//\//-}"
             else
                 # Sonst "vol-" davor
-                local prefix="vol-$vol"
+                local prefix="${prefix1}-vol-$vol"
             fi
 
             docker run --rm \
@@ -146,18 +148,18 @@ shopt -s nullglob
 rm -rf "${BASE_DIR}/"*
 shopt -u nullglob
 
-# Website (Dump-Dateiname einmal festlegen, an pg_dump + backup_volumes)
-dump_file="${PG_PROD_DB}_$(date +%F).sql"
+# Website
+dump_file="website_db_dump_${PG_PROD_DB}_$(date +%F).sql"
 pg_dump_docker "$BASE_DIR" "$PG_PROD_DB" "$dump_file"
-backup_volumes "$BASE_DIR" \
+backup_volumes "$BASE_DIR" "website" \
 	"hzd-backend-prod" "hzd-frontend-prod" -- \
 	"$BASE_DIR/$dump_file" \
 	"iws80ks8w8g8ckogs84gggsw-hzd-strapi-prod"
 
-# Website (Dump-Dateiname einmal festlegen, an pg_dump + backup_volumes)
-dump_file="redmine_$(date +%F).sql"
+# Redmine
+dump_file="redmine_db_dump_$(date +%F).sql"
 mysql_dump_docker "$BASE_DIR" "redmine" "$dump_file"
-backup_volumes "$BASE_DIR" \
+backup_volumes "$BASE_DIR" "redmine" \
 	"redmine-ik4k40sg4ckg8cc0wc44k8sk-170948139091" -- \
 	"$BASE_DIR/$dump_file" \
 	"ik4k40sg4ckg8cc0wc44k8sk_redmine-files" \
@@ -165,17 +167,16 @@ backup_volumes "$BASE_DIR" \
 	"ik4k40sg4ckg8cc0wc44k8sk_redmine-themes"
 
 # Vaultwarden
-backup_volumes "$BASE_DIR" \
+backup_volumes "$BASE_DIR" "vaultwarden" \
     "vaultwarden-e0c4woggs40w4swo8w0kcw48-122151023460" \
     -- \
     "e0c4woggs40w4swo8w0kcw48_vaultwarden-data"
 
 # n8n
-backup_volumes "$BASE_DIR" \
+backup_volumes "$BASE_DIR" "n8n"\
     "n8n-ikcc8gsgcco4o84oscsoss08" \
     -- \
     "ikcc8gsgcco4o84oscsoss08_n8n-data"
-
 
 # Minuten und Sekunden berechnen
 minutes=$((SECONDS / 60))
