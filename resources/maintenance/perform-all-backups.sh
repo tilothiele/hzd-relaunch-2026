@@ -13,6 +13,12 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 
 . $SCRIPT_DIR/.env
 
+set -euo pipefail
+
+die() {
+	echo "FEHLER: $*" >&2
+	exit 1
+}
 
 pg_dump_docker() {
     local base_dir="$1"
@@ -23,19 +29,21 @@ pg_dump_docker() {
     docker run --rm -it -e PGPASSWORD="$PG_PASSWORD" --network "$PG_NETWORK" \
       -v "$base_dir:/transfer" \
       pgvector/pgvector:pg17 \
-      pg_dump -h "$PG_HOST" -U "$PG_USER" -d "$dbname" -Fc -f "/transfer/$dumpfile"
+      pg_dump -h "$PG_HOST" -U "$PG_USER" -d "$dbname" -Fc -f "/transfer/$dumpfile" \
+      || die "PostgreSQL-Dump fehlgeschlagen (Datenbank: $dbname)"
 }
 
 mysql_dump_docker() {
     local base_dir="$1"
     local dbname="$2"
-    local dumpfile="${dbname}_$(date +%F).sql"
+    local dumpfile="${3:-"${dbname}_$(date +%F).sql"}"
     local mysql_port="${MYSQL_PORT:-3306}"
     echo "--- MySQL dump durchführen ---"
     docker run --rm -it -e MYSQL_PWD="$MYSQL_PASSWORD" --network "$MYSQL_NETWORK" \
       -v "$base_dir:/transfer" \
       mysql:8 \
-      sh -c "mysqldump --single-transaction --skip-lock-tables --quick -h \"$MYSQL_HOST\" -P \"$mysql_port\" -u \"$MYSQL_USER\" \"$dbname\" > \"/transfer/$dumpfile\""
+      sh -c "mysqldump --single-transaction --skip-lock-tables --quick -h \"$MYSQL_HOST\" -P \"$mysql_port\" -u \"$MYSQL_USER\" \"$dbname\" > \"/transfer/$dumpfile\"" \
+      || die "MySQL-Dump fehlgeschlagen (Datenbank: $dbname)"
 }
 
 # Sichert benannte Docker-Volumes als .tgz unter base_dir.
@@ -64,12 +72,12 @@ backup_volumes() {
 		echo "--- Container starten ---"
 		for c in "${containers[@]}"; do
 			echo "Starte Container: $c"
-			docker start "$c" || echo "Warnung: docker start $c fehlgeschlagen" >&2
+			docker start "$c" || die "docker start fehlgeschlagen: $c"
 		done
 	}
 	trap '_bv_ensure_start' RETURN
 
-	mkdir -p "$base_dir"
+	mkdir -p "$base_dir" || die "Zielverzeichnis anlegen fehlgeschlagen: $base_dir"
 	echo "Volume-Backup: Zielverzeichnis $base_dir"
 
 	if [[ ${#containers[@]} -eq 0 ]]; then
@@ -78,7 +86,11 @@ backup_volumes() {
 		echo "--- Container stoppen ---"
 		for c in "${containers[@]}"; do
 			echo "Stoppe Container: $c"
-			docker stop "$c" || echo "Warnung: docker stop $c fehlgeschlagen" >&2
+			docker stop "$c" || {
+				trap - RETURN
+				_bv_ensure_start
+				die "docker stop fehlgeschlagen: $c"
+			}
 		done
 	fi
 
@@ -107,20 +119,22 @@ backup_volumes() {
                 -e BACKUP_RETENTION_DAYS="10" \
                 -e BACKUP_FILENAME="hzd-backup-%Y-%m-%dT%H-%M-%S-$prefix.{{ .Extension }}" \
                 --entrypoint backup \
-                offen/docker-volume-backup:latest
-
-            if [[ $? -ne 0 ]]; then
-                echo "Fehler beim Backup von $vol"
-            else
-                echo "Backup von $vol erfolgreich"
-            fi
+                offen/docker-volume-backup:latest \
+				|| {
+					trap - RETURN
+					_bv_ensure_start
+					die "Volume-Backup fehlgeschlagen: $vol"
+				}
+			echo "Backup von $vol erfolgreich"
 		done
 	fi
 }
 
 
-mkdir -p $BASE_DIR
-rm -rf "$BASE_DIR/*"
+mkdir -p "$BASE_DIR" || die "BASE_DIR anlegen fehlgeschlagen: $BASE_DIR"
+shopt -s nullglob
+rm -rf "${BASE_DIR}/"*
+shopt -u nullglob
 
 # Website (Dump-Dateiname einmal festlegen, an pg_dump + backup_volumes)
 dump_file="${PG_PROD_DB}_$(date +%F).sql"
@@ -128,8 +142,17 @@ pg_dump_docker "$BASE_DIR" "$PG_PROD_DB" "$dump_file"
 backup_volumes "$BASE_DIR" \
 	"hzd-backend-prod" "hzd-frontend-prod" -- \
 	"$BASE_DIR/$dump_file" \
-	"iws80ks8w8g8ckogs84gggsw-hzd-strapi-prod" \
-	"kyno-backup-volume"
+	"iws80ks8w8g8ckogs84gggsw-hzd-strapi-prod"
+
+# Website (Dump-Dateiname einmal festlegen, an pg_dump + backup_volumes)
+dump_file="redmine_$(date +%F).sql"
+mysql_dump_docker "$BASE_DIR" "redmine" "$dump_file"
+backup_volumes "$BASE_DIR" \
+	"redmine-ik4k40sg4ckg8cc0wc44k8sk-170948139091" -- \
+	"$BASE_DIR/$dump_file" \
+	"ik4k40sg4ckg8cc0wc44k8sk_redmine-files" \
+	"ik4k40sg4ckg8cc0wc44k8sk_redmine-plugins" \
+	"ik4k40sg4ckg8cc0wc44k8sk_redmine-themes"
 
 # Vaultwarden
 backup_volumes "$BASE_DIR" \
