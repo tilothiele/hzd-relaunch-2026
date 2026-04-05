@@ -126,7 +126,7 @@ backup_volumes() {
                 -v "$vol:/backup/data:ro" \
                 -e SSH_HOST_NAME="$STORAGEBOX_HOST" \
                 -e SSH_PORT="$STORAGEBOX_PORT" \
-                -e SSH_REMOTE_PATH="$STORAGEBOX_DIR" \
+                -e SSH_REMOTE_PATH="$STORAGEBOX_DIR/$prefix1" \
                 -e SSH_USER="$STORAGEBOX_USER" \
                 -e SSH_PASSWORD="$STORAGEBOX_PASSWORD" \
                 -e BACKUP_RETENTION_DAYS="10" \
