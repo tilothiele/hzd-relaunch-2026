@@ -201,6 +201,8 @@ backup_volumes "$BASE_DIR" "n8n"\
     -- \
     "ikcc8gsgcco4o84oscsoss08_n8n-data"
 
+rm -rf "${BASE_DIR}/"*
+
 # Minuten und Sekunden berechnen
 minutes=$((SECONDS / 60))
 seconds=$((SECONDS % 60))
