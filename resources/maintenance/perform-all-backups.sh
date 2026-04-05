@@ -17,6 +17,7 @@ set -euo pipefail
 
 die() {
 	echo "FEHLER: $*" >&2
+	curl -H "X-Tags: stop_sign" -d "HZD Backup failed: $*" https://ntfy.emsgmbh-tt-homeoffice.srv64.de/backup
 	exit 1
 }
 
@@ -192,3 +193,5 @@ minutes=$((SECONDS / 60))
 seconds=$((SECONDS % 60))
 
 echo "Verstrichene Zeit: ${minutes}m ${seconds}s"
+
+curl -H "X-Tags: ok"        -d "HZD Backup finished" https://ntfy.emsgmbh-tt-homeoffice.srv64.de/backup
