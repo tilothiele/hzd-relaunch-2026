@@ -157,10 +157,21 @@ prune_old_backups() {
 	fi
 	remote_q=$(printf '%q' "$remote_dir")
 	echo "--- Alte Backups entfernen (Dateien älter als 10 Tage): ${STORAGEBOX_USER}@${ssh_host}:${remote_dir} ---"
+	# Kein ~/.ssh/config (ControlMaster etc.), keine Agent-/Key-Versuche (Cron hängt sonst oft)
 	sshpass -p "$STORAGEBOX_PASSWORD" ssh \
+		-F /dev/null \
+		-p "$port" \
+		-o ConnectTimeout=30 \
+		-o ServerAliveInterval=15 \
+		-o ServerAliveCountMax=3 \
 		-o StrictHostKeyChecking=no \
 		-o UserKnownHostsFile=/dev/null \
-		-p "$port" \
+		-o GlobalKnownHostsFile=/dev/null \
+		-o UpdateHostKeys=no \
+		-o LogLevel=ERROR \
+		-o PreferredAuthentications=keyboard-interactive,password \
+		-o PubkeyAuthentication=no \
+		-o GSSAPIAuthentication=no \
 		"${STORAGEBOX_USER}@${ssh_host}" \
 		"find ${remote_q} -type f -mtime +7 -delete" \
 		|| die "prune_old_backups fehlgeschlagen (SSH: $ssh_host)"
