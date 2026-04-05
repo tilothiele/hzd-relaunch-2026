@@ -201,6 +201,17 @@ backup_volumes "$BASE_DIR" "n8n"\
     -- \
     "ikcc8gsgcco4o84oscsoss08_n8n-data"
 
+# open-archiver
+dump_file="mailarchiver_db_dump_$(date +%F).sql"
+pg_dump_docker "$BASE_DIR" "mailarchiver" "$dump_file"
+mailarchiver
+backup_volumes "$BASE_DIR" "open-archiver"\
+    "open-archiver-yksggcgggsogcggococ8gco0-145130673346" \
+    -- \
+	"$BASE_DIR/$dump_file"
+
+
+
 rm -rf "${BASE_DIR}/"*
 
 # Minuten und Sekunden berechnen
