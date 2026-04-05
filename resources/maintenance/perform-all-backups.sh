@@ -143,40 +143,6 @@ backup_volumes() {
 	fi
 }
 
-# Löscht rekursiv auf dem SSH-Ziel alle regulären Dateien älter als 10 Tage
-# (mtime). Verzeichnisse werden nicht entfernt.
-# Parameter: ssh_host, remote_dir (absoluter Pfad auf dem Ziel)
-# Env wie Volume-Backup: STORAGEBOX_USER, STORAGEBOX_PASSWORD, optional STORAGEBOX_PORT
-prune_old_backups() {
-	local ssh_host="$1"
-	local remote_dir="$2"
-	local port="${STORAGEBOX_PORT:-22}"
-	local remote_q
-	if [[ -z "$ssh_host" || -z "$remote_dir" ]]; then
-		die "prune_old_backups: ssh_host und remote_dir angeben"
-	fi
-	remote_q=$(printf '%q' "$remote_dir")
-	echo "--- Alte Backups entfernen (Dateien älter als 10 Tage): ${STORAGEBOX_USER}@${ssh_host}:${remote_dir} ---"
-	# Kein ~/.ssh/config (ControlMaster etc.), keine Agent-/Key-Versuche (Cron hängt sonst oft)
-	sshpass -p "$STORAGEBOX_PASSWORD" ssh \
-		-F /dev/null \
-		-p "$port" \
-		-o ConnectTimeout=30 \
-		-o ServerAliveInterval=15 \
-		-o ServerAliveCountMax=3 \
-		-o StrictHostKeyChecking=no \
-		-o UserKnownHostsFile=/dev/null \
-		-o GlobalKnownHostsFile=/dev/null \
-		-o UpdateHostKeys=no \
-		-o LogLevel=ERROR \
-		-o PreferredAuthentications=keyboard-interactive,password \
-		-o PubkeyAuthentication=no \
-		-o GSSAPIAuthentication=no \
-		"${STORAGEBOX_USER}@${ssh_host}" \
-		"find ${remote_q} -type f -mtime +7 -delete" \
-		|| die "prune_old_backups fehlgeschlagen (SSH: $ssh_host)"
-}
-
 
 mkdir -p "$BASE_DIR" || die "BASE_DIR anlegen fehlgeschlagen: $BASE_DIR"
 shopt -s nullglob
@@ -225,8 +191,6 @@ backup_volumes "$BASE_DIR" "n8n"\
 # Minuten und Sekunden berechnen
 minutes=$((SECONDS / 60))
 seconds=$((SECONDS % 60))
-
-prune_old_backups "$STORAGEBOX_HOST" "$STORAGEBOX_DIR"
 
 echo "Verstrichene Zeit: ${minutes}m ${seconds}s"
 
