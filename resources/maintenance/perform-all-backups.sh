@@ -168,7 +168,7 @@ backup_volumes "$BASE_DIR" "redmine" \
 
 # Paperless
 dump_file="paperless_db_dump_$(date +%F).sql"
-mysql_dump_docker "$BASE_DIR" "paperless" "$dump_file"
+pg_dump_docker "$BASE_DIR" "paperless" "$dump_file"
 backup_volumes "$BASE_DIR" "paperless" \
 	"webserver-jsss8kkkgso40gww08wkws4s-122357838465" -- \
 	"$BASE_DIR/$dump_file" \
