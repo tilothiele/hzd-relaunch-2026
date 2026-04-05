@@ -204,7 +204,6 @@ backup_volumes "$BASE_DIR" "n8n"\
 # open-archiver
 dump_file="mailarchiver_db_dump_$(date +%F).sql"
 pg_dump_docker "$BASE_DIR" "mailarchiver" "$dump_file"
-mailarchiver
 backup_volumes "$BASE_DIR" "open-archiver"\
     "open-archiver-yksggcgggsogcggococ8gco0-145130673346" \
     -- \
