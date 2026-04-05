@@ -1,0 +1,173 @@
+---
+services:
+  opencloud:
+    # renovate: depName=opencloudeu/opencloud-rolling
+    image: ${OC_DOCKER_IMAGE:-opencloudeu/opencloud-rolling}:${OC_DOCKER_TAG:-5.2.0}
+    # changelog: https://github.com/opencloud-eu/opencloud/tree/main/changelog
+    # release notes: https://docs.opencloud.eu/opencloud_release_notes.html
+    user: ${OC_CONTAINER_UID_GID:-1000:1000}
+    networks:
+      coolify:
+    entrypoint:
+      - /bin/sh
+    # run opencloud init to initialize a configuration file with random secrets
+    # it will fail on subsequent runs, because the config file already exists
+    # therefore we ignore the error and then start the opencloud server
+    command: ["-c", "opencloud init || true; opencloud server"]
+    environment:
+      # enable services that are not started automatically
+      OC_ADD_RUN_SERVICES: ${START_ADDITIONAL_SERVICES}
+      OC_URL: https://${OC_DOMAIN:-cloud.opencloud.test}${TRAEFIK_PORT_HTTPS:+:}${TRAEFIK_PORT_HTTPS:-}
+      OC_LOG_LEVEL: ${LOG_LEVEL:-info}
+      OC_LOG_COLOR: "${LOG_PRETTY:-false}"
+      OC_LOG_PRETTY: "${LOG_PRETTY:-false}"
+      # do not use SSL between the reverse proxy and OpenCloud
+      PROXY_TLS: "false"
+      # INSECURE: needed if OpenCloud / reverse proxy is using self generated certificates
+      OC_INSECURE: "${INSECURE:-false}"
+      # basic auth (not recommended, but needed for eg. WebDav clients that do not support OpenID Connect)
+      PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH:-false}"
+      # demo users
+      IDM_CREATE_DEMO_USERS: "${DEMO_USERS:-false}"
+      # admin password
+      IDM_ADMIN_PASSWORD: "${INITIAL_ADMIN_PASSWORD}"
+      # email server (if configured)
+      NOTIFICATIONS_SMTP_HOST: "${SMTP_HOST}"
+      NOTIFICATIONS_SMTP_PORT: "${SMTP_PORT}"
+      NOTIFICATIONS_SMTP_SENDER: "${SMTP_SENDER:-OpenCloud Notifications <notifications@cloud.opencloud.test>}"
+      NOTIFICATIONS_SMTP_USERNAME: "${SMTP_USERNAME}"
+      NOTIFICATIONS_SMTP_PASSWORD: "${SMTP_PASSWORD}"
+      NOTIFICATIONS_SMTP_INSECURE: "${SMTP_INSECURE:-false}"
+      NOTIFICATIONS_SMTP_AUTHENTICATION: "${SMTP_AUTHENTICATION}"
+      NOTIFICATIONS_SMTP_ENCRYPTION: "${SMTP_TRANSPORT_ENCRYPTION:-none}"
+      FRONTEND_ARCHIVER_MAX_SIZE: "10000000000"
+      FRONTEND_CHECK_FOR_UPDATES: "${CHECK_FOR_UPDATES:-true}"
+      PROXY_CSP_CONFIG_FILE_LOCATION: /etc/opencloud/csp.yaml
+      # enable to allow using the banned passwords list
+      OC_PASSWORD_POLICY_BANNED_PASSWORDS_LIST: banned-password-list.txt
+      # control the password enforcement and policy for public shares
+      OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD: "${OC_SHARING_PUBLIC_SHARE_MUST_HAVE_PASSWORD:-true}"
+      OC_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD: "${OC_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD:-false}"
+      OC_PASSWORD_POLICY_DISABLED: "${OC_PASSWORD_POLICY_DISABLED:-false}"
+      OC_PASSWORD_POLICY_MIN_CHARACTERS: "${OC_PASSWORD_POLICY_MIN_CHARACTERS:-8}"
+      OC_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS: "${OC_PASSWORD_POLICY_MIN_LOWERCASE_CHARACTERS:-1}"
+      OC_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS: "${OC_PASSWORD_POLICY_MIN_UPPERCASE_CHARACTERS:-1}"
+      OC_PASSWORD_POLICY_MIN_DIGITS: "${OC_PASSWORD_POLICY_MIN_DIGITS:-1}"
+      OC_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS: "${OC_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS:-1}"
+      # default language for services/WebUI; defaults to English, language code (ISO 639-1, e.g. de, en, fr)
+      OC_DEFAULT_LANGUAGE: ${DEFAULT_LANGUAGE}
+      STORAGE_USERS_DRIVER: decomposeds3
+      # keep system data on opencloud storage since this are only small files atm
+      STORAGE_SYSTEM_DRIVER: decomposed
+      # decomposeds3 specific settings
+      STORAGE_USERS_DECOMPOSEDS3_ENDPOINT: ${DECOMPOSEDS3_ENDPOINT:-http://minio:9000}
+      STORAGE_USERS_DECOMPOSEDS3_REGION: ${DECOMPOSEDS3_REGION:-default}
+      STORAGE_USERS_DECOMPOSEDS3_ACCESS_KEY: ${DECOMPOSEDS3_ACCESS_KEY:-opencloud}
+      STORAGE_USERS_DECOMPOSEDS3_SECRET_KEY: ${DECOMPOSEDS3_SECRET_KEY:-opencloud-secret-key}
+      STORAGE_USERS_DECOMPOSEDS3_BUCKET: ${DECOMPOSEDS3_BUCKET:-opencloud-bucket}
+      STORAGE_USERS_EVENTS_NUM_CONSUMERS: ${DECOMPOSEDS3_EVENTS_NUM_CONSUMERS:-5}
+
+      # this is needed for setting the correct CSP header
+      COLLABORA_DOMAIN: ${COLLABORA_DOMAIN:-collabora.opencloud.test}
+      TRAEFIK_PORT_HTTPS: ${TRAEFIK_PORT_HTTPS:+:}${TRAEFIK_PORT_HTTPS:-}
+      # expose nats and the reva gateway for the collaboration service
+      NATS_NATS_HOST: 0.0.0.0
+      GATEWAY_GRPC_ADDR: 0.0.0.0:9142
+      # make collabora the secure view app
+      FRONTEND_APP_HANDLER_SECURE_VIEW_APP_ADDR: eu.opencloud.api.collaboration
+      GRAPH_AVAILABLE_ROLES: "b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5,a8d5fe5e-96e3-418d-825b-534dbdf22b99,fb6c3e19-e378-47e5-b277-9732f9de6e21,58c63c02-1d89-4572-916a-870abc5a1b7d,2d00ce52-1fc2-4dbc-8b95-a73b73395f5a,1c996275-f1c9-4e71-abdf-a42f6495e960,312c0871-5ef7-4b3a-85b6-0e4074c64049,aa97fe03-7980-45ac-9e50-b325749fd7e6"
+    volumes:
+      - ./config/opencloud/csp.yaml:/etc/opencloud/csp.yaml
+      - ./config/opencloud/banned-password-list.txt:/etc/opencloud/banned-password-list.txt
+      # configure the .env file to use own paths instead of docker internal volumes
+      - ${OC_CONFIG_DIR:-opencloud-config}:/etc/opencloud
+      - ${OC_DATA_DIR:-opencloud-data}:/var/lib/opencloud
+      - ${OC_APPS_DIR:-./config/opencloud/apps}:/var/lib/opencloud/web/assets/apps
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
+    labels:
+      - "diun.enable=true"
+
+
+  collaboration:
+    # renovate: depName=opencloudeu/opencloud-rolling
+    image: ${OC_DOCKER_IMAGE:-opencloudeu/opencloud-rolling}:${OC_DOCKER_TAG:-6.0.0}
+    user: ${OC_CONTAINER_UID_GID:-1000:1000}
+    networks:
+      opencloud-net:
+    depends_on:
+      opencloud:
+        condition: service_started
+      collabora:
+        condition: service_healthy
+    entrypoint:
+      - /bin/sh
+    command: [ "-c", "opencloud collaboration server" ]
+    environment:
+      COLLABORATION_GRPC_ADDR: 0.0.0.0:9301
+      COLLABORATION_HTTP_ADDR: 0.0.0.0:9300
+      MICRO_REGISTRY: "nats-js-kv"
+      MICRO_REGISTRY_ADDRESS: "opencloud:9233"
+      COLLABORATION_WOPI_SRC: https://${WOPISERVER_DOMAIN:-wopiserver.opencloud.test}${TRAEFIK_PORT_HTTPS:+:}${TRAEFIK_PORT_HTTPS:-}
+      COLLABORATION_APP_NAME: "CollaboraOnline"
+      COLLABORATION_APP_PRODUCT: "Collabora"
+      COLLABORATION_APP_ADDR: https://${COLLABORA_DOMAIN:-collabora.opencloud.test}${TRAEFIK_PORT_HTTPS:+:}${TRAEFIK_PORT_HTTPS:-}
+      COLLABORATION_APP_ICON: https://${COLLABORA_DOMAIN:-collabora.opencloud.test}${TRAEFIK_PORT_HTTPS:+:}${TRAEFIK_PORT_HTTPS:-}/favicon.ico
+      COLLABORATION_APP_INSECURE: "${INSECURE:-true}"
+      COLLABORATION_CS3API_DATAGATEWAY_INSECURE: "${INSECURE:-true}"
+      COLLABORATION_LOG_LEVEL: ${LOG_LEVEL:-info}
+      OC_URL: https://${OC_DOMAIN:-cloud.opencloud.test}${TRAEFIK_PORT_HTTPS:+:}${TRAEFIK_PORT_HTTPS:-}
+    volumes:
+      # configure the .env file to use own paths instead of docker internal volumes
+      - ${OC_CONFIG_DIR:-opencloud-config}:/etc/opencloud
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
+
+  collabora:
+    image: collabora/code:25.04.9.4.1
+    # release notes: https://www.collaboraonline.com/release-notes/
+    networks:
+      opencloud-net:
+    environment:
+      aliasgroup1: https://${WOPISERVER_DOMAIN:-wopiserver.opencloud.test}${TRAEFIK_PORT_HTTPS:+:}${TRAEFIK_PORT_HTTPS:-}
+      DONT_GEN_SSL_CERT: "YES"
+      extra_params: |
+        --o:ssl.enable=${COLLABORA_SSL_ENABLE:-true} \
+        --o:ssl.ssl_verification=${COLLABORA_SSL_VERIFICATION:-true} \
+        --o:ssl.termination=true \
+        --o:welcome.enable=false \
+        --o:net.frame_ancestors=${OC_DOMAIN:-cloud.opencloud.test}${TRAEFIK_PORT_HTTPS:+:}${TRAEFIK_PORT_HTTPS:-} \
+        --o:net.lok_allow.host[14]=${OC_DOMAIN:-cloud.opencloud.test}${TRAEFIK_PORT_HTTPS:+:}${TRAEFIK_PORT_HTTPS:-} \
+        --o:home_mode.enable=${COLLABORA_HOME_MODE:-false}
+      username: ${COLLABORA_ADMIN_USER:-admin}
+      password: ${COLLABORA_ADMIN_PASSWORD:-admin}
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - seccomp=unconfined
+      - apparmor:unconfined
+    volumes:
+      # Mount local TrueType fonts so the container can use system fonts
+      # (e.g. Microsoft fonts like Arial, Calibri, Cambria by installing the `ttf-mscorefonts-installer` package).
+      - /usr/share/fonts/truetype:/usr/share/fonts/truetype/more:ro
+      - /usr/share/fonts/truetype:/opt/cool/systemplate/usr/share/fonts/truetype/more:ro
+    logging:
+      driver: ${LOG_DRIVER:-local}
+    restart: always
+    entrypoint: [ '/bin/bash', '-c' ]
+    command: [ 'coolconfig generate-proof-key && /start-collabora-online.sh' ]
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9980/hosting/discovery" ]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+
+volumes:
+  opencloud-config:
+  opencloud-data:
+
+networks:
+  coolify:

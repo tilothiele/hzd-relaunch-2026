@@ -166,6 +166,15 @@ backup_volumes "$BASE_DIR" "redmine" \
 	"ik4k40sg4ckg8cc0wc44k8sk_redmine-plugins" \
 	"ik4k40sg4ckg8cc0wc44k8sk_redmine-themes"
 
+# Paperless
+dump_file="paperless_db_dump_$(date +%F).sql"
+mysql_dump_docker "$BASE_DIR" "paperless" "$dump_file"
+backup_volumes "$BASE_DIR" "paperless" \
+	"webserver-jsss8kkkgso40gww08wkws4s-122357838465" -- \
+	"$BASE_DIR/$dump_file" \
+	"jsss8kkkgso40gww08wkws4s_media" \
+	"jsss8kkkgso40gww08wkws4s_data"
+
 # Vaultwarden
 backup_volumes "$BASE_DIR" "vaultwarden" \
     "vaultwarden-e0c4woggs40w4swo8w0kcw48-122151023460" \
