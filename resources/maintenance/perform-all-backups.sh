@@ -64,7 +64,7 @@ mysql_dump_docker() {
 backup_volumes() {
 	local base_dir="$1"
 	shift
-    local prefix1="$2"
+    local prefix1="$1"
     shift
 	local containers=()
 	while [[ $# -gt 0 && "$1" != "--" ]]; do
@@ -175,6 +175,13 @@ backup_volumes "$BASE_DIR" "paperless" \
 	"$BASE_DIR/$dump_file" \
 	"jsss8kkkgso40gww08wkws4s_media" \
 	"jsss8kkkgso40gww08wkws4s_data"
+
+# Umami
+dump_file="umami_db_dump_$(date +%F).sql"
+pg_dump_docker "$BASE_DIR" "umami" "$dump_file"
+backup_volumes "$BASE_DIR" "umami" \
+	"umami" -- \
+	"$BASE_DIR/$dump_file"
 
 # Vaultwarden
 backup_volumes "$BASE_DIR" "vaultwarden" \
