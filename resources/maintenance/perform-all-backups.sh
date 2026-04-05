@@ -26,7 +26,7 @@ pg_dump_docker() {
     # Optional: 3. Argument = Dateiname unter base_dir (Default: ${dbname}_$(date +%F).sql)
     local dumpfile="${3:-"db_dump_${dbname}_$(date +%F).sql"}"
     echo "--- PGSQL dump durchführen ---"
-    docker run --rm -it -e PGPASSWORD="$PG_PASSWORD" --network "$PG_NETWORK" \
+    docker run --rm -e PGPASSWORD="$PG_PASSWORD" --network "$PG_NETWORK" \
       -v "$base_dir:/transfer" \
       pgvector/pgvector:pg17 \
       pg_dump -h "$PG_HOST" -U "$PG_USER" -d "$dbname" -Fc -f "/transfer/$dumpfile" \
@@ -41,7 +41,7 @@ mysql_dump_docker() {
     echo "--- MySQL/MariaDB dump durchführen ---"
     # mariadb:11 liefert mariadb-dump (mysqldump fehlt oft im PATH); ohne sh -c,
     # damit nicht der Image-Entrypoint dazwischenfunkt.
-    docker run --rm -it -e MYSQL_PWD="$MYSQL_PASSWORD" --network "$MYSQL_NETWORK" \
+    docker run --rm -e MYSQL_PWD="$MYSQL_PASSWORD" --network "$MYSQL_NETWORK" \
       -v "$base_dir:/transfer" \
       --entrypoint mariadb-dump \
       mariadb:11 \
