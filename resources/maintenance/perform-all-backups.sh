@@ -183,6 +183,12 @@ backup_volumes "$BASE_DIR" "umami" \
 	"umami" -- \
 	"$BASE_DIR/$dump_file"
 
+# OpenCloud
+backup_volumes "$BASE_DIR" "opencloud" \
+	"opencloud-qoksokw84wcsokkgokksww8c-132905742513" -- \
+	"qoksokw84wcsokkgokksww8c_opencloud-config" \
+	"qoksokw84wcsokkgokksww8c_opencloud-data"
+
 # Vaultwarden
 backup_volumes "$BASE_DIR" "vaultwarden" \
     "vaultwarden-e0c4woggs40w4swo8w0kcw48-122151023460" \
