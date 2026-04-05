@@ -58,10 +58,10 @@ mysql_dump_docker() {
 }
 
 # Sichert benannte Docker-Volumes als .tgz unter base_dir.
-# Aufruf: backup_volumes <base_dir> <container1> [...] -- <volume1> [...]
+# Aufruf: backup_application <base_dir> <container1> [...] -- <volume1> [...]
 # (Container- und Volume-Liste durch -- getrennt; eine Seite darf leer sein:
-#  nur Volumes: backup_volumes "$DIR" -- vol1 vol2)
-backup_volumes() {
+#  nur Volumes: backup_application "$DIR" -- vol1 vol2)
+backup_application() {
 	local base_dir="$1"
 	shift
     local prefix1="$1"
@@ -152,7 +152,7 @@ shopt -u nullglob
 # Website
 dump_file="website_db_dump_${PG_PROD_DB}_$(date +%F).sql"
 pg_dump_docker "$BASE_DIR" "$PG_PROD_DB" "$dump_file"
-backup_volumes "$BASE_DIR" "website" \
+backup_application "$BASE_DIR" "website" \
 	"hzd-backend-prod" "hzd-frontend-prod" -- \
 	"$BASE_DIR/$dump_file" \
 	"iws80ks8w8g8ckogs84gggsw-hzd-strapi-prod"
@@ -160,7 +160,7 @@ backup_volumes "$BASE_DIR" "website" \
 # Redmine
 dump_file="redmine_db_dump_$(date +%F).sql"
 mysql_dump_docker "$BASE_DIR" "redmine" "$dump_file"
-backup_volumes "$BASE_DIR" "redmine" \
+backup_application "$BASE_DIR" "redmine" \
 	"redmine-ik4k40sg4ckg8cc0wc44k8sk-170948139091" -- \
 	"$BASE_DIR/$dump_file" \
 	"ik4k40sg4ckg8cc0wc44k8sk_redmine-files" \
@@ -170,7 +170,7 @@ backup_volumes "$BASE_DIR" "redmine" \
 # Paperless
 dump_file="paperless_db_dump_$(date +%F).sql"
 pg_dump_docker "$BASE_DIR" "paperless" "$dump_file"
-backup_volumes "$BASE_DIR" "paperless" \
+backup_application "$BASE_DIR" "paperless" \
 	"webserver-jsss8kkkgso40gww08wkws4s-122357838465" -- \
 	"$BASE_DIR/$dump_file" \
 	"jsss8kkkgso40gww08wkws4s_media" \
@@ -179,24 +179,24 @@ backup_volumes "$BASE_DIR" "paperless" \
 # Umami
 dump_file="umami_db_dump_$(date +%F).sql"
 pg_dump_docker "$BASE_DIR" "umami" "$dump_file"
-backup_volumes "$BASE_DIR" "umami" \
+backup_application "$BASE_DIR" "umami" \
 	"umami" -- \
 	"$BASE_DIR/$dump_file"
 
 # OpenCloud
-backup_volumes "$BASE_DIR" "opencloud" \
+backup_application "$BASE_DIR" "opencloud" \
 	"opencloud-qoksokw84wcsokkgokksww8c-132905742513" -- \
 	"qoksokw84wcsokkgokksww8c_opencloud-config" \
 	"qoksokw84wcsokkgokksww8c_opencloud-data"
 
 # Vaultwarden
-backup_volumes "$BASE_DIR" "vaultwarden" \
+backup_application "$BASE_DIR" "vaultwarden" \
     "vaultwarden-e0c4woggs40w4swo8w0kcw48-122151023460" \
     -- \
     "e0c4woggs40w4swo8w0kcw48_vaultwarden-data"
 
 # n8n
-backup_volumes "$BASE_DIR" "n8n"\
+backup_application "$BASE_DIR" "n8n"\
     "n8n-ikcc8gsgcco4o84oscsoss08" \
     -- \
     "ikcc8gsgcco4o84oscsoss08_n8n-data"
@@ -204,7 +204,7 @@ backup_volumes "$BASE_DIR" "n8n"\
 # open-archiver
 dump_file="mailarchiver_db_dump_$(date +%F).sql"
 pg_dump_docker "$BASE_DIR" "mailarchiver" "$dump_file"
-backup_volumes "$BASE_DIR" "open-archiver"\
+backup_application "$BASE_DIR" "open-archiver"\
     "open-archiver-yksggcgggsogcggococ8gco0-145130673346" \
     -- \
 	"$BASE_DIR/$dump_file"
