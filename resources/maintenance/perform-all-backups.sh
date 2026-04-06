@@ -205,11 +205,9 @@ backup_application "$BASE_DIR" "n8n"\
 dump_file="mailarchiver_db_dump_$(date +%F).sql"
 pg_dump_docker "$BASE_DIR" "mailarchiver" "$dump_file"
 backup_application "$BASE_DIR" "open-archiver"\
-    "open-archiver-yksggcgggsogcggococ8gco0-145130673346" \
+    "open-archiver-yksggcgggsogcggococ8gco0-163329621686" \
     -- \
 	"$BASE_DIR/$dump_file"
-
-
 
 rm -rf "${BASE_DIR}/"*
 
