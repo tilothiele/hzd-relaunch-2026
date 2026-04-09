@@ -167,6 +167,14 @@ backup_application "$BASE_DIR" "redmine" \
 	"ik4k40sg4ckg8cc0wc44k8sk_redmine-plugins" \
 	"ik4k40sg4ckg8cc0wc44k8sk_redmine-themes"
 
+# GLPI
+dump_file="glpi_db_dump_$(date +%F).sql"
+mysql_dump_docker "$BASE_DIR" "glpi" "$dump_file"
+backup_application "$BASE_DIR" "glpi" \
+	"glpi" -- \
+	"$BASE_DIR/$dump_file" \
+	"dkkoc84408ws008gsg440000-glpi_data"
+
 # Paperless
 dump_file="paperless_db_dump_$(date +%F).sql"
 pg_dump_docker "$BASE_DIR" "paperless" "$dump_file"
