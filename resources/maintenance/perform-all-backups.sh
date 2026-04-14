@@ -124,11 +124,11 @@ backup_application() {
 
             docker run --rm \
                 -v "$vol:/backup/data:ro" \
-                -e SSH_HOST_NAME="$STORAGEBOX_HOST" \
-                -e SSH_PORT="$STORAGEBOX_PORT" \
-                -e SSH_REMOTE_PATH="$STORAGEBOX_DIR/$prefix1" \
-                -e SSH_USER="$STORAGEBOX_USER" \
-                -e SSH_PASSWORD="$STORAGEBOX_PASSWORD" \
+                -e AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" \
+                -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
+                -e AWS_DEFAULT_REGION="$AWS_REGION" \
+                -e AWS_S3_BUCKET_NAME="$S3_BUCKET" \
+                -e AWS_ENDPOINT="$S3_ENDPOINT" \
                 -e BACKUP_RETENTION_DAYS="10" \
                 -e BACKUP_FILENAME="hzd-backup-%Y-%m-%dT%H-%M-%S-$prefix.{{ .Extension }}" \
                 --entrypoint backup \
@@ -210,10 +210,11 @@ backup_application "$BASE_DIR" "n8n"\
     "ikcc8gsgcco4o84oscsoss08_n8n-data"
 
 # open-archiver
+# diesen Container nicht stoppen. Nach dem Hochfahren funktioniert der Zugriff auf den S3-Storage nicht mehr.
+# Der S3-Storage wird gesondert gesichert.
 dump_file="mailarchiver_db_dump_$(date +%F).sql"
 pg_dump_docker "$BASE_DIR" "mailarchiver" "$dump_file"
 backup_application "$BASE_DIR" "open-archiver"\
-    "open-archiver-yksggcgggsogcggococ8gco0-163329621686" \
     -- \
 	"$BASE_DIR/$dump_file"
 
