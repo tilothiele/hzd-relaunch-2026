@@ -1,0 +1,6 @@
+[opencloud]
+type = webdav
+url = ${RCLONE_WEBDAV_URL}
+vendor = other
+user = ${RCLONE_WEBDAV_USER}
+pass = ${RCLONE_WEBDAV_PASS}

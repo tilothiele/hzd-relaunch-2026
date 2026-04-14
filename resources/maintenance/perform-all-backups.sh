@@ -210,10 +210,11 @@ backup_application "$BASE_DIR" "n8n"\
     "ikcc8gsgcco4o84oscsoss08_n8n-data"
 
 # open-archiver
+# diesen Container nicht stoppen. Nach dem Hochfahren funktioniert der Zugriff auf den S3-Storage nicht mehr.
+# Der S3-Storage wird gesondert gesichert.
 dump_file="mailarchiver_db_dump_$(date +%F).sql"
 pg_dump_docker "$BASE_DIR" "mailarchiver" "$dump_file"
 backup_application "$BASE_DIR" "open-archiver"\
-    "open-archiver-yksggcgggsogcggococ8gco0-163329621686" \
     -- \
 	"$BASE_DIR/$dump_file"
 
