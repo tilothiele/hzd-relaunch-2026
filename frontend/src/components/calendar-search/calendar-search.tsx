@@ -12,6 +12,14 @@ import { ExternalRegistrationLink, InternalRegistrationLink } from '@/components
 import { getCalendarColors } from '@/lib/calendar-utils'
 import { CalendarItemCard } from './calendar-item-card'
 
+/** Kalendertag in lokaler Zeitzone (yyyy-mm-dd), nicht UTC */
+function getLocalDateIso(d: Date): string {
+	const y = d.getFullYear()
+	const m = String(d.getMonth() + 1).padStart(2, '0')
+	const day = String(d.getDate()).padStart(2, '0')
+	return `${y}-${m}-${day}`
+}
+
 interface CalendarSearchProps {
 	strapiBaseUrl?: string | null
 	theme?: ThemeDefinition
@@ -50,15 +58,6 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 		return fromOk && toOk
 	}, [])
 
-	const isFutureEntry = useCallback((item: CalendarItem, now: number): boolean => {
-		const dt = toDateTime(item.Date, item.Time)
-		if (dt) {
-			return dt.getTime() >= now
-		}
-		const due = item.DueDate ? new Date(item.DueDate).getTime() : null
-		return due !== null && !Number.isNaN(due) ? due >= now : false
-	}, [toDateTime])
-
 	const parseDueDateMs = useCallback((dueDate: string | null | undefined): number | null => {
 		if (!dueDate) {
 			return null
@@ -92,6 +91,53 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 
 		return null
 	}, [])
+
+	/** Termin liegt am heutigen Kalendertag oder danach (ganzer „heute“-Tag zählt) */
+	const isTodayOrFuture = useCallback(
+		(item: CalendarItem): boolean => {
+			const todayStr = getLocalDateIso(new Date())
+
+			if (item.Date && item.DateTo) {
+				const start = item.Date.trim()
+				const end = item.DateTo.trim()
+				if (
+					/^\d{4}-\d{2}-\d{2}$/.test(start)
+					&& /^\d{4}-\d{2}-\d{2}$/.test(end)
+				) {
+					return end >= todayStr
+				}
+			}
+
+			if (item.Date) {
+				const d = item.Date.trim()
+				if (/^\d{4}-\d{2}-\d{2}$/.test(d)) {
+					return d >= todayStr
+				}
+			}
+
+			const dt = toDateTime(item.Date, item.Time)
+			if (dt) {
+				return getLocalDateIso(dt) >= todayStr
+			}
+
+			if (item.DateTo) {
+				const d = item.DateTo.trim()
+				if (/^\d{4}-\d{2}-\d{2}$/.test(d)) {
+					return d >= todayStr
+				}
+			}
+
+			if (item.DueDate) {
+				const ms = parseDueDateMs(item.DueDate)
+				if (ms !== null) {
+					return getLocalDateIso(new Date(ms)) >= todayStr
+				}
+			}
+
+			return false
+		},
+		[toDateTime, parseDueDateMs],
+	)
 
 	const isRegistrationOpen = useCallback((item: CalendarItem): boolean => {
 		const dueMs = parseDueDateMs(item.DueDate)
@@ -145,7 +191,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 		}
 
 		try {
-			const todayIso = new Date().toISOString().slice(0, 10)
+			const todayIso = getLocalDateIso(new Date())
 			const nowIso = new Date().toISOString()
 			const filterConditions: Array<Record<string, unknown>> = [
 				{
@@ -156,9 +202,10 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 					},
 				},
 				{
-					Date: {
-						gte: todayIso,
-					},
+					or: [
+						{ Date: { gte: todayIso } },
+						{ DateTo: { gte: todayIso } },
+					],
 				},
 				{
 					or: [
@@ -192,13 +239,15 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 
 			const itemsArray = Array.isArray(data.calendarEntries) ? data.calendarEntries : []
 			const nowTs = Date.now()
-			const visibleItems = itemsArray.filter((item) => isWithinVisibility(item, nowTs))
+			const visibleItems = itemsArray.filter(
+				(item) => isWithinVisibility(item, nowTs) && isTodayOrFuture(item),
+			)
 			setAllCalendarItems(visibleItems)
 		} catch (err) {
 			// Fehler beim Laden aller Items ignorieren
 			setAllCalendarItems([])
 		}
-	}, [strapiBaseUrl, selectedCalendarIds, isFutureEntry, isWithinVisibility])
+	}, [strapiBaseUrl, selectedCalendarIds, isTodayOrFuture, isWithinVisibility])
 
 	const loadCalendarItems = useCallback(async () => {
 		if (!strapiBaseUrl || selectedCalendarIds.size === 0) {
@@ -210,7 +259,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 		setError(null)
 
 		try {
-			const todayIso = new Date().toISOString().slice(0, 10)
+			const todayIso = getLocalDateIso(new Date())
 			const nowIso = new Date().toISOString()
 			const filterConditions: Array<Record<string, unknown>> = [
 				{
@@ -219,6 +268,12 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 							in: Array.from(selectedCalendarIds),
 						},
 					},
+				},
+				{
+					or: [
+						{ Date: { gte: todayIso } },
+						{ DateTo: { gte: todayIso } },
+					],
 				},
 				{
 					or: [
@@ -247,7 +302,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				filters: {
 					and: filterConditions,
 				},
-					pagination: { limit: -1 },
+				pagination: { limit: -1 },
 				sort: ['Date:asc'],
 			}
 
@@ -261,7 +316,9 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 
 			const itemsArray = Array.isArray(data.calendarEntries) ? data.calendarEntries : []
 			const nowTs = Date.now()
-				const visibleItems = itemsArray.filter((item) => isWithinVisibility(item, nowTs))
+			const visibleItems = itemsArray.filter(
+				(item) => isWithinVisibility(item, nowTs) && isTodayOrFuture(item),
+			)
 			setCalendarItems(visibleItems)
 		} catch (err) {
 			const fetchError = err instanceof Error
@@ -272,7 +329,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [strapiBaseUrl, selectedCalendarIds, selectedRegion, isFutureEntry, isWithinVisibility])
+	}, [strapiBaseUrl, selectedCalendarIds, selectedRegion, isTodayOrFuture, isWithinVisibility])
 
 	useEffect(() => {
 		void loadCalendars()
