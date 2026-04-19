@@ -2,7 +2,27 @@ import { NextRequest, NextResponse } from 'next/server'
 import { GraphQLClient } from 'graphql-request'
 import { draftMode } from 'next/headers'
 
-const strapiBaseUrl = process.env.STRAPI_BASE_URL || process.env.NEXT_PUBLIC_STRAPI_BASE_URL || 'http://localhost:1337'
+export const dynamic = 'force-dynamic'
+export const fetchCache = 'force-no-store'
+
+function getStrapiBaseUrl(): string {
+	const raw =
+		process.env.STRAPI_BASE_URL
+		|| process.env.NEXT_PUBLIC_STRAPI_BASE_URL
+		|| 'http://localhost:1337'
+	return raw.replace(/\/$/, '')
+}
+
+/** Kein Next.js Data Cache für ausgehende Strapi-GraphQL-Requests */
+function fetchNoStore(
+	input: RequestInfo | URL,
+	init?: RequestInit,
+): Promise<Response> {
+	return fetch(input, {
+		...init,
+		cache: 'no-store',
+	})
+}
 
 /**
  * Proxy-Route für GraphQL-Anfragen.
@@ -18,16 +38,6 @@ export async function POST(request: NextRequest) {
 			? { ...variables, publicationState: 'PREVIEW' }
 			: variables
 
-		// console.log('[GraphQL Proxy] Request Body:', {
-		// 	'has query': !!query,
-		// 	'query length': query?.length ?? 0,
-		// 	'has variables': !!variables,
-		// 	'has token': !!token,
-		// 	'token type': typeof token,
-		// 	'token length': token?.length ?? 0,
-		// 	'token preview': token ? (typeof token === 'string' ? token.substring(0, 30) + '...' : String(token)) : null,
-		// })
-
 		if (!query) {
 			return NextResponse.json(
 				{ error: 'GraphQL query is required' },
@@ -35,26 +45,22 @@ export async function POST(request: NextRequest) {
 			)
 		}
 
-		const effectiveBaseUrl = strapiBaseUrl.replace(/\/$/, '')
-		const endpoint = `${effectiveBaseUrl}/graphql`
-		const client = new GraphQLClient(endpoint)
+		const endpoint = `${getStrapiBaseUrl()}/graphql`
+		const client = new GraphQLClient(endpoint, {
+			fetch: fetchNoStore,
+		})
 
 		if (token && typeof token === 'string' && token.length > 0) {
 			client.setHeader('Authorization', `Bearer ${token}`)
-			//console.log('[GraphQL Proxy] Token wird übergeben:', token.substring(0, 30) + '...')
-		} else {
-			// console.log('[GraphQL Proxy] Token-Daten:', {
-			// 	'token': token,
-			// 	'type': typeof token,
-			// 	'is string': typeof token === 'string',
-			// 	'length': token?.length ?? 0,
-			// })
-			// console.warn('[GraphQL Proxy] Kein gültiger Token gefunden. Typ:', typeof token)
 		}
 
 		const data = await client.request(query, effectiveVariables)
 
-		return NextResponse.json(data)
+		return NextResponse.json(data, {
+			headers: {
+				'Cache-Control': 'no-store, must-revalidate',
+			},
+		})
 	} catch (error) {
 		console.error('GraphQL proxy error:', error)
 
