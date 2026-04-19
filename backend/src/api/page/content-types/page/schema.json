@@ -39,7 +39,8 @@
         "blocks.simple-hero-section",
         "blocks.document-bundle-section",
         "blocks.table-of-content-section",
-        "blocks.champions-section"
+        "blocks.champions-section",
+        "blocks.passed-dogs-section"
       ]
     },
     "ColorTheme": {

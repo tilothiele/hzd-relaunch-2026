@@ -15,6 +15,7 @@ import { SimpleHeroSectionComponent } from './simple-hero-section/simple-hero-se
 import { DocumentBundleSectionComponent } from './document-bundle-section/document-bundle-section'
 import { TableOfContentSectionComponent } from './table-of-content-section/table-of-content-section'
 import { ChampionsSectionComponent } from './champions-section/champions-section'
+import { PassedDogsSectionComponent } from './passed-dogs-section/passed-dogs-section'
 
 interface RenderSectionParams {
 	section: StartpageSection
@@ -168,6 +169,14 @@ function renderSection({
 					section={section as any}
 					theme={theme}
 					hzdSetting={hzdSetting}
+				/>
+			)
+		case 'ComponentBlocksPassedDogsSection':
+			return (
+				<PassedDogsSectionComponent
+					key={key}
+					section={section as any}
+					theme={theme}
 				/>
 			)
 		default:

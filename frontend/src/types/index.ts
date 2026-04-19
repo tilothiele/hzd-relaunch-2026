@@ -249,7 +249,12 @@ export interface ChampionsSection {
 	id: string
 }
 
-export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | SimpleCtaSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection | DocumentBundleSection | TableOfContentSection | ChampionsSection
+export interface PassedDogsSection {
+	__typename: 'ComponentBlocksPassedDogsSection'
+	id: string
+}
+
+export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | SimpleCtaSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection | DocumentBundleSection | TableOfContentSection | ChampionsSection | PassedDogsSection
 
 export type PageSection = StartpageSection
 

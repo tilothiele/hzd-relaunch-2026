@@ -170,6 +170,14 @@ export interface BlocksNewsArticlesSection extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksPassedDogsSection extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_passed_dogs_sections';
+  info: {
+    displayName: 'PassedDogsSection';
+  };
+  attributes: {};
+}
+
 export interface BlocksRichTextSection extends Struct.ComponentSchema {
   collectionName: 'components_blocks_rich_text_sections';
   info: {
@@ -745,6 +753,7 @@ declare module '@strapi/strapi' {
       'blocks.image-gallery-section': BlocksImageGallerySection;
       'blocks.item-list': BlocksItemList;
       'blocks.news-articles-section': BlocksNewsArticlesSection;
+      'blocks.passed-dogs-section': BlocksPassedDogsSection;
       'blocks.rich-text-section': BlocksRichTextSection;
       'blocks.simple-cta-section': BlocksSimpleCtaSection;
       'blocks.simple-hero-section': BlocksSimpleHeroSection;

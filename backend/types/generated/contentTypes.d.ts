@@ -1318,6 +1318,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.document-bundle-section',
         'blocks.table-of-content-section',
         'blocks.champions-section',
+        'blocks.passed-dogs-section',
       ]
     >;
     SEO: Schema.Attribute.Component<'seo.seo', true>;
@@ -1326,6 +1327,47 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+  };
+}
+
+export interface ApiPassedDogPassedDog extends Struct.CollectionTypeSchema {
+  collectionName: 'passed_dogs';
+  info: {
+    displayName: 'PassedDog';
+    pluralName: 'passed-dogs';
+    singularName: 'passed-dog';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    Approved: Schema.Attribute.Boolean;
+    Avatar: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    Consent: Schema.Attribute.Boolean;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    DatePassed: Schema.Attribute.Date;
+    DogName: Schema.Attribute.String;
+    hzd_plugin_dog: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::hzd-plugin.dog'
+    >;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::passed-dog.passed-dog'
+    > &
+      Schema.Attribute.Private;
+    Message: Schema.Attribute.Text;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    users_permissions_user: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
   };
 }
 
@@ -2399,6 +2441,7 @@ declare module '@strapi/strapi' {
       'api::order-item.order-item': ApiOrderItemOrderItem;
       'api::order.order': ApiOrderOrder;
       'api::page.page': ApiPagePage;
+      'api::passed-dog.passed-dog': ApiPassedDogPassedDog;
       'api::photobox-image-collection.photobox-image-collection': ApiPhotoboxImageCollectionPhotoboxImageCollection;
       'api::photobox-image.photobox-image': ApiPhotoboxImagePhotoboxImage;
       'api::regional-unit.regional-unit': ApiRegionalUnitRegionalUnit;

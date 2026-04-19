@@ -1,0 +1,50 @@
+{
+  "kind": "collectionType",
+  "collectionName": "passed_dogs",
+  "info": {
+    "singularName": "passed-dog",
+    "pluralName": "passed-dogs",
+    "displayName": "PassedDog"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "users_permissions_user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "hzd_plugin_dog": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::hzd-plugin.dog"
+    },
+    "DatePassed": {
+      "type": "date"
+    },
+    "Message": {
+      "type": "text"
+    },
+    "Approved": {
+      "type": "boolean"
+    },
+    "Avatar": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "DogName": {
+      "type": "string"
+    },
+    "Consent": {
+      "type": "boolean"
+    }
+  }
+}

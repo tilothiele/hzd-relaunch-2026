@@ -363,6 +363,10 @@ export const GET_LAYOUT = `
 				__typename
 				id
 			}
+			... on ComponentBlocksPassedDogsSection {
+				__typename
+				id
+			}
 		}
 	}
 `
@@ -594,6 +598,10 @@ export const GET_INDEX_PAGE = `
 					Height
  				}
 				... on ComponentBlocksChampionsSection {
+					__typename
+					id
+				}
+				... on ComponentBlocksPassedDogsSection {
 					__typename
 					id
 				}
@@ -932,6 +940,10 @@ export const GET_PAGE_BY_SLUG = `
 							}
 						}
 						... on ComponentBlocksChampionsSection {
+							__typename
+							id
+						}
+						... on ComponentBlocksPassedDogsSection {
 							__typename
 							id
 						}

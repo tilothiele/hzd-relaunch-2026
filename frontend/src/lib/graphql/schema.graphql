@@ -1,9 +1,4 @@
 """
-Indicates exactly one field must be supplied and this field must not be `null`.
-"""
-directive @oneOf on INPUT_OBJECT
-
-"""
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON
@@ -908,6 +903,10 @@ type ComponentBlocksRichTextSection {
   RichTextOddEven: ENUM_COMPONENTBLOCKSRICHTEXTSECTION_RICHTEXTODDEVEN
   RichTextAnchor: String
   RichTextPadding: ComponentLayoutPadding
+}
+
+type ComponentBlocksPassedDogsSection {
+  id: ID!
 }
 
 type ComponentBlocksNewsArticlesSection {
@@ -2716,7 +2715,7 @@ type OrderItemEntityResponseCollection {
   pageInfo: Pagination!
 }
 
-union PageSectionsDynamicZone = ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksRichTextSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTextColumnsSection | ComponentBlocksImageGallerySection | ComponentBlocksSimpleCtaSection | ComponentBlocksNewsArticlesSection | ComponentBlocksContactGroupSection | ComponentBlocksContactMailerSection | ComponentBlocksSimpleHeroSection | ComponentBlocksDocumentBundleSection | ComponentBlocksTableOfContentSection | ComponentBlocksChampionsSection | Error
+union PageSectionsDynamicZone = ComponentBlocksHeroSectionSlideShow | ComponentBlocksCardSection | ComponentBlocksRichTextSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTextColumnsSection | ComponentBlocksImageGallerySection | ComponentBlocksSimpleCtaSection | ComponentBlocksNewsArticlesSection | ComponentBlocksContactGroupSection | ComponentBlocksContactMailerSection | ComponentBlocksSimpleHeroSection | ComponentBlocksDocumentBundleSection | ComponentBlocksTableOfContentSection | ComponentBlocksChampionsSection | ComponentBlocksPassedDogsSection | Error
 
 scalar PageSectionsDynamicZoneInput
 
@@ -2763,6 +2762,55 @@ type Page {
 
 type PageEntityResponseCollection {
   nodes: [Page!]!
+  pageInfo: Pagination!
+}
+
+input PassedDogFiltersInput {
+  documentId: IDFilterInput
+  users_permissions_user: UsersPermissionsUserFiltersInput
+  hzd_plugin_dog: HzdPluginDogFiltersInput
+  DatePassed: DateFilterInput
+  Message: StringFilterInput
+  Approved: BooleanFilterInput
+  DogName: StringFilterInput
+  Consent: BooleanFilterInput
+  createdAt: DateTimeFilterInput
+  updatedAt: DateTimeFilterInput
+  publishedAt: DateTimeFilterInput
+  and: [PassedDogFiltersInput]
+  or: [PassedDogFiltersInput]
+  not: PassedDogFiltersInput
+}
+
+input PassedDogInput {
+  users_permissions_user: ID
+  hzd_plugin_dog: ID
+  DatePassed: Date
+  Message: String
+  Approved: Boolean
+  Avatar: ID
+  DogName: String
+  Consent: Boolean
+  publishedAt: DateTime
+}
+
+type PassedDog {
+  documentId: ID!
+  users_permissions_user: UsersPermissionsUser
+  hzd_plugin_dog: HzdPluginDog
+  DatePassed: Date
+  Message: String
+  Approved: Boolean
+  Avatar: UploadFile
+  DogName: String
+  Consent: Boolean
+  createdAt: DateTime
+  updatedAt: DateTime
+  publishedAt: DateTime
+}
+
+type PassedDogEntityResponseCollection {
+  nodes: [PassedDog!]!
   pageInfo: Pagination!
 }
 
@@ -3030,7 +3078,7 @@ type SupplementalDocumentGroupRelationResponseCollection {
   nodes: [SupplementalDocumentGroup!]!
 }
 
-union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBreedingDogDocument | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTableOfContentSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksDocumentBundle | ComponentBlocksDocumentBundleSection | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksChampionsSection | ComponentBlocksCardSection | ComponentBlocksCardItem | ComponentBlocksBundleDocuments | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Announcement | Author | Calendar | CalendarEntry | Champion | Contact | ContactGroup | Form | FormInstance | GalleryImage | GlobalLayout | HzdSetting | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | NewsArticleTag | Order | OrderItem | Page | PhotoboxImage | PhotoboxImageCollection | RegionalUnit | Subscription | SupplementalDocument | SupplementalDocumentGroup
+union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBreedingDogDocument | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTableOfContentSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksPassedDogsSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksDocumentBundle | ComponentBlocksDocumentBundleSection | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksChampionsSection | ComponentBlocksCardSection | ComponentBlocksCardItem | ComponentBlocksBundleDocuments | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Announcement | Author | Calendar | CalendarEntry | Champion | Contact | ContactGroup | Form | FormInstance | GalleryImage | GlobalLayout | HzdSetting | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | NewsArticleTag | Order | OrderItem | Page | PassedDog | PhotoboxImage | PhotoboxImageCollection | RegionalUnit | Subscription | SupplementalDocument | SupplementalDocumentGroup
 
 input FileInfoInput {
   name: String
@@ -3192,6 +3240,9 @@ type Query {
   page(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): Page
   pages_connection(filters: PageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): PageEntityResponseCollection
   pages(filters: PageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [Page]!
+  passedDog(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): PassedDog
+  passedDogs_connection(filters: PassedDogFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): PassedDogEntityResponseCollection
+  passedDogs(filters: PassedDogFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [PassedDog]!
   photoboxImage(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): PhotoboxImage
   photoboxImages_connection(filters: PhotoboxImageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): PhotoboxImageEntityResponseCollection
   photoboxImages(filters: PhotoboxImageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [PhotoboxImage]!
@@ -3291,6 +3342,9 @@ type Mutation {
   createPage(status: PublicationStatus = PUBLISHED, data: PageInput!): Page
   updatePage(documentId: ID!, status: PublicationStatus = PUBLISHED, data: PageInput!): Page
   deletePage(documentId: ID!): DeleteMutationResponse
+  createPassedDog(status: PublicationStatus = PUBLISHED, data: PassedDogInput!): PassedDog
+  updatePassedDog(documentId: ID!, status: PublicationStatus = PUBLISHED, data: PassedDogInput!): PassedDog
+  deletePassedDog(documentId: ID!): DeleteMutationResponse
   createPhotoboxImage(status: PublicationStatus = PUBLISHED, data: PhotoboxImageInput!): PhotoboxImage
   updatePhotoboxImage(documentId: ID!, status: PublicationStatus = PUBLISHED, data: PhotoboxImageInput!): PhotoboxImage
   deletePhotoboxImage(documentId: ID!): DeleteMutationResponse

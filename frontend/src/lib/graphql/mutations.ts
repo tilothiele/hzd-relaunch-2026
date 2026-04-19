@@ -184,3 +184,49 @@ export const DELETE_PHOTOBOX_COLLECTION = `
 		}
 	}
 `
+
+export const CREATE_PASSED_DOG = `
+	mutation CreatePassedDog($data: PassedDogInput!) {
+		createPassedDog(data: $data) {
+			documentId
+			DogName
+			DatePassed
+			Message
+			Approved
+			Consent
+			Avatar {
+				url
+				alternativeText
+				width
+				height
+			}
+			hzd_plugin_dog {
+				documentId
+				fullKennelName
+			}
+		}
+	}
+`
+
+export const UPDATE_PASSED_DOG = `
+	mutation UpdatePassedDog($documentId: ID!, $data: PassedDogInput!) {
+		updatePassedDog(documentId: $documentId, data: $data) {
+			documentId
+			DogName
+			DatePassed
+			Message
+			Approved
+			Consent
+			Avatar {
+				url
+				alternativeText
+				width
+				height
+			}
+			hzd_plugin_dog {
+				documentId
+				fullKennelName
+			}
+		}
+	}
+`

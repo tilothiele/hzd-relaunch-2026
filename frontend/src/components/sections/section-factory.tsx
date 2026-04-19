@@ -16,6 +16,7 @@ import { ContactMailerSectionComponent } from './contact-mailer-section/contact-
 
 import { SimpleHeroSectionComponent } from './simple-hero-section/simple-hero-section'
 import { TableOfContentSectionComponent } from './table-of-content-section/table-of-content-section'
+import { PassedDogsSectionClientLoader } from './passed-dogs-section/passed-dogs-section-client-loader'
 
 
 interface RenderStartpageSectionsParams {
@@ -155,6 +156,15 @@ function renderStartpageSection({
 				<TableOfContentSectionComponent
 					key={key}
 					section={section as any}
+					theme={theme}
+				/>
+			)
+		case 'ComponentBlocksPassedDogsSection':
+			return (
+				<PassedDogsSectionClientLoader
+					key={key}
+					section={section as any}
+					strapiBaseUrl={strapiBaseUrl}
 					theme={theme}
 				/>
 			)
