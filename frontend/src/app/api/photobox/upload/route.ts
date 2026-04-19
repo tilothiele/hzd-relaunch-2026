@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
 			alternativeText: `Bilderspende von ${displayName}`,
 		}))
 
-		console.log(`[PhotoBox API] Uploading to Strapi Media Library (root) with caption: ${caption}`)
+		//console.log(`[PhotoBox API] Uploading to Strapi Media Library (root) with caption: ${caption}`)
 		const strapiUploadRes = await fetch(`${strapiBaseUrl.replace(/\/$/, '')}/api/upload`, {
 			method: 'POST',
 			headers: {
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
 			},
 		})
 
-		console.log('[PhotoBox API] Mutation response:', JSON.stringify(mutationResponse, null, 2))
+		//console.log('[PhotoBox API] Mutation response:', JSON.stringify(mutationResponse, null, 2))
 
 		return NextResponse.json({
 			message: 'Foto erfolgreich gespeichert.',
