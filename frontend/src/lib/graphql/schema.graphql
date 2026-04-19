@@ -1049,6 +1049,7 @@ input UploadFileFiltersInput {
   name: StringFilterInput
   alternativeText: StringFilterInput
   caption: StringFilterInput
+  focalPoint: JSONFilterInput
   width: IntFilterInput
   height: IntFilterInput
   formats: JSONFilterInput
@@ -1073,6 +1074,7 @@ type UploadFile {
   name: String!
   alternativeText: String
   caption: String
+  focalPoint: JSON
   width: Int
   height: Int
   formats: JSON
@@ -2941,7 +2943,7 @@ input SupplementalDocumentFiltersInput {
   ShortId: StringFilterInput
   VisibilityStart: DateTimeFilterInput
   VisibilityEnd: DateTimeFilterInput
-  supplemental_document_group: SupplementalDocumentGroupFiltersInput
+  supplemental_document_groups: SupplementalDocumentGroupFiltersInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   publishedAt: DateTimeFilterInput
@@ -2958,7 +2960,7 @@ input SupplementalDocumentInput {
   DownloadDocument: [ID]
   VisibilityStart: DateTime
   VisibilityEnd: DateTime
-  supplemental_document_group: ID
+  supplemental_document_groups: [ID]
   publishedAt: DateTime
 }
 
@@ -2972,7 +2974,8 @@ type SupplementalDocument {
   DownloadDocument(filters: UploadFileFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [UploadFile]!
   VisibilityStart: DateTime
   VisibilityEnd: DateTime
-  supplemental_document_group: SupplementalDocumentGroup
+  supplemental_document_groups_connection(filters: SupplementalDocumentGroupFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): SupplementalDocumentGroupRelationResponseCollection
+  supplemental_document_groups(filters: SupplementalDocumentGroupFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [SupplementalDocumentGroup]!
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
@@ -3021,6 +3024,10 @@ type SupplementalDocumentGroup {
 type SupplementalDocumentGroupEntityResponseCollection {
   nodes: [SupplementalDocumentGroup!]!
   pageInfo: Pagination!
+}
+
+type SupplementalDocumentGroupRelationResponseCollection {
+  nodes: [SupplementalDocumentGroup!]!
 }
 
 union GenericMorph = ComponentSeoSeo | ComponentPersonalShippingAddress | ComponentPersonalAddress | ComponentPermissionRestriction | ComponentPermissionGroups | ComponentLinksPartnerlLink | ComponentLinksActionButton | ComponentLayoutSos | ComponentLayoutPadding | ComponentLayoutFooter | ComponentLayoutColorTheme | ComponentFormTextArea | ComponentFormStandardIdentifiers | ComponentFormShortTextInput | ComponentFormNumberInput | ComponentFormFormSubmitButton | ComponentFormFldStaticText | ComponentFormFldGroupSeparator | ComponentFormEmailAdress | ComponentFormDogStandardIdentifier | ComponentFormChoice | ComponentFormBooleanChoice | ComponentColumnsTextColumn | ComponentColumnsColumnItem | ComponentCalendarCalendarDocument | ComponentBreedingPuppyAmount | ComponentBreedingGeoLocation | ComponentBreedingDogDocument | ComponentBlocksTextColumnsSection | ComponentBlocksTeaserTextWithImage | ComponentBlocksTableOfContentSection | ComponentBlocksSupplementalDocumentGroupSection | ComponentBlocksSlideItem | ComponentBlocksSimpleHeroSection | ComponentBlocksSimpleCtaSection | ComponentBlocksRichTextSection | ComponentBlocksNewsArticlesSection | ComponentBlocksItemList | ComponentBlocksImageGallerySection | ComponentBlocksHeroSectionSlideShow | ComponentBlocksEmailAddresses | ComponentBlocksDocumentBundle | ComponentBlocksDocumentBundleSection | ComponentBlocksContactMailerSection | ComponentBlocksContactGroupSection | ComponentBlocksChampionsSection | ComponentBlocksCardSection | ComponentBlocksCardItem | ComponentBlocksBundleDocuments | UploadFile | I18NLocale | ReviewWorkflowsWorkflow | ReviewWorkflowsWorkflowStage | UsersPermissionsPermission | UsersPermissionsRole | UsersPermissionsUser | HzdPluginDog | HzdPluginBreeder | HzdPluginLitter | HzdPluginGeoLocation | Announcement | Author | Calendar | CalendarEntry | Champion | Contact | ContactGroup | Form | FormInstance | GalleryImage | GlobalLayout | HzdSetting | LocalCummunity | MerchandisingProduct | NewsArticle | NewsArticleCategory | NewsArticleTag | Order | OrderItem | Page | PhotoboxImage | PhotoboxImageCollection | RegionalUnit | Subscription | SupplementalDocument | SupplementalDocumentGroup
@@ -3099,110 +3106,110 @@ input PaginationArg {
 }
 
 type Query {
-  uploadFile(documentId: ID!, status: PublicationStatus = PUBLISHED): UploadFile
-  uploadFiles_connection(filters: UploadFileFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): UploadFileEntityResponseCollection
-  uploadFiles(filters: UploadFileFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [UploadFile]!
-  i18NLocale(documentId: ID!, status: PublicationStatus = PUBLISHED): I18NLocale
-  i18NLocales_connection(filters: I18NLocaleFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): I18NLocaleEntityResponseCollection
-  i18NLocales(filters: I18NLocaleFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [I18NLocale]!
-  reviewWorkflowsWorkflow(documentId: ID!, status: PublicationStatus = PUBLISHED): ReviewWorkflowsWorkflow
-  reviewWorkflowsWorkflows_connection(filters: ReviewWorkflowsWorkflowFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): ReviewWorkflowsWorkflowEntityResponseCollection
-  reviewWorkflowsWorkflows(filters: ReviewWorkflowsWorkflowFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [ReviewWorkflowsWorkflow]!
-  reviewWorkflowsWorkflowStage(documentId: ID!, status: PublicationStatus = PUBLISHED): ReviewWorkflowsWorkflowStage
-  reviewWorkflowsWorkflowStages_connection(filters: ReviewWorkflowsWorkflowStageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): ReviewWorkflowsWorkflowStageEntityResponseCollection
-  reviewWorkflowsWorkflowStages(filters: ReviewWorkflowsWorkflowStageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [ReviewWorkflowsWorkflowStage]!
-  usersPermissionsRole(documentId: ID!, status: PublicationStatus = PUBLISHED): UsersPermissionsRole
-  usersPermissionsRoles_connection(filters: UsersPermissionsRoleFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): UsersPermissionsRoleEntityResponseCollection
-  usersPermissionsRoles(filters: UsersPermissionsRoleFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [UsersPermissionsRole]!
-  usersPermissionsUser(documentId: ID!, status: PublicationStatus = PUBLISHED): UsersPermissionsUser
-  usersPermissionsUsers_connection(filters: UsersPermissionsUserFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): UsersPermissionsUserEntityResponseCollection
-  usersPermissionsUsers(filters: UsersPermissionsUserFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [UsersPermissionsUser]!
-  hzdPluginDog(documentId: ID!, status: PublicationStatus = PUBLISHED): HzdPluginDog
-  hzdPluginDogs_connection(filters: HzdPluginDogFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): HzdPluginDogEntityResponseCollection
-  hzdPluginDogs(filters: HzdPluginDogFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [HzdPluginDog]!
-  hzdPluginBreeder(documentId: ID!, status: PublicationStatus = PUBLISHED): HzdPluginBreeder
-  hzdPluginBreeders_connection(filters: HzdPluginBreederFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): HzdPluginBreederEntityResponseCollection
-  hzdPluginBreeders(filters: HzdPluginBreederFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [HzdPluginBreeder]!
-  hzdPluginLitter(documentId: ID!, status: PublicationStatus = PUBLISHED): HzdPluginLitter
-  hzdPluginLitters_connection(filters: HzdPluginLitterFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): HzdPluginLitterEntityResponseCollection
-  hzdPluginLitters(filters: HzdPluginLitterFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [HzdPluginLitter]!
-  hzdPluginGeoLocation(documentId: ID!, status: PublicationStatus = PUBLISHED): HzdPluginGeoLocation
-  hzdPluginGeoLocations_connection(filters: HzdPluginGeoLocationFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): HzdPluginGeoLocationEntityResponseCollection
-  hzdPluginGeoLocations(filters: HzdPluginGeoLocationFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [HzdPluginGeoLocation]!
-  announcement(documentId: ID!, status: PublicationStatus = PUBLISHED): Announcement
-  announcements_connection(filters: AnnouncementFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): AnnouncementEntityResponseCollection
-  announcements(filters: AnnouncementFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Announcement]!
-  author(documentId: ID!, status: PublicationStatus = PUBLISHED): Author
-  authors_connection(filters: AuthorFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): AuthorEntityResponseCollection
-  authors(filters: AuthorFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Author]!
-  calendar(documentId: ID!, status: PublicationStatus = PUBLISHED): Calendar
-  calendars_connection(filters: CalendarFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): CalendarEntityResponseCollection
-  calendars(filters: CalendarFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Calendar]!
-  calendarEntry(documentId: ID!, status: PublicationStatus = PUBLISHED): CalendarEntry
-  calendarEntries_connection(filters: CalendarEntryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): CalendarEntryEntityResponseCollection
-  calendarEntries(filters: CalendarEntryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [CalendarEntry]!
-  champion(documentId: ID!, status: PublicationStatus = PUBLISHED): Champion
-  champions_connection(filters: ChampionFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): ChampionEntityResponseCollection
-  champions(filters: ChampionFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Champion]!
-  contact(documentId: ID!, status: PublicationStatus = PUBLISHED): Contact
-  contacts_connection(filters: ContactFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): ContactEntityResponseCollection
-  contacts(filters: ContactFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Contact]!
-  contactGroup(documentId: ID!, status: PublicationStatus = PUBLISHED): ContactGroup
-  contactGroups_connection(filters: ContactGroupFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): ContactGroupEntityResponseCollection
-  contactGroups(filters: ContactGroupFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [ContactGroup]!
-  form(documentId: ID!, status: PublicationStatus = PUBLISHED): Form
-  forms_connection(filters: FormFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): FormEntityResponseCollection
-  forms(filters: FormFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Form]!
-  formInstance(documentId: ID!, status: PublicationStatus = PUBLISHED): FormInstance
-  formInstances_connection(filters: FormInstanceFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): FormInstanceEntityResponseCollection
-  formInstances(filters: FormInstanceFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [FormInstance]!
-  galleryImage(documentId: ID!, status: PublicationStatus = PUBLISHED): GalleryImage
-  galleryImages_connection(filters: GalleryImageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): GalleryImageEntityResponseCollection
-  galleryImages(filters: GalleryImageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [GalleryImage]!
-  globalLayout(status: PublicationStatus = PUBLISHED): GlobalLayout
-  hzdSetting(status: PublicationStatus = PUBLISHED): HzdSetting
-  localCummunity(documentId: ID!, status: PublicationStatus = PUBLISHED): LocalCummunity
-  localCummunities_connection(filters: LocalCummunityFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): LocalCummunityEntityResponseCollection
-  localCummunities(filters: LocalCummunityFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [LocalCummunity]!
-  merchandisingProduct(documentId: ID!, status: PublicationStatus = PUBLISHED): MerchandisingProduct
-  merchandisingProducts_connection(filters: MerchandisingProductFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): MerchandisingProductEntityResponseCollection
-  merchandisingProducts(filters: MerchandisingProductFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [MerchandisingProduct]!
-  newsArticle(documentId: ID!, status: PublicationStatus = PUBLISHED): NewsArticle
-  newsArticles_connection(filters: NewsArticleFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): NewsArticleEntityResponseCollection
-  newsArticles(filters: NewsArticleFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [NewsArticle]!
-  newsArticleCategory(documentId: ID!, status: PublicationStatus = PUBLISHED): NewsArticleCategory
-  newsArticleCategories_connection(filters: NewsArticleCategoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): NewsArticleCategoryEntityResponseCollection
-  newsArticleCategories(filters: NewsArticleCategoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [NewsArticleCategory]!
-  newsArticleTag(documentId: ID!, status: PublicationStatus = PUBLISHED): NewsArticleTag
-  newsArticleTags_connection(filters: NewsArticleTagFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): NewsArticleTagEntityResponseCollection
-  newsArticleTags(filters: NewsArticleTagFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [NewsArticleTag]!
-  order(documentId: ID!, status: PublicationStatus = PUBLISHED): Order
-  orders_connection(filters: OrderFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): OrderEntityResponseCollection
-  orders(filters: OrderFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Order]!
-  orderItem(documentId: ID!, status: PublicationStatus = PUBLISHED): OrderItem
-  orderItems_connection(filters: OrderItemFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): OrderItemEntityResponseCollection
-  orderItems(filters: OrderItemFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [OrderItem]!
-  page(documentId: ID!, status: PublicationStatus = PUBLISHED): Page
-  pages_connection(filters: PageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): PageEntityResponseCollection
-  pages(filters: PageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Page]!
-  photoboxImage(documentId: ID!, status: PublicationStatus = PUBLISHED): PhotoboxImage
-  photoboxImages_connection(filters: PhotoboxImageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): PhotoboxImageEntityResponseCollection
-  photoboxImages(filters: PhotoboxImageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [PhotoboxImage]!
-  photoboxImageCollection(documentId: ID!, status: PublicationStatus = PUBLISHED): PhotoboxImageCollection
-  photoboxImageCollections_connection(filters: PhotoboxImageCollectionFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): PhotoboxImageCollectionEntityResponseCollection
-  photoboxImageCollections(filters: PhotoboxImageCollectionFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [PhotoboxImageCollection]!
-  regionalUnit(documentId: ID!, status: PublicationStatus = PUBLISHED): RegionalUnit
-  regionalUnits_connection(filters: RegionalUnitFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): RegionalUnitEntityResponseCollection
-  regionalUnits(filters: RegionalUnitFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [RegionalUnit]!
-  subscription(documentId: ID!, status: PublicationStatus = PUBLISHED): Subscription
-  subscriptions_connection(filters: SubscriptionFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): SubscriptionEntityResponseCollection
-  subscriptions(filters: SubscriptionFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [Subscription]!
-  supplementalDocument(documentId: ID!, status: PublicationStatus = PUBLISHED): SupplementalDocument
-  supplementalDocuments_connection(filters: SupplementalDocumentFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): SupplementalDocumentEntityResponseCollection
-  supplementalDocuments(filters: SupplementalDocumentFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [SupplementalDocument]!
-  supplementalDocumentGroup(documentId: ID!, status: PublicationStatus = PUBLISHED): SupplementalDocumentGroup
-  supplementalDocumentGroups_connection(filters: SupplementalDocumentGroupFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): SupplementalDocumentGroupEntityResponseCollection
-  supplementalDocumentGroups(filters: SupplementalDocumentGroupFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED): [SupplementalDocumentGroup]!
+  uploadFile(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): UploadFile
+  uploadFiles_connection(filters: UploadFileFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): UploadFileEntityResponseCollection
+  uploadFiles(filters: UploadFileFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [UploadFile]!
+  i18NLocale(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): I18NLocale
+  i18NLocales_connection(filters: I18NLocaleFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): I18NLocaleEntityResponseCollection
+  i18NLocales(filters: I18NLocaleFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [I18NLocale]!
+  reviewWorkflowsWorkflow(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): ReviewWorkflowsWorkflow
+  reviewWorkflowsWorkflows_connection(filters: ReviewWorkflowsWorkflowFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): ReviewWorkflowsWorkflowEntityResponseCollection
+  reviewWorkflowsWorkflows(filters: ReviewWorkflowsWorkflowFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [ReviewWorkflowsWorkflow]!
+  reviewWorkflowsWorkflowStage(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): ReviewWorkflowsWorkflowStage
+  reviewWorkflowsWorkflowStages_connection(filters: ReviewWorkflowsWorkflowStageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): ReviewWorkflowsWorkflowStageEntityResponseCollection
+  reviewWorkflowsWorkflowStages(filters: ReviewWorkflowsWorkflowStageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [ReviewWorkflowsWorkflowStage]!
+  usersPermissionsRole(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): UsersPermissionsRole
+  usersPermissionsRoles_connection(filters: UsersPermissionsRoleFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): UsersPermissionsRoleEntityResponseCollection
+  usersPermissionsRoles(filters: UsersPermissionsRoleFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [UsersPermissionsRole]!
+  usersPermissionsUser(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): UsersPermissionsUser
+  usersPermissionsUsers_connection(filters: UsersPermissionsUserFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): UsersPermissionsUserEntityResponseCollection
+  usersPermissionsUsers(filters: UsersPermissionsUserFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [UsersPermissionsUser]!
+  hzdPluginDog(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): HzdPluginDog
+  hzdPluginDogs_connection(filters: HzdPluginDogFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): HzdPluginDogEntityResponseCollection
+  hzdPluginDogs(filters: HzdPluginDogFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [HzdPluginDog]!
+  hzdPluginBreeder(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): HzdPluginBreeder
+  hzdPluginBreeders_connection(filters: HzdPluginBreederFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): HzdPluginBreederEntityResponseCollection
+  hzdPluginBreeders(filters: HzdPluginBreederFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [HzdPluginBreeder]!
+  hzdPluginLitter(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): HzdPluginLitter
+  hzdPluginLitters_connection(filters: HzdPluginLitterFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): HzdPluginLitterEntityResponseCollection
+  hzdPluginLitters(filters: HzdPluginLitterFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [HzdPluginLitter]!
+  hzdPluginGeoLocation(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): HzdPluginGeoLocation
+  hzdPluginGeoLocations_connection(filters: HzdPluginGeoLocationFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): HzdPluginGeoLocationEntityResponseCollection
+  hzdPluginGeoLocations(filters: HzdPluginGeoLocationFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [HzdPluginGeoLocation]!
+  announcement(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): Announcement
+  announcements_connection(filters: AnnouncementFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): AnnouncementEntityResponseCollection
+  announcements(filters: AnnouncementFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [Announcement]!
+  author(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): Author
+  authors_connection(filters: AuthorFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): AuthorEntityResponseCollection
+  authors(filters: AuthorFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [Author]!
+  calendar(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): Calendar
+  calendars_connection(filters: CalendarFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): CalendarEntityResponseCollection
+  calendars(filters: CalendarFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [Calendar]!
+  calendarEntry(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): CalendarEntry
+  calendarEntries_connection(filters: CalendarEntryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): CalendarEntryEntityResponseCollection
+  calendarEntries(filters: CalendarEntryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [CalendarEntry]!
+  champion(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): Champion
+  champions_connection(filters: ChampionFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): ChampionEntityResponseCollection
+  champions(filters: ChampionFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [Champion]!
+  contact(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): Contact
+  contacts_connection(filters: ContactFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): ContactEntityResponseCollection
+  contacts(filters: ContactFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [Contact]!
+  contactGroup(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): ContactGroup
+  contactGroups_connection(filters: ContactGroupFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): ContactGroupEntityResponseCollection
+  contactGroups(filters: ContactGroupFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [ContactGroup]!
+  form(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): Form
+  forms_connection(filters: FormFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): FormEntityResponseCollection
+  forms(filters: FormFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [Form]!
+  formInstance(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): FormInstance
+  formInstances_connection(filters: FormInstanceFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): FormInstanceEntityResponseCollection
+  formInstances(filters: FormInstanceFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [FormInstance]!
+  galleryImage(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): GalleryImage
+  galleryImages_connection(filters: GalleryImageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): GalleryImageEntityResponseCollection
+  galleryImages(filters: GalleryImageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [GalleryImage]!
+  globalLayout(status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): GlobalLayout
+  hzdSetting(status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): HzdSetting
+  localCummunity(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): LocalCummunity
+  localCummunities_connection(filters: LocalCummunityFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): LocalCummunityEntityResponseCollection
+  localCummunities(filters: LocalCummunityFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [LocalCummunity]!
+  merchandisingProduct(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): MerchandisingProduct
+  merchandisingProducts_connection(filters: MerchandisingProductFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): MerchandisingProductEntityResponseCollection
+  merchandisingProducts(filters: MerchandisingProductFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [MerchandisingProduct]!
+  newsArticle(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): NewsArticle
+  newsArticles_connection(filters: NewsArticleFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): NewsArticleEntityResponseCollection
+  newsArticles(filters: NewsArticleFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [NewsArticle]!
+  newsArticleCategory(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): NewsArticleCategory
+  newsArticleCategories_connection(filters: NewsArticleCategoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): NewsArticleCategoryEntityResponseCollection
+  newsArticleCategories(filters: NewsArticleCategoryFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [NewsArticleCategory]!
+  newsArticleTag(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): NewsArticleTag
+  newsArticleTags_connection(filters: NewsArticleTagFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): NewsArticleTagEntityResponseCollection
+  newsArticleTags(filters: NewsArticleTagFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [NewsArticleTag]!
+  order(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): Order
+  orders_connection(filters: OrderFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): OrderEntityResponseCollection
+  orders(filters: OrderFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [Order]!
+  orderItem(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): OrderItem
+  orderItems_connection(filters: OrderItemFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): OrderItemEntityResponseCollection
+  orderItems(filters: OrderItemFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [OrderItem]!
+  page(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): Page
+  pages_connection(filters: PageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): PageEntityResponseCollection
+  pages(filters: PageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [Page]!
+  photoboxImage(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): PhotoboxImage
+  photoboxImages_connection(filters: PhotoboxImageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): PhotoboxImageEntityResponseCollection
+  photoboxImages(filters: PhotoboxImageFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [PhotoboxImage]!
+  photoboxImageCollection(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): PhotoboxImageCollection
+  photoboxImageCollections_connection(filters: PhotoboxImageCollectionFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): PhotoboxImageCollectionEntityResponseCollection
+  photoboxImageCollections(filters: PhotoboxImageCollectionFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [PhotoboxImageCollection]!
+  regionalUnit(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): RegionalUnit
+  regionalUnits_connection(filters: RegionalUnitFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): RegionalUnitEntityResponseCollection
+  regionalUnits(filters: RegionalUnitFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [RegionalUnit]!
+  subscription(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): Subscription
+  subscriptions_connection(filters: SubscriptionFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): SubscriptionEntityResponseCollection
+  subscriptions(filters: SubscriptionFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [Subscription]!
+  supplementalDocument(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): SupplementalDocument
+  supplementalDocuments_connection(filters: SupplementalDocumentFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): SupplementalDocumentEntityResponseCollection
+  supplementalDocuments(filters: SupplementalDocumentFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [SupplementalDocument]!
+  supplementalDocumentGroup(documentId: ID!, status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): SupplementalDocumentGroup
+  supplementalDocumentGroups_connection(filters: SupplementalDocumentGroupFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): SupplementalDocumentGroupEntityResponseCollection
+  supplementalDocumentGroups(filters: SupplementalDocumentGroupFiltersInput, pagination: PaginationArg = {}, sort: [String] = [], status: PublicationStatus = PUBLISHED, hasPublishedVersion: Boolean): [SupplementalDocumentGroup]!
   me: UsersPermissionsMe
   getGeoLocationByCountryCode(zip: String!, countryCode: String!): GeoLocationResult
 }

@@ -90,6 +90,7 @@ export interface SupplementalDocument {
 	DownloadDocument?: File[] | null
 	VisibilityStart?: string | null
 	VisibilityEnd?: string | null
+	supplemental_document_groups?: SupplementalDocumentGroup[] | null
 }
 
 export interface SupplementalDocumentGroup {
