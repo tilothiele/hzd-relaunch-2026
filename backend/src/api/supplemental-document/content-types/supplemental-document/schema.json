@@ -39,9 +39,9 @@
     "VisibilityEnd": {
       "type": "datetime"
     },
-    "supplemental_document_group": {
+    "supplemental_document_groups": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::supplemental-document-group.supplemental-document-group",
       "inversedBy": "supplemental_documents"
     }

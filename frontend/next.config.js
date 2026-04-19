@@ -1,6 +1,9 @@
-import type { NextConfig } from 'next'
 import withSerwistInit from '@serwist/next'
-import pkg from './package.json'
+import { readFileSync } from 'node:fs'
+
+const pkg = JSON.parse(
+	readFileSync(new URL('./package.json', import.meta.url))
+)
 
 const withSerwist = withSerwistInit({
 	swSrc: 'src/app/sw.ts',
@@ -9,7 +12,7 @@ const withSerwist = withSerwistInit({
 	disable: process.env.NODE_ENV === 'development',
 })
 
-const nextConfig: NextConfig = {
+const nextConfig = {
 	images: {
 		remotePatterns: [
 			{

@@ -63,11 +63,8 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 									<div className='text-sm'>{globalLayout?.Footer?.PraesidiumOrt}</div>
 									<div className='text-sm'>{globalLayout?.Footer?.PraesidiumTelefon}</div>
 								</div>
-								<div>
-									<p className='font-bold' style={{ color: theme.headerFooterIcons }}>IT-Projektleitung</p>
-									<div className='text-sm'>{globalLayout?.Footer?.ItProjektleitungName}</div>
-									<div className='text-sm'>{globalLayout?.Footer?.ItProjektleitungOrt}</div>
-									<div className='text-sm'>{globalLayout?.Footer?.ItProjektleitungTelefon}</div>
+								<div className='flex'>
+									<SocialLinks socialLinkFB={globalLayout?.SocialLinkFB} theme={theme} />
 								</div>
 							</div>
 							<hr
@@ -77,9 +74,10 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 									marginBottom: '1rem',
 								}}
 							/>
-							<div className='mt-4 grid grid-cols-2 gap-2'>
-								<div className='flex justify-center gap-4'>
-									<SocialLinks socialLinkFB={globalLayout?.SocialLinkFB} theme={theme} />
+							<div className='mt-4 grid grid-cols-2 gap-2 px-2'>
+								<div>
+									<p className='text-sm'>TIK/IT-Support</p>
+									<div className='text-sm'>tik@hovawarte.com</div>
 								</div>
 								<div>
 									<div><Link href='/impressum' className='text-sm transition-colors hover:text-yellow-400 underline'>

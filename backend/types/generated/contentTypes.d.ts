@@ -1512,7 +1512,7 @@ export interface ApiSupplementalDocumentGroupSupplementalDocumentGroup
     publishedAt: Schema.Attribute.DateTime;
     SortOrd: Schema.Attribute.Integer;
     supplemental_documents: Schema.Attribute.Relation<
-      'oneToMany',
+      'manyToMany',
       'api::supplemental-document.supplemental-document'
     >;
     updatedAt: Schema.Attribute.DateTime;
@@ -1549,8 +1549,8 @@ export interface ApiSupplementalDocumentSupplementalDocument
     publishedAt: Schema.Attribute.DateTime;
     ShortId: Schema.Attribute.String;
     SortOrd: Schema.Attribute.Integer & Schema.Attribute.Unique;
-    supplemental_document_group: Schema.Attribute.Relation<
-      'manyToOne',
+    supplemental_document_groups: Schema.Attribute.Relation<
+      'manyToMany',
       'api::supplemental-document-group.supplemental-document-group'
     >;
     updatedAt: Schema.Attribute.DateTime;
@@ -2082,6 +2082,7 @@ export interface PluginUploadFile extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     ext: Schema.Attribute.String;
+    focalPoint: Schema.Attribute.JSON;
     folder: Schema.Attribute.Relation<'manyToOne', 'plugin::upload.folder'> &
       Schema.Attribute.Private;
     folderPath: Schema.Attribute.String &
