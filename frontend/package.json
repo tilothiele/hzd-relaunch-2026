@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:pwa": "npm run build && cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/ && PORT=3000 node .next/standalone/server.js",
-    "build": "next build --turbo",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
