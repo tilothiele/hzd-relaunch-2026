@@ -65,10 +65,12 @@ async function uploadAvatar(
 ): Promise<string | number> {
 	const fd = new FormData()
 	fd.append('files', file, file.name)
+	// JWT im Body (wie PhotoBox), kein Authorization-Header — sonst fehlt
+	// Basic-Auth für den Reverse-Proxy auf derselben Origin.
+	fd.append('token', token)
 	const res = await fetch('/api/strapi/upload', {
 		method: 'POST',
 		credentials: 'include',
-		headers: { Authorization: `Bearer ${token}` },
 		body: fd,
 	})
 	if (!res.ok) {

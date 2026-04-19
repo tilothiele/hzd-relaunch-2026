@@ -9,16 +9,10 @@ export const dynamic = 'force-dynamic'
 
 /**
  * Proxied Strapi-Medien-Upload (vermeidet CORS: Browser spricht nur same-origin).
+ * JWT kommt per Form-Feld `token` (wie PhotoBox), nicht im Authorization-Header —
+ * sonst würde der Browser die Basic-Auth gegen den Reverse-Proxy verlieren.
  */
 export async function POST(request: NextRequest) {
-	const auth = request.headers.get('authorization')
-	if (!auth?.startsWith('Bearer ')) {
-		return NextResponse.json(
-			{ message: 'Nicht authentifiziert.' },
-			{ status: 401 },
-		)
-	}
-
 	let formData: FormData
 	try {
 		formData = await request.formData()
@@ -29,21 +23,46 @@ export async function POST(request: NextRequest) {
 		)
 	}
 
-	const upstream = await fetch(
+	const tokenField = formData.get('token')
+	const jwtFromForm =
+		typeof tokenField === 'string' && tokenField.length > 0
+			? tokenField
+			: null
+	const authHeader = request.headers.get('authorization')
+	const jwtFromBearer =
+		authHeader?.startsWith('Bearer ') ? authHeader.slice(7).trim() : null
+	const jwt = jwtFromForm ?? jwtFromBearer
+
+	if (!jwt) {
+		return NextResponse.json(
+			{ message: 'Nicht authentifiziert.' },
+			{ status: 401 },
+		)
+	}
+
+	const upstream = new FormData()
+	for (const [key, value] of formData.entries()) {
+		if (key === 'token') {
+			continue
+		}
+		upstream.append(key, value)
+	}
+
+	const upstreamRes = await fetch(
 		`${strapiBaseUrl.replace(/\/$/, '')}/api/upload`,
 		{
 			method: 'POST',
-			headers: { Authorization: auth },
-			body: formData,
+			headers: { Authorization: `Bearer ${jwt}` },
+			body: upstream,
 		},
 	)
 
-	const text = await upstream.text()
+	const text = await upstreamRes.text()
 	const contentType =
-		upstream.headers.get('Content-Type') || 'application/json'
+		upstreamRes.headers.get('Content-Type') || 'application/json'
 
 	return new NextResponse(text, {
-		status: upstream.status,
+		status: upstreamRes.status,
 		headers: { 'Content-Type': contentType },
 	})
 }
