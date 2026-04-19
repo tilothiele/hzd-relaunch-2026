@@ -1,4 +1,4 @@
-/* 
+/*
    Semantic variables mapping to theme primitives.
    This allows components to use --lq-action-primary regardless of the active theme.
 */
@@ -47,7 +47,7 @@
 
     --color-login-icon: var(--color-hzd-blau);
 
-    --color-logo-background-face: white;
+    --color-logo-background-face: var(--color-goldbeige);
 
     /* sonstiges */
 

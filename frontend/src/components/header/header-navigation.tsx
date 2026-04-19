@@ -94,6 +94,7 @@ export function HeaderNavigation({
     const logoContainerStyle = {
         ...(logoBackground ? {
             backgroundColor: 'var(--color-logo-background-face)',
+            backgroundTransparency: '0.4',
             padding: isScrolled ? '6px 12px' : '15px 30px',
             borderRadius: '0',
             boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
