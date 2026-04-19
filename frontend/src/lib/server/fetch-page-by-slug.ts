@@ -1,6 +1,7 @@
 import { fetchGraphQLServer, getStrapiBaseUrl } from './graphql-client'
 import { GET_PAGE_BY_SLUG, GET_LAYOUT } from '@/lib/graphql/queries'
 import type { GlobalLayout, Page } from '@/types'
+import { enrichSectionsWithSupplementalDocuments } from './enrich-supplemental-sections'
 
 interface PageQueryResult {
 	pages?: Page[] | null
@@ -72,10 +73,20 @@ export async function fetchPageBySlug(slug: string): Promise<PageBySlugResult> {
 		])
 
 		// Finde die passende Seite
-		const matchingPage = pageData.pages?.find((entity) => {
+		let matchingPage = pageData.pages?.find((entity) => {
 			const entitySlug = entity?.slug
 			return entitySlug?.toLowerCase() === normalizedSlug.toLowerCase()
 		}) ?? null
+
+		if (matchingPage?.Sections?.length) {
+			matchingPage = {
+				...matchingPage,
+				Sections: await enrichSectionsWithSupplementalDocuments(
+					matchingPage.Sections,
+					baseUrl,
+				),
+			}
+		}
 
 		if (layoutData.globalLayout) {
 			layoutData.globalLayout.HzdSetting = layoutData.hzdSetting ?? null

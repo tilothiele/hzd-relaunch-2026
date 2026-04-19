@@ -167,6 +167,36 @@ export const GET_LAYOUT = `
 				}
 				CardsAnchor
 			}
+			... on ComponentBlocksSupplementalDocumentGroupSection {
+				SupplementalsOddEven
+				GroupHeadline
+				supplemental_document_group {
+					documentId
+					Name
+					SortOrd
+					supplemental_documents_connection(
+						pagination: { pageSize: 500 }
+					) {
+						nodes {
+							documentId
+							Name
+							Description
+							ShortId
+							SortOrd
+							DownloadDocument {
+								url
+								name
+								ext
+								mime
+								size
+							}
+							VisibilityStart
+							VisibilityEnd
+						}
+					}
+				}
+				GroupAnchor
+			}
 			... on ComponentBlocksTeaserTextWithImage {
 				TeaserOddEven
 				TeaserHeadline
@@ -690,21 +720,25 @@ export const GET_PAGE_BY_SLUG = `
 								documentId
 								Name
 								SortOrd
-								supplemental_documents(pagination: { pageSize: 50 }) {
-									documentId
-									Name
-									Description
-									ShortId
-									SortOrd
-									DownloadDocument {
-										url
-										name
-										ext
-										mime
-										size
+								supplemental_documents_connection(
+									pagination: { pageSize: 500 }
+								) {
+									nodes {
+										documentId
+										Name
+										Description
+										ShortId
+										SortOrd
+										DownloadDocument {
+											url
+											name
+											ext
+											mime
+											size
+										}
+										VisibilityStart
+										VisibilityEnd
 									}
-									VisibilityStart
-									VisibilityEnd
 								}
 							}
 							GroupAnchor
@@ -1743,23 +1777,28 @@ export const GET_NEWS_ARTICLE_BY_SLUG = `
 						documentId
 						Name
 						SortOrd
-						supplemental_documents(pagination: { pageSize: 50 }) {
-							documentId
-							Name
-							Description
-							ShortId
-							SortOrd
-							DownloadDocument {
-								url
-								name
-								ext
-								mime
-								size
+						supplemental_documents_connection(
+							pagination: { pageSize: 500 }
+						) {
+							nodes {
+								documentId
+								Name
+								Description
+								ShortId
+								SortOrd
+								DownloadDocument {
+									url
+									name
+									ext
+									mime
+									size
+								}
+								VisibilityStart
+								VisibilityEnd
 							}
-							VisibilityStart
-							VisibilityEnd
 						}
 					}
+					GroupAnchor
 				}
 				... on ComponentBlocksTeaserTextWithImage {
 					TeaserOddEven
@@ -1965,9 +2004,9 @@ export const GET_NEWS_ARTICLE_CATEGORY_BY_SLUG = `
 export const GET_NEWS_ARTICLES_BY_CATEGORY = `
 	query GetNewsArticlesByCategory($categoryId: ID!, $pagination: PaginationArg, $featuredFilter: Boolean) {
 		newsArticles(
-			filters: { 
+			filters: {
 				category: { documentId: { eq: $categoryId } }
-				FeaturedArticle: { eq: $featuredFilter } 
+				FeaturedArticle: { eq: $featuredFilter }
 			}
 			pagination: $pagination
 			sort: ["publishedAt:desc"]
@@ -2271,6 +2310,82 @@ export const GET_PHOTOBOX_IMAGE = `
 			Thumbnail {
 				documentId
 			}
+		}
+	}
+`
+
+/**
+ * Einzelgruppe inkl. Dokumente (Root-Query — zuverlässiger als verschachtelte
+ * Dynamic-Zone und oft zuverlässiger als supplementalDocuments-Filter auf M:N).
+ */
+export const GET_SUPPLEMENTAL_DOCUMENT_GROUP_WITH_DOCUMENTS = `
+	query SupplementalDocumentGroupWithDocuments($documentId: ID!) {
+		supplementalDocumentGroup(documentId: $documentId) {
+			documentId
+			Name
+			SortOrd
+			supplemental_documents_connection(pagination: { pageSize: 500 }) {
+				nodes {
+					documentId
+					Name
+					Description
+					ShortId
+					SortOrd
+					DownloadDocument {
+						url
+						name
+						ext
+						mime
+						size
+					}
+					VisibilityStart
+					VisibilityEnd
+				}
+			}
+			supplemental_documents(pagination: { pageSize: 500 }) {
+				documentId
+				Name
+				Description
+				ShortId
+				SortOrd
+				DownloadDocument {
+					url
+					name
+					ext
+					mime
+					size
+				}
+				VisibilityStart
+				VisibilityEnd
+			}
+		}
+	}
+`
+
+/** Fallback, wenn supplementalDocumentGroup keine Dokumente populated */
+export const GET_SUPPLEMENTAL_DOCUMENTS_FOR_ONE_GROUP = `
+	query SupplementalDocumentsForOneGroup($groupId: ID!) {
+		supplementalDocuments(
+			filters: {
+				supplemental_document_groups: { documentId: { eq: $groupId } }
+			}
+			pagination: { pageSize: 500 }
+			sort: ["SortOrd:asc", "Name:asc"]
+		) {
+			documentId
+			Name
+			Description
+			ShortId
+			SortOrd
+			DownloadDocument {
+				url
+				name
+				ext
+				mime
+				size
+			}
+			VisibilityStart
+			VisibilityEnd
 		}
 	}
 `

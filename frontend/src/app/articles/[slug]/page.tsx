@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { MainPageStructure } from '../../main-page-structure'
 import { theme as globalTheme } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
+import { enrichSectionsWithSupplementalDocuments } from '@/lib/server/enrich-supplemental-sections'
 import { fetchCategoryBySlug, fetchArticlesByCategory } from '@/lib/server/fetch-articles-by-category'
 import { renderServerSections } from '@/components/sections/server-section-factory'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
@@ -122,6 +123,11 @@ export default async function ArticlesCategoryPage({ params, searchParams }: Pag
 	// Note: This is a simplified pagination - ideally we'd get total count from API
 	const totalPages = articles.length === pageSize ? currentPage + 1 : currentPage
 
+	const enrichedCategorySections = await enrichSectionsWithSupplementalDocuments(
+		category.ContentSections ?? [],
+		baseUrl,
+	)
+
 	return (
 		<MainPageStructure
 			homepage={globalLayout}
@@ -131,7 +137,7 @@ export default async function ArticlesCategoryPage({ params, searchParams }: Pag
 		>
 			{/* Dynamic Content Sections */}
 			{renderServerSections({
-				sections: category.ContentSections,
+				sections: enrichedCategorySections,
 				strapiBaseUrl: baseUrl,
 				theme: theme,
 				logo: globalLayout?.Logo

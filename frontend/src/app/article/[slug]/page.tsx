@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { MainPageStructure } from '../../main-page-structure'
 import { theme as globalTheme, type ThemeDefinition } from '@/themes'
 import { fetchNewsArticleBySlug, fetchGlobalLayout } from '@/lib/server/fetch-news-article-by-slug'
+import { enrichSectionsWithSupplementalDocuments } from '@/lib/server/enrich-supplemental-sections'
 import { renderServerSections } from '@/components/sections/server-section-factory'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import NotFoundSection from '@/components/sections/not-found-section/not-found-section'
@@ -169,7 +170,10 @@ export default async function ArticlePage({ params }: PageProps) {
         )
     }
 
-    const sections = article.NewsContentSections || []
+    const sections = await enrichSectionsWithSupplementalDocuments(
+        article.NewsContentSections || [],
+        baseUrl,
+    )
     const theme = globalTheme
     const author = article.SEO?.author
     const authorName = author?.DisplayName

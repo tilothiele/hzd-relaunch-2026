@@ -1,6 +1,7 @@
 import { MainPageStructure } from './main-page-structure'
 import { theme as globalTheme } from '@/themes'
 import { fetchGraphQLServer, getStrapiBaseUrl } from '@/lib/server/graphql-client'
+import { enrichSectionsWithSupplementalDocuments } from '@/lib/server/enrich-supplemental-sections'
 import { GET_LAYOUT, GET_ME } from '@/lib/graphql/queries'
 import { renderServerSections } from '@/components/sections/server-section-factory'
 import type { GlobalLayout } from '@/types'
@@ -67,7 +68,10 @@ export default async function Home() {
 	const page = isAuthenticated
 		? (globalLayout?.authenticated_page ?? globalLayout?.page)
 		: globalLayout?.page
-	const sections = page?.Sections ?? []
+	const sections = await enrichSectionsWithSupplementalDocuments(
+		page?.Sections ?? [],
+		baseUrl,
+	)
 
 	if (error) {
 		return (

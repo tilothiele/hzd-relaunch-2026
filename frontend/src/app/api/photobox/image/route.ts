@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3'
 
+/** `request.url` / Query-Parameter → Route muss dynamisch sein (nicht statisch prerendern). */
+export const dynamic = 'force-dynamic'
+
 // S3 Configuration (same as in upload route)
 const s3Config = {
     endpoint: process.env.S3_ENDPOINT,

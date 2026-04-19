@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+/** `request.headers` / IP → Route muss dynamisch sein. */
+export const dynamic = 'force-dynamic'
+
 /**
  * API-Route zur Ermittlung der Geolocation aus der IP-Adresse
  * Verwendet ip-api.com (kostenlos, keine API-Key erforderlich)

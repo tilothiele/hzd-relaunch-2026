@@ -94,10 +94,15 @@ export interface SupplementalDocument {
 }
 
 export interface SupplementalDocumentGroup {
+	/** Strapi-Datenbank-ID (REST / ältere Antworten) */
+	id?: string | number | null
 	documentId?: string
 	Name?: string | null
 	SortOrd?: number | null
 	supplemental_documents?: SupplementalDocument[] | null
+	supplemental_documents_connection?: {
+		nodes: SupplementalDocument[]
+	} | null
 }
 
 export interface SupplementalDocumentGroupSection {

@@ -11,6 +11,19 @@ interface SupplementalDocumentGroupSectionComponentProps {
 	theme: ThemeDefinition
 }
 
+function endOfCalendarDayUtc(isoOrDate: Date): Date {
+	const end = new Date(isoOrDate)
+	const isUtcMidnight =
+		end.getUTCHours() === 0
+		&& end.getUTCMinutes() === 0
+		&& end.getUTCSeconds() === 0
+		&& end.getUTCMilliseconds() === 0
+	if (isUtcMidnight) {
+		end.setUTCHours(23, 59, 59, 999)
+	}
+	return end
+}
+
 function isDocumentVisible(document: SupplementalDocument | null | undefined): boolean {
 	if (!document) {
 		return false
@@ -18,7 +31,8 @@ function isDocumentVisible(document: SupplementalDocument | null | undefined): b
 
 	const now = new Date()
 	const visibilityStart = document.VisibilityStart ? new Date(document.VisibilityStart) : null
-	const visibilityEnd = document.VisibilityEnd ? new Date(document.VisibilityEnd) : null
+	const visibilityEndRaw = document.VisibilityEnd ? new Date(document.VisibilityEnd) : null
+	const visibilityEnd = visibilityEndRaw ? endOfCalendarDayUtc(visibilityEndRaw) : null
 
 	if (visibilityStart && now < visibilityStart) {
 		return false
@@ -47,12 +61,29 @@ function formatFileSize(bytes: number | null | undefined): string {
 	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-function getVisibleDocuments(documentGroup: SupplementalDocumentGroupSection['supplemental_document_group']): SupplementalDocument[] {
-	if (!documentGroup?.supplemental_documents) {
+function getDocumentsFromGroup(
+	documentGroup: SupplementalDocumentGroupSection['supplemental_document_group'],
+): SupplementalDocument[] {
+	if (!documentGroup) {
 		return []
 	}
 
-	return documentGroup.supplemental_documents
+	const fromFlat = documentGroup.supplemental_documents
+	const fromConnection = documentGroup.supplemental_documents_connection?.nodes
+	if (fromFlat?.length) {
+		return fromFlat
+	}
+
+	if (fromConnection?.length) {
+		return fromConnection
+	}
+
+	return fromFlat ?? []
+}
+
+function getVisibleDocuments(documentGroup: SupplementalDocumentGroupSection['supplemental_document_group']): SupplementalDocument[] {
+	const documents = getDocumentsFromGroup(documentGroup)
+	return documents
 		.filter(isDocumentVisible)
 		.sort((a, b) => {
 			// Sortiere primär nach SortOrd, dann nach Name
@@ -79,7 +110,7 @@ export function SupplementalDocumentGroupSectionComponent({
 	const documentGroup = section.supplemental_document_group
 	const visibleDocuments = getVisibleDocuments(documentGroup)
 
-	if (!documentGroup || visibleDocuments.length === 0) {
+	if (!documentGroup) {
 		return null
 	}
 
@@ -114,6 +145,14 @@ export function SupplementalDocumentGroupSectionComponent({
 					</Typography>
 				) : null}
 
+				{visibleDocuments.length === 0 ? (
+					<Typography variant='body1' color='text.secondary' sx={{ mb: 2 }}>
+						Aktuell sind keine Dokumente sichtbar (Sichtbarkeitszeitraum oder keine
+						Einträge).
+					</Typography>
+				) : null}
+
+				{visibleDocuments.length > 0 ? (
 				<TableContainer component={Paper} sx={{ boxShadow: 2 }}>
 					<Table>
 						<TableHead>
@@ -289,6 +328,7 @@ export function SupplementalDocumentGroupSectionComponent({
 						</TableBody>
 					</Table>
 				</TableContainer>
+				) : null}
 			</Container>
 		</SectionContainer>
 	)
