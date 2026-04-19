@@ -140,7 +140,7 @@ export const CREATE_PHOTOBOX_COLLECTION = `
 			documentId
 			CollectionDescription
 			Location
-			photogapher { documentId username }
+			photogapher { documentId }
 		}
 	}
 `
@@ -153,7 +153,7 @@ export const CREATE_PHOTOBOX_IMAGE = `
 			RenderedPersons
 			ReneredDogs
 			UserMessage
-			origin { documentId username }
+			origin { documentId }
 			photobox_image_collection { documentId CollectionDescription }
 		}
 	}

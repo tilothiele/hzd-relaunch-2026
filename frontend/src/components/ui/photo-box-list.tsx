@@ -173,7 +173,8 @@ export function PhotoBoxList({ maxCollections = 5, strapiBaseUrl }: PhotoBoxList
             return resolved
         }
 
-        // Fallback auf S3 für alte Bilder oder falls Strapi-Thumbnail fehlt
+        // Fallback Rohdatei (OpenCloud WebDAV / früher S3-Pfad in S3Path) falls
+        // Strapi-Thumbnail fehlt
         if (img.S3Path) {
             return `/api/photobox/image?path=${encodeURIComponent(img.S3Path)}`
         }
