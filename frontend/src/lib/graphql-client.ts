@@ -90,10 +90,13 @@ export async function fetchGraphQL<T>(
 		}
 	}
 
-	// Verwende Next.js API-Route als Proxy, um CORS-Probleme zu vermeiden
+	// Verwende Next.js API-Route als Proxy, um CORS-Probleme zu vermeiden.
+	// credentials: 'include' damit HTTP-Basic (falls Next geschützt ist) mitgeht;
+	// Strapi erhält weiter nur den JWT über den Proxy-Body, keine Basic-Header.
 	try {
 		const response = await fetch('/api/graphql', {
 			method: 'POST',
+			credentials: 'include',
 			headers: {
 				'Content-Type': 'application/json',
 			},

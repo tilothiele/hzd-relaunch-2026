@@ -67,6 +67,7 @@ async function uploadAvatar(
 	fd.append('files', file, file.name)
 	const res = await fetch('/api/strapi/upload', {
 		method: 'POST',
+		credentials: 'include',
 		headers: { Authorization: `Bearer ${token}` },
 		body: fd,
 	})
