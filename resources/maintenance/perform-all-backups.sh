@@ -199,7 +199,7 @@ backup_application "$BASE_DIR" "opencloud" \
 
 # Vaultwarden
 backup_application "$BASE_DIR" "vaultwarden" \
-    "vaultwarden-e0c4woggs40w4swo8w0kcw48-122151023460" \
+    "vaultwarden-e0c4woggs40w4swo8w0kcw48-123741972336" \
     -- \
     "e0c4woggs40w4swo8w0kcw48_vaultwarden-data"
 
