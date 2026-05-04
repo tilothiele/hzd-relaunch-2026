@@ -31,7 +31,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 
 BACKUP_REMOTE="hzd-cloud-backup"
 
-LOCAL_LOG_DIR="/var/log/webdav-sync"
+LOCAL_LOG_DIR="~/webdav-sync"
 TIMESTAMP="$(date +%Y-%m-%d_%H-%M-%S)"
 
 WEBDAV_REMOTES=(
@@ -95,7 +95,7 @@ for REMOTE in "${WEBDAV_REMOTES[@]}"; do
     # s3://bucket/central-backup/webdav02/
     #
 
-    DESTINATION="${BACKUP_REMOTE}:/"
+    DESTINATION="${BACKUP_REMOTE}:/${REMOTE}"
 
     rclone sync "${REMOTE}:" "${DESTINATION}" \
         --create-empty-src-dirs \
