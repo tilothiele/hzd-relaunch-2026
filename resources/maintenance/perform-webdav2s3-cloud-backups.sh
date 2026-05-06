@@ -31,7 +31,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 
 BACKUP_REMOTE="hzd-cloud-backup"
 
-LOCAL_LOG_DIR="~/webdav-sync"
+LOCAL_LOG_DIR="$BASE_DIR/webdav-sync"
 TIMESTAMP="$(date +%Y-%m-%d_%H-%M-%S)"
 
 WEBDAV_REMOTES=(
@@ -41,17 +41,17 @@ WEBDAV_REMOTES=(
   ro-Formulare_ab_2019_11_27        # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$5692ed49-6e5a-425f-abdd-8efad24336e3
   ro-Formulare_Vorlagen             # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$49977cb9-4d82-4872-bd37-4adc187e204c
   ro-GS-allgemeine-Daten            # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$3d9a89cd-d444-466e-a568-59d7a50e2276
-  GS-HZD-Verwaltung-Mitglieder   # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$0111f73b-61be-44a3-b1fb-612d636b9ade
+  ro-GS-HZD-Verwaltung-Mitglieder   # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$0111f73b-61be-44a3-b1fb-612d636b9ade
   ro-Hovi-Kosmos                    # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$05e6403e-01a5-444f-af1f-48fa55edc7a6
   ro-IT-Administration              # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$4f1889fb-10ef-47d8-b761-1c9e592fa12b
-  ro-Körmeister                     # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$33f68003-4396-4375-87d8-dc23c4a32267
+  ro-Koermeister                    # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$33f68003-4396-4375-87d8-dc23c4a32267
   ro-Medlestelle-Nord               # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$aca30546-b56a-463c-bd8e-07f26f3c3462
   ro-Neue_Website                   # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$d4334100-c7bb-4f31-b864-58cb44b2c8e2
   ro-Photobox                       # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$215d15cc-e752-404b-980d-f3fc61280341
-  ro-Präsidium                      # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$3cf895dc-4e42-44bc-8cf1-9c6887e3aec1
+  ro-Praesidium                     # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$3cf895dc-4e42-44bc-8cf1-9c6887e3aec1
   ro-RG-Mitte                       # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$7febd358-518d-4b0f-b0f4-e7479cfb1102
   ro-RG-Nord                        # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$3f2489c9-363d-40e3-a094-284dcbfbae5c
-  ro-RG-Süd                         # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$65506787-e1ce-4d98-82ec-24d6b3c1c3ec
+  ro-RG-Sued                        # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$65506787-e1ce-4d98-82ec-24d6b3c1c3ec
   ro-RG-West                        # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$de6df07b-6b2a-4b34-9165-d34e1912cbf2
   ro-RG-Ost                         # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$fddac1f3-2b58-4ab5-b683-07eb126c050c
   ro-Thale                          # https://cloud.hovawarte.com/remote.php/dav/spaces/8d37af2e-7780-4753-8efe-d283556216cc$78daf375-2c93-4b7f-bd4b-c923b729cadb
