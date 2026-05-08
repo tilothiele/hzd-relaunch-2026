@@ -15,9 +15,23 @@
     }
   },
   "attributes": {
+    "BreederRole": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "B",
+        "S"
+      ]
+    },
     "kennelName": {
       "type": "string",
       "maxLength": 200
+    },
+    "litters": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::hzd-plugin.litter",
+      "mappedBy": "breeder"
     },
     "breedingLicenseSince": {
       "type": "date"
@@ -28,12 +42,6 @@
     },
     "IsActive": {
       "type": "boolean"
-    },
-    "litters": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "plugin::hzd-plugin.litter",
-      "mappedBy": "breeder"
     },
     "BreedersIntroduction": {
       "type": "customField",

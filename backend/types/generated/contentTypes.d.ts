@@ -1715,6 +1715,8 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
     Address: Schema.Attribute.Component<'personal.address', false>;
     avatar: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     BreederEmail: Schema.Attribute.Email;
+    BreederRole: Schema.Attribute.Enumeration<['B', 'S']> &
+      Schema.Attribute.Required;
     BreedersIntroDraft: Schema.Attribute.Text;
     BreedersIntroduction: Schema.Attribute.RichText &
       Schema.Attribute.CustomField<
