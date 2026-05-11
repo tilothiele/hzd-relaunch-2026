@@ -3,11 +3,13 @@
  */
 
 import { factories } from '@strapi/strapi'
-import type { Core, UID } from '@strapi/strapi'
+import type { Core } from '@strapi/strapi'
 
-type LitterService = Core.CoreAPI.Service.ContentType<UID.ContentType>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyService = Record<string, any>
 
-const service = ({ strapi }: { strapi: Core.Strapi }): LitterService =>
-  factories.createCoreService('plugin::hzd-plugin.litter')({ strapi })
+const coreServiceFactory = factories.createCoreService('plugin::hzd-plugin.litter')
 
-export default service
+export default ({ strapi }: { strapi: Core.Strapi }): AnyService => {
+  return coreServiceFactory({ strapi } as any)
+}

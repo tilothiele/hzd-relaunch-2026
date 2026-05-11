@@ -3,12 +3,13 @@
  */
 
 import { factories } from '@strapi/strapi'
-import type { Core, UID } from '@strapi/strapi'
+import type { Core } from '@strapi/strapi'
 
-type BreederController = Core.CoreAPI.Controller.ContentType<UID.ContentType>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyController = Record<string, any>
 
-export default ({ strapi }: { strapi: Core.Strapi }): BreederController => {
-  return factories.createCoreController('plugin::hzd-plugin.breeder')({ strapi })
+const coreControllerFactory = factories.createCoreController('plugin::hzd-plugin.breeder')
+
+export default ({ strapi }: { strapi: Core.Strapi }): AnyController => {
+  return coreControllerFactory({ strapi } as any)
 }
-
-

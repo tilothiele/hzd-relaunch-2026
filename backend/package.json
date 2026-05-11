@@ -51,10 +51,19 @@
   },
   "engines": {
     "node": ">=20.0.0 <=22.x.x",
-    "npm": ">=6.0.0"
+    "pnpm": ">=9.0.0"
   },
   "strapi": {
     "uuid": "c9487574-a864-47e3-a97f-45ca3fd7af01",
     "installId": "d7ec222baeace4a0333c8d0f3ab3bea09258efc3cd77b3e8c9fb31fccb62aba6"
+  },
+  "pnpm": {
+    "overrides": {
+      "@strapi/admin": "5.45.1",
+      "@strapi/content-manager": "5.45.1",
+      "@strapi/core": "5.45.1",
+      "@strapi/types": "5.45.1",
+      "@strapi/utils": "5.45.1"
+    }
   }
 }

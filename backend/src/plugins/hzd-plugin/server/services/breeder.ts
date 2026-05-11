@@ -3,11 +3,13 @@
  */
 
 import { factories } from '@strapi/strapi'
-import type { Core, UID } from '@strapi/strapi'
+import type { Core } from '@strapi/strapi'
 
-type BreederService = Core.CoreAPI.Service.ContentType<UID.ContentType>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyService = Record<string, any>
 
-const service = ({ strapi }: { strapi: Core.Strapi }): BreederService =>
-  factories.createCoreService('plugin::hzd-plugin.breeder')({ strapi })
+const coreServiceFactory = factories.createCoreService('plugin::hzd-plugin.breeder')
 
-export default service
+export default ({ strapi }: { strapi: Core.Strapi }): AnyService => {
+  return coreServiceFactory({ strapi } as any)
+}

@@ -16,7 +16,8 @@ import policies from './policies';
 import routes from './routes';
 import services from './services';
 
-export default {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const plugin: Record<string, any> = {
   register,
   bootstrap,
   destroy,
@@ -27,4 +28,6 @@ export default {
   contentTypes,
   policies,
   middlewares,
-};
+}
+
+export default plugin
