@@ -2,6 +2,12 @@
  *  service
  */
 
-import { factories } from '@strapi/strapi';
+import type { Core, Module } from '@strapi/strapi'
+import { factories } from '@strapi/strapi'
 
-export default factories.createCoreService('plugin::hzd-plugin.breeder');
+type BreederService = Module<'plugin::hzd-plugin.breeder'>['services']['registry']
+
+const createBreederService = (): BreederService =>
+  factories.createCoreService('plugin::hzd-plugin.breeder')
+
+export default createBreederService()

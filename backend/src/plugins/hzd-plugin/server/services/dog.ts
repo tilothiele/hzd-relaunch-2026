@@ -2,10 +2,15 @@
  *  service
  */
 
-import type { Core } from '@strapi/strapi'
+import type { Core, Module } from '@strapi/strapi'
 import { factories } from '@strapi/strapi'
 
-const coreService = factories.createCoreService('plugin::hzd-plugin.dog')
+type DogService = Module<'plugin::hzd-plugin.dog'>['services']['registry']
+
+const createDogService = (): DogService =>
+  factories.createCoreService('plugin::hzd-plugin.dog')
+
+const coreService = createDogService()
 
 // Haversine-Formel für Distanzberechnung
 const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
@@ -22,7 +27,7 @@ const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: numbe
 	return R * c
 }
 
-export default ({ strapi }: { strapi: Core.Strapi }) => {
+export default ({ strapi }: { strapi: Core.Strapi }): DogService => {
 	const service = coreService({ strapi })
 
 	return {
