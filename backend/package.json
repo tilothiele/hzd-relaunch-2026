@@ -64,6 +64,15 @@
       "@strapi/core": "5.45.1",
       "@strapi/types": "5.45.1",
       "@strapi/utils": "5.45.1"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@apollo/protobufjs",
+      "@swc/core",
+      "aws-sdk",
+      "better-sqlite3",
+      "core-js-pure",
+      "esbuild",
+      "sharp"
+    ]
   }
 }
