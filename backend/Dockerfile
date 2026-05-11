@@ -1,5 +1,5 @@
 # Creating multi-stage build for production
-FROM node:20-alpine AS build
+FROM node:22-alpine AS build
 RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev git > /dev/null 2>&1
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
@@ -18,7 +18,7 @@ WORKDIR /opt/app
 RUN npm run build
 
 # Creating final production image
-FROM node:20-alpine AS production
+FROM node:22-alpine AS production
 RUN apk add --no-cache postgresql-client sqlite
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
