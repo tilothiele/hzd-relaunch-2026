@@ -73,6 +73,15 @@
       "core-js-pure",
       "esbuild",
       "sharp"
-    ]
+    ],
+    "peerDependencyRules": {
+      "allowAny": [
+        "@ai-sdk/google",
+        "@ai-sdk/provider-utils",
+        "@ai-sdk/react",
+        "@ai-sdk/gateway",
+        "ai"
+      ]
+    }
   }
 }
