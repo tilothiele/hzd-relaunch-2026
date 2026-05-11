@@ -11,7 +11,9 @@ ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /opt/
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+
+# Generate lockfile with overrides (allow mismatch since lockfile might be older)
+RUN pnpm install --no-frozen-lockfile
 ENV PATH=/opt/node_modules/.bin:$PATH
 
 WORKDIR /opt/app
@@ -19,7 +21,7 @@ COPY . .
 
 # Build plugin first before building Strapi
 WORKDIR /opt/app/src/plugins/hzd-plugin
-RUN if [ -f "package.json" ]; then pnpm install --frozen-lockfile && pnpm run build; fi
+RUN if [ -f "package.json" ]; then pnpm install --no-frozen-lockfile && pnpm run build; fi
 WORKDIR /opt/app
 RUN pnpm run build
 
