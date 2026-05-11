@@ -31,6 +31,12 @@ export default async function fixPermissions(strapi: Core.Strapi) {
 		'plugin::hzd-plugin.homepage-section.findOne',
 		'plugin::hzd-plugin.contact.find',
 		'plugin::hzd-plugin.contact.findOne',
+		'plugin::hzd-plugin.dog.find',
+		'plugin::hzd-plugin.dog.findOne',
+		'plugin::hzd-plugin.breeder.find',
+		'plugin::hzd-plugin.breeder.findOne',
+		'plugin::hzd-plugin.litter.find',
+		'plugin::hzd-plugin.litter.findOne',
 	]
 
 	let created = 0
@@ -39,7 +45,7 @@ export default async function fixPermissions(strapi: Core.Strapi) {
 
 	for (const action of permissions) {
 		try {
-			// Prüfe, ob Permission existiert
+			// Prüfe, ob Permission existiert (public role)
 			const existingPermission = await strapi
 				.query('plugin::users-permissions.permission')
 				.findOne({
@@ -50,7 +56,7 @@ export default async function fixPermissions(strapi: Core.Strapi) {
 				})
 
 			if (existingPermission) {
-				console.log(`✓ ${action} - already exists`)
+				console.log(`✓ [public] ${action} - already exists`)
 				existingCount++
 			} else {
 				// Erstelle Permission
@@ -62,13 +68,57 @@ export default async function fixPermissions(strapi: Core.Strapi) {
 							role: publicRole.id,
 						},
 					})
-				console.log(`✅ ${action} - CREATED`)
+				console.log(`✅ [public] ${action} - CREATED`)
 				created++
 			}
 		} catch (error) {
-			console.error(`❌ ${action} - ERROR:`, error.message)
+			console.error(`❌ [public] ${action} - ERROR:`, error.message)
 			errors++
 		}
+	}
+
+	// Auch für authenticated role
+	const authenticatedRole = await strapi
+		.query('plugin::users-permissions.role')
+		.findOne({
+			where: { type: 'authenticated' },
+		})
+
+	if (authenticatedRole) {
+		console.log(`\n✓ Authenticated role found (ID: ${authenticatedRole.id})\n`)
+
+		for (const action of permissions) {
+			try {
+				const existingPermission = await strapi
+					.query('plugin::users-permissions.permission')
+					.findOne({
+						where: {
+							role: authenticatedRole.id,
+							action,
+						},
+					})
+
+				if (existingPermission) {
+					console.log(`✓ [authenticated] ${action} - already exists`)
+				} else {
+					await strapi
+						.query('plugin::users-permissions.permission')
+						.create({
+							data: {
+								action,
+								role: authenticatedRole.id,
+							},
+						})
+					console.log(`✅ [authenticated] ${action} - CREATED`)
+					created++
+				}
+			} catch (error) {
+				console.error(`❌ [authenticated] ${action} - ERROR:`, error.message)
+				errors++
+			}
+		}
+	} else {
+		console.log('\n⚠️ Authenticated role not found')
 	}
 
 	console.log(`\n📊 Summary:`)
