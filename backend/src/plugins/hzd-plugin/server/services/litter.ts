@@ -2,12 +2,12 @@
  *  service
  */
 
-import type { Core, Module } from '@strapi/strapi'
 import { factories } from '@strapi/strapi'
+import type { Core, UID } from '@strapi/strapi'
 
-type LitterService = Module<'plugin::hzd-plugin.litter'>['services']['registry']
+type LitterService = Core.CoreAPI.Service.ContentType<UID.ContentType>
 
-const createLitterService = (): LitterService =>
-  factories.createCoreService('plugin::hzd-plugin.litter')
+const service = ({ strapi }: { strapi: Core.Strapi }): LitterService =>
+  factories.createCoreService('plugin::hzd-plugin.litter')({ strapi })
 
-export default createLitterService()
+export default service
