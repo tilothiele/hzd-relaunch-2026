@@ -4,7 +4,7 @@ FROM node:22-alpine AS build
 RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev git > /dev/null 2>&1
 
 # Install pnpm
-RUN npm install -g pnpm
+RUN npm install -g pnpm@10.20.0
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
