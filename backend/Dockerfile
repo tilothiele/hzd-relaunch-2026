@@ -13,8 +13,7 @@ WORKDIR /opt/
 COPY package.json pnpm-lock.yaml ./
 
 # Generate lockfile with overrides
-# Use --ignore-peer-warnings to bypass peer dependency mismatches from plugins
-RUN pnpm install --no-frozen-lockfile --ignore-peer-warnings
+RUN pnpm install --no-frozen-lockfile --force
 ENV PATH=/opt/node_modules/.bin:$PATH
 
 WORKDIR /opt/app
@@ -22,7 +21,7 @@ COPY . .
 
 # Build plugin first before building Strapi
 WORKDIR /opt/app/src/plugins/hzd-plugin
-RUN if [ -f "package.json" ]; then pnpm install --no-frozen-lockfile --ignore-peer-warnings && pnpm run build; fi
+RUN if [ -f "package.json" ]; then pnpm install --no-frozen-lockfile --force && pnpm run build; fi
 WORKDIR /opt/app
 RUN pnpm run build
 
@@ -36,7 +35,7 @@ ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /opt/
 COPY --from=build /opt/package.json /opt/pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --prod --ignore-peer-warnings
+RUN pnpm install --frozen-lockfile --prod --force
 ENV PATH=/opt/node_modules/.bin:$PATH
 
 WORKDIR /opt/app
