@@ -469,6 +469,7 @@ export interface Dog {
 	MemosReleased?: string | null
 	breeder?: {
 		BreedersIntroduction?: string | null
+		HasNoDogsAvailabe?: boolean | null
 	} | null
 	Images?: Image[] | null
 	avatar?: Image | null
@@ -524,6 +525,7 @@ export interface Breeder {
 		locationLng?: number | null
 	} | null
 	IsActive?: boolean | null
+	HasNoDogsAvailabe?: boolean | null
 	Disable?: boolean | null
 	BreedersIntroduction?: string | null
 	BreedersIntroDraft?: string | null

@@ -43,6 +43,15 @@
     "IsActive": {
       "type": "boolean"
     },
+    "HasNoDogsAvailabe": {
+      "type": "boolean"
+    },
+    "litters": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "plugin::hzd-plugin.litter",
+      "mappedBy": "breeder"
+    },
     "BreedersIntroduction": {
       "type": "customField",
       "customField": "plugin::ckeditor5.CKEditor",

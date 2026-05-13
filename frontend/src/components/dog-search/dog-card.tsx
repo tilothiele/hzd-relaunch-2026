@@ -2,7 +2,7 @@
 
 import { useId } from 'react'
 import Image from 'next/image'
-import { Card, CardMedia, CardContent, Table, TableBody, TableRow, TableCell, Box, Tooltip } from '@mui/material'
+import { Card, CardMedia, CardContent, Table, TableBody, TableRow, TableCell, Box, Tooltip, Chip } from '@mui/material'
 import type { Dog, HzdSetting } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import type { DistanceFilter } from '@/hooks/use-dogs'
@@ -182,6 +182,8 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 		}
 	}
 
+	const showNoDogsInBreedingChip = dog.breeder?.HasNoDogsAvailabe === true
+
 	return (
 		<Card
 			sx={{
@@ -224,6 +226,14 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 			</CardMedia>
 
 			<CardContent>
+				{showNoDogsInBreedingChip ? (
+					<Chip
+						label='Aktuell keine Hunde in der Zucht'
+						color='warning'
+						variant='outlined'
+						sx={{ mb: 2, width: '100%', justifyContent: 'center' }}
+					/>
+				) : null}
 				<Table size='small'>
 					<TableBody>
 						<TableRow>

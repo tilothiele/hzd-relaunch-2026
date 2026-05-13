@@ -1,7 +1,7 @@
 'use client'
 
 import { useDogs } from '@/hooks/use-dogs'
-import { Box, CircularProgress, Link as MuiLink, Pagination, Typography, Modal, IconButton } from '@mui/material'
+import { Box, CircularProgress, Link as MuiLink, Pagination, Typography, Modal, IconButton, Chip } from '@mui/material'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useMemo, useState } from 'react'
@@ -16,12 +16,16 @@ interface BreederDogsListProps {
     ownerDocumentId: string
     strapiBaseUrl?: string | null
     hzdSetting?: HzdSetting | null
+    /** Züchter: keine Zuchthunde öffentlich listen */
+    hasNoDogsAvailabe?: boolean | null
 }
 
-export function BreederDogsList({ ownerDocumentId, strapiBaseUrl, hzdSetting }: BreederDogsListProps) {
+export function BreederDogsList({ ownerDocumentId, strapiBaseUrl, hzdSetting, hasNoDogsAvailabe }: BreederDogsListProps) {
     const [page, setPage] = useState(1)
     const [zoomImage, setZoomImage] = useState<{ url: string; name: string } | null>(null)
     const pageSize = 5
+
+    const breederHidesDogListing = hasNoDogsAvailabe === true
 
     // useDogs filtert standardmäßig nach 'cFertile: true', was hier gewünscht ist.
     const { dogs, totalDogs, pageCount, isLoading } = useDogs(
@@ -35,7 +39,8 @@ export function BreederDogsList({ ownerDocumentId, strapiBaseUrl, hzdSetting }: 
                 pageSize,
             },
             baseUrl: strapiBaseUrl,
-        }), [ownerDocumentId, page, pageSize, strapiBaseUrl])
+            queryDisabled: breederHidesDogListing,
+        }), [ownerDocumentId, page, pageSize, strapiBaseUrl, breederHidesDogListing])
     )
 
     const handlePageChange = (_: unknown, value: number) => {
@@ -43,6 +48,18 @@ export function BreederDogsList({ ownerDocumentId, strapiBaseUrl, hzdSetting }: 
     }
 
     const handleZoomClose = () => setZoomImage(null)
+
+    if (breederHidesDogListing) {
+        return (
+            <Box sx={{ mt: 1 }}>
+                <Chip
+                    label='Aktuell keine Hunde in der Zucht'
+                    color='warning'
+                    variant='outlined'
+                />
+            </Box>
+        )
+    }
 
     if (isLoading) {
         return (

@@ -46,7 +46,9 @@ export async function fetchGraphQLServer<T>(
 
 	const effectiveBaseUrl = resolvedBaseUrl.replace(/\/$/, '')
 	const endpoint = `${effectiveBaseUrl}/graphql`
-	const client = new GraphQLClient(endpoint)
+	// Next.js 14 cached fetch() standardmäßig (Data Cache). Ohne no-store bleiben
+	// CMS-Änderungen bis zur TTL unsichtbar, obwohl die Route dynamisch ist.
+	const client = new GraphQLClient(endpoint, { cache: 'no-store' })
 
 	if (token) {
 		client.setHeader('Authorization', `Bearer ${token}`)

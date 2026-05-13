@@ -188,6 +188,7 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack }
                                 ownerDocumentId={breeder.owner_members[0].documentId}
                                 strapiBaseUrl={strapiBaseUrl}
                                 hzdSetting={hzdSetting}
+                                hasNoDogsAvailabe={breeder.HasNoDogsAvailabe}
                             />
                         </Box>
                     </section>
