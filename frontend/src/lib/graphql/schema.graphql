@@ -1589,6 +1589,7 @@ input HzdPluginBreederFiltersInput {
   breedingLicenseSince: DateFilterInput
   Disable: BooleanFilterInput
   IsActive: BooleanFilterInput
+  HasNoDogsAvailabe: BooleanFilterInput
   litters: HzdPluginLitterFiltersInput
   BreedersIntroduction: StringFilterInput
   cId: IntFilterInput
@@ -1614,6 +1615,7 @@ input HzdPluginBreederInput {
   breedingLicenseSince: Date
   Disable: Boolean
   IsActive: Boolean
+  HasNoDogsAvailabe: Boolean
   litters: [ID]
   BreedersIntroduction: String
   cId: Int
@@ -1636,6 +1638,7 @@ type HzdPluginBreeder {
   breedingLicenseSince: Date
   Disable: Boolean
   IsActive: Boolean
+  HasNoDogsAvailabe: Boolean
   litters_connection(filters: HzdPluginLitterFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): HzdPluginLitterRelationResponseCollection
   litters(filters: HzdPluginLitterFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [HzdPluginLitter]!
   BreedersIntroduction: String

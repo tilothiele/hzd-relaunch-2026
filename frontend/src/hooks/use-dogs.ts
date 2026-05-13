@@ -52,6 +52,8 @@ export interface UseDogsOptions {
 	pagination?: DogsPagination
 	autoLoad?: boolean
 	baseUrl?: string | null
+	/** Kein API-Aufruf (z. B. Züchter meldet „keine Hunde in der Zucht“) */
+	queryDisabled?: boolean
 }
 
 export function useDogs(options: UseDogsOptions = {}) {
@@ -61,6 +63,7 @@ export function useDogs(options: UseDogsOptions = {}) {
 		pagination = {},
 		autoLoad = true,
 		baseUrl: optionsBaseUrl,
+		queryDisabled = false,
 	} = options
 
 	const [dogs, setDogs] = useState<Dog[]>([])
@@ -88,6 +91,15 @@ export function useDogs(options: UseDogsOptions = {}) {
 
 	const searchDogs = useCallback(async () => {
 		if (!baseUrl || baseUrl.trim().length === 0) {
+			return
+		}
+
+		if (queryDisabled) {
+			setError(null)
+			setDogs([])
+			setTotalDogs(0)
+			setPageCount(0)
+			setIsLoading(false)
 			return
 		}
 
@@ -134,6 +146,14 @@ export function useDogs(options: UseDogsOptions = {}) {
 			if (ownerDocumentId) {
 				filterConditions.push({
 					owner: { documentId: { eq: ownerDocumentId } },
+				})
+			} else {
+				filterConditions.push({
+					or: [
+						{ breeder: { documentId: { null: true } } },
+						{ breeder: { HasNoDogsAvailabe: { eq: false } } },
+						{ breeder: { HasNoDogsAvailabe: { null: true } } },
+					],
 				})
 			}
 
@@ -229,13 +249,13 @@ export function useDogs(options: UseDogsOptions = {}) {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [baseUrl, nameFilter, sexFilter, colorFilter, ownerDocumentId, JSON.stringify(sort), page, pageSize, hdFilter, genprofilFilter, eyescheckFilter, heartcheckFilter, colorcheckFilter])
+	}, [baseUrl, nameFilter, sexFilter, colorFilter, ownerDocumentId, queryDisabled, JSON.stringify(sort), page, pageSize, maxAge, hdFilter, genprofilFilter, eyescheckFilter, heartcheckFilter, colorcheckFilter])
 
 	useEffect(() => {
-		if (autoLoad && baseUrl && baseUrl.trim().length > 0) {
+		if (autoLoad && !queryDisabled && baseUrl && baseUrl.trim().length > 0) {
 			void searchDogs()
 		}
-	}, [autoLoad, baseUrl, searchDogs])
+	}, [autoLoad, queryDisabled, baseUrl, searchDogs])
 
 	const isBusy = isConfigLoading || isLoading
 

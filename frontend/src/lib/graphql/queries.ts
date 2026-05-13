@@ -1003,6 +1003,7 @@ export const SEARCH_DOGS = `
 				Disabled
 				breeder {
 					BreedersIntroduction
+					HasNoDogsAvailabe
 				}
 				HD
 				SOD1
@@ -1236,6 +1237,7 @@ export const SEARCH_BREEDERS = `
 				kennelName
 				breedingLicenseSince
 				IsActive
+				HasNoDogsAvailabe
 				owner_members {
 					documentId
 					firstName

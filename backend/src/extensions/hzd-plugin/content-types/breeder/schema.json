@@ -29,6 +29,9 @@
     "IsActive": {
       "type": "boolean"
     },
+    "HasNoDogsAvailabe": {
+      "type": "boolean"
+    },
     "litters": {
       "type": "relation",
       "relation": "oneToMany",
