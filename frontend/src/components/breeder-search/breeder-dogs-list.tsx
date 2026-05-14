@@ -1,8 +1,7 @@
 'use client'
 
 import { useDogs } from '@/hooks/use-dogs'
-import { Box, CircularProgress, Link as MuiLink, Pagination, Typography, Modal, IconButton, Chip } from '@mui/material'
-import Link from 'next/link'
+import { Box, CircularProgress, Pagination, Typography, Modal, IconButton, Chip } from '@mui/material'
 import Image from 'next/image'
 import { useMemo, useState } from 'react'
 import { resolveDogImage } from '@/lib/dog-utils'
@@ -10,7 +9,7 @@ import { formatDate } from '@/lib/date-utils'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import CloseIcon from '@mui/icons-material/Close'
 import { theme } from '@/themes'
-import type { HzdSetting } from '@/types'
+import type { Dog, HzdSetting } from '@/types'
 
 interface BreederDogsListProps {
     ownerDocumentId: string
@@ -18,20 +17,28 @@ interface BreederDogsListProps {
     hzdSetting?: HzdSetting | null
     /** Züchter: keine Zuchthunde öffentlich listen */
     hasNoDogsAvailabe?: boolean | null
+    onDogSelect: (dog: Dog) => void
 }
 
-export function BreederDogsList({ ownerDocumentId, strapiBaseUrl, hzdSetting, hasNoDogsAvailabe }: BreederDogsListProps) {
+export function BreederDogsList({
+    ownerDocumentId,
+    strapiBaseUrl,
+    hzdSetting,
+    hasNoDogsAvailabe,
+    onDogSelect,
+}: BreederDogsListProps) {
     const [page, setPage] = useState(1)
     const [zoomImage, setZoomImage] = useState<{ url: string; name: string } | null>(null)
     const pageSize = 5
 
     const breederHidesDogListing = hasNoDogsAvailabe === true
 
-    // useDogs filtert standardmäßig nach 'cFertile: true', was hier gewünscht ist.
+    // Zuechter-Detailseiten zeigen nur zuchtfaehige Huendinnen.
     const { dogs, totalDogs, pageCount, isLoading } = useDogs(
         useMemo(() => ({
             filters: {
                 ownerDocumentId,
+                sexFilter: 'F',
                 sort: ['givenName:asc'],
             },
             pagination: {
@@ -90,13 +97,20 @@ export function BreederDogsList({ ownerDocumentId, strapiBaseUrl, hzdSetting, ha
                         >
                             <div className='flex-1 min-w-0'>
                                 <h4 className='text-sm font-bold text-gray-900 truncate mb-1'>
-                                    <Link href={`/hunde?id=${dog.documentId}`} className="hover:underline flex items-center gap-1 group">
+                                    <button
+                                        type='button'
+                                        className='hover:underline flex items-center gap-1 group text-left'
+                                        onClick={() => {
+                                            onDogSelect(dog)
+                                            window.scrollTo({ top: 0, behavior: 'smooth' })
+                                        }}
+                                    >
                                         {dog.fullKennelName ?? dog.givenName ?? 'Unbekannt'}
                                         <OpenInNewIcon
                                             sx={{ fontSize: 14 }}
                                             className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400"
                                         />
-                                    </Link>
+                                    </button>
                                 </h4>
                                 <div className='text-xs text-gray-600 space-y-0.5'>
                                     {dog.dateOfBirth && (

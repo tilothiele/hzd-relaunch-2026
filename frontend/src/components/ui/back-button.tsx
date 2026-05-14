@@ -8,13 +8,18 @@ import { cn } from '@/lib/utils'
 interface BackButtonProps {
     onClick: () => void
     className?: string
+    label?: string
 }
 
 /**
  * A reusable back button for detail views (e.g., Dog or Litter details).
  * Displays an arrow back icon and the text "Zurück zur Suchliste".
  */
-export function BackButton({ onClick, className }: BackButtonProps) {
+export function BackButton({
+    onClick,
+    className,
+    label = 'Zurück zur Suchliste',
+}: BackButtonProps) {
     return (
         <Button
             startIcon={<ArrowBackIcon />}
@@ -32,7 +37,7 @@ export function BackButton({ onClick, className }: BackButtonProps) {
                 }
             }}
         >
-            Zurück zur Suchliste
+            {label}
         </Button>
     )
 }

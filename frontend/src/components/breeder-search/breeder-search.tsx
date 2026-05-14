@@ -58,6 +58,7 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 
 		try {
 			const filterConditions: Array<Record<string, unknown>> = [
+				{ BreederRole: { eq: 'B' } },
 				{ IsActive: { eq: true } },
 				{
 					or: [
