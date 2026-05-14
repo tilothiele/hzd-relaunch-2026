@@ -1326,7 +1326,6 @@ input UsersPermissionsUserFiltersInput {
   DisplayName: StringFilterInput
   publishMyData: BooleanFilterInput
   breeders: HzdPluginBreederFiltersInput
-  ForcePublishMyData: BooleanFilterInput
   createdAt: DateTimeFilterInput
   updatedAt: DateTimeFilterInput
   publishedAt: DateTimeFilterInput
@@ -1369,7 +1368,6 @@ input UsersPermissionsUserInput {
   DisplayName: String
   publishMyData: Boolean
   breeders: [ID]
-  ForcePublishMyData: Boolean
   publishedAt: DateTime
   password: String
 }
@@ -1410,7 +1408,6 @@ type UsersPermissionsUser {
   publishMyData: Boolean
   breeders_connection(filters: HzdPluginBreederFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): HzdPluginBreederRelationResponseCollection
   breeders(filters: HzdPluginBreederFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [HzdPluginBreeder]!
-  ForcePublishMyData: Boolean
   createdAt: DateTime
   updatedAt: DateTime
   publishedAt: DateTime
