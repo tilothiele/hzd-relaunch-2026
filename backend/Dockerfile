@@ -11,6 +11,7 @@ ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /opt/
 COPY package.json pnpm-lock.yaml ./
+COPY scripts ./scripts
 
 # Generate lockfile with overrides
 RUN pnpm install
@@ -35,6 +36,7 @@ ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /opt/
 COPY --from=build /opt/package.json /opt/pnpm-lock.yaml ./
+COPY --from=build /opt/scripts ./scripts
 
 # Install pnpm
 RUN npm install -g pnpm@10.20.0

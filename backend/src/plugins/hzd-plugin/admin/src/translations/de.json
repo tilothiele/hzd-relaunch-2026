@@ -1,0 +1,13 @@
+{
+  "hzd-plugin.plugin.name": "HZD-Verwaltung",
+  "hzd-plugin.homepage.title": "HZD-Verwaltung",
+  "hzd-plugin.homepage.description": "Werkzeuge und Reports fuer die HZD-Verwaltungsprozesse.",
+  "hzd-plugin.reports.users.title": "Benutzer-Report",
+  "hzd-plugin.reports.users.description": "Prueft Owner-Members von Zuechtern auf fehlendes publishMyData.",
+  "hzd-plugin.reports.users.button": "Generiere Report",
+  "hzd-plugin.reports.users.error": "Der Benutzer-Report konnte nicht generiert werden.",
+  "hzd-plugin.reports.breeders.title": "Breeder-Report",
+  "hzd-plugin.reports.breeders.description": "Prueft aktive, nicht deaktivierte Breeder auf fehlende Owner-Members.",
+  "hzd-plugin.reports.breeders.button": "Generiere Breeder-Report",
+  "hzd-plugin.reports.breeders.error": "Der Breeder-Report konnte nicht generiert werden."
+}

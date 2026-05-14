@@ -2375,7 +2375,6 @@ export interface PluginUsersPermissionsUser
         minLength: 6;
       }>;
     firstName: Schema.Attribute.String;
-    ForcePublishMyData: Schema.Attribute.Boolean;
     form: Schema.Attribute.Relation<'manyToOne', 'api::form.form'>;
     lastName: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;

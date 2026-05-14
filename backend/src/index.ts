@@ -1,6 +1,6 @@
 import type { Core } from '@strapi/strapi';
+import { errors } from '@strapi/utils';
 import userAdminSchema from './extensions/graphql/config/schema.graphql';
-import { calcPublishMyData, syncUserPublishMyData } from './utils/user-publish-data';
 import { sanitizeUser, sanitizeUsers } from './utils/user-sanitize';
 
 const USER_CT_UID = 'plugin::users-permissions.user';
@@ -72,6 +72,118 @@ function buildUsersPermissionsUserPublishAwareResolvers(strapi: Core.Strapi) {
 	}
 
 	return resolvers;
+}
+
+type RelationValue = number | string | { id?: number | string; documentId?: string };
+
+function extractRelationIds(value: unknown): Array<number | string> {
+	if (!value) {
+		return [];
+	}
+
+	const values = Array.isArray(value) ? value : [value];
+	return values
+		.map((entry) => {
+			if (typeof entry === 'number' || typeof entry === 'string') {
+				return entry;
+			}
+
+			if (entry && typeof entry === 'object') {
+				const relation = entry as { id?: number | string; documentId?: string };
+				return relation.id ?? relation.documentId;
+			}
+
+			return null;
+		})
+		.filter((id): id is number | string => id !== null && id !== undefined);
+}
+
+async function findUsersByRelationIds(ids: Array<number | string>) {
+	const numericIds = ids.filter((id): id is number => typeof id === 'number');
+	const documentIds = ids.filter((id): id is string => typeof id === 'string');
+	const users: any[] = [];
+
+	if (numericIds.length > 0) {
+		users.push(...await strapi.db.query('plugin::users-permissions.user').findMany({
+			where: { id: { $in: numericIds } },
+			select: ['id', 'documentId', 'firstName', 'lastName', 'email', 'publishMyData'],
+		}));
+	}
+
+	if (documentIds.length > 0) {
+		users.push(...await strapi.db.query('plugin::users-permissions.user').findMany({
+			where: { documentId: { $in: documentIds } },
+			select: ['id', 'documentId', 'firstName', 'lastName', 'email', 'publishMyData'],
+		}));
+	}
+
+	return users;
+}
+
+function getOwnerMembersRelationPayload(data: any) {
+	const relation = data?.owner_members;
+	if (!relation || typeof relation !== 'object' || Array.isArray(relation)) {
+		return {
+			connectIds: extractRelationIds(relation),
+			disconnectIds: [],
+			setIds: null,
+		};
+	}
+
+	return {
+		connectIds: extractRelationIds(relation.connect),
+		disconnectIds: extractRelationIds(relation.disconnect),
+		setIds: relation.set ? extractRelationIds(relation.set) : null,
+	};
+}
+
+async function getExistingOwnerMembers(breederId?: number | string) {
+	if (!breederId) {
+		return [];
+	}
+
+	const breeder = await strapi.db.query('plugin::hzd-plugin.breeder').findOne({
+		where: { id: breederId },
+		populate: {
+			owner_members: {
+				select: ['id', 'documentId', 'firstName', 'lastName', 'email', 'publishMyData'],
+			},
+		},
+	});
+
+	return breeder?.owner_members ?? [];
+}
+
+function createUserLabel(user: any): string {
+	const displayName = [user.firstName, user.lastName].filter(Boolean).join(' ').trim();
+	return displayName || user.email || user.documentId || `User ${user.id}`;
+}
+
+async function validateBreederOwnerMembersPublishMyData(event: any) {
+	const data = event.params.data ?? {};
+	const breederId = event.params.where?.id;
+	const existingOwnerMembers = await getExistingOwnerMembers(breederId);
+	const { connectIds, disconnectIds, setIds } = getOwnerMembersRelationPayload(data);
+	const connectedUsers = await findUsersByRelationIds(connectIds);
+	const setUsers = setIds ? await findUsersByRelationIds(setIds) : null;
+	const disconnectIdSet = new Set(disconnectIds.map(String));
+	const usersToValidate = setUsers ?? [
+		...existingOwnerMembers.filter((user: any) =>
+			!disconnectIdSet.has(String(user.id)) &&
+			!disconnectIdSet.has(String(user.documentId))),
+		...connectedUsers,
+	];
+	const uniqueUsers = Array.from(
+		new Map(usersToValidate.map((user: any) => [String(user.id), user])).values(),
+	);
+	const invalidUsers = uniqueUsers.filter((user: any) => user.publishMyData !== true);
+
+	if (invalidUsers.length > 0) {
+		const names = invalidUsers.map(createUserLabel).join(', ');
+		throw new errors.ValidationError(
+			`Breeder kann nicht gespeichert werden. Alle verknüpften Owner-Members müssen "publishMyData" aktiviert haben. Betroffen: ${names}`,
+		);
+	}
 }
 
 export default {
@@ -257,64 +369,13 @@ export default {
     );
 
     strapi.db.lifecycles.subscribe({
-      models: ['plugin::users-permissions.user'],
+      models: ['plugin::hzd-plugin.breeder'],
       async beforeCreate(event) {
-        if (event.params.data) {
-          event.params.data.publishMyData = await calcPublishMyData(event.params.data);
-        }
+        await validateBreederOwnerMembersPublishMyData(event);
       },
       async beforeUpdate(event) {
-        if (event.params.data) {
-          event.params.data.publishMyData = await calcPublishMyData(event.params.data, event.params.where?.id);
-        }
-      }
-    });
-
-    strapi.db.lifecycles.subscribe({
-      models: ['plugin::hzd-plugin.dog'],
-      async afterCreate(event) {
-        const dogId = event.result?.id;
-        if (!dogId) return;
-        setTimeout(async () => {
-          try {
-            const dog = await strapi.db.query('plugin::hzd-plugin.dog').findOne({
-              where: { id: dogId },
-              populate: ['owner']
-            });
-            if (dog?.owner?.id) {
-              await syncUserPublishMyData(dog.owner.id);
-            }
-          } catch(err) { strapi.log.error(err); }
-        }, 100);
+        await validateBreederOwnerMembersPublishMyData(event);
       },
-      async beforeUpdate(event) {
-        try {
-          const oldDog = await strapi.db.query('plugin::hzd-plugin.dog').findOne({
-            where: event.params.where,
-            populate: ['owner']
-          });
-          (event as any).state = { oldOwnerId: oldDog?.owner?.id };
-        } catch(err) { strapi.log.error(err); }
-      },
-      async afterUpdate(event) {
-        const state = (event as any).state;
-        const oldOwnerId = state?.oldOwnerId;
-        const dogId = event.result?.id || event.params.where?.id;
-        
-        if (!dogId) return;
-        setTimeout(async () => {
-          try {
-            const dog = await strapi.db.query('plugin::hzd-plugin.dog').findOne({
-              where: { id: dogId },
-              populate: ['owner']
-            });
-            const newOwnerId = dog?.owner?.id;
-
-            if (oldOwnerId) await syncUserPublishMyData(oldOwnerId);
-            if (newOwnerId && newOwnerId !== oldOwnerId) await syncUserPublishMyData(newOwnerId);
-          } catch(err) { strapi.log.error(err); }
-        }, 100);
-      }
     });
 
     const uid = 'api::form-instance.form-instance';

@@ -3,12 +3,7 @@ export function sanitizeUser(user: any): any {
 		return user
 	}
 
-	let publish = user.forcePublishMyData;
-	if (publish === undefined || publish === null) {
-		publish = user.publishMyData;
-	}
-
-	if (publish === true) {
+	if (user.publishMyData === true) {
 		return user
 	}
 

@@ -194,9 +194,6 @@
       "relation": "manyToMany",
       "target": "plugin::hzd-plugin.breeder",
       "inversedBy": "owner_members"
-    },
-    "ForcePublishMyData": {
-      "type": "boolean"
     }
   }
 }
