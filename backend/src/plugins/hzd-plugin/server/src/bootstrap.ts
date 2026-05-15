@@ -1,6 +1,7 @@
 import type { Core } from '@strapi/strapi';
 import cron from 'node-cron';
 import { extendJWT } from './extend-jwt';
+import { initPermissions, waitForUsersPermissions } from './init-permissions';
 import { setupRoles } from './setup-roles';
 
 const bootstrap = async ({ strapi }: { strapi: Core.Strapi }) => {
@@ -11,91 +12,25 @@ const bootstrap = async ({ strapi }: { strapi: Core.Strapi }) => {
 	await new Promise((resolve) => setTimeout(resolve, 2000))
 
 	try {
-		// Warte, bis users-permissions Plugin vollständig geladen ist
-		let retries = 0;
-		while (retries < 10) {
-			try {
-				const testRole = await strapi.query('plugin::users-permissions.role').findOne({ where: { type: 'public' } });
-				if (testRole) {
-					break; // Plugin ist bereit
-				}
-			} catch (error) {
-				// Plugin noch nicht bereit, warte weiter
-			}
-			await new Promise((resolve) => setTimeout(resolve, 500));
-			retries++;
+		const usersPermissionsReady = await waitForUsersPermissions(strapi)
+
+		if (!usersPermissionsReady) {
+			strapi.log.warn(
+				'[HZD Plugin] users-permissions not ready, skipping role/permission setup',
+			)
+			return
 		}
 
 		// Lege Roles an
 		await setupRoles(strapi);
 
-		// GraphQL Permissions für alle Content-Types aktivieren
-		const publicRole = await strapi
-			.query('plugin::users-permissions.role')
-			.findOne({
-				where: { type: 'public' },
-			})
-
-		if (!publicRole) {
-			console.log('[HZD Plugin] Public role not found, skipping permission setup')
-			return
+		if (process.env.INIT_PERMISSIONS === 'true') {
+			await initPermissions(strapi)
+		} else {
+			strapi.log.info(
+				'[HZD Plugin] Permission init skipped (set INIT_PERMISSIONS=true to enable)',
+			)
 		}
-
-		console.log('[HZD Plugin] Setting up public permissions...')
-		console.log(`[HZD Plugin] Public role ID: ${publicRole.id}`)
-
-		/*
-		// Liste aller Content-Types, die öffentlich zugänglich sein sollen
-		const contentTypes = [
-			{ name: 'dog', actions: ['find', 'findOne'] },
-			{ name: 'breeder', actions: ['find', 'findOne'] },
-			{ name: 'litter', actions: ['find', 'findOne'] },
-			{ name: 'homepage', actions: ['find'] }, // singleType hat nur find
-			{ name: 'news-article', actions: ['find', 'findOne'] },
-			{ name: 'homepage-section', actions: ['find', 'findOne'] },
-			{ name: 'contact', actions: ['find', 'findOne'] },
-		]
-
-		// Für jeden Content-Type die Permissions setzen
-		for (const contentType of contentTypes) {
-			const subject = `plugin::hzd-plugin.${contentType.name}`
-
-			// Erstelle fehlende Permissions
-			for (const action of contentType.actions) {
-				const actionName = `${subject}.${action}`
-
-				try {
-					// Prüfe, ob Permission bereits existiert
-					const existingPermission = await strapi
-						.query('plugin::users-permissions.permission')
-						.findOne({
-							where: {
-								role: publicRole.id,
-								action: actionName,
-							},
-						})
-
-					if (!existingPermission) {
-						const created = await strapi
-							.query('plugin::users-permissions.permission')
-							.create({
-								data: {
-									action: actionName,
-									role: publicRole.id,
-								},
-							})
-						console.log(`[HZD Plugin] ✓ Created permission: ${actionName} (ID: ${created.id})`)
-					} else {
-						console.log(`[HZD Plugin] - Permission already exists: ${actionName}`)
-					}
-				} catch (error) {
-					console.error(`[HZD Plugin] ✗ Error creating permission ${actionName}:`, error)
-				}
-			}
-		}
-			*/
-
-		console.log('[HZD Plugin] Permission setup completed')
 
 		// Setup Geolocation Sync Cronjob
 		// Default: Run every hour at minute 0 (e.g., 1:00, 2:00, 3:00)
