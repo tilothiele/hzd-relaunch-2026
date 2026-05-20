@@ -186,6 +186,29 @@ async function validateBreederOwnerMembersPublishMyData(event: any) {
 	}
 }
 
+async function setMissingBreederRoles(strapi: Core.Strapi) {
+	const knex = strapi.db.connection;
+	const hasTable = await knex.schema.hasTable('breeders');
+	if (!hasTable) {
+		return;
+	}
+
+	const hasColumn = await knex.schema.hasColumn('breeders', 'BreederRole');
+	if (!hasColumn) {
+		return;
+	}
+
+	const updatedRows = await knex('breeders')
+		.whereNull('BreederRole')
+		.update({
+			BreederRole: 'B',
+		});
+
+	if (updatedRows > 0) {
+		strapi.log.info(`[Bootstrap] Set missing BreederRole to B for ${updatedRows} breeders`);
+	}
+}
+
 export default {
   /**
    * An asynchronous register function that runs before
@@ -358,7 +381,7 @@ export default {
    * This gives you an opportunity to set up your data model,
    * run jobs, or perform some special logic.
    */
-  bootstrap({ strapi }: { strapi: Core.Strapi }) {
+  async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     const enabled = strapi.config.get('admin.transfer.remote.enabled', true);
     strapi.log.info(
       `Remote data transfer is ${enabled ? 'ENABLED' : 'DISABLED'}`
@@ -377,6 +400,8 @@ export default {
         await validateBreederOwnerMembersPublishMyData(event);
       },
     });
+
+    await setMissingBreederRoles(strapi);
 
     const uid = 'api::form-instance.form-instance';
 
