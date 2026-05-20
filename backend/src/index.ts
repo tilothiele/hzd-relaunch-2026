@@ -193,19 +193,19 @@ async function setMissingBreederRoles(strapi: Core.Strapi) {
 		return;
 	}
 
-	const hasColumn = await knex.schema.hasColumn('breeders', 'BreederRole');
+	const hasColumn = await knex.schema.hasColumn('breeders', 'breeder_role');
 	if (!hasColumn) {
 		return;
 	}
 
 	const updatedRows = await knex('breeders')
-		.whereNull('BreederRole')
+		.whereNull('breeder_role')
 		.update({
-			BreederRole: 'B',
+			breeder_role: 'B',
 		});
 
 	if (updatedRows > 0) {
-		strapi.log.info(`[Bootstrap] Set missing BreederRole to B for ${updatedRows} breeders`);
+		strapi.log.info(`[Bootstrap] Set missing breeder_role to B for ${updatedRows} breeders`);
 	}
 }
 
