@@ -21,9 +21,16 @@ interface DogDetailViewProps {
     strapiBaseUrl?: string | null
     hzdSetting?: HzdSetting | null
     onBack: () => void
+    backButtonLabel?: string
 }
 
-export function DogDetailView({ dog, strapiBaseUrl, hzdSetting, onBack }: DogDetailViewProps) {
+export function DogDetailView({
+    dog,
+    strapiBaseUrl,
+    hzdSetting,
+    onBack,
+    backButtonLabel,
+}: DogDetailViewProps) {
     const fullName = dog.fullKennelName ?? dog.givenName ?? 'Unbekannt'
     const showNoDogsInBreedingChip = dog.breeder?.HasNoDogsAvailabe === true
 
@@ -33,7 +40,7 @@ export function DogDetailView({ dog, strapiBaseUrl, hzdSetting, onBack }: DogDet
             <Typography variant='h5' component='h2' sx={{ fontWeight: 700 }}>
                 {title}
             </Typography>
-            <BackButton onClick={onBack} />
+            <BackButton onClick={onBack} label={backButtonLabel} />
         </Box>
     )
 

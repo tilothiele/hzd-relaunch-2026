@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-05-13T13:55:00.527Z"
+    "x-generation-date": "2026-05-15T10:45:34.195Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -17920,21 +17920,15 @@
                     "documentId": {
                       "type": "string"
                     },
+                    "BreederRole": {
+                      "type": "string",
+                      "enum": [
+                        "B",
+                        "S"
+                      ]
+                    },
                     "kennelName": {
                       "type": "string"
-                    },
-                    "breedingLicenseSince": {
-                      "type": "string",
-                      "format": "date"
-                    },
-                    "Disable": {
-                      "type": "boolean"
-                    },
-                    "IsActive": {
-                      "type": "boolean"
-                    },
-                    "HasNoDogsAvailabe": {
-                      "type": "boolean"
                     },
                     "litters": {
                       "type": "array",
@@ -18913,6 +18907,19 @@
                         }
                       }
                     },
+                    "breedingLicenseSince": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "Disable": {
+                      "type": "boolean"
+                    },
+                    "IsActive": {
+                      "type": "boolean"
+                    },
+                    "HasNoDogsAvailabe": {
+                      "type": "boolean"
+                    },
                     "BreedersIntroduction": {
                       "type": "string"
                     },
@@ -19226,9 +19233,6 @@
                     }
                   }
                 }
-              },
-              "ForcePublishMyData": {
-                "type": "boolean"
               },
               "createdAt": {
                 "type": "string",
@@ -22863,21 +22867,15 @@
                           "documentId": {
                             "type": "string"
                           },
+                          "BreederRole": {
+                            "type": "string",
+                            "enum": [
+                              "B",
+                              "S"
+                            ]
+                          },
                           "kennelName": {
                             "type": "string"
-                          },
-                          "breedingLicenseSince": {
-                            "type": "string",
-                            "format": "date"
-                          },
-                          "Disable": {
-                            "type": "boolean"
-                          },
-                          "IsActive": {
-                            "type": "boolean"
-                          },
-                          "HasNoDogsAvailabe": {
-                            "type": "boolean"
                           },
                           "litters": {
                             "type": "array",
@@ -23856,6 +23854,19 @@
                               }
                             }
                           },
+                          "breedingLicenseSince": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "Disable": {
+                            "type": "boolean"
+                          },
+                          "IsActive": {
+                            "type": "boolean"
+                          },
+                          "HasNoDogsAvailabe": {
+                            "type": "boolean"
+                          },
                           "BreedersIntroduction": {
                             "type": "string"
                           },
@@ -24169,9 +24180,6 @@
                           }
                         }
                       }
-                    },
-                    "ForcePublishMyData": {
-                      "type": "boolean"
                     },
                     "createdAt": {
                       "type": "string",
@@ -27069,21 +27077,15 @@
                         "documentId": {
                           "type": "string"
                         },
+                        "BreederRole": {
+                          "type": "string",
+                          "enum": [
+                            "B",
+                            "S"
+                          ]
+                        },
                         "kennelName": {
                           "type": "string"
-                        },
-                        "breedingLicenseSince": {
-                          "type": "string",
-                          "format": "date"
-                        },
-                        "Disable": {
-                          "type": "boolean"
-                        },
-                        "IsActive": {
-                          "type": "boolean"
-                        },
-                        "HasNoDogsAvailabe": {
-                          "type": "boolean"
                         },
                         "litters": {
                           "type": "array",
@@ -27458,6 +27460,19 @@
                             }
                           }
                         },
+                        "breedingLicenseSince": {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        "Disable": {
+                          "type": "boolean"
+                        },
+                        "IsActive": {
+                          "type": "boolean"
+                        },
+                        "HasNoDogsAvailabe": {
+                          "type": "boolean"
+                        },
                         "BreedersIntroduction": {
                           "type": "string"
                         },
@@ -27771,9 +27786,6 @@
                         }
                       }
                     }
-                  },
-                  "ForcePublishMyData": {
-                    "type": "boolean"
                   },
                   "createdAt": {
                     "type": "string",
@@ -30829,21 +30841,15 @@
                     "documentId": {
                       "type": "string"
                     },
+                    "BreederRole": {
+                      "type": "string",
+                      "enum": [
+                        "B",
+                        "S"
+                      ]
+                    },
                     "kennelName": {
                       "type": "string"
-                    },
-                    "breedingLicenseSince": {
-                      "type": "string",
-                      "format": "date"
-                    },
-                    "Disable": {
-                      "type": "boolean"
-                    },
-                    "IsActive": {
-                      "type": "boolean"
-                    },
-                    "HasNoDogsAvailabe": {
-                      "type": "boolean"
                     },
                     "litters": {
                       "type": "array",
@@ -31822,6 +31828,19 @@
                         }
                       }
                     },
+                    "breedingLicenseSince": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "Disable": {
+                      "type": "boolean"
+                    },
+                    "IsActive": {
+                      "type": "boolean"
+                    },
+                    "HasNoDogsAvailabe": {
+                      "type": "boolean"
+                    },
                     "BreedersIntroduction": {
                       "type": "string"
                     },
@@ -32135,9 +32154,6 @@
                     }
                   }
                 }
-              },
-              "ForcePublishMyData": {
-                "type": "boolean"
               },
               "createdAt": {
                 "type": "string",
@@ -35080,21 +35096,15 @@
                           "documentId": {
                             "type": "string"
                           },
+                          "BreederRole": {
+                            "type": "string",
+                            "enum": [
+                              "B",
+                              "S"
+                            ]
+                          },
                           "kennelName": {
                             "type": "string"
-                          },
-                          "breedingLicenseSince": {
-                            "type": "string",
-                            "format": "date"
-                          },
-                          "Disable": {
-                            "type": "boolean"
-                          },
-                          "IsActive": {
-                            "type": "boolean"
-                          },
-                          "HasNoDogsAvailabe": {
-                            "type": "boolean"
                           },
                           "litters": {
                             "type": "array",
@@ -36073,6 +36083,19 @@
                               }
                             }
                           },
+                          "breedingLicenseSince": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "Disable": {
+                            "type": "boolean"
+                          },
+                          "IsActive": {
+                            "type": "boolean"
+                          },
+                          "HasNoDogsAvailabe": {
+                            "type": "boolean"
+                          },
                           "BreedersIntroduction": {
                             "type": "string"
                           },
@@ -36386,9 +36409,6 @@
                           }
                         }
                       }
-                    },
-                    "ForcePublishMyData": {
-                      "type": "boolean"
                     },
                     "createdAt": {
                       "type": "string",
@@ -38896,21 +38916,15 @@
                       "documentId": {
                         "type": "string"
                       },
+                      "BreederRole": {
+                        "type": "string",
+                        "enum": [
+                          "B",
+                          "S"
+                        ]
+                      },
                       "kennelName": {
                         "type": "string"
-                      },
-                      "breedingLicenseSince": {
-                        "type": "string",
-                        "format": "date"
-                      },
-                      "Disable": {
-                        "type": "boolean"
-                      },
-                      "IsActive": {
-                        "type": "boolean"
-                      },
-                      "HasNoDogsAvailabe": {
-                        "type": "boolean"
                       },
                       "litters": {
                         "type": "array",
@@ -40184,6 +40198,19 @@
                           }
                         }
                       },
+                      "breedingLicenseSince": {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      "Disable": {
+                        "type": "boolean"
+                      },
+                      "IsActive": {
+                        "type": "boolean"
+                      },
+                      "HasNoDogsAvailabe": {
+                        "type": "boolean"
+                      },
                       "BreedersIntroduction": {
                         "type": "string"
                       },
@@ -40497,9 +40524,6 @@
                       }
                     }
                   }
-                },
-                "ForcePublishMyData": {
-                  "type": "boolean"
                 },
                 "createdAt": {
                   "type": "string",
@@ -42225,21 +42249,15 @@
                           "documentId": {
                             "type": "string"
                           },
+                          "BreederRole": {
+                            "type": "string",
+                            "enum": [
+                              "B",
+                              "S"
+                            ]
+                          },
                           "kennelName": {
                             "type": "string"
-                          },
-                          "breedingLicenseSince": {
-                            "type": "string",
-                            "format": "date"
-                          },
-                          "Disable": {
-                            "type": "boolean"
-                          },
-                          "IsActive": {
-                            "type": "boolean"
-                          },
-                          "HasNoDogsAvailabe": {
-                            "type": "boolean"
                           },
                           "litters": {
                             "type": "array",
@@ -43513,6 +43531,19 @@
                               }
                             }
                           },
+                          "breedingLicenseSince": {
+                            "type": "string",
+                            "format": "date"
+                          },
+                          "Disable": {
+                            "type": "boolean"
+                          },
+                          "IsActive": {
+                            "type": "boolean"
+                          },
+                          "HasNoDogsAvailabe": {
+                            "type": "boolean"
+                          },
                           "BreedersIntroduction": {
                             "type": "string"
                           },
@@ -43826,9 +43857,6 @@
                           }
                         }
                       }
-                    },
-                    "ForcePublishMyData": {
-                      "type": "boolean"
                     },
                     "createdAt": {
                       "type": "string",
@@ -46292,21 +46320,15 @@
                     "documentId": {
                       "type": "string"
                     },
+                    "BreederRole": {
+                      "type": "string",
+                      "enum": [
+                        "B",
+                        "S"
+                      ]
+                    },
                     "kennelName": {
                       "type": "string"
-                    },
-                    "breedingLicenseSince": {
-                      "type": "string",
-                      "format": "date"
-                    },
-                    "Disable": {
-                      "type": "boolean"
-                    },
-                    "IsActive": {
-                      "type": "boolean"
-                    },
-                    "HasNoDogsAvailabe": {
-                      "type": "boolean"
                     },
                     "litters": {
                       "type": "array",
@@ -47285,6 +47307,19 @@
                         }
                       }
                     },
+                    "breedingLicenseSince": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "Disable": {
+                      "type": "boolean"
+                    },
+                    "IsActive": {
+                      "type": "boolean"
+                    },
+                    "HasNoDogsAvailabe": {
+                      "type": "boolean"
+                    },
                     "BreedersIntroduction": {
                       "type": "string"
                     },
@@ -47598,9 +47633,6 @@
                     }
                   }
                 }
-              },
-              "ForcePublishMyData": {
-                "type": "boolean"
               },
               "createdAt": {
                 "type": "string",
@@ -57479,21 +57511,15 @@
                               "documentId": {
                                 "type": "string"
                               },
+                              "BreederRole": {
+                                "type": "string",
+                                "enum": [
+                                  "B",
+                                  "S"
+                                ]
+                              },
                               "kennelName": {
                                 "type": "string"
-                              },
-                              "breedingLicenseSince": {
-                                "type": "string",
-                                "format": "date"
-                              },
-                              "Disable": {
-                                "type": "boolean"
-                              },
-                              "IsActive": {
-                                "type": "boolean"
-                              },
-                              "HasNoDogsAvailabe": {
-                                "type": "boolean"
                               },
                               "litters": {
                                 "type": "array",
@@ -58767,6 +58793,19 @@
                                   }
                                 }
                               },
+                              "breedingLicenseSince": {
+                                "type": "string",
+                                "format": "date"
+                              },
+                              "Disable": {
+                                "type": "boolean"
+                              },
+                              "IsActive": {
+                                "type": "boolean"
+                              },
+                              "HasNoDogsAvailabe": {
+                                "type": "boolean"
+                              },
                               "BreedersIntroduction": {
                                 "type": "string"
                               },
@@ -59080,9 +59119,6 @@
                               }
                             }
                           }
-                        },
-                        "ForcePublishMyData": {
-                          "type": "boolean"
                         },
                         "createdAt": {
                           "type": "string",
@@ -71487,21 +71523,15 @@
                     "documentId": {
                       "type": "string"
                     },
+                    "BreederRole": {
+                      "type": "string",
+                      "enum": [
+                        "B",
+                        "S"
+                      ]
+                    },
                     "kennelName": {
                       "type": "string"
-                    },
-                    "breedingLicenseSince": {
-                      "type": "string",
-                      "format": "date"
-                    },
-                    "Disable": {
-                      "type": "boolean"
-                    },
-                    "IsActive": {
-                      "type": "boolean"
-                    },
-                    "HasNoDogsAvailabe": {
-                      "type": "boolean"
                     },
                     "litters": {
                       "type": "array",
@@ -72775,6 +72805,19 @@
                         }
                       }
                     },
+                    "breedingLicenseSince": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "Disable": {
+                      "type": "boolean"
+                    },
+                    "IsActive": {
+                      "type": "boolean"
+                    },
+                    "HasNoDogsAvailabe": {
+                      "type": "boolean"
+                    },
                     "BreedersIntroduction": {
                       "type": "string"
                     },
@@ -73088,9 +73131,6 @@
                     }
                   }
                 }
-              },
-              "ForcePublishMyData": {
-                "type": "boolean"
               },
               "createdAt": {
                 "type": "string",
@@ -75428,21 +75468,15 @@
                     "documentId": {
                       "type": "string"
                     },
+                    "BreederRole": {
+                      "type": "string",
+                      "enum": [
+                        "B",
+                        "S"
+                      ]
+                    },
                     "kennelName": {
                       "type": "string"
-                    },
-                    "breedingLicenseSince": {
-                      "type": "string",
-                      "format": "date"
-                    },
-                    "Disable": {
-                      "type": "boolean"
-                    },
-                    "IsActive": {
-                      "type": "boolean"
-                    },
-                    "HasNoDogsAvailabe": {
-                      "type": "boolean"
                     },
                     "litters": {
                       "type": "array",
@@ -76716,6 +76750,19 @@
                         }
                       }
                     },
+                    "breedingLicenseSince": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "Disable": {
+                      "type": "boolean"
+                    },
+                    "IsActive": {
+                      "type": "boolean"
+                    },
+                    "HasNoDogsAvailabe": {
+                      "type": "boolean"
+                    },
                     "BreedersIntroduction": {
                       "type": "string"
                     },
@@ -77029,9 +77076,6 @@
                     }
                   }
                 }
-              },
-              "ForcePublishMyData": {
-                "type": "boolean"
               },
               "createdAt": {
                 "type": "string",
@@ -79464,21 +79508,15 @@
                     "documentId": {
                       "type": "string"
                     },
+                    "BreederRole": {
+                      "type": "string",
+                      "enum": [
+                        "B",
+                        "S"
+                      ]
+                    },
                     "kennelName": {
                       "type": "string"
-                    },
-                    "breedingLicenseSince": {
-                      "type": "string",
-                      "format": "date"
-                    },
-                    "Disable": {
-                      "type": "boolean"
-                    },
-                    "IsActive": {
-                      "type": "boolean"
-                    },
-                    "HasNoDogsAvailabe": {
-                      "type": "boolean"
                     },
                     "litters": {
                       "type": "array",
@@ -80752,6 +80790,19 @@
                         }
                       }
                     },
+                    "breedingLicenseSince": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "Disable": {
+                      "type": "boolean"
+                    },
+                    "IsActive": {
+                      "type": "boolean"
+                    },
+                    "HasNoDogsAvailabe": {
+                      "type": "boolean"
+                    },
                     "BreedersIntroduction": {
                       "type": "string"
                     },
@@ -81065,9 +81116,6 @@
                     }
                   }
                 }
-              },
-              "ForcePublishMyData": {
-                "type": "boolean"
               },
               "createdAt": {
                 "type": "string",
@@ -83102,21 +83150,15 @@
                               "documentId": {
                                 "type": "string"
                               },
+                              "BreederRole": {
+                                "type": "string",
+                                "enum": [
+                                  "B",
+                                  "S"
+                                ]
+                              },
                               "kennelName": {
                                 "type": "string"
-                              },
-                              "breedingLicenseSince": {
-                                "type": "string",
-                                "format": "date"
-                              },
-                              "Disable": {
-                                "type": "boolean"
-                              },
-                              "IsActive": {
-                                "type": "boolean"
-                              },
-                              "HasNoDogsAvailabe": {
-                                "type": "boolean"
                               },
                               "litters": {
                                 "type": "array",
@@ -84390,6 +84432,19 @@
                                   }
                                 }
                               },
+                              "breedingLicenseSince": {
+                                "type": "string",
+                                "format": "date"
+                              },
+                              "Disable": {
+                                "type": "boolean"
+                              },
+                              "IsActive": {
+                                "type": "boolean"
+                              },
+                              "HasNoDogsAvailabe": {
+                                "type": "boolean"
+                              },
                               "BreedersIntroduction": {
                                 "type": "string"
                               },
@@ -84703,9 +84758,6 @@
                               }
                             }
                           }
-                        },
-                        "ForcePublishMyData": {
-                          "type": "boolean"
                         },
                         "createdAt": {
                           "type": "string",

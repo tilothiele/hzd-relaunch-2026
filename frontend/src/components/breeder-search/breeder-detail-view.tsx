@@ -1,13 +1,15 @@
 'use client'
 
+import { useState } from 'react'
 import { Box, Typography, Divider } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import Image from 'next/image'
-import type { Breeder, HzdSetting } from '@/types'
+import type { Breeder, Dog, HzdSetting } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { theme } from '@/themes'
 import { BreederDogsList } from './breeder-dogs-list'
 import { BackButton } from '@/components/ui/back-button'
+import { DogDetailView } from '@/components/dog-search/dog-detail-view'
 
 interface BreederDetailViewProps {
     breeder: Breeder
@@ -41,6 +43,7 @@ function getRegionLabel(region: string | null | undefined): string {
 }
 
 export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack }: BreederDetailViewProps) {
+    const [selectedDog, setSelectedDog] = useState<Dog | null>(null)
     const kennelName = breeder.kennelName ?? 'Kein Zwingername bekannt'
     const member = breeder.member
     const ownerMemberNames = (breeder.owner_members ?? [])
@@ -52,6 +55,18 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack }
         breeder.avatar || hzdSetting?.DefaultBreederAvatar,
         strapiBaseUrl
     ) || '/static-images/placeholder/user-avatar.png'
+
+    if (selectedDog) {
+        return (
+            <DogDetailView
+                dog={selectedDog}
+                strapiBaseUrl={strapiBaseUrl}
+                hzdSetting={hzdSetting}
+                onBack={() => setSelectedDog(null)}
+                backButtonLabel='Zurück zum Züchter'
+            />
+        )
+    }
 
     // Helper to render a Section Header with Back Button
     const SectionHeader = ({ title }: { title: string }) => (
@@ -189,6 +204,7 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack }
                                 strapiBaseUrl={strapiBaseUrl}
                                 hzdSetting={hzdSetting}
                                 hasNoDogsAvailabe={breeder.HasNoDogsAvailabe}
+                                onDogSelect={setSelectedDog}
                             />
                         </Box>
                     </section>

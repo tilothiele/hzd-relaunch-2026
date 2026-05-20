@@ -9,6 +9,22 @@ export default [
   },
   {
     method: "GET",
+    path: "/reports/users",
+    handler: "controller.userReport",
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: "GET",
+    path: "/reports/breeders",
+    handler: "controller.breederReport",
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: "GET",
     path: "/geolocation-sync/trigger",
     handler: "geolocation-sync.trigger",
     config: {

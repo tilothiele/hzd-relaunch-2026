@@ -1725,6 +1725,8 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
     Address: Schema.Attribute.Component<'personal.address', false>;
     avatar: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     BreederEmail: Schema.Attribute.Email;
+    BreederRole: Schema.Attribute.Enumeration<['B', 'S']> &
+      Schema.Attribute.Required;
     BreedersIntroDraft: Schema.Attribute.Text;
     BreedersIntroduction: Schema.Attribute.RichText &
       Schema.Attribute.CustomField<
@@ -2373,7 +2375,6 @@ export interface PluginUsersPermissionsUser
         minLength: 6;
       }>;
     firstName: Schema.Attribute.String;
-    ForcePublishMyData: Schema.Attribute.Boolean;
     form: Schema.Attribute.Relation<'manyToOne', 'api::form.form'>;
     lastName: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;

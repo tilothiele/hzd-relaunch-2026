@@ -2058,6 +2058,56 @@ export const GET_NEWS_ARTICLES_BY_CATEGORY = `
 		}
 	}
 `
+
+export const GET_NEWS_ARTICLES_BY_CATEGORY_NON_FEATURED = `
+	query GetNewsArticlesByCategoryNonFeatured(
+		$categoryId: ID!,
+		$pagination: PaginationArg
+	) {
+		newsArticles(
+			filters: {
+				category: { documentId: { eq: $categoryId } }
+				or: [
+					{ FeaturedArticle: { eq: false } }
+					{ FeaturedArticle: { null: true } }
+				]
+			}
+			pagination: $pagination
+			sort: ["publishedAt:desc"]
+		) {
+			documentId
+			Headline
+			SubHeadline
+			TeaserText
+			Slug
+			DateOfPublication
+			publishedAt
+			FeaturedArticle
+			Image {
+				url
+				alternativeText
+				width
+				height
+				caption
+				previewUrl
+			}
+			SEO {
+				author {
+					DisplayName
+					FirstName
+					LastName
+					AcademicTitle
+					Slug
+				}
+			}
+			news_article_tags {
+				Label
+				TagColorHexCode
+				TagBgColorHexCode
+			}
+		}
+	}
+`
 export const GET_AUTHOR_BY_SLUG = `
 	query GetAuthorBySlug($slug: String!) {
 		authors(filters: { Slug: { eq: $slug } }, pagination: { pageSize: 1 }) {

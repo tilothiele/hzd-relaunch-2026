@@ -3,27 +3,29 @@
  */
 
 import { factories } from '@strapi/strapi'
+import type { Core } from '@strapi/strapi'
 
-const defaultController = factories.createCoreController('plugin::hzd-plugin.dog')
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyController = Record<string, any>
 
-export default {
-	...defaultController,
-	async find(ctx) {
-		const service = strapi.service('plugin::hzd-plugin.dog')
-		return service.find(ctx)
-	},
-	async findOne(ctx) {
-		const service = strapi.service('plugin::hzd-plugin.dog')
-		return service.findOne(ctx)
-	},
-	async create(ctx) {
-		const service = strapi.service('plugin::hzd-plugin.dog')
-		return service.create(ctx)
-	},
-	async update(ctx) {
-		const service = strapi.service('plugin::hzd-plugin.dog')
-		return service.update(ctx)
-	},
+const coreControllerFactory = factories.createCoreController('plugin::hzd-plugin.dog')
+
+export default ({ strapi }: { strapi: Core.Strapi }): AnyController => {
+	const service = strapi.service('plugin::hzd-plugin.dog')
+
+	return {
+		...(coreControllerFactory({ strapi } as any) as AnyController),
+		async find(ctx: any) {
+			return service.find(ctx)
+		},
+		async findOne(ctx: any) {
+			return service.findOne(ctx)
+		},
+		async create(ctx: any) {
+			return service.create(ctx)
+		},
+		async update(ctx: any) {
+			return service.update(ctx)
+		},
+	}
 }
-
-

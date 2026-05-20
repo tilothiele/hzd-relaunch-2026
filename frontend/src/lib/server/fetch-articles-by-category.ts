@@ -1,5 +1,9 @@
 import { fetchGraphQLServer, getStrapiBaseUrl } from './graphql-client'
-import { GET_NEWS_ARTICLE_CATEGORY_BY_SLUG, GET_NEWS_ARTICLES_BY_CATEGORY } from '@/lib/graphql/queries'
+import {
+    GET_NEWS_ARTICLE_CATEGORY_BY_SLUG,
+    GET_NEWS_ARTICLES_BY_CATEGORY,
+    GET_NEWS_ARTICLES_BY_CATEGORY_NON_FEATURED,
+} from '@/lib/graphql/queries'
 import type { NewsArticleCategory, NewsArticle } from '@/types'
 
 interface CategoryQueryResult {
@@ -57,11 +61,18 @@ export async function fetchArticlesByCategory({
                 page,
                 pageSize,
             },
-            featuredFilter
+        }
+
+        const query = featuredFilter === false
+            ? GET_NEWS_ARTICLES_BY_CATEGORY_NON_FEATURED
+            : GET_NEWS_ARTICLES_BY_CATEGORY
+
+        if (featuredFilter !== false) {
+            variables.featuredFilter = featuredFilter
         }
 
         const data = await fetchGraphQLServer<any>(
-            GET_NEWS_ARTICLES_BY_CATEGORY,
+            query,
             {
                 baseUrl,
                 variables,

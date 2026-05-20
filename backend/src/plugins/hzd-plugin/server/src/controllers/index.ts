@@ -6,7 +6,8 @@ import geolocationController from './geolocation';
 import geolocationSync from './geolocation-sync';
 import userImport from './user-import';
 
-export default {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const controllers: Record<string, any> = {
   controller,
   dog,
   breeder,
@@ -14,4 +15,6 @@ export default {
   geolocation: geolocationController,
   'geolocation-sync': geolocationSync,
   'user-import': userImport,
-};
+}
+
+export default controllers

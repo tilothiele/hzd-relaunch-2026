@@ -44,8 +44,12 @@ export function NewsArticleList({ articles, strapiBaseUrl, theme }: NewsArticleL
     }, [searchInput])
 
     const filteredArticles = articles.filter((article) => {
-        if (!article.DateOfPublication) return false
-        const date = new Date(article.DateOfPublication)
+        const publicationDate = article.DateOfPublication || article.publishedAt
+        if (!publicationDate) return false
+
+        const date = new Date(publicationDate)
+        if (Number.isNaN(date.getTime())) return false
+
         const year = date.getFullYear()
         const yearMatch = year === selectedYear || year === selectedYear - 1
 

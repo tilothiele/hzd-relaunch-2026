@@ -2,10 +2,13 @@
  *  service
  */
 
-import type { Core } from '@strapi/strapi'
 import { factories } from '@strapi/strapi'
+import type { Core } from '@strapi/strapi'
 
-const coreService = factories.createCoreService('plugin::hzd-plugin.dog')
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyService = Record<string, any>
+
+const coreServiceFactory = factories.createCoreService('plugin::hzd-plugin.dog')
 
 // Haversine-Formel für Distanzberechnung
 const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
@@ -22,8 +25,9 @@ const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: numbe
 	return R * c
 }
 
-export default ({ strapi }: { strapi: Core.Strapi }) => {
-	const service = coreService({ strapi })
+export default ({ strapi }: { strapi: Core.Strapi }): AnyService => {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const service = coreServiceFactory({ strapi } as any) as AnyService
 
 	return {
 		...service,
@@ -32,7 +36,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => {
 
 			// Wenn keine Geolocation-Parameter, normale Suche
 			if (!lat || !lng) {
-				return (service as any).find(ctx.query)
+				return service.find(ctx.query)
 			}
 
 			// Extrahiere normale Filter aus Query
