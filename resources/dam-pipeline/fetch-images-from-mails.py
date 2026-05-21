@@ -5,8 +5,10 @@ import hashlib
 import shutil
 import os
 import sys
+import json
 
 from email.header import decode_header
+from email.utils import parseaddr
 from pathlib import Path
 from datetime import datetime
 
@@ -64,6 +66,7 @@ ZIP_DIR = BASE_DIR / "zip"
 EXTRACT_DIR = BASE_DIR / "extracted"
 IMAGE_DIR = BASE_DIR / "images"
 REJECT_DIR = BASE_DIR / "rejected"
+METADATA_DIR = BASE_DIR / "metadata"
 
 for d in [
     RAW_DIR,
@@ -71,6 +74,7 @@ for d in [
     EXTRACT_DIR,
     IMAGE_DIR,
     REJECT_DIR,
+    METADATA_DIR,
 ]:
     d.mkdir(parents=True, exist_ok=True)
 
@@ -163,13 +167,52 @@ def is_safe_zip_member(base_dir: Path, member_name: str):
     )
 
 
+def extract_message_body(msg):
+    """
+    Klartext-Nachricht aus Mail extrahieren
+    """
+    if msg.is_multipart():
+        for part in msg.walk():
+            if part.get_content_type() != "text/plain":
+                continue
+
+            if part.get("Content-Disposition"):
+                continue
+
+            payload = part.get_payload(decode=True)
+
+            if not payload:
+                continue
+
+            charset = part.get_content_charset() or "utf-8"
+
+            return payload.decode(
+                charset,
+                errors="ignore",
+            ).strip()
+
+        return ""
+
+    payload = msg.get_payload(decode=True)
+
+    if not payload:
+        return ""
+
+    charset = msg.get_content_charset() or "utf-8"
+
+    return payload.decode(
+        charset,
+        errors="ignore",
+    ).strip()
+
+
 def save_image_if_valid(src: Path):
     """
     Nur gültige Bilddateien übernehmen
     """
 
     if src.suffix.lower() not in VALID_IMAGE_EXTENSIONS:
-        return
+        return None
 
     target = unique_path(
         IMAGE_DIR / src.name
@@ -178,6 +221,32 @@ def save_image_if_valid(src: Path):
     shutil.copy2(src, target)
 
     print(f"  Bild gespeichert: {target}")
+
+    return target.name
+
+
+def write_mail_metadata(
+    mail_id: str,
+    timestamp: str,
+    metadata: dict,
+):
+    """
+    Metadaten der Mail als JSON speichern
+    """
+    metadata_path = unique_path(
+        METADATA_DIR / f"mail_{timestamp}_{mail_id}.json"
+    )
+
+    with open(metadata_path, "w", encoding="utf-8") as f:
+        json.dump(
+            metadata,
+            f,
+            ensure_ascii=False,
+            indent=2,
+        )
+        f.write("\n")
+
+    print(f"Metadaten gespeichert: {metadata_path}")
 
 
 # =========================================================
@@ -236,21 +305,26 @@ for mail_id in mail_ids:
         msg.get("From")
     )
 
+    _, sender_email = parseaddr(sender)
+
+    message_body = extract_message_body(msg)
+
+    message_id = decode_mime_header(
+        msg.get("Message-ID")
+    ).strip()
+
     date_str = msg.get("Date")
 
     print(f"Betreff : {subject}")
     print(f"Von      : {sender}")
     print(f"Datum    : {date_str}")
 
-    # eigener Job-Ordner pro Mail
-
     timestamp = datetime.now().strftime(
         "%Y%m%d_%H%M%S"
     )
 
-    job_dir = BASE_DIR / f"job_{timestamp}_{mail_id.decode()}"
-
-    job_dir.mkdir(exist_ok=True)
+    mail_id_str = mail_id.decode()
+    saved_images = []
 
     # -----------------------------------------------------
     # Attachments
@@ -295,7 +369,10 @@ for mail_id in mail_ids:
 
         if attachment_path.suffix.lower() in VALID_IMAGE_EXTENSIONS:
 
-            save_image_if_valid(attachment_path)
+            saved_name = save_image_if_valid(attachment_path)
+
+            if saved_name:
+                saved_images.append(saved_name)
 
         # -------------------------------------------------
         # ZIP Dateien
@@ -374,7 +451,10 @@ for mail_id in mail_ids:
 
                         if file.is_file():
 
-                            save_image_if_valid(file)
+                            saved_name = save_image_if_valid(file)
+
+                            if saved_name:
+                                saved_images.append(saved_name)
 
             except zipfile.BadZipFile:
 
@@ -393,6 +473,18 @@ for mail_id in mail_ids:
                     zip_target,
                     REJECT_DIR / zip_target.name
                 )
+
+    write_mail_metadata(
+        mail_id_str,
+        timestamp,
+        {
+            "from": sender_email,
+            "subject": subject,
+            "message": message_body,
+            "message_id": message_id,
+            "images": saved_images,
+        },
+    )
 
 # =========================================================
 # Cleanup
