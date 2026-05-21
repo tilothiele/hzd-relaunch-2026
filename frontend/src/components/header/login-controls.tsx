@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation'
 import type { AuthUser } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { fetchGraphQL } from '@/lib/graphql-client'
-import { REGISTER_USER, FORGOT_PASSWORD } from '@/lib/graphql/queries'
+import { REGISTER_USER } from '@/lib/graphql/queries'
 
 interface LoginControlsProps {
 	isAuthenticated: boolean
@@ -164,19 +164,26 @@ export function LoginControls({
 		setIsSendingReset(true)
 
 		try {
-			const result = await fetchGraphQL<{ forgotPassword: { ok: boolean } }>(
-				FORGOT_PASSWORD,
-				{
-					variables: {
-						email,
-					},
+			const response = await fetch('/api/auth/forgot-password', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
 				},
-			)
+				body: JSON.stringify({ email }),
+			})
 
-			if (result.forgotPassword?.ok) {
-				setLocalSuccess('Eine E-Mail zum Zurücksetzen des Passworts wurde gesendet.')
-				setEmail('')
+			if (!response.ok) {
+				const errorPayload = await response.json().catch(() => null)
+				throw new Error(
+					errorPayload?.error?.message
+					?? 'Fehler beim Senden der E-Mail. Bitte versuchen Sie es erneut.',
+				)
 			}
+
+			setLocalSuccess(
+				'Falls ein Konto mit dieser E-Mail-Adresse existiert, erhalten Sie in Kürze eine E-Mail mit einem Link zum Zurücksetzen Ihres Passworts.',
+			)
+			setEmail('')
 		} catch (submissionError) {
 			if (submissionError instanceof Error && submissionError.message) {
 				setLocalError(submissionError.message)

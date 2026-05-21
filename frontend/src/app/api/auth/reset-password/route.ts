@@ -22,8 +22,23 @@ export async function POST(request: NextRequest) {
 
 		if (!response.ok) {
 			return NextResponse.json(
-				{ error: data.error || { message: 'Passwort konnte nicht zurückgesetzt werden' } },
+				{
+					error: data.error || {
+						message: 'Passwort konnte nicht zurückgesetzt werden',
+					},
+				},
 				{ status: response.status },
+			)
+		}
+
+		if (!data?.jwt) {
+			return NextResponse.json(
+				{
+					error: {
+						message: 'Passwort konnte nicht zurückgesetzt werden',
+					},
+				},
+				{ status: 502 },
 			)
 		}
 
