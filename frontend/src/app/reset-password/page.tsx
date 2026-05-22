@@ -3,11 +3,12 @@ import { ResetPasswordForm } from '@/components/reset-password/reset-password-fo
 import { theme as globalTheme } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
+import { extractResetPasswordCode } from '@/lib/reset-password-code'
 
 export const dynamic = 'force-dynamic'
 
 interface ResetPasswordPageProps {
-	searchParams: Promise<{ code?: string }>
+	searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
 export default async function ResetPasswordPage({ searchParams }: ResetPasswordPageProps) {
@@ -15,7 +16,7 @@ export default async function ResetPasswordPage({ searchParams }: ResetPasswordP
 	const theme = globalTheme
 	const pageTitle = 'Passwort ändern'
 	const params = await searchParams
-	const code = params.code
+	const code = extractResetPasswordCode(params)
 
 	if (error) {
 		return (

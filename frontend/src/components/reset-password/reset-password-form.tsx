@@ -19,12 +19,24 @@ interface ResetPasswordInput {
 }
 
 interface ResetPasswordResponse {
-	jwt: string
-	user: {
+	jwt?: string
+	user?: {
 		id: number
 		username: string
 		email: string
 	}
+}
+
+function getResetPasswordErrorMessage(error: unknown): string {
+	if (!(error instanceof Error) || !error.message) {
+		return 'Passwort konnte nicht zurückgesetzt werden. Bitte versuchen Sie es erneut.'
+	}
+
+	if (error.message.includes('Incorrect code provided')) {
+		return 'Der Link ist ungültig oder abgelaufen. Bitte fordern Sie über „neues Passwort“ einen neuen Link an.'
+	}
+
+	return error.message
 }
 
 export function ResetPasswordForm({ code, strapiBaseUrl, theme }: ResetPasswordFormProps) {
@@ -76,29 +88,28 @@ export function ResetPasswordForm({ code, strapiBaseUrl, theme }: ResetPasswordF
 				if (!response.ok) {
 					const errorPayload = await response.json().catch(() => null)
 					const message =
-						errorPayload?.error?.message ??
-						'Passwort konnte nicht zurückgesetzt werden. Bitte versuchen Sie es erneut.'
+						errorPayload?.error?.message
+						?? errorPayload?.message
+						?? 'Passwort konnte nicht zurückgesetzt werden. Bitte versuchen Sie es erneut.'
 					throw new Error(message)
 				}
 
 				const data = (await response.json()) as ResetPasswordResponse
 
-				if (data?.jwt) {
+				if (typeof data?.jwt === 'string' && data.jwt.length > 0) {
 					setIsSuccess(true)
-					// Nach erfolgreichem Reset zum Login weiterleiten
+					setError(null)
 					setTimeout(() => {
 						router.push('/')
 					}, 2000)
 				} else {
+					setIsSuccess(false)
 					setError('Passwort konnte nicht zurückgesetzt werden. Bitte versuchen Sie es erneut.')
 				}
 			} catch (err) {
 				console.error('Reset Password Error:', err)
-				const errorMessage =
-					err instanceof Error
-						? err.message
-						: 'Passwort konnte nicht zurückgesetzt werden. Bitte versuchen Sie es erneut.'
-				setError(errorMessage)
+				setIsSuccess(false)
+				setError(getResetPasswordErrorMessage(err))
 			} finally {
 				setIsSubmitting(false)
 			}

@@ -2,6 +2,62 @@
 // and extend JWT service with member and officer_roles
 import { sanitizeUser, sanitizeUsers } from '../../utils/user-sanitize'
 
+function buildResetPasswordBaseUrl(rawUrl: string): string {
+	let url = rawUrl.trim().replace(/\/$/, '')
+
+	// Strapi haengt "?code=<%= TOKEN %>" an die URL. Query-Strings hier
+	// fuehren zu ungueltigen Links wie "...?code=?code=TOKEN".
+	url = url.replace(/\?.*$/, '')
+
+	if (!url.endsWith('/reset-password')) {
+		url = `${url}/reset-password`
+	}
+
+	return url
+}
+
+function resolveResetPasswordBaseUrl(): string | null {
+	const frontendUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL
+
+	if (!frontendUrl?.trim()) {
+		return null
+	}
+
+	return buildResetPasswordBaseUrl(frontendUrl)
+}
+
+async function ensureResetPasswordUrl(strapi: any) {
+	const resetUrl = resolveResetPasswordBaseUrl()
+
+	if (!resetUrl) {
+		strapi.log.warn(
+			'[User Ext] CLIENT_URL/FRONTEND_URL nicht gesetzt – Reset-Link in E-Mails kann fehlerhaft sein',
+		)
+		return
+	}
+
+	const pluginStore = strapi.store({ type: 'plugin', name: 'users-permissions' })
+	const advanced = (await pluginStore.get({ key: 'advanced' })) || {}
+	const currentUrl = advanced.email_reset_password as string | null | undefined
+	const normalizedCurrent = currentUrl
+		? buildResetPasswordBaseUrl(currentUrl)
+		: null
+
+	if (normalizedCurrent !== resetUrl) {
+		await pluginStore.set({
+			key: 'advanced',
+			value: {
+				...advanced,
+				email_reset_password: resetUrl,
+			},
+		})
+
+		strapi.log.info(
+			`[User Ext] email_reset_password auf ${resetUrl} gesetzt`,
+		)
+	}
+}
+
 export default (plugin: any) => {
 	// Store original bootstrap if it exists
 	const originalBootstrap = plugin.bootstrap
@@ -14,6 +70,19 @@ export default (plugin: any) => {
 		}
 
 		strapi.log.info('[User Ext] Bootstrap: extending JWT service and patching user document service')
+
+		await ensureResetPasswordUrl(strapi)
+
+		if (plugin.controllers?.auth) {
+			const originalForgotPassword = plugin.controllers.auth.forgotPassword
+
+			plugin.controllers.auth.forgotPassword = async (ctx: any) => {
+				await ensureResetPasswordUrl(strapi)
+				return originalForgotPassword(ctx)
+			}
+
+			strapi.log.info('[User Ext] ✓ Auth Controller extended (forgotPassword URL patch)')
+		}
 
 		// Extend User Controller to fix /api/me returning ID instead of DocumentID
 		if (plugin.controllers?.user) {
