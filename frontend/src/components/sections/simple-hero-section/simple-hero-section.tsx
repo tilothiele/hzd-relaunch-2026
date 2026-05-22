@@ -189,20 +189,20 @@ export function SimpleHeroSectionComponent({
                 ) : null}
                 {/* Content Side */}
                 <div
-                    className={`z-10 flex flex-1 flex-col justify-end px-6 pb-8 pt-12 md:px-12 md:pt-24 lg:px-24 lg:pt-32 ${isImageLeft ? 'md:order-2' : 'md:order-1'
+                    className={`z-10 flex flex-1 flex-col justify-end px-6 pb-6 pt-12 md:px-12 md:pt-24 lg:px-24 lg:pt-32 ${isImageLeft ? 'md:order-2' : 'md:order-1'
                         }`}
                 >
                     <div className="max-w-xl">
 
                         {headline ? (
-                            <h1 className="mb-6 text-4xl line-height-1.1 font-bold leading-tight md:text-5xl lg:text-6xl" style={{ color: theme.headlineColor }}>
+                            <h1 className="mb-2 text-4xl line-height-1.1 font-bold leading-tight md:text-5xl lg:text-6xl" style={{ color: theme.headlineColor }}>
                                 {headline}
                             </h1>
                         ) : null}
 
                         {teaserText ? (
                             <div
-                                className="prose prose-lg mb-10 max-w-none text-gray-600"
+                                className="prose prose-lg mb-2 max-w-none text-gray-600"
                             >
                                 <p
                                     dangerouslySetInnerHTML={{ __html: teaserText }}
