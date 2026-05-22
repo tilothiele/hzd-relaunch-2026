@@ -164,13 +164,23 @@ export interface SimpleCtaSection {
 	SimpleCtaAnchor?: string | null
 }
 
+export type HeroLayout =
+	| 'Image_left'
+	| 'Image_right'
+	| 'full_width'
+	| 'full_text_below'
+	| 'Image left'
+	| 'Image right'
+	| 'full width'
+	| 'full text below'
+
 export interface SimpleHeroSection {
 	__typename: 'ComponentBlocksSimpleHeroSection'
 	HeroAnchor?: string | null
 	HeroHeadline?: string | null
 	HeroTeaser?: string | null
 	HeroImage?: Image | null
-	HeroLayout?: 'Image_left' | 'Image_right' | 'full_width' | null
+	HeroLayout?: HeroLayout | null
 	HeroCta?: ActionButton | null
 	FullWidth?: boolean | null
 	ShowLog?: boolean | null
