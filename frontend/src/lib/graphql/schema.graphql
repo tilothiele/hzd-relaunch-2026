@@ -859,6 +859,7 @@ enum ENUM_COMPONENTBLOCKSSIMPLEHEROSECTION_HEROLAYOUT {
   Image_left
   Image_right
   full_width
+  full_text_below
 }
 
 enum ENUM_COMPONENTBLOCKSSIMPLEHEROSECTION_HEIGHT {
@@ -1580,14 +1581,20 @@ type HzdPluginDogEntityResponseCollection {
   pageInfo: Pagination!
 }
 
+enum ENUM_HZDPLUGINBREEDER_BREEDERROLE {
+  B
+  S
+}
+
 input HzdPluginBreederFiltersInput {
   documentId: IDFilterInput
+  BreederRole: StringFilterInput
   kennelName: StringFilterInput
+  litters: HzdPluginLitterFiltersInput
   breedingLicenseSince: DateFilterInput
   Disable: BooleanFilterInput
   IsActive: BooleanFilterInput
   HasNoDogsAvailabe: BooleanFilterInput
-  litters: HzdPluginLitterFiltersInput
   BreedersIntroduction: StringFilterInput
   cId: IntFilterInput
   member: UsersPermissionsUserFiltersInput
@@ -1608,12 +1615,13 @@ input HzdPluginBreederFiltersInput {
 }
 
 input HzdPluginBreederInput {
+  BreederRole: ENUM_HZDPLUGINBREEDER_BREEDERROLE
   kennelName: String
+  litters: [ID]
   breedingLicenseSince: Date
   Disable: Boolean
   IsActive: Boolean
   HasNoDogsAvailabe: Boolean
-  litters: [ID]
   BreedersIntroduction: String
   cId: Int
   member: ID
@@ -1631,13 +1639,14 @@ input HzdPluginBreederInput {
 
 type HzdPluginBreeder {
   documentId: ID!
+  BreederRole: ENUM_HZDPLUGINBREEDER_BREEDERROLE!
   kennelName: String
+  litters_connection(filters: HzdPluginLitterFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): HzdPluginLitterRelationResponseCollection
+  litters(filters: HzdPluginLitterFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [HzdPluginLitter]!
   breedingLicenseSince: Date
   Disable: Boolean
   IsActive: Boolean
   HasNoDogsAvailabe: Boolean
-  litters_connection(filters: HzdPluginLitterFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): HzdPluginLitterRelationResponseCollection
-  litters(filters: HzdPluginLitterFiltersInput, pagination: PaginationArg = {}, sort: [String] = []): [HzdPluginLitter]!
   BreedersIntroduction: String
   cId: Int
   member: UsersPermissionsUser

@@ -233,7 +233,7 @@ export interface BlocksSimpleHeroSection extends Struct.ComponentSchema {
     HeroHeadline: Schema.Attribute.String & Schema.Attribute.Required;
     HeroImage: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     HeroLayout: Schema.Attribute.Enumeration<
-      ['Image left', 'Image right', 'full width']
+      ['Image left', 'Image right', 'full width', 'full text below']
     > &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'Image right'>;
