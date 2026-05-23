@@ -8,7 +8,7 @@ import time
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Literal, Optional, TypedDict, cast
 from dotenv import load_dotenv
 import os
 import requests
@@ -125,6 +125,142 @@ COLOR_ENUM_MAP = {
 	'schwarzmarken': 'SM',
 	'blond': 'B',
 }
+
+GraphQLID = str
+DateString = str
+DateTimeString = str
+
+DogSex = Literal['M', 'F']
+DogColor = Literal['S', 'SM', 'B']
+DogSod1 = Literal['N_N', 'N_DM', 'DM_DM']
+DogHd = Literal['A1', 'A2', 'B1', 'B2']
+BreederRole = Literal['B', 'S']
+UserSex = Literal['M', 'F']
+UserRegion = Literal['Nord', 'Ost', 'Mitte', 'West', 'Sued']
+
+
+class ComponentBreedingGeoLocationInput(TypedDict, total=False):
+	id: GraphQLID
+	lat: float
+	lng: float
+
+
+class ComponentBreedingDogDocumentInput(TypedDict, total=False):
+	id: GraphQLID
+	Description: str
+	MediaFile: list[GraphQLID]
+
+
+class ComponentPersonalAddressInput(TypedDict, total=False):
+	id: GraphQLID
+	FullName: str
+	Address1: str
+	Address2: str
+	CountryCode: str
+	Zip: str
+	City: str
+
+
+class UsersPermissionsUserInput(TypedDict, total=False):
+	username: str
+	email: str
+	provider: str
+	confirmed: bool
+	blocked: bool
+	role: GraphQLID
+	title: str
+	firstName: str
+	lastName: str
+	address1: str
+	address2: str
+	zip: str
+	countryCode: str
+	city: str
+	phone: str
+	sex: UserSex
+	dateOfBirth: DateString
+	dateOfDeath: DateString
+	cId: int
+	cFlagBreeder: bool
+	cEmail: str
+	cFlagAccess: bool
+	memberSince: DateString
+	cancellationOn: DateString
+	cancellationDueDate: DateString
+	membershipNumber: int
+	form: GraphQLID
+	region: UserRegion
+	locationLng: float
+	locationLat: float
+	DisplayName: str
+	publishMyData: bool
+	breeders: list[GraphQLID]
+	publishedAt: DateTimeString
+	password: str
+
+
+class HzdPluginDogInput(TypedDict, total=False):
+	givenName: str
+	fullKennelName: str
+	avatar: GraphQLID
+	microchipNo: str
+	stuntLicenseSince: DateString
+	dateOfBirth: DateString
+	dateOfDeath: DateString
+	sex: DogSex
+	color: DogColor
+	withersHeight: int
+	father: GraphQLID
+	mother: GraphQLID
+	cId: int
+	cBreederId: int
+	cOwnerId: int
+	SOD1: DogSod1
+	HD: DogHd
+	Genprofil: bool
+	EyesCheck: bool
+	HeartCheck: bool
+	ColorCheck: bool
+	MemosDraft: str
+	MemosReleased: str
+	owner: GraphQLID
+	Location: ComponentBreedingGeoLocationInput
+	breeder: GraphQLID
+	Exhibitions: str
+	BreedSurvey: str
+	cFertile: bool
+	cStudBookNumber: str
+	cStudBookNumberFather: str
+	cStudBookNumberMother: str
+	Images: list[GraphQLID]
+	DogDocument: list[ComponentBreedingDogDocumentInput]
+	Disabled: bool
+	publishedAt: DateTimeString
+
+
+class HzdPluginBreederInput(TypedDict, total=False):
+	BreederRole: BreederRole
+	kennelName: str
+	litters: list[GraphQLID]
+	breedingLicenseSince: DateString
+	Disable: bool
+	IsActive: bool
+	HasNoDogsAvailabe: bool
+	BreedersIntroduction: str
+	cId: int
+	member: GraphQLID
+	avatar: GraphQLID
+	WebsiteUrl: str
+	WebsiteUrlDraft: str
+	Address: ComponentPersonalAddressInput
+	InternalNotes: str
+	BreedersIntroDraft: str
+	isDirty: bool
+	owner_members: list[GraphQLID]
+	BreederEmail: str
+	publishedAt: DateTimeString
+
+
 @dataclass
 class ChromosoftDogRecord:
 	c_id: int
@@ -220,14 +356,14 @@ class GraphQLClient:
 			return None
 		return items[0].get('documentId')
 
-	def create_dog(self, payload: dict[str, Any]) -> Optional[str]:
+	def create_dog(self, payload: HzdPluginDogInput) -> Optional[str]:
 		data = self.execute(CREATE_DOG_MUTATION, {'data': payload})
 		result = data.get('data', {}).get('createHzdPluginDog')
 		if result:
 			return result.get('documentId')
 		return None
 
-	def update_dog(self, dog_id: str, payload: dict[str, Any]) -> Optional[str]:
+	def update_dog(self, dog_id: str, payload: HzdPluginDogInput) -> Optional[str]:
 		if self.verbose:
 			print(f'Update payload: {payload}', file=sys.stderr)
 		data = self.execute(UPDATE_DOG_MUTATION, {'documentId': dog_id, 'data': payload})
@@ -247,7 +383,7 @@ class GraphQLClient:
 			return None
 		return items[0].get('documentId')
 
-	def create_breeder(self, payload: dict[str, Any]) -> Optional[str]:
+	def create_breeder(self, payload: HzdPluginBreederInput) -> Optional[str]:
 		"""Erstelle einen neuen Breeder."""
 		data = self.execute(CREATE_BREEDER_MUTATION, {'data': payload})
 		result = data.get('data', {}).get('createHzdPluginBreeder')
@@ -255,7 +391,7 @@ class GraphQLClient:
 			return result.get('documentId')
 		return None
 
-	def update_breeder(self, breeder_id: str, payload: dict[str, Any]) -> Optional[str]:
+	def update_breeder(self, breeder_id: str, payload: HzdPluginBreederInput) -> Optional[str]:
 		"""Aktualisiere einen existierenden Breeder."""
 		data = self.execute(UPDATE_BREEDER_MUTATION, {'documentId': breeder_id, 'data': payload})
 		result = data.get('data', {}).get('updateHzdPluginBreeder')
@@ -309,32 +445,41 @@ def parse_iso_date(value: str) -> Optional[str]:
 	return None
 
 
-def map_sex_enum(raw: str) -> Optional[str]:
+def map_sex_enum(raw: str) -> Optional[DogSex]:
 	key = raw.strip().lower()
-	return SEX_ENUM_MAP.get(key)
+	return cast(Optional[DogSex], SEX_ENUM_MAP.get(key))
 
 
-def map_hd_enum(raw: str) -> Optional[str]:
+def map_hd_enum(raw: str) -> Optional[DogHd]:
 	value = raw.strip()
 	if not value or value == '-':
 		return None
 	# Entferne (G) falls vorhanden
 	value = value.replace('(G)', '').strip()
-	return HD_ENUM_MAP.get(value) or HD_ENUM_MAP.get(value.upper())
+	return cast(
+		Optional[DogHd],
+		HD_ENUM_MAP.get(value) or HD_ENUM_MAP.get(value.upper()),
+	)
 
 
-def map_sod1_enum(raw: str) -> Optional[str]:
+def map_sod1_enum(raw: str) -> Optional[DogSod1]:
 	value = raw.strip()
 	if not value or value == '-':
 		return None
-	return SOD1_ENUM_MAP.get(value) or SOD1_ENUM_MAP.get(value.upper())
+	return cast(
+		Optional[DogSod1],
+		SOD1_ENUM_MAP.get(value) or SOD1_ENUM_MAP.get(value.upper()),
+	)
 
 
-def map_color_enum(raw: str) -> Optional[str]:
+def map_color_enum(raw: str) -> Optional[DogColor]:
 	value = raw.strip()
 	if not value or value == '-':
 		return None
-	return COLOR_ENUM_MAP.get(value) or COLOR_ENUM_MAP.get(value.upper())
+	return cast(
+		Optional[DogColor],
+		COLOR_ENUM_MAP.get(value) or COLOR_ENUM_MAP.get(value.upper()),
+	)
 
 
 def parse_bool_check(value: str) -> Optional[bool]:
@@ -425,7 +570,7 @@ def read_chromosoft_csv(file_path: Path) -> list[ChromosoftDogRecord]:
 		return records
 
 
-def build_graphql_payload(record: ChromosoftDogRecord, breeder_id: Optional[str] = None) -> dict[str, Any]:
+def build_graphql_payload(record: ChromosoftDogRecord, breeder_id: Optional[str] = None) -> HzdPluginDogInput:
 	payload: dict[str, Any] = {}
 
 	def assign(key: str, value: Any) -> None:
@@ -487,7 +632,7 @@ def build_graphql_payload(record: ChromosoftDogRecord, breeder_id: Optional[str]
 	if record.breed_survey and record.breed_survey.strip():
 		assign('BreedSurvey', record.breed_survey.strip())
 
-	return payload
+	return cast(HzdPluginDogInput, payload)
 
 
 def ensure_breeder_exists(client: GraphQLClient, breeder_c_id: Optional[int], kennel_name: Optional[str] = None, verbose: bool = False) -> Optional[str]:
@@ -502,7 +647,7 @@ def ensure_breeder_exists(client: GraphQLClient, breeder_c_id: Optional[int], ke
 			print(f'Warnung: Kein User mit cId={breeder_c_id} gefunden. Breeder wird ohne User-Verknüpfung erstellt.', file=sys.stderr)
 
 	# Erstelle neuen Breeder
-	breeder_payload: dict[str, Any] = {
+	breeder_payload: HzdPluginBreederInput = {
 		'cId': breeder_c_id,
 		'IsActive': True,
 	}
@@ -566,7 +711,7 @@ def import_records(
 				# Aktualisiere kennelName falls vorhanden
 				kennel_info = f', kennelName: {kennel_name}' if kennel_name else ', kennelName: (nicht gefunden)'
 				if kennel_name:
-					update_payload: dict[str, Any] = {
+					update_payload: HzdPluginBreederInput = {
 						'kennelName': kennel_name
 					}
 					client.update_breeder(existing_breeder_id, update_payload)
