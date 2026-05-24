@@ -1,6 +1,10 @@
 // Extend users-permissions plugin to inject geolocation via document service on create/update
 // and extend JWT service with member and officer_roles
 import { sanitizeUser, sanitizeUsers } from '../../utils/user-sanitize'
+import {
+	authenticateAuthentikBearerToken,
+	isAuthentikAuthEnabled,
+} from '../../utils/authentik-auth'
 
 function buildResetPasswordBaseUrl(rawUrl: string): string {
 	let url = rawUrl.trim().replace(/\/$/, '')
@@ -156,8 +160,43 @@ export default (plugin: any) => {
 			const jwtService = strapi.plugin('users-permissions')?.service('jwt')
 
 			if (jwtService) {
+				const originalGetToken = jwtService.getToken.bind(jwtService)
 				// Speichere die originale issue-Methode
 				const originalIssue = jwtService.issue.bind(jwtService)
+
+				jwtService.getToken = async function (ctx: any) {
+					try {
+						return await originalGetToken(ctx)
+					} catch (error) {
+						strapi.log.info('[User Ext] Local Strapi JWT rejected, trying Authentik', {
+							authentikEnabled: isAuthentikAuthEnabled(),
+							hasAuthorizationHeader: typeof ctx?.request?.header?.authorization === 'string',
+							message: error instanceof Error ? error.message : String(error),
+						})
+
+						if (!isAuthentikAuthEnabled()) {
+							throw error
+						}
+
+						try {
+							const authentikToken = await authenticateAuthentikBearerToken(strapi, ctx)
+							strapi.log.info('[User Ext] Authentik bearer token mapped to Strapi user', {
+								hasUserId: Boolean(authentikToken?.id),
+								userId: authentikToken?.id,
+							})
+							return authentikToken
+						} catch (authentikError) {
+							strapi.log.warn('[User Ext] Authentik bearer token rejected', {
+								message: authentikError instanceof Error
+									? authentikError.message
+									: String(authentikError),
+							})
+							throw error
+						}
+					}
+				}
+
+				strapi.log.info('[User Ext] ✓ JWT Service extended with Authentik bearer support')
 
 				// Erweitere die issue-Methode
 				jwtService.issue = function (payload: any, jwtOptions: any = {}) {

@@ -65,26 +65,34 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 	useEffect(() => {
 		let isActive = true
-		const accessToken = session?.accessToken ?? null
+		const strapiToken = session?.idToken ?? session?.accessToken ?? null
 
 		async function syncSessionUser() {
 			if (!hasMounted || status === 'loading') {
 				return
 			}
 
-			if (!accessToken) {
+			if (session?.error) {
+				setGraphQLAuthToken(null)
+				setAuthState({ token: null, user: null })
+				setAuthError('Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.')
+				await signOut({ callbackUrl: '/' })
+				return
+			}
+
+			if (!strapiToken) {
 				setGraphQLAuthToken(null)
 				setAuthState({ token: null, user: null })
 				setAuthError(null)
 				return
 			}
 
-			setGraphQLAuthToken(accessToken)
+			setGraphQLAuthToken(strapiToken)
 			setAuthError(null)
 
 			try {
 				const meData = await fetchGraphQL<GetMeResponse>(GET_ME, {
-					token: accessToken,
+					token: strapiToken,
 				})
 
 				if (!isActive) {
@@ -92,7 +100,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 				}
 
 				setAuthState({
-					token: accessToken,
+					token: strapiToken,
 					user: meData.me ?? createFallbackUser(session?.user),
 				})
 			} catch (error) {
@@ -102,7 +110,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 				console.error('[Auth] Fehler beim Laden des User-Profils:', error)
 				setAuthState({
-					token: accessToken,
+					token: strapiToken,
 					user: createFallbackUser(session?.user),
 				})
 			}

@@ -17,7 +17,7 @@ NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=change-me
 AUTHENTIK_ISSUER=https://auth.example.org/application/o/hzd/
 AUTHENTIK_CLIENT_ID=change-me
-AUTHENTIK_SCOPE=openid email profile
+AUTHENTIK_SCOPE=openid email profile offline_access
 AUTHENTIK_LOG_TOKENS=false
 ```
 
@@ -50,7 +50,9 @@ Die OIDC-Parameter werden ausschließlich über Environment-Variablen gesetzt:
 - `AUTHENTIK_ISSUER`: Authentik Provider-Issuer, zum Beispiel
   `https://auth.example.org/application/o/hzd/`.
 - `AUTHENTIK_CLIENT_ID`: OIDC Client-ID aus Authentik.
-- `AUTHENTIK_SCOPE`: optionaler Scope, Standard ist `openid email profile`.
+- `AUTHENTIK_SCOPE`: optionaler Scope, Standard ist
+  `openid email profile offline_access`. `offline_access` wird fuer den
+  Token-Refresh benoetigt.
 - `AUTHENTIK_LOG_TOKENS`: optionales Debug-Logging für Authentik JWTs.
   Nur lokal auf `true` setzen, weil Access- und ID-Token Secrets enthalten.
 

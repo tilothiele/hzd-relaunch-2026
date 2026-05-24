@@ -367,6 +367,31 @@ export const GET_LAYOUT = `
 				__typename
 				id
 			}
+			... on ComponentBlocksDocumentBundleSection {
+				DBSName
+				DBSDescription
+				DocumentBundle {
+					BundleName
+					BundleDocument {
+						Name
+						Document {
+							url
+							name
+							ext
+							mime
+							size
+						}
+					}
+				}
+			}
+			... on ComponentBlocksTableOfContentSection {
+				TocHeadline
+				TocLink {
+					Label
+					Link
+					Primary
+				}
+			}
 		}
 	}
 `
