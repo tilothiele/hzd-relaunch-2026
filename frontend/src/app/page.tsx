@@ -5,7 +5,8 @@ import { enrichSectionsWithSupplementalDocuments } from '@/lib/server/enrich-sup
 import { GET_LAYOUT, GET_ME } from '@/lib/graphql/queries'
 import { renderServerSections } from '@/components/sections/server-section-factory'
 import type { GlobalLayout } from '@/types'
-import { cookies } from 'next/headers'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth-options'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,23 +37,8 @@ export default async function Home() {
 			globalLayout.announcements = data.announcements ?? null
 		}
 
-		const cookieStore = await cookies()
-		const tokenFromCookie = cookieStore.get('hzd_auth_token')?.value
-		const stateFromCookie = cookieStore.get('hzd_auth_state')?.value
-		let authToken: string | null = tokenFromCookie ?? null
-
-		if (!authToken && stateFromCookie) {
-			try {
-				const parsed = JSON.parse(stateFromCookie) as {
-					token?: string | { jwt?: string; token?: string } | null
-				}
-				authToken = typeof parsed.token === 'string'
-					? parsed.token
-					: (parsed.token?.jwt ?? parsed.token?.token ?? null)
-			} catch {
-				authToken = null
-			}
-		}
+		const session = await getServerSession(authOptions)
+		const authToken = session?.accessToken ?? null
 
 		if (authToken) {
 			const meData = await fetchGraphQLServer<MeData>(GET_ME, {

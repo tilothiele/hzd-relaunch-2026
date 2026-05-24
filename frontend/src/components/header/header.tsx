@@ -5,19 +5,14 @@ import { useEffect, useState } from 'react'
 import { HeaderNavigation } from './header-navigation'
 import { AnnouncementSlider } from './announcement-slider'
 
-interface LoginCredentials {
-	identifier: string
-	password: string
-}
-
 interface HeaderProps {
 	globalLayout?: GlobalLayout | null
 	strapiBaseUrl?: string | null
 	theme: ThemeDefinition
 	isAuthenticated: boolean
 	user: AuthUser | null
-	onLogin: (credentials: LoginCredentials) => Promise<void>
-	onLogout: () => void
+	onLogin: () => Promise<void>
+	onLogout: () => Promise<void>
 	isAuthenticating: boolean
 	error?: string | null
 	pageTitle?: string | null

@@ -25,26 +25,11 @@ import {
 import { MAX_PENDING_PASSED_DOGS } from '@/lib/passed-dogs-limits'
 import { CREATE_PASSED_DOG, UPDATE_PASSED_DOG } from '@/lib/graphql/mutations'
 import type { PassedDogCardData } from '@/lib/server/passed-dog-utils'
+import { useAuth } from '@/hooks/use-auth'
 
 interface AliveDog {
 	documentId: string
 	fullKennelName?: string | null
-}
-
-function readAuthToken(): string | null {
-	if (typeof window === 'undefined') {
-		return null
-	}
-	try {
-		const raw = localStorage.getItem('hzd_auth_state')
-		if (!raw) {
-			return null
-		}
-		const p = JSON.parse(raw) as { token?: string | null }
-		return typeof p.token === 'string' ? p.token : null
-	} catch {
-		return null
-	}
 }
 
 function ymd(d: Date): string {
@@ -106,6 +91,7 @@ export function PassedDogFormModal({
 	onSuccess,
 }: PassedDogFormModalProps) {
 	const muiTheme = useTheme()
+	const { authState } = useAuth()
 	const fullScreen = useMediaQuery(muiTheme.breakpoints.down('sm'))
 	const { min: minDate, max: maxDate } = useMemo(() => dateBounds(), [])
 
@@ -208,7 +194,7 @@ export function PassedDogFormModal({
 
 			let avatarId: string | number | undefined
 			if (file) {
-				const token = readAuthToken()
+				const token = authState.token
 				if (!token) {
 					throw new Error('Nicht angemeldet.')
 				}

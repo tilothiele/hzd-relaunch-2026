@@ -31,7 +31,7 @@ interface FormComponentProps {
 
 export function FormComponent({ form, privacyPolicy, strapiBaseUrl }: FormComponentProps) {
 	const router = useRouter()
-	const { isAuthenticated, authState } = useAuth(strapiBaseUrl)
+	const { isAuthenticated, authState } = useAuth()
 	const [values, setValues] = useState<Record<string, unknown>>({})
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [showThankYouModal, setShowThankYouModal] = useState(false)

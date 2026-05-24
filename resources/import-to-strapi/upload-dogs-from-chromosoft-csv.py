@@ -15,6 +15,10 @@ import requests
 
 load_dotenv()
 
+DEFAULT_HTTP_TIMEOUT = 30
+DEFAULT_MAX_RETRIES = 3
+DEFAULT_REQUEST_DELAY = 0.1
+
 
 try:
 	import requests
@@ -26,6 +30,76 @@ except ImportError as exc:  # pragma: no cover
 # python scripts/import-dogs-from-chromosoft-csv.py \
 #  pfad/zur/chromosoft.csv \
 #  --verbose
+
+
+def get_first_env(keys: tuple[str, ...]) -> Optional[str]:
+	for key in keys:
+		value = os.getenv(key)
+		if value:
+			return value
+
+	return None
+
+
+def require_value(value: Optional[str], label: str) -> str:
+	if value:
+		return value
+
+	raise ValueError(f'Missing required configuration value: {label}')
+
+
+def get_int_env(keys: tuple[str, ...], default: int) -> int:
+	value = get_first_env(keys)
+	if value is None:
+		return default
+
+	try:
+		return int(value)
+	except ValueError as exc:
+		raise ValueError(f'Invalid integer value for {", ".join(keys)}: {value}') from exc
+
+
+def get_float_env(keys: tuple[str, ...], default: float) -> float:
+	value = get_first_env(keys)
+	if value is None:
+		return default
+
+	try:
+		return float(value)
+	except ValueError as exc:
+		raise ValueError(f'Invalid float value for {", ".join(keys)}: {value}') from exc
+
+
+def get_strapi_graphql_url(explicit: Optional[str] = None) -> str:
+	return require_value(
+		explicit or get_first_env(('STRAPI_GRAPHQL_URL', 'STRAPI_ENDPOINT', 'ENDPOINT')),
+		'STRAPI_GRAPHQL_URL',
+	)
+
+
+def get_strapi_api_token(explicit: Optional[str] = None) -> Optional[str]:
+	return explicit or get_first_env(('STRAPI_API_TOKEN', 'STRAPI_TOKEN', 'TOKEN'))
+
+
+def get_strapi_http_timeout(explicit: Optional[int] = None) -> int:
+	if explicit is not None:
+		return explicit
+
+	return get_int_env(
+		('STRAPI_HTTP_TIMEOUT', 'IMPORT_HTTP_TIMEOUT'),
+		DEFAULT_HTTP_TIMEOUT,
+	)
+
+
+def get_strapi_max_retries(explicit: Optional[int] = None) -> int:
+	if explicit is not None:
+		return explicit
+
+	return get_int_env(('STRAPI_MAX_RETRIES',), DEFAULT_MAX_RETRIES)
+
+
+def get_import_request_delay() -> float:
+	return get_float_env(('IMPORT_REQUEST_DELAY',), DEFAULT_REQUEST_DELAY)
 
 DOG_BY_CID_QUERY = """
 query DogByCId($cId: Int) {
@@ -284,14 +358,23 @@ class ChromosoftDogRecord:
 
 
 class GraphQLClient:
-	def __init__(self, endpoint: str, token: Optional[str], timeout: int = 30, max_retries: int = 3, retry_delay: float = 1.0, verbose: bool = False) -> None:
-		self.endpoint = endpoint
-		self.timeout = timeout
-		self.max_retries = max_retries
+	def __init__(
+		self,
+		endpoint: Optional[str] = None,
+		token: Optional[str] = None,
+		timeout: Optional[int] = None,
+		max_retries: Optional[int] = None,
+		retry_delay: float = 1.0,
+		verbose: bool = False,
+	) -> None:
+		self.endpoint = get_strapi_graphql_url(endpoint)
+		self.timeout = get_strapi_http_timeout(timeout)
+		self.max_retries = get_strapi_max_retries(max_retries)
 		self.retry_delay = retry_delay
 		self.verbose = verbose
 		self.session = requests.Session()
 		self.session.headers.update({'Content-Type': 'application/json'})
+		token = get_strapi_api_token(token)
 		if token:
 			self.session.headers['Authorization'] = f'Bearer {token}'
 
@@ -815,14 +898,14 @@ def build_arg_parser() -> argparse.ArgumentParser:
 	parser.add_argument(
 		'--delay',
 		type=float,
-		default=0.1,
-		help='Pause zwischen Anfragen in Sekunden (Standard: 0.1)'
+		default=get_import_request_delay(),
+		help='Pause zwischen Anfragen in Sekunden (Standard: 0.1 oder IMPORT_REQUEST_DELAY)'
 	)
 	parser.add_argument(
 		'--max-retries',
 		type=int,
-		default=3,
-		help='Maximale Anzahl Wiederholungen bei Fehlern (Standard: 3)'
+		default=get_strapi_max_retries(),
+		help='Maximale Anzahl Wiederholungen bei Fehlern (Standard: STRAPI_MAX_RETRIES oder 3)'
 	)
 	return parser
 
@@ -835,8 +918,8 @@ def main() -> None:
 	if not csv_path.is_file():
 		parser.error(f'Datei nicht gefunden: {csv_path}')
 
-	token = os.getenv("TOKEN")
-	endpoint = os.getenv("ENDPOINT")
+	token = get_strapi_api_token()
+	endpoint = get_strapi_graphql_url()
 
 	records = read_chromosoft_csv(csv_path)
 	print(f'{len(records)} Datensätze aus {csv_path} gelesen.')

@@ -5,6 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUpload, faUser, faDog, faTrash, faPaperPlane, faLock, faCommentAlt } from '@fortawesome/free-solid-svg-icons'
 import Image from 'next/image'
 import { PhotoBoxCollectionSelector } from './photo-box-collection-selector'
+import { useAuth } from '@/hooks/use-auth'
+import type { PhotoboxImageCollection } from '@/types'
 
 interface PhotoBoxUploaderProps {
     maxPhotosPerCollection?: number
@@ -17,8 +19,9 @@ export function PhotoBoxUploader({
     maxPhotoSizeMB = 10,
     maxCollections = 5
 }: PhotoBoxUploaderProps) {
-    const [selectedCollection, setSelectedCollection] = useState<any | null>(null)
-    const selectedCollectionId = selectedCollection?.documentId
+    const { authState } = useAuth()
+    const [selectedCollection, setSelectedCollection] = useState<PhotoboxImageCollection | null>(null)
+    const selectedCollectionId = selectedCollection?.documentId ?? null
     const currentPhotosCount = selectedCollection?.photos?.length || 0
     const [selectedImage, setSelectedImage] = useState<File | null>(null)
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -133,8 +136,7 @@ export function PhotoBoxUploader({
             formData.append('message', message)
             formData.append('collectionId', selectedCollectionId)
 
-            // Get token from auth state if available
-            const token = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('hzd_auth_state') || '{}').token : null
+            const token = authState.token
             if (token) {
                 formData.append('token', token)
             }

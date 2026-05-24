@@ -67,7 +67,7 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 		isAuthenticating,
 		handleLogin,
 		handleLogout,
-	} = useAuth(strapiBaseUrl)
+	} = useAuth()
 
 	// theme prop is kept for backward compatibility but ignored in favor of the global theme
 	const currentTheme = globalTheme

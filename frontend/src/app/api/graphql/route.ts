@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { GraphQLClient } from 'graphql-request'
 import { draftMode } from 'next/headers'
+import { getToken } from 'next-auth/jwt'
 
 export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
@@ -50,8 +51,16 @@ export async function POST(request: NextRequest) {
 			fetch: fetchNoStore,
 		})
 
-		if (token && typeof token === 'string' && token.length > 0) {
-			client.setHeader('Authorization', `Bearer ${token}`)
+		const sessionToken = await getToken({
+			req: request,
+			secret: process.env.NEXTAUTH_SECRET,
+		})
+		const effectiveToken = typeof token === 'string' && token.length > 0
+			? token
+			: sessionToken?.accessToken
+
+		if (typeof effectiveToken === 'string' && effectiveToken.length > 0) {
+			client.setHeader('Authorization', `Bearer ${effectiveToken}`)
 		}
 
 		const data = await client.request(query, effectiveVariables)

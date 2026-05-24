@@ -29,11 +29,7 @@ export default function FormInstancePage() {
 	const {
 		isAuthenticated,
 		user,
-		authError,
-		isAuthenticating,
-		handleLogin,
-		handleLogout,
-	} = useAuth(baseUrl || '')
+	} = useAuth()
 
 	const themeStyles = useMemo(() => ({
 		'--theme-text-color': theme.textColor,

@@ -1,31 +1,22 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState, useRef, type ChangeEvent, type FormEvent } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser, faRightFromBracket, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { AuthUser } from '@/types'
 import type { ThemeDefinition } from '@/themes'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { REGISTER_USER } from '@/lib/graphql/queries'
 
 interface LoginControlsProps {
 	isAuthenticated: boolean
 	user: AuthUser | null
-	onLogin: (credentials: { identifier: string; password: string }) => Promise<void>
-	onLogout: () => void
+	onLogin: () => Promise<void>
+	onLogout: () => Promise<void>
 	isAuthenticating: boolean
 	error?: string | null
 	theme: ThemeDefinition
 }
-
-interface LoginCredentials {
-	identifier: string
-	password: string
-}
-
-type TabValue = 'login' | 'register' | 'forgot-password'
 
 export function LoginControls({
 	isAuthenticated,
@@ -37,20 +28,7 @@ export function LoginControls({
 	theme,
 }: LoginControlsProps) {
 	const router = useRouter()
-	const [isFormVisible, setIsFormVisible] = useState(false)
-	const [activeTab, setActiveTab] = useState<TabValue>('login')
-	const [identifier, setIdentifier] = useState('')
-	const [email, setEmail] = useState('')
-	const [username, setUsername] = useState('')
-	const [password, setPassword] = useState('')
-	const [confirmPassword, setConfirmPassword] = useState('')
-	const [localError, setLocalError] = useState<string | null>(null)
-	const [localSuccess, setLocalSuccess] = useState<string | null>(null)
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
-	const [isRegistering, setIsRegistering] = useState(false)
-	const [isSendingReset, setIsSendingReset] = useState(false)
-	const [hoveredButton, setHoveredButton] = useState<string | null>(null)
-
 	const menuRef = useRef<HTMLDivElement>(null)
 	const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -71,22 +49,6 @@ export function LoginControls({
 		return user.username ?? user.email ?? 'Account'
 	}, [user])
 
-	useEffect(() => {
-		if (isAuthenticated) {
-			setIsFormVisible(false)
-			setIdentifier('')
-			setPassword('')
-			setEmail('')
-			setUsername('')
-			setConfirmPassword('')
-			setActiveTab('login')
-		}
-	}, [isAuthenticated])
-
-	useEffect(() => {
-		setLocalError(error ?? null)
-	}, [error])
-
 	// Close menu when clicking outside
 	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {
@@ -101,99 +63,15 @@ export function LoginControls({
 		}
 	}, [isMenuOpen])
 
-	const toggleFormVisibility = useCallback(() => {
-		setIsFormVisible((previousVisible: boolean) => {
-			if (!previousVisible) {
-				setActiveTab('login')
-				setLocalError(null)
-				setLocalSuccess(null)
-			}
-			return !previousVisible
-		})
-	}, [])
+	const handleLogin = useCallback(async () => {
+		await onLogin()
+	}, [onLogin])
 
-	const handleTabChange = useCallback((newValue: TabValue) => {
-		setActiveTab(newValue)
-		setLocalError(null)
-		setLocalSuccess(null)
-		setIdentifier('')
-		setEmail('')
-		setUsername('')
-		setPassword('')
-		setConfirmPassword('')
-	}, [])
-
-	const handleLogout = useCallback(() => {
-		setIsFormVisible(false)
+	const handleLogout = useCallback(async () => {
 		setIsMenuOpen(false)
-		onLogout()
+		await onLogout()
 		router.refresh()
 	}, [onLogout, router])
-
-	const handleLoginSubmit = useCallback(async (event: FormEvent<HTMLFormElement>) => {
-		event.preventDefault()
-		setLocalError(null)
-		setLocalSuccess(null)
-
-		try {
-			await onLogin({ identifier, password })
-			router.refresh()
-		} catch (submissionError) {
-			if (submissionError instanceof Error && submissionError.message) {
-				setLocalError(submissionError.message)
-			} else {
-				setLocalError('Login fehlgeschlagen. Bitte versuchen Sie es erneut.')
-			}
-		} finally {
-			setPassword('')
-		}
-	}, [identifier, onLogin, password, router])
-
-
-
-	const handleForgotPasswordSubmit = useCallback(async (event: FormEvent<HTMLFormElement>) => {
-		event.preventDefault()
-		setLocalError(null)
-		setLocalSuccess(null)
-
-		if (!email) {
-			setLocalError('Bitte geben Sie Ihre E-Mail-Adresse ein.')
-			return
-		}
-
-		setIsSendingReset(true)
-
-		try {
-			const response = await fetch('/api/auth/forgot-password', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ email }),
-			})
-
-			if (!response.ok) {
-				const errorPayload = await response.json().catch(() => null)
-				throw new Error(
-					errorPayload?.error?.message
-					?? 'Fehler beim Senden der E-Mail. Bitte versuchen Sie es erneut.',
-				)
-			}
-
-			setLocalSuccess(
-				'Falls ein Konto mit dieser E-Mail-Adresse existiert, erhalten Sie in Kürze eine E-Mail mit einem Link zum Zurücksetzen Ihres Passworts.',
-			)
-			setEmail('')
-		} catch (submissionError) {
-			if (submissionError instanceof Error && submissionError.message) {
-				setLocalError(submissionError.message)
-			} else {
-				setLocalError('Fehler beim Senden der E-Mail. Bitte versuchen Sie es erneut.')
-			}
-		} finally {
-			setIsSendingReset(false)
-		}
-	}, [email])
 
 	const clearCloseTimeout = useCallback(() => {
 		if (closeTimeoutRef.current) {
@@ -267,11 +145,11 @@ export function LoginControls({
 		<div className='relative'>
 			<button
 				type='button'
-				onClick={toggleFormVisibility}
+				onClick={handleLogin}
 				className='flex items-center gap-2 transition-colors hover:text-yellow-400'
 				style={{ color: theme.headerFooterTextColor, fontSize: '1.2em', fontWeight: 400 }}
-				aria-expanded={isFormVisible}
-				aria-controls='login-form'
+				title={error ?? 'Mit Authentik anmelden'}
+				disabled={isAuthenticating}
 			>
 				<FontAwesomeIcon icon={faUser} style={{ color: theme.headerFooterTextColor, fontSize: '1.2em' }} />
 				{isAuthenticating ? (
@@ -283,204 +161,6 @@ export function LoginControls({
 					<span style={{ color: theme.headerFooterTextColor }}>{userLabel}</span>
 				)}
 			</button>
-
-			{isFormVisible && (
-				<div
-					className='absolute right-4 z-50 mt-3 w-full max-w-[400px] rounded-lg border border-gray-200 bg-white text-gray-900 shadow-xl'
-					style={{ width: 'min(400px, calc(100vw - 32px))' }}
-				>
-					{/* Tabs */}
-					<div className='border-b border-gray-200'>
-						<div className='flex'>
-							<button
-								onClick={() => handleTabChange('login')}
-								className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'login'
-									? 'border-b-2 border-yellow-400 text-yellow-600'
-									: 'text-gray-600 hover:text-gray-900'
-									}`}
-							>
-								Anmeldung
-							</button>
-							<button
-								onClick={() => handleTabChange('register')}
-								className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'register'
-									? 'border-b-2 border-yellow-400 text-yellow-600'
-									: 'text-gray-600 hover:text-gray-900'
-									}`}
-							>
-								Registrieren
-							</button>
-							<button
-								onClick={() => handleTabChange('forgot-password')}
-								className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${activeTab === 'forgot-password'
-									? 'border-b-2 border-yellow-400 text-yellow-600'
-									: 'text-gray-600 hover:text-gray-900'
-									}`}
-							>
-								neues Passwort
-							</button>
-						</div>
-					</div>
-
-					{/* Login Tab */}
-					{activeTab === 'login' && (
-						<form id='login-form' onSubmit={handleLoginSubmit} className='p-6'>
-							<div className='flex flex-col gap-5'>
-								<p className='text-sm text-gray-700 mb-5'>
-									Sollten Sie sich erstmalig anmelden wollen, fordern Sie bitte erst über die 'Passwort vergessen' Funktion ein neues Passwort an.
-									Verwenden Sie die EMail-Adresse, die sie in Ihrem Mitgliedsantrag angegeben haben.
-									Nachdem Ihre bestätigte Mitgliedschaft von der HZD-Geschäftsstelle in der Chromosoft-Datenbank eingetragen wurde,
-									steht Ihr Profil automatisch am Folgetag zur Verfügung.
-								</p>
-							</div>
-							<div className='flex flex-col gap-5'>
-								<label className='block text-sm font-medium text-gray-700'>
-									<span className='mb-2 block'>E-Mail oder HZD-Mitgliedsnummer</span>
-									<input
-										type='text'
-										name='identifier'
-										value={identifier}
-										onChange={(event: ChangeEvent<HTMLInputElement>) =>
-											setIdentifier(event.target.value)
-										}
-										className='w-full rounded-md border border-gray-300 bg-gray-200 px-3 py-2.5 text-sm transition-colors focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1'
-										autoComplete='username'
-										required
-									/>
-								</label>
-
-								<label className='block text-sm font-medium text-gray-700'>
-									<span className='mb-2 block'>Passwort</span>
-									<input
-										type='password'
-										name='password'
-										value={password}
-										onChange={(event: ChangeEvent<HTMLInputElement>) =>
-											setPassword(event.target.value)
-										}
-										className='w-full rounded-md border border-gray-300 bg-gray-200 px-3 py-2.5 text-sm transition-colors focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1'
-										autoComplete='current-password'
-										required
-									/>
-								</label>
-
-								{localError && (
-									<div className='rounded-md bg-red-50 p-3'>
-										<p className='text-sm text-red-800'>{localError}</p>
-									</div>
-								)}
-
-								{localSuccess && (
-									<div className='rounded-md bg-green-50 p-3'>
-										<p className='text-sm text-green-800'>{localSuccess}</p>
-									</div>
-								)}
-
-								<button
-									type='submit'
-									className='mt-2 flex w-full items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-all hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60'
-									style={{
-										backgroundColor: theme.submitButtonColor,
-										color: theme.submitButtonTextColor,
-										filter: hoveredButton === 'login' ? 'brightness(90%)' : 'none',
-									}}
-									onMouseEnter={() => setHoveredButton('login')}
-									onMouseLeave={() => setHoveredButton(null)}
-									disabled={isAuthenticating}
-								>
-									{isAuthenticating ? (
-										<>
-											<FontAwesomeIcon icon={faSpinner} spin />
-											Anmeldung läuft
-										</>
-									) : (
-										'Einloggen'
-									)}
-								</button>
-							</div>
-						</form>
-					)}
-
-					{/* Register Tab */}
-					{activeTab === 'register' && (
-						<div className='p-6'>
-							<p className='mb-4 text-sm text-gray-600'>
-								Ihr Benutzerprofil wird automatisch erstellt, nachdem Ihre Mitgliedschaft
-								bestätigt wurde.
-							</p>
-							<p className='text-sm text-gray-600'>
-								Sollten Sie Fragen haben oder Probleme beim Registrieren haben, wenden Sie
-								sich bitte an unseren IT-Support oder die HZD-Geschäftsstelle.
-							</p>
-						</div>
-					)}
-
-					{/* Forgot Password Tab */}
-					{activeTab === 'forgot-password' && (
-						<form
-							id='forgot-password-form'
-							onSubmit={handleForgotPasswordSubmit}
-							className='p-6'
-						>
-							<div className='flex flex-col gap-5'>
-								<p className='mb-2 text-sm text-gray-600'>
-									Geben Sie Ihre E-Mail-Adresse ein, die Sie in Ihrem Mitgliedsantrag angegeben haben.
-									Wir senden Ihnen einen Link zum	Zurücksetzen Ihres Passworts.
-								</p>
-
-								<label className='block text-sm font-medium text-gray-700'>
-									<span className='mb-2 block'>E-Mail</span>
-									<input
-										type='email'
-										name='email'
-										value={email}
-										onChange={(event: ChangeEvent<HTMLInputElement>) =>
-											setEmail(event.target.value)
-										}
-										className='w-full rounded-md border border-gray-300 bg-gray-200 px-3 py-2.5 text-sm transition-colors focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1'
-										autoComplete='email'
-										required
-									/>
-								</label>
-
-								{localError && (
-									<div className='rounded-md bg-red-50 p-3'>
-										<p className='text-sm text-red-800'>{localError}</p>
-									</div>
-								)}
-
-								{localSuccess && (
-									<div className='rounded-md bg-green-50 p-3'>
-										<p className='text-sm text-green-800'>{localSuccess}</p>
-									</div>
-								)}
-
-								<button
-									type='submit'
-									className='mt-2 flex w-full items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition-all hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60'
-									style={{
-										backgroundColor: theme.submitButtonColor,
-										color: theme.submitButtonTextColor,
-										filter: hoveredButton === 'forgot-password' ? 'brightness(90%)' : 'none',
-									}}
-									onMouseEnter={() => setHoveredButton('forgot-password')}
-									onMouseLeave={() => setHoveredButton(null)}
-									disabled={isSendingReset}
-								>
-									{isSendingReset ? (
-										<>
-											<FontAwesomeIcon icon={faSpinner} spin />
-											Wird gesendet
-										</>
-									) : (
-										'Passwort zurücksetzen'
-									)}
-								</button>
-							</div>
-						</form>
-					)}
-				</div>
-			)}
 		</div>
 	)
 }
