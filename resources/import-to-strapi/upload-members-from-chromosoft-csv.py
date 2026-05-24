@@ -6,10 +6,10 @@ This script imports member data from a CSV file into the Strapi member collectio
 It uses the Strapi REST API to create members.
 
 Usage:
-    python import_members.py <csv_file> [--api-url URL] [--api-token TOKEN] [--dry-run]
+    python upload-members-from-crhomosoft.py <csv_file> [--api-url URL] [--api-token TOKEN] [--dry-run]
 
 Example:
-    python import_members.py members.csv --api-url http://localhost:1337 --api-token YOUR_API_TOKEN
+    python upload-members-from-crhomosoft.py members.csv --api-url http://localhost:1337 --api-token YOUR_API_TOKEN
 """
 
 import csv

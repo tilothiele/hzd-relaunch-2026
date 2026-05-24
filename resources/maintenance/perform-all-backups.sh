@@ -179,7 +179,7 @@ backup_application "$BASE_DIR" "glpi" \
 dump_file="paperless_db_dump_$(date +%F).sql"
 pg_dump_docker "$BASE_DIR" "paperless" "$dump_file"
 backup_application "$BASE_DIR" "paperless" \
-	"webserver-jsss8kkkgso40gww08wkws4s-122357838465" -- \
+	"webserver-jsss8kkkgso40gww08wkws4s-212040964510" -- \
 	"$BASE_DIR/$dump_file" \
 	"jsss8kkkgso40gww08wkws4s_media" \
 	"jsss8kkkgso40gww08wkws4s_data"
