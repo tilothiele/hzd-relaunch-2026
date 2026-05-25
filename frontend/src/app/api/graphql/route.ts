@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { GraphQLClient } from 'graphql-request'
 import { draftMode } from 'next/headers'
 import { getToken } from 'next-auth/jwt'
+import { resolveGraphQLErrorStatus } from '@/lib/graphql-errors'
 
 export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
@@ -86,17 +87,14 @@ export async function POST(request: NextRequest) {
 		})
 	} catch (error) {
 		console.error('GraphQL proxy error:', error)
-
-		if (error instanceof Error) {
-			return NextResponse.json(
-				{ error: { message: error.message } },
-				{ status: 500 },
-			)
-		}
+		const status = resolveGraphQLErrorStatus(error)
+		const message = error instanceof Error
+			? error.message
+			: 'GraphQL-Anfrage fehlgeschlagen'
 
 		return NextResponse.json(
-			{ error: { message: 'GraphQL-Anfrage fehlgeschlagen' } },
-			{ status: 500 },
+			{ error: { message } },
+			{ status },
 		)
 	}
 }
