@@ -3,7 +3,6 @@ import {
 	Serwist,
 	StaleWhileRevalidate,
 	CacheFirst,
-	NetworkOnly,
 	ExpirationPlugin,
 } from "serwist";
 import pkg from "../../package.json";
@@ -20,11 +19,9 @@ const serwist = new Serwist({
     clientsClaim: false,
     // navigationPreload kann OAuth-Callbacks doppelt auslösen (Authorization-Code nur einmal gültig).
     navigationPreload: false,
+    // /api/auth nicht vom SW abfangen: OAuth-Callback braucht Browser-Navigation inkl.
+    // Traefik-HTTP-Basic-Auth (SW-fetch sendet diese Credentials nicht zuverlässig).
     runtimeCaching: [
-        {
-            matcher: ({ url }) => url.pathname.startsWith("/api/auth"),
-            handler: new NetworkOnly(),
-        },
         {
             matcher: ({ request }) => request.destination === "style" || request.destination === "script" || request.destination === "worker",
             handler: new StaleWhileRevalidate({
