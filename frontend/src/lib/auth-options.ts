@@ -71,6 +71,29 @@ function getAuthentikScope(): string {
 	return `${configured} offline_access`.trim()
 }
 
+function getAuthentikAuthorizationParams(): Record<string, string> {
+	const params: Record<string, string> = {
+		scope: getAuthentikScope(),
+	}
+
+	const prompt = process.env.AUTHENTIK_PROMPT?.trim()
+	if (
+		prompt === 'login'
+		|| prompt === 'consent'
+		|| prompt === 'none'
+		|| prompt === 'select_account'
+	) {
+		params.prompt = prompt
+	}
+
+	const maxAge = process.env.AUTHENTIK_MAX_AGE?.trim()
+	if (maxAge !== undefined && maxAge !== '' && !Number.isNaN(Number(maxAge))) {
+		params.max_age = maxAge
+	}
+
+	return params
+}
+
 function getAccessTokenExpiresAt(account: { expires_at?: number; expires_in?: number }): number {
 	if (typeof account.expires_at === 'number') {
 		return account.expires_at * 1000
@@ -152,9 +175,7 @@ export const authOptions: NextAuthOptions = {
 			clientSecret: getAuthentikClientSecret(),
 			issuer: getIssuer(),
 			authorization: {
-				params: {
-					scope: getAuthentikScope(),
-				},
+				params: getAuthentikAuthorizationParams(),
 			},
 			client: {
 				token_endpoint_auth_method: getAuthentikTokenEndpointAuthMethod(),

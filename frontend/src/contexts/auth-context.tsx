@@ -8,6 +8,7 @@ import {
 	fetchGraphQL,
 } from '@/lib/graphql-client'
 import { isGraphQLUnauthorizedError } from '@/lib/graphql-errors'
+import { getLoginCallbackUrl } from '@/lib/auth-login'
 import { GET_ME } from '@/lib/graphql/queries'
 import type { AuthUser } from '@/types'
 
@@ -152,9 +153,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 		try {
 			await signIn('authentik', {
-				callbackUrl: typeof window !== 'undefined'
-					? window.location.href
-					: '/',
+				callbackUrl: getLoginCallbackUrl(),
+				redirect: true,
 			})
 		} finally {
 			setIsAuthenticating(false)

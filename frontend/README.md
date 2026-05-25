@@ -81,6 +81,37 @@ sein; Client-Typ und Auth-Methode müssen zusammenpassen.
 - `AUTH_TRUST_HOST` nur mit korrekten `X-Forwarded-Host` / `X-Forwarded-Proto` Headern;
   sonst weglassen und nur `NEXTAUTH_URL` setzen.
 
+### HTTP Basic Auth (z. B. Staging via Coolify/Traefik)
+
+Wenn die Next.js-App zusätzlich per **HTTP Basic Auth** geschützt ist, kollidiert das leicht mit OIDC:
+
+- Der Rückruf von Authentik geht auf `/api/auth/callback/authentik`.
+- Der Authorization-Code ist **nur einmal** gültig.
+- Service-Worker oder ein zweiter Request ohne Basic-Auth-Header → `invalid_grant` / `OAuthCallback`.
+
+**Empfohlen:** Basic Auth in Traefik **nicht** auf OIDC-Pfade anwenden. Nur die öffentliche Site schützen, `/api/auth` ausnehmen:
+
+```bash
+# Beispiel: Router-Regel mit Basic Auth (Pseudocode für Custom Labels)
+# Router MIT Basic Auth:
+#   Host(`relaunch-staging.example.com`) && !PathPrefix(`/api/auth`)
+# Router OHNE Basic Auth (gleicher Service/Port):
+#   Host(`relaunch-staging.example.com`) && PathPrefix(`/api/auth`)
+```
+
+In Coolify: Container Labels → Readonly aus → Middleware `basicauth` nur am HTTPS-Router, der **nicht** `/api/auth` matched; separater Router nur für `/api/auth` ohne `basicauth`. Alternativ Staging nur über Authentik absichern und Basic Auth abschalten.
+
+Nach Änderung: Service Worker im Browser entfernen, redeployen, Login in Inkognito testen.
+
+### Sofortige Rückkehr von Authentik ohne Login-Maske
+
+Wenn du bereits bei Authentik angemeldet bist (SSO), zeigt Authentik keine Login-Seite
+und leitet direkt zurück zur Website – das ist erwartetes Verhalten.
+
+- Test mit frischer Session: Inkognito oder Abmeldung auf
+  `https://auth.hovawarte.com`
+- Login-Maske erzwingen: `AUTHENTIK_PROMPT=login` (optional `AUTHENTIK_MAX_AGE=0`)
+
 ## Content-Types
 
 Die folgenden Content-Types müssen in Strapi erstellt werden:
