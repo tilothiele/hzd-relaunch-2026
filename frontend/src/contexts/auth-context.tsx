@@ -2,7 +2,12 @@
 
 import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { signIn, signOut, useSession } from 'next-auth/react'
-import { setGraphQLAuthToken, fetchGraphQL } from '@/lib/graphql-client'
+import {
+	setGraphQLAuthToken,
+	setGraphQLUnauthorizedHandler,
+	fetchGraphQL,
+} from '@/lib/graphql-client'
+import { isGraphQLUnauthorizedError } from '@/lib/graphql-errors'
 import { GET_ME } from '@/lib/graphql/queries'
 import type { AuthUser } from '@/types'
 
@@ -59,9 +64,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	const [isAuthenticating, setIsAuthenticating] = useState(false)
 	const [hasMounted, setHasMounted] = useState(false)
 
+	const invalidateSession = useCallback(async () => {
+		setGraphQLAuthToken(null)
+		setAuthState({ token: null, user: null })
+		setAuthError('Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.')
+		await signOut({ callbackUrl: '/' })
+	}, [])
+
 	useEffect(() => {
 		setHasMounted(true)
 	}, [])
+
+	useEffect(() => {
+		setGraphQLUnauthorizedHandler(() => {
+			void invalidateSession()
+		})
+
+		return () => {
+			setGraphQLUnauthorizedHandler(null)
+		}
+	}, [invalidateSession])
 
 	useEffect(() => {
 		let isActive = true
@@ -73,10 +95,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 			}
 
 			if (session?.error) {
-				setGraphQLAuthToken(null)
-				setAuthState({ token: null, user: null })
-				setAuthError('Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.')
-				await signOut({ callbackUrl: '/' })
+				await invalidateSession()
 				return
 			}
 
@@ -108,6 +127,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 					return
 				}
 
+				if (isGraphQLUnauthorizedError(error)) {
+					return
+				}
+
 				console.error('[Auth] Fehler beim Laden des User-Profils:', error)
 				setAuthState({
 					token: strapiToken,
@@ -121,7 +144,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		return () => {
 			isActive = false
 		}
-	}, [hasMounted, session, status])
+	}, [hasMounted, invalidateSession, session, status])
 
 	const handleLogin = useCallback(async () => {
 		setIsAuthenticating(true)

@@ -26,6 +26,42 @@ function getTokenEndpoint(): string {
 	return `${getIssuer()}/token/`
 }
 
+function getAuthentikClientSecret(): string {
+	return process.env.AUTHENTIK_CLIENT_SECRET?.trim() ?? ''
+}
+
+function isConfidentialAuthentikClient(): boolean {
+	return getAuthentikClientSecret().length > 0
+}
+
+function getAuthentikTokenEndpointAuthMethod():
+	| 'none'
+	| 'client_secret_post'
+	| 'client_secret_basic' {
+	const configured = process.env.AUTHENTIK_TOKEN_ENDPOINT_AUTH_METHOD?.trim()
+	if (
+		configured === 'none'
+		|| configured === 'client_secret_post'
+		|| configured === 'client_secret_basic'
+	) {
+		return configured
+	}
+
+	return isConfidentialAuthentikClient() ? 'client_secret_post' : 'none'
+}
+
+function buildAuthentikTokenRequestBody(
+	params: Record<string, string>,
+): URLSearchParams {
+	const body = new URLSearchParams(params)
+
+	if (isConfidentialAuthentikClient()) {
+		body.set('client_secret', getAuthentikClientSecret())
+	}
+
+	return body
+}
+
 function getAccessTokenExpiresAt(account: { expires_at?: number; expires_in?: number }): number {
 	if (typeof account.expires_at === 'number') {
 		return account.expires_at * 1000
@@ -51,7 +87,7 @@ async function refreshAuthentikToken(token: JWT): Promise<JWT> {
 		headers: {
 			'Content-Type': 'application/x-www-form-urlencoded',
 		},
-		body: new URLSearchParams({
+		body: buildAuthentikTokenRequestBody({
 			client_id: process.env.AUTHENTIK_CLIENT_ID ?? '',
 			grant_type: 'refresh_token',
 			refresh_token: token.refreshToken,
@@ -98,7 +134,7 @@ export const authOptions: NextAuthOptions = {
 	providers: [
 		AuthentikProvider({
 			clientId: process.env.AUTHENTIK_CLIENT_ID ?? '',
-			clientSecret: '',
+			clientSecret: getAuthentikClientSecret(),
 			issuer: process.env.AUTHENTIK_ISSUER ?? '',
 			authorization: {
 				params: {
@@ -106,7 +142,7 @@ export const authOptions: NextAuthOptions = {
 				},
 			},
 			client: {
-				token_endpoint_auth_method: 'none',
+				token_endpoint_auth_method: getAuthentikTokenEndpointAuthMethod(),
 			},
 		}),
 	],
