@@ -8,12 +8,28 @@ interface AuthentikClaims {
 	given_name?: string
 	family_name?: string
 	name?: string
+	username?: string
 	[key: string]: unknown
 }
 
 interface OpenIdConfiguration {
 	jwks_uri?: string
 	issuer?: string
+	introspection_endpoint?: string
+}
+
+interface IntrospectionResponse {
+	active?: boolean
+	sub?: string
+	username?: string
+	preferred_username?: string
+	email?: string
+	given_name?: string
+	family_name?: string
+	name?: string
+	iss?: string
+	aud?: string | string[]
+	[key: string]: unknown
 }
 
 interface Jwk {
@@ -28,6 +44,7 @@ interface JsonWebKeySet {
 	keys?: Jwk[]
 }
 
+let openIdConfigPromise: Promise<OpenIdConfiguration> | null = null
 let jwksUriPromise: Promise<string> | null = null
 let jwksPromise: Promise<JsonWebKeySet> | null = null
 let jwksFetchedAt = 0
@@ -42,8 +59,21 @@ function getIssuer(): string | null {
 	return issuer ? trimTrailingSlash(issuer) : null
 }
 
+function getAuthentikClientId(): string | null {
+	return process.env.AUTHENTIK_CLIENT_ID?.trim() || null
+}
+
+function getAuthentikClientSecret(): string | null {
+	return process.env.AUTHENTIK_CLIENT_SECRET?.trim() || null
+}
+
+export function isConfidentialAuthentikClient(): boolean {
+	return Boolean(getAuthentikClientSecret())
+}
+
 function getAudience(): string | null {
 	return process.env.AUTHENTIK_AUDIENCE?.trim()
+		|| getAuthentikClientId()
 		|| null
 }
 
@@ -70,12 +100,17 @@ function getBearerToken(ctx: any): string | null {
 	return parts[1]
 }
 
-async function fetchJwksUri(issuer: string): Promise<string> {
-	const configuredJwksUri = process.env.AUTHENTIK_JWKS_URI?.trim()
-	if (configuredJwksUri) {
-		return configuredJwksUri
+function isAudienceValidationError(error: unknown): boolean {
+	if (!(error instanceof Error)) {
+		return false
 	}
 
+	const message = error.message.toLowerCase()
+	return message.includes('audience')
+		|| message.includes('jwt audience')
+}
+
+async function fetchOpenIdConfiguration(issuer: string): Promise<OpenIdConfiguration> {
 	const response = await fetch(`${issuer}/.well-known/openid-configuration`)
 	if (!response.ok) {
 		throw new Error(
@@ -83,7 +118,29 @@ async function fetchJwksUri(issuer: string): Promise<string> {
 		)
 	}
 
-	const configuration = (await response.json()) as OpenIdConfiguration
+	return response.json() as Promise<OpenIdConfiguration>
+}
+
+async function getOpenIdConfiguration(): Promise<OpenIdConfiguration> {
+	const issuer = getIssuer()
+	if (!issuer) {
+		throw new Error('AUTHENTIK_ISSUER is not configured')
+	}
+
+	if (!openIdConfigPromise) {
+		openIdConfigPromise = fetchOpenIdConfiguration(issuer)
+	}
+
+	return openIdConfigPromise
+}
+
+async function fetchJwksUri(issuer: string): Promise<string> {
+	const configuredJwksUri = process.env.AUTHENTIK_JWKS_URI?.trim()
+	if (configuredJwksUri) {
+		return configuredJwksUri
+	}
+
+	const configuration = await getOpenIdConfiguration()
 	if (!configuration.jwks_uri) {
 		throw new Error('Authentik OpenID configuration does not contain jwks_uri')
 	}
@@ -154,14 +211,16 @@ async function getSigningKey(header: any): Promise<string> {
 	}) as string
 }
 
-function verifyToken(token: string): Promise<AuthentikClaims> {
+function verifyTokenWithAudience(
+	token: string,
+	audience: string | null,
+): Promise<AuthentikClaims> {
 	const issuer = getIssuer()
 	if (!issuer) {
 		throw new Error('AUTHENTIK_ISSUER is not configured')
 	}
 
 	const issuerCandidates = [issuer, `${issuer}/`]
-	const audience = getAudience()
 
 	return new Promise((resolve, reject) => {
 		jwt.verify(
@@ -174,7 +233,7 @@ function verifyToken(token: string): Promise<AuthentikClaims> {
 			{
 				algorithms: (process.env.AUTHENTIK_JWT_ALGORITHMS || 'RS256')
 					.split(',')
-					.map((algorithm) => algorithm.trim())
+					.map((algorithm: string) => algorithm.trim())
 					.filter(Boolean),
 				issuer: issuerCandidates,
 				...(audience ? { audience } : {}),
@@ -194,6 +253,114 @@ function verifyToken(token: string): Promise<AuthentikClaims> {
 			},
 		)
 	})
+}
+
+async function verifyToken(token: string): Promise<AuthentikClaims> {
+	const audience = getAudience()
+
+	try {
+		return await verifyTokenWithAudience(token, audience)
+	} catch (error) {
+		if (audience && isAudienceValidationError(error)) {
+			return verifyTokenWithAudience(token, null)
+		}
+
+		throw error
+	}
+}
+
+function mapIntrospectionToClaims(payload: IntrospectionResponse): AuthentikClaims {
+	return {
+		sub: payload.sub,
+		preferred_username: payload.preferred_username
+			|| payload.username
+			|| undefined,
+		email: payload.email,
+		given_name: payload.given_name,
+		family_name: payload.family_name,
+		name: payload.name,
+		iss: payload.iss,
+		aud: payload.aud,
+	}
+}
+
+async function getIntrospectionEndpoint(): Promise<string> {
+	const configured = process.env.AUTHENTIK_INTROSPECTION_URL?.trim()
+	if (configured) {
+		return configured
+	}
+
+	const configuration = await getOpenIdConfiguration()
+	if (!configuration.introspection_endpoint) {
+		throw new Error(
+			'Authentik OpenID configuration does not contain introspection_endpoint',
+		)
+	}
+
+	return configuration.introspection_endpoint
+}
+
+async function introspectToken(token: string): Promise<AuthentikClaims> {
+	const clientId = getAuthentikClientId()
+	const clientSecret = getAuthentikClientSecret()
+
+	if (!clientId || !clientSecret) {
+		throw new Error(
+			'AUTHENTIK_CLIENT_ID and AUTHENTIK_CLIENT_SECRET are required for token introspection',
+		)
+	}
+
+	const introspectionEndpoint = await getIntrospectionEndpoint()
+	const response = await fetch(introspectionEndpoint, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded',
+		},
+		body: new URLSearchParams({
+			token,
+			client_id: clientId,
+			client_secret: clientSecret,
+		}),
+	})
+
+	if (!response.ok) {
+		throw new Error(
+			`Authentik token introspection failed: ${response.status} ${response.statusText}`,
+		)
+	}
+
+	const payload = (await response.json()) as IntrospectionResponse
+	if (!payload.active) {
+		throw new Error('Authentik token introspection returned inactive token')
+	}
+
+	return mapIntrospectionToClaims(payload)
+}
+
+async function resolveClaims(token: string): Promise<AuthentikClaims> {
+	try {
+		return await verifyToken(token)
+	} catch (jwtError) {
+		if (!isConfidentialAuthentikClient()) {
+			throw jwtError
+		}
+
+		try {
+			return await introspectToken(token)
+		} catch (introspectionError) {
+			const jwtMessage = jwtError instanceof Error
+				? jwtError.message
+				: String(jwtError)
+			const introspectionMessage = introspectionError instanceof Error
+				? introspectionError.message
+				: String(introspectionError)
+
+			throw new Error(
+				`Authentik JWT verification failed (${jwtMessage}); `
+				+ `introspection failed (${introspectionMessage})`,
+			)
+		}
+	}
 }
 
 function readClaim(claims: AuthentikClaims, claimName: string): string | null {
@@ -235,6 +402,7 @@ async function findOrCreateUser(strapi: any, claims: AuthentikClaims) {
 		hasEmail: Boolean(readClaim(claims, getEmailClaim()) || readClaim(claims, 'email')),
 		issuer: typeof claims.iss === 'string' ? claims.iss : undefined,
 		audience: claims.aud,
+		confidentialClient: isConfidentialAuthentikClient(),
 	})
 
 	const existingUser = await strapi.db
@@ -290,9 +458,12 @@ export async function authenticateAuthentikBearerToken(strapi: any, ctx: any) {
 		return null
 	}
 
-	strapi.log.info('[Authentik Auth] Bearer token received')
+	strapi.log.info('[Authentik Auth] Bearer token received', {
+		confidentialClient: isConfidentialAuthentikClient(),
+		hasAudience: Boolean(getAudience()),
+	})
 
-	const claims = await verifyToken(token)
+	const claims = await resolveClaims(token)
 	const user = await findOrCreateUser(strapi, claims)
 
 	return {

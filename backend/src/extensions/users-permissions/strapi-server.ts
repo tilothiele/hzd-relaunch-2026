@@ -4,6 +4,7 @@ import { sanitizeUser, sanitizeUsers } from '../../utils/user-sanitize'
 import {
 	authenticateAuthentikBearerToken,
 	isAuthentikAuthEnabled,
+	isConfidentialAuthentikClient,
 } from '../../utils/authentik-auth'
 
 function buildResetPasswordBaseUrl(rawUrl: string): string {
@@ -74,6 +75,16 @@ export default (plugin: any) => {
 		}
 
 		strapi.log.info('[User Ext] Bootstrap: extending JWT service and patching user document service')
+
+		if (isAuthentikAuthEnabled()) {
+			strapi.log.info('[User Ext] Authentik bearer auth enabled', {
+				confidentialClient: isConfidentialAuthentikClient(),
+			})
+		} else {
+			strapi.log.warn(
+				'[User Ext] AUTHENTIK_ISSUER not set – Authentik bearer tokens will be rejected',
+			)
+		}
 
 		await ensureResetPasswordUrl(strapi)
 
@@ -190,8 +201,9 @@ export default (plugin: any) => {
 								message: authentikError instanceof Error
 									? authentikError.message
 									: String(authentikError),
+								confidentialClient: isConfidentialAuthentikClient(),
 							})
-							throw error
+							throw authentikError
 						}
 					}
 				}
