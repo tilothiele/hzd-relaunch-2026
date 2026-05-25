@@ -143,11 +143,35 @@ backup_application() {
 	fi
 }
 
+backup_files_in_dir() {
+	local base_dir = "$1"
+	local prefix = "$2"
+	docker run --rm \
+		-v "$base_dir:/backup/data:ro" \
+		-e AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" \
+		-e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
+		-e AWS_DEFAULT_REGION="$AWS_REGION" \
+		-e AWS_S3_BUCKET_NAME="$S3_BUCKET" \
+		-e AWS_ENDPOINT="$S3_ENDPOINT" \
+		-e BACKUP_RETENTION_DAYS="10" \
+		-e BACKUP_FILENAME="hzd-backup-%Y-%m-%dT%H-%M-%S-$prefix.{{ .Extension }}" \
+		--entrypoint backup \
+		offen/docker-volume-backup:latest \
+		|| {
+			trap - RETURN
+			_bv_ensure_start
+			die "Volume-Backup fehlgeschlagen: $vol"
+		}
+	echo "Backup von $vol erfolgreich"
+}
 
 mkdir -p "$BASE_DIR" || die "BASE_DIR anlegen fehlgeschlagen: $BASE_DIR"
 shopt -s nullglob
 rm -rf "${BASE_DIR}/"*
 shopt -u nullglob
+
+# Coolify-DB-dumps
+backup_files_in_dir /data/coolify/backups/coolify/coolify-db-hostdockerinternal coolify-db
 
 # Website
 dump_file="website_db_dump_${PG_PROD_DB}_$(date +%F).sql"
