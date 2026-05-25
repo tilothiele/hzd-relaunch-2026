@@ -62,6 +62,15 @@ function buildAuthentikTokenRequestBody(
 	return body
 }
 
+function getAuthentikScope(): string {
+	const configured = process.env.AUTHENTIK_SCOPE?.trim() ?? defaultOidcScope
+	if (configured.includes('offline_access')) {
+		return configured
+	}
+
+	return `${configured} offline_access`.trim()
+}
+
 function getAccessTokenExpiresAt(account: { expires_at?: number; expires_in?: number }): number {
 	if (typeof account.expires_at === 'number') {
 		return account.expires_at * 1000
@@ -129,16 +138,22 @@ async function refreshAuthentikToken(token: JWT): Promise<JWT> {
 	}
 }
 
+function getNextAuthPublicUrl(): string {
+	return (process.env.NEXTAUTH_URL ?? '').replace(/\/$/, '')
+}
+
 export const authOptions: NextAuthOptions = {
 	secret: process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET,
+	debug: process.env.NEXTAUTH_DEBUG === 'true',
+	useSecureCookies: getNextAuthPublicUrl().startsWith('https://'),
 	providers: [
 		AuthentikProvider({
 			clientId: process.env.AUTHENTIK_CLIENT_ID ?? '',
 			clientSecret: getAuthentikClientSecret(),
-			issuer: process.env.AUTHENTIK_ISSUER ?? '',
+			issuer: getIssuer(),
 			authorization: {
 				params: {
-					scope: process.env.AUTHENTIK_SCOPE ?? defaultOidcScope,
+					scope: getAuthentikScope(),
 				},
 			},
 			client: {
@@ -149,24 +164,43 @@ export const authOptions: NextAuthOptions = {
 	session: {
 		strategy: 'jwt',
 	},
+	events: {
+		async signIn(message) {
+			if (process.env.NEXTAUTH_DEBUG === 'true') {
+				console.log('[next-auth] signIn success', {
+					provider: message.account?.provider,
+					userId: message.user?.id,
+					callbackUrl: `${getNextAuthPublicUrl()}/api/auth/callback/authentik`,
+					authTrustHost: process.env.AUTH_TRUST_HOST ?? '',
+				})
+			}
+		},
+	},
+	logger: {
+		error(code, metadata) {
+			console.error('[next-auth]', code, metadata)
+		},
+	},
 	callbacks: {
 		async jwt({ token, account }) {
 			if (account) {
 				token.accessTokenExpiresAt = getAccessTokenExpiresAt(account)
-			}
 
-			if (account?.refresh_token) {
-				token.refreshToken = account.refresh_token
-			}
+				if (account.refresh_token) {
+					token.refreshToken = account.refresh_token
+				}
 
-			if (account?.access_token) {
-				logAuthentikToken('access_token', account.access_token)
-				token.accessToken = account.access_token
-			}
+				if (account.access_token) {
+					logAuthentikToken('access_token', account.access_token)
+					token.accessToken = account.access_token
+				}
 
-			if (account?.id_token) {
-				logAuthentikToken('id_token', account.id_token)
-				token.idToken = account.id_token
+				if (account.id_token) {
+					logAuthentikToken('id_token', account.id_token)
+					token.idToken = account.id_token
+				}
+
+				return token
 			}
 
 			if (

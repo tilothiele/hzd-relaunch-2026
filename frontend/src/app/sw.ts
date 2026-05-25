@@ -1,4 +1,11 @@
-import { type PrecacheEntry, Serwist, StaleWhileRevalidate, CacheFirst, ExpirationPlugin } from "serwist";
+import {
+	type PrecacheEntry,
+	Serwist,
+	StaleWhileRevalidate,
+	CacheFirst,
+	NetworkOnly,
+	ExpirationPlugin,
+} from "serwist";
 import pkg from "../../package.json";
 
 const VERSION = pkg.version;
@@ -11,8 +18,13 @@ const serwist = new Serwist({
     precacheEntries: self.__SW_MANIFEST,
     skipWaiting: false,
     clientsClaim: false,
-    navigationPreload: true,
+    // navigationPreload kann OAuth-Callbacks doppelt auslösen (Authorization-Code nur einmal gültig).
+    navigationPreload: false,
     runtimeCaching: [
+        {
+            matcher: ({ url }) => url.pathname.startsWith("/api/auth"),
+            handler: new NetworkOnly(),
+        },
         {
             matcher: ({ request }) => request.destination === "style" || request.destination === "script" || request.destination === "worker",
             handler: new StaleWhileRevalidate({

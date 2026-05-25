@@ -66,6 +66,21 @@ Ohne `AUTHENTIK_CLIENT_SECRET` ist der Provider ein Public Client (PKCE).
 Mit Secret muss die Authentik-Application als Confidential Client konfiguriert
 sein; Client-Typ und Auth-Methode müssen zusammenpassen.
 
+### Staging / Reverse Proxy
+
+- `AUTHENTIK_ISSUER` ohne trailing slash setzen (z. B.
+  `https://auth.example.org/application/o/website-frontend`).
+- Redirect-URI in Authentik: `{NEXTAUTH_URL}/api/auth/callback/authentik`
+- `AUTH_TRUST_HOST=true` nutzt `X-Forwarded-Host` und `X-Forwarded-Proto`
+  statt `NEXTAUTH_URL`. Das Proxy muss beide Header korrekt setzen
+  (`relaunch-staging.example.com`, `https`). Sonst `invalid_grant` /
+  `OAuthCallback` – in dem Fall `AUTH_TRUST_HOST` entfernen oder Header fixen.
+- `NEXTAUTH_DEBUG=true` loggt NextAuth-Fehler im Server-Log.
+- Nach Deploy: Service Worker in Browser deaktivieren (Application → Service Workers → Unregister)
+  oder Hard Reload, damit OAuth-Callbacks nicht doppelt laufen.
+- `AUTH_TRUST_HOST` nur mit korrekten `X-Forwarded-Host` / `X-Forwarded-Proto` Headern;
+  sonst weglassen und nur `NEXTAUTH_URL` setzen.
+
 ## Content-Types
 
 Die folgenden Content-Types müssen in Strapi erstellt werden:
