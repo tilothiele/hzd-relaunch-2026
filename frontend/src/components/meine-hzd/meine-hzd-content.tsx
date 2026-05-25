@@ -9,7 +9,7 @@ interface MeinHzdContentProps {
 }
 
 export function MeinHzdContent({ strapiBaseUrl }: MeinHzdContentProps) {
-	const { isAuthenticated, isAuthenticating, user } = useAuth(strapiBaseUrl)
+	const { isAuthenticated, isAuthenticating, user } = useAuth()
 
 	if (isAuthenticating) {
 		return (

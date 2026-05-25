@@ -22,15 +22,56 @@ import argparse
 import requests
 import time
 from typing import Dict, Optional, Any, Tuple
-import os
-import requests
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
 
 # Rate limiting für Nominatim API (max 1 Request pro Sekunde)
 NOMINATIM_DELAY = 1.0
+DEFAULT_HTTP_TIMEOUT = 30
+
+
+def get_first_env(keys: tuple[str, ...]) -> Optional[str]:
+    for key in keys:
+        value = os.getenv(key)
+        if value:
+            return value
+
+    return None
+
+
+def require_value(value: Optional[str], label: str) -> str:
+    if value:
+        return value
+
+    raise ValueError(f'Missing required configuration value: {label}')
+
+
+def get_strapi_graphql_url(explicit: Optional[str] = None) -> str:
+    return require_value(
+        explicit or get_first_env(('STRAPI_GRAPHQL_URL', 'STRAPI_ENDPOINT', 'ENDPOINT')),
+        'STRAPI_GRAPHQL_URL',
+    )
+
+
+def get_strapi_api_token(explicit: Optional[str] = None) -> Optional[str]:
+    return explicit or get_first_env(('STRAPI_API_TOKEN', 'STRAPI_TOKEN', 'TOKEN'))
+
+
+def get_strapi_http_timeout() -> int:
+    value = get_first_env(('STRAPI_HTTP_TIMEOUT', 'IMPORT_HTTP_TIMEOUT'))
+    if value is None:
+        return DEFAULT_HTTP_TIMEOUT
+
+    try:
+        return int(value)
+    except ValueError as exc:
+        raise ValueError(f'Invalid Strapi timeout value: {value}') from exc
+
+
+STRAPI_HTTP_TIMEOUT = get_strapi_http_timeout()
 
 def get_all_dogs(api_url: str, api_token: Optional[str]) -> list:
     """Hole alle Dogs über GraphQL."""
@@ -68,7 +109,7 @@ def get_all_dogs(api_url: str, api_token: Optional[str]) -> list:
             url,
             json={'query': query},
             headers=headers,
-            timeout=30
+            timeout=STRAPI_HTTP_TIMEOUT
         )
 
         if response.status_code == 200:
@@ -119,7 +160,7 @@ def find_member_by_cid(api_url: str, api_token: Optional[str], c_id: int) -> Opt
             url,
             json={'query': query, 'variables': {'cId': c_id}},
             headers=headers,
-            timeout=30
+            timeout=STRAPI_HTTP_TIMEOUT
         )
 
         if response.status_code == 200:
@@ -207,7 +248,7 @@ def find_breeder_by_member(api_url: str, api_token: Optional[str], member_id: in
             url,
             json={'query': query, 'variables': {'cId': member_id}},
             headers=headers,
-            timeout=30
+            timeout=STRAPI_HTTP_TIMEOUT
         )
 
         if response.status_code == 200:
@@ -276,7 +317,7 @@ def create_or_update_breeder(api_url: str, api_token: Optional[str], member_id: 
                     }
                 },
                 headers=headers,
-                timeout=30
+                timeout=STRAPI_HTTP_TIMEOUT
             )
 
             if response.status_code == 200:
@@ -317,7 +358,7 @@ def create_or_update_breeder(api_url: str, api_token: Optional[str], member_id: 
                     }
                 },
                 headers=headers,
-                timeout=30
+                timeout=STRAPI_HTTP_TIMEOUT
             )
 
             if response.status_code == 200:
@@ -378,7 +419,7 @@ def update_dog_owner_relation(api_url: str, api_token: Optional[str], dog_id: st
                 }
             },
             headers=headers,
-            timeout=30
+            timeout=STRAPI_HTTP_TIMEOUT
         )
 
         if response.status_code == 200:
@@ -450,7 +491,7 @@ def update_dog_location(api_url: str, api_token: Optional[str], dog_id: str,
                 'variables': variables
             },
             headers=headers,
-            timeout=30
+            timeout=STRAPI_HTTP_TIMEOUT
         )
 
         if response.status_code == 200:
@@ -475,8 +516,8 @@ def update_dog_location(api_url: str, api_token: Optional[str], dog_id: str,
         return False
 
 def main():
-    token = os.getenv("TOKEN")
-    endpoint = os.getenv("ENDPOINT")
+    token = get_strapi_api_token()
+    endpoint = get_strapi_graphql_url()
 
     parser = argparse.ArgumentParser(description='Update Dog Locations basierend auf Member PLZ')
     parser.add_argument('--dry-run', action='store_true',

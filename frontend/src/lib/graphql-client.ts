@@ -3,34 +3,6 @@ import { GraphQLClient } from 'graphql-request'
 let persistedAuthToken: string | null = null
 let persistedBaseUrl: string | null = null
 
-/**
- * Initialisiert den Token aus localStorage (falls vorhanden)
- * Sollte beim App-Start aufgerufen werden
- */
-function initializeTokenFromStorage() {
-	if (typeof window === 'undefined') {
-		return
-	}
-
-	try {
-		const stored = localStorage.getItem('hzd_auth_state')
-		if (stored) {
-			const parsed = JSON.parse(stored) as { token?: string | null }
-			if (parsed.token && typeof parsed.token === 'string') {
-				persistedAuthToken = parsed.token
-				return
-			}
-		}
-	} catch {
-		// Ignore parse errors
-	}
-}
-
-// Initialisiere beim Modul-Laden (nur im Browser)
-if (typeof window !== 'undefined') {
-	initializeTokenFromStorage()
-}
-
 export function setGraphQLAuthToken(token?: string | null) {
 	persistedAuthToken = token ?? null
 }
@@ -55,44 +27,11 @@ export async function fetchGraphQL<T>(
 ): Promise<T> {
 	const { variables, token } = options
 
-	// Versuche Token aus verschiedenen Quellen zu holen
-	let effectiveToken = token ?? persistedAuthToken
-
-	// Fallback: Versuche Token aus localStorage zu holen, falls noch nicht gesetzt
-	if (!effectiveToken && typeof window !== 'undefined') {
-		try {
-			const stored = localStorage.getItem('hzd_auth_state')
-			if (stored) {
-				const parsed = JSON.parse(stored) as { token?: string | null | unknown; user?: unknown }
-
-				// Normalisiere Token: Falls es ein Objekt ist, versuche token.token oder token.jwt
-				let normalizedToken: string | null = null
-				if (typeof parsed.token === 'string' && parsed.token.length > 0) {
-					normalizedToken = parsed.token
-				} else if (parsed.token && typeof parsed.token === 'object') {
-					const tokenObj = parsed.token as Record<string, unknown>
-					if (typeof tokenObj.token === 'string') {
-						normalizedToken = tokenObj.token
-					} else if (typeof tokenObj.jwt === 'string') {
-						normalizedToken = tokenObj.jwt
-					} else if (typeof tokenObj.Token === 'string') {
-						normalizedToken = tokenObj.Token
-					}
-				}
-
-				if (normalizedToken) {
-					effectiveToken = normalizedToken
-					persistedAuthToken = normalizedToken
-				}
-			}
-		} catch (error) {
-			console.error('[GraphQL Client] Fehler beim Laden aus localStorage:', error)
-		}
-	}
+	const effectiveToken = token ?? persistedAuthToken
 
 	// Verwende Next.js API-Route als Proxy, um CORS-Probleme zu vermeiden.
 	// credentials: 'include' damit HTTP-Basic (falls Next geschützt ist) mitgeht;
-	// Strapi erhält weiter nur den JWT über den Proxy-Body, keine Basic-Header.
+	// Strapi erhält weiter nur den OIDC-Token über den Proxy-Body, keine Basic-Header.
 	try {
 		const response = await fetch('/api/graphql', {
 			method: 'POST',

@@ -67,7 +67,7 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 		isAuthenticating,
 		handleLogin,
 		handleLogout,
-	} = useAuth(strapiBaseUrl)
+	} = useAuth()
 
 	// theme prop is kept for backward compatibility but ignored in favor of the global theme
 	const currentTheme = globalTheme
@@ -84,7 +84,12 @@ export function MainPageStructure({ homepage, strapiBaseUrl, loading = false, pa
 
 	// Bevorzuge children (Server Components), falls vorhanden, sonst rendere sections (Client Components)
 	const content = children ?? (sections && strapiBaseUrl
-		? renderStartpageSections({ sections, strapiBaseUrl, theme: currentTheme })
+		? renderStartpageSections({
+			sections,
+			strapiBaseUrl,
+			theme: currentTheme,
+			logo: homepage?.Logo,
+		})
 		: null)
 
 	return (

@@ -14,19 +14,14 @@ import FacebookShare from '@/components/ui/facebook-share-1'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBell, faCalendar } from '@fortawesome/free-solid-svg-icons'
 
-interface LoginCredentials {
-    identifier: string
-    password: string
-}
-
 interface HeaderNavigationProps {
     globalLayout?: GlobalLayout | null
     strapiBaseUrl?: string | null
     theme: ThemeDefinition
     isAuthenticated: boolean
     user: AuthUser | null
-    onLogin: (credentials: LoginCredentials) => Promise<void>
-    onLogout: () => void
+    onLogin: () => Promise<void>
+    onLogout: () => Promise<void>
     isAuthenticating: boolean
     error?: string | null
     isScrolled: boolean
@@ -51,7 +46,9 @@ export function HeaderNavigation({
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            setCurrentUrl(window.location.href)
+            queueMicrotask(() => {
+                setCurrentUrl(window.location.href)
+            })
 
             // Check if push notifications are active
             if ('serviceWorker' in navigator && 'PushManager' in window) {
@@ -60,10 +57,6 @@ export function HeaderNavigation({
                         setIsNotificationActive(!!sub)
                     }).catch(() => setIsNotificationActive(false))
                 }).catch(() => setIsNotificationActive(false))
-            } else {
-                // If PushManager is not supported (e.g. on iOS Safari not in standalone)
-                // we keep it as false to show the prompt icon
-                setIsNotificationActive(false)
             }
         }
     }, [])

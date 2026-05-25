@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { GraphQLClient } from 'graphql-request'
 import { draftMode } from 'next/headers'
+import { getToken } from 'next-auth/jwt'
 
 export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
@@ -50,8 +51,30 @@ export async function POST(request: NextRequest) {
 			fetch: fetchNoStore,
 		})
 
-		if (token && typeof token === 'string' && token.length > 0) {
-			client.setHeader('Authorization', `Bearer ${token}`)
+		const sessionToken = await getToken({
+			req: request,
+			secret: process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET,
+		})
+		const effectiveToken = typeof token === 'string' && token.length > 0
+			? token
+			: (sessionToken?.idToken ?? sessionToken?.accessToken)
+
+		if (typeof effectiveToken === 'string' && effectiveToken.length > 0) {
+			if (process.env.AUTHENTIK_LOG_TOKENS === 'true') {
+				console.log('[GraphQL proxy] Forwarding bearer token to Strapi', {
+					source: typeof token === 'string' && token.length > 0
+						? 'request-body'
+						: sessionToken?.idToken
+							? 'nextauth-id-token'
+							: 'nextauth-access-token',
+					query: typeof query === 'string' ? query.match(/\b(query|mutation)\s+(\w+)/)?.[2] : undefined,
+				})
+			}
+			client.setHeader('Authorization', `Bearer ${effectiveToken}`)
+		} else if (process.env.AUTHENTIK_LOG_TOKENS === 'true') {
+			console.log('[GraphQL proxy] No bearer token forwarded to Strapi', {
+				query: typeof query === 'string' ? query.match(/\b(query|mutation)\s+(\w+)/)?.[2] : undefined,
+			})
 		}
 
 		const data = await client.request(query, effectiveVariables)

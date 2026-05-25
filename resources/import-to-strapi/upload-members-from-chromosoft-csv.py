@@ -19,12 +19,24 @@ import requests
 import time
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, Optional, Any
+from typing import Optional, cast
 import re
 from dotenv import load_dotenv
 import os
 
+from strapi_backend import (
+    CreateUsersPermissionsUserVariables,
+    UserSex,
+    UsersPermissionsUser,
+    UsersPermissionsUserInput,
+    fetch_existing_users_from_strapi,
+    find_existing_member_by_c_id,
+)
+
 load_dotenv()
+
+DEFAULT_HTTP_TIMEOUT = 30
+
 
 # Mapping of country names to ISO 3166-1 alpha-2 codes
 COUNTRY_CODES = {
@@ -44,6 +56,39 @@ REGION_MAPPING = {
     'West': 'West',
     'Mitte': 'Mitte'
 }
+
+def get_first_env(keys: tuple[str, ...]) -> Optional[str]:
+    for key in keys:
+        value = os.getenv(key)
+        if value:
+            return value
+
+    return None
+
+def require_value(value: Optional[str], label: str) -> str:
+    if value:
+        return value
+
+    raise ValueError(f'Missing required configuration value: {label}')
+
+def get_strapi_graphql_url(explicit: Optional[str] = None) -> str:
+    return require_value(
+        explicit or get_first_env(('STRAPI_GRAPHQL_URL', 'STRAPI_ENDPOINT', 'ENDPOINT')),
+        'STRAPI_GRAPHQL_URL',
+    )
+
+def get_strapi_api_token(explicit: Optional[str] = None) -> Optional[str]:
+    return explicit or get_first_env(('STRAPI_API_TOKEN', 'STRAPI_TOKEN', 'TOKEN'))
+
+def get_strapi_http_timeout() -> int:
+    value = get_first_env(('STRAPI_HTTP_TIMEOUT', 'IMPORT_HTTP_TIMEOUT'))
+    if value is None:
+        return DEFAULT_HTTP_TIMEOUT
+
+    try:
+        return int(value)
+    except ValueError as exc:
+        raise ValueError(f'Invalid Strapi timeout value: {value}') from exc
 
 def parse_date(date_str: str) -> Optional[str]:
     """Parse date from DD/MM/YYYY format to YYYY-MM-DD format."""
@@ -87,7 +132,7 @@ def parse_integer(value: str) -> Optional[int]:
     except ValueError:
         return None
 
-def parse_sex(salutation: str) -> Optional[str]:
+def parse_sex(salutation: str) -> Optional[UserSex]:
     """Convert salutation to sex enum (M or F)."""
     if not salutation or salutation.strip() == '-' or salutation.strip() == '':
         return None
@@ -117,9 +162,9 @@ def clean_string(value: str, max_length: Optional[int] = None) -> Optional[str]:
         cleaned = cleaned[:max_length]
     return cleaned
 
-def map_csv_to_member(row: Dict[str, str]) -> Dict[str, Any]:
+def map_csv_to_member(row: dict[str, str]) -> UsersPermissionsUserInput:
     """Map CSV row to Strapi member data structure."""
-    member_data = {}
+    member_data: UsersPermissionsUserInput = {}
 
     # cId - unique identifier from CSV
     c_id = parse_integer(row.get('ID Person', ''))
@@ -226,49 +271,14 @@ def map_csv_to_member(row: Dict[str, str]) -> Dict[str, Any]:
 
     return member_data
 
-def find_existing_user(api_url: str, api_token: Optional[str], c_id: int) -> Optional[int]:
-    """Find existing member by cId using GraphQL. Returns member ID if found, None otherwise."""
-    url = f"{api_url}"
-
-    headers = {
-        'Content-Type': 'application/json',
-    }
-
-    if api_token:
-        headers['Authorization'] = f'Bearer {api_token}'
-
-    query = """
-    query FindUserByCId($cId: Int!) {
-        usersPermissionsUsers(filters: { cId: { eq: $cId } }) {
-            documentId
-        }
-    }
-    """
-
-    try:
-        response = requests.post(
-            url,
-            json={'query': query, 'variables': {'cId': c_id}},
-            headers=headers,
-            timeout=30
-        )
-
-        if response.status_code == 200:
-            result = response.json()
-            if 'errors' in result:
-                return None
-            data = result.get('data', {}).get('usersPermissionsUsers', [])
-            if data and len(data) > 0:
-                return data[0].get('documentId')
-    except Exception as e:
-        print(f"Warning: Error finding existing member: {e}")
-        pass
-
-    return None
-
-def build_graphql_mutation(member_data: Dict[str, Any]) -> tuple[str, Dict[str, Any]]:
+def build_graphql_mutation(
+    member_data: UsersPermissionsUserInput,
+) -> tuple[str, CreateUsersPermissionsUserVariables]:
     """Build GraphQL mutation string and variables for creating a member."""
-    member_data['password'] = 'Startstart'
+    user_input: UsersPermissionsUserInput = {
+        **member_data,
+        'password': 'Startstart',
+    }
     mutation = """
     mutation CreateUser($data: UsersPermissionsUserInput!) {
         createUsersPermissionsUser(data: $data) {
@@ -281,21 +291,24 @@ def build_graphql_mutation(member_data: Dict[str, Any]) -> tuple[str, Dict[str, 
         }
     }
     """
-    variables = {
-        'data': member_data
+    variables: CreateUsersPermissionsUserVariables = {
+        'data': user_input
     }
 
     return mutation, variables
 
-def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str, Any],
+def import_member(api_url: Optional[str], api_token: Optional[str], member_data: UsersPermissionsUserInput,
                   dry_run: bool = False) -> bool:
     """Import a single member via Strapi GraphQL API."""
+    api_url = get_strapi_graphql_url(api_url)
+    api_token = get_strapi_api_token(api_token)
+
     # Check if member with this cId already exists
     c_id = member_data.get('cId')
     existing_id = None
 
     if c_id and not dry_run:
-        existing_id = find_existing_user(api_url, api_token, c_id)
+        existing_id = find_existing_member_by_c_id(c_id, api_url, api_token)
 
     url = f"{api_url}"
 
@@ -325,7 +338,7 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
             url,
             json={'query': mutation, 'variables': variables},
             headers=headers,
-            timeout=30
+            timeout=get_strapi_http_timeout()
         )
 
         if response.status_code == 200:
@@ -336,7 +349,10 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
                 print(f"✗ Failed to create member (cId: {member_data.get('cId', 'N/A')}): {error_msg}")
                 return False
 
-            data = result.get('data', {}).get('createUsersPermissionsUser', {}).get('data')
+            data = cast(
+                Optional[UsersPermissionsUser],
+                result.get('data', {}).get('createUsersPermissionsUser', {}).get('data'),
+            )
 
             if data:
                 member_id = data.get('documentId', 'N/A')
@@ -358,8 +374,8 @@ def import_member(api_url: str, api_token: Optional[str], member_data: Dict[str,
 
 def main():
 
-    token = os.getenv("TOKEN")
-    endpoint = os.getenv("ENDPOINT")
+    token = get_strapi_api_token()
+    endpoint = get_strapi_graphql_url()
 
 
     parser = argparse.ArgumentParser(description='Import members from CSV into Strapi')
@@ -403,6 +419,10 @@ def main():
         print(f"API Token: Not provided (requests may fail if authentication is required)")
     print(f"Dry run: {args.dry_run}")
     print("-" * 60)
+
+    existing_strapi_users = fetch_existing_users_from_strapi(endpoint, token)
+    print(f"Found {len(existing_strapi_users)} existing Strapi users")
+    print(existing_strapi_users)
 
     # Process each row
     success_count = 0

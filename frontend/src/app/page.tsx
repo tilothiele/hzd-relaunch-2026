@@ -4,8 +4,9 @@ import { fetchGraphQLServer, getStrapiBaseUrl } from '@/lib/server/graphql-clien
 import { enrichSectionsWithSupplementalDocuments } from '@/lib/server/enrich-supplemental-sections'
 import { GET_LAYOUT, GET_ME } from '@/lib/graphql/queries'
 import { renderServerSections } from '@/components/sections/server-section-factory'
-import type { GlobalLayout } from '@/types'
-import { cookies } from 'next/headers'
+import type { GlobalLayout, Page } from '@/types'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth-options'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,6 +20,35 @@ interface MeData {
 	me?: {
 		documentId: string
 	} | null
+}
+
+function resolveHomePage(
+	globalLayout: GlobalLayout,
+	isAuthenticated: boolean,
+): Page | null | undefined {
+	const defaultPage = globalLayout.page
+	const authenticatedPage = globalLayout.authenticated_page
+	const authSections = authenticatedPage?.Sections ?? []
+
+	if (!isAuthenticated || authSections.length === 0) {
+		return defaultPage
+	}
+
+	const hasOnlyRichTextSections = authSections.every(
+		(section) => section.__typename === 'ComponentBlocksRichTextSection',
+	)
+	const defaultSections = defaultPage?.Sections ?? []
+	const defaultHasStructuredSections = defaultSections.some(
+		(section) => section.__typename !== 'ComponentBlocksRichTextSection',
+	)
+
+	// authenticated_page ist in Strapi oft nur ein Platzhalter (z. B. "Happy Welcome").
+	// Solange dort keine echten Layout-Sections liegen, normale Startseite anzeigen.
+	if (hasOnlyRichTextSections && defaultHasStructuredSections) {
+		return defaultPage
+	}
+
+	return authenticatedPage ?? defaultPage
 }
 
 export default async function Home() {
@@ -36,23 +66,8 @@ export default async function Home() {
 			globalLayout.announcements = data.announcements ?? null
 		}
 
-		const cookieStore = await cookies()
-		const tokenFromCookie = cookieStore.get('hzd_auth_token')?.value
-		const stateFromCookie = cookieStore.get('hzd_auth_state')?.value
-		let authToken: string | null = tokenFromCookie ?? null
-
-		if (!authToken && stateFromCookie) {
-			try {
-				const parsed = JSON.parse(stateFromCookie) as {
-					token?: string | { jwt?: string; token?: string } | null
-				}
-				authToken = typeof parsed.token === 'string'
-					? parsed.token
-					: (parsed.token?.jwt ?? parsed.token?.token ?? null)
-			} catch {
-				authToken = null
-			}
-		}
+		const session = await getServerSession(authOptions)
+		const authToken = session?.idToken ?? session?.accessToken ?? null
 
 		if (authToken) {
 			const meData = await fetchGraphQLServer<MeData>(GET_ME, {
@@ -65,9 +80,9 @@ export default async function Home() {
 		error = err instanceof Error ? err : new Error('Fehler beim Laden der Seite.')
 	}
 
-	const page = isAuthenticated
-		? (globalLayout?.authenticated_page ?? globalLayout?.page)
-		: globalLayout?.page
+	const page = globalLayout
+		? resolveHomePage(globalLayout, isAuthenticated)
+		: null
 	const sections = await enrichSectionsWithSupplementalDocuments(
 		page?.Sections ?? [],
 		baseUrl,
@@ -95,7 +110,7 @@ export default async function Home() {
 		strapiBaseUrl: baseUrl,
 		theme,
 		logo: globalLayout?.Logo,
-		hzdSetting: globalLayout?.HzdSetting
+		hzdSetting: globalLayout?.HzdSetting,
 	})
 
 	return (
