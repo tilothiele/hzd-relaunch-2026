@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { signIn, signOut, useSession } from 'next-auth/react'
+import { performFederatedLogout } from '@/lib/federated-logout'
 import {
 	setGraphQLAuthToken,
 	setGraphQLUnauthorizedHandler,
@@ -165,11 +166,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		setIsAuthenticating(true)
 		setAuthError(null)
 		setGraphQLAuthToken(null)
+		setAuthState({ token: null, user: null })
 
 		try {
-			await signOut({
-				callbackUrl: '/',
-			})
+			await performFederatedLogout(`${window.location.origin}/`)
 		} finally {
 			setIsAuthenticating(false)
 		}
