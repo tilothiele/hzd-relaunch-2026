@@ -71,13 +71,12 @@ await setPermissions(strapi)
 
 ## Überprüfung
 
-Nach dem Setup sollten GraphQL-Queries funktionieren. Teste mit:
+Nach dem Setup sollten REST-Anfragen funktionieren. Teste z. B.:
 
 ```bash
-curl -X POST http://localhost:1337/graphql \
-  -H "Content-Type: application/json" \
-  -d '{"query":"{ hzdPluginHomepage { data { id attributes { heroTitle } } } }"}'
+curl -s "http://localhost:1337/api/global-layout?populate[Logo]=true" \
+  -H "Authorization: Bearer <API-TOKEN>"
 ```
 
-Wenn du eine Antwort ohne "Forbidden access" erhältst, sind die Permissions korrekt gesetzt.
+Wenn du eine Antwort ohne „Forbidden access“ erhältst, sind die Permissions korrekt gesetzt.
 

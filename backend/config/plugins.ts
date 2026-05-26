@@ -38,12 +38,6 @@ export default ({ env }) => ({
       },
     },
   },
-  // https://docs.strapi.io/cms/plugins/graphql
-  graphql: {
-    config: {
-      landingPage: true
-    }
-  },
   backup: {
     enabled: env.bool('BACKUP_ENABLE', false),
     config: {

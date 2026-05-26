@@ -15,9 +15,13 @@ import {
 	TableRow,
 	TableSortLabel,
 } from '@mui/material'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { SEARCH_BREEDERS } from '@/lib/graphql/queries'
-import type { Breeder, BreederSearchResult, HzdSetting } from '@/types'
+import {
+	getBreederApiSort,
+	sortBreedersByField,
+	type BreederSortField,
+} from '@/lib/breeder-sort-utils'
+import { searchBreeders } from '@/lib/strapi/api'
+import type { Breeder, HzdSetting } from '@/types'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
 import { ViewToggle } from '@/components/common/view-toggle'
@@ -34,12 +38,7 @@ interface StudDogSearchProps {
 
 type PageSize = 5 | 10 | 20 | 50 | 100
 type SortDirection = 'asc' | 'desc'
-type SortField =
-	| 'member.lastName'
-	| 'member.zip'
-	| 'member.city'
-	| 'member.phone'
-	| 'member.email'
+type SortField = BreederSortField
 
 export function StudDogSearch({
 	strapiBaseUrl,
@@ -98,24 +97,20 @@ export function StudDogSearch({
 				})
 			}
 
-			const data = await fetchGraphQL<BreederSearchResult>(
-				SEARCH_BREEDERS,
+			const data = await searchBreeders(
 				{
-					baseUrl: strapiBaseUrl,
-					variables: {
-						filters: { and: filterConditions },
-						pagination: {
-							page,
-							pageSize,
-						},
-						sort: [`${sortField}:${sortDirection}`],
-					},
+					filters: { and: filterConditions },
+					pagination: { page, pageSize },
+					sort: [getBreederApiSort(sortField, sortDirection)],
 				},
+				{ baseUrl: strapiBaseUrl },
 			)
 			const connection = data.hzdPluginBreeders_connection
-			const breederNodes = Array.isArray(connection.nodes)
-				? connection.nodes
-				: []
+			const breederNodes = sortBreedersByField(
+				Array.isArray(connection.nodes) ? connection.nodes : [],
+				sortField,
+				sortDirection,
+			)
 
 			setBreeders(breederNodes)
 			setTotalBreeders(connection.pageInfo?.total ?? 0)

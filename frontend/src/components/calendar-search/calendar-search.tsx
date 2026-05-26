@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Box, Typography, Paper, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { GET_CALENDARS, SEARCH_CALENDAR_ITEMS } from '@/lib/graphql/queries'
-import type { Calendar, CalendarItem, CalendarSearchResult, CalendarItemSearchResult } from '@/types'
+import { buildStrapiQuery } from '@/lib/strapi/filters'
+import { fetchEntityList } from '@/lib/strapi/api'
+import { POPULATE_CALENDAR_ENTRY } from '@/lib/strapi/populate'
+import type { Calendar, CalendarItem } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { ExternalRegistrationLink, InternalRegistrationLink } from '@/components/calendar/registration-links'
@@ -156,14 +157,15 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 		setError(null)
 
 		try {
-			const data = await fetchGraphQL<CalendarSearchResult>(
-				GET_CALENDARS,
-				{
-					baseUrl: strapiBaseUrl,
-				},
+			const query = buildStrapiQuery({
+				sort: ['Ord:asc', 'Name:asc'],
+				pagination: { pageSize: 100 },
+			})
+			const calendarsArray = await fetchEntityList<Calendar>(
+				'calendars',
+				query,
+				{ baseUrl: strapiBaseUrl },
 			)
-
-			const calendarsArray = Array.isArray(data.calendars) ? data.calendars : []
 			calendarsArray.sort((a, b) => {
 				const ordA = a.Ord ?? 999
 				const ordB = b.Ord ?? 999
@@ -225,19 +227,21 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				filters: {
 					and: filterConditions,
 				},
-				pagination: { limit: -1 },
+				pagination: { pageSize: 500 },
 				sort: ['Date:asc'],
 			}
 
-			const data = await fetchGraphQL<CalendarItemSearchResult>(
-				SEARCH_CALENDAR_ITEMS,
-				{
-					baseUrl: strapiBaseUrl,
-					variables,
-				},
+			const query = buildStrapiQuery({
+				filters: variables.filters as Record<string, unknown>,
+				pagination: variables.pagination as { limit?: number },
+				sort: variables.sort as string[],
+				populate: Object.fromEntries(POPULATE_CALENDAR_ENTRY.entries()),
+			})
+			const itemsArray = await fetchEntityList<CalendarItem>(
+				'calendar-entries',
+				query,
+				{ baseUrl: strapiBaseUrl },
 			)
-
-			const itemsArray = Array.isArray(data.calendarEntries) ? data.calendarEntries : []
 			const nowTs = Date.now()
 			const visibleItems = itemsArray.filter(
 				(item) => isWithinVisibility(item, nowTs) && isTodayOrFuture(item),
@@ -302,19 +306,21 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				filters: {
 					and: filterConditions,
 				},
-				pagination: { limit: -1 },
+				pagination: { pageSize: 500 },
 				sort: ['Date:asc'],
 			}
 
-			const data = await fetchGraphQL<CalendarItemSearchResult>(
-				SEARCH_CALENDAR_ITEMS,
-				{
-					baseUrl: strapiBaseUrl,
-					variables,
-				},
+			const query = buildStrapiQuery({
+				filters: variables.filters as Record<string, unknown>,
+				pagination: variables.pagination as { limit?: number },
+				sort: variables.sort as string[],
+				populate: Object.fromEntries(POPULATE_CALENDAR_ENTRY.entries()),
+			})
+			const itemsArray = await fetchEntityList<CalendarItem>(
+				'calendar-entries',
+				query,
+				{ baseUrl: strapiBaseUrl },
 			)
-
-			const itemsArray = Array.isArray(data.calendarEntries) ? data.calendarEntries : []
 			const nowTs = Date.now()
 			const visibleItems = itemsArray.filter(
 				(item) => isWithinVisibility(item, nowTs) && isTodayOrFuture(item),

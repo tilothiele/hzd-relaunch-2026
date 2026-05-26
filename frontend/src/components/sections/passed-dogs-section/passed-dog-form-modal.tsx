@@ -17,13 +17,10 @@ import {
 import { useTheme } from '@mui/material/styles'
 import CloseIcon from '@mui/icons-material/Close'
 import type { ThemeDefinition } from '@/themes'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import {
-	GET_MY_ALIVE_DOGS,
-	GET_MY_PENDING_PASSED_DOGS,
-} from '@/lib/graphql/passed-dogs-queries'
+import { buildStrapiQuery } from '@/lib/strapi/filters'
+import { POPULATE_PASSED_DOG } from '@/lib/strapi/populate'
+import { createEntity, fetchEntityList, searchDogs, updateEntity } from '@/lib/strapi/api'
 import { MAX_PENDING_PASSED_DOGS } from '@/lib/passed-dogs-limits'
-import { CREATE_PASSED_DOG, UPDATE_PASSED_DOG } from '@/lib/graphql/mutations'
 import type { PassedDogCardData } from '@/lib/server/passed-dog-utils'
 import { useAuth } from '@/hooks/use-auth'
 
@@ -120,11 +117,22 @@ export function PassedDogFormModal({
 
 	const loadAliveDogs = useCallback(async () => {
 		try {
-			const res = await fetchGraphQL<{ hzdPluginDogs: AliveDog[] }>(
-				GET_MY_ALIVE_DOGS,
-				{ variables: { ownerId: userDocumentId } },
+			const res = await searchDogs({
+				filters: {
+					and: [
+						{ owner: { documentId: { eq: userDocumentId } } },
+						{ dateOfDeath: { null: true } },
+					],
+				},
+				pagination: { pageSize: 500 },
+				sort: ['fullKennelName:asc'],
+			})
+			setAliveDogs(
+				(res.hzdPluginDogs_connection?.nodes ?? []).map((d) => ({
+					documentId: d.documentId,
+					fullKennelName: d.fullKennelName,
+				})),
 			)
-			setAliveDogs(res.hzdPluginDogs ?? [])
 		} catch (e) {
 			console.error(e)
 			setAliveDogs([])
@@ -178,12 +186,21 @@ export function PassedDogFormModal({
 		setSubmitting(true)
 		try {
 			if (mode === 'create') {
-				const pendingCheck = await fetchGraphQL<{
-					passedDogs: { documentId: string }[]
-				}>(GET_MY_PENDING_PASSED_DOGS, {
-					variables: { userId: userDocumentId },
+				const pendingQuery = buildStrapiQuery({
+					filters: {
+						and: [
+							{ users_permissions_user: { documentId: { eq: userDocumentId } } },
+							{ not: { Approved: { eq: true } } },
+						],
+					},
+					pagination: { pageSize: 100 },
+					populate: Object.fromEntries(POPULATE_PASSED_DOG.entries()),
 				})
-				const pendingCount = pendingCheck.passedDogs?.length ?? 0
+				const pendingCheck = await fetchEntityList<{ documentId: string }>(
+					'passed-dogs',
+					pendingQuery,
+				)
+				const pendingCount = pendingCheck.length
 				if (pendingCount >= MAX_PENDING_PASSED_DOGS) {
 					setFormError(
 						`Sie dürfen höchstens ${MAX_PENDING_PASSED_DOGS} Einträge gleichzeitig in Prüfung haben.`,
@@ -221,9 +238,7 @@ export function PassedDogFormModal({
 				if (avatarId !== undefined) {
 					data.Avatar = avatarId
 				}
-				await fetchGraphQL(CREATE_PASSED_DOG, {
-					variables: { data },
-				})
+				await createEntity('passed-dogs', data)
 			} else if (initial) {
 				const data: Record<string, unknown> = {
 					DatePassed: datePassed,
@@ -239,9 +254,7 @@ export function PassedDogFormModal({
 				if (avatarId !== undefined) {
 					data.Avatar = avatarId
 				}
-				await fetchGraphQL(UPDATE_PASSED_DOG, {
-					variables: { documentId: initial.documentId, data },
-				})
+				await updateEntity('passed-dogs', initial.documentId, data)
 			}
 
 			onSuccess()

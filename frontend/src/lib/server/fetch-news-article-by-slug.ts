@@ -1,20 +1,12 @@
-import { fetchGraphQLServer, getStrapiBaseUrl } from './graphql-client'
-import { GET_NEWS_ARTICLE_BY_SLUG, GET_LAYOUT } from '@/lib/graphql/queries'
+import { getStrapiBaseUrl } from './strapi-client'
+import { fetchLayoutServer, fetchNewsArticleBySlug as fetchNewsArticleBySlugApi } from '@/lib/strapi/api'
 import type { GlobalLayout, NewsArticle } from '@/types'
 
-interface NewsArticleQueryResult {
-    newsArticles?: NewsArticle[] | null
-}
-
-interface LayoutData {
-    globalLayout: GlobalLayout
-}
-
 export interface NewsArticleBySlugResult {
-    article: NewsArticle | null
-    globalLayout: GlobalLayout | null
-    baseUrl: string
-    error: Error | null
+	article: NewsArticle | null
+	globalLayout: GlobalLayout | null
+	baseUrl: string
+	error: Error | null
 }
 
 /**
@@ -22,41 +14,34 @@ export interface NewsArticleBySlugResult {
  * Combines article data with global layout data.
  */
 export async function fetchNewsArticleBySlug(slug: string): Promise<NewsArticleBySlugResult> {
-    try {
-        const baseUrl = getStrapiBaseUrl()
+	try {
+		const baseUrl = getStrapiBaseUrl()
 
-        const [articleData, layoutData] = await Promise.all([
-            fetchGraphQLServer<NewsArticleQueryResult>(
-                GET_NEWS_ARTICLE_BY_SLUG,
-                {
-                    baseUrl,
-                    variables: { slug },
-                },
-            ),
-            fetchGraphQLServer<LayoutData>(GET_LAYOUT, { baseUrl }),
-        ])
+		const [articleData, layoutData] = await Promise.all([
+			fetchNewsArticleBySlugApi(slug, baseUrl),
+			fetchLayoutServer(baseUrl),
+		])
 
-        // Get the first matching article (should only be one due to unique slug)
-        const matchingArticle = articleData.newsArticles?.[0] ?? null
+		const matchingArticle = (articleData.newsArticles?.[0] ?? null) as unknown as NewsArticle | null
 
-        return {
-            article: matchingArticle,
-            globalLayout: layoutData.globalLayout,
-            baseUrl,
-            error: null,
-        }
-    } catch (err) {
-        const error = err instanceof Error
-            ? err
-            : new Error('Artikel konnte nicht geladen werden.')
+		return {
+			article: matchingArticle,
+			globalLayout: layoutData.globalLayout,
+			baseUrl,
+			error: null,
+		}
+	} catch (err) {
+		const error = err instanceof Error
+			? err
+			: new Error('Artikel konnte nicht geladen werden.')
 
-        return {
-            article: null,
-            globalLayout: null,
-            baseUrl: getStrapiBaseUrl(),
-            error,
-        }
-    }
+		return {
+			article: null,
+			globalLayout: null,
+			baseUrl: getStrapiBaseUrl(),
+			error,
+		}
+	}
 }
 
 /**

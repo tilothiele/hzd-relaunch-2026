@@ -4,8 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Box, Typography, Paper, TextField, Button, FormControl, InputLabel, Select, MenuItem, Pagination, CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton } from '@mui/material'
 import Link from 'next/link'
 import VisibilityIcon from '@mui/icons-material/Visibility'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { SEARCH_FORMS, COUNT_FORM_INSTANCES } from '@/lib/graphql/queries'
+import { buildStrapiQuery } from '@/lib/strapi/filters'
+import { countFormInstances, fetchEntityList } from '@/lib/strapi/api'
 import type { Form, FormSearchResult, FormInstanceSearchResult, AuthUser } from '@/types'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { ActionButton } from '@/components/ui/action-button'
@@ -63,20 +63,15 @@ export function FormsInstanceSearch({ strapiBaseUrl, user, isAuthenticated }: Fo
 		try {
 			const countPromises = formsToCount.map(async (form) => {
 				try {
-					const data = await fetchGraphQL<FormInstanceSearchResult>(
-						COUNT_FORM_INSTANCES,
+					const data = await countFormInstances(
 						{
-							baseUrl: strapiBaseUrl,
-							variables: {
-								filters: {
-									form: {
-										documentId: {
-											eq: form.documentId,
-										},
-									},
+							form: {
+								documentId: {
+									eq: form.documentId,
 								},
 							},
 						},
+						{ baseUrl: strapiBaseUrl },
 					)
 
 					const instances = Array.isArray(data.formInstances) ? data.formInstances : []
@@ -151,15 +146,16 @@ export function FormsInstanceSearch({ strapiBaseUrl, user, isAuthenticated }: Fo
 				}
 			}
 
-			const data = await fetchGraphQL<FormSearchResult>(
-				SEARCH_FORMS,
-				{
-					baseUrl: strapiBaseUrl,
-					variables,
-				},
+			const query = buildStrapiQuery({
+				filters: filterConditions.length > 0 ? { and: filterConditions } : undefined,
+				pagination: { page, pageSize },
+				sort: ['Name:asc'],
+			})
+			const formsArray = await fetchEntityList<Form>(
+				'forms',
+				query,
+				{ baseUrl: strapiBaseUrl },
 			)
-
-			const formsArray = Array.isArray(data.forms) ? data.forms : []
 			setForms(formsArray)
 
 			// Schätze die Gesamtzahl basierend auf der Anzahl der zurückgegebenen Ergebnisse

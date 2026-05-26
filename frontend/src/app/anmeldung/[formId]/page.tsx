@@ -1,9 +1,7 @@
 import { MainPageStructure } from '../../main-page-structure'
 import { theme as globalTheme } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
-import { fetchGraphQLServer } from '@/lib/server/graphql-client'
-import { GET_FORM_BY_DOCUMENT_ID } from '@/lib/graphql/queries'
-import type { FormQueryResult } from '@/types'
+import { fetchFormByDocumentId } from '@/lib/strapi/api'
 import { FormComponent } from '@/components/form/form'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 
@@ -26,14 +24,8 @@ export default async function AnmeldungFormIdPage({ params }: AnmeldungFormIdPag
 	let form = null
 	if (formId) {
 		try {
-			const formData = await fetchGraphQLServer<FormQueryResult>(
-				GET_FORM_BY_DOCUMENT_ID,
-				{
-					baseUrl,
-					variables: { documentId: formId },
-				},
-			)
-			form = formData.forms?.[0] ?? null
+			const formData = await fetchFormByDocumentId(formId, { server: true, baseUrl })
+			form = (formData.forms?.[0] ?? null) as unknown as typeof form
 		} catch (err) {
 			console.error('Fehler beim Laden des Formulars:', err)
 		}

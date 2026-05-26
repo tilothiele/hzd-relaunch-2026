@@ -5,8 +5,9 @@ import { Box, Button, CircularProgress, Dialog, IconButton, Typography } from '@
 import CloseIcon from '@mui/icons-material/Close'
 import type { ThemeDefinition } from '@/themes'
 import { useAuth } from '@/hooks/use-auth'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { GET_MY_PENDING_PASSED_DOGS } from '@/lib/graphql/passed-dogs-queries'
+import { buildStrapiQuery } from '@/lib/strapi/filters'
+import { POPULATE_PASSED_DOG } from '@/lib/strapi/populate'
+import { fetchEntityList } from '@/lib/strapi/api'
 import { getMoreApprovedPassedDogs } from '@/lib/server/passed-dog-actions'
 import type { PassedDogCardData } from '@/lib/server/passed-dog-utils'
 import { PassedDogCard, passedDogCardTitle } from './passed-dog-card'
@@ -60,11 +61,19 @@ export function PassedDogsSectionContent({
 			return
 		}
 		try {
-			const res = await fetchGraphQL<{ passedDogs: PassedDogCardData[] }>(
-				GET_MY_PENDING_PASSED_DOGS,
-				{ variables: { userId: user.documentId } },
-			)
-			setPending(res.passedDogs ?? [])
+			const query = buildStrapiQuery({
+				filters: {
+					and: [
+						{ users_permissions_user: { documentId: { eq: user.documentId } } },
+						{ not: { Approved: { eq: true } } },
+					],
+				},
+				pagination: { pageSize: 100 },
+				sort: ['updatedAt:desc'],
+				populate: Object.fromEntries(POPULATE_PASSED_DOG.entries()),
+			})
+			const res = await fetchEntityList<PassedDogCardData>('passed-dogs', query)
+			setPending(res)
 		} catch (e) {
 			console.error(e)
 		}

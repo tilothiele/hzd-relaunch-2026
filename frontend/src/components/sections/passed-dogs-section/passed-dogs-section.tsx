@@ -3,7 +3,7 @@ import type { PassedDogsSection as PassedDogsSectionType } from '@/types'
 import { SectionContainer } from '../section-container/section-container'
 import { PassedDogsSectionContent } from './passed-dogs-section-content'
 import { fetchApprovedPassedDogsPage } from '@/lib/server/passed-dog-utils'
-import { getStrapiBaseUrl } from '@/lib/server/graphql-client'
+import { getStrapiBaseUrl } from '@/lib/server/strapi-client'
 
 const PAGE_SIZE = 12
 

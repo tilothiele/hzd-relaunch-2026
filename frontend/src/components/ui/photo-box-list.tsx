@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faImages, faCircleNotch, faUser, faDog, faCalendarAlt, faChevronRight, faArrowLeft, faFolderOpen, faTimes, faEdit, faSave, faBan, faCommentAlt, faTrash } from '@fortawesome/free-solid-svg-icons'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { GET_MY_PHOTOBOX_COLLECTIONS } from '@/lib/graphql/queries'
-import { UPDATE_PHOTOBOX_IMAGE, DELETE_PHOTOBOX_IMAGE, DELETE_PHOTOBOX_COLLECTION } from '@/lib/graphql/mutations'
+import { fetchMyPhotoboxCollections, updateEntity, deleteEntity } from '@/lib/strapi/api'
 import { useAuth } from '@/hooks/use-auth'
 import type { PhotoboxImageCollection } from '@/types'
 import Image from 'next/image'
@@ -30,14 +28,11 @@ export function PhotoBoxList({ maxCollections = 5, strapiBaseUrl }: PhotoBoxList
     const [isSaving, setIsSaving] = useState(false)
 
     const loadCollections = async () => {
-        if (!user?.documentId) return
+        if (!user?.documentId || !authState.token) return
         setIsLoading(true)
         try {
-            const data = await fetchGraphQL<{ photoboxImageCollections: PhotoboxImageCollection[] }>(
-                GET_MY_PHOTOBOX_COLLECTIONS,
-                { variables: { userId: user.documentId } }
-            )
-            setCollections(data.photoboxImageCollections)
+            const data = await fetchMyPhotoboxCollections(authState.token)
+            setCollections(data.photoboxImageCollections as unknown as PhotoboxImageCollection[])
         } catch (error) {
             console.error('Error loading collections:', error)
         } finally {
@@ -73,16 +68,15 @@ export function PhotoBoxList({ maxCollections = 5, strapiBaseUrl }: PhotoBoxList
     const handleSave = async (imgId: string) => {
         setIsSaving(true)
         try {
-            await fetchGraphQL(UPDATE_PHOTOBOX_IMAGE, {
-                variables: {
-                    documentId: imgId,
-                    data: {
-                        RenderedPersons: editPersons,
-                        ReneredDogs: editDogs,
-                        UserMessage: editMessage
-                    }
-                }
-            })
+            await updateEntity(
+                'photobox-images',
+                imgId,
+                {
+                    RenderedPersons: editPersons,
+                    ReneredDogs: editDogs,
+                    UserMessage: editMessage,
+                },
+            )
             // Update local state
             setCollections(prev => prev.map(col => ({
                 ...col,
@@ -134,9 +128,7 @@ export function PhotoBoxList({ maxCollections = 5, strapiBaseUrl }: PhotoBoxList
         e.stopPropagation()
         if (!window.confirm('Möchtest du diese leere Collection wirklich löschen?')) return
         try {
-            await fetchGraphQL(DELETE_PHOTOBOX_COLLECTION, {
-                variables: { documentId: colId }
-            })
+            await deleteEntity('photobox-image-collections', colId)
             // Update local state
             setCollections(prev => prev.filter(c => c.documentId !== colId))
         } catch (error) {

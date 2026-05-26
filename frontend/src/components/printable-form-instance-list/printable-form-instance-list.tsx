@@ -3,8 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Box, Typography, CircularProgress, Divider, Button } from '@mui/material'
 import PrintIcon from '@mui/icons-material/Print'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { COUNT_FORM_INSTANCES } from '@/lib/graphql/queries'
+import { countFormInstances } from '@/lib/strapi/api'
 import type { Form, FormInstance, FormInstanceSearchResult } from '@/types'
 
 interface PrintableFormInstanceListProps {
@@ -80,23 +79,18 @@ export function PrintableFormInstanceList({ form, strapiBaseUrl }: PrintableForm
 		setError(null)
 
 		try {
-			const data = await fetchGraphQL<FormInstanceSearchResult>(
-				COUNT_FORM_INSTANCES,
+			const data = await countFormInstances(
 				{
-					baseUrl: strapiBaseUrl,
-					variables: {
-						filters: {
-							form: {
-								documentId: {
-									eq: form.documentId,
-								},
-							},
+					form: {
+						documentId: {
+							eq: form.documentId,
 						},
 					},
 				},
+				{ baseUrl: strapiBaseUrl },
 			)
 
-			const instances = Array.isArray(data.formInstances) ? data.formInstances : []
+			const instances = data.formInstances as FormInstance[]
 			setFormInstances(instances)
 		} catch (err) {
 			console.error('Fehler beim Laden der Formular-Instanzen:', err)

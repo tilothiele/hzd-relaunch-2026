@@ -1,15 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { GET_LAYOUT } from '@/lib/graphql/queries'
+import { fetchLayoutClient } from '@/lib/strapi/api'
 import { useConfig } from '@/hooks/use-config'
 import type { GlobalLayout } from '@/types'
-
-interface LayoutData {
-	globalLayout: GlobalLayout
-	hzdSetting?: GlobalLayout['HzdSetting']
-}
 
 export function useGlobalLayout() {
 	const { config, isLoading: isConfigLoading, error: configError } = useConfig()
@@ -22,13 +16,7 @@ export function useGlobalLayout() {
 	const loadGlobalLayout = useCallback(async (resolvedBaseUrl?: string | null) => {
 		try {
 			setIsLoading(true)
-			const data = await fetchGraphQL<LayoutData>(
-				GET_LAYOUT,
-				{ baseUrl: resolvedBaseUrl ?? baseUrl },
-			)
-			if (data.globalLayout) {
-				data.globalLayout.HzdSetting = data.hzdSetting ?? null
-			}
+			const data = await fetchLayoutClient(resolvedBaseUrl ?? baseUrl)
 			setGlobalLayout(data.globalLayout)
 			setError(null)
 		} catch (err) {
@@ -59,4 +47,3 @@ export function useGlobalLayout() {
 		baseUrl,
 	}
 }
-

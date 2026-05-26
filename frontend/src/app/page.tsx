@@ -1,26 +1,14 @@
 import { MainPageStructure } from './main-page-structure'
 import { theme as globalTheme } from '@/themes'
-import { fetchGraphQLServer, getStrapiBaseUrl } from '@/lib/server/graphql-client'
+import { getStrapiBaseUrl } from '@/lib/server/strapi-client'
+import { fetchLayoutServer, fetchMe } from '@/lib/strapi/api'
 import { enrichSectionsWithSupplementalDocuments } from '@/lib/server/enrich-supplemental-sections'
-import { GET_LAYOUT, GET_ME } from '@/lib/graphql/queries'
 import { renderServerSections } from '@/components/sections/server-section-factory'
 import type { GlobalLayout, Page } from '@/types'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth-options'
 
 export const dynamic = 'force-dynamic'
-
-interface LayoutData {
-	globalLayout: GlobalLayout
-	hzdSetting?: GlobalLayout['HzdSetting']
-	announcements?: GlobalLayout['announcements']
-}
-
-interface MeData {
-	me?: {
-		documentId: string
-	} | null
-}
 
 function resolveHomePage(
 	globalLayout: GlobalLayout,
@@ -42,8 +30,6 @@ function resolveHomePage(
 		(section) => section.__typename !== 'ComponentBlocksRichTextSection',
 	)
 
-	// authenticated_page ist in Strapi oft nur ein Platzhalter (z. B. "Happy Welcome").
-	// Solange dort keine echten Layout-Sections liegen, normale Startseite anzeigen.
 	if (hasOnlyRichTextSections && defaultHasStructuredSections) {
 		return defaultPage
 	}
@@ -59,21 +45,14 @@ export default async function Home() {
 
 	try {
 		baseUrl = getStrapiBaseUrl()
-		const data = await fetchGraphQLServer<LayoutData>(GET_LAYOUT, { baseUrl })
+		const data = await fetchLayoutServer(baseUrl)
 		globalLayout = data.globalLayout
-		if (globalLayout) {
-			globalLayout.HzdSetting = data.hzdSetting ?? null
-			globalLayout.announcements = data.announcements ?? null
-		}
 
 		const session = await getServerSession(authOptions)
 		const authToken = session?.idToken ?? session?.accessToken ?? null
 
 		if (authToken) {
-			const meData = await fetchGraphQLServer<MeData>(GET_ME, {
-				baseUrl,
-				token: authToken,
-			})
+			const meData = await fetchMe(authToken, { server: true, baseUrl })
 			isAuthenticated = Boolean(meData.me?.documentId)
 		}
 	} catch (err) {

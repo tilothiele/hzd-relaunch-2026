@@ -1,20 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { GET_INDEX_PAGE, GET_LAYOUT } from '@/lib/graphql/queries'
+import { fetchLayoutClient } from '@/lib/strapi/api'
 import { useConfig } from '@/hooks/use-config'
-import type { GlobalLayout, StartpageSection } from '@/types'
-
-interface IndexPageData {
-	indexPage: {
-		Sections?: StartpageSection[] | null
-	}
-}
-
-interface LayoutData {
-	globalLayout: GlobalLayout
-}
+import type { GlobalLayout } from '@/types'
 
 type StatusType = 'loading' | 'error' | 'empty' | null
 
@@ -42,21 +31,11 @@ export function useIndexPage(): IndexPage {
 	const loadIndexPage = useCallback(async (resolvedBaseUrl?: string | null) => {
 		try {
 			setIsLoading(true)
-			const [layoutData, indexPageData] = await Promise.all([
-				fetchGraphQL<LayoutData>(
-					GET_LAYOUT,
-					{ baseUrl: resolvedBaseUrl ?? baseUrl },
-				),
-				fetchGraphQL<IndexPageData>(
-					GET_INDEX_PAGE,
-					{ baseUrl: resolvedBaseUrl ?? baseUrl },
-				),
-			])
+			const layoutData = await fetchLayoutClient(resolvedBaseUrl ?? baseUrl)
 
-			// Kombiniere Layout-Daten mit Sections aus indexPage
 			const combinedLayout: GlobalLayout = {
 				...layoutData.globalLayout,
-				Sections: indexPageData.indexPage.Sections ?? null,
+				Sections: layoutData.globalLayout.page?.Sections ?? null,
 			}
 
 			setGlobalLayout(combinedLayout)

@@ -1,8 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { SEARCH_LITTERS } from '@/lib/graphql/queries'
+import { searchLitters as searchLittersApi } from '@/lib/strapi/api'
 import { useConfig } from '@/hooks/use-config'
 import type { Litter, LitterSearchResult } from '@/types'
 
@@ -118,27 +117,13 @@ export function useLitters(options: UseLittersOptions = {}) {
                 }
             }
 
-            const variables: Record<string, unknown> = {
-                pagination: {
-                    page,
-                    pageSize,
-                },
+            const data = await searchLittersApi({
+                pagination: { page, pageSize },
                 sort: ['dateOfBirth:desc', 'expectedDateOfBirth:desc'],
-            }
-
-            if (filterConditions.length > 0) {
-                variables.filters = {
-                    and: filterConditions,
-                }
-            }
-
-            const data = await fetchGraphQL<LitterSearchResult>(
-                SEARCH_LITTERS,
-                {
-                    baseUrl,
-                    variables,
-                },
-            )
+                ...(filterConditions.length > 0
+                    ? { filters: { and: filterConditions } }
+                    : {}),
+            }, { baseUrl })
 
             const littersArray = Array.isArray(data.hzdPluginLitters_connection?.nodes)
                 ? data.hzdPluginLitters_connection.nodes

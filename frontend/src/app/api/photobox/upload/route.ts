@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { GraphQLClient } from 'graphql-request'
-import { CREATE_PHOTOBOX_IMAGE } from '@/lib/graphql/mutations'
+import { getStrapiPublicBaseUrl } from '@/lib/server/strapi-client'
+import { createEntity, fetchMe } from '@/lib/strapi/api'
 import {
 	buildPhotoboxStorageKey,
 	isPhotoboxWebDavConfigured,
@@ -50,16 +50,12 @@ export async function POST(request: NextRequest) {
 			return NextResponse.json({ message: 'Nicht authentifiziert.' }, { status: 401 })
 		}
 
-		const gqlEndpoint = `${strapiBaseUrl.replace(/\/$/, '')}/graphql`
-		const gqlClient = new GraphQLClient(gqlEndpoint, {
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		})
+		const baseUrl = getStrapiPublicBaseUrl()
+		const meResult = await fetchMe(token, { server: true, baseUrl })
 
-		const meResult = await gqlClient.request<{ me: { documentId: string, username: string, firstName?: string, lastName?: string } }>(`
-            query { me { documentId username firstName lastName } }
-        `)
+		if (!meResult.me?.documentId) {
+			return NextResponse.json({ message: 'Nicht authentifiziert.' }, { status: 401 })
+		}
 
 		const { documentId: userDocumentId, firstName, lastName } = meResult.me
 		const webdavUserFolder =
@@ -82,7 +78,6 @@ export async function POST(request: NextRequest) {
 			alternativeText: `Bilderspende von ${displayName}`,
 		}))
 
-		//console.log(`[PhotoBox API] Uploading to Strapi Media Library (root) with caption: ${caption}`)
 		const strapiUploadRes = await fetch(`${strapiBaseUrl.replace(/\/$/, '')}/api/upload`, {
 			method: 'POST',
 			headers: {
@@ -119,8 +114,9 @@ export async function POST(request: NextRequest) {
 
 		console.log(`[PhotoBox API] Creating record in Strapi for user ${userDocumentId}, Collection: ${collectionId}`)
 
-		const mutationResponse = await gqlClient.request(CREATE_PHOTOBOX_IMAGE, {
-			data: {
+		const record = await createEntity<Record<string, unknown>>(
+			'photobox-images',
+			{
 				S3Path: storageKey,
 				origin: userDocumentId,
 				RenderedPersons: persons,
@@ -130,9 +126,8 @@ export async function POST(request: NextRequest) {
 				Thumbnail: mediaId,
 				publishedAt: new Date().toISOString(),
 			},
-		})
-
-		//console.log('[PhotoBox API] Mutation response:', JSON.stringify(mutationResponse, null, 2))
+			{ server: true, baseUrl, token },
+		)
 
 		return NextResponse.json({
 			message: 'Foto erfolgreich gespeichert.',
@@ -141,7 +136,7 @@ export async function POST(request: NextRequest) {
 				storageKey,
 				collectionId: collectionId,
 				mediaId: mediaId,
-				record: (mutationResponse as { createPhotoboxImage?: unknown })?.createPhotoboxImage,
+				record,
 			},
 		}, { status: 200 })
 

@@ -2,18 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { notFound } from 'next/navigation'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { GET_PAGE_BY_SLUG, GET_LAYOUT } from '@/lib/graphql/queries'
+import { fetchLayoutClient, fetchPagesBySlug } from '@/lib/strapi/api'
 import { useConfig } from '@/hooks/use-config'
 import type { GlobalLayout, Page } from '@/types'
-
-interface PageQueryResult {
-	pages?: Page[] | null
-}
-
-interface LayoutData {
-	globalLayout: GlobalLayout
-}
 
 type StatusType = 'loading' | 'error' | 'empty' | null
 
@@ -25,13 +16,7 @@ interface StatusState {
 async function loadPageBySlug(rawSlug: string, baseUrl: string) {
 	const slug = `/${rawSlug}`
 
-    const { pages } = await fetchGraphQL<PageQueryResult>(
-		GET_PAGE_BY_SLUG,
-		{
-			baseUrl,
-			variables: { slug },
-		},
-	)
+	const { pages } = await fetchPagesBySlug(slug, { baseUrl })
 
 	const matchingPage = pages?.find((entity) => {
 		const entitySlug = entity?.slug
@@ -40,8 +25,6 @@ async function loadPageBySlug(rawSlug: string, baseUrl: string) {
 
 	return matchingPage ?? null
 }
-
-
 
 export interface PageData {
 	page: Page | null
@@ -82,15 +65,37 @@ export function usePage(params: Promise<{ slug: string }>): PageData {
 
 		try {
 			setIsLoading(true)
+			const effectiveBaseUrl = resolvedBaseUrl ?? baseUrl ?? ''
 			const [pageData, layoutData] = await Promise.all([
-				loadPageBySlug(normalizedSlug, resolvedBaseUrl ?? baseUrl ?? ''),
-				fetchGraphQL<LayoutData>(
-					GET_LAYOUT,
-					{ baseUrl: resolvedBaseUrl ?? baseUrl ?? '' },
-				),
+				loadPageBySlug(normalizedSlug, effectiveBaseUrl),
+				fetchLayoutClient(effectiveBaseUrl),
 			])
 
-			setPage(pageData)
+			let enrichedPage = pageData
+			if (pageData?.Sections?.length) {
+				const enrichResponse = await fetch('/api/sections/enrich-supplemental', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						sections: pageData.Sections,
+						baseUrl: effectiveBaseUrl,
+					}),
+				})
+
+				if (enrichResponse.ok) {
+					const enrichData = await enrichResponse.json() as {
+						sections?: typeof pageData.Sections
+					}
+					if (enrichData.sections) {
+						enrichedPage = {
+							...pageData,
+							Sections: enrichData.sections,
+						}
+					}
+				}
+			}
+
+			setPage(enrichedPage)
 			setGlobalLayout(layoutData.globalLayout)
 			setError(null)
 		} catch (err) {
@@ -174,4 +179,3 @@ export function usePage(params: Promise<{ slug: string }>): PageData {
 		status,
 	}), [page, globalLayout, baseUrl, isBusy, configError, error, status])
 }
-

@@ -1,9 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { GET_MY_PHOTOBOX_COLLECTIONS } from '@/lib/graphql/queries'
-import { CREATE_PHOTOBOX_COLLECTION } from '@/lib/graphql/mutations'
+import { fetchMyPhotoboxCollections, createEntity } from '@/lib/strapi/api'
 import { useAuth } from '@/hooks/use-auth'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus, faFolderOpen, faLocationDot, faCircleNotch } from '@fortawesome/free-solid-svg-icons'
@@ -20,7 +18,7 @@ export function PhotoBoxCollectionSelector({
     activeCollectionId,
     maxCollections = 5
 }: PhotoBoxCollectionSelectorProps) {
-    const { user } = useAuth()
+    const { user, authState } = useAuth()
     const [collections, setCollections] = useState<PhotoboxImageCollection[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [isCreating, setIsCreating] = useState(false)
@@ -31,14 +29,11 @@ export function PhotoBoxCollectionSelector({
     const [location, setLocation] = useState('')
 
     const loadCollections = async () => {
-        if (!user?.documentId) return
+        if (!user?.documentId || !authState.token) return
         setIsLoading(true)
         try {
-            const data = await fetchGraphQL<{ photoboxImageCollections: PhotoboxImageCollection[] }>(
-                GET_MY_PHOTOBOX_COLLECTIONS,
-                { variables: { userId: user.documentId } }
-            )
-            setCollections(data.photoboxImageCollections)
+            const data = await fetchMyPhotoboxCollections(authState.token)
+            setCollections(data.photoboxImageCollections as unknown as PhotoboxImageCollection[])
         } catch (error) {
             console.error('Error loading collections:', error)
         } finally {
@@ -58,22 +53,17 @@ export function PhotoBoxCollectionSelector({
 
         setIsCreating(true)
         try {
-            const result = await fetchGraphQL<{ createPhotoboxImageCollection: PhotoboxImageCollection }>(
-                CREATE_PHOTOBOX_COLLECTION,
+            const newCollection = await createEntity<PhotoboxImageCollection>(
+                'photobox-image-collections',
                 {
-                    variables: {
-                        data: {
-                            CollectionDescription: description,
-                            Location: location,
-                            photogapher: user.documentId,
-                            publishedAt: new Date().toISOString()
-                        }
-                    }
-                }
+                    CollectionDescription: description,
+                    Location: location,
+                    photogapher: user.documentId,
+                    publishedAt: new Date().toISOString(),
+                },
             )
 
-            if (result.createPhotoboxImageCollection) {
-                const newCollection = result.createPhotoboxImageCollection
+            if (newCollection) {
                 setCollections(prev => [newCollection, ...prev])
                 onCollectionChange(newCollection)
                 setShowModal(false)
