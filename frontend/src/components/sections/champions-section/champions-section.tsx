@@ -4,7 +4,7 @@ import type { ThemeDefinition } from '@/themes'
 import type { HzdSetting, ChampionsSection } from '@/types'
 import { SectionContainer } from '../section-container/section-container'
 import { ChampionsList } from './champions-list'
-import { getStrapiBaseUrl } from '@/lib/server/graphql-client'
+import { getStrapiBaseUrl } from '@/lib/server/strapi-client'
 import { Typography, Box } from '@mui/material'
 
 interface ChampionsSectionComponentProps {

@@ -1,17 +1,7 @@
-import { fetchGraphQLServer, getStrapiBaseUrl } from './graphql-client'
-import { GET_PAGE_BY_SLUG, GET_LAYOUT } from '@/lib/graphql/queries'
+import { getStrapiBaseUrl } from './strapi-client'
+import { fetchLayoutServer, fetchPagesBySlug } from '@/lib/strapi/api'
 import type { GlobalLayout, Page } from '@/types'
 import { enrichSectionsWithSupplementalDocuments } from './enrich-supplemental-sections'
-
-interface PageQueryResult {
-	pages?: Page[] | null
-}
-
-interface LayoutData {
-	globalLayout: GlobalLayout
-	hzdSetting?: GlobalLayout['HzdSetting']
-	announcements?: GlobalLayout['announcements']
-}
 
 export interface PageBySlugResult {
 	page: Page | null
@@ -27,12 +17,7 @@ export interface PageBySlugResult {
 export async function fetchGlobalLayout(): Promise<{ globalLayout: GlobalLayout | null; baseUrl: string; error: Error | null }> {
 	try {
 		const baseUrl = getStrapiBaseUrl()
-		const layoutData = await fetchGraphQLServer<LayoutData>(GET_LAYOUT, { baseUrl })
-
-		if (layoutData.globalLayout) {
-			layoutData.globalLayout.HzdSetting = layoutData.hzdSetting ?? null
-			layoutData.globalLayout.announcements = layoutData.announcements ?? null
-		}
+		const layoutData = await fetchLayoutServer(baseUrl)
 
 		return {
 			globalLayout: layoutData.globalLayout,
@@ -62,17 +47,10 @@ export async function fetchPageBySlug(slug: string): Promise<PageBySlugResult> {
 		const normalizedSlug = slug.startsWith('/') ? slug : `/${slug}`
 
 		const [pageData, layoutData] = await Promise.all([
-			fetchGraphQLServer<PageQueryResult>(
-				GET_PAGE_BY_SLUG,
-				{
-					baseUrl,
-					variables: { slug: normalizedSlug },
-				},
-			),
-			fetchGraphQLServer<LayoutData>(GET_LAYOUT, { baseUrl }),
+			fetchPagesBySlug(normalizedSlug, { server: true, baseUrl }),
+			fetchLayoutServer(baseUrl),
 		])
 
-		// Finde die passende Seite
 		let matchingPage = pageData.pages?.find((entity) => {
 			const entitySlug = entity?.slug
 			return entitySlug?.toLowerCase() === normalizedSlug.toLowerCase()
@@ -86,11 +64,6 @@ export async function fetchPageBySlug(slug: string): Promise<PageBySlugResult> {
 					baseUrl,
 				),
 			}
-		}
-
-		if (layoutData.globalLayout) {
-			layoutData.globalLayout.HzdSetting = layoutData.hzdSetting ?? null
-			layoutData.globalLayout.announcements = layoutData.announcements ?? null
 		}
 
 		return {
@@ -112,4 +85,3 @@ export async function fetchPageBySlug(slug: string): Promise<PageBySlugResult> {
 		}
 	}
 }
-

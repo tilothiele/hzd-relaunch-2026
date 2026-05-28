@@ -1,78 +1,29 @@
-import { getStrapiBaseUrl } from './graphql-client'
+import { getStrapiBaseUrl } from './strapi-client'
+import { buildStrapiQuery } from '@/lib/strapi/filters'
+import { fetchEntityList } from '@/lib/strapi/api'
 
-const STRAPI_BASE_URL = getStrapiBaseUrl()
+const CHAMPIONS_POPULATE = new URLSearchParams({
+	'populate[ChampinAvatar]': '*',
+	'populate[hzd_plugin_dog][populate][avatar]': '*',
+	'populate[hzd_plugin_dog][populate][owner]': '*',
+	'populate[hzd_plugin_dog][populate][breeder][populate][member]': '*',
+})
 
 export async function fetchChampions(page = 1, pageSize = 20) {
-    try {
-        const query = `
-        query GetChampions($pagination: PaginationArg) {
-            champions(sort: ["DateOfChampionship:desc"], pagination: $pagination) {
-                documentId
-                ChampionshipTitles
-                DateOfChampionship
-                ChampinAvatar {
-                    url
-                    alternativeText
-                    width
-                    height
-                }
-                hzd_plugin_dog {
-                    documentId
-                    givenName
-                    fullKennelName
-                    avatar {
-                        url
-                        alternativeText
-                        width
-                        height
-                    }
-                    owner {
-                        firstName
-                        lastName
-                        city
-                    }
-                    breeder {
-                        kennelName
-                        member {
-                            firstName
-                            lastName
-                            city
-                        }
-                    }
-                }
-            }
-        }
-        `
+	try {
+		const query = buildStrapiQuery({
+			pagination: { page, pageSize },
+			sort: ['DateOfChampionship:desc'],
+			populate: Object.fromEntries(CHAMPIONS_POPULATE.entries()),
+		})
 
-        const response = await fetch(`${STRAPI_BASE_URL}/graphql`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                query,
-                variables: {
-                    pagination: {
-                        page,
-                        pageSize
-                    }
-                }
-            }),
-            next: { revalidate: 60 }
-        })
-
-        const json = await response.json()
-
-        if (json.errors) {
-            console.error('Error fetching champions:', json.errors)
-            return []
-        }
-
-        return json.data?.champions || []
-    } catch (error) {
-        console.error('Error fetching champions:', error)
-        return []
-    }
+		return await fetchEntityList<Record<string, unknown>>(
+			'champions',
+			query,
+			{ server: true, baseUrl: getStrapiBaseUrl() },
+		)
+	} catch (error) {
+		console.error('Error fetching champions:', error)
+		return []
+	}
 }
-
-// End of file

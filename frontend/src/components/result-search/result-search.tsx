@@ -5,8 +5,9 @@ import { Box, Typography, Paper, Button, Link as MuiLink, Select, MenuItem, Form
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { GET_CALENDARS, SEARCH_CALENDAR_ITEMS } from '@/lib/graphql/queries'
+import { buildStrapiQuery } from '@/lib/strapi/filters'
+import { fetchEntityList } from '@/lib/strapi/api'
+import { POPULATE_CALENDAR_ENTRY } from '@/lib/strapi/populate'
 import type { Calendar, CalendarItem, CalendarSearchResult, CalendarItemSearchResult } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
@@ -85,14 +86,15 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 		setError(null)
 
 		try {
-			const data = await fetchGraphQL<CalendarSearchResult>(
-				GET_CALENDARS,
-				{
-					baseUrl: strapiBaseUrl,
-				},
+			const query = buildStrapiQuery({
+				sort: ['Ord:asc', 'Name:asc'],
+				pagination: { limit: 100 },
+			})
+			const calendarsArray = await fetchEntityList<Calendar>(
+				'calendars',
+				query,
+				{ baseUrl: strapiBaseUrl },
 			)
-
-			const calendarsArray = Array.isArray(data.calendars) ? data.calendars : []
 			setCalendars(calendarsArray)
 			// Default: Alle Kalender auswählen
 			setSelectedCalendarIds(new Set(calendarsArray.map((cal) => cal.documentId)))
@@ -150,15 +152,16 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				sort: ['Date:desc'],
 			}
 
-			const data = await fetchGraphQL<CalendarItemSearchResult>(
-				SEARCH_CALENDAR_ITEMS,
-				{
-					baseUrl: strapiBaseUrl,
-					variables,
-				},
+			const query = buildStrapiQuery({
+				filters: variables.filters as Record<string, unknown>,
+				sort: variables.sort as string[],
+				populate: Object.fromEntries(POPULATE_CALENDAR_ENTRY.entries()),
+			})
+			const itemsArray = await fetchEntityList<CalendarItem>(
+				'calendar-entries',
+				query,
+				{ baseUrl: strapiBaseUrl },
 			)
-
-			const itemsArray = Array.isArray(data.calendarEntries) ? data.calendarEntries : []
 			const nowTs = Date.now()
 			const visibleItems = itemsArray.filter((item) => isPastEntry(item, nowTs) && isWithinVisibility(item, nowTs))
 			setAllCalendarItems(visibleItems)
@@ -227,15 +230,16 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				sort: ['Date:desc'],
 			}
 
-			const data = await fetchGraphQL<CalendarItemSearchResult>(
-				SEARCH_CALENDAR_ITEMS,
-				{
-					baseUrl: strapiBaseUrl,
-					variables,
-				},
+			const query = buildStrapiQuery({
+				filters: variables.filters as Record<string, unknown>,
+				sort: variables.sort as string[],
+				populate: Object.fromEntries(POPULATE_CALENDAR_ENTRY.entries()),
+			})
+			const itemsArray = await fetchEntityList<CalendarItem>(
+				'calendar-entries',
+				query,
+				{ baseUrl: strapiBaseUrl },
 			)
-
-			const itemsArray = Array.isArray(data.calendarEntries) ? data.calendarEntries : []
 			const nowTs = Date.now()
 			const visibleItems = itemsArray.filter((item) => isPastEntry(item, nowTs) && isWithinVisibility(item, nowTs))
 			setCalendarItems(visibleItems)

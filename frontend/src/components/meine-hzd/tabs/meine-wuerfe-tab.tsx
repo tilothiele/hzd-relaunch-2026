@@ -4,9 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Collapse, Button, Grid, TextField, CircularProgress, Chip, Alert, MenuItem, Select, Autocomplete } from '@mui/material'
 import { Edit as EditIcon, Save as SaveIcon, Cancel as CancelIcon } from '@mui/icons-material'
 import type { Breeder, Litter, LitterSearchResult, Dog, DogSearchResult } from '@/types'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { GET_LITTERS_BY_BREEDER, SEARCH_DOGS } from '@/lib/graphql/queries'
-import { UPDATE_LITTER, CREATE_LITTER } from '@/lib/graphql/mutations'
+import { searchDogs, searchLitters, createEntity, updateEntity } from '@/lib/strapi/api'
 import { formatDate } from '@/lib/utils'
 import { Add as AddIcon } from '@mui/icons-material'
 
@@ -104,17 +102,14 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
         async function loadMothers() {
             if (!breeder?.owner_members || breeder.owner_members.length === 0) return
             try {
-                const data = await fetchGraphQL<DogSearchResult>(SEARCH_DOGS, {
-                    variables: {
-                        filters: {
-                            sex: { eq: 'F' },
-                            owner: { documentId: { in: breeder.owner_members.map(m => m.documentId).filter(Boolean) } },
-                            cFertile: { eq: true }
-                        },
-                        pagination: { limit: 100 }
+                const data = await searchDogs({
+                    filters: {
+                        sex: { eq: 'F' },
+                        owner: { documentId: { in: breeder.owner_members.map(m => m.documentId).filter(Boolean) } },
+                        cFertile: { eq: true },
                     },
-                    baseUrl: strapiBaseUrl
-                })
+                    pagination: { pageSize: 100 },
+                }, { baseUrl: strapiBaseUrl })
                 setBreedingBitches(data.hzdPluginDogs_connection.nodes || [])
             } catch (error) {
                 console.error('Failed to load mothers:', error)
@@ -137,21 +132,18 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
                 date15YearsAgo.setFullYear(date15YearsAgo.getFullYear() - 15)
                 const minDateOfBirth = date15YearsAgo.toISOString().split('T')[0]
 
-                const data = await fetchGraphQL<DogSearchResult>(SEARCH_DOGS, {
-                    variables: {
-                        filters: {
-                            sex: { eq: 'M' },
-                            fullKennelName: { contains: fatherSearchInput },
-                            dateOfBirth: { gte: minDateOfBirth },
-                            or: [
-                                { Disabled: { eq: false } },
-                                { Disabled: { null: true } }
-                            ]
-                        },
-                        pagination: { limit: 20 }
+                const data = await searchDogs({
+                    filters: {
+                        sex: { eq: 'M' },
+                        fullKennelName: { containsi: fatherSearchInput },
+                        dateOfBirth: { gte: minDateOfBirth },
+                        or: [
+                            { Disabled: { eq: false } },
+                            { Disabled: { null: true } },
+                        ],
                     },
-                    baseUrl: strapiBaseUrl
-                })
+                    pagination: { pageSize: 20 },
+                }, { baseUrl: strapiBaseUrl })
 
                 const results = data.hzdPluginDogs_connection.nodes || []
                 // Ensure selected father remains in options if selected
@@ -173,10 +165,10 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
         async function loadLitters() {
             if (!breeder?.documentId) return
             try {
-                const data = await fetchGraphQL<LitterSearchResult>(GET_LITTERS_BY_BREEDER, {
-                    variables: { breederId: breeder.documentId },
-                    baseUrl: strapiBaseUrl,
-                })
+                const data = await searchLitters({
+                    filters: { breeder: { documentId: { eq: breeder.documentId } } },
+                    sort: ['dateOfBirth:desc'],
+                }, { baseUrl: strapiBaseUrl })
                 setLitters(data.hzdPluginLitters_connection.nodes || [])
             } catch (error) {
                 console.error('Failed to load litters:', error)
@@ -266,17 +258,16 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
         if (!editFormData || validationError) return
         setIsSaving(true)
         try {
-            const result = await fetchGraphQL<{ updateHzdPluginLitter: Litter }>(UPDATE_LITTER, {
-                variables: {
-                    documentId: litterId,
-                    data: editFormData
-                },
-                baseUrl: strapiBaseUrl
-            })
+            const result = await updateEntity<Litter>(
+                'hzd-plugin/litters',
+                litterId,
+                editFormData as unknown as Record<string, unknown>,
+                { baseUrl: strapiBaseUrl },
+            )
 
             // Update local state with the returned data which includes resolved relations
-            if (result.updateHzdPluginLitter) {
-                setLitters(litters.map(l => l.documentId === litterId ? result.updateHzdPluginLitter : l))
+            if (result) {
+                setLitters(litters.map(l => l.documentId === litterId ? result : l))
             }
 
             setEditingLitterId(null)
@@ -307,18 +298,17 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
                 OrderLetter: 'A' // Backend might handle this or we might need to calculate it
             }
 
-            const result = await fetchGraphQL<{ createHzdPluginLitter: Litter }>(CREATE_LITTER, {
-                variables: { data: newLitterData },
-                baseUrl: strapiBaseUrl
-            })
-
-            const newLitter = result.createHzdPluginLitter
+            const newLitter = await createEntity<Litter>(
+                'hzd-plugin/litters',
+                newLitterData,
+                { baseUrl: strapiBaseUrl },
+            )
             if (newLitter) {
                 // Refresh litters list
-                const data = await fetchGraphQL<LitterSearchResult>(GET_LITTERS_BY_BREEDER, {
-                    variables: { breederId: breeder.documentId },
-                    baseUrl: strapiBaseUrl,
-                })
+                const data = await searchLitters({
+                    filters: { breeder: { documentId: { eq: breeder.documentId } } },
+                    sort: ['dateOfBirth:desc'],
+                }, { baseUrl: strapiBaseUrl })
                 setLitters(data.hzdPluginLitters_connection.nodes || [])
 
                 // Automatically start editing the new litter

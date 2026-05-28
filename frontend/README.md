@@ -31,12 +31,15 @@ pnpm dev
 
 - `src/app/` - Next.js App Router Seiten
 - `src/components/` - React Komponenten
-- `src/lib/` - Utilities und GraphQL Client
+- `src/lib/` - Utilities und Strapi REST Client
+- `src/lib/strapi/` - REST-Helfer, Populate-Parameter, API-Funktionen
 - `src/types/` - TypeScript Typen
 
-## GraphQL
+## Strapi REST API
 
-Das Frontend verwendet GraphQL, um Daten von Strapi abzurufen. Die Queries befinden sich in `src/lib/graphql/queries.ts`.
+Das Frontend kommuniziert mit Strapi über die REST API (`/api/...`). Client-seitige
+Aufrufe laufen über den Next.js-Proxy `/api/strapi/*`, serverseitige direkt gegen
+`STRAPI_BASE_URL`. Zentrale Funktionen liegen in `src/lib/strapi/api.ts`.
 
 ## Authentifizierung
 

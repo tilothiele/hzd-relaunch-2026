@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Tabs, Tab, Box } from '@mui/material'
-import { GET_BREEDER_BY_USER } from '@/lib/graphql/queries'
-import { fetchGraphQL } from '@/lib/graphql-client'
+import { searchBreeders } from '@/lib/strapi/api'
 import { MeinProfilTab } from './tabs/mein-profil-tab'
 import { MeinZwingerTab } from './tabs/mein-zwinger-tab'
 import { MeineWuerfeTab } from './tabs/meine-wuerfe-tab'
@@ -32,10 +31,14 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 
 			try {
 				//console.log('Fetching breeder for user:', user.documentId)
-				const data = await fetchGraphQL<BreederSearchResult>(GET_BREEDER_BY_USER, {
-					variables: { userId: user.documentId },
-					baseUrl: strapiBaseUrl,
-				})
+				const data = await searchBreeders(
+					{
+						filters: {
+							owner_members: { documentId: { eq: user.documentId } },
+						},
+					},
+					{ baseUrl: strapiBaseUrl },
+				)
 				//console.log('Breeder fetch result:', data)
 
 				if (data?.hzdPluginBreeders_connection?.nodes?.length) {

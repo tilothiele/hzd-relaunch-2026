@@ -3,8 +3,7 @@
 import { useState } from 'react'
 import { Box, Typography, TextField, Button, Avatar, Chip, Divider } from '@mui/material'
 import type { Breeder } from '@/types'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { UPDATE_BREEDER } from '@/lib/graphql/mutations'
+import { updateEntity } from '@/lib/strapi/api'
 
 interface MeinZwingerTabProps {
     breeder: Breeder
@@ -38,18 +37,17 @@ export function MeinZwingerTab({ breeder, strapiBaseUrl }: MeinZwingerTabProps) 
         setSaveMessage(null)
 
         try {
-            await fetchGraphQL(UPDATE_BREEDER, {
-                variables: {
-                    documentId: breeder.documentId,
-                    data: {
-                        WebsiteUrlDraft: websiteUrlDraft,
-                        BreedersIntroDraft: breederIntroDraft,
-                        BreederEmail: breederEmail,
-                        Address: address,
-                    },
+            await updateEntity(
+                'hzd-plugin/breeders',
+                breeder.documentId,
+                {
+                    WebsiteUrlDraft: websiteUrlDraft,
+                    BreedersIntroDraft: breederIntroDraft,
+                    BreederEmail: breederEmail,
+                    Address: address,
                 },
-                baseUrl: strapiBaseUrl,
-            })
+                { baseUrl: strapiBaseUrl },
+            )
             setSaveMessage({ type: 'success', text: 'Änderungen erfolgreich gespeichert.' })
         } catch (error) {
             console.error('Failed to save breeder data:', error)

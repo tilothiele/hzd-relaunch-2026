@@ -8,7 +8,7 @@ const cors = process.env.CORS_ORIGIN
 
 console.log('cors', cors)
 
-const scriptSrc = ["'self'", "'unsafe-inline'", "apollo-server-landing-page.cdn.apollographql.com", 'https://cdn.ckeditor.com'];
+const scriptSrc = ["'self'", "'unsafe-inline'", 'https://cdn.ckeditor.com'];
 scriptSrc.push(...cors);
 
 export default [
@@ -21,11 +21,11 @@ export default [
         useDefaults: true,
         directives: {
           //'script-src': [],
-          "connect-src": ["'self'", "https:", "apollo-server-landing-page.cdn.apollographql.com", 'https://proxy-event.ckeditor.com'],
-          "img-src": ["'self'", "data:", "blob:", "apollo-server-landing-page.cdn.apollographql.com"],
+          "connect-src": ["'self'", "https:", 'https://proxy-event.ckeditor.com'],
+          "img-src": ["'self'", "data:", "blob:"],
           "script-src": scriptSrc,
-          "style-src": ["'self'", "'unsafe-inline'", "apollo-server-landing-page.cdn.apollographql.com"],
-          "frame-src": ["'self'", "sandbox.embed.apollographql.com", ...cors],
+          "style-src": ["'self'", "'unsafe-inline'"],
+          "frame-src": ["'self'", ...cors],
           "frame-ancestors": ["'self'", ...cors]
         },
       },

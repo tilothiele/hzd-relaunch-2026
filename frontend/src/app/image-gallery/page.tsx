@@ -1,7 +1,8 @@
 
-import { fetchGraphQLServer } from '@/lib/server/graphql-client'
-import { GET_GALLERY_IMAGES } from '@/lib/graphql/queries'
-import type { GalleryImage, GalleryImagesQueryResult } from '@/types'
+import { getStrapiBaseUrl } from '@/lib/server/strapi-client'
+import { buildStrapiQuery } from '@/lib/strapi/filters'
+import { fetchEntityList } from '@/lib/strapi/api'
+import type { GalleryImage } from '@/types'
 import { MainPageStructure } from '../main-page-structure'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { theme as globalTheme } from '@/themes'
@@ -16,14 +17,29 @@ export default async function ImageGalleryPage() {
 
     let images: GalleryImage[] = []
     try {
-        const result = await fetchGraphQLServer<GalleryImagesQueryResult>(GET_GALLERY_IMAGES)
-        images = result.galleryImages || []
+        const query = buildStrapiQuery({
+            sort: ['DateOfSubmission:desc'],
+            populate: {
+                'populate[GalleryImageMedia]': '*',
+                'populate[Photographer][fields][0]': 'firstName',
+                'populate[Photographer][fields][1]': 'lastName',
+                'populate[Photographer][fields][2]': 'username',
+            },
+        })
+        images = await fetchEntityList<GalleryImage>(
+            'gallery-images',
+            query,
+            { server: true, baseUrl: getStrapiBaseUrl() },
+        )
     } catch (error) {
         console.error('Error fetching gallery images:', error)
     }
 
-    // Use the baseUrl from fetchGlobalLayout consistently
     const strapiUrl = baseUrl || strapiBaseUrl
+
+    if (layoutError) {
+        console.error('Layout error:', layoutError)
+    }
 
     if (images.length === 0) {
         return (
@@ -41,16 +57,13 @@ export default async function ImageGalleryPage() {
         )
     }
 
-    // 1. Separate Featured and Non-Featured Images
     const featuredImages = images.filter(img => img.FeaturedImage === true)
     const nonFeaturedImages = images.filter(img => img.FeaturedImage !== true)
 
-    // Hero Image: Latest Featured Image, fallback to latest non-featured
     const heroImage = featuredImages.length > 0
         ? featuredImages[0]
         : images[0]
 
-    // 2. Group Non-Featured by Month
     type GroupedByPhotographer = {
         photographerName: string
         images: GalleryImage[]

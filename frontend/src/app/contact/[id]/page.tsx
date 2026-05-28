@@ -1,8 +1,7 @@
 import { MainPageStructure } from '../../main-page-structure'
 import { theme as globalTheme } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
-import { fetchGraphQLServer } from '@/lib/server/graphql-client'
-import { GET_CONTACT_BY_DOCUMENT_ID } from '@/lib/graphql/queries'
+import { fetchContactByDocumentId } from '@/lib/strapi/api'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { ContactDetail } from '@/components/contact-detail/contact-detail'
 
@@ -53,14 +52,8 @@ export default async function ContactIdPage({ params }: ContactIdPageProps) {
 	let contact = null
 	if (contactId) {
 		try {
-			const contactData = await fetchGraphQLServer<ContactQueryResult>(
-				GET_CONTACT_BY_DOCUMENT_ID,
-				{
-					baseUrl,
-					variables: { documentId: contactId },
-				},
-			)
-			contact = contactData.contact
+			const contactData = await fetchContactByDocumentId(contactId, { server: true, baseUrl })
+			contact = contactData.contact as typeof contact
 		} catch (err) {
 			console.error('Fehler beim Laden des Kontakts:', err)
 		}

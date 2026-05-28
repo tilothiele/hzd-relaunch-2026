@@ -24,7 +24,6 @@
     "@sklinet/strapi-plugin-tinymce": "^1.1.8",
     "@strapi/plugin-cloud": "5.45.1",
     "@strapi/plugin-documentation": "^5.35.0",
-    "@strapi/plugin-graphql": "5.45.1",
     "@strapi/plugin-users-permissions": "5.45.1",
     "@strapi/provider-email-nodemailer": "5.45.1",
     "@strapi/strapi": "5.45.1",
@@ -69,7 +68,6 @@
       "@strapi/utils": "5.45.1"
     },
     "onlyBuiltDependencies": [
-      "@apollo/protobufjs",
       "@swc/core",
       "aws-sdk",
       "better-sqlite3",

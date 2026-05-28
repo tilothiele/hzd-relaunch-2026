@@ -1,52 +1,50 @@
-import { fetchGraphQLServer, getStrapiBaseUrl } from './graphql-client'
-import { GET_AUTHOR_BY_SLUG } from '@/lib/graphql/queries'
+import { getStrapiBaseUrl } from './strapi-client'
+import { buildStrapiQuery } from '@/lib/strapi/filters'
+import { fetchEntityList } from '@/lib/strapi/api'
 import { fetchGlobalLayout } from './fetch-page-by-slug'
 import type { GlobalLayout, Author } from '@/types'
 
-interface AuthorQueryResult {
-    authors?: Author[] | null
-}
-
 export interface AuthorBySlugResult {
-    author: Author | null
-    globalLayout: GlobalLayout | null
-    baseUrl: string
-    error: Error | null
+	author: Author | null
+	globalLayout: GlobalLayout | null
+	baseUrl: string
+	error: Error | null
 }
 
 export async function fetchAuthorBySlug(slug: string): Promise<AuthorBySlugResult> {
-    try {
-        const baseUrl = getStrapiBaseUrl()
+	try {
+		const baseUrl = getStrapiBaseUrl()
 
-        const [authorData, layoutData] = await Promise.all([
-            fetchGraphQLServer<AuthorQueryResult>(
-                GET_AUTHOR_BY_SLUG,
-                {
-                    baseUrl,
-                    variables: { slug },
-                },
-            ),
-            fetchGlobalLayout(),
-        ])
+		const query = buildStrapiQuery({
+			filters: { Slug: { eq: slug } },
+			pagination: { pageSize: 1 },
+			populate: {
+				'populate[Avatar]': '*',
+				'populate[ExternalPublication]': '*',
+			},
+		})
 
-        const matchingAuthor = authorData.authors?.[0] ?? null
+		const [authors, layoutData] = await Promise.all([
+			fetchEntityList<Author>('authors', query, { server: true, baseUrl }),
+			fetchGlobalLayout(),
+		])
 
-        return {
-            author: matchingAuthor,
-            globalLayout: layoutData.globalLayout,
-            baseUrl,
-            error: null,
-        }
-    } catch (err) {
-        const error = err instanceof Error
-            ? err
-            : new Error('Autor konnte nicht geladen werden.')
+		return {
+			author: authors[0] ?? null,
+			globalLayout: layoutData.globalLayout,
+			baseUrl,
+			error: null,
+		}
+	} catch (err) {
+		const error = err instanceof Error
+			? err
+			: new Error('Autor konnte nicht geladen werden.')
 
-        return {
-            author: null,
-            globalLayout: null,
-            baseUrl: getStrapiBaseUrl(),
-            error,
-        }
-    }
+		return {
+			author: null,
+			globalLayout: null,
+			baseUrl: getStrapiBaseUrl(),
+			error,
+		}
+	}
 }

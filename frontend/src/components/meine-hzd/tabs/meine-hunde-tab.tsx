@@ -14,8 +14,7 @@ import {
     FormControlLabel,
     Switch
 } from '@mui/material'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { SEARCH_DOGS } from '@/lib/graphql/queries'
+import { searchDogs } from '@/lib/strapi/api'
 import type { AuthUser, Dog, DogSearchResult } from '@/types'
 import { formatDate } from '@/lib/utils'
 
@@ -49,16 +48,11 @@ export function MeineHundeTab({ user, strapiBaseUrl }: MeineHundeTabProps) {
                     filters.cFertile = { eq: true }
                 }
 
-                const response = await fetchGraphQL<DogSearchResult>(SEARCH_DOGS, {
-                    variables: {
-                        filters,
-                        pagination: {
-                            pageSize: 100 // Fetch all or reasonably many
-                        },
-                        sort: ["dateOfBirth:desc"]
-                    },
-                    baseUrl: strapiBaseUrl
-                })
+                const response = await searchDogs({
+                    filters,
+                    pagination: { pageSize: 100 },
+                    sort: ['dateOfBirth:desc'],
+                }, { baseUrl: strapiBaseUrl })
 
                 if (response?.hzdPluginDogs_connection?.nodes) {
                     setDogs(response.hzdPluginDogs_connection.nodes)

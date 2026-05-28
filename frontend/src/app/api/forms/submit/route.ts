@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { fetchGraphQLServer, getStrapiBaseUrl } from '@/lib/server/graphql-client'
-import { CREATE_FORM_INSTANCE } from '@/lib/graphql/queries'
-import type { FormInstance } from '@/types'
+import { getStrapiBaseUrl } from '@/lib/server/strapi-client'
+import { createFormInstance } from '@/lib/strapi/api'
 
 /**
  * Server-Funktion zum Absenden von Formularen
@@ -27,26 +26,18 @@ export async function POST(request: NextRequest) {
 			)
 		}
 
-		// Speichere die form-instance im Backend
 		const baseUrl = getStrapiBaseUrl()
 
-		// In Strapi werden Relations normalerweise als documentId übergeben
-		// formData wird als JSON-Objekt gespeichert (Strapi JSON-Feld)
 		const mutationData = {
 			form: documentId,
 			Content: formData,
 		}
 
 		try {
-			const result = await fetchGraphQLServer<FormInstance>(
-				CREATE_FORM_INSTANCE,
-				{
-					baseUrl,
-					variables: {
-						data: mutationData,
-					},
-				},
-			)
+			const result = await createFormInstance(mutationData, {
+				server: true,
+				baseUrl,
+			})
 
 			console.log('Formular erfolgreich gespeichert:', {
 				documentId: result.documentId,
@@ -60,21 +51,12 @@ export async function POST(request: NextRequest) {
 					documentId: result.documentId,
 				},
 			})
-		} catch (graphqlError) {
-			console.error('GraphQL Fehler beim Speichern der form-instance:', graphqlError)
+		} catch (strapiError) {
+			console.error('Strapi Fehler beim Speichern der form-instance:', strapiError)
 
-			// Detaillierte Fehlerinformationen aus GraphQL-Error extrahieren
 			let errorMessage = 'Formular konnte nicht abgesendet werden'
-			if (graphqlError instanceof Error) {
-				errorMessage = graphqlError.message
-			}
-
-			// Prüfe ob es ein GraphQL Response Error ist
-			if (graphqlError && typeof graphqlError === 'object' && 'response' in graphqlError) {
-				const responseError = graphqlError as { response?: { errors?: Array<{ message?: string }> } }
-				if (responseError.response?.errors?.[0]?.message) {
-					errorMessage = responseError.response.errors[0].message
-				}
+			if (strapiError instanceof Error) {
+				errorMessage = strapiError.message
 			}
 
 			return NextResponse.json(
@@ -98,4 +80,3 @@ export async function POST(request: NextRequest) {
 		)
 	}
 }
-

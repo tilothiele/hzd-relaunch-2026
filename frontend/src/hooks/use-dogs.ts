@@ -1,8 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { SEARCH_DOGS } from '@/lib/graphql/queries'
+import { searchDogs as searchDogsApi } from '@/lib/strapi/api'
 import { useConfig } from '@/hooks/use-config'
 import type { Dog, DogSearchResult } from '@/types'
 
@@ -196,29 +195,13 @@ export function useDogs(options: UseDogsOptions = {}) {
 				})
 			}
 
-			const variables: Record<string, unknown> = {
-				pagination: {
-					page,
-					pageSize,
-				},
+			const data = await searchDogsApi({
+				pagination: { page, pageSize },
 				sort: sort || ['fullKennelName:asc'],
-			}
-
-			if (filterConditions.length > 0) {
-				variables.filters = {
-					and: filterConditions,
-				}
-			}
-
-			//console.log('Fetching dogs with variables:', JSON.stringify(variables, null, 2)) // Debugging color issue
-
-			const data = await fetchGraphQL<DogSearchResult>(
-				SEARCH_DOGS,
-				{
-					baseUrl,
-					variables,
-				},
-			)
+				...(filterConditions.length > 0
+					? { filters: { and: filterConditions } }
+					: {}),
+			}, { baseUrl })
 
 			const dogsArray = Array.isArray(data.hzdPluginDogs_connection?.nodes)
 				? data.hzdPluginDogs_connection.nodes

@@ -113,9 +113,7 @@ const OTHER_COUNTRIES = [
 ].sort((a, b) => a.name.localeCompare(b.name))
 
 const ALL_COUNTRIES = [...PRIORITY_COUNTRIES, ...OTHER_COUNTRIES]
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { GET_ME } from '@/lib/graphql/queries'
-import { CHANGE_PASSWORD } from '@/lib/graphql/mutations'
+import { fetchMe, changePassword } from '@/lib/strapi/api'
 import type { AuthUser } from '@/types'
 import { formatDate } from '@/lib/utils'
 
@@ -159,7 +157,7 @@ export function MeinProfilTab({ user: initialUser }: MeinProfilTabProps) {
         setLoading(true)
         setError(null)
         try {
-            const data = await fetchGraphQL<{ me: AuthUser }>(GET_ME)
+            const data = await fetchMe()
             if (data?.me) {
                 setUser(data.me)
                 setFormData({
@@ -207,12 +205,10 @@ export function MeinProfilTab({ user: initialUser }: MeinProfilTabProps) {
         setSuccessMessage(null)
 
         try {
-            await fetchGraphQL(CHANGE_PASSWORD, {
-                variables: {
-                    currentPassword: passwordData.currentPassword,
-                    password: passwordData.password,
-                    passwordConfirmation: passwordData.passwordConfirmation
-                }
+            await changePassword({
+                currentPassword: passwordData.currentPassword,
+                password: passwordData.password,
+                passwordConfirmation: passwordData.passwordConfirmation,
             })
             setSuccessMessage('Passwort erfolgreich geändert.')
             setPasswordData({

@@ -1,11 +1,14 @@
-export class GraphQLUnauthorizedError extends Error {
+export class StrapiUnauthorizedError extends Error {
 	readonly status = 401
 
 	constructor(message = 'Nicht authentifiziert') {
 		super(message)
-		this.name = 'GraphQLUnauthorizedError'
+		this.name = 'StrapiUnauthorizedError'
 	}
 }
+
+/** @deprecated Use StrapiUnauthorizedError */
+export const GraphQLUnauthorizedError = StrapiUnauthorizedError
 
 export function isUnauthorizedMessage(message: string): boolean {
 	const normalized = message.toLowerCase()
@@ -17,8 +20,8 @@ export function isUnauthorizedMessage(message: string): boolean {
 		|| normalized.includes('forbidden')
 }
 
-export function isGraphQLUnauthorizedError(error: unknown): boolean {
-	if (error instanceof GraphQLUnauthorizedError) {
+export function isStrapiUnauthorizedError(error: unknown): boolean {
+	if (error instanceof StrapiUnauthorizedError) {
 		return true
 	}
 
@@ -29,8 +32,11 @@ export function isGraphQLUnauthorizedError(error: unknown): boolean {
 	return false
 }
 
-export function resolveGraphQLErrorStatus(error: unknown): number {
-	if (error instanceof GraphQLUnauthorizedError) {
+/** @deprecated Use isStrapiUnauthorizedError */
+export const isGraphQLUnauthorizedError = isStrapiUnauthorizedError
+
+export function resolveStrapiErrorStatus(error: unknown): number {
+	if (error instanceof StrapiUnauthorizedError) {
 		return 401
 	}
 
@@ -48,3 +54,6 @@ export function resolveGraphQLErrorStatus(error: unknown): number {
 
 	return 500
 }
+
+/** @deprecated Use resolveStrapiErrorStatus */
+export const resolveGraphQLErrorStatus = resolveStrapiErrorStatus

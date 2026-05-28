@@ -4,8 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Button } from '@mui/material'
 import DownloadIcon from '@mui/icons-material/Download'
 import PrintIcon from '@mui/icons-material/Print'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { COUNT_FORM_INSTANCES } from '@/lib/graphql/queries'
+import { countFormInstances } from '@/lib/strapi/api'
 import type { Form, FormInstance, FormInstanceSearchResult } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 
@@ -84,23 +83,18 @@ export function FormInstanceList({ form, strapiBaseUrl, theme }: FormInstanceLis
 
 		try {
 			// Hole alle FormInstances für dieses Form (ohne Pagination, um alle zu bekommen)
-			const data = await fetchGraphQL<FormInstanceSearchResult>(
-				COUNT_FORM_INSTANCES,
+			const data = await countFormInstances(
 				{
-					baseUrl: strapiBaseUrl,
-					variables: {
-						filters: {
-							form: {
-								documentId: {
-									eq: form.documentId,
-								},
-							},
+					form: {
+						documentId: {
+							eq: form.documentId,
 						},
 					},
 				},
+				{ baseUrl: strapiBaseUrl },
 			)
 
-			const instances = Array.isArray(data.formInstances) ? data.formInstances : []
+			const instances = data.formInstances as FormInstance[]
 			setFormInstances(instances)
 		} catch (err) {
 			console.error('Fehler beim Laden der Formular-Instanzen:', err)

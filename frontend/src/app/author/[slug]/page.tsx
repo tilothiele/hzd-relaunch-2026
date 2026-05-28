@@ -3,8 +3,7 @@ import Link from 'next/link'
 import { MainPageStructure } from '../../main-page-structure'
 import { theme as globalTheme } from '@/themes'
 import { fetchAuthorBySlug } from '@/lib/server/fetch-author-by-slug'
-import { fetchGraphQLServer } from '@/lib/server/graphql-client'
-import { GET_NEWS_ARTICLES_BY_AUTHOR_SLUG } from '@/lib/graphql/queries'
+import { fetchNewsArticles } from '@/lib/strapi/api'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import NotFoundSection from '@/components/sections/not-found-section/not-found-section'
 
@@ -68,18 +67,15 @@ export default async function AuthorPage({ params }: PageProps) {
 
     const theme = globalTheme
     const displayName = author.DisplayName || [author.AcademicTitle, author.FirstName, author.LastName].filter(Boolean).join(' ') || 'Autor'
-    const authorArticlesResult = await fetchGraphQLServer<AuthorArticlesQueryResult>(
-        GET_NEWS_ARTICLES_BY_AUTHOR_SLUG,
-        {
-            baseUrl,
-            variables: {
-                slug: slugParam,
-                pagination: { limit: 20 },
-            },
-        },
-    )
+    const authorArticlesResult = await fetchNewsArticles({
+        filters: { SEO: { author: { Slug: { eq: slugParam } } } },
+        pagination: { pageSize: 20 },
+        sort: ['DateOfPublication:desc', 'publishedAt:desc'],
+        baseUrl,
+    })
     const authorArticles = (authorArticlesResult.newsArticles ?? []).filter(
-        (article) => article.Headline && article.Slug,
+        (article): article is { documentId: string; Headline: string; Slug: string } =>
+            Boolean(article.Headline && article.Slug),
     )
 
     return (

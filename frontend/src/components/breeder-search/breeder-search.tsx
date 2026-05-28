@@ -5,9 +5,13 @@ import { Box, Pagination, Switch, Table, TableBody, TableCell, TableContainer, T
 import GridViewIcon from '@mui/icons-material/GridView'
 import TableRowsIcon from '@mui/icons-material/TableRows'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
-import { fetchGraphQL } from '@/lib/graphql-client'
-import { SEARCH_BREEDERS } from '@/lib/graphql/queries'
-import type { Breeder, BreederSearchResult, HzdSetting } from '@/types'
+import {
+	getBreederApiSort,
+	sortBreedersByField,
+	type BreederSortField,
+} from '@/lib/breeder-sort-utils'
+import { searchBreeders as searchBreedersApi } from '@/lib/strapi/api'
+import type { Breeder, HzdSetting } from '@/types'
 import { BreederCard } from './breeder-card'
 import { BreederDetailView } from './breeder-detail-view'
 import { BreederSearchForm } from './breeder-search-form'
@@ -24,7 +28,7 @@ interface BreederSearchProps {
 
 type PageSize = 5 | 10 | 20 | 50 | 100
 type SortDirection = 'asc' | 'desc'
-type SortField = 'kennelName' | 'member.lastName' | 'member.zip' | 'member.city' | 'member.phone' | 'member.email'
+type SortField = BreederSortField
 
 export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps) {
 	const [nameFilter, setNameFilter] = useState('')
@@ -80,29 +84,19 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 				})
 			}
 
-			const variables: Record<string, unknown> = {
-				pagination: {
-					page,
-					pageSize,
-				},
-				sort: [`${sortField}:${sortDirection}`],
-			}
+			const data = await searchBreedersApi({
+				filters: { and: filterConditions },
+				pagination: { page, pageSize },
+				sort: [getBreederApiSort(sortField, sortDirection)],
+			}, { baseUrl: strapiBaseUrl })
 
-			if (filterConditions.length > 0) {
-				variables.filters = {
-					and: filterConditions,
-				}
-			}
-
-			const data = await fetchGraphQL<BreederSearchResult>(
-				SEARCH_BREEDERS,
-				{
-					baseUrl: strapiBaseUrl,
-					variables,
-				},
+			const breedersArray = sortBreedersByField(
+				Array.isArray(data.hzdPluginBreeders_connection.nodes)
+					? data.hzdPluginBreeders_connection.nodes
+					: [],
+				sortField,
+				sortDirection,
 			)
-
-			const breedersArray = Array.isArray(data.hzdPluginBreeders_connection.nodes) ? data.hzdPluginBreeders_connection.nodes : []
 			setBreeders(breedersArray)
 
 			const pageInfo = data.hzdPluginBreeders_connection?.pageInfo

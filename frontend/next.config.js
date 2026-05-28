@@ -13,12 +13,6 @@ const withSerwist = withSerwistInit({
 })
 
 const nextConfig = {
-	async rewrites() {
-		return [
-			// z. B. Altair/IDE auf /graphql; gleicher Proxy wie /api/graphql
-			{ source: '/graphql', destination: '/api/graphql' },
-		]
-	},
 	images: {
 		remotePatterns: [
 			{

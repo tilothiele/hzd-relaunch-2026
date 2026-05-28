@@ -1,13 +1,23 @@
-import { fetchGraphQLServer } from '../lib/server/graphql-client'
-import { GET_AUTHOR_BY_SLUG } from '../lib/graphql/queries'
+import { getStrapiBaseUrl } from '../lib/server/strapi-client'
+import { buildStrapiQuery } from '../lib/strapi/filters'
+import { fetchEntityList } from '../lib/strapi/api'
 
 async function test() {
     try {
         console.log('Fetching author with slug "mareike-busch"')
-        const result = await fetchGraphQLServer(GET_AUTHOR_BY_SLUG, {
-            baseUrl: 'http://127.0.0.1:1337', // Or process.env.NEXT_PUBLIC_STRAPI_URL
-            variables: { slug: 'mareike-busch' }
+        const query = buildStrapiQuery({
+            filters: { Slug: { eq: 'mareike-busch' } },
+            pagination: { pageSize: 1 },
+            populate: {
+                'populate[Avatar]': '*',
+                'populate[ExternalPublication]': '*',
+            },
         })
+        const result = await fetchEntityList(
+            'authors',
+            query,
+            { server: true, baseUrl: 'http://127.0.0.1:1337' },
+        )
         console.log(JSON.stringify(result, null, 2))
     } catch (e) {
         console.error('Error fetching:', e)

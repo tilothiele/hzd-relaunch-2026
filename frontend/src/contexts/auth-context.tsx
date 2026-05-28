@@ -4,13 +4,12 @@ import { createContext, useCallback, useEffect, useMemo, useState, type ReactNod
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { performFederatedLogout } from '@/lib/federated-logout'
 import {
-	setGraphQLAuthToken,
-	setGraphQLUnauthorizedHandler,
-	fetchGraphQL,
-} from '@/lib/graphql-client'
-import { isGraphQLUnauthorizedError } from '@/lib/graphql-errors'
+	setStrapiAuthToken,
+	setStrapiUnauthorizedHandler,
+} from '@/lib/strapi-client'
+import { isStrapiUnauthorizedError } from '@/lib/strapi-errors'
+import { fetchMe } from '@/lib/strapi/api'
 import { getLoginCallbackUrl } from '@/lib/auth-login'
-import { GET_ME } from '@/lib/graphql/queries'
 import type { AuthUser } from '@/types'
 
 interface AuthState {
@@ -36,9 +35,6 @@ interface AuthProviderProps {
 	strapiBaseUrl?: string | null
 }
 
-interface GetMeResponse {
-	me: AuthUser
-}
 
 function createFallbackUser(sessionUser: {
 	name?: string | null
@@ -67,7 +63,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	const [hasMounted, setHasMounted] = useState(false)
 
 	const invalidateSession = useCallback(async () => {
-		setGraphQLAuthToken(null)
+		setStrapiAuthToken(null)
 		setAuthState({ token: null, user: null })
 		setAuthError('Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.')
 		await signOut({ callbackUrl: '/' })
@@ -78,12 +74,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	}, [])
 
 	useEffect(() => {
-		setGraphQLUnauthorizedHandler(() => {
+		setStrapiUnauthorizedHandler(() => {
 			void invalidateSession()
 		})
 
 		return () => {
-			setGraphQLUnauthorizedHandler(null)
+			setStrapiUnauthorizedHandler(null)
 		}
 	}, [invalidateSession])
 
@@ -102,19 +98,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
 			}
 
 			if (!strapiToken) {
-				setGraphQLAuthToken(null)
+				setStrapiAuthToken(null)
 				setAuthState({ token: null, user: null })
 				setAuthError(null)
 				return
 			}
 
-			setGraphQLAuthToken(strapiToken)
+			setStrapiAuthToken(strapiToken)
 			setAuthError(null)
 
 			try {
-				const meData = await fetchGraphQL<GetMeResponse>(GET_ME, {
-					token: strapiToken,
-				})
+				const meData = await fetchMe(strapiToken)
 
 				if (!isActive) {
 					return
@@ -129,7 +123,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 					return
 				}
 
-				if (isGraphQLUnauthorizedError(error)) {
+				if (isStrapiUnauthorizedError(error)) {
 					return
 				}
 
@@ -165,7 +159,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	const handleLogout = useCallback(async () => {
 		setIsAuthenticating(true)
 		setAuthError(null)
-		setGraphQLAuthToken(null)
+		setStrapiAuthToken(null)
 		setAuthState({ token: null, user: null })
 
 		try {
