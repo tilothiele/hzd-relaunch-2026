@@ -136,6 +136,7 @@ public class StrapiMemberAdapter {
 		Set<Integer> cIds = new HashSet<>();
 		
 		while (true) {
+			Log.info("fetching user from strapi - page #"+page);
 			JsonNode response = client.listAllPaginated(StrapiResources.USERS, page, pageSize);
 			JsonNode items = StrapiResponseReader.readResultItems(response);
 			if (items == null || items.isEmpty()) {

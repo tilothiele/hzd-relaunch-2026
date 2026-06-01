@@ -63,6 +63,12 @@ public interface ImporterConfig {
 
 		Optional<String> apiToken();
 
+		Optional<String> username();
+
+		Optional<String> password();
+
+		Optional<String> authFlow();
+
 		@WithDefault("30s")
 		Duration httpTimeout();
 
