@@ -1,0 +1,13 @@
+.gradle/
+build/
+target/
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+bin/
+*.log
+.env
+dogs.csv
+members.csv

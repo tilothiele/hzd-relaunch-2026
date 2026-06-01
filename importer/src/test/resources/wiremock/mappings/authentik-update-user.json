@@ -1,0 +1,19 @@
+{
+	"priority": 1,
+	"request": {
+		"method": "PATCH",
+		"urlPathPattern": "/api/v3/core/users/[0-9]+/?"
+	},
+	"response": {
+		"status": 200,
+		"headers": {
+			"Content-Type": "application/json"
+		},
+		"jsonBody": {
+			"pk": 1001,
+			"username": "hzd.152544",
+			"email": "lena@example.de",
+			"is_active": true
+		}
+	}
+}

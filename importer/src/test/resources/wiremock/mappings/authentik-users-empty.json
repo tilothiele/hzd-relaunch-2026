@@ -1,0 +1,21 @@
+{
+	"priority": 1,
+	"request": {
+		"method": "GET",
+		"urlPathPattern": "/api/v3/core/users/?"
+	},
+	"response": {
+		"status": 200,
+		"headers": {
+			"Content-Type": "application/json"
+		},
+		"jsonBody": {
+			"pagination": {
+				"count": 0,
+				"current": 1,
+				"total_pages": 1
+			},
+			"results": []
+		}
+	}
+}

@@ -1,0 +1,28 @@
+{
+	"priority": 1,
+	"request": {
+		"method": "GET",
+		"urlPathPattern": "/api/v3/core/groups/?"
+	},
+	"response": {
+		"status": 200,
+		"headers": {
+			"Content-Type": "application/json"
+		},
+		"jsonBody": {
+			"pagination": {
+				"count": 1,
+				"current": 1,
+				"total_pages": 1
+			},
+			"results": [
+				{
+					"pk": "6b2f8f1a-4d3c-4b5e-9f0a-1c2d3e4f5a6b",
+					"num_pk": 7,
+					"name": "hzd-member",
+					"is_superuser": false
+				}
+			]
+		}
+	}
+}

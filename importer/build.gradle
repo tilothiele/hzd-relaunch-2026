@@ -1,0 +1,161 @@
+plugins {
+	id 'java'
+	id 'io.quarkus'
+	id 'jacoco'
+}
+
+repositories {
+	mavenCentral()
+	mavenLocal()
+}
+
+dependencies {
+	implementation enforcedPlatform(
+		"${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"
+	)
+	implementation 'io.quarkus:quarkus-rest'
+	implementation 'io.quarkus:quarkus-rest-jackson'
+	implementation 'io.quarkus:quarkus-rest-client'
+	implementation 'io.quarkus:quarkus-rest-client-jackson'
+	implementation 'io.quarkus:quarkus-hibernate-orm-panache'
+	implementation 'io.quarkus:quarkus-jdbc-postgresql'
+	implementation 'io.quarkus:quarkus-jdbc-h2'
+	implementation 'io.quarkus:quarkus-scheduler'
+	implementation 'io.quarkus:quarkus-arc'
+	implementation 'io.quarkus:quarkus-hibernate-orm'
+	implementation 'io.quarkus:quarkus-flyway'
+	implementation 'org.apache.commons:commons-csv:1.14.1'
+	testImplementation 'io.quarkus:quarkus-junit'
+	testImplementation 'io.quarkus:quarkus-junit-mockito'
+	testImplementation 'io.quarkus:quarkus-jacoco'
+	testImplementation 'io.rest-assured:rest-assured'
+	testImplementation 'org.awaitility:awaitility:4.3.0'
+	testImplementation 'org.mockito:mockito-core:5.20.0'
+	testImplementation 'org.testcontainers:testcontainers:1.20.6'
+	testImplementation 'org.testcontainers:postgresql:1.20.6'
+	testImplementation 'org.testcontainers:junit-jupiter:1.20.6'
+}
+
+group = 'de.hzd'
+version = '1.0.0-SNAPSHOT'
+
+jacoco {
+	toolVersion = '0.8.12'
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
+
+compileJava {
+	options.encoding = 'UTF-8'
+	options.compilerArgs << '-parameters'
+}
+
+compileTestJava {
+	options.encoding = 'UTF-8'
+}
+
+test {
+	systemProperty 'java.util.logging.manager', 'org.jboss.logmanager.LogManager'
+	systemProperty 'testcontainers.reuse.enable', 'true'
+
+	// Gradle würde sonst bei unveränderten Quellen die Tests überspringen (BUILD in ~1s).
+	outputs.upToDateWhen { false }
+
+	jacoco {
+		includeNoLocationClasses = true
+		excludes = [
+			'org/jacoco/**',
+			'io/quarkus/**',
+			'org/jboss/**',
+		]
+	}
+
+	testLogging {
+		events 'passed', 'failed', 'skipped'
+		exceptionFormat 'full'
+		showExceptions true
+		showCauses true
+		showStackTraces true
+	}
+
+	finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+	dependsOn test
+
+	executionData.setFrom(fileTree(layout.buildDirectory) {
+		include 'jacoco/test.exec', 'jacoco-quarkus.exec'
+	})
+
+	reports {
+		xml.required = true
+		html.required = true
+		csv.required = true
+	}
+
+	doLast {
+		def csvFile = reports.csv.outputLocation.get().asFile
+		if (!csvFile.exists()) {
+			println '\nKein JaCoCo-Report gefunden.\n'
+			return
+		}
+
+		int instructionMissed = 0
+		int instructionCovered = 0
+		int lineMissed = 0
+		int lineCovered = 0
+		int branchMissed = 0
+		int branchCovered = 0
+		int methodMissed = 0
+		int methodCovered = 0
+		int classCount = 0
+
+		csvFile.readLines().drop(1).each { line ->
+			def cols = line.split(',', -1)
+			if (cols.length < 13) {
+				return
+			}
+			classCount++
+			instructionMissed += cols[3] as int
+			instructionCovered += cols[4] as int
+			branchMissed += cols[5] as int
+			branchCovered += cols[6] as int
+			lineMissed += cols[7] as int
+			lineCovered += cols[8] as int
+			methodMissed += cols[11] as int
+			methodCovered += cols[12] as int
+		}
+
+		def printMetric = { String label, int covered, int missed ->
+			int total = covered + missed
+			double pct = total == 0 ? 0.0d : (covered * 100.0d / total)
+			println String.format(
+				'%-12s %6.1f%%  (%d/%d)',
+				label + ':',
+				pct,
+				covered,
+				total
+			)
+		}
+
+		println '\n' + '=' * 60
+		println 'Code Coverage (JaCoCo)'
+		println '=' * 60
+		printMetric('INSTRUCTION', instructionCovered, instructionMissed)
+		printMetric('LINE', lineCovered, lineMissed)
+		printMetric('BRANCH', branchCovered, branchMissed)
+		printMetric('METHOD', methodCovered, methodMissed)
+		println String.format(
+			'%-12s %6d',
+			'CLASS:',
+			classCount
+		)
+		println '=' * 60
+		println "HTML-Report: ${reports.html.outputLocation.get().asFile}"
+		println '=' * 60 + '\n'
+	}
+}

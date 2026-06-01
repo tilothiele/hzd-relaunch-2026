@@ -63,9 +63,66 @@ async function ensureResetPasswordUrl(strapi: any) {
 	}
 }
 
+async function adminUpdate(ctx: any) {
+	const documentId = ctx.params.id
+	const payload = ctx.request.body
+	const data = payload?.data ?? payload
+	const { user, auth } = ctx.state
+	const isApiToken = auth?.strategy?.name === 'api-token'
+	const isSuperAdmin = user?.isSuperAdmin === true
+
+	if (!isApiToken && !isSuperAdmin) {
+		strapi.log.warn('[User Ext] Unauthorized admin user update attempt', {
+			userId: user?.id,
+			username: user?.username,
+			isApiToken,
+		})
+		return ctx.forbidden(
+			'Forbidden: Only super admins or API tokens can update users',
+		)
+	}
+
+	if (!documentId || !data || typeof data !== 'object') {
+		return ctx.badRequest('documentId and data are required')
+	}
+
+	try {
+		const updatedUser = await strapi
+			.documents('plugin::users-permissions.user')
+			.update({
+				documentId,
+				data,
+			})
+
+		ctx.body = { data: updatedUser }
+	} catch (error: any) {
+		strapi.log.error('[User Ext] Error in adminUpdate:', error)
+		return ctx.internalServerError(
+			`Failed to update user: ${error?.message ?? 'unknown error'}`,
+		)
+	}
+}
+
 export default (plugin: any) => {
 	// Store original bootstrap if it exists
 	const originalBootstrap = plugin.bootstrap
+
+	if (plugin.controllers?.user) {
+		plugin.controllers.user.adminUpdate = adminUpdate
+	}
+
+	const contentApiRoutes = plugin.routes?.['content-api']?.routes
+	if (Array.isArray(contentApiRoutes)) {
+		contentApiRoutes.push({
+			method: 'PUT',
+			path: '/users/:id/admin-update',
+			handler: 'user.adminUpdate',
+			config: {
+				prefix: '',
+				policies: [],
+			},
+		})
+	}
 
 	// Register bootstrap hook to patch document service after Strapi is fully initialized
 	plugin.bootstrap = async ({ strapi }: { strapi: any }) => {
@@ -163,60 +220,10 @@ export default (plugin: any) => {
 				};
 			}
 			
-			plugin.controllers.user.adminUpdate = async (ctx: any) => {
-				const documentId = ctx.params.id
-				const payload = ctx.request.body
-				const data = payload?.data ?? payload
-				const { user, auth } = ctx.state
-				const isApiToken = auth?.strategy?.name === 'api-token'
-				const isSuperAdmin = user?.isSuperAdmin === true
-
-				if (!isApiToken && !isSuperAdmin) {
-					strapi.log.warn('[User Ext] Unauthorized admin user update attempt', {
-						userId: user?.id,
-						username: user?.username,
-						isApiToken,
-					})
-					return ctx.forbidden(
-						'Forbidden: Only super admins or API tokens can update users',
-					)
-				}
-
-				if (!documentId || !data || typeof data !== 'object') {
-					return ctx.badRequest('documentId and data are required')
-				}
-
-				try {
-					const updatedUser = await strapi
-						.documents('plugin::users-permissions.user')
-						.update({
-							documentId,
-							data,
-						})
-
-					ctx.body = { data: updatedUser }
-				} catch (error: any) {
-					strapi.log.error('[User Ext] Error in adminUpdate:', error)
-					return ctx.internalServerError(
-						`Failed to update user: ${error?.message ?? 'unknown error'}`,
-					)
-				}
-			}
-
 			strapi.log.info('[User Ext] ✓ User Controller extended (find & findOne privacy patch)')
 		}
 
-		const contentApiRoutes = plugin.routes?.['content-api']?.routes
 		if (Array.isArray(contentApiRoutes)) {
-			contentApiRoutes.push({
-				method: 'PUT',
-				path: '/users/:id/admin-update',
-				handler: 'user.adminUpdate',
-				config: {
-					policies: [],
-					middlewares: [],
-				},
-			})
 			strapi.log.info('[User Ext] ✓ REST route PUT /users/:id/admin-update registered')
 		}
 

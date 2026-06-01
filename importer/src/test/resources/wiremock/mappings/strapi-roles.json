@@ -1,0 +1,29 @@
+{
+	"priority": 1,
+	"request": {
+		"method": "GET",
+		"urlPath": "/api/users-permissions/roles"
+	},
+	"response": {
+		"status": 200,
+		"headers": {
+			"Content-Type": "application/json"
+		},
+		"jsonBody": {
+			"roles": [
+				{
+					"id": 1,
+					"name": "Public",
+					"type": "public",
+					"description": "Default role given to unauthenticated user."
+				},
+				{
+					"id": 2,
+					"name": "Authenticated",
+					"type": "authenticated",
+					"description": "Default role given to authenticated user."
+				}
+			]
+		}
+	}
+}
