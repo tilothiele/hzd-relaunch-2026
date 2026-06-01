@@ -147,6 +147,7 @@ public class ImportService {
 				statistics = switch (result) {
 					case CREATED -> statistics.withMembersCreated(1);
 					case UPDATED -> statistics.withMembersUpdated(1);
+					case DELETED -> statistics.withMembersUpdated(1);
 					case SKIPPED -> statistics.withMembersSkipped(1);
 				};
 			} catch (RuntimeException exception) {
@@ -170,6 +171,7 @@ public class ImportService {
 				statistics = switch (result) {
 					case CREATED -> statistics.withMembersCreated(1);
 					case UPDATED -> statistics.withMembersUpdated(1);
+					case DELETED -> statistics;
 					case SKIPPED -> statistics.withMembersSkipped(1);
 				};
 			} catch (RuntimeException exception) {

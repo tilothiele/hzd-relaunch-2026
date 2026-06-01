@@ -39,6 +39,7 @@ public class AuthentikUserAdapter {
 	public enum UpsertResult {
 		CREATED,
 		UPDATED,
+		DELETED,
 		SKIPPED
 	}
 
@@ -161,6 +162,30 @@ public class AuthentikUserAdapter {
 		groupMapper = AuthentikGroupMapper.empty();
 	}
 
+	public UpsertResult delete(Member member) {
+		String username = member.username();
+		Optional<JsonNode> existingUser = findUserByUsername(username);
+		if (existingUser.isEmpty()) {
+			LOG.infof(
+				"Skipping Authentik delete for cId=%d username=%s: user not found",
+				member.cId(),
+				username
+			);
+			return UpsertResult.SKIPPED;
+		}
+
+		int pk = existingUser.get().path("pk").asInt();
+		deleteUser(pk);
+		removeFromImportCache(username);
+		LOG.infof(
+			"Deleted Authentik user cId=%d username=%s pk=%d",
+			member.cId(),
+			username,
+			pk
+		);
+		return UpsertResult.DELETED;
+	}
+
 	public UpsertResult upsert(Member member) {
 //		if (member.cEmail().isEmpty()) {
 //			LOG.warnf("Skipping Authentik sync for cId=%d: no valid email in CSV", member.cId());
@@ -267,6 +292,31 @@ public class AuthentikUserAdapter {
 		return false;
 	}
 
+	private void deleteUser(int pk) {
+		try {
+			HttpResponse<String> response = sendDelete(usersUrl() + pk + "/");
+			if (response.statusCode() >= 400) {
+				throw new AuthentikClientException(
+					"Authentik delete failed: HTTP " + response.statusCode()
+						+ " " + response.body()
+				);
+			}
+		} catch (AuthentikClientException exception) {
+			throw exception;
+		} catch (Exception exception) {
+			throw new AuthentikClientException("Failed to delete Authentik user", exception);
+		}
+	}
+
+	private void removeFromImportCache(String username) {
+		if (!importCache.containsKey(username)) {
+			return;
+		}
+		Map<String, AuthentikUserSnapshot> updatedUsers = new LinkedHashMap<>(importCache);
+		updatedUsers.remove(username);
+		importCache = updatedUsers;
+	}
+
 	private void postUser(Map<String, Object> payload) {
 		try {
 			ObjectNode body = objectMapper.valueToTree(payload);
@@ -314,6 +364,10 @@ public class AuthentikUserAdapter {
 		return httpClient.send(buildRequest(url, "PATCH", body), HttpResponse.BodyHandlers.ofString());
 	}
 
+	private HttpResponse<String> sendDelete(String url) throws Exception {
+		return httpClient.send(buildRequest(url, "DELETE", null), HttpResponse.BodyHandlers.ofString());
+	}
+
 	private HttpRequest buildRequest(String url, String method, String body) {
 		HttpRequest.Builder builder = HttpRequest.newBuilder()
 			.uri(URI.create(url))
@@ -327,6 +381,7 @@ public class AuthentikUserAdapter {
 			case "GET" -> builder.GET().build();
 			case "POST" -> builder.POST(HttpRequest.BodyPublishers.ofString(body)).build();
 			case "PATCH" -> builder.method("PATCH", HttpRequest.BodyPublishers.ofString(body)).build();
+			case "DELETE" -> builder.DELETE().build();
 			default -> throw new IllegalArgumentException("Unsupported method: " + method);
 		};
 	}

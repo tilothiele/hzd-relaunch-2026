@@ -59,7 +59,7 @@ public record Member(
 	}
 
 	public boolean doImportInAuthentik() {
-		return true;
+		return isActive();
 	}
 	
 	

@@ -27,23 +27,25 @@ public class MemberSyncService implements MemberSyncPort {
 	public SyncResult syncInAuthentik(Member member) {
 		try {
 			boolean importInAuthentik = member.doImportInAuthentik();
-			if(!member.isActive()) {
-				
-			}
 			AuthentikUserAdapter.UpsertResult authentikResult = importInAuthentik
 				? authentikUserAdapter.upsert(member)
-				: AuthentikUserAdapter.UpsertResult.SKIPPED;
+				: authentikUserAdapter.delete(member);
 			if (!importInAuthentik) {
 				LOG.debugf(
-					"Skipping Authentik sync for cId=%d: cFlagBreeder is not true",
-					member.cId()
+					"Deleting Authentik sync for cId=%d, username=%s, email=%s: cFlagBreeder is true",
+					member.cId(),
+					member.username(),
+					member.email()
 				);
 			}
 			
-
-				return authentikResult == UpsertResult.CREATED
-					? SyncResult.CREATED
-					: SyncResult.UPDATED;
+			switch(authentikResult) {
+			case UpsertResult.CREATED: return SyncResult.CREATED;
+			case UpsertResult.UPDATED: return SyncResult.UPDATED;
+			case UpsertResult.DELETED: return SyncResult.DELETED;
+			default: return SyncResult.SKIPPED;
+			}
+			
 		} catch (RuntimeException exception) {
 			LOG.errorf(exception, "Failed to sync member cId=%d", member.cId());
 			throw exception;

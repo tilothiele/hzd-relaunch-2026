@@ -6,6 +6,7 @@ public interface MemberSyncPort {
 	enum SyncResult {
 		CREATED,
 		UPDATED,
+		DELETED,
 		SKIPPED
 	}
 
