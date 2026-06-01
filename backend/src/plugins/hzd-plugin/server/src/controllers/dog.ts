@@ -12,7 +12,12 @@ export default factories.createCoreController(
 
 		return {
 			async find(ctx: any) {
-				return service.find(ctx)
+				const { lat, lng } = ctx.query ?? {}
+				if (lat && lng) {
+					return service.find(ctx)
+				}
+
+				return Object.getPrototypeOf(this).find.call(this, ctx)
 			},
 		}
 	},

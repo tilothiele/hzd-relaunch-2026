@@ -33,6 +33,7 @@ public class DogSyncService implements DogSyncPort {
 
 	@Override
 	public DogSyncPort.BreederPreparationResult prepareBreeders(List<Dog> dogs) {
+		strapiDogAdapter.clearCache();
 		Map<Integer, Optional<String>> breederData = new HashMap<>();
 		for (Dog dog : dogs) {
 			dog.breederId().ifPresent(breederId ->

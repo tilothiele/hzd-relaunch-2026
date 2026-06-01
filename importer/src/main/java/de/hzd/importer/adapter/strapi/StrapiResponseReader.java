@@ -16,6 +16,10 @@ final class StrapiResponseReader {
 		if (data != null && data.isArray()) {
 			return data;
 		}
+		JsonNode results = response.get("results");
+		if (results != null && results.isArray()) {
+			return results;
+		}
 		if (response.isArray()) {
 			return response;
 		}

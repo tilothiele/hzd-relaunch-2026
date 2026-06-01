@@ -14,6 +14,28 @@ class StrapiResponseReaderTest {
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Test
+	void readsItemsFromResultsWrapper() throws Exception {
+		JsonNode response = objectMapper.readTree("""
+			{
+				"results": [
+					{ "documentId": "doc-2", "cId": 6621 }
+				],
+				"pagination": {
+					"page": 1,
+					"pageSize": 25,
+					"pageCount": 1,
+					"total": 1
+				}
+			}
+			""");
+
+		JsonNode items = StrapiResponseReader.readResultItems(response);
+
+		assertEquals(1, items.size());
+		assertEquals("doc-2", StrapiResponseReader.readResourceId(items.get(0)).orElseThrow());
+	}
+
+	@Test
 	void readsItemsFromDataWrapper() throws Exception {
 		JsonNode response = objectMapper.readTree("""
 			{
