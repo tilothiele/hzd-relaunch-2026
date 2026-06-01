@@ -90,9 +90,10 @@ Kopiere `.env.example` nach `.env`. Quarkus liest Umgebungsvariablen automatisch
 | `importer.strapi.api-token` | `IMPORTER_STRAPI_API_TOKEN` | Strapi API Token |
 | `importer.authentik.base-url` | `IMPORTER_AUTHENTIK_BASE_URL` | Authentik Basis-URL |
 | `importer.authentik.api-token` | `IMPORTER_AUTHENTIK_API_TOKEN` | Authentik API Token (Priorität vor Username/Passwort) |
-| `importer.authentik.username` | `IMPORTER_AUTHENTIK_USERNAME` | Authentik-Benutzer für Session-Login |
+| `importer.authentik.username` | `IMPORTER_AUTHENTIK_USERNAME` | Login-Identifikator wie im Authentik-Webformular (oft E-Mail) |
 | `importer.authentik.password` | `IMPORTER_AUTHENTIK_PASSWORD` | Passwort für Session-Login |
 | `importer.authentik.auth-flow` | `IMPORTER_AUTHENTIK_AUTH_FLOW` | Optionaler Flow-Slug (Standard: `default-authentication-flow`) |
+| `importer.authentik.default-groups` | `IMPORTER_AUTHENTIK_DEFAULT_GROUPS` | Authentik-Gruppen bei User-Upsert (Standard: `website-users`, kommagetrennt) |
 | `quarkus.datasource.jdbc.url` | `QUARKUS_DATASOURCE_JDBC_URL` | Job-DB (prod: PostgreSQL) |
 
 ## Job-Locking

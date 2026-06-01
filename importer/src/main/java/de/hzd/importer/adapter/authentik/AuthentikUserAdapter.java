@@ -34,13 +34,6 @@ public class AuthentikUserAdapter {
 	private Map<String, AuthentikUserSnapshot> importCache = Map.of();
 	private AuthentikGroupMapper groupMapper = AuthentikGroupMapper.empty();
 
-	public enum UpsertResult {
-		CREATED,
-		UPDATED,
-		DELETED,
-		SKIPPED
-	}
-
 	public record AuthentikUserSnapshot(
 		int pk,
 		String username,
@@ -152,6 +145,40 @@ public class AuthentikUserAdapter {
 		}
 	}
 
+	public enum UpsertResult {
+		CREATED,
+		UPDATED,
+		DELETED,
+		SKIPPED
+	}
+
+	public record DeleteAllUsersResult(int deleted, int total) {
+	}
+
+	public boolean doDelete(AuthentikUserSnapshot member) {
+		return member.username().startsWith("c."); // alle chromosoft user // nicht-hzd
+	}
+
+	public DeleteAllUsersResult deleteAllUsers() {
+		Map<String, AuthentikUserSnapshot> users = fetchAllUsers();
+		int deleted = 0;
+
+		for (AuthentikUserSnapshot user : users.values()) {
+			if(!doDelete(user)) continue;
+			deleteUser(user.pk());
+			deleted++;
+			LOG.infof(
+				"Deleted Authentik user username=%s pk=%d",
+				user.username(),
+				user.pk()
+			);
+		}
+
+		clearImportCache();
+		LOG.infof("Deleted %d of %d Authentik users", deleted, users.size());
+		return new DeleteAllUsersResult(deleted, users.size());
+	}
+
 	public void setImportCache(Map<String, AuthentikUserSnapshot> users) {
 		importCache = users != null ? users : Map.of();
 	}
@@ -201,7 +228,11 @@ public class AuthentikUserAdapter {
 
 		String username = member.username();
 		Optional<JsonNode> existingUser = findUserByUsername(username);
-		Map<String, Object> payload = AuthentikPayloadMapper.toUserPayload(member, groupMapper);
+		Map<String, Object> payload = AuthentikPayloadMapper.toUserPayload(
+			member,
+			groupMapper,
+			config.authentik().defaultGroups()
+		);
 
 		if (existingUser.isPresent()) {
 			int pk = existingUser.get().path("pk").asInt();

@@ -17,17 +17,20 @@ class AuthentikPayloadMapperTest {
 
 	private static final String HZD_MEMBER_UUID =
 		"6b2f8f1a-4d3c-4b5e-9f0a-1c2d3e4f5a6b";
+	private static final String WEBSITE_USERS_UUID =
+		"8c4e9a2b-1f3d-4e5a-9b0c-2d3e4f5a6b7c";
 
 	@Test
-	void mapsIsActiveAndGroups() {
+	void mapsIsActiveAndConfiguredGroups() {
 		Member member = activeMember();
 
 		Map<String, Object> payload = AuthentikPayloadMapper.toUserPayload(
 			member,
-			AuthentikGroupMapper.fromEntries(Map.of("hzd-member", HZD_MEMBER_UUID))
+			AuthentikGroupMapper.fromEntries(Map.of("hzd-member", HZD_MEMBER_UUID)),
+			List.of("hzd-member")
 		);
 
-		assertEquals("hzd.152544", payload.get("username"));
+		assertEquals("152544", payload.get("username"));
 		assertEquals("lena@example.de", payload.get("email"));
 		assertEquals("Lena Babel", payload.get("name"));
 		assertEquals(true, payload.get("is_active"));
@@ -35,7 +38,7 @@ class AuthentikPayloadMapperTest {
 	}
 
 	@Test
-	void mapsInactiveMemberWithoutKnownGroups() {
+	void mapsInactiveMemberWithoutConfiguredGroups() {
 		Member member = new Member(
 			10927,
 			Optional.of(false),
@@ -64,7 +67,8 @@ class AuthentikPayloadMapperTest {
 
 		Map<String, Object> payload = AuthentikPayloadMapper.toUserPayload(
 			member,
-			AuthentikGroupMapper.empty()
+			AuthentikGroupMapper.empty(),
+			List.of()
 		);
 
 		assertTrue((Boolean) payload.get("is_active"));
@@ -77,7 +81,8 @@ class AuthentikPayloadMapperTest {
 
 		Map<String, Object> payload = AuthentikPayloadMapper.toUserPayload(
 			member,
-			AuthentikGroupMapper.fromEntries(Map.of("hzd-member", HZD_MEMBER_UUID))
+			AuthentikGroupMapper.fromEntries(Map.of("hzd-member", HZD_MEMBER_UUID)),
+			List.of("hzd-member")
 		);
 
 		assertEquals(List.of(HZD_MEMBER_UUID), payload.get("groups"));
@@ -89,10 +94,30 @@ class AuthentikPayloadMapperTest {
 
 		Map<String, Object> payload = AuthentikPayloadMapper.toUserPayload(
 			member,
-			AuthentikGroupMapper.empty()
+			AuthentikGroupMapper.empty(),
+			List.of("missing-group")
 		);
 
 		assertFalse(payload.containsKey("groups"));
+	}
+
+	@Test
+	void mapsMultipleConfiguredGroups() {
+		Member member = activeMember();
+
+		Map<String, Object> payload = AuthentikPayloadMapper.toUserPayload(
+			member,
+			AuthentikGroupMapper.fromEntries(Map.of(
+				"hzd-member", HZD_MEMBER_UUID,
+				"website-users", WEBSITE_USERS_UUID
+			)),
+			List.of("hzd-member", "website-users")
+		);
+
+		assertEquals(
+			List.of(HZD_MEMBER_UUID, WEBSITE_USERS_UUID),
+			payload.get("groups")
+		);
 	}
 
 	private Member activeMember() {

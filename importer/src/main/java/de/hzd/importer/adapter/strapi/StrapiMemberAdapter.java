@@ -32,13 +32,9 @@ public class StrapiMemberAdapter {
 	ImporterConfig config;
 
 	private Map<Integer, StrapiMemberSnapshot> membersByCid = Map.of();
-	private Map<String, List<StrapiMemberSnapshot>> membersByEmail = Map.of();
 	private Map<String, StrapiMemberSnapshot> membersByUsername = Map.of();
 	private int authenticatedRoleId = -1;
 
-	public List<StrapiMemberSnapshot> cachedMemberByEmail(String email) {
-		return membersByEmail.get(email);
-	}
 	public StrapiMemberSnapshot cachedMemberByCid(int cId) {
 		return membersByCid.get(cId);
 	}
@@ -179,17 +175,6 @@ public class StrapiMemberAdapter {
 		this.membersByCid = members != null 
 				? members.stream().collect(Collectors.toMap(m -> m.cId, m -> m)) 
 				: Map.of();
-		this.membersByEmail = new HashMap<>();
-		if(members!=null) {
-			members.stream().filter(m -> m.email().isPresent() && m.email().get()!=null).forEach(m -> {
-				List<StrapiMemberSnapshot> l = membersByEmail.get(m.email().get());
-				if(l==null) {
-					l = new ArrayList<>();
-					membersByEmail.put(m.email().get(), l);
-				}
-				l.add(m);
-			});
-		}
 		this.membersByUsername = members !=null
 				? members.stream().filter(m -> m.username()!=null && m.username().isPresent()).collect(Collectors.toMap(m -> m.username().get(), m -> m))
 				: Map.of();
@@ -197,7 +182,6 @@ public class StrapiMemberAdapter {
 
 	public void clearImportCache() {
 		membersByCid = Map.of();
-		membersByEmail = Map.of();
 		membersByUsername = Map.of();
 		authenticatedRoleId = -1;
 	}
@@ -297,8 +281,6 @@ public class StrapiMemberAdapter {
 		return true;
 	}
 
-
-
 	private Optional<StrapiUserRef> findExistingStrapiUser(Member member) {
 		if (member.hasStrapiIdentity()) {
 			return Optional.of(new StrapiUserRef(
@@ -311,11 +293,6 @@ public class StrapiMemberAdapter {
 
 	private Optional<StrapiUserRef> findExistingStrapiByUsername(Member member) {
 		return Optional.empty();
-	}
-
-	private List<StrapiMemberSnapshot> findExistingUserByEmail(Member member) {
-		List<StrapiMemberSnapshot> u = membersByEmail.get(member.email());
-		return u;
 	}
 
 	private Optional<StrapiMemberSnapshot> findExistingUserRefByCId(int cId) {

@@ -128,7 +128,6 @@ public class AuthentikApiAuthentication {
 		String executorUrl = buildFlowExecutorUrl(flowSlug);
 
 		try {
-			bootstrapFlowSession(flowSlug);
 			HttpResponse<String> initialResponse = sendAuthenticatedGet(executorUrl, executorUrl);
 			if (initialResponse.statusCode() >= 400) {
 				throw new AuthentikClientException(
@@ -139,8 +138,9 @@ public class AuthentikApiAuthentication {
 				);
 			}
 
+			FlowContext flowContext = new FlowContext(buildBaseUrl(), executorUrl);
 			JsonNode challenge = parseChallengeBody(initialResponse);
-			executeFlow(executorUrl, challenge, username, password);
+			executeFlow(flowContext, challenge, username, password);
 			verifyAuthenticatedSession();
 			sessionAuthenticated = true;
 			LOG.infof(
@@ -157,27 +157,14 @@ public class AuthentikApiAuthentication {
 		}
 	}
 
-	private void bootstrapFlowSession(String flowSlug) throws Exception {
-		String bootstrapUrl = buildBaseUrl()
-			+ "/api/v3/flows/instances/"
-			+ flowSlug
-			+ "/execute/";
-		HttpResponse<String> response = sendAuthenticatedGet(bootstrapUrl, bootstrapUrl);
-		if (response.statusCode() >= 400) {
-			LOG.warnf(
-				"Authentik flow bootstrap returned HTTP %d, continuing with executor",
-				response.statusCode()
-			);
-		}
-	}
-
 	private void executeFlow(
-		String executorUrl,
+		FlowContext flowContext,
 		JsonNode challenge,
 		String username,
 		String password
 	) throws Exception {
 		JsonNode currentChallenge = challenge;
+		String lastComponent = "";
 
 		for (int step = 0; step < MAX_FLOW_STEPS; step++) {
 			if (currentChallenge == null) {
@@ -191,6 +178,14 @@ public class AuthentikApiAuthentication {
 				);
 			}
 
+			flowContext.ensureFlowProgress(component, lastComponent);
+			lastComponent = component;
+			LOG.infof(
+				"Authentik flow stage %d: %s",
+				step + 1,
+				component
+			);
+
 			if ("xak-flow-redirect".equals(component)) {
 				completeFlowRedirect(currentChallenge);
 				return;
@@ -203,25 +198,61 @@ public class AuthentikApiAuthentication {
 				throw new AuthentikClientException("Authentik login failed: " + message);
 			}
 
-			HttpResponse<String> response = submitChallenge(
-				executorUrl,
-				buildChallengeResponse(component, username, password)
+			if ("ak-stage-user-login".equals(component)) {
+				HttpResponse<String> loginGetResponse = sendAuthenticatedGet(
+					flowContext.executorUrl(),
+					flowContext.executorUrl()
+				);
+				currentChallenge = advanceFlow(flowContext, loginGetResponse);
+				if (currentChallenge == null) {
+					return;
+				}
+				component = currentChallenge.path("component").asText("");
+				if ("xak-flow-redirect".equals(component)) {
+					completeFlowRedirect(currentChallenge);
+					return;
+				}
+				if (!"ak-stage-user-login".equals(component)) {
+					continue;
+				}
+			}
+
+			ObjectNode challengeResponse = buildChallengeResponse(
+				currentChallenge,
+				component,
+				username,
+				password
 			);
-			currentChallenge = advanceFlow(executorUrl, response);
+			if ("ak-stage-identification".equals(component)) {
+				LOG.infof(
+					"Submitting Authentik identification for user_fields %s",
+					formatUserFields(currentChallenge.path("user_fields"))
+				);
+			}
+
+			HttpResponse<String> response = submitChallenge(
+				flowContext.executorUrl(),
+				challengeResponse
+			);
+			currentChallenge = advanceFlow(flowContext, response);
 		}
 
 		throw new AuthentikClientException(
 			"Authentik login flow exceeded maximum number of stages"
+				+ (lastComponent.isBlank() ? "" : " (last stage: " + lastComponent + ")")
 		);
 	}
 
-	private JsonNode advanceFlow(String executorUrl, HttpResponse<String> response)
+	private JsonNode advanceFlow(FlowContext flowContext, HttpResponse<String> response)
 		throws Exception {
 		absorbSetCookies(response);
 
 		if (response.statusCode() == 301 || response.statusCode() == 302) {
-			HttpResponse<String> redirectResponse = followRedirectChain(response, 0);
-			return advanceFlow(executorUrl, redirectResponse);
+			flowContext.updateExecutorUrlFromLocation(
+				response.headers().firstValue("Location").orElse("")
+			);
+			HttpResponse<String> redirectResponse = followRedirectChain(response, 0, flowContext);
+			return advanceFlow(flowContext, redirectResponse);
 		}
 
 		if (response.statusCode() >= 400) {
@@ -234,6 +265,7 @@ public class AuthentikApiAuthentication {
 		}
 
 		JsonNode challenge = parseChallengeBody(response);
+		assertNoChallengeErrors(challenge);
 		String component = challenge.path("component").asText("");
 		if ("xak-flow-redirect".equals(component)) {
 			completeFlowRedirect(challenge);
@@ -241,6 +273,67 @@ public class AuthentikApiAuthentication {
 		}
 
 		return challenge;
+	}
+
+	private void assertNoChallengeErrors(JsonNode challenge) {
+		JsonNode errors = challenge.path("response_errors");
+		if (!errors.isObject() || errors.isEmpty()) {
+			return;
+		}
+
+		StringBuilder message = new StringBuilder("Authentik login failed");
+		boolean identificationRejected = false;
+		for (var entry : errors.properties()) {
+			JsonNode fieldErrors = entry.getValue();
+			if (!fieldErrors.isArray()) {
+				continue;
+			}
+
+			for (JsonNode fieldError : fieldErrors) {
+				String detail = fieldError.path("string").asText(
+					fieldError.path("code").asText("")
+				);
+				if (detail.isBlank()) {
+					continue;
+				}
+
+				message.append(": ").append(entry.getKey()).append(" - ").append(detail);
+				if ("non_field_errors".equals(entry.getKey())
+					&& detail.toLowerCase().contains("failed to authenticate")) {
+					identificationRejected = true;
+				}
+			}
+		}
+
+		if (identificationRejected) {
+			message.append(
+				". IMPORTER_AUTHENTIK_USERNAME must match the Authentik web login"
+			);
+			String userFields = formatUserFields(challenge.path("user_fields"));
+			if (!userFields.isBlank()) {
+				message.append(" (accepted fields: ").append(userFields).append(')');
+			}
+			message.append(
+				". Prefer IMPORTER_AUTHENTIK_API_TOKEN for automation."
+			);
+		}
+
+		throw new AuthentikClientException(message.toString());
+	}
+
+	private String formatUserFields(JsonNode userFields) {
+		if (!userFields.isArray() || userFields.isEmpty()) {
+			return "";
+		}
+
+		StringBuilder formatted = new StringBuilder("[");
+		for (int index = 0; index < userFields.size(); index++) {
+			if (index > 0) {
+				formatted.append(", ");
+			}
+			formatted.append(userFields.get(index).asText(""));
+		}
+		return formatted.append(']').toString();
 	}
 
 	private JsonNode parseChallengeBody(HttpResponse<String> response) throws Exception {
@@ -273,6 +366,7 @@ public class AuthentikApiAuthentication {
 	}
 
 	private ObjectNode buildChallengeResponse(
+		JsonNode challenge,
 		String component,
 		String username,
 		String password
@@ -283,7 +377,9 @@ public class AuthentikApiAuthentication {
 		switch (component) {
 			case "ak-stage-identification" -> {
 				body.put("uid_field", username);
-				body.put("password", password);
+				if (challenge.path("password_fields").asBoolean(false)) {
+					body.put("password", password);
+				}
 			}
 			case "ak-stage-password" -> body.put("password", password);
 			case "ak-stage-user-login" -> body.put("remember_me", false);
@@ -345,7 +441,8 @@ public class AuthentikApiAuthentication {
 
 	private HttpResponse<String> followRedirectChain(
 		HttpResponse<String> response,
-		int depth
+		int depth,
+		FlowContext flowContext
 	) throws Exception {
 		if (depth >= MAX_REDIRECTS) {
 			throw new AuthentikClientException(
@@ -358,10 +455,14 @@ public class AuthentikApiAuthentication {
 			return response;
 		}
 
+		flowContext.updateExecutorUrlFromLocation(location);
 		String redirectUrl = resolveUrl(location).toString();
-		HttpResponse<String> redirectResponse = sendAuthenticatedGet(redirectUrl, redirectUrl);
+		HttpResponse<String> redirectResponse = sendAuthenticatedGet(
+			redirectUrl,
+			flowContext.executorUrl()
+		);
 		if (redirectResponse.statusCode() == 301 || redirectResponse.statusCode() == 302) {
-			return followRedirectChain(redirectResponse, depth + 1);
+			return followRedirectChain(redirectResponse, depth + 1, flowContext);
 		}
 
 		return redirectResponse;
@@ -432,5 +533,45 @@ public class AuthentikApiAuthentication {
 
 	private URI resolveUrl(String location) {
 		return URI.create(buildBaseUrl() + "/").resolve(location);
+	}
+
+	private static final class FlowContext {
+		private final String baseUrl;
+		private String executorUrl;
+		private int repeatedComponentCount;
+
+		private FlowContext(String baseUrl, String executorUrl) {
+			this.baseUrl = baseUrl.replaceAll("/+$", "");
+			this.executorUrl = executorUrl;
+		}
+
+		private String executorUrl() {
+			return executorUrl;
+		}
+
+		private void updateExecutorUrlFromLocation(String location) {
+			if (location.isBlank()) {
+				return;
+			}
+
+			String resolvedUrl = URI.create(baseUrl + "/").resolve(location).toString();
+			if (resolvedUrl.contains("/flows/executor/")) {
+				executorUrl = resolvedUrl;
+			}
+		}
+
+		private void ensureFlowProgress(String component, String lastComponent) {
+			if (component.equals(lastComponent)) {
+				repeatedComponentCount++;
+			} else {
+				repeatedComponentCount = 1;
+			}
+
+			if (repeatedComponentCount >= 3) {
+				throw new AuthentikClientException(
+					"Authentik login flow stalled at stage '" + component + "'"
+				);
+			}
+		}
 	}
 }

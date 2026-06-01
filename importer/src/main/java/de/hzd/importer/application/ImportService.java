@@ -177,15 +177,6 @@ public class ImportService {
 			final int j = i++;
 			logTicker.tick(() -> Log.info(Ticker.formatProceedingMessage(t1, members.size(), j, "Strapi user")));
 			try {
-				List<StrapiMemberSnapshot> u = strapiMemberAdapter.cachedMemberByEmail(member.strapiEmail());
-				if (u != null) {
-					for(StrapiMemberSnapshot user: u) {
-						int cId = user.cId();
-						if(cId==member.cId()) continue;
-						String email = "c." + cId + "@hovawarte.com";
-						memberSyncPort.setMemberEmailInStrapi(cId, email);
-					}
-				}
 				Member memberToSync = enrichWithStrapiIdentity(member);
 				MemberSyncPort.SyncResult result = memberSyncPort.syncInStrapi(memberToSync);
 				statistics = switch (result) {

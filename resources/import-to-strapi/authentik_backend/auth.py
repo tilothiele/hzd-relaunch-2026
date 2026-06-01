@@ -119,7 +119,6 @@ def authenticate_with_username_password(
     flow_slug = settings.auth_flow or DEFAULT_AUTH_FLOW
     executor_url = build_flow_executor_url(settings.base_url, flow_slug)
 
-    bootstrap_flow_session(session, settings, flow_slug)
     response = session.get(
         executor_url,
         timeout=settings.timeout,
@@ -136,23 +135,6 @@ def authenticate_with_username_password(
     verify_authenticated_session(session, settings)
 
 
-def bootstrap_flow_session(
-    session: requests.Session,
-    settings: AuthentikAuthSettings,
-    flow_slug: str,
-) -> None:
-    bootstrap_url = urljoin(
-        settings.base_url.rstrip('/') + '/',
-        f'api/v3/flows/instances/{flow_slug}/execute/',
-    )
-    session.get(
-        bootstrap_url,
-        timeout=settings.timeout,
-        allow_redirects=False,
-        headers={'Referer': bootstrap_url},
-    )
-
-
 def execute_flow(
     session: requests.Session,
     executor_url: str,
@@ -162,8 +144,10 @@ def execute_flow(
     settings: AuthentikAuthSettings,
 ) -> None:
     current_challenge: Optional[dict[str, Any]] = challenge
+    last_component = ''
+    repeated_component_count = 0
 
-    for _ in range(MAX_FLOW_STEPS):
+    for step in range(MAX_FLOW_STEPS):
         if current_challenge is None:
             return
 
@@ -171,6 +155,17 @@ def execute_flow(
         if not component:
             raise AuthentikAuthError(
                 'Authentik login flow returned a challenge without component'
+            )
+
+        if component == last_component:
+            repeated_component_count += 1
+        else:
+            repeated_component_count = 1
+            last_component = component
+
+        if repeated_component_count >= 3:
+            raise AuthentikAuthError(
+                f"Authentik login flow stalled at stage '{component}'"
             )
 
         if component == 'xak-flow-redirect':
@@ -181,15 +176,46 @@ def execute_flow(
             message = current_challenge.get('error_message', 'Authentik login was denied')
             raise AuthentikAuthError(f'Authentik login failed: {message}')
 
+        if component == 'ak-stage-user-login':
+            login_get_response = session.get(
+                executor_url,
+                timeout=settings.timeout,
+                allow_redirects=False,
+                headers={'Referer': executor_url},
+            )
+            current_challenge = advance_flow(
+                session,
+                executor_url,
+                login_get_response,
+                settings,
+            )
+            if current_challenge is None:
+                return
+
+            component = current_challenge.get('component')
+            if component == 'xak-flow-redirect':
+                complete_flow_redirect(session, current_challenge, settings)
+                return
+            if component != 'ak-stage-user-login':
+                continue
+
         response = submit_challenge(
             session,
             executor_url,
-            build_challenge_response(component, username, password),
+            build_challenge_response(current_challenge, component, username, password),
             settings.timeout,
         )
-        current_challenge = advance_flow(session, executor_url, response, settings)
+        current_challenge, executor_url = advance_flow_with_url(
+            session,
+            executor_url,
+            response,
+            settings,
+        )
 
-    raise AuthentikAuthError('Authentik login flow exceeded maximum number of stages')
+    raise AuthentikAuthError(
+        'Authentik login flow exceeded maximum number of stages'
+        + (f" (last stage: {last_component})" if last_component else '')
+    )
 
 
 def advance_flow(
@@ -198,9 +224,35 @@ def advance_flow(
     response: requests.Response,
     settings: AuthentikAuthSettings,
 ) -> Optional[dict[str, Any]]:
+    challenge, _executor_url = advance_flow_with_url(
+        session,
+        executor_url,
+        response,
+        settings,
+    )
+    return challenge
+
+
+def advance_flow_with_url(
+    session: requests.Session,
+    executor_url: str,
+    response: requests.Response,
+    settings: AuthentikAuthSettings,
+) -> tuple[Optional[dict[str, Any]], str]:
     if response.status_code in (301, 302):
-        redirect_response = follow_redirect_chain(session, response, settings, 0)
-        return advance_flow(session, executor_url, redirect_response, settings)
+        redirect_response, executor_url = follow_redirect_chain(
+            session,
+            executor_url,
+            response,
+            settings,
+            0,
+        )
+        return advance_flow_with_url(
+            session,
+            executor_url,
+            redirect_response,
+            settings,
+        )
 
     if response.status_code >= 400:
         raise AuthentikAuthError(
@@ -208,12 +260,13 @@ def advance_flow(
         )
 
     challenge = response.json()
+    assert_no_challenge_errors(challenge)
     component = challenge.get('component')
     if component == 'xak-flow-redirect':
         complete_flow_redirect(session, challenge, settings)
-        return None
+        return None, executor_url
 
-    return challenge
+    return challenge, executor_url
 
 
 def complete_flow_redirect(
@@ -236,31 +289,42 @@ def complete_flow_redirect(
 
 def follow_redirect_chain(
     session: requests.Session,
+    executor_url: str,
     response: requests.Response,
     settings: AuthentikAuthSettings,
     depth: int,
-) -> requests.Response:
+) -> tuple[requests.Response, str]:
     if depth >= MAX_REDIRECTS:
         raise AuthentikAuthError('Authentik login redirect chain exceeded maximum length')
 
     location = response.headers.get('Location')
     if not location:
-        return response
+        return response, executor_url
 
     redirect_url = resolve_url(settings.base_url, location)
+    if '/flows/executor/' in redirect_url:
+        executor_url = redirect_url
+
     redirect_response = session.get(
         redirect_url,
         timeout=settings.timeout,
         allow_redirects=False,
-        headers={'Referer': redirect_url},
+        headers={'Referer': executor_url},
     )
     if redirect_response.status_code in (301, 302):
-        return follow_redirect_chain(session, redirect_response, settings, depth + 1)
+        return follow_redirect_chain(
+            session,
+            executor_url,
+            redirect_response,
+            settings,
+            depth + 1,
+        )
 
-    return redirect_response
+    return redirect_response, executor_url
 
 
 def build_challenge_response(
+    challenge: dict[str, Any],
     component: str,
     username: str,
     password: str,
@@ -269,7 +333,8 @@ def build_challenge_response(
 
     if component == 'ak-stage-identification':
         body['uid_field'] = username
-        body['password'] = password
+        if challenge.get('password_fields'):
+            body['password'] = password
     elif component == 'ak-stage-password':
         body['password'] = password
     elif component == 'ak-stage-user-login':
@@ -281,6 +346,40 @@ def build_challenge_response(
         )
 
     return body
+
+
+def assert_no_challenge_errors(challenge: dict[str, Any]) -> None:
+    errors = challenge.get('response_errors')
+    if not isinstance(errors, dict) or not errors:
+        return
+
+    details: list[str] = []
+    identification_rejected = False
+    for field, field_errors in errors.items():
+        if not isinstance(field_errors, list):
+            continue
+        for field_error in field_errors:
+            if not isinstance(field_error, dict):
+                continue
+            detail = field_error.get('string') or field_error.get('code')
+            if detail:
+                details.append(f'{field} - {detail}')
+                if field == 'non_field_errors' and 'failed to authenticate' in str(detail).lower():
+                    identification_rejected = True
+
+    if not details:
+        return
+
+    message = 'Authentik login failed: ' + '; '.join(details)
+    if identification_rejected:
+        user_fields = challenge.get('user_fields')
+        if isinstance(user_fields, list) and user_fields:
+            message += (
+                '. AUTHENTIK_USERNAME must match the Authentik web login '
+                f'(accepted fields: {user_fields}). Prefer AUTHENTIK_API_TOKEN for automation.'
+            )
+
+    raise AuthentikAuthError(message)
 
 
 def submit_challenge(

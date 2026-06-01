@@ -1,11 +1,12 @@
 package de.hzd.importer.adapter.authentik;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.jboss.logging.Logger;
 
 /**
@@ -82,7 +83,15 @@ public final class AuthentikGroupMapper {
 			return List.of();
 		}
 
-		List<String> uuids = new ArrayList<>();
+		return uuidsForNames(List.of(groupNames));
+	}
+
+	public List<String> uuidsForNames(List<String> groupNames) {
+		if (groupNames == null || groupNames.isEmpty()) {
+			return List.of();
+		}
+
+		Set<String> uuids = new LinkedHashSet<>();
 		for (String groupName : groupNames) {
 			if (groupName == null || groupName.isBlank()) {
 				continue;
@@ -94,7 +103,7 @@ public final class AuthentikGroupMapper {
 				LOG.warnf("Authentik group not found: %s", groupName);
 			}
 		}
-		return uuids;
+		return List.copyOf(uuids);
 	}
 
 	private static Optional<String> readGroupUuid(JsonNode group) {

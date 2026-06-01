@@ -34,13 +34,12 @@ public record Member(
 	public String username() {
 		String cUsername = "c."+cId;
 		if(cFlagBreeder.orElse(Boolean.FALSE)) return cUsername;
-		if(membershipNumber!=null && !membershipNumber.isEmpty()) return "hzd."+membershipNumber.get();
+		if(membershipNumber!=null && !membershipNumber.isEmpty()) return ""+membershipNumber.get();
 		return cUsername;
 	}
 
 	public String strapiEmail() {
-		return email().filter(value -> value.contains("@"))
-			.orElseGet(() -> username() + "@hovawarte.com");
+		return "c."+cId + "@hovawarte.com";
 	}
 
 	public Optional<String> cEmail() {
@@ -59,7 +58,7 @@ public record Member(
 	}
 
 	public boolean doImportInAuthentik() {
-		return isActive();
+		return isActive() && membershipNumber.isPresent();
 	}
 	
 	
@@ -74,10 +73,6 @@ public record Member(
 //			return cFlagAccess.get();
 //		}
 		return !isBreeder();
-	}
-	
-	public String [] groups() {
-		return new String[] { "hzd-member"};
 	}
 
 	public Member withStrapiIdentity(
