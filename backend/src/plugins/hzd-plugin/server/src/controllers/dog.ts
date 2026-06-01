@@ -5,27 +5,20 @@
 import { factories } from '@strapi/strapi'
 import type { Core } from '@strapi/strapi'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyController = Record<string, any>
+export default factories.createCoreController(
+	'plugin::hzd-plugin.dog',
+	({ strapi }: { strapi: Core.Strapi }) => {
+		const service = strapi.service('plugin::hzd-plugin.dog')
 
-const coreControllerFactory = factories.createCoreController('plugin::hzd-plugin.dog')
+		return {
+			async find(ctx: any) {
+				const { lat, lng } = ctx.query ?? {}
+				if (lat && lng) {
+					return service.find(ctx)
+				}
 
-export default ({ strapi }: { strapi: Core.Strapi }): AnyController => {
-	const service = strapi.service('plugin::hzd-plugin.dog')
-
-	return {
-		...(coreControllerFactory({ strapi } as any) as AnyController),
-		async find(ctx: any) {
-			return service.find(ctx)
-		},
-		async findOne(ctx: any) {
-			return service.findOne(ctx)
-		},
-		async create(ctx: any) {
-			return service.create(ctx)
-		},
-		async update(ctx: any) {
-			return service.update(ctx)
-		},
-	}
-}
+				return Object.getPrototypeOf(this).find.call(this, ctx)
+			},
+		}
+	},
+)

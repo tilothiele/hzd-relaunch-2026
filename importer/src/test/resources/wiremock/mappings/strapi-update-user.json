@@ -1,0 +1,16 @@
+{
+	"priority": 1,
+	"request": {
+		"method": "PUT",
+		"urlPathPattern": "/api/users/.*"
+	},
+	"response": {
+		"status": 200,
+		"headers": {
+			"Content-Type": "application/json"
+		},
+		"jsonBody": {
+			"documentId": "strapi-user-doc-1"
+		}
+	}
+}

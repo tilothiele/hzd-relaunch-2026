@@ -5,11 +5,6 @@
 import { factories } from '@strapi/strapi'
 import type { Core } from '@strapi/strapi'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyService = Record<string, any>
-
-const coreServiceFactory = factories.createCoreService('plugin::hzd-plugin.dog')
-
 // Haversine-Formel für Distanzberechnung
 const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
 	const R = 6371 // Erdradius in km
@@ -25,18 +20,16 @@ const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: numbe
 	return R * c
 }
 
-export default ({ strapi }: { strapi: Core.Strapi }): AnyService => {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const service = coreServiceFactory({ strapi } as any) as AnyService
-
-	return {
-		...service,
+export default factories.createCoreService(
+	'plugin::hzd-plugin.dog',
+	({ strapi }: { strapi: Core.Strapi }) => ({
 		async find(ctx: any) {
-			const { lat, lng, maxDistance, ...restQuery } = ctx.query
+			const query = ctx?.query ?? ctx
+			const { lat, lng, maxDistance, ...restQuery } = query
 
 			// Wenn keine Geolocation-Parameter, normale Suche
 			if (!lat || !lng) {
-				return service.find(ctx.query)
+				return Object.getPrototypeOf(this).find.call(this, query)
 			}
 
 			// Extrahiere normale Filter aus Query
@@ -121,5 +114,5 @@ export default ({ strapi }: { strapi: Core.Strapi }): AnyService => {
 				},
 			}
 		},
-	}
-}
+	}),
+)

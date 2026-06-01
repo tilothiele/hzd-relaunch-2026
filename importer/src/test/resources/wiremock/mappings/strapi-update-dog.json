@@ -1,0 +1,18 @@
+{
+	"priority": 1,
+	"request": {
+		"method": "PUT",
+		"urlPathPattern": "/api/dogs/.*"
+	},
+	"response": {
+		"status": 200,
+		"headers": {
+			"Content-Type": "application/json"
+		},
+		"jsonBody": {
+			"data": {
+				"documentId": "strapi-dog-doc-1"
+			}
+		}
+	}
+}
