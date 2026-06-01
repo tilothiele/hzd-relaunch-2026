@@ -114,7 +114,7 @@ public class ImportService {
 			strapiMemberAdapter.setAuthenticatedRoleId(authenticatedRoleId);
 			
 			try {
-				statistics = importMembers(members, statistics);
+				//statistics = importMembers(members, statistics);
 				statistics = importDogs(dogs, statistics);
 			} finally {
 				authentikUserAdapter.clearImportCache();

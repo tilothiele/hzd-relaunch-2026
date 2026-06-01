@@ -277,7 +277,6 @@ public class StrapiMemberAdapter {
 		Map<String, Object> payload = StrapiPayloadMapper.toBreederInput(
 			member.cId(),
 			kennelName,
-			Optional.of(memberDocumentId),
 			existingBreederId.isEmpty()
 		);
 

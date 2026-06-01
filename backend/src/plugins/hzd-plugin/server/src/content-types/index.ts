@@ -12,118 +12,176 @@ import contact from "../../content-types/contact/schema.json"
 
 // https://docs.strapi.io/cms/backend-customization/models#lifecycle-hooks
 
-// https://docs.strapi.io/cms/backend-customization/models#lifecycle-hooks
+async function findUserIdByCId(cId: number | undefined | null) {
+	if (cId === undefined || cId === null) {
+		return undefined
+	}
+
+	const user = await strapi.db.query('plugin::users-permissions.user').findOne({
+		where: { cId },
+		select: ['id'],
+	})
+
+	return user?.id
+}
+
+async function findBreederIdByCId(cId: number | undefined | null) {
+	if (cId === undefined || cId === null) {
+		return undefined
+	}
+
+	const breederEntry = await strapi.db.query('plugin::hzd-plugin.breeder').findOne({
+		where: { cId },
+		select: ['id'],
+	})
+
+	return breederEntry?.id
+}
+
+async function linkBreederMemberFromCId(data: Record<string, any>) {
+	if (data.member || data.cId === undefined || data.cId === null) {
+		return
+	}
+
+	const userId = await findUserIdByCId(data.cId)
+	if (userId) {
+		data.member = userId
+	}
+}
+
+async function syncDogRelationsFromCIds(data: Record<string, any>) {
+	if (!data.owner && data.cOwnerId !== undefined && data.cOwnerId !== null) {
+		const userId = await findUserIdByCId(data.cOwnerId)
+		if (userId) {
+			data.owner = userId
+		}
+	}
+
+	if (!data.breeder && data.cBreederId !== undefined && data.cBreederId !== null) {
+		const breederId = await findBreederIdByCId(data.cBreederId)
+		if (breederId) {
+			data.breeder = breederId
+		}
+	}
+}
+
+function resolveOwnerIdFromPayload(data: Record<string, any>) {
+	if (!data.owner) {
+		return undefined
+	}
+
+	if (typeof data.owner === 'object') {
+		if (Array.isArray(data.owner.connect) && data.owner.connect.length > 0) {
+			const first = data.owner.connect[0]
+			return typeof first === 'object' ? first.id : first
+		}
+		if (data.owner.id) {
+			return data.owner.id
+		}
+		return undefined
+	}
+
+	return data.owner
+}
+
+async function syncDogLocationFromOwner(
+	data: Record<string, any>,
+	existingLocationId?: number,
+) {
+	const ownerId = resolveOwnerIdFromPayload(data)
+	if (!ownerId) {
+		return
+	}
+
+	const owner = await strapi.entityService.findOne(
+		'plugin::users-permissions.user',
+		ownerId,
+	)
+
+	if (
+		owner
+		&& owner.locationLat !== undefined
+		&& owner.locationLat !== null
+		&& owner.locationLng !== undefined
+		&& owner.locationLng !== null
+	) {
+		const newLocation: Record<string, unknown> = {
+			lat: owner.locationLat,
+			lng: owner.locationLng,
+		}
+
+		if (existingLocationId) {
+			newLocation.id = existingLocationId
+		}
+
+		data.Location = newLocation
+	}
+}
+
 const dogLifecycles = {
-    async beforeCreate(event) {
-        console.log('HZD-PLUGIN: dog.beforeCreate triggered', event.params);
-        const { data } = event.params;
+	async beforeCreate(event) {
+		console.log('HZD-PLUGIN: dog.beforeCreate triggered', event.params)
+		const { data } = event.params
 
-        let ownerId;
-        if (data.owner) {
-            if (typeof data.owner === 'object') {
-                if (Array.isArray(data.owner.connect) && data.owner.connect.length > 0) {
-                    ownerId = data.owner.connect[0].id;
-                } else if (data.owner.id) {
-                    ownerId = data.owner.id;
-                }
-            } else {
-                ownerId = data.owner;
-            }
-        }
+		await syncDogRelationsFromCIds(data)
+		await syncDogLocationFromOwner(data)
+	},
+	async beforeUpdate(event) {
+		const { data, where } = event.params
+		console.log('HZD-PLUGIN: dog.beforeUpdate triggered', event.params, data)
 
-        if (ownerId) {
-            const owner = await strapi.entityService.findOne('plugin::users-permissions.user', ownerId);
-            if (owner && (owner.locationLat !== undefined && owner.locationLat !== null) && (owner.locationLng !== undefined && owner.locationLng !== null)) {
-                data.Location = {
-                    lat: owner.locationLat,
-                    lng: owner.locationLng
-                };
-            }
-        }
-    },
-    async beforeUpdate(event) {
-        const { data, where } = event.params;
-        console.log('HZD-PLUGIN: dog.beforeUpdate triggered', event.params, data);
+		const existingDog = await strapi.entityService.findOne(
+			'plugin::hzd-plugin.dog',
+			where.id,
+			{
+				populate: { owner: true, Location: true },
+			},
+		)
 
-        // Always fetch the current dog data to get existing owner and existing Location ID
-        const existingDog = await strapi.entityService.findOne('plugin::hzd-plugin.dog', where.id, {
-            populate: { owner: true, Location: true }
-        });
+		if (!existingDog) {
+			console.warn('HZD-PLUGIN: dog.beforeUpdate - Dog not found', where.id)
+			return
+		}
 
-        if (!existingDog) {
-            console.warn('HZD-PLUGIN: dog.beforeUpdate - Dog not found', where.id);
-            return;
-        }
+		await syncDogRelationsFromCIds(data)
 
-        let ownerId;
+		const isDisconnectingOwner = data.owner
+			&& typeof data.owner === 'object'
+			&& Array.isArray(data.owner.disconnect)
+			&& data.owner.disconnect.length > 0
+			&& (!data.owner.connect || data.owner.connect.length === 0)
 
-        // Try to get new owner from payload
-        if (data.owner) {
-            console.log('HZD-PLUGIN: owner in payload', data.owner);
-            if (typeof data.owner === 'object') {
-                if (Array.isArray(data.owner.connect) && data.owner.connect.length > 0) {
-                    ownerId = data.owner.connect[0].id;
-                } else if (data.owner.id) {
-                    ownerId = data.owner.id;
-                }
-            } else {
-                ownerId = data.owner;
-            }
-        }
+		if (!data.owner && !isDisconnectingOwner && existingDog.owner) {
+			data.owner = existingDog.owner.id
+		}
 
-        // If no new owner found in payload, use existing owner
-        if (!ownerId) {
-            // Check if we are explicitly disconnecting the owner
-            const isDisconnecting = data.owner && typeof data.owner === 'object' &&
-                Array.isArray(data.owner.disconnect) && data.owner.disconnect.length > 0 &&
-                (!data.owner.connect || data.owner.connect.length === 0);
+		const existingLocationId = existingDog.Location?.id
+		await syncDogLocationFromOwner(data, existingLocationId)
+	},
+}
 
-            if (!isDisconnecting && existingDog.owner) {
-                ownerId = existingDog.owner.id;
-            }
-        }
-
-        if (ownerId) {
-            console.log('HZD-PLUGIN: fetching ownerId', ownerId);
-            // No populate needed for scalar fields locationLat/locationLng
-            const owner = await strapi.entityService.findOne('plugin::users-permissions.user', ownerId);
-
-            console.log('HZD-PLUGIN: owner data', owner);
-
-            if (owner && (owner.locationLat !== undefined && owner.locationLat !== null) && (owner.locationLng !== undefined && owner.locationLng !== null)) {
-                // Strictly construct the component data
-                const newLocation: any = {
-                    lat: owner.locationLat,
-                    lng: owner.locationLng
-                };
-
-                // CRITICAL: Preserve the existing component ID if it exists
-                // Otherwise Strapi might try to create a new one or fail to update the relation correctly
-                if (existingDog.Location && existingDog.Location.id) {
-                    newLocation.id = existingDog.Location.id;
-                }
-
-                console.log('HZD-PLUGIN: Syncing location with strict data (preserving ID)', newLocation);
-                data.Location = newLocation;
-            } else {
-                console.log('HZD-PLUGIN: No Location to sync (owner has none)');
-            }
-        }
-    }
+const breederLifecycles = {
+	async beforeCreate(event) {
+		await linkBreederMemberFromCId(event.params.data)
+	},
+	async beforeUpdate(event) {
+		await linkBreederMemberFromCId(event.params.data)
+	},
 }
 
 export default {
-    dog: {
-        schema: dog,
-        lifecycles: dogLifecycles
-    },
-    breeder: {
-        schema: breeder
-    },
-    litter: {
-        schema: litter
-    },
-    'geo-location': {
-        schema: geoLocation
-    }
-};
+	dog: {
+		schema: dog,
+		lifecycles: dogLifecycles,
+	},
+	breeder: {
+		schema: breeder,
+		lifecycles: breederLifecycles,
+	},
+	litter: {
+		schema: litter,
+	},
+	'geo-location': {
+		schema: geoLocation,
+	},
+}

@@ -269,11 +269,7 @@ class StrapiPayloadMapperTest {
 			Optional.of("Enormous")
 		);
 
-		Map<String, Object> payload = StrapiPayloadMapper.toDogInput(
-			dog,
-			Optional.of("breeder-doc-id"),
-			Optional.of("owner-doc-id")
-		);
+		Map<String, Object> payload = StrapiPayloadMapper.toDogInput(dog);
 
 		assertEquals(23824, payload.get("cId"));
 		assertEquals("Do It Again", payload.get("givenName"));
@@ -281,9 +277,11 @@ class StrapiPayloadMapperTest {
 		assertEquals("N_N", payload.get("SOD1"));
 		assertEquals(true, payload.get("cFertile"));
 		assertEquals(true, payload.get("Genprofil"));
-		assertEquals("breeder-doc-id", payload.get("breeder"));
-		assertEquals("owner-doc-id", payload.get("owner"));
+		assertEquals(7402, payload.get("cBreederId"));
+		assertEquals(10745, payload.get("cOwnerId"));
 		assertEquals("PKR.II-156446", payload.get("cStudBookNumber"));
+		assertTrue(!payload.containsKey("owner"));
+		assertTrue(!payload.containsKey("breeder"));
 	}
 
 	@Test

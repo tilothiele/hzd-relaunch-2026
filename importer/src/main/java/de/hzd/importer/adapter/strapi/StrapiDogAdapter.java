@@ -26,14 +26,9 @@ public class StrapiDogAdapter {
 			StrapiResources.BREEDERS,
 			breederCId
 		);
-		Optional<String> memberDocumentId = client.findDocumentIdByCId(
-			StrapiResources.USERS,
-			breederCId
-		);
 		Map<String, Object> payload = StrapiPayloadMapper.toBreederInput(
 			breederCId,
 			kennelName,
-			memberDocumentId,
 			existingBreederId.isEmpty()
 		);
 
@@ -61,16 +56,18 @@ public class StrapiDogAdapter {
 	}
 
 	public UpsertResult upsert(Dog dog, Optional<String> breederDocumentId) {
-		Optional<String> ownerDocumentId = dog.ownerId().flatMap(this::findOwnerDocumentId);
 		Optional<String> existingId = client.findDocumentIdByCId(
 			StrapiResources.DOGS,
 			dog.cId()
 		);
-		Map<String, Object> payload = StrapiPayloadMapper.toDogInput(
-			dog,
-			breederDocumentId,
-			ownerDocumentId
-		);
+		Map<String, Object> payload = StrapiPayloadMapper.toDogInput(dog);
+
+		boolean ownerResolvable = dog.ownerId().flatMap(this::findOwnerDocumentId).isPresent();
+		boolean breederResolvable = dog.breederId()
+			.flatMap(breederId -> breederDocumentId.isPresent()
+				? breederDocumentId
+				: findBreederDocumentId(breederId))
+			.isPresent();
 
 		if (existingId.isPresent()) {
 			client.update(StrapiResources.DOGS, existingId.get(), payload, true);
@@ -78,8 +75,8 @@ public class StrapiDogAdapter {
 				"Updated dog cId=%d documentId=%s ownerLinked=%s breederLinked=%s",
 				dog.cId(),
 				existingId.get(),
-				ownerDocumentId.isPresent(),
-				breederDocumentId.isPresent()
+				ownerResolvable,
+				breederResolvable
 			);
 			return UpsertResult.UPDATED;
 		}
@@ -91,8 +88,8 @@ public class StrapiDogAdapter {
 			"Created dog cId=%d documentId=%s ownerLinked=%s breederLinked=%s",
 			dog.cId(),
 			documentId,
-			ownerDocumentId.isPresent(),
-			breederDocumentId.isPresent()
+			ownerResolvable,
+			breederResolvable
 		);
 		return UpsertResult.CREATED;
 	}

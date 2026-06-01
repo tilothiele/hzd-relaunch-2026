@@ -67,7 +67,6 @@ final class StrapiPayloadMapper {
 	static Map<String, Object> toBreederInput(
 		int breederCId,
 		Optional<String> kennelName,
-		Optional<String> memberDocumentId,
 		boolean includeRole
 	) {
 		Map<String, Object> payload = new HashMap<>();
@@ -77,15 +76,10 @@ final class StrapiPayloadMapper {
 			payload.put("BreederRole", "B");
 		}
 		kennelName.ifPresent(value -> payload.put("kennelName", value));
-		memberDocumentId.ifPresent(value -> payload.put("member", value));
 		return payload;
 	}
 
-	static Map<String, Object> toDogInput(
-		Dog dog,
-		Optional<String> breederDocumentId,
-		Optional<String> ownerDocumentId
-	) {
+	static Map<String, Object> toDogInput(Dog dog) {
 		Map<String, Object> payload = new HashMap<>();
 		payload.put("cId", dog.cId());
 		dog.givenName().ifPresent(value -> payload.put("givenName", truncate(value, 100)));
@@ -108,8 +102,6 @@ final class StrapiPayloadMapper {
 		dog.studbookNumberMother().ifPresent(value -> payload.put("cStudBookNumberMother", value));
 		dog.exhibitions().ifPresent(value -> payload.put("Exhibitions", value));
 		dog.breedSurvey().ifPresent(value -> payload.put("BreedSurvey", value));
-		breederDocumentId.ifPresent(value -> payload.put("breeder", value));
-		ownerDocumentId.ifPresent(value -> payload.put("owner", value));
 		return payload;
 	}
 
