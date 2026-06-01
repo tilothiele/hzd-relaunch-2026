@@ -163,6 +163,13 @@ public class AuthentikUserAdapter {
 	}
 
 	public UpsertResult delete(Member member) {
+		if(member.email().isEmpty()) {
+			LOG.infof(
+					"Skipping Authentik delete for cId=%d username=%s: no email",
+					member.cId()
+				);
+				return UpsertResult.SKIPPED;
+		}
 		String username = member.username();
 		Optional<JsonNode> existingUser = findUserByUsername(username);
 		if (existingUser.isEmpty()) {
