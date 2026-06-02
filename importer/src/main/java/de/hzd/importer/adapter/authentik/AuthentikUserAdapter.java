@@ -6,13 +6,12 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.hzd.importer.domain.Member;
 import de.hzd.importer.infrastructure.config.ImporterConfig;
+import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -29,19 +28,11 @@ public class AuthentikUserAdapter {
 	@Inject
 	ObjectMapper objectMapper;
 
-	private final HttpClient httpClient = HttpClient.newBuilder()
-		.connectTimeout(Duration.ofSeconds(30))
-		.build();
+	@Inject
+	AuthentikApiAuthentication authentikAuth;
 
 	private Map<String, AuthentikUserSnapshot> importCache = Map.of();
 	private AuthentikGroupMapper groupMapper = AuthentikGroupMapper.empty();
-
-	public enum UpsertResult {
-		CREATED,
-		UPDATED,
-		DELETED,
-		SKIPPED
-	}
 
 	public record AuthentikUserSnapshot(
 		int pk,
@@ -120,6 +111,7 @@ public class AuthentikUserAdapter {
 			JsonNode lastBody = null;
 
 			while (true) {
+				Log.info("fetching user from Authentik - page #"+page);
 				String url = usersUrl() + "?page=" + page + "&page_size=" + pageSize;
 				JsonNode body = fetchPage(url);
 				lastBody = body;
@@ -153,6 +145,40 @@ public class AuthentikUserAdapter {
 		}
 	}
 
+	public enum UpsertResult {
+		CREATED,
+		UPDATED,
+		DELETED,
+		SKIPPED
+	}
+
+	public record DeleteAllUsersResult(int deleted, int total) {
+	}
+
+	public boolean doDelete(AuthentikUserSnapshot member) {
+		return member.username().startsWith("c."); // alle chromosoft user // nicht-hzd
+	}
+
+	public DeleteAllUsersResult deleteAllUsers() {
+		Map<String, AuthentikUserSnapshot> users = fetchAllUsers();
+		int deleted = 0;
+
+		for (AuthentikUserSnapshot user : users.values()) {
+			if(!doDelete(user)) continue;
+			deleteUser(user.pk());
+			deleted++;
+			LOG.infof(
+				"Deleted Authentik user username=%s pk=%d",
+				user.username(),
+				user.pk()
+			);
+		}
+
+		clearImportCache();
+		LOG.infof("Deleted %d of %d Authentik users", deleted, users.size());
+		return new DeleteAllUsersResult(deleted, users.size());
+	}
+
 	public void setImportCache(Map<String, AuthentikUserSnapshot> users) {
 		importCache = users != null ? users : Map.of();
 	}
@@ -166,7 +192,8 @@ public class AuthentikUserAdapter {
 		if(member.email().isEmpty()) {
 			LOG.infof(
 					"Skipping Authentik delete for cId=%d username=%s: no email",
-					member.cId()
+					member.cId(),
+					member.username()
 				);
 				return UpsertResult.SKIPPED;
 		}
@@ -193,21 +220,17 @@ public class AuthentikUserAdapter {
 		return UpsertResult.DELETED;
 	}
 
-	public UpsertResult upsert(Member member) {
-//		if (member.cEmail().isEmpty()) {
-//			LOG.warnf("Skipping Authentik sync for cId=%d: no valid email in CSV", member.cId());
-//			return UpsertResult.SKIPPED;
-//		}
-
+	public UpsertResult upsert(Member member, Optional<AuthentikUserSnapshot> existingUser) {
 		String username = member.username();
-		Optional<JsonNode> existingUser = findUserByUsername(username);
-		Map<String, Object> payload = AuthentikPayloadMapper.toUserPayload(member, groupMapper);
+		Map<String, Object> payload = AuthentikPayloadMapper.toUserPayload(
+			member,
+			groupMapper,
+			config.authentik().defaultGroups()
+		);
 
 		if (existingUser.isPresent()) {
-			int pk = existingUser.get().path("pk").asInt();
-			patchUser(pk, payload);
-			LOG.infof("Updated Authentik user username=%s pk=%d", username, pk);
-			return UpsertResult.UPDATED;
+			LOG.infof("Skipped Authentik user username=%s already in Authentik", username);
+			return UpsertResult.SKIPPED;
 		}
 
 		postUser(payload);
@@ -360,30 +383,42 @@ public class AuthentikUserAdapter {
 	}
 
 	private HttpResponse<String> sendGet(String url) throws Exception {
-		return httpClient.send(buildRequest(url, "GET", null), HttpResponse.BodyHandlers.ofString());
+		return authentikAuth.getHttpClient().send(
+			buildRequest(url, "GET", null),
+			HttpResponse.BodyHandlers.ofString()
+		);
 	}
 
 	private HttpResponse<String> sendPost(String url, String body) throws Exception {
-		return httpClient.send(buildRequest(url, "POST", body), HttpResponse.BodyHandlers.ofString());
+		return authentikAuth.getHttpClient().send(
+			buildRequest(url, "POST", body),
+			HttpResponse.BodyHandlers.ofString()
+		);
 	}
 
 	private HttpResponse<String> sendPatch(String url, String body) throws Exception {
-		return httpClient.send(buildRequest(url, "PATCH", body), HttpResponse.BodyHandlers.ofString());
+		return authentikAuth.getHttpClient().send(
+			buildRequest(url, "PATCH", body),
+			HttpResponse.BodyHandlers.ofString()
+		);
 	}
 
 	private HttpResponse<String> sendDelete(String url) throws Exception {
-		return httpClient.send(buildRequest(url, "DELETE", null), HttpResponse.BodyHandlers.ofString());
+		return authentikAuth.getHttpClient().send(
+			buildRequest(url, "DELETE", null),
+			HttpResponse.BodyHandlers.ofString()
+		);
 	}
 
 	private HttpRequest buildRequest(String url, String method, String body) {
+		authentikAuth.validateConfiguration();
+		URI requestUri = URI.create(url);
 		HttpRequest.Builder builder = HttpRequest.newBuilder()
-			.uri(URI.create(url))
+			.uri(requestUri)
 			.timeout(config.authentik().httpTimeout())
 			.header("Accept", "application/json")
 			.header("Content-Type", "application/json");
-		config.authentik().apiToken().ifPresent(token ->
-			builder.header("Authorization", "Bearer " + token)
-		);
+		authentikAuth.applyAuthHeaders(builder, requestUri);
 		return switch (method) {
 			case "GET" -> builder.GET().build();
 			case "POST" -> builder.POST(HttpRequest.BodyPublishers.ofString(body)).build();

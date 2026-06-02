@@ -28,7 +28,7 @@ public class StrapiDogAdapter {
 		documentIdsByCId.clear();
 	}
 
-	public boolean ensureBreeder(int breederCId, Optional<String> kennelName) {
+	public boolean ensureBreeder(int breederCId, Optional<String> kennelName, Optional<Boolean> isActiveBreeder) {
 		Optional<String> existingBreederId = client.findDocumentIdByCId(
 			StrapiResources.BREEDERS,
 			breederCId
@@ -36,7 +36,8 @@ public class StrapiDogAdapter {
 		Map<String, Object> payload = StrapiPayloadMapper.toBreederInput(
 			breederCId,
 			kennelName,
-			existingBreederId.isEmpty()
+			existingBreederId.isEmpty(),
+			isActiveBreeder
 		);
 
 		if (existingBreederId.isPresent()) {

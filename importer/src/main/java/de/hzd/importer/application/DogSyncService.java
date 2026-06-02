@@ -4,6 +4,8 @@ import de.hzd.importer.adapter.strapi.StrapiDogAdapter;
 import de.hzd.importer.adapter.strapi.StrapiRestClient;
 import de.hzd.importer.domain.Dog;
 import de.hzd.importer.port.DogSyncPort;
+import de.hzd.util.Ticker;
+import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.HashMap;
@@ -43,9 +45,14 @@ public class DogSyncService implements DogSyncPort {
 
 		int breedersCreated = 0;
 		breederCache.clear();
+		Ticker logTicker = new Ticker(10000l);
+		long t0 = System.currentTimeMillis();
+		int i=0;
 		for (Map.Entry<Integer, Optional<String>> entry : breederData.entrySet()) {
+			final int j = i++;
+			logTicker.tick(() -> Log.info(Ticker.formatProceedingMessage(t0, breederData.entrySet().size(), j, "Breeder")));
 			try {
-				boolean created = strapiDogAdapter.ensureBreeder(entry.getKey(), entry.getValue());
+				boolean created = strapiDogAdapter.ensureBreeder(entry.getKey(), entry.getValue(), Optional.empty());
 				if (created) {
 					breedersCreated++;
 				}

@@ -6,8 +6,17 @@ from urllib.parse import urljoin
 
 import requests
 
-DEFAULT_HTTP_TIMEOUT = 30
+from .auth import (
+    AuthentikAuthError,
+    build_authentik_auth_settings,
+    create_authentik_session,
+    get_first_env,
+    get_int_env,
+    require_value,
+)
+
 DEFAULT_PAGE_SIZE = 100
+
 
 class AuthentikUser(TypedDict, total=False):
     pk: int
@@ -29,22 +38,6 @@ class AuthentikUsersPage(TypedDict, total=False):
 ExistingAuthentikUsersByUsername: TypeAlias = dict[str, AuthentikUser]
 
 
-def get_first_env(keys: tuple[str, ...]) -> Optional[str]:
-    for key in keys:
-        value = os.getenv(key)
-        if value:
-            return value
-
-    return None
-
-
-def require_value(value: Optional[str], label: str) -> str:
-    if value:
-        return value
-
-    raise ValueError(f'Missing required configuration value: {label}')
-
-
 def get_authentik_base_url(explicit: Optional[str] = None) -> str:
     return require_value(
         explicit or get_first_env(('AUTHENTIK_BASE_URL', 'AUTHENTIK_URL')),
@@ -56,24 +49,13 @@ def get_authentik_api_token(explicit: Optional[str] = None) -> Optional[str]:
     return explicit or get_first_env(('AUTHENTIK_API_TOKEN', 'AUTHENTIK_TOKEN'))
 
 
-def get_int_env(keys: tuple[str, ...], default: int) -> int:
-    value = get_first_env(keys)
-    if value is None:
-        return default
-
-    try:
-        return int(value)
-    except ValueError as exc:
-        raise ValueError(f'Invalid integer value for {", ".join(keys)}: {value}') from exc
-
-
 def get_authentik_http_timeout(explicit: Optional[int] = None) -> int:
     if explicit is not None:
         return explicit
 
     return get_int_env(
         ('AUTHENTIK_HTTP_TIMEOUT', 'IMPORT_HTTP_TIMEOUT'),
-        DEFAULT_HTTP_TIMEOUT,
+        30,
     )
 
 
@@ -93,18 +75,6 @@ def build_authentik_users_url(authentik_url: Optional[str] = None) -> str:
     return urljoin(base_url + '/', 'api/v3/core/users/')
 
 
-def build_headers(authentik_token: Optional[str] = None) -> dict[str, str]:
-    headers = {
-        'Accept': 'application/json',
-    }
-
-    authentik_token = get_authentik_api_token(authentik_token)
-    if authentik_token:
-        headers['Authorization'] = f'Bearer {authentik_token}'
-
-    return headers
-
-
 def fetch_existing_users_from_authentik(
     authentik_url: Optional[str] = None,
     authentik_token: Optional[str] = None,
@@ -116,20 +86,29 @@ def fetch_existing_users_from_authentik(
     if page_size < 1:
         raise ValueError('page_size must be greater than zero')
 
+    auth_settings = build_authentik_auth_settings(
+        authentik_url=authentik_url,
+        authentik_token=authentik_token,
+        timeout=get_authentik_http_timeout(timeout),
+    )
+
+    try:
+        session = create_authentik_session(auth_settings)
+    except AuthentikAuthError as exc:
+        raise ValueError(str(exc)) from exc
+
     existing_users: ExistingAuthentikUsersByUsername = {}
-    users_url = build_authentik_users_url(authentik_url)
-    headers = build_headers(authentik_token)
-    timeout = get_authentik_http_timeout(timeout)
+    users_url = build_authentik_users_url(auth_settings.base_url)
+    timeout = auth_settings.timeout
     page = 1
 
     while True:
-        response = requests.get(
+        response = session.get(
             users_url,
             params={
                 'page': page,
                 'page_size': page_size,
             },
-            headers=headers,
             timeout=timeout,
         )
         response.raise_for_status()

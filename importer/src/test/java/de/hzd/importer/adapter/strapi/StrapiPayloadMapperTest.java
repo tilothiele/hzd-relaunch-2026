@@ -88,14 +88,15 @@ class StrapiPayloadMapperTest {
 			Optional.of(LocalDate.of(2026, 2, 23)),
 			Optional.empty(),
 			Optional.empty(),
+			Optional.empty(),
 			Member.UNDEFINED_DOCUMENT_ID,
 			Member.UNDEFINED_ID
 		);
 
 		Map<String, Object> payload = StrapiPayloadMapper.toUserInput(member, config, true, 2);
 
-		assertEquals("hzd.152544", payload.get("username"));
-		assertEquals("lena@example.de", payload.get("email"));
+		assertEquals("152544", payload.get("username"));
+		assertEquals("c.10927@hovawarte.com", payload.get("email"));
 		assertEquals("lena@example.de", payload.get("cEmail"));
 		assertEquals("Süd", payload.get("region"));
 		assertEquals("51580", payload.get("zip"));
@@ -112,7 +113,7 @@ class StrapiPayloadMapperTest {
 
 		Map<String, Object> payload = StrapiPayloadMapper.toUserInput(member, config, false, 2);
 
-		assertEquals("hzd.10927", payload.get("username"));
+		assertEquals("c.10927", payload.get("username"));
 		assertEquals(true, payload.get("publishMyData"));
 	}
 
@@ -161,6 +162,7 @@ class StrapiPayloadMapperTest {
 			Optional.empty(),
 			Optional.empty(),
 			Optional.empty(),
+			Optional.empty(),
 			Member.UNDEFINED_DOCUMENT_ID,
 			Member.UNDEFINED_ID
 		);
@@ -168,6 +170,36 @@ class StrapiPayloadMapperTest {
 		Map<String, Object> payload = StrapiPayloadMapper.toUserInput(member, config, false, 2);
 
 		assertEquals(false, payload.get("publishMyData"));
+	}
+
+	@Test
+	void mapsBreederIsActiveFromMember() {
+		assertEquals(
+			false,
+			StrapiPayloadMapper.toBreederInput(
+				10927,
+				Optional.of("Enormous"),
+				true,
+				Optional.of(false)
+			).get("IsActive")
+		);
+		assertEquals(
+			true,
+			StrapiPayloadMapper.toBreederInput(
+				10927,
+				Optional.of("Enormous"),
+				true,
+				breederMember(Optional.empty(), Optional.of(true)).isActiveBreeder()
+			).get("IsActive")
+		);
+		assertTrue(
+			!StrapiPayloadMapper.toBreederInput(
+				10927,
+				Optional.of("Enormous"),
+				true,
+				Optional.empty()
+			).containsKey("IsActive")
+		);
 	}
 
 	private void mockStrapiConfig() {
@@ -215,6 +247,13 @@ class StrapiPayloadMapperTest {
 	}
 
 	private Member breederMember(Optional<Boolean> publishMyData) {
+		return breederMember(publishMyData, Optional.empty());
+	}
+
+	private Member breederMember(
+		Optional<Boolean> publishMyData,
+		Optional<Boolean> isActiveBreeder
+	) {
 		return new Member(
 			10927,
 			Optional.of(false),
@@ -236,6 +275,7 @@ class StrapiPayloadMapperTest {
 			Optional.empty(),
 			Optional.empty(),
 			Optional.empty(),
+			isActiveBreeder,
 			publishMyData,
 			"doc-1",
 			9
@@ -350,12 +390,13 @@ class StrapiPayloadMapperTest {
 			Optional.empty(),
 			Optional.empty(),
 			Optional.empty(),
+			Optional.empty(),
 			Member.UNDEFINED_DOCUMENT_ID,
 			Member.UNDEFINED_ID
 		);
 
 		Map<String, Object> payload = StrapiPayloadMapper.toUserInput(member, config, true, 2);
-		assertEquals("hzd.42@hovawarte.com", payload.get("email"));
+		assertEquals("c.42@hovawarte.com", payload.get("email"));
 		assertTrue(payload.containsKey("password"));
 	}
 }

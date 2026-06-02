@@ -39,6 +39,7 @@ final class MemberCsvMapper {
 			CsvParsingUtils.parseDate(row.get("date of death")),
 			CsvParsingUtils.parseDate(row.get("date of joining")),
 			CsvParsingUtils.parseDate(row.get("date of leaving")),
+			CsvParsingUtils.parseBoolean(row.get("person is an active breeder")),
 			Optional.empty(),
 			Member.UNDEFINED_DOCUMENT_ID,
 			Member.UNDEFINED_ID

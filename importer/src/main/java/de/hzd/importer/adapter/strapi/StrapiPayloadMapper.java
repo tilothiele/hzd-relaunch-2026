@@ -67,11 +67,12 @@ final class StrapiPayloadMapper {
 	static Map<String, Object> toBreederInput(
 		int breederCId,
 		Optional<String> kennelName,
-		boolean includeRole
+		boolean includeRole,
+		Optional<Boolean> isActiveBreeder
 	) {
 		Map<String, Object> payload = new HashMap<>();
 		payload.put("cId", breederCId);
-		payload.put("IsActive", true);
+		isActiveBreeder.ifPresent(v -> payload.put("IsActive", v.booleanValue()));
 		if (includeRole) {
 			payload.put("BreederRole", "B");
 		}

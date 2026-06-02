@@ -24,6 +24,7 @@ public record Member(
 		Optional<LocalDate> dateOfDeath,
 		Optional<LocalDate> memberSince,
 		Optional<LocalDate> cancellationOn,
+		Optional<Boolean> isActiveBreeder,
 		Optional<Boolean> publishMyData,
 		String documentId,
 		int id
@@ -34,13 +35,16 @@ public record Member(
 	public String username() {
 		String cUsername = "c."+cId;
 		if(cFlagBreeder.orElse(Boolean.FALSE)) return cUsername;
-		if(membershipNumber!=null && !membershipNumber.isEmpty()) return "hzd."+membershipNumber.get();
+		if(membershipNumber!=null && !membershipNumber.isEmpty()) return ""+membershipNumber.get();
 		return cUsername;
 	}
 
 	public String strapiEmail() {
-		return email().filter(value -> value.contains("@"))
-			.orElseGet(() -> username() + "@hovawarte.com");
+		return "c."+cId + "@hovawarte.com";
+	}
+	
+	public String authentikEmail() {
+		return cEmail().orElse(email().orElse(strapiEmail()));
 	}
 
 	public Optional<String> cEmail() {
@@ -59,7 +63,7 @@ public record Member(
 	}
 
 	public boolean doImportInAuthentik() {
-		return isActive();
+		return isActive() && membershipNumber.isPresent();
 	}
 	
 	
@@ -74,10 +78,6 @@ public record Member(
 //			return cFlagAccess.get();
 //		}
 		return !isBreeder();
-	}
-	
-	public String [] groups() {
-		return new String[] { "hzd-member"};
 	}
 
 	public Member withStrapiIdentity(
@@ -106,6 +106,7 @@ public record Member(
 			dateOfDeath,
 			memberSince,
 			cancellationOn,
+			isActiveBreeder,
 			publishMyData,
 			documentId,
 			id

@@ -18,6 +18,9 @@ public class ImportJobRepository implements ImportJobRepositoryPort {
 	@Inject
 	EntityManager entityManager;
 
+	@Inject
+	JobExecutionGuard jobExecutionGuard;
+
 	@Override
 	@Transactional
 	public Optional<ImportJob> findRunningJob() {
@@ -60,8 +63,7 @@ public class ImportJobRepository implements ImportJobRepositoryPort {
 	@Override
 	@Transactional
 	public boolean tryAcquireLock(UUID jobId) {
-		Long runningCount = ImportJobEntity.count("status", ImportJobStatus.RUNNING);
-		if (runningCount != null && runningCount > 0) {
+		if (jobExecutionGuard.hasRunningJob()) {
 			return false;
 		}
 		ImportJobEntity entity = new ImportJobEntity();
@@ -82,7 +84,7 @@ public class ImportJobRepository implements ImportJobRepositoryPort {
 
 	@Transactional
 	public void failRunningJobs() {
-		ImportJobEntity.update("status = ?1 where status = ?2", ImportJobStatus.FAILED, ImportJobStatus.RUNNING);
+		jobExecutionGuard.failAllRunningJobs();
 	}
 
 	private ImportJob toDomain(ImportJobEntity entity) {

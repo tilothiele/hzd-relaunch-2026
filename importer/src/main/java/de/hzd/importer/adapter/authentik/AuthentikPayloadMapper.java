@@ -10,14 +10,18 @@ final class AuthentikPayloadMapper {
 	private AuthentikPayloadMapper() {
 	}
 
-	static Map<String, Object> toUserPayload(Member member, AuthentikGroupMapper groupMapper) {
+	static Map<String, Object> toUserPayload(
+		Member member,
+		AuthentikGroupMapper groupMapper,
+		List<String> groupNames
+	) {
 		Map<String, Object> payload = new HashMap<>();
 		payload.put("username", member.username());
-		member.cEmail().ifPresent(email -> payload.put("email", email));
+		payload.put("email", member.authentikEmail());
 		member.displayName().ifPresent(name -> payload.put("name", name));
 		payload.put("is_active", member.isActive());
 
-		List<String> groupUuids = groupMapper.uuidsForNames(member.groups());
+		List<String> groupUuids = groupMapper.uuidsForNames(groupNames);
 		if (!groupUuids.isEmpty()) {
 			payload.put("groups", groupUuids);
 		}
