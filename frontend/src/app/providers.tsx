@@ -7,6 +7,7 @@ import { SessionProvider } from 'next-auth/react'
 import { muiTheme } from '@/lib/mui-theme'
 import { AuthProvider } from '@/contexts/auth-context'
 import { PwaUpdater } from '@/components/pwa/pwa-updater'
+import { PwaDevCleanup } from '@/components/pwa/pwa-dev-cleanup'
 
 export function Providers({ children }: PropsWithChildren) {
 	return (
@@ -14,6 +15,7 @@ export function Providers({ children }: PropsWithChildren) {
 			{/* <CssBaseline /> */}
 			<SessionProvider>
 				<AuthProvider>
+					<PwaDevCleanup />
 					{children}
 					<PwaUpdater />
 				</AuthProvider>

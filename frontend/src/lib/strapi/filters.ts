@@ -40,6 +40,7 @@ export function appendStrapiFilters(
 			|| op === 'lt'
 			|| op === 'null'
 			|| op === 'in'
+			|| op === 'notIn'
 		))
 
 		if (isOperatorMap && operators.length > 0) {
@@ -49,12 +50,12 @@ export function appendStrapiFilters(
 					continue
 				}
 
-				if (op === 'in') {
+				if (op === 'in' || op === 'notIn') {
 					const values = Array.isArray(operatorValue)
 						? operatorValue
 						: String(operatorValue).split(',').map((v) => v.trim()).filter(Boolean)
 					values.forEach((item, index) => {
-						params.append(`${prefix}[${key}][$in][${index}]`, String(item))
+						params.append(`${prefix}[${key}][$${op}][${index}]`, String(item))
 					})
 					continue
 				}

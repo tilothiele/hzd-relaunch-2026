@@ -116,11 +116,17 @@ export function PassedDogFormModal({
 	}, [file])
 
 	const loadAliveDogs = useCallback(async () => {
+		const userCId = authState.user?.cId
+		if (typeof userCId !== 'number') {
+			setAliveDogs([])
+			return
+		}
+
 		try {
 			const res = await searchDogs({
 				filters: {
 					and: [
-						{ owner: { documentId: { eq: userDocumentId } } },
+						{ cOwnerId: { eq: userCId } },
 						{ dateOfDeath: { null: true } },
 					],
 				},
@@ -137,7 +143,7 @@ export function PassedDogFormModal({
 			console.error(e)
 			setAliveDogs([])
 		}
-	}, [userDocumentId])
+	}, [authState.user?.cId])
 
 	useEffect(() => {
 		if (!open) {
