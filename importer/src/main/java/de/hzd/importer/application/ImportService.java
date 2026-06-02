@@ -118,6 +118,7 @@ public class ImportService {
 
 			authentikUserAdapter.setImportCache(authentikUsers);
 			authentikUserAdapter.setGroupMapper(authentikGroups);
+			memberSyncPort.setAuthentikUsersByUsername(authentikUsers);
 			strapiMemberAdapter.setImportCache(strapiMembers);
 			strapiMemberAdapter.setAuthenticatedRoleId(authenticatedRoleId);
 			
@@ -129,6 +130,7 @@ public class ImportService {
 				statistics = importDogs(dogs, statistics);
 			} finally {
 				authentikUserAdapter.clearImportCache();
+				memberSyncPort.clearAuthentikUsersByUsername();
 				strapiMemberAdapter.clearImportCache();
 			}
 

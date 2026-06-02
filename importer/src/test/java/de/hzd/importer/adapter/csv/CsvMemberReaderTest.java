@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.hzd.importer.domain.Member;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 class CsvMemberReaderTest {
@@ -19,7 +20,8 @@ class CsvMemberReaderTest {
 		assertEquals(10927, member.cId());
 		assertEquals("Lena", member.firstName().orElseThrow());
 		assertEquals("Babel", member.lastName().orElseThrow());
-		assertEquals("hzd.152544", member.username());
+		assertEquals("152544", member.username());
 		assertTrue(member.email().orElse("").contains("lena@example.de"));
+		assertEquals(Optional.of(false), member.isActiveBreeder());
 	}
 }

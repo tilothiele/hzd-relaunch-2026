@@ -1,7 +1,11 @@
 package de.hzd.importer.support;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -19,6 +23,12 @@ public class ImporterTestResource implements QuarkusTestResourceLifecycleManager
 
 	private PostgreSQLContainer<?> postgres;
 	private GenericContainer<?> wireMock;
+
+	@Override
+	public void init(Map<String, String> initArgs) {
+		System.setProperty("quarkus.jacoco.enabled", "false");
+		System.setProperty("quarkus.jacoco.report", "false");
+	}
 
 	@Override
 	public Map<String, String> start() {
@@ -50,10 +60,13 @@ public class ImporterTestResource implements QuarkusTestResourceLifecycleManager
 		config.put("quarkus.flyway.migrate-at-start", "true");
 		config.put("quarkus.flyway.baseline-on-migrate", "true");
 		config.put("quarkus.flyway.baseline-version", "1");
+		config.put("quarkus.jacoco.enabled", "false");
+		config.put("quarkus.jacoco.report", "false");
 		config.put("importer.strapi.base-url", wireMockBaseUrl + "/api");
 		config.put("importer.strapi.api-token", "test-token");
 		config.put("importer.authentik.base-url", wireMockBaseUrl);
 		config.put("importer.authentik.api-token", "test-token");
+		config.put("importer.authentik.default-groups", "hzd-member");
 		config.put("quarkus.rest-client.strapi-api.url", wireMockBaseUrl + "/api");
 		config.put("quarkus.rest-client.authentik-api.url", wireMockBaseUrl);
 		config.put(
@@ -69,16 +82,24 @@ public class ImporterTestResource implements QuarkusTestResourceLifecycleManager
 
 	private static String resolveTestCsv(String fileName) {
 		Path moduleRelative = Path.of("src/test/resources", fileName).toAbsolutePath().normalize();
-		if (moduleRelative.toFile().exists()) {
+		if (Files.exists(moduleRelative)) {
 			return moduleRelative.toString();
 		}
-		var classpathResource = Thread.currentThread()
+
+		try (InputStream inputStream = Thread.currentThread()
 			.getContextClassLoader()
-			.getResource(fileName);
-		if (classpathResource == null) {
-			throw new IllegalStateException("Test CSV not found: " + fileName);
+			.getResourceAsStream(fileName)) {
+			if (inputStream == null) {
+				throw new IllegalStateException("Test CSV not found: " + fileName);
+			}
+
+			Path tempFile = Files.createTempFile("importer-test-", "-" + fileName);
+			tempFile.toFile().deleteOnExit();
+			Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+			return tempFile.toString();
+		} catch (IOException exception) {
+			throw new IllegalStateException("Failed to resolve test CSV: " + fileName, exception);
 		}
-		return Path.of(classpathResource.getPath()).toAbsolutePath().normalize().toString();
 	}
 
 	@Override

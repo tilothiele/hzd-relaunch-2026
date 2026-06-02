@@ -52,7 +52,7 @@ public class DogSyncService implements DogSyncPort {
 			final int j = i++;
 			logTicker.tick(() -> Log.info(Ticker.formatProceedingMessage(t0, breederData.entrySet().size(), j, "Breeder")));
 			try {
-				boolean created = strapiDogAdapter.ensureBreeder(entry.getKey(), entry.getValue());
+				boolean created = strapiDogAdapter.ensureBreeder(entry.getKey(), entry.getValue(), Optional.empty());
 				if (created) {
 					breedersCreated++;
 				}

@@ -220,14 +220,8 @@ public class AuthentikUserAdapter {
 		return UpsertResult.DELETED;
 	}
 
-	public UpsertResult upsert(Member member) {
-//		if (member.cEmail().isEmpty()) {
-//			LOG.warnf("Skipping Authentik sync for cId=%d: no valid email in CSV", member.cId());
-//			return UpsertResult.SKIPPED;
-//		}
-
+	public UpsertResult upsert(Member member, Optional<AuthentikUserSnapshot> existingUser) {
 		String username = member.username();
-		Optional<JsonNode> existingUser = findUserByUsername(username);
 		Map<String, Object> payload = AuthentikPayloadMapper.toUserPayload(
 			member,
 			groupMapper,
@@ -235,10 +229,8 @@ public class AuthentikUserAdapter {
 		);
 
 		if (existingUser.isPresent()) {
-			int pk = existingUser.get().path("pk").asInt();
-			patchUser(pk, payload);
-			LOG.infof("Updated Authentik user username=%s pk=%d", username, pk);
-			return UpsertResult.UPDATED;
+			LOG.infof("Skipped Authentik user username=%s already in Authentik", username);
+			return UpsertResult.SKIPPED;
 		}
 
 		postUser(payload);

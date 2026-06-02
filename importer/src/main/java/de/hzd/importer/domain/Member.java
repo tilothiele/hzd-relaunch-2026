@@ -24,6 +24,7 @@ public record Member(
 		Optional<LocalDate> dateOfDeath,
 		Optional<LocalDate> memberSince,
 		Optional<LocalDate> cancellationOn,
+		Optional<Boolean> isActiveBreeder,
 		Optional<Boolean> publishMyData,
 		String documentId,
 		int id
@@ -105,6 +106,7 @@ public record Member(
 			dateOfDeath,
 			memberSince,
 			cancellationOn,
+			isActiveBreeder,
 			publishMyData,
 			documentId,
 			id

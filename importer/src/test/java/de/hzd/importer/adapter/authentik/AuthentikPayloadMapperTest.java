@@ -61,6 +61,7 @@ class AuthentikPayloadMapperTest {
 			Optional.empty(),
 			Optional.empty(),
 			Optional.empty(),
+			Optional.empty(),
 			Member.UNDEFINED_DOCUMENT_ID,
 			Member.UNDEFINED_ID
 		);
@@ -137,6 +138,7 @@ class AuthentikPayloadMapperTest {
 			Optional.of(UserSex.F),
 			Optional.of(false),
 			Optional.of(152544),
+			Optional.empty(),
 			Optional.empty(),
 			Optional.empty(),
 			Optional.empty(),

@@ -262,7 +262,8 @@ public class StrapiMemberAdapter {
 		Map<String, Object> payload = StrapiPayloadMapper.toBreederInput(
 			member.cId(),
 			kennelName,
-			existingBreederId.isEmpty()
+			existingBreederId.isEmpty(),
+			member.isActiveBreeder()
 		);
 
 		if (existingBreederId.isPresent()) {

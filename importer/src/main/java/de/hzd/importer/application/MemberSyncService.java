@@ -1,10 +1,12 @@
 package de.hzd.importer.application;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.jboss.logging.Logger;
 
 import de.hzd.importer.adapter.authentik.AuthentikUserAdapter;
+import de.hzd.importer.adapter.authentik.AuthentikUserAdapter.AuthentikUserSnapshot;
 import de.hzd.importer.adapter.authentik.AuthentikUserAdapter.UpsertResult;
 import de.hzd.importer.adapter.strapi.StrapiMemberAdapter;
 import de.hzd.importer.domain.Member;
@@ -23,21 +25,36 @@ public class MemberSyncService implements MemberSyncPort {
 	@Inject
 	StrapiMemberAdapter strapiMemberAdapter;
 
+	private Map<String, AuthentikUserSnapshot> authentikUsersByUsername = Map.of();
+
+	@Override
+	public void setAuthentikUsersByUsername(Map<String, AuthentikUserSnapshot> users) {
+		authentikUsersByUsername = users != null ? users : Map.of();
+	}
+
+	@Override
+	public void clearAuthentikUsersByUsername() {
+		authentikUsersByUsername = Map.of();
+	}
+
 	@Override
 	public SyncResult syncInAuthentik(Member member) {
 		try {
-			if(!member.doImportInAuthentik()) {
+			if (!member.doImportInAuthentik()) {
 				return SyncResult.SKIPPED;
 			}
-			AuthentikUserAdapter.UpsertResult authentikResult = authentikUserAdapter.upsert(member);
 
-			switch(authentikResult) {
-			case UpsertResult.CREATED: return SyncResult.CREATED;
-			case UpsertResult.UPDATED: return SyncResult.UPDATED;
-			case UpsertResult.DELETED: return SyncResult.DELETED;
-			default: return SyncResult.SKIPPED;
-			}
-			
+			Optional<AuthentikUserSnapshot> existingUser = Optional.ofNullable(
+				authentikUsersByUsername.get(member.username())
+			);
+			UpsertResult authentikResult = authentikUserAdapter.upsert(member, existingUser);
+
+			return switch (authentikResult) {
+				case CREATED -> SyncResult.CREATED;
+				case UPDATED -> SyncResult.UPDATED;
+				case DELETED -> SyncResult.DELETED;
+				default -> SyncResult.SKIPPED;
+			};
 		} catch (RuntimeException exception) {
 			LOG.errorf(exception, "Failed to sync member cId=%d", member.cId());
 			throw exception;
