@@ -180,7 +180,8 @@ class StrapiPayloadMapperTest {
 				10927,
 				Optional.of("Enormous"),
 				true,
-				Optional.of(false)
+				Optional.of(false),
+				Optional.empty()
 			).get("IsActive")
 		);
 		assertEquals(
@@ -189,7 +190,8 @@ class StrapiPayloadMapperTest {
 				10927,
 				Optional.of("Enormous"),
 				true,
-				breederMember(Optional.empty(), Optional.of(true)).isActiveBreeder()
+				breederMember(Optional.empty(), Optional.of(true)).isActiveBreeder(),
+				Optional.empty()
 			).get("IsActive")
 		);
 		assertTrue(
@@ -197,6 +199,7 @@ class StrapiPayloadMapperTest {
 				10927,
 				Optional.of("Enormous"),
 				true,
+				Optional.empty(),
 				Optional.empty()
 			).containsKey("IsActive")
 		);

@@ -3,10 +3,43 @@ import cron from 'node-cron';
 import { extendJWT } from './extend-jwt';
 import { initPermissions, waitForUsersPermissions } from './init-permissions';
 import { setupRoles } from './setup-roles';
+import { enrichBreederRecords } from './utils/breeder-enrich';
+
+function patchBreederController(strapi: Core.Strapi) {
+	const breederController = strapi
+		.plugin('hzd-plugin')
+		.controller('breeder') as Record<string, any> | undefined
+
+	if (!breederController) {
+		strapi.log.warn('[HZD Plugin] Breeder controller not found for enrichment patch')
+		return
+	}
+
+	for (const action of ['find', 'findOne'] as const) {
+		const original = breederController[action]
+
+		if (typeof original !== 'function') {
+			continue
+		}
+
+		breederController[action] = async (ctx: any) => {
+			const response = await original.call(breederController, ctx)
+
+			if (response?.data) {
+				response.data = await enrichBreederRecords(strapi, response.data)
+			}
+
+			return response
+		}
+	}
+
+	strapi.log.info('[HZD Plugin] Breeder API enrichment patch applied')
+}
 
 const bootstrap = async ({ strapi }: { strapi: Core.Strapi }) => {
 	// Erweitere JWT-Service mit member und officer_roles
 	await extendJWT(strapi);
+	patchBreederController(strapi)
 
 	// Warte kurz, damit Strapi vollständig initialisiert ist
 	await new Promise((resolve) => setTimeout(resolve, 2000))

@@ -7,6 +7,7 @@ import { Card, CardMedia, CardContent, Table, TableBody, TableRow, TableCell, Bo
 import PersonIcon from '@mui/icons-material/Person'
 import PhoneIcon from '@mui/icons-material/Phone'
 import type { Breeder, HzdSetting } from '@/types'
+import { resolveBreederContact, formatBreederLocation } from '@/lib/breeder-display-utils'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 
 import { calculateDistance } from '@/lib/geo-utils'
@@ -39,21 +40,18 @@ function formatDate(dateString: string | null | undefined): string {
 
 export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, maxDistance, hzdSetting }: BreederCardProps) {
 	const kennelName = breeder.kennelName ?? 'Kein Zwingername bekannt'
-	const member = breeder.member
-	const memberFirstName = (member as { firstName?: string; firstname?: string } | null)?.firstName
-		?? (member as { firstName?: string; firstname?: string } | null)?.firstname
-	const memberLastName = (member as { lastName?: string; lastname?: string } | null)?.lastName
-		?? (member as { lastName?: string; lastname?: string } | null)?.lastname
+	const contact = resolveBreederContact(breeder)
+	const locationLabel = formatBreederLocation(contact)
 
 	let distance: number | null = null
 	let isDistanceExceeded = false
 
-	if (userLocation && typeof member?.locationLat === 'number' && typeof member?.locationLng === 'number') {
+	if (userLocation && typeof contact.locationLat === 'number' && typeof contact.locationLng === 'number') {
 		distance = calculateDistance(
 			userLocation.lat,
 			userLocation.lng,
-			member.locationLat,
-			member.locationLng
+			contact.locationLat,
+			contact.locationLng
 		)
 
 		if (maxDistance && maxDistance !== '' && typeof maxDistance === 'number' && distance > maxDistance) {
@@ -172,8 +170,7 @@ export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, max
 						)}
 
 						{/* Züchter Name */}
-						{/* Züchter Name */}
-						{(breeder.owner_members && breeder.owner_members.length > 0) ? (
+						{contact.ownerDisplayName ? (
 							<TableRow>
 								<TableCell
 									sx={{
@@ -188,31 +185,13 @@ export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, max
 									</Tooltip>
 								</TableCell>
 								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-									{breeder.owner_members.map(om => [om.firstName, om.lastName].filter(Boolean).join(' ')).join(', ')}
+									{contact.ownerDisplayName}
 								</TableCell>
 							</TableRow>
-						) : (memberFirstName && memberLastName ? (
-							<TableRow>
-								<TableCell
-									sx={{
-										width: 48,
-										paddingLeft: '1em',
-										paddingRight: '1em',
-										verticalAlign: 'middle',
-									}}
-								>
-									<Tooltip title='Züchter' arrow>
-										<PersonIcon sx={{ fontSize: 20, color: 'text.secondary', cursor: 'help' }} />
-									</Tooltip>
-								</TableCell>
-								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-									{memberFirstName} {memberLastName}
-								</TableCell>
-							</TableRow>
-						) : null)}
+						) : null}
 
 						{/* Ort / PLZ */}
-						{(member?.zip || member?.city || member?.countryCode) && (
+						{locationLabel ? (
 							<TableRow>
 								<TableCell
 									sx={{
@@ -235,14 +214,13 @@ export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, max
 									</Tooltip>
 								</TableCell>
 								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-									{[member.zip, member.city].filter(Boolean).join(' ')}
-									{member.countryCode && member.countryCode !== 'DE' && ` (${member.countryCode})`}
+									{locationLabel}
 								</TableCell>
 							</TableRow>
-						)}
+						) : null}
 
 						{/* Telefon */}
-						{member?.phone && (
+						{contact.phone ? (
 							<TableRow>
 								<TableCell
 									sx={{
@@ -257,10 +235,10 @@ export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, max
 									</Tooltip>
 								</TableCell>
 								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-									{member.phone}
+									{contact.phone}
 								</TableCell>
 							</TableRow>
-						)}
+						) : null}
 
 						{/* Entfernung */}
 						{distance !== null && (

@@ -248,6 +248,92 @@ export async function searchBreeders(
 	}
 }
 
+export async function getBreederByDocumentId(
+	documentId: string,
+	options: { server?: boolean; baseUrl?: string | null; token?: string | null; enriched?: boolean } = {},
+): Promise<Breeder | null> {
+	if (options.enriched !== false && !options.server) {
+		const response = await fetch(`/api/breeders/${documentId}`, {
+			cache: 'no-store',
+		})
+
+		if (!response.ok) {
+			return null
+		}
+
+		const payload = await response.json() as { data?: Breeder }
+		return payload.data ?? null
+	}
+
+	const query = buildStrapiQuery({
+		populate: Object.fromEntries(POPULATE_BREEDER_SEARCH.entries()),
+	})
+
+	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
+	const response = await fetcher<unknown>(`hzd-plugin/breeders/${documentId}`, query, {
+		token: options.token,
+		baseUrl: options.baseUrl,
+	})
+
+	let breeder = extractStrapiSingle<Breeder>(response)
+
+	if (
+		breeder
+		&& options.server
+		&& options.enriched !== false
+		&& !breeder.member?.documentId
+		&& !(breeder.owner_members?.length)
+		&& typeof breeder.cId === 'number'
+		&& options.token
+	) {
+		const userQuery = new URLSearchParams({
+			'filters[cId][$eq]': String(breeder.cId),
+			'fields[0]': 'documentId',
+			'fields[1]': 'cId',
+			'fields[2]': 'firstName',
+			'fields[3]': 'lastName',
+			'fields[4]': 'region',
+			'fields[5]': 'phone',
+			'fields[6]': 'email',
+			'fields[7]': 'city',
+			'fields[8]': 'address1',
+			'fields[9]': 'address2',
+			'fields[10]': 'zip',
+			'fields[11]': 'countryCode',
+			'fields[12]': 'locationLat',
+			'fields[13]': 'locationLng',
+			'fields[14]': 'publishMyData',
+		})
+
+		const usersResponse = await fetchStrapiServer<unknown>(
+			`users?${userQuery.toString()}`,
+			undefined,
+			{ token: options.token },
+		)
+
+		const users = Array.isArray(usersResponse)
+			? usersResponse
+			: Array.isArray((usersResponse as { data?: unknown[] })?.data)
+				? (usersResponse as { data: Record<string, unknown>[] }).data
+				: []
+
+		const member = users[0] as (Breeder['member'] & { publishMyData?: boolean | null })
+		if (member && member.publishMyData !== false) {
+			breeder = {
+				...breeder,
+				member: breeder.member ?? member,
+				owner_members: breeder.owner_members?.length
+					? breeder.owner_members
+					: member
+						? [member as NonNullable<Breeder['owner_members']>[number]]
+						: breeder.owner_members,
+			}
+		}
+	}
+
+	return breeder
+}
+
 export async function searchLitters(
 	variables: {
 		filters?: FilterValue

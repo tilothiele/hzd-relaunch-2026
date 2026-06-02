@@ -68,7 +68,8 @@ final class StrapiPayloadMapper {
 		int breederCId,
 		Optional<String> kennelName,
 		boolean includeRole,
-		Optional<Boolean> isActiveBreeder
+		Optional<Boolean> isActiveBreeder,
+		Optional<String> memberDocumentId
 	) {
 		Map<String, Object> payload = new HashMap<>();
 		payload.put("cId", breederCId);
@@ -77,6 +78,10 @@ final class StrapiPayloadMapper {
 			payload.put("BreederRole", "B");
 		}
 		kennelName.ifPresent(value -> payload.put("kennelName", value));
+		memberDocumentId.ifPresent(documentId -> {
+			payload.put("member", Map.of("connect", java.util.List.of(documentId)));
+			payload.put("owner_members", Map.of("connect", java.util.List.of(documentId)));
+		});
 		return payload;
 	}
 

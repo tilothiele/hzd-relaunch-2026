@@ -4,12 +4,31 @@
 
 import { factories } from '@strapi/strapi'
 import type { Core } from '@strapi/strapi'
+import { enrichBreederRecords } from '../utils/breeder-enrich'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyController = Record<string, any>
+const coreControllerFactory = factories.createCoreController(
+	'plugin::hzd-plugin.breeder',
+	({ strapi }: { strapi: Core.Strapi }) => ({
+		async find(ctx: any) {
+			const response = await Object.getPrototypeOf(this).find.call(this, ctx)
 
-const coreControllerFactory = factories.createCoreController('plugin::hzd-plugin.breeder')
+			if (response?.data) {
+				response.data = await enrichBreederRecords(strapi, response.data)
+			}
 
-export default ({ strapi }: { strapi: Core.Strapi }): AnyController => {
-  return coreControllerFactory({ strapi } as any)
-}
+			return response
+		},
+
+		async findOne(ctx: any) {
+			const response = await Object.getPrototypeOf(this).findOne.call(this, ctx)
+
+			if (response?.data) {
+				response.data = await enrichBreederRecords(strapi, response.data)
+			}
+
+			return response
+		},
+	}),
+)
+
+export default ({ strapi }: { strapi: Core.Strapi }) => coreControllerFactory({ strapi })

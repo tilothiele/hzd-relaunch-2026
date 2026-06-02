@@ -100,14 +100,21 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
     // Fetch breeding bitches (mothers)
     useEffect(() => {
         async function loadMothers() {
-            if (!breeder?.owner_members || breeder.owner_members.length === 0) return
-            try {
-                const data = await searchDogs({
-                    filters: {
-                        sex: { eq: 'F' },
-                        owner: { documentId: { in: breeder.owner_members.map(m => m.documentId).filter(Boolean) } },
-                        cFertile: { eq: true },
-                    },
+			if (!breeder?.owner_members || breeder.owner_members.length === 0) return
+			const ownerCIds = breeder.owner_members
+				.map((member) => member.cId)
+				.filter((cId): cId is number => typeof cId === 'number')
+			if (ownerCIds.length === 0 && typeof breeder.cId === 'number') {
+				ownerCIds.push(breeder.cId)
+			}
+			if (ownerCIds.length === 0) return
+			try {
+				const data = await searchDogs({
+					filters: {
+						sex: { eq: 'F' },
+						cOwnerId: { in: ownerCIds },
+						cFertile: { eq: true },
+					},
                     pagination: { pageSize: 100 },
                 }, { baseUrl: strapiBaseUrl })
                 setBreedingBitches(data.hzdPluginDogs_connection.nodes || [])

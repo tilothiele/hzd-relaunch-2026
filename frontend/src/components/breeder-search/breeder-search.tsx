@@ -11,6 +11,7 @@ import {
 	type BreederSortField,
 } from '@/lib/breeder-sort-utils'
 import { searchBreeders as searchBreedersApi } from '@/lib/strapi/api'
+import { enrichBreedersWithMembers } from '@/lib/breeder-member-enrich'
 import type { Breeder, HzdSetting } from '@/types'
 import { BreederCard } from './breeder-card'
 import { BreederDetailView } from './breeder-detail-view'
@@ -91,9 +92,11 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 			}, { baseUrl: strapiBaseUrl })
 
 			const breedersArray = sortBreedersByField(
-				Array.isArray(data.hzdPluginBreeders_connection.nodes)
-					? data.hzdPluginBreeders_connection.nodes
-					: [],
+				await enrichBreedersWithMembers(
+					Array.isArray(data.hzdPluginBreeders_connection.nodes)
+						? data.hzdPluginBreeders_connection.nodes
+						: [],
+				),
 				sortField,
 				sortDirection,
 			)

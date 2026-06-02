@@ -407,6 +407,7 @@ export interface UsersPermissionsMeRole {
 export interface AuthUser {
 	id: string
 	documentId: string
+	cId?: number | null
 	username: string
 	email?: string | null
 	confirmed?: boolean | null
@@ -417,6 +418,8 @@ export interface AuthUser {
 	dateOfBirth?: string | null
 	firstName?: string | null
 	lastName?: string | null
+	DisplayName?: string | null
+	region?: string | null
 	address1?: string | null
 	address2?: string | null
 	countryCode?: string | null
@@ -516,12 +519,15 @@ export interface Address {
 
 export interface Breeder {
 	documentId: string
+	cId?: number | null
 	kennelName?: string | null
 	breedingLicenseSince?: string | null
 	member?: {
 		documentId: string
+		cId?: number | null
 		firstName?: string | null
 		lastName?: string | null
+		DisplayName?: string | null
 		region?: string | null
 		phone?: string | null
 		email?: string | null
