@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { searchDogs as searchDogsApi } from '@/lib/strapi/api'
+import { searchDogs as searchDogsApi, fetchBreederCIdsWithNoDogsAvailable } from '@/lib/strapi/api'
 import { useConfig } from '@/hooks/use-config'
 import type { Dog, DogSearchResult } from '@/types'
 
@@ -80,10 +80,7 @@ export function useDogs(options: UseDogsOptions = {}) {
 	const sexFilter = filters.sexFilter ?? ''
 	const colorFilter = filters.colorFilter ?? ''
 	const maxDistance = filters.maxDistance ?? ''
-	const ownerDocumentId = filters.ownerDocumentId
-	const ownerDocumentIds = filters.ownerDocumentIds?.filter(Boolean) ?? []
 	const ownerCIds = filters.ownerCIds?.filter((cId) => typeof cId === 'number') ?? []
-	const breederDocumentId = filters.breederDocumentId
 	const cBreederId = filters.cBreederId
 	const sort = filters.sort
 	const userLocation = filters.userLocation
@@ -123,9 +120,6 @@ export function useDogs(options: UseDogsOptions = {}) {
 					or: [
 						{ givenName: { containsi: nameFilter.trim() } },
 						{ fullKennelName: { containsi: nameFilter.trim() } },
-						{ owner: { firstName: { containsi: nameFilter.trim() } } },
-						{ owner: { lastName: { containsi: nameFilter.trim() } } },
-						{ owner: { city: { containsi: nameFilter.trim() } } },
 					],
 				})
 			}
@@ -154,30 +148,20 @@ export function useDogs(options: UseDogsOptions = {}) {
 				filterConditions.push({
 					cOwnerId: { in: ownerCIds },
 				})
-			} else if (ownerDocumentIds.length > 0) {
-				filterConditions.push({
-					owner: { documentId: { in: ownerDocumentIds } },
-				})
-			} else if (ownerDocumentId) {
-				filterConditions.push({
-					owner: { documentId: { eq: ownerDocumentId } },
-				})
 			} else if (typeof cBreederId === 'number') {
 				filterConditions.push({
 					cBreederId: { eq: cBreederId },
 				})
-			} else if (breederDocumentId) {
-				filterConditions.push({
-					breeder: { documentId: { eq: breederDocumentId } },
-				})
 			} else {
-				filterConditions.push({
-					or: [
-						{ breeder: { documentId: { null: true } } },
-						{ breeder: { HasNoDogsAvailabe: { eq: false } } },
-						{ breeder: { HasNoDogsAvailabe: { null: true } } },
-					],
-				})
+				const excludedBreederCIds = await fetchBreederCIdsWithNoDogsAvailable({ baseUrl })
+				if (excludedBreederCIds.length > 0) {
+					filterConditions.push({
+						or: [
+							{ cBreederId: { null: true } },
+							{ cBreederId: { notIn: excludedBreederCIds } },
+						],
+					})
+				}
 			}
 
 			if (maxAge) {
@@ -256,7 +240,7 @@ export function useDogs(options: UseDogsOptions = {}) {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [baseUrl, nameFilter, sexFilter, colorFilter, ownerDocumentId, ownerDocumentIds.join(','), ownerCIds.join(','), breederDocumentId, cBreederId, queryDisabled, JSON.stringify(sort), page, pageSize, maxAge, hdFilter, genprofilFilter, eyescheckFilter, heartcheckFilter, colorcheckFilter])
+	}, [baseUrl, nameFilter, sexFilter, colorFilter, ownerCIds.join(','), cBreederId, queryDisabled, JSON.stringify(sort), page, pageSize, maxAge, hdFilter, genprofilFilter, eyescheckFilter, heartcheckFilter, colorcheckFilter])
 
 	useEffect(() => {
 		if (autoLoad && !queryDisabled && baseUrl && baseUrl.trim().length > 0) {

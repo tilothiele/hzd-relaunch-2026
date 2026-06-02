@@ -213,6 +213,27 @@ export async function searchDogs(
 	}
 }
 
+/** Züchter-cIds mit „keine Hunde in Zucht“ — für cBreederId-Filter (Relation-Filter auf breeder schlägt fehl). */
+export async function fetchBreederCIdsWithNoDogsAvailable(
+	options: { server?: boolean; baseUrl?: string | null; token?: string | null } = {},
+): Promise<number[]> {
+	const query = buildStrapiQuery({
+		filters: { HasNoDogsAvailabe: { eq: true } },
+		fields: ['cId'],
+		pagination: { pageSize: 500 },
+	})
+
+	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
+	const response = await fetcher<unknown>('hzd-plugin/breeders', query, {
+		token: options.token,
+		baseUrl: options.baseUrl,
+	})
+
+	return extractStrapiList<Breeder>(response)
+		.map((breeder) => breeder.cId)
+		.filter((cId): cId is number => typeof cId === 'number')
+}
+
 export async function searchBreeders(
 	variables: {
 		filters?: FilterValue
