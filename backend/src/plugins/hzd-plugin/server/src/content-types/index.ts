@@ -39,13 +39,23 @@ async function findBreederIdByCId(cId: number | undefined | null) {
 }
 
 async function linkBreederMemberFromCId(data: Record<string, any>) {
-	if (data.member || data.cId === undefined || data.cId === null) {
+	if (data.cId === undefined || data.cId === null) {
 		return
 	}
 
 	const userId = await findUserIdByCId(data.cId)
-	if (userId) {
+	if (!userId) {
+		return
+	}
+
+	if (!data.member) {
 		data.member = userId
+	}
+
+	if (!data.owner_members) {
+		data.owner_members = {
+			connect: [userId],
+		}
 	}
 }
 

@@ -5,6 +5,7 @@ import { Card, CardContent, CardMedia, Table, TableBody, TableCell, TableRow, Bo
 import PersonIcon from '@mui/icons-material/Person'
 import PhoneIcon from '@mui/icons-material/Phone'
 import type { Breeder, HzdSetting } from '@/types'
+import { resolveBreederContact, formatBreederLocation } from '@/lib/breeder-display-utils'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { calculateDistance } from '@/lib/geo-utils'
 
@@ -23,27 +24,21 @@ export function StudDogCard({
 	userLocation,
 	hzdSetting,
 }: StudDogCardProps) {
-	const member = breeder.member
-	const ownerNames = (breeder.owner_members ?? [])
-		.map((ownerMember) =>
-			[ownerMember.firstName, ownerMember.lastName].filter(Boolean).join(' ').trim()
-		)
-		.filter(Boolean)
-	const memberName = [member?.firstName, member?.lastName]
-		.filter(Boolean)
-		.join(' ')
+	const contact = resolveBreederContact(breeder)
+	const locationLabel = formatBreederLocation(contact)
+	const displayName = contact.ownerDisplayName
 	let distance: number | null = null
 
 	if (
 		userLocation &&
-		typeof member?.locationLat === 'number' &&
-		typeof member?.locationLng === 'number'
+		typeof contact.locationLat === 'number' &&
+		typeof contact.locationLng === 'number'
 	) {
 		distance = calculateDistance(
 			userLocation.lat,
 			userLocation.lng,
-			member.locationLat,
-			member.locationLng,
+			contact.locationLat,
+			contact.locationLng,
 		)
 	}
 
@@ -74,7 +69,7 @@ export function StudDogCard({
 						breeder.avatar || hzdSetting?.DefaultBreederAvatar,
 						strapiBaseUrl,
 					) || '/static-images/placeholder/user-avatar.png'}
-					alt={memberName || ownerNames.join(', ') || 'Deckrüdenbesitzer'}
+					alt={displayName || 'Deckrüdenbesitzer'}
 					fill
 					style={{ objectFit: 'cover' }}
 					unoptimized
@@ -85,7 +80,7 @@ export function StudDogCard({
 			<CardContent>
 				<Table size='small'>
 					<TableBody>
-						{ownerNames.length > 0 || memberName ? (
+						{displayName ? (
 							<TableRow>
 								<TableCell
 									sx={{
@@ -100,12 +95,12 @@ export function StudDogCard({
 									</Tooltip>
 								</TableCell>
 								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary', fontWeight: 'bold' }}>
-									{ownerNames.length > 0 ? ownerNames.join(', ') : memberName}
+									{displayName}
 								</TableCell>
 							</TableRow>
 						) : null}
 
-						{member?.zip || member?.city || member?.countryCode ? (
+						{locationLabel ? (
 							<TableRow>
 								<TableCell
 									sx={{
@@ -128,13 +123,12 @@ export function StudDogCard({
 									</Tooltip>
 								</TableCell>
 								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-									{[member.zip, member.city].filter(Boolean).join(' ')}
-									{member.countryCode && member.countryCode !== 'DE' && ` (${member.countryCode})`}
+									{locationLabel}
 								</TableCell>
 							</TableRow>
 						) : null}
 
-						{member?.phone ? (
+						{contact.phone ? (
 							<TableRow>
 								<TableCell
 									sx={{
@@ -149,7 +143,7 @@ export function StudDogCard({
 									</Tooltip>
 								</TableCell>
 								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-									{member.phone}
+									{contact.phone}
 								</TableCell>
 							</TableRow>
 						) : null}

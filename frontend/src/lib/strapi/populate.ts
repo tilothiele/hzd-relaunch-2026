@@ -138,41 +138,98 @@ export const POPULATE_CONTACT = new URLSearchParams({
 	'populate[member][fields][2]': 'lastName',
 })
 
-export const POPULATE_DOG_SEARCH = new URLSearchParams({
-	'populate[owner]': '*',
-	'populate[breeder]': '*',
-	'populate[Images]': 'true',
-	'populate[DogDocument][populate][MediaFile]': 'true',
-	'populate[father][populate][owner]': '*',
-	'populate[father][populate][father][populate][owner]': '*',
-	'populate[father][populate][mother][populate][owner]': '*',
-	'populate[mother][populate][owner]': '*',
-	'populate[mother][populate][father][populate][owner]': '*',
-	'populate[mother][populate][mother][populate][owner]': '*',
-})
+/** users-permissions.user — `=*` triggert Invalid key role */
+const DOG_USER_POPULATE_FIELDS = [
+	'documentId',
+	'firstName',
+	'lastName',
+	'city',
+	'zip',
+	'phone',
+	'email',
+	'countryCode',
+] as const
+
+const DOG_BREEDER_POPULATE_FIELDS = [
+	'documentId',
+	'kennelName',
+	'HasNoDogsAvailabe',
+] as const
+
+function appendUserFieldsPopulate(
+	params: URLSearchParams,
+	path: string,
+	fields: readonly string[] = DOG_USER_POPULATE_FIELDS,
+): void {
+	fields.forEach((field, index) => {
+		params.set(`${path}[fields][${index}]`, field)
+	})
+}
+
+function buildDogSearchPopulate(): URLSearchParams {
+	const params = new URLSearchParams()
+
+	appendUserFieldsPopulate(params, 'populate[owner]')
+
+	DOG_BREEDER_POPULATE_FIELDS.forEach((field, index) => {
+		params.set(`populate[breeder][fields][${index}]`, field)
+	})
+
+	params.set('populate[Images]', 'true')
+	params.set('populate[avatar]', 'true')
+	params.set('populate[DogDocument][populate][MediaFile]', 'true')
+
+	const nestedOwnerPaths = [
+		'populate[father][populate][owner]',
+		'populate[father][populate][father][populate][owner]',
+		'populate[father][populate][mother][populate][owner]',
+		'populate[mother][populate][owner]',
+		'populate[mother][populate][father][populate][owner]',
+		'populate[mother][populate][mother][populate][owner]',
+	]
+
+	for (const path of nestedOwnerPaths) {
+		appendUserFieldsPopulate(params, path)
+	}
+
+	return params
+}
+
+export const POPULATE_DOG_SEARCH = buildDogSearchPopulate()
 
 /** member/owner_members sind users-permissions.user — `=*` triggert Invalid key role */
 export const POPULATE_BREEDER_SEARCH = new URLSearchParams({
 	'populate[member][fields][0]': 'documentId',
-	'populate[member][fields][1]': 'firstName',
-	'populate[member][fields][2]': 'lastName',
-	'populate[member][fields][3]': 'region',
-	'populate[member][fields][4]': 'phone',
-	'populate[member][fields][5]': 'email',
-	'populate[member][fields][6]': 'city',
-	'populate[member][fields][7]': 'address1',
-	'populate[member][fields][8]': 'address2',
-	'populate[member][fields][9]': 'zip',
-	'populate[member][fields][10]': 'countryCode',
-	'populate[member][fields][11]': 'locationLat',
-	'populate[member][fields][12]': 'locationLng',
-	'populate[member][fields][13]': 'DisplayName',
+	'populate[member][fields][1]': 'cId',
+	'populate[member][fields][2]': 'firstName',
+	'populate[member][fields][3]': 'lastName',
+	'populate[member][fields][4]': 'region',
+	'populate[member][fields][5]': 'phone',
+	'populate[member][fields][6]': 'email',
+	'populate[member][fields][7]': 'city',
+	'populate[member][fields][8]': 'address1',
+	'populate[member][fields][9]': 'address2',
+	'populate[member][fields][10]': 'zip',
+	'populate[member][fields][11]': 'countryCode',
+	'populate[member][fields][12]': 'locationLat',
+	'populate[member][fields][13]': 'locationLng',
 	'populate[member][fields][14]': 'username',
 	'populate[avatar]': 'true',
 	'populate[Address]': 'true',
 	'populate[owner_members][fields][0]': 'documentId',
-	'populate[owner_members][fields][1]': 'firstName',
-	'populate[owner_members][fields][2]': 'lastName',
+	'populate[owner_members][fields][1]': 'cId',
+	'populate[owner_members][fields][2]': 'firstName',
+	'populate[owner_members][fields][3]': 'lastName',
+	'populate[owner_members][fields][4]': 'region',
+	'populate[owner_members][fields][5]': 'phone',
+	'populate[owner_members][fields][6]': 'email',
+	'populate[owner_members][fields][7]': 'city',
+	'populate[owner_members][fields][8]': 'address1',
+	'populate[owner_members][fields][9]': 'address2',
+	'populate[owner_members][fields][10]': 'zip',
+	'populate[owner_members][fields][11]': 'countryCode',
+	'populate[owner_members][fields][12]': 'locationLat',
+	'populate[owner_members][fields][13]': 'locationLng',
 })
 
 export const POPULATE_LITTER_SEARCH = new URLSearchParams({

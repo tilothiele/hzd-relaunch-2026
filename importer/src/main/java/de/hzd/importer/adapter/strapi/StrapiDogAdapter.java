@@ -37,7 +37,8 @@ public class StrapiDogAdapter {
 			breederCId,
 			kennelName,
 			existingBreederId.isEmpty(),
-			isActiveBreeder
+			isActiveBreeder,
+			Optional.empty()
 		);
 
 		if (existingBreederId.isPresent()) {

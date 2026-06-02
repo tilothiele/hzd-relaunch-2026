@@ -1,10 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Box, Typography, Divider } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import Image from 'next/image'
 import type { Breeder, Dog, HzdSetting } from '@/types'
+import { resolveBreederContact } from '@/lib/breeder-display-utils'
+import { getBreederByDocumentId } from '@/lib/strapi/api'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { theme } from '@/themes'
 import { BreederDogsList } from './breeder-dogs-list'
@@ -44,15 +46,37 @@ function getRegionLabel(region: string | null | undefined): string {
 
 export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack }: BreederDetailViewProps) {
     const [selectedDog, setSelectedDog] = useState<Dog | null>(null)
-    const kennelName = breeder.kennelName ?? 'Kein Zwingername bekannt'
-    const member = breeder.member
-    const ownerMemberNames = (breeder.owner_members ?? [])
-        .map((om) => {
-            return [om.firstName, om.lastName].filter(Boolean).join(' ').trim()
-        })
-        .filter(Boolean)
+    const [breederDetails, setBreederDetails] = useState<Breeder>(breeder)
+    const kennelName = breederDetails.kennelName ?? 'Kein Zwingername bekannt'
+    const contact = resolveBreederContact(breederDetails)
+
+    useEffect(() => {
+        setBreederDetails(breeder)
+    }, [breeder])
+
+    useEffect(() => {
+        if (!breeder.documentId) {
+            return
+        }
+
+        let cancelled = false
+
+        void getBreederByDocumentId(breeder.documentId)
+            .then((freshBreeder) => {
+                if (!cancelled && freshBreeder) {
+                    setBreederDetails(freshBreeder)
+                }
+            })
+            .catch(() => {
+                // Liste bleibt als Fallback sichtbar
+            })
+
+        return () => {
+            cancelled = true
+        }
+    }, [breeder.documentId])
     const avatarUrl = resolveMediaUrl(
-        breeder.avatar || hzdSetting?.DefaultBreederAvatar,
+        breederDetails.avatar || hzdSetting?.DefaultBreederAvatar,
         strapiBaseUrl
     ) || '/static-images/placeholder/user-avatar.png'
 
@@ -94,9 +118,9 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack }
                     />
                 </div>
                 <h1 className='text-3xl font-bold text-gray-900 md:text-4xl'>
-                    {breeder.WebsiteUrl ? (
+                    {breederDetails.WebsiteUrl ? (
                         <a
-                            href={breeder.WebsiteUrl}
+                            href={breederDetails.WebsiteUrl}
                             target='_blank'
                             rel='noopener noreferrer'
                             className='hover:underline inline-flex items-center gap-2 transition-colors'
@@ -116,70 +140,62 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack }
                 <section>
                     <SectionHeader title="Züchter Details" />
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-gray-700 bg-gray-50 p-6 rounded-lg'>
-                        {breeder.breedingLicenseSince ? (
+                        {breederDetails.breedingLicenseSince ? (
                             <p>
-                                <strong>Zuchterlaubnis seit:</strong> {formatDate(breeder.breedingLicenseSince)}
+                                <strong>Zuchterlaubnis seit:</strong> {formatDate(breederDetails.breedingLicenseSince)}
                             </p>
                         ) : null}
 
-                        {ownerMemberNames.length > 0 ? (
-                            <div>
-                                <strong>Züchter:</strong>
-                                {ownerMemberNames.map((fullName, index) => (
-                                    <div key={`${fullName}-${index}`}>
-                                        {fullName}
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (member?.firstName && member?.lastName ? (
-                            <p>
-                                <strong>Züchter:</strong> {member.firstName} {member.lastName}
-                            </p>
-                        ) : null)}
+						{contact.ownerDisplayName ? (
+							<p>
+								<strong>Züchter:</strong> {contact.ownerDisplayName}
+							</p>
+						) : null}
 
-                        {member?.region ? (
+                        {contact.region ? (
                             <p>
-                                <strong>Region:</strong> {getRegionLabel(member.region)}
+                                <strong>Region:</strong> {getRegionLabel(contact.region)}
                             </p>
                         ) : null}
 
-                        {member?.phone ? (
+                        {contact.phone ? (
                             <p>
-                                <strong>Telefon:</strong> {member.phone}
+                                <strong>Telefon:</strong> {contact.phone}
                             </p>
                         ) : null}
 
-                        {member?.email ? (
+                        {contact.email ? (
                             <p>
-                                <strong>E-Mail:</strong> <a href={`mailto:${member.email}`} className='text-submit-button hover:underline' style={{ color: theme.submitButtonColor }}>{member.email}</a>
+                                <strong>E-Mail:</strong> <a href={`mailto:${contact.email}`} className='text-submit-button hover:underline' style={{ color: theme.submitButtonColor }}>{contact.email}</a>
                             </p>
                         ) : null}
 
-                        {member?.address1 || member?.address2 ? (
+                        {contact.address1 || contact.address2 ? (
                             <p>
                                 <strong>Adresse:</strong>{' '}
-                                {[member.address1, member.address2].filter(Boolean).join(', ')}
+                                {[contact.address1, contact.address2].filter(Boolean).join(', ')}
                             </p>
                         ) : null}
 
-                        {member?.zip || member?.countryCode ? (
+                        {contact.zip || contact.city || contact.countryCode ? (
                             <p>
-                                <strong>PLZ / Land:</strong>{' '}
-                                {[member.zip, member.countryCode].filter(Boolean).join(' / ')}
+                                <strong>PLZ / Ort:</strong>{' '}
+                                {[contact.zip, contact.city].filter(Boolean).join(' ')}
+                                {contact.countryCode ? ` / ${contact.countryCode}` : ''}
                             </p>
                         ) : null}
 
-                        {breeder.WebsiteUrl ? (
+                        {breederDetails.WebsiteUrl ? (
                             <p>
                                 <strong>Webseite:</strong>{' '}
                                 <a
-                                    href={breeder.WebsiteUrl}
+                                    href={breederDetails.WebsiteUrl}
                                     target='_blank'
                                     rel='noopener noreferrer'
                                     className='text-submit-button hover:underline'
                                     style={{ color: theme.submitButtonColor }}
                                 >
-                                    {breeder.WebsiteUrl}
+                                    {breederDetails.WebsiteUrl}
                                 </a>
                             </p>
                         ) : null}
@@ -187,28 +203,27 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack }
                 </section>
 
                 {/* Introduction Section */}
-                {breeder.BreedersIntroduction ? (
+                {breederDetails.BreedersIntroduction ? (
                     <section>
                         <SectionHeader title="Über uns" />
-                        <div className='prose prose-lg max-w-none text-gray-600 bg-white p-6 border border-gray-100 rounded-lg shadow-sm' dangerouslySetInnerHTML={{ __html: breeder.BreedersIntroduction }} />
+                        <div className='prose prose-lg max-w-none text-gray-600 bg-white p-6 border border-gray-100 rounded-lg shadow-sm' dangerouslySetInnerHTML={{ __html: breederDetails.BreedersIntroduction }} />
                     </section>
                 ) : null}
 
-                {/* Dogs List Section */}
-                {breeder.owner_members && breeder.owner_members.length > 0 && breeder.owner_members[0].documentId && (
-                    <section>
-                        <SectionHeader title="Zuchthunde" />
-                        <Box sx={{ p: 2, bg: 'white', borderRadius: 2, border: '1px solid', borderColor: 'grey.100', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' }}>
-                            <BreederDogsList
-                                ownerDocumentId={breeder.owner_members[0].documentId}
-                                strapiBaseUrl={strapiBaseUrl}
-                                hzdSetting={hzdSetting}
-                                hasNoDogsAvailabe={breeder.HasNoDogsAvailabe}
-                                onDogSelect={setSelectedDog}
-                            />
-                        </Box>
-                    </section>
-                )}
+                {/* Zuchthündinnen */}
+                <section>
+                    <SectionHeader title="Zuchthündinnen" />
+                    <Box sx={{ p: 2, bg: 'white', borderRadius: 2, border: '1px solid', borderColor: 'grey.100', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' }}>
+                        <BreederDogsList
+                            key={`${breederDetails.documentId}:${contact.ownerCIds.join(',')}`}
+                            ownerCIds={contact.ownerCIds}
+                            strapiBaseUrl={strapiBaseUrl}
+                            hzdSetting={hzdSetting}
+                            hasNoDogsAvailabe={breederDetails.HasNoDogsAvailabe}
+                            onDogSelect={setSelectedDog}
+                        />
+                    </Box>
+                </section>
 
                 {/* Final Back Link */}
                 <Box sx={{ display: 'flex', justifyContent: 'center', pt: 4 }}>

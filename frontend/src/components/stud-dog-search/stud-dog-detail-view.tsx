@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { Box, Typography } from '@mui/material'
 import type { Breeder, Dog, HzdSetting } from '@/types'
+import { resolveBreederContact } from '@/lib/breeder-display-utils'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { BackButton } from '@/components/ui/back-button'
 import { theme } from '@/themes'
@@ -31,23 +32,12 @@ export function StudDogDetailView({
 	onBack,
 }: StudDogDetailViewProps) {
 	const [selectedDog, setSelectedDog] = useState<Dog | null>(null)
-	const member = breeder.member
-	const ownerMemberNames = (breeder.owner_members ?? [])
-		.map((ownerMember) =>
-			[ownerMember.firstName, ownerMember.lastName].filter(Boolean).join(' ').trim()
-		)
-		.filter(Boolean)
-	const memberName = [member?.firstName, member?.lastName]
-		.filter(Boolean)
-		.join(' ')
+	const contact = resolveBreederContact(breeder)
 	const avatarUrl = resolveMediaUrl(
 		breeder.avatar || hzdSetting?.DefaultBreederAvatar,
 		strapiBaseUrl,
 	) || '/static-images/placeholder/user-avatar.png'
-	const ownerDocumentId = breeder.owner_members?.[0]?.documentId
-	const title = ownerMemberNames.length > 0
-		? ownerMemberNames.join(', ')
-		: memberName || 'Deckrüdenbesitzer'
+	const title = contact.ownerDisplayName || 'Deckrüdenbesitzer'
 
 	if (selectedDog) {
 		return (
@@ -105,57 +95,49 @@ export function StudDogDetailView({
 				<section>
 					<SectionHeader title='Deckrüdenbesitzer Details' />
 					<div className='grid grid-cols-1 gap-x-8 gap-y-4 rounded-lg bg-gray-50 p-6 text-gray-700 md:grid-cols-2'>
-						{ownerMemberNames.length > 0 ? (
-							<div>
-								<strong>Deckrüdenbesitzer:</strong>
-								{ownerMemberNames.map((fullName, index) => (
-									<div key={`${fullName}-${index}`}>
-										{fullName}
-									</div>
-								))}
-							</div>
-						) : memberName ? (
+						{contact.ownerDisplayName ? (
 							<p>
-								<strong>Deckrüdenbesitzer:</strong> {memberName}
+								<strong>Deckrüdenbesitzer:</strong> {contact.ownerDisplayName}
 							</p>
 						) : null}
 
-						{member?.region ? (
+						{contact.region ? (
 							<p>
-								<strong>Region:</strong> {getRegionLabel(member.region)}
+								<strong>Region:</strong> {getRegionLabel(contact.region)}
 							</p>
 						) : null}
 
-						{member?.phone ? (
+						{contact.phone ? (
 							<p>
-								<strong>Telefon:</strong> {member.phone}
+								<strong>Telefon:</strong> {contact.phone}
 							</p>
 						) : null}
 
-						{member?.email ? (
+						{contact.email ? (
 							<p>
 								<strong>E-Mail:</strong>{' '}
 								<a
-									href={`mailto:${member.email}`}
+									href={`mailto:${contact.email}`}
 									className='hover:underline'
 									style={{ color: theme.submitButtonColor }}
 								>
-									{member.email}
+									{contact.email}
 								</a>
 							</p>
 						) : null}
 
-						{member?.address1 || member?.address2 ? (
+						{contact.address1 || contact.address2 ? (
 							<p>
 								<strong>Adresse:</strong>{' '}
-								{[member.address1, member.address2].filter(Boolean).join(', ')}
+								{[contact.address1, contact.address2].filter(Boolean).join(', ')}
 							</p>
 						) : null}
 
-						{member?.zip || member?.countryCode ? (
+						{contact.zip || contact.city || contact.countryCode ? (
 							<p>
-								<strong>PLZ / Land:</strong>{' '}
-								{[member.zip, member.countryCode].filter(Boolean).join(' / ')}
+								<strong>PLZ / Ort:</strong>{' '}
+								{[contact.zip, contact.city].filter(Boolean).join(' ')}
+								{contact.countryCode ? ` / ${contact.countryCode}` : ''}
 							</p>
 						) : null}
 					</div>
@@ -171,7 +153,7 @@ export function StudDogDetailView({
 					</section>
 				) : null}
 
-				{ownerDocumentId ? (
+				{contact.ownerCIds.length > 0 ? (
 					<section>
 						<SectionHeader title='Deckrüden' />
 						<Box
@@ -185,7 +167,7 @@ export function StudDogDetailView({
 							}}
 						>
 							<StudDogsList
-								ownerDocumentId={ownerDocumentId}
+								ownerCIds={contact.ownerCIds}
 								strapiBaseUrl={strapiBaseUrl}
 								hzdSetting={hzdSetting}
 								onDogSelect={setSelectedDog}

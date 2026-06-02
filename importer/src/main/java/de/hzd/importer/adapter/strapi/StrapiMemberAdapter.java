@@ -263,7 +263,8 @@ public class StrapiMemberAdapter {
 			member.cId(),
 			kennelName,
 			existingBreederId.isEmpty(),
-			member.isActiveBreeder()
+			member.isActiveBreeder(),
+			Optional.of(memberDocumentId)
 		);
 
 		if (existingBreederId.isPresent()) {

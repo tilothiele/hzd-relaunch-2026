@@ -24,6 +24,10 @@ interface DogsFilters {
 	maxDistance?: DistanceFilter
 	userLocation?: { lat: number; lng: number }
 	ownerDocumentId?: string
+	ownerDocumentIds?: string[]
+	ownerCIds?: number[]
+	breederDocumentId?: string
+	cBreederId?: number
 	sort?: string[]
 	maxAge?: number
 	hdFilter?: HDLevel
@@ -77,6 +81,10 @@ export function useDogs(options: UseDogsOptions = {}) {
 	const colorFilter = filters.colorFilter ?? ''
 	const maxDistance = filters.maxDistance ?? ''
 	const ownerDocumentId = filters.ownerDocumentId
+	const ownerDocumentIds = filters.ownerDocumentIds?.filter(Boolean) ?? []
+	const ownerCIds = filters.ownerCIds?.filter((cId) => typeof cId === 'number') ?? []
+	const breederDocumentId = filters.breederDocumentId
+	const cBreederId = filters.cBreederId
 	const sort = filters.sort
 	const userLocation = filters.userLocation
 	const page = pagination.page ?? 1
@@ -142,9 +150,25 @@ export function useDogs(options: UseDogsOptions = {}) {
 			})
 
 
-			if (ownerDocumentId) {
+			if (ownerCIds.length > 0) {
+				filterConditions.push({
+					cOwnerId: { in: ownerCIds },
+				})
+			} else if (ownerDocumentIds.length > 0) {
+				filterConditions.push({
+					owner: { documentId: { in: ownerDocumentIds } },
+				})
+			} else if (ownerDocumentId) {
 				filterConditions.push({
 					owner: { documentId: { eq: ownerDocumentId } },
+				})
+			} else if (typeof cBreederId === 'number') {
+				filterConditions.push({
+					cBreederId: { eq: cBreederId },
+				})
+			} else if (breederDocumentId) {
+				filterConditions.push({
+					breeder: { documentId: { eq: breederDocumentId } },
 				})
 			} else {
 				filterConditions.push({
@@ -232,7 +256,7 @@ export function useDogs(options: UseDogsOptions = {}) {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [baseUrl, nameFilter, sexFilter, colorFilter, ownerDocumentId, queryDisabled, JSON.stringify(sort), page, pageSize, maxAge, hdFilter, genprofilFilter, eyescheckFilter, heartcheckFilter, colorcheckFilter])
+	}, [baseUrl, nameFilter, sexFilter, colorFilter, ownerDocumentId, ownerDocumentIds.join(','), ownerCIds.join(','), breederDocumentId, cBreederId, queryDisabled, JSON.stringify(sort), page, pageSize, maxAge, hdFilter, genprofilFilter, eyescheckFilter, heartcheckFilter, colorcheckFilter])
 
 	useEffect(() => {
 		if (autoLoad && !queryDisabled && baseUrl && baseUrl.trim().length > 0) {

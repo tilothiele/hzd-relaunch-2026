@@ -19,14 +19,14 @@ import { theme } from '@/themes'
 import type { Dog, HzdSetting } from '@/types'
 
 interface StudDogsListProps {
-	ownerDocumentId: string
+	ownerCIds: number[]
 	strapiBaseUrl?: string | null
 	hzdSetting?: HzdSetting | null
 	onDogSelect: (dog: Dog) => void
 }
 
 export function StudDogsList({
-	ownerDocumentId,
+	ownerCIds,
 	strapiBaseUrl,
 	hzdSetting,
 	onDogSelect,
@@ -37,10 +37,11 @@ export function StudDogsList({
 		name: string
 	} | null>(null)
 	const pageSize = 5
+	const resolvedOwnerCIds = ownerCIds.filter((cId) => typeof cId === 'number')
 	const { dogs, totalDogs, pageCount, isLoading } = useDogs(
 		useMemo(() => ({
 			filters: {
-				ownerDocumentId,
+				ownerCIds: resolvedOwnerCIds,
 				sexFilter: 'M' as const,
 				sort: ['givenName:asc'],
 			},
@@ -49,7 +50,8 @@ export function StudDogsList({
 				pageSize,
 			},
 			baseUrl: strapiBaseUrl,
-		}), [ownerDocumentId, page, pageSize, strapiBaseUrl])
+			queryDisabled: resolvedOwnerCIds.length === 0,
+		}), [resolvedOwnerCIds.join(','), page, pageSize, strapiBaseUrl])
 	)
 
 	if (isLoading) {
