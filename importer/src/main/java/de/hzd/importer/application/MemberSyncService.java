@@ -26,19 +26,11 @@ public class MemberSyncService implements MemberSyncPort {
 	@Override
 	public SyncResult syncInAuthentik(Member member) {
 		try {
-			boolean importInAuthentik = member.doImportInAuthentik();
-			AuthentikUserAdapter.UpsertResult authentikResult = importInAuthentik
-				? authentikUserAdapter.upsert(member)
-				: authentikUserAdapter.delete(member);
-			if (!importInAuthentik) {
-				LOG.debugf(
-					"Deleting Authentik sync for cId=%d, username=%s, email=%s: cFlagBreeder is true",
-					member.cId(),
-					member.username(),
-					member.email()
-				);
+			if(!member.doImportInAuthentik()) {
+				return SyncResult.SKIPPED;
 			}
-			
+			AuthentikUserAdapter.UpsertResult authentikResult = authentikUserAdapter.upsert(member);
+
 			switch(authentikResult) {
 			case UpsertResult.CREATED: return SyncResult.CREATED;
 			case UpsertResult.UPDATED: return SyncResult.UPDATED;

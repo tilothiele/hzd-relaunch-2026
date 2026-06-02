@@ -41,6 +41,10 @@ public record Member(
 	public String strapiEmail() {
 		return "c."+cId + "@hovawarte.com";
 	}
+	
+	public String authentikEmail() {
+		return cEmail().orElse(email().orElse(strapiEmail()));
+	}
 
 	public Optional<String> cEmail() {
 		return email().filter(value -> value.contains("@"));

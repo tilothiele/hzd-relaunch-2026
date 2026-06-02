@@ -233,6 +233,10 @@ backup_application "$BASE_DIR" "n8n"\
     -- \
     "ikcc8gsgcco4o84oscsoss08_n8n-data"
 
+# authentik
+dump_file="authentik_db_dump_$(date +%F).sql"
+pg_dump_docker "$BASE_DIR" "authentik" "$dump_file"
+
 # open-archiver
 # diesen Container nicht stoppen. Nach dem Hochfahren funktioniert der Zugriff auf den S3-Storage nicht mehr.
 # Der S3-Storage wird gesondert gesichert.

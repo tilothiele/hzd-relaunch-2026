@@ -17,7 +17,7 @@ final class AuthentikPayloadMapper {
 	) {
 		Map<String, Object> payload = new HashMap<>();
 		payload.put("username", member.username());
-		payload.put("email", member.strapiEmail());
+		payload.put("email", member.authentikEmail());
 		member.displayName().ifPresent(name -> payload.put("name", name));
 		payload.put("is_active", member.isActive());
 
