@@ -31,7 +31,6 @@ public class AuthentikUserAdapter {
 	@Inject
 	AuthentikApiAuthentication authentikAuth;
 
-	private Map<String, AuthentikUserSnapshot> importCache = Map.of();
 	private AuthentikGroupMapper groupMapper = AuthentikGroupMapper.empty();
 
 	public record AuthentikUserSnapshot(
@@ -58,6 +57,14 @@ public class AuthentikUserAdapter {
 			}
 			String text = value.asText().trim();
 			return text.isEmpty() ? Optional.empty() : Optional.of(text);
+		}
+		
+		public static int fingerPrint(String username, String email, boolean active) {
+			return (username+email+active).hashCode();
+		}
+		
+		public int fingerPrint() {
+			return fingerPrint(username, email.orElse(""), active);
 		}
 	}
 
@@ -179,48 +186,11 @@ public class AuthentikUserAdapter {
 		return new DeleteAllUsersResult(deleted, users.size());
 	}
 
-	public void setImportCache(Map<String, AuthentikUserSnapshot> users) {
-		importCache = users != null ? users : Map.of();
-	}
-
 	public void clearImportCache() {
-		importCache = Map.of();
 		groupMapper = AuthentikGroupMapper.empty();
 	}
 
-	public UpsertResult delete(Member member) {
-		if(member.email().isEmpty()) {
-			LOG.infof(
-					"Skipping Authentik delete for cId=%d username=%s: no email",
-					member.cId(),
-					member.username()
-				);
-				return UpsertResult.SKIPPED;
-		}
-		String username = member.username();
-		Optional<JsonNode> existingUser = findUserByUsername(username);
-		if (existingUser.isEmpty()) {
-			LOG.infof(
-				"Skipping Authentik delete for cId=%d username=%s: user not found",
-				member.cId(),
-				username
-			);
-			return UpsertResult.SKIPPED;
-		}
-
-		int pk = existingUser.get().path("pk").asInt();
-		deleteUser(pk);
-		removeFromImportCache(username);
-		LOG.infof(
-			"Deleted Authentik user cId=%d username=%s pk=%d",
-			member.cId(),
-			username,
-			pk
-		);
-		return UpsertResult.DELETED;
-	}
-
-	public UpsertResult upsert(Member member, Optional<AuthentikUserSnapshot> existingUser) {
+	public UpsertResult upsert(Member member) {
 		String username = member.username();
 		Map<String, Object> payload = AuthentikPayloadMapper.toUserPayload(
 			member,
@@ -228,38 +198,9 @@ public class AuthentikUserAdapter {
 			config.authentik().defaultGroups()
 		);
 
-		if (existingUser.isPresent()) {
-			LOG.infof("Skipped Authentik user username=%s already in Authentik", username);
-			return UpsertResult.SKIPPED;
-		}
-
 		postUser(payload);
 		LOG.infof("Created Authentik user username=%s", username);
 		return UpsertResult.CREATED;
-	}
-
-	private Optional<JsonNode> findUserByUsername(String username) {
-		AuthentikUserSnapshot cachedUser = importCache.get(username);
-		if (cachedUser != null) {
-			return Optional.of(toJsonNode(cachedUser));
-		}
-
-		try {
-			String url = usersUrl() + "?search=" + username;
-			JsonNode body = fetchPage(url);
-			JsonNode results = body.path("results");
-			if (!results.isArray()) {
-				return Optional.empty();
-			}
-			for (JsonNode user : results) {
-				if (username.equals(user.path("username").asText())) {
-					return Optional.of(user);
-				}
-			}
-			return Optional.empty();
-		} catch (Exception exception) {
-			throw new AuthentikClientException("Failed to find Authentik user", exception);
-		}
 	}
 
 	private JsonNode fetchPage(String url) throws Exception {
@@ -336,15 +277,6 @@ public class AuthentikUserAdapter {
 		} catch (Exception exception) {
 			throw new AuthentikClientException("Failed to delete Authentik user", exception);
 		}
-	}
-
-	private void removeFromImportCache(String username) {
-		if (!importCache.containsKey(username)) {
-			return;
-		}
-		Map<String, AuthentikUserSnapshot> updatedUsers = new LinkedHashMap<>(importCache);
-		updatedUsers.remove(username);
-		importCache = updatedUsers;
 	}
 
 	private void postUser(Map<String, Object> payload) {

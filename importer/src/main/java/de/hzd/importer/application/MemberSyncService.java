@@ -25,18 +25,6 @@ public class MemberSyncService implements MemberSyncPort {
 	@Inject
 	StrapiMemberAdapter strapiMemberAdapter;
 
-	private Map<String, AuthentikUserSnapshot> authentikUsersByUsername = Map.of();
-
-	@Override
-	public void setAuthentikUsersByUsername(Map<String, AuthentikUserSnapshot> users) {
-		authentikUsersByUsername = users != null ? users : Map.of();
-	}
-
-	@Override
-	public void clearAuthentikUsersByUsername() {
-		authentikUsersByUsername = Map.of();
-	}
-
 	@Override
 	public SyncResult syncInAuthentik(Member member) {
 		try {
@@ -44,10 +32,7 @@ public class MemberSyncService implements MemberSyncPort {
 				return SyncResult.SKIPPED;
 			}
 
-			Optional<AuthentikUserSnapshot> existingUser = Optional.ofNullable(
-				authentikUsersByUsername.get(member.username())
-			);
-			UpsertResult authentikResult = authentikUserAdapter.upsert(member, existingUser);
+			UpsertResult authentikResult = authentikUserAdapter.upsert(member);
 
 			return switch (authentikResult) {
 				case CREATED -> SyncResult.CREATED;

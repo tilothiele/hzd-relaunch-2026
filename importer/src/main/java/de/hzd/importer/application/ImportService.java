@@ -116,21 +116,18 @@ public class ImportService {
 
 			int authenticatedRoleId = strapiMemberAdapter.fetchAuthenticatedRoleId();
 
-			authentikUserAdapter.setImportCache(authentikUsers);
 			authentikUserAdapter.setGroupMapper(authentikGroups);
-			memberSyncPort.setAuthentikUsersByUsername(authentikUsers);
 			strapiMemberAdapter.setImportCache(strapiMembers);
 			strapiMemberAdapter.setAuthenticatedRoleId(authenticatedRoleId);
 			
 			try {
 				Log.info("start import Members");
-				statistics = importMembers(members, statistics);
+				statistics = importMembers(members, authentikUsers, statistics);
 				
 				Log.info("start import Dogs");
 				statistics = importDogs(dogs, statistics);
 			} finally {
 				authentikUserAdapter.clearImportCache();
-				memberSyncPort.clearAuthentikUsersByUsername();
 				strapiMemberAdapter.clearImportCache();
 			}
 
@@ -151,6 +148,7 @@ public class ImportService {
 
 	private ImportStatistics importMembers(
 		List<Member> members,
+		Map<String, AuthentikUserAdapter.AuthentikUserSnapshot> authenticUsers,
 		ImportStatistics statistics
 	) {
 		Ticker logTicker = new Ticker(10000l);
@@ -161,7 +159,16 @@ public class ImportService {
 			logTicker.tick(() -> Log.info(Ticker.formatProceedingMessage(t0, members.size(), j, "Authentik user")));
 			try {
 				Member memberToSync = enrichWithStrapiIdentity(member);
-				MemberSyncPort.SyncResult result = memberSyncPort.syncInAuthentik(memberToSync);
+				AuthentikUserAdapter.AuthentikUserSnapshot authenticUser = authenticUsers.get(memberToSync.username());
+				boolean doSync = authenticUser == null
+					|| authenticUser.fingerPrint() != AuthentikUserAdapter.AuthentikUserSnapshot.fingerPrint(
+						memberToSync.username(),
+						memberToSync.authentikEmail(),
+						memberToSync.isActive()
+					);
+				MemberSyncPort.SyncResult result = doSync
+					? memberSyncPort.syncInAuthentik(memberToSync)
+					: MemberSyncPort.SyncResult.SKIPPED;
 				statistics = switch (result) {
 					case CREATED -> statistics.withMembersCreated(1);
 					case UPDATED -> statistics.withMembersUpdated(1);
