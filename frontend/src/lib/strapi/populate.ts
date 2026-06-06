@@ -138,65 +138,6 @@ export const POPULATE_CONTACT = new URLSearchParams({
 	'populate[member][fields][2]': 'lastName',
 })
 
-/** users-permissions.user — `=*` triggert Invalid key role */
-const DOG_USER_POPULATE_FIELDS = [
-	'documentId',
-	'firstName',
-	'lastName',
-	'city',
-	'zip',
-	'phone',
-	'email',
-	'countryCode',
-] as const
-
-const DOG_BREEDER_POPULATE_FIELDS = [
-	'documentId',
-	'kennelName',
-	'HasNoDogsAvailabe',
-] as const
-
-function appendUserFieldsPopulate(
-	params: URLSearchParams,
-	path: string,
-	fields: readonly string[] = DOG_USER_POPULATE_FIELDS,
-): void {
-	fields.forEach((field, index) => {
-		params.set(`${path}[fields][${index}]`, field)
-	})
-}
-
-function buildDogSearchPopulate(): URLSearchParams {
-	const params = new URLSearchParams()
-
-	appendUserFieldsPopulate(params, 'populate[owner]')
-
-	DOG_BREEDER_POPULATE_FIELDS.forEach((field, index) => {
-		params.set(`populate[breeder][fields][${index}]`, field)
-	})
-
-	params.set('populate[Images]', 'true')
-	params.set('populate[avatar]', 'true')
-	params.set('populate[DogDocument][populate][MediaFile]', 'true')
-
-	const nestedOwnerPaths = [
-		'populate[father][populate][owner]',
-		'populate[father][populate][father][populate][owner]',
-		'populate[father][populate][mother][populate][owner]',
-		'populate[mother][populate][owner]',
-		'populate[mother][populate][father][populate][owner]',
-		'populate[mother][populate][mother][populate][owner]',
-	]
-
-	for (const path of nestedOwnerPaths) {
-		appendUserFieldsPopulate(params, path)
-	}
-
-	return params
-}
-
-export const POPULATE_DOG_SEARCH = buildDogSearchPopulate()
-
 /** member/owner_members sind users-permissions.user — `=*` triggert Invalid key role */
 export const POPULATE_BREEDER_SEARCH = new URLSearchParams({
 	'populate[member][fields][0]': 'documentId',
@@ -230,17 +171,6 @@ export const POPULATE_BREEDER_SEARCH = new URLSearchParams({
 	'populate[owner_members][fields][11]': 'countryCode',
 	'populate[owner_members][fields][12]': 'locationLat',
 	'populate[owner_members][fields][13]': 'locationLng',
-})
-
-export const POPULATE_LITTER_SEARCH = new URLSearchParams({
-	'populate[mother]': '*',
-	'populate[stuntDog]': '*',
-	'populate[AmountRS]': '*',
-	'populate[AmountRSM]': '*',
-	'populate[AmountRB]': '*',
-	'populate[AmountHS]': '*',
-	'populate[AmountHSM]': '*',
-	'populate[AmountHB]': '*',
 })
 
 export const POPULATE_PASSED_DOG = new URLSearchParams({

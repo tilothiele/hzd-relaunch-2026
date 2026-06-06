@@ -19,7 +19,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import type { ThemeDefinition } from '@/themes'
 import { buildStrapiQuery } from '@/lib/strapi/filters'
 import { POPULATE_PASSED_DOG } from '@/lib/strapi/populate'
-import { createEntity, fetchEntityList, searchDogs, updateEntity } from '@/lib/strapi/api'
+import { createEntity, fetchEntityList, searchDogsGeneric, updateEntity } from '@/lib/strapi/api'
 import { MAX_PENDING_PASSED_DOGS } from '@/lib/passed-dogs-limits'
 import type { PassedDogCardData } from '@/lib/server/passed-dog-utils'
 import { useAuth } from '@/hooks/use-auth'
@@ -123,7 +123,7 @@ export function PassedDogFormModal({
 		}
 
 		try {
-			const res = await searchDogs({
+			const res = await searchDogsGeneric({
 				filters: {
 					and: [
 						{ cOwnerId: { eq: userCId } },

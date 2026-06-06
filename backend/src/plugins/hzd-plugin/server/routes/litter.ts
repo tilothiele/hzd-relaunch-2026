@@ -9,6 +9,14 @@ export default [
   },
   {
     method: 'GET',
+    path: '/litters/search',
+    handler: 'litter.search',
+    config: {
+      auth: false, // öffentlich
+    },
+  },
+  {
+    method: 'GET',
     path: '/litters/:id',
     handler: 'litter.findOne',
     config: {

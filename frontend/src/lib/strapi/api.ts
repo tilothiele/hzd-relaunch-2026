@@ -13,10 +13,8 @@ import {
 import {
 	POPULATE_BREEDER_SEARCH,
 	POPULATE_CONTACT,
-	POPULATE_DOG_SEARCH,
 	POPULATE_FORM,
 	POPULATE_LAYOUT,
-	POPULATE_LITTER_SEARCH,
 	POPULATE_NEWS_ARTICLE,
 	POPULATE_PAGE_SECTIONS,
 	POPULATE_PASSED_DOG,
@@ -172,14 +170,86 @@ export async function fetchPagesBySlug(
 	return { pages }
 }
 
+export interface DogSearchParams {
+	name?: string
+	sex?: string
+	color?: string
+	hd?: string
+	sod1?: string
+	eyesCheck?: string
+	heartCheck?: string
+	colorCheck?: string
+	ownerCIds?: number[]
+	cBreederId?: number
+	maxAge?: number
+	lat?: number
+	lng?: number
+	maxDistance?: number
+	sort?: string | string[]
+	page?: number
+	pageSize?: number
+}
+
 export async function searchDogs(
+	params: DogSearchParams,
+	options: { server?: boolean; baseUrl?: string | null; token?: string | null } = {},
+): Promise<DogSearchResult> {
+	const query = new URLSearchParams()
+
+	if (params.name?.trim()) query.set('name', params.name.trim())
+	if (params.sex?.trim()) query.set('sex', params.sex.trim())
+	if (params.color?.trim()) query.set('color', params.color.trim())
+	if (params.hd?.trim()) query.set('hd', params.hd.trim())
+	if (params.sod1?.trim()) query.set('sod1', params.sod1.trim())
+	if (params.eyesCheck) query.set('eyesCheck', params.eyesCheck)
+	if (params.heartCheck) query.set('heartCheck', params.heartCheck)
+	if (params.colorCheck) query.set('colorCheck', params.colorCheck)
+	if (params.ownerCIds && params.ownerCIds.length > 0) {
+		query.set('ownerCIds', params.ownerCIds.join(','))
+	}
+	if (typeof params.cBreederId === 'number') {
+		query.set('cBreederId', String(params.cBreederId))
+	}
+	if (typeof params.maxAge === 'number' && params.maxAge > 0) {
+		query.set('maxAge', String(params.maxAge))
+	}
+	if (typeof params.lat === 'number' && typeof params.lng === 'number') {
+		query.set('lat', String(params.lat))
+		query.set('lng', String(params.lng))
+		if (typeof params.maxDistance === 'number') {
+			query.set('maxDistance', String(params.maxDistance))
+		}
+	}
+	if (params.sort) {
+		const sortValue = Array.isArray(params.sort) ? params.sort.join(',') : params.sort
+		if (sortValue.trim().length > 0) query.set('sort', sortValue)
+	}
+	if (params.page !== undefined) query.set('page', String(params.page))
+	if (params.pageSize !== undefined) query.set('pageSize', String(params.pageSize))
+
+	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
+	const response = await fetcher<unknown>('hzd-plugin/dogs/search', query, {
+		token: options.token,
+		baseUrl: options.baseUrl,
+	})
+
+	const items = extractStrapiList<Dog>(response)
+	const pagination = extractStrapiPagination(response)
+
+	return {
+		hzdPluginDogs_connection: toConnectionResult({
+			items,
+			pagination,
+		}),
+	}
+}
+
+/** Generische Dog-Suche mit freier Filter-Syntax (für Admin/Moderator-Bereich) */
+export async function searchDogsGeneric(
 	variables: {
 		filters?: FilterValue
 		pagination?: { page?: number; pageSize?: number; limit?: number }
 		sort?: string | string[]
-		lat?: number
-		lng?: number
-		maxDistance?: number
 	},
 	options: { server?: boolean; baseUrl?: string | null; token?: string | null } = {},
 ): Promise<DogSearchResult> {
@@ -187,16 +257,7 @@ export async function searchDogs(
 		filters: variables.filters,
 		pagination: variables.pagination,
 		sort: variables.sort,
-		populate: Object.fromEntries(POPULATE_DOG_SEARCH.entries()),
 	})
-
-	if (variables.lat !== undefined && variables.lng !== undefined) {
-		query.set('lat', String(variables.lat))
-		query.set('lng', String(variables.lng))
-		if (variables.maxDistance !== undefined) {
-			query.set('maxDistance', String(variables.maxDistance))
-		}
-	}
 
 	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
 	const response = await fetcher<unknown>('hzd-plugin/dogs', query, {
@@ -206,10 +267,12 @@ export async function searchDogs(
 
 	const items = extractStrapiList<Dog>(response)
 	const pagination = extractStrapiPagination(response)
-	const connection = toConnectionResult({ items, pagination })
 
 	return {
-		hzdPluginDogs_connection: connection,
+		hzdPluginDogs_connection: toConnectionResult({
+			items,
+			pagination,
+		}),
 	}
 }
 
@@ -355,23 +418,45 @@ export async function getBreederByDocumentId(
 	return breeder
 }
 
+export interface LitterSearchParams {
+	breeder?: string
+	breederDocumentId?: string
+	mother?: string
+	status?: string
+	orderLetter?: string
+	maleColors?: string[]
+	femaleColors?: string[]
+	sort?: string | string[]
+	page?: number
+	pageSize?: number
+}
+
 export async function searchLitters(
-	variables: {
-		filters?: FilterValue
-		pagination?: { page?: number; pageSize?: number; limit?: number }
-		sort?: string | string[]
-	},
+	params: LitterSearchParams,
 	options: { server?: boolean; baseUrl?: string | null; token?: string | null } = {},
 ): Promise<LitterSearchResult> {
-	const query = buildStrapiQuery({
-		filters: variables.filters,
-		pagination: variables.pagination,
-		sort: variables.sort,
-		populate: Object.fromEntries(POPULATE_LITTER_SEARCH.entries()),
-	})
+	const query = new URLSearchParams()
+
+	if (params.breeder?.trim()) query.set('breeder', params.breeder.trim())
+	if (params.breederDocumentId?.trim()) query.set('breederDocumentId', params.breederDocumentId.trim())
+	if (params.mother?.trim()) query.set('mother', params.mother.trim())
+	if (params.status?.trim()) query.set('status', params.status.trim())
+	if (params.orderLetter?.trim()) query.set('orderLetter', params.orderLetter.trim())
+	if (params.maleColors && params.maleColors.length > 0) {
+		query.set('maleColors', params.maleColors.join(','))
+	}
+	if (params.femaleColors && params.femaleColors.length > 0) {
+		query.set('femaleColors', params.femaleColors.join(','))
+	}
+	if (params.sort) {
+		const sortValue = Array.isArray(params.sort) ? params.sort.join(',') : params.sort
+		if (sortValue.trim().length > 0) query.set('sort', sortValue)
+	}
+	if (params.page !== undefined) query.set('page', String(params.page))
+	if (params.pageSize !== undefined) query.set('pageSize', String(params.pageSize))
 
 	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
-	const response = await fetcher<unknown>('hzd-plugin/litters', query, {
+	const response = await fetcher<unknown>('hzd-plugin/litters/search', query, {
 		token: options.token,
 		baseUrl: options.baseUrl,
 	})

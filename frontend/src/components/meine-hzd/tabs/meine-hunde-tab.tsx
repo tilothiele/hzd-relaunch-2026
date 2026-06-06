@@ -14,7 +14,7 @@ import {
     FormControlLabel,
     Switch
 } from '@mui/material'
-import { searchDogs } from '@/lib/strapi/api'
+import { searchDogsGeneric } from '@/lib/strapi/api'
 import type { AuthUser, Dog, DogSearchResult } from '@/types'
 import { formatDate } from '@/lib/utils'
 
@@ -50,7 +50,7 @@ export function MeineHundeTab({ user, strapiBaseUrl }: MeineHundeTabProps) {
                     filters.cFertile = { eq: true }
                 }
 
-                const response = await searchDogs({
+                const response = await searchDogsGeneric({
                     filters,
                     pagination: { pageSize: 100 },
                     sort: ['dateOfBirth:desc'],
