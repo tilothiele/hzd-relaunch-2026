@@ -26,7 +26,7 @@ const USER_CONTACT_SELECT = [
 	'lastName',
 	'region',
 	'phone',
-	'email',
+	'cEmail',
 	'city',
 	'address1',
 	'address2',

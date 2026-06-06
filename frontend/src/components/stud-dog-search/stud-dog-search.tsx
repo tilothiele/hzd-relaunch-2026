@@ -426,7 +426,7 @@ export function StudDogSearch({
 												<TableCell>{breeder.member?.zip || '-'}</TableCell>
 												<TableCell>{breeder.member?.city || '-'}</TableCell>
 												<TableCell>{breeder.member?.phone || '-'}</TableCell>
-												<TableCell>{breeder.member?.email || '-'}</TableCell>
+												<TableCell>{breeder.member?.cEmail || '-'}</TableCell>
 												<TableCell>
 													{distance !== null
 														? `~${Math.round(distance)} km`

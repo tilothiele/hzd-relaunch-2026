@@ -8,7 +8,7 @@ export type BreederSortField =
 	| 'member.zip'
 	| 'member.city'
 	| 'member.phone'
-	| 'member.email'
+	| 'member.cEmail'
 
 /** Strapi REST: keine Sortierung über Relation-Pfade (member.lastName → 400) */
 export function getBreederApiSort(
@@ -37,8 +37,8 @@ function getBreederSortValue(
 			return breeder.member?.city ?? ''
 		case 'member.phone':
 			return breeder.member?.phone ?? ''
-		case 'member.email':
-			return breeder.member?.email ?? ''
+		case 'member.cEmail':
+			return breeder.member?.cEmail ?? ''
 		default:
 			return ''
 	}

@@ -37,6 +37,7 @@ const DEFAULT_PERMISSIONS: string[] = [
 	...apiActions('calendar', ['find', 'findOne']),
 	...apiActions('calendar-entry', ['find', 'findOne']),
 	...apiActions('champion', ['find', 'findOne']),
+	'api::champion.champion.search',
 	...apiActions('form', ['find', 'findOne']),
 	...apiActions('gallery-image', ['find', 'findOne']),
 	...apiActions('passed-dog', ['find', 'findOne']),

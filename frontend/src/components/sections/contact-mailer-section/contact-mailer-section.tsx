@@ -36,8 +36,8 @@ export function ContactMailerSectionComponent({
     const recipients = section.ReceipientOptions || []
 
     useEffect(() => {
-        if (user?.email) {
-            setFormData((prev) => ({ ...prev, from: user.email! }))
+        if (user?.cEmail) {
+            setFormData((prev) => ({ ...prev, from: user.cEmail! }))
         }
     }, [user])
 

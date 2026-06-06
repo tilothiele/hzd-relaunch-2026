@@ -371,9 +371,9 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 											</TableCell>
 											<TableCell sx={{ fontWeight: 'bold' }}>
 												<TableSortLabel
-													active={sortField === 'member.email'}
-													direction={sortField === 'member.email' ? sortDirection : 'asc'}
-													onClick={() => handleSort('member.email')}
+													active={sortField === 'member.cEmail'}
+													direction={sortField === 'member.cEmail' ? sortDirection : 'asc'}
+													onClick={() => handleSort('member.cEmail')}
 												>
 													E-Mail
 												</TableSortLabel>
@@ -424,7 +424,7 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 													<TableCell>{breeder.member?.zip || '-'}</TableCell>
 													<TableCell>{breeder.member?.city || '-'}</TableCell>
 													<TableCell>{breeder.member?.phone || '-'}</TableCell>
-													<TableCell>{breeder.member?.email || '-'}</TableCell>
+													<TableCell>{breeder.member?.cEmail || '-'}</TableCell>
 													<TableCell>{distance !== null ? `~${Math.round(distance)} km` : '-'}</TableCell>
 												</TableRow>
 											)

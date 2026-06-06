@@ -8,7 +8,7 @@ const USER_CONTACT_FIELDS = [
 	'lastName',
 	'region',
 	'phone',
-	'email',
+	'cEmail',
 	'city',
 	'address1',
 	'address2',

@@ -18,7 +18,7 @@ export async function ChampionsSectionComponent({
     theme,
     hzdSetting
 }: ChampionsSectionComponentProps) {
-    const champions = await fetchChampions(1, 20)
+    const { nodes: champions, pageInfo } = await fetchChampions(1, 20)
 
     if (!champions.length) {
         return null
@@ -48,6 +48,7 @@ export async function ChampionsSectionComponent({
 
                 <ChampionsList
                     initialChampions={champions}
+                    initialPageInfo={pageInfo}
                     theme={theme}
                     strapiBaseUrl={getStrapiBaseUrl()}
                     hzdSetting={hzdSetting}
