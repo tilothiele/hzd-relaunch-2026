@@ -99,19 +99,128 @@ const toTriStateBool = (value: unknown): boolean | null => {
 	return null
 }
 
-/** Rekursives Pedigree-Populate. `owner` wird nur auf der obersten Ebene geladen. */
-const buildPedigreePopulate = (depth: number): Record<string, any> => {
-	if (depth <= 0) {
-		return {}
+const PEDIGREE_SELECT = [
+	'id',
+	'documentId',
+	'fullKennelName',
+	'givenName',
+	'dateOfBirth',
+	'dateOfDeath',
+] as const
+
+/** UI zeigt 3 Ahnen-Generationen: Eltern → Großeltern → Urgroßeltern */
+const PEDIGREE_ANCESTOR_GENERATIONS = 3
+
+const getParentDogId = async (
+	strapi: Core.Strapi,
+	dogId: number,
+	relation: 'father' | 'mother',
+): Promise<number | null> => {
+	const table = relation === 'father' ? 'dogs_father_lnk' : 'dogs_mother_lnk'
+	const link = await strapi.db.connection(table)
+		.select('inv_dog_id')
+		.where('dog_id', dogId)
+		.first()
+
+	const parentId = link?.inv_dog_id
+	return typeof parentId === 'number' ? parentId : null
+}
+
+const pedigreeCacheKey = (dogId: number, generationsLeft: number): string =>
+	`${dogId}:${generationsLeft}`
+
+const loadPedigreeNode = async (
+	strapi: Core.Strapi,
+	dogId: number,
+	generationsLeft: number,
+	cache: Map<string, Record<string, any>>,
+): Promise<Record<string, any> | null> => {
+	const cacheKey = pedigreeCacheKey(dogId, generationsLeft)
+	if (cache.has(cacheKey)) {
+		return cache.get(cacheKey)!
 	}
-	const ancestor: Record<string, any> = {
-		fields: ['documentId', 'fullKennelName', 'givenName', 'dateOfBirth', 'dateOfDeath'],
-		populate: {
-			father: buildPedigreePopulate(depth - 1),
-			mother: buildPedigreePopulate(depth - 1),
-		},
+
+	const record = await strapi.db.query('plugin::hzd-plugin.dog').findOne({
+		where: { id: dogId },
+		select: [...PEDIGREE_SELECT],
+	})
+
+	if (!record) {
+		return null
 	}
-	return ancestor
+
+	const node: Record<string, any> = {
+		...record,
+		father: null,
+		mother: null,
+	}
+
+	if (generationsLeft > 0) {
+		const fatherId = await getParentDogId(strapi, dogId, 'father')
+		const motherId = await getParentDogId(strapi, dogId, 'mother')
+
+		if (fatherId != null) {
+			node.father = await loadPedigreeNode(
+				strapi,
+				fatherId,
+				generationsLeft - 1,
+				cache,
+			)
+		}
+
+		if (motherId != null) {
+			node.mother = await loadPedigreeNode(
+				strapi,
+				motherId,
+				generationsLeft - 1,
+				cache,
+			)
+		}
+	}
+
+	cache.set(cacheKey, node)
+	return node
+}
+
+const enrichDogPedigreeTransitive = async (
+	strapi: Core.Strapi,
+	dog: Record<string, any>,
+	cache: Map<string, Record<string, any>>,
+): Promise<void> => {
+	const dogId = dog.id
+	if (typeof dogId !== 'number') {
+		return
+	}
+
+	const fatherId = await getParentDogId(strapi, dogId, 'father')
+	const motherId = await getParentDogId(strapi, dogId, 'mother')
+	const generationsBelowDog = PEDIGREE_ANCESTOR_GENERATIONS - 1
+
+	if (fatherId != null) {
+		const existingOwner = dog.father?.owner
+		dog.father = await loadPedigreeNode(
+			strapi,
+			fatherId,
+			generationsBelowDog,
+			cache,
+		)
+		if (dog.father && existingOwner) {
+			dog.father.owner = existingOwner
+		}
+	}
+
+	if (motherId != null) {
+		const existingOwner = dog.mother?.owner
+		dog.mother = await loadPedigreeNode(
+			strapi,
+			motherId,
+			generationsBelowDog,
+			cache,
+		)
+		if (dog.mother && existingOwner) {
+			dog.mother.owner = existingOwner
+		}
+	}
 }
 
 const enrichDogWithBreeder = async (
@@ -305,8 +414,6 @@ const coreControllerFactory = factories.createCoreController(
 										'locationLng',
 									],
 								},
-								father: buildPedigreePopulate(2),
-								mother: buildPedigreePopulate(2),
 							},
 						},
 						mother: {
@@ -326,8 +433,6 @@ const coreControllerFactory = factories.createCoreController(
 										'locationLng',
 									],
 								},
-								father: buildPedigreePopulate(2),
-								mother: buildPedigreePopulate(2),
 							},
 						},
 						Images: true,
@@ -353,8 +458,13 @@ const coreControllerFactory = factories.createCoreController(
 
 				// Breeder-Anreicherung (cBreederId -> breeder record)
 				const breedersByCId = new Map<number, any>()
+				const pedigreeCache = new Map<string, Record<string, any>>()
 				results = await Promise.all(
-					results.map((dog) => enrichDogWithBreeder(strapi, dog, breedersByCId)),
+					results.map(async (dog) => {
+						const enriched = await enrichDogWithBreeder(strapi, dog, breedersByCId)
+						await enrichDogPedigreeTransitive(strapi, enriched, pedigreeCache)
+						return enriched
+					}),
 				)
 
 				// Distanz-Filterung im Backend (Haversine auf owner.locationLat/Lng)
