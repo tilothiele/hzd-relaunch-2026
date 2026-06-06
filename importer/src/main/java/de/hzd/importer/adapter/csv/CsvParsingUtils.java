@@ -148,14 +148,14 @@ final class CsvParsingUtils {
 		return cleaned.filter(CsvParsingUtils::isValidEmailSyntax);
 	}
 
-	static Optional<String> parseMemberEmail(String value, int cId) {
+	static Optional<String> parseMemberEmail(String value, int cId, String name) {
 		Optional<String> cleaned = cleanString(value, 255);
 		if (cleaned.isEmpty()) {
 			return Optional.empty();
 		}
 		String email = cleaned.get();
 		if (!isValidEmailSyntax(email)) {
-			Log.infof("invalid email for cId=" + cId + ": " + email);
+			Log.infof("invalid email for name="+name+" cId=" + cId + ": " + email);
 			return Optional.empty();
 		}
 		return Optional.of(email);

@@ -7,7 +7,7 @@ type ContactUser = BreederMember & {
 }
 
 export interface BreederContactInfo {
-	/** Kommaseparierte Vor- und Nachnamen aller owner_members */
+	/** Vor-/Nachname von member, sonst kommaseparierte owner_members */
 	ownerDisplayName: string
 	names: string[]
 	ownerDocumentIds: string[]
@@ -70,6 +70,27 @@ export function resolveOwnerMemberDisplayNames(breeder: Breeder): string[] {
 		.filter((name): name is string => Boolean(name))
 }
 
+function resolveBreederPersonDisplayName(breeder: Breeder): {
+	displayName: string
+	names: string[]
+} {
+	const member = isContactUser(breeder.member) ? breeder.member : null
+	const memberName = member ? resolveOwnerMemberDisplayName(member) : null
+
+	if (memberName) {
+		return {
+			displayName: memberName,
+			names: [memberName],
+		}
+	}
+
+	const ownerMemberNames = resolveOwnerMemberDisplayNames(breeder)
+	return {
+		displayName: ownerMemberNames.join(', '),
+		names: ownerMemberNames,
+	}
+}
+
 export function resolveOwnerMemberDocumentIds(breeder: Breeder): string[] {
 	return resolveOwnerMembers(breeder)
 		.map((user) => user.documentId)
@@ -87,10 +108,10 @@ export function resolveBreederContact(breeder: Breeder): BreederContactInfo {
 	const ownerMembers = resolveOwnerMembers(breeder)
 	const member = isContactUser(breeder.member) ? breeder.member : null
 	const primaryUser = resolvePrimaryUser(breeder)
-	const names = resolveOwnerMemberDisplayNames(breeder)
+	const { displayName, names } = resolveBreederPersonDisplayName(breeder)
 
 	return {
-		ownerDisplayName: names.join(', '),
+		ownerDisplayName: displayName,
 		names,
 		ownerDocumentIds: resolveOwnerMemberDocumentIds(breeder),
 		ownerCIds: resolveOwnerMemberCIds(breeder),

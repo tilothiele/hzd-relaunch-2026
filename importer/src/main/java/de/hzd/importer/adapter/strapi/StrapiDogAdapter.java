@@ -133,13 +133,13 @@ public class StrapiDogAdapter {
 	) {
 		client.update(StrapiResources.DOGS, documentId, payload, true);
 		documentIdsByCId.put(cId, documentId);
-		LOG.infof(
-			"Updated dog cId=%d documentId=%s ownerLinked=%s breederLinked=%s",
-			cId,
-			documentId,
-			ownerResolvable,
-			breederResolvable
-		);
+//		LOG.infof(
+//			"Updated dog cId=%d documentId=%s ownerLinked=%s breederLinked=%s",
+//			cId,
+//			documentId,
+//			ownerResolvable,
+//			breederResolvable
+//		);
 	}
 
 	private boolean isDuplicateCIdError(StrapiClientException exception) {

@@ -74,23 +74,23 @@ class CsvParsingUtilsTest {
 
 	@Test
 	void parseMemberEmailRejectsInvalidAddress() {
-		assertTrue(CsvParsingUtils.parseMemberEmail("not-an-email", 10927).isEmpty());
-		assertTrue(CsvParsingUtils.parseMemberEmail("b.becker@becker---.de", 10927).isEmpty());
-		assertTrue(CsvParsingUtils.parseMemberEmail("hovawarte@kleinestrohe.de.", 10927).isEmpty());
+		assertTrue(CsvParsingUtils.parseMemberEmail("not-an-email", 10927, "testuser").isEmpty());
+		assertTrue(CsvParsingUtils.parseMemberEmail("b.becker@becker---.de", 10927, "testuser").isEmpty());
+		assertTrue(CsvParsingUtils.parseMemberEmail("hovawarte@kleinestrohe.de.", 10927, "testuser").isEmpty());
 	}
 
 	@Test
 	void parseMemberEmailAcceptsValidAddress() {
 		assertEquals(
 			Optional.of("lena@example.de"),
-			CsvParsingUtils.parseMemberEmail("lena@example.de", 10927)
+			CsvParsingUtils.parseMemberEmail("lena@example.de", 10927, "testuser")
 		);
 	}
 
 	@Test
 	void parseMemberEmailTreatsEmptyAsMissing() {
-		assertTrue(CsvParsingUtils.parseMemberEmail("-", 10927).isEmpty());
-		assertTrue(CsvParsingUtils.parseMemberEmail("", 10927).isEmpty());
+		assertTrue(CsvParsingUtils.parseMemberEmail("-", 10927, "testuser").isEmpty());
+		assertTrue(CsvParsingUtils.parseMemberEmail("", 10927, "testuser").isEmpty());
 	}
 
 	@Test
