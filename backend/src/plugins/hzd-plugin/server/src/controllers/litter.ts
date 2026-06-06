@@ -4,6 +4,7 @@
 
 import { factories } from '@strapi/strapi'
 import type { Core } from '@strapi/strapi'
+import { findDocumentsPage } from '../utils/document-pagination'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyController = Record<string, any>
@@ -124,7 +125,7 @@ const toFilterConditions = (query: LitterSearchQuery): Array<Record<string, unkn
 
 const coreControllerFactory = factories.createCoreController(
   'plugin::hzd-plugin.litter',
-  () => ({
+  ({ strapi }: { strapi: Core.Strapi }) => ({
     async search(ctx: any) {
       const rawQuery = (ctx?.query ?? {}) as LitterSearchQuery
       const filterConditions = toFilterConditions(rawQuery)
@@ -139,50 +140,46 @@ const coreControllerFactory = factories.createCoreController(
             : []
       const sort = sortList.length > 0 ? sortList : ['dateOfBirth:desc', 'expectedDateOfBirth:desc']
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const queryParams: Record<string, any> = {
-        populate: {
-          breeder: {
-            fields: ['documentId', 'kennelName', 'WebsiteUrl'],
-            populate: {
-              member: {
-                fields: ['documentId', 'firstName', 'lastName', 'zip', 'city', 'locationLat', 'locationLng'],
+      const result = await findDocumentsPage(
+        strapi,
+        'plugin::hzd-plugin.litter',
+        {
+          populate: {
+            breeder: {
+              fields: ['documentId', 'kennelName', 'WebsiteUrl'],
+              populate: {
+                member: {
+                  fields: ['documentId', 'firstName', 'lastName', 'zip', 'city', 'locationLat', 'locationLng'],
+                },
               },
             },
+            mother: {
+              fields: ['documentId', 'fullKennelName', 'givenName', 'color'],
+              populate: { avatar: true },
+            },
+            stuntDog: {
+              fields: ['documentId', 'fullKennelName', 'givenName', 'color'],
+              populate: { avatar: true },
+            },
+            AmountRS: true,
+            AmountRSM: true,
+            AmountRB: true,
+            AmountHS: true,
+            AmountHSM: true,
+            AmountHB: true,
           },
-          mother: {
-            fields: ['documentId', 'fullKennelName', 'givenName', 'color'],
-            populate: { avatar: true },
-          },
-          stuntDog: {
-            fields: ['documentId', 'fullKennelName', 'givenName', 'color'],
-            populate: { avatar: true },
-          },
-          AmountRS: true,
-          AmountRSM: true,
-          AmountRB: true,
-          AmountHS: true,
-          AmountHSM: true,
-          AmountHB: true,
+          sort,
+          page,
+          pageSize,
+          filters: filterConditions.length > 0
+            ? { $and: filterConditions }
+            : undefined,
         },
-        sort,
-        pagination: { page, pageSize },
-      }
-
-      if (filterConditions.length > 0) {
-        queryParams.filters = { $and: filterConditions }
-      }
-
-      const result = await strapi.entityService.findPage(
-        'plugin::hzd-plugin.litter',
-        queryParams,
       )
 
-      const pagination = result?.pagination ?? { page, pageSize, pageCount: 1, total: result?.results?.length ?? 0 }
-
       return {
-        data: result?.results ?? [],
-        meta: { pagination },
+        data: result.results,
+        meta: { pagination: result.pagination },
       }
     },
   }),
