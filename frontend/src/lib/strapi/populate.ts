@@ -233,8 +233,16 @@ export const POPULATE_BREEDER_SEARCH = new URLSearchParams({
 })
 
 export const POPULATE_LITTER_SEARCH = new URLSearchParams({
-	'populate[mother]': '*',
-	'populate[stuntDog]': '*',
+	'populate[mother][fields][0]': 'documentId',
+	'populate[mother][fields][1]': 'fullKennelName',
+	'populate[mother][fields][2]': 'givenName',
+	'populate[mother][fields][3]': 'color',
+	'populate[mother][populate][avatar]': 'true',
+	'populate[stuntDog][fields][0]': 'documentId',
+	'populate[stuntDog][fields][1]': 'fullKennelName',
+	'populate[stuntDog][fields][2]': 'givenName',
+	'populate[stuntDog][fields][3]': 'color',
+	'populate[stuntDog][populate][avatar]': 'true',
 	'populate[AmountRS]': '*',
 	'populate[AmountRSM]': '*',
 	'populate[AmountRB]': '*',
