@@ -25,11 +25,9 @@ async function forwardToStrapi(
 ) {
 	const isDraft = (await draftMode()).isEnabled
 	const incomingUrl = new URL(request.url)
-	const baseUrlParam = incomingUrl.searchParams.get('baseUrl')
-	const strapiBaseUrl = (baseUrlParam || getStrapiPublicBaseUrl()).replace(/\/$/, '')
+	const strapiBaseUrl = getStrapiPublicBaseUrl().replace(/\/$/, '')
 
 	const forwardParams = new URLSearchParams(incomingUrl.searchParams)
-	forwardParams.delete('baseUrl')
 
 	if (isDraft) {
 		forwardParams.set('publicationState', 'preview')

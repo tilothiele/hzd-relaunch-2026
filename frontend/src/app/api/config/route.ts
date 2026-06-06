@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
+import { getStrapiPublicBaseUrl } from '@/lib/server/strapi-client'
 
-const strapiBaseUrl = process.env.STRAPI_BASE_URL || 'http://localhost:1337'
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
-	return NextResponse.json({ strapiBaseUrl })
+	return NextResponse.json({
+		strapiBaseUrl: getStrapiPublicBaseUrl(),
+	})
 }
-
-

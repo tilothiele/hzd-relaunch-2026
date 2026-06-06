@@ -1,5 +1,4 @@
 import { fetchApprovedPassedDogsPage as fetchApprovedPassedDogsPageApi } from '@/lib/strapi/api'
-import { getStrapiBaseUrl } from './strapi-client'
 
 export interface PassedDogCardData {
 	documentId: string
@@ -37,7 +36,6 @@ export async function fetchApprovedPassedDogsPage(
 	const result = await fetchApprovedPassedDogsPageApi(
 		page,
 		pageSize,
-		getStrapiBaseUrl(),
 	)
 	return {
 		nodes: result.nodes as PassedDogCardData[],

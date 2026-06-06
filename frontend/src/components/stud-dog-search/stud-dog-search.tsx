@@ -75,35 +75,15 @@ export function StudDogSearch({
 		setError(null)
 
 		try {
-			const filterConditions: Array<Record<string, unknown>> = [
-				{ BreederRole: { eq: 'S' } },
-				{ IsActive: { eq: true } },
-				{
-					or: [
-						{ Disable: { eq: false } },
-						{ Disable: { null: true } },
-					],
-				},
-			]
-
-			if (nameFilter.trim()) {
-				filterConditions.push({
-					or: [
-						{ member: { lastName: { containsi: nameFilter.trim() } } },
-						{ member: { firstName: { containsi: nameFilter.trim() } } },
-						{ member: { DisplayName: { containsi: nameFilter.trim() } } },
-						{ member: { username: { containsi: nameFilter.trim() } } },
-					],
-				})
-			}
-
 			const data = await searchBreeders(
 				{
-					filters: { and: filterConditions },
-					pagination: { page, pageSize },
+					name: nameFilter.trim() || undefined,
+					breederRole: 'S',
+					page,
+					pageSize,
 					sort: [getBreederApiSort(sortField, sortDirection)],
 				},
-				{ baseUrl: strapiBaseUrl },
+				{},
 			)
 			const connection = data.hzdPluginBreeders_connection
 			const breederNodes = sortBreedersByField(

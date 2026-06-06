@@ -1,4 +1,3 @@
-import { getStrapiBaseUrl } from '@/lib/server/strapi-client'
 import { fetchNewsArticles as fetchNewsArticlesApi } from '@/lib/strapi/api'
 import type { Image } from '@/types'
 
@@ -37,8 +36,6 @@ export async function fetchNewsArticles({
 	limit?: number
 	categoryDocumentId?: string
 } = {}): Promise<NewsArticle[]> {
-	const baseUrl = getStrapiBaseUrl()
-
 	const filters: Record<string, unknown> = {}
 	if (categoryDocumentId) {
 		filters.category = { documentId: { eq: categoryDocumentId } }
@@ -49,7 +46,6 @@ export async function fetchNewsArticles({
 			filters,
 			pagination: { pageSize: limit },
 			sort: ['publishedAt:desc'],
-			baseUrl,
 		})
 
 		return newsArticles as unknown as NewsArticle[]

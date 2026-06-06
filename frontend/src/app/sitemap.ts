@@ -11,7 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://hzd-hovawart.de'
 
 	try {
-		const data = await fetchSitemapData(baseUrl)
+		const data = await fetchSitemapData()
 
 		const now = new Date().toISOString()
 		const indexUpdated = data?.indexPage?.updatedAt || now

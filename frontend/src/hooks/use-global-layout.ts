@@ -13,10 +13,10 @@ export function useGlobalLayout() {
 
 	const baseUrl = config.strapiBaseUrl
 
-	const loadGlobalLayout = useCallback(async (resolvedBaseUrl?: string | null) => {
+	const loadGlobalLayout = useCallback(async () => {
 		try {
 			setIsLoading(true)
-			const data = await fetchLayoutClient(resolvedBaseUrl ?? baseUrl)
+			const data = await fetchLayoutClient()
 			setGlobalLayout(data.globalLayout)
 			setError(null)
 		} catch (err) {
@@ -28,14 +28,14 @@ export function useGlobalLayout() {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [baseUrl])
+	}, [])
 
 	useEffect(() => {
 		if (!baseUrl || baseUrl.trim().length === 0) {
 			return
 		}
 
-		void loadGlobalLayout(baseUrl)
+		void loadGlobalLayout()
 	}, [baseUrl, loadGlobalLayout])
 
 	const isBusy = isConfigLoading || isLoading

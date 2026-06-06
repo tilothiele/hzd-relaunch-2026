@@ -125,7 +125,6 @@ export default async function ArticlesCategoryPage({ params, searchParams }: Pag
 
 	const enrichedCategorySections = await enrichSectionsWithSupplementalDocuments(
 		category.ContentSections ?? [],
-		baseUrl,
 	)
 
 	return (

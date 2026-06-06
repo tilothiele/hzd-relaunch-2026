@@ -78,7 +78,7 @@ export function useLitters(options: UseLittersOptions = {}) {
                 femaleColors: statusFilter === 'Littered' ? selectedFemaleColors : undefined,
                 page,
                 pageSize,
-            }, { baseUrl })
+            })
 
             const littersArray = Array.isArray(data.hzdPluginLitters_connection?.nodes)
                 ? data.hzdPluginLitters_connection.nodes

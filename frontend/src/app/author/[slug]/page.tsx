@@ -71,7 +71,6 @@ export default async function AuthorPage({ params }: PageProps) {
         filters: { SEO: { author: { Slug: { eq: slugParam } } } },
         pagination: { pageSize: 20 },
         sort: ['DateOfPublication:desc', 'publishedAt:desc'],
-        baseUrl,
     })
     const authorArticles = (authorArticlesResult.newsArticles ?? []).filter(
         (article): article is { documentId: string; Headline: string; Slug: string } =>

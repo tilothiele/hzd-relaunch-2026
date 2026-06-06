@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getStrapiBaseUrl } from '@/lib/server/strapi-client'
 import { createFormInstance } from '@/lib/strapi/api'
 
 /**
@@ -26,8 +25,6 @@ export async function POST(request: NextRequest) {
 			)
 		}
 
-		const baseUrl = getStrapiBaseUrl()
-
 		const mutationData = {
 			form: documentId,
 			Content: formData,
@@ -36,7 +33,6 @@ export async function POST(request: NextRequest) {
 		try {
 			const result = await createFormInstance(mutationData, {
 				server: true,
-				baseUrl,
 			})
 
 			console.log('Formular erfolgreich gespeichert:', {

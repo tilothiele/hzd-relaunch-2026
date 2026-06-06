@@ -172,7 +172,6 @@ export default async function ArticlePage({ params }: PageProps) {
 
     const sections = await enrichSectionsWithSupplementalDocuments(
         article.NewsContentSections || [],
-        baseUrl,
     )
     const theme = globalTheme
     const author = article.SEO?.author

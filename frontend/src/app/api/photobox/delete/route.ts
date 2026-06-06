@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 		}
 
 		const baseUrl = getStrapiPublicBaseUrl()
-		const meResult = await fetchMe(token, { server: true, baseUrl })
+		const meResult = await fetchMe(token, { server: true })
 		const userDocumentId = meResult.me?.documentId
 
 		if (!userDocumentId) {
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
 			'photobox-images',
 			documentId,
 			PHOTOBOX_IMAGE_POPULATE,
-			{ server: true, baseUrl, token },
+			{ server: true, token },
 		)
 
 		if (!photoboxImage) {
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
 		}
 
 		console.log(`[PhotoBox Delete API] Deleting Strapi record: ${documentId}`)
-		await deleteEntity('photobox-images', documentId, { server: true, baseUrl, token })
+		await deleteEntity('photobox-images', documentId, { server: true, token })
 
 		return NextResponse.json({ message: 'Bild erfolgreich gelöscht.' }, { status: 200 })
 

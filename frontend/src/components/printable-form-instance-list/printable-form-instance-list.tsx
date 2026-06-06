@@ -87,7 +87,7 @@ export function PrintableFormInstanceList({ form, strapiBaseUrl }: PrintableForm
 						},
 					},
 				},
-				{ baseUrl: strapiBaseUrl },
+				{},
 			)
 
 			const instances = data.formInstances as FormInstance[]

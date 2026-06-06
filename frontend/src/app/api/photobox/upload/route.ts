@@ -7,8 +7,6 @@ import {
 	putPhotoboxRawFile,
 } from '@/lib/server/photobox-webdav'
 
-const strapiBaseUrl = process.env.STRAPI_BASE_URL || process.env.NEXT_PUBLIC_STRAPI_BASE_URL || 'http://localhost:1337'
-
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
@@ -51,7 +49,7 @@ export async function POST(request: NextRequest) {
 		}
 
 		const baseUrl = getStrapiPublicBaseUrl()
-		const meResult = await fetchMe(token, { server: true, baseUrl })
+		const meResult = await fetchMe(token, { server: true })
 
 		if (!meResult.me?.documentId) {
 			return NextResponse.json({ message: 'Nicht authentifiziert.' }, { status: 401 })
@@ -78,7 +76,7 @@ export async function POST(request: NextRequest) {
 			alternativeText: `Bilderspende von ${displayName}`,
 		}))
 
-		const strapiUploadRes = await fetch(`${strapiBaseUrl.replace(/\/$/, '')}/api/upload`, {
+		const strapiUploadRes = await fetch(`${baseUrl}/api/upload`, {
 			method: 'POST',
 			headers: {
 				Authorization: `Bearer ${token}`,
@@ -126,7 +124,7 @@ export async function POST(request: NextRequest) {
 				Thumbnail: mediaId,
 				publishedAt: new Date().toISOString(),
 			},
-			{ server: true, baseUrl, token },
+			{ server: true, token },
 		)
 
 		return NextResponse.json({

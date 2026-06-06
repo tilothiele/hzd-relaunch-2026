@@ -49,8 +49,7 @@ export function StudDogsList({
 				page,
 				pageSize,
 			},
-			baseUrl: strapiBaseUrl,
-			queryDisabled: resolvedOwnerCIds.length === 0,
+						queryDisabled: resolvedOwnerCIds.length === 0,
 		}), [resolvedOwnerCIds.join(','), page, pageSize, strapiBaseUrl])
 	)
 

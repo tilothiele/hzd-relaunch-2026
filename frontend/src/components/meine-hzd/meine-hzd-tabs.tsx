@@ -33,11 +33,9 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 				//console.log('Fetching breeder for user:', user.documentId)
 				const data = await searchBreeders(
 					{
-						filters: {
-							owner_members: { documentId: { eq: user.documentId } },
-						},
+						ownerMemberDocumentId: user.documentId,
 					},
-					{ baseUrl: strapiBaseUrl },
+					{},
 				)
 				//console.log('Breeder fetch result:', data)
 

@@ -20,7 +20,7 @@ export async function fetchChampions(page = 1, pageSize = 20) {
 		return await fetchEntityList<Record<string, unknown>>(
 			'champions',
 			query,
-			{ server: true, baseUrl: getStrapiBaseUrl() },
+			{ server: true },
 		)
 	} catch (error) {
 		console.error('Error fetching champions:', error)

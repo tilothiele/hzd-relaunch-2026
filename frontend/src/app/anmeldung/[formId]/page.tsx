@@ -24,7 +24,7 @@ export default async function AnmeldungFormIdPage({ params }: AnmeldungFormIdPag
 	let form = null
 	if (formId) {
 		try {
-			const formData = await fetchFormByDocumentId(formId, { server: true, baseUrl })
+			const formData = await fetchFormByDocumentId(formId, { server: true })
 			form = (formData.forms?.[0] ?? null) as unknown as typeof form
 		} catch (err) {
 			console.error('Fehler beim Laden des Formulars:', err)

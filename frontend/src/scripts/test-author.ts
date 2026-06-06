@@ -16,7 +16,7 @@ async function test() {
         const result = await fetchEntityList(
             'authors',
             query,
-            { server: true, baseUrl: 'http://127.0.0.1:1337' },
+            { server: true },
         )
         console.log(JSON.stringify(result, null, 2))
     } catch (e) {

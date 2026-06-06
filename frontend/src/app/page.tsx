@@ -45,14 +45,14 @@ export default async function Home() {
 
 	try {
 		baseUrl = getStrapiBaseUrl()
-		const data = await fetchLayoutServer(baseUrl)
+		const data = await fetchLayoutServer()
 		globalLayout = data.globalLayout
 
 		const session = await getServerSession(authOptions)
 		const authToken = session?.idToken ?? session?.accessToken ?? null
 
 		if (authToken) {
-			const meData = await fetchMe(authToken, { server: true, baseUrl })
+			const meData = await fetchMe(authToken, { server: true })
 			isAuthenticated = Boolean(meData.me?.documentId)
 		}
 	} catch (err) {
@@ -64,7 +64,6 @@ export default async function Home() {
 		: null
 	const sections = await enrichSectionsWithSupplementalDocuments(
 		page?.Sections ?? [],
-		baseUrl,
 	)
 
 	if (error) {

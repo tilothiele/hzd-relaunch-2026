@@ -164,7 +164,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 			const calendarsArray = await fetchEntityList<Calendar>(
 				'calendars',
 				query,
-				{ baseUrl: strapiBaseUrl },
+				{},
 			)
 			calendarsArray.sort((a, b) => {
 				const ordA = a.Ord ?? 999
@@ -240,7 +240,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 			const itemsArray = await fetchEntityList<CalendarItem>(
 				'calendar-entries',
 				query,
-				{ baseUrl: strapiBaseUrl },
+				{},
 			)
 			const nowTs = Date.now()
 			const visibleItems = itemsArray.filter(
@@ -319,7 +319,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 			const itemsArray = await fetchEntityList<CalendarItem>(
 				'calendar-entries',
 				query,
-				{ baseUrl: strapiBaseUrl },
+				{},
 			)
 			const nowTs = Date.now()
 			const visibleItems = itemsArray.filter(

@@ -104,24 +104,6 @@ function buildPageSectionsPopulate(): URLSearchParams {
 	return params
 }
 
-function buildLayoutPopulate(): URLSearchParams {
-	const params = new URLSearchParams({
-		'populate[Logo]': 'true',
-		'populate[Footer]': '*',
-		'populate[SOS]': '*',
-		'populate[PartnerLink][populate][Logo]': 'true',
-		'populate[Impressum][fields][0]': 'documentId',
-		'populate[Impressum][fields][1]': 'slug',
-		'populate[Impressum][fields][2]': 'title',
-		'populate[PrivacyPolicy]': 'true',
-	})
-	appendSectionsDeepPopulate(params, 'populate[page][populate][Sections]')
-	appendSectionsDeepPopulate(params, 'populate[authenticated_page][populate][Sections]')
-	return params
-}
-
-export const POPULATE_LAYOUT = buildLayoutPopulate()
-
 export const POPULATE_PAGE_SECTIONS = buildPageSectionsPopulate()
 
 export const POPULATE_FORM = new URLSearchParams({

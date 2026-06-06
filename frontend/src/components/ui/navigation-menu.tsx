@@ -335,7 +335,12 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 		setMobileOpen(!mobileOpen)
 	}
 
-	const handleSubmenuToggle = (itemKey: string) => {
+	const handleSubmenuToggle = (
+		itemKey: string,
+		event?: React.MouseEvent<unknown>,
+	) => {
+		event?.preventDefault()
+		event?.stopPropagation()
 		setOpenSubmenus((prev) => ({
 			...prev,
 			[itemKey]: !prev[itemKey],
@@ -381,13 +386,29 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 									<Box key={itemKey}>
 										{hasChildren ? (
 											<>
-												<ListItem disablePadding>
+												<ListItem
+													disablePadding
+													secondaryAction={
+														<IconButton
+															edge='end'
+															aria-label={`${item.name} Untermenü ${isSubmenuOpen ? 'schließen' : 'öffnen'}`}
+															onClick={(event) => handleSubmenuToggle(itemKey, event)}
+															sx={{
+																color: 'var(--color-text)',
+																mr: 1,
+															}}
+														>
+															{isSubmenuOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+														</IconButton>
+													}
+												>
 													{item.url ? (
 														<ListItemButton
 															component={Link}
 															href={item.url}
-															onClick={() => handleSubmenuToggle(itemKey)}
+															onClick={handleMobileToggle}
 															sx={{
+																pr: 7,
 																color: 'var(--color-text)',
 																'&:hover': {
 																	backgroundColor: 'rgba(0, 0, 0, 0.04)',
@@ -407,12 +428,12 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 																	</Typography>
 																}
 															/>
-															{isSubmenuOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
 														</ListItemButton>
 													) : (
 														<ListItemButton
-															onClick={() => handleSubmenuToggle(itemKey)}
+															onClick={(event) => handleSubmenuToggle(itemKey, event)}
 															sx={{
+																pr: 7,
 																color: 'var(--color-text)',
 																'&:hover': {
 																	backgroundColor: 'rgba(0, 0, 0, 0.04)',
@@ -432,7 +453,6 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 																	</Typography>
 																}
 															/>
-															{isSubmenuOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
 														</ListItemButton>
 													)}
 												</ListItem>

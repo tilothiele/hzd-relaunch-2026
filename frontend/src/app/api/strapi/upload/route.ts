@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-
-const strapiBaseUrl =
-	process.env.STRAPI_BASE_URL
-	|| process.env.NEXT_PUBLIC_STRAPI_BASE_URL
-	|| 'http://localhost:1337'
+import { getStrapiPublicBaseUrl } from '@/lib/server/strapi-client'
 
 export const dynamic = 'force-dynamic'
 
@@ -49,7 +45,7 @@ export async function POST(request: NextRequest) {
 	}
 
 	const upstreamRes = await fetch(
-		`${strapiBaseUrl.replace(/\/$/, '')}/api/upload`,
+		`${getStrapiPublicBaseUrl()}/api/upload`,
 		{
 			method: 'POST',
 			headers: { Authorization: `Bearer ${jwt}` },

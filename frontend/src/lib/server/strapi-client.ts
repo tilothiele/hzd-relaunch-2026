@@ -15,12 +15,14 @@ export function getStrapiBaseUrl(): string {
 	)
 }
 
+/** Runtime-URL für BFF und /api/config (nur STRAPI_BASE_URL, kein NEXT_PUBLIC_*). */
 export function getStrapiPublicBaseUrl(): string {
-	return (
-		process.env.STRAPI_BASE_URL
-		|| process.env.NEXT_PUBLIC_STRAPI_BASE_URL
-		|| 'http://localhost:1337'
-	).replace(/\/$/, '')
+	const serverUrl = process.env.STRAPI_BASE_URL?.trim()
+	if (serverUrl) {
+		return serverUrl.replace(/\/$/, '')
+	}
+
+	return 'http://localhost:1337'
 }
 
 interface StrapiErrorPayload {
