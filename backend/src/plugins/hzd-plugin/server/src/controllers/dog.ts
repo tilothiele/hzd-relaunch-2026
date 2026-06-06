@@ -4,6 +4,7 @@
 
 import { factories } from '@strapi/strapi'
 import type { Core } from '@strapi/strapi'
+import { findDocumentsPage } from '../utils/document-pagination'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyController = Record<string, any>
@@ -380,81 +381,81 @@ const coreControllerFactory = factories.createCoreController(
 				const sort = toSortArray(rawQuery.sort)
 				const hasGeo = rawQuery.lat != null && rawQuery.lng != null
 
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				const queryParams: Record<string, any> = {
-					populate: {
-						owner: {
-							fields: [
-								'documentId',
-								'firstName',
-								'lastName',
-								'city',
-								'zip',
-								'phone',
-								'cEmail',
-								'countryCode',
-								'locationLat',
-								'locationLng',
-							],
-						},
-						father: {
-							fields: ['documentId', 'fullKennelName', 'givenName', 'dateOfBirth', 'dateOfDeath'],
-							populate: {
-								owner: {
-									fields: [
-										'documentId',
-										'firstName',
-										'lastName',
-										'city',
-										'zip',
-										'phone',
-										'cEmail',
-										'countryCode',
-										'locationLat',
-										'locationLng',
-									],
-								},
+				const dogPopulate = {
+					owner: {
+						fields: [
+							'documentId',
+							'firstName',
+							'lastName',
+							'city',
+							'zip',
+							'phone',
+							'cEmail',
+							'countryCode',
+							'locationLat',
+							'locationLng',
+						],
+					},
+					father: {
+						fields: ['documentId', 'fullKennelName', 'givenName', 'dateOfBirth', 'dateOfDeath'],
+						populate: {
+							owner: {
+								fields: [
+									'documentId',
+									'firstName',
+									'lastName',
+									'city',
+									'zip',
+									'phone',
+									'cEmail',
+									'countryCode',
+									'locationLat',
+									'locationLng',
+								],
 							},
-						},
-						mother: {
-							fields: ['documentId', 'fullKennelName', 'givenName', 'dateOfBirth', 'dateOfDeath'],
-							populate: {
-								owner: {
-									fields: [
-										'documentId',
-										'firstName',
-										'lastName',
-										'city',
-										'zip',
-										'phone',
-										'cEmail',
-										'countryCode',
-										'locationLat',
-										'locationLng',
-									],
-								},
-							},
-						},
-						Images: true,
-						avatar: true,
-						DogDocument: {
-							populate: { MediaFile: true },
 						},
 					},
-					sort,
-					pagination: hasGeo ? { pageSize: 1000 } : { page, pageSize },
+					mother: {
+						fields: ['documentId', 'fullKennelName', 'givenName', 'dateOfBirth', 'dateOfDeath'],
+						populate: {
+							owner: {
+								fields: [
+									'documentId',
+									'firstName',
+									'lastName',
+									'city',
+									'zip',
+									'phone',
+									'cEmail',
+									'countryCode',
+									'locationLat',
+									'locationLng',
+								],
+							},
+						},
+					},
+					Images: true,
+					avatar: true,
+					DogDocument: {
+						populate: { MediaFile: true },
+					},
 				}
 
-				if (filterConditions.length > 0) {
-					queryParams.filters = { $and: filterConditions }
-				}
-
-				const result = await strapi.entityService.findPage(
+				const result = await findDocumentsPage(
+					strapi,
 					'plugin::hzd-plugin.dog',
-					queryParams,
+					{
+						populate: dogPopulate,
+						sort,
+						page: hasGeo ? 1 : page,
+						pageSize: hasGeo ? 1000 : pageSize,
+						filters: filterConditions.length > 0
+							? { $and: filterConditions }
+							: undefined,
+					},
 				)
 
-				let results: any[] = Array.isArray(result?.results) ? result.results : []
+				let results: any[] = result.results
 
 				// Breeder-Anreicherung (cBreederId -> breeder record)
 				const breedersByCId = new Map<number, any>()
@@ -497,31 +498,20 @@ const coreControllerFactory = factories.createCoreController(
 					}
 				}
 
-				// Pagination anwenden (im Geo-Fall war pageSize 1000)
-				const effectivePage = hasGeo ? page : 1
-				const effectivePageSize = hasGeo ? pageSize : results.length
-				const startIndex = (effectivePage - 1) * effectivePageSize
-				const endIndex = startIndex + effectivePageSize
-				const paginatedResults = hasGeo ? results.slice(startIndex, endIndex) : results
+				let paginatedResults = results
+				let pagination = result.pagination
 
-				const finalTotal = hasGeo ? total : paginatedResults.length
-				const finalPageCount = hasGeo
-					? Math.max(1, Math.ceil(total / effectivePageSize))
-					: 1
-
-				const pagination = hasGeo
-					? {
-							page: effectivePage,
-							pageSize: effectivePageSize,
-							pageCount: finalPageCount,
-							total: finalTotal,
-						}
-					: (result?.pagination ?? {
-							page,
-							pageSize,
-							pageCount: 1,
-							total: finalTotal,
-						})
+				if (hasGeo) {
+					const startIndex = (page - 1) * pageSize
+					const endIndex = startIndex + pageSize
+					paginatedResults = results.slice(startIndex, endIndex)
+					pagination = {
+						page,
+						pageSize,
+						pageCount: Math.max(1, Math.ceil(total / pageSize)),
+						total,
+					}
+				}
 
 				return {
 					data: paginatedResults,

@@ -4,6 +4,7 @@
 
 import { factories } from '@strapi/strapi'
 import type { Core } from '@strapi/strapi'
+import { findDocumentsPage } from '../utils/document-pagination'
 import { enrichBreederRecords } from '../utils/breeder-enrich'
 
 const VALID_BREEDER_ROLES = ['B', 'S'] as const
@@ -152,35 +153,26 @@ const coreControllerFactory = factories.createCoreController(
 			const { page, pageSize } = parsePagination(rawQuery)
 			const sort = toSortArray(rawQuery.sort)
 
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const queryParams: Record<string, any> = {
-				populate: BREEDER_SEARCH_POPULATE,
-				sort,
-				pagination: { page, pageSize },
-			}
-
-			if (filterConditions.length > 0) {
-				queryParams.filters = { $and: filterConditions }
-			}
-
-			const result = await strapi.entityService.findPage(
+			const result = await findDocumentsPage(
+				strapi,
 				'plugin::hzd-plugin.breeder',
-				queryParams,
+				{
+					populate: BREEDER_SEARCH_POPULATE,
+					sort,
+					page,
+					pageSize,
+					filters: filterConditions.length > 0
+						? { $and: filterConditions }
+						: undefined,
+				},
 			)
 
-			let results: any[] = Array.isArray(result?.results) ? result.results : []
+			let results: any[] = result.results
 			results = (await enrichBreederRecords(strapi, results)) as any[]
-
-			const pagination = result?.pagination ?? {
-				page,
-				pageSize,
-				pageCount: 1,
-				total: results.length,
-			}
 
 			return {
 				data: results,
-				meta: { pagination },
+				meta: { pagination: result.pagination },
 			}
 		},
 	}),

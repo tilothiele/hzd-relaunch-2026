@@ -4,6 +4,7 @@
 
 import { factories } from '@strapi/strapi'
 import type { Core } from '@strapi/strapi'
+import { findDocumentsPage } from '../../../plugins/hzd-plugin/server/src/utils/document-pagination'
 import { enrichBreederRecords } from '../../../plugins/hzd-plugin/server/src/utils/breeder-enrich'
 
 interface ChampionSearchQuery {
@@ -162,32 +163,25 @@ export default factories.createCoreController(
 			const sort = toSortArray(rawQuery.sort)
 			const filterConditions = toFilterConditions(rawQuery)
 
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const queryParams: Record<string, any> = {
-				populate: CHAMPION_SEARCH_POPULATE,
-				sort,
-				pagination: { page, pageSize },
-				filters: { $and: filterConditions },
-			}
-
-			const result = await strapi.entityService.findPage(
+			const result = await findDocumentsPage(
+				strapi as never,
 				'api::champion.champion',
-				queryParams,
+				{
+					populate: CHAMPION_SEARCH_POPULATE,
+					sort,
+					page,
+					pageSize,
+					status: 'published',
+					filters: { $and: filterConditions },
+				},
 			)
 
-			let results: any[] = Array.isArray(result?.results) ? result.results : []
+			let results: any[] = result.results
 			results = await enrichChampionRecords(strapi, results)
-
-			const pagination = result?.pagination ?? {
-				page,
-				pageSize,
-				pageCount: 1,
-				total: results.length,
-			}
 
 			return {
 				data: results,
-				meta: { pagination },
+				meta: { pagination: result.pagination },
 			}
 		},
 	}),
