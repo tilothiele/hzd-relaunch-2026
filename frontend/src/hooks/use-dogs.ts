@@ -1,13 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { searchDogs as searchDogsApi, fetchBreederCIdsWithNoDogsAvailable } from '@/lib/strapi/api'
+import { searchDogs as searchDogsApi } from '@/lib/strapi/api'
 import { useConfig } from '@/hooks/use-config'
 import type { Dog, DogSearchResult } from '@/types'
-
-import { calculateDistance } from '@/lib/geo-utils'
-
-
 
 export type SexFilter = 'M' | 'F' | ''
 export type ColorFilter = 'S' | 'SM' | 'B' | ''
@@ -55,7 +51,7 @@ export interface UseDogsOptions {
 	pagination?: DogsPagination
 	autoLoad?: boolean
 	baseUrl?: string | null
-	/** Kein API-Aufruf (z. B. Züchter meldet „keine Hunde in der Zucht“) */
+	/** Kein API-Aufruf (z. B. Züchter meldet „keine Hunde in der Zucht") */
 	queryDisabled?: boolean
 }
 
@@ -111,116 +107,34 @@ export function useDogs(options: UseDogsOptions = {}) {
 		setError(null)
 
 		try {
-			const filterConditions: Array<Record<string, unknown>> = [
-				{ cFertile: { eq: true } },
-			]
-
-			if (nameFilter.trim()) {
-				filterConditions.push({
-					or: [
-						{ givenName: { containsi: nameFilter.trim() } },
-						{ fullKennelName: { containsi: nameFilter.trim() } },
-					],
-				})
-			}
-
-			if (sexFilter) {
-				filterConditions.push({
-					sex: { eq: sexFilter },
-				})
-			}
-
-			if (colorFilter) {
-				filterConditions.push({
-					color: { eq: colorFilter },
-				})
-			}
-
-			filterConditions.push({
-				or: [
-					{ Disabled: { eq: false } },
-					{ Disabled: { null: true } },
-				],
-			})
-
-
-			if (ownerCIds.length > 0) {
-				filterConditions.push({
-					cOwnerId: { in: ownerCIds },
-				})
-			} else if (typeof cBreederId === 'number') {
-				filterConditions.push({
-					cBreederId: { eq: cBreederId },
-				})
-			} else {
-				const excludedBreederCIds = await fetchBreederCIdsWithNoDogsAvailable({ baseUrl })
-				if (excludedBreederCIds.length > 0) {
-					filterConditions.push({
-						or: [
-							{ cBreederId: { null: true } },
-							{ cBreederId: { notIn: excludedBreederCIds } },
-						],
-					})
-				}
-			}
-
-			if (maxAge) {
-				const date = new Date()
-				date.setFullYear(date.getFullYear() - maxAge)
-				const dateString = date.toISOString().split('T')[0]
-				filterConditions.push({
-					dateOfBirth: { gte: dateString },
-				})
-			}
- 
-			if (hdFilter) {
-				filterConditions.push({
-					HD: { eq: hdFilter },
-				})
-			}
- 
-			if (genprofilFilter) {
-				filterConditions.push({
-					SOD1: { eq: genprofilFilter },
-				})
-			}
- 
-			if (eyescheckFilter) {
-				filterConditions.push({
-					EyesCheck: { eq: eyescheckFilter === 'true' },
-				})
-			}
- 
-			if (heartcheckFilter) {
-				filterConditions.push({
-					HeartCheck: { eq: heartcheckFilter === 'true' },
-				})
-			}
- 
-			if (colorcheckFilter) {
-				filterConditions.push({
-					ColorCheck: { eq: colorcheckFilter === 'true' },
-				})
-			}
-
-			const data = await searchDogsApi({
-				pagination: { page, pageSize },
-				sort: sort || ['fullKennelName:asc'],
-				...(filterConditions.length > 0
-					? { filters: { and: filterConditions } }
-					: {}),
-			}, { baseUrl })
+			const data = await searchDogsApi(
+				{
+					name: nameFilter || undefined,
+					sex: sexFilter || undefined,
+					color: colorFilter || undefined,
+					hd: hdFilter || undefined,
+					sod1: genprofilFilter || undefined,
+					eyesCheck: eyescheckFilter || undefined,
+					heartCheck: heartcheckFilter || undefined,
+					colorCheck: colorcheckFilter || undefined,
+					ownerCIds: ownerCIds.length > 0 ? ownerCIds : undefined,
+					cBreederId: typeof cBreederId === 'number' ? cBreederId : undefined,
+					maxAge,
+					lat: userLocation?.lat,
+					lng: userLocation?.lng,
+					maxDistance: typeof maxDistance === 'number' ? maxDistance : undefined,
+					sort: sort ?? ['fullKennelName:asc'],
+					page,
+					pageSize,
+				},
+				{ baseUrl },
+			)
 
 			const dogsArray = Array.isArray(data.hzdPluginDogs_connection?.nodes)
 				? data.hzdPluginDogs_connection.nodes
 				: []
-			//console.log('Fetched dogs:', dogsArray) // Debugging color issue
+			setDogs(dogsArray)
 
-
-
-			setDogs(dogsArray) // Using the raw array as before, assuming processing happens in component or is not needed here
-
-			// Use pageInfo from the connection for pagination
 			const pageInfo = data.hzdPluginDogs_connection?.pageInfo
 			if (pageInfo) {
 				setTotalDogs(pageInfo.total)
@@ -240,7 +154,27 @@ export function useDogs(options: UseDogsOptions = {}) {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [baseUrl, nameFilter, sexFilter, colorFilter, ownerCIds.join(','), cBreederId, queryDisabled, JSON.stringify(sort), page, pageSize, maxAge, hdFilter, genprofilFilter, eyescheckFilter, heartcheckFilter, colorcheckFilter])
+	}, [
+		baseUrl,
+		nameFilter,
+		sexFilter,
+		colorFilter,
+		ownerCIds.join(','),
+		cBreederId,
+		queryDisabled,
+		JSON.stringify(sort),
+		page,
+		pageSize,
+		maxAge,
+		hdFilter,
+		genprofilFilter,
+		eyescheckFilter,
+		heartcheckFilter,
+		colorcheckFilter,
+		maxDistance,
+		userLocation?.lat,
+		userLocation?.lng,
+	])
 
 	useEffect(() => {
 		if (autoLoad && !queryDisabled && baseUrl && baseUrl.trim().length > 0) {
@@ -250,14 +184,16 @@ export function useDogs(options: UseDogsOptions = {}) {
 
 	const isBusy = isConfigLoading || isLoading
 
-	return useMemo(() => ({
-		dogs,
-		totalDogs,
-		pageCount,
-		isLoading: isBusy,
-		error: configError ?? error,
-		baseUrl: baseUrl ?? null,
-		searchDogs,
-	}), [dogs, totalDogs, pageCount, isBusy, configError, error, baseUrl, searchDogs])
+	return useMemo(
+		() => ({
+			dogs,
+			totalDogs,
+			pageCount,
+			isLoading: isBusy,
+			error: configError ?? error,
+			baseUrl: baseUrl ?? null,
+			searchDogs,
+		}),
+		[dogs, totalDogs, pageCount, isBusy, configError, error, baseUrl, searchDogs],
+	)
 }
-

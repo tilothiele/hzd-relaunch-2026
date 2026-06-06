@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Collapse, Button, Grid, TextField, CircularProgress, Chip, Alert, MenuItem, Select, Autocomplete } from '@mui/material'
 import { Edit as EditIcon, Save as SaveIcon, Cancel as CancelIcon } from '@mui/icons-material'
 import type { Breeder, Litter, LitterSearchResult, Dog, DogSearchResult } from '@/types'
-import { searchDogs, searchLitters, createEntity, updateEntity } from '@/lib/strapi/api'
+import { searchDogsGeneric, searchLitters, createEntity, updateEntity } from '@/lib/strapi/api'
 import { formatDate } from '@/lib/utils'
 import { Add as AddIcon } from '@mui/icons-material'
 
@@ -109,7 +109,7 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
 			}
 			if (ownerCIds.length === 0) return
 			try {
-				const data = await searchDogs({
+				const data = await searchDogsGeneric({
 					filters: {
 						sex: { eq: 'F' },
 						cOwnerId: { in: ownerCIds },
@@ -139,7 +139,7 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
                 date15YearsAgo.setFullYear(date15YearsAgo.getFullYear() - 15)
                 const minDateOfBirth = date15YearsAgo.toISOString().split('T')[0]
 
-                const data = await searchDogs({
+                const data = await searchDogsGeneric({
                     filters: {
                         sex: { eq: 'M' },
                         fullKennelName: { containsi: fatherSearchInput },
@@ -173,7 +173,7 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
             if (!breeder?.documentId) return
             try {
                 const data = await searchLitters({
-                    filters: { breeder: { documentId: { eq: breeder.documentId } } },
+                    breederDocumentId: breeder.documentId,
                     sort: ['dateOfBirth:desc'],
                 }, { baseUrl: strapiBaseUrl })
                 setLitters(data.hzdPluginLitters_connection.nodes || [])
@@ -313,7 +313,7 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
             if (newLitter) {
                 // Refresh litters list
                 const data = await searchLitters({
-                    filters: { breeder: { documentId: { eq: breeder.documentId } } },
+                    breederDocumentId: breeder.documentId,
                     sort: ['dateOfBirth:desc'],
                 }, { baseUrl: strapiBaseUrl })
                 setLitters(data.hzdPluginLitters_connection.nodes || [])

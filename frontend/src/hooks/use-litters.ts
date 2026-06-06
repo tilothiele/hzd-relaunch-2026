@@ -69,60 +69,15 @@ export function useLitters(options: UseLittersOptions = {}) {
         setError(null)
 
         try {
-            const filterConditions: Array<Record<string, unknown>> = []
-
-            if (breederFilter.trim()) {
-                filterConditions.push({
-                    breeder: {
-                        kennelName: { containsi: breederFilter.trim() },
-                    },
-                })
-            }
-
-            if (motherFilter.trim()) {
-                filterConditions.push({
-                    or: [
-                        { mother: { fullKennelName: { containsi: motherFilter.trim() } } },
-                        { mother: { givenName: { containsi: motherFilter.trim() } } },
-                    ],
-                })
-            }
-
-            if (statusFilter) {
-                filterConditions.push({
-                    LitterStatus: { eq: statusFilter },
-                })
-            }
-
-            if (orderLetterFilter) {
-                filterConditions.push({
-                    OrderLetter: { eq: orderLetterFilter },
-                })
-            }
-
-            // Farben nur filtern, wenn Status "Geworfen" ist
-            if (statusFilter === 'Littered') {
-                if (selectedMaleColors.length > 0) {
-                    const colorFilters = selectedMaleColors.map((color: string) => ({
-                        [`AmountR${color}`]: { Available: { gt: 0 } }
-                    }))
-                    filterConditions.push({ or: colorFilters })
-                }
-
-                if (selectedFemaleColors.length > 0) {
-                    const colorFilters = selectedFemaleColors.map((color: string) => ({
-                        [`AmountH${color}`]: { Available: { gt: 0 } }
-                    }))
-                    filterConditions.push({ or: colorFilters })
-                }
-            }
-
             const data = await searchLittersApi({
-                pagination: { page, pageSize },
-                sort: ['dateOfBirth:desc', 'expectedDateOfBirth:desc'],
-                ...(filterConditions.length > 0
-                    ? { filters: { and: filterConditions } }
-                    : {}),
+                breeder: breederFilter,
+                mother: motherFilter,
+                status: statusFilter || undefined,
+                orderLetter: orderLetterFilter,
+                maleColors: statusFilter === 'Littered' ? selectedMaleColors : undefined,
+                femaleColors: statusFilter === 'Littered' ? selectedFemaleColors : undefined,
+                page,
+                pageSize,
             }, { baseUrl })
 
             const littersArray = Array.isArray(data.hzdPluginLitters_connection?.nodes)
@@ -130,7 +85,6 @@ export function useLitters(options: UseLittersOptions = {}) {
                 : []
             setLitters(littersArray)
 
-            // Use pageInfo from the connection for pagination
             const pageInfo = data.hzdPluginLitters_connection?.pageInfo
             if (pageInfo) {
                 setTotalLitters(pageInfo.total)
