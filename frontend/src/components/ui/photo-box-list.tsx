@@ -141,7 +141,7 @@ export function PhotoBoxList({ maxCollections = 5, strapiBaseUrl }: PhotoBoxList
 
     const getImageUrl = (img: any, preferOriginal = false) => {
         // Fallback-Logik für die Base URL auf Client-Seite
-        const effectiveBaseUrl = (typeof window !== 'undefined' ? (process.env.NEXT_PUBLIC_STRAPI_URL || process.env.NEXT_PUBLIC_STRAPI_BASE_URL) : '') || strapiBaseUrl;
+        const effectiveBaseUrl = strapiBaseUrl ?? '';
 
         if (img.Thumbnail) {
             const formats = img.Thumbnail.formats

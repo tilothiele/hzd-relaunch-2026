@@ -116,7 +116,7 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
 						cFertile: { eq: true },
 					},
                     pagination: { pageSize: 100 },
-                }, { baseUrl: strapiBaseUrl })
+                }, {})
                 setBreedingBitches(data.hzdPluginDogs_connection.nodes || [])
             } catch (error) {
                 console.error('Failed to load mothers:', error)
@@ -150,7 +150,7 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
                         ],
                     },
                     pagination: { pageSize: 20 },
-                }, { baseUrl: strapiBaseUrl })
+                }, {})
 
                 const results = data.hzdPluginDogs_connection.nodes || []
                 // Ensure selected father remains in options if selected
@@ -175,7 +175,7 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
                 const data = await searchLitters({
                     breederDocumentId: breeder.documentId,
                     sort: ['dateOfBirth:desc'],
-                }, { baseUrl: strapiBaseUrl })
+                }, {})
                 setLitters(data.hzdPluginLitters_connection.nodes || [])
             } catch (error) {
                 console.error('Failed to load litters:', error)
@@ -269,7 +269,7 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
                 'hzd-plugin/litters',
                 litterId,
                 editFormData as unknown as Record<string, unknown>,
-                { baseUrl: strapiBaseUrl },
+                {},
             )
 
             // Update local state with the returned data which includes resolved relations
@@ -308,14 +308,14 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
             const newLitter = await createEntity<Litter>(
                 'hzd-plugin/litters',
                 newLitterData,
-                { baseUrl: strapiBaseUrl },
+                {},
             )
             if (newLitter) {
                 // Refresh litters list
                 const data = await searchLitters({
                     breederDocumentId: breeder.documentId,
                     sort: ['dateOfBirth:desc'],
-                }, { baseUrl: strapiBaseUrl })
+                }, {})
                 setLitters(data.hzdPluginLitters_connection.nodes || [])
 
                 // Automatically start editing the new litter

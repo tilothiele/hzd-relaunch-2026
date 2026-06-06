@@ -52,7 +52,7 @@ export default async function ContactIdPage({ params }: ContactIdPageProps) {
 	let contact = null
 	if (contactId) {
 		try {
-			const contactData = await fetchContactByDocumentId(contactId, { server: true, baseUrl })
+			const contactData = await fetchContactByDocumentId(contactId, { server: true })
 			contact = contactData.contact as typeof contact
 		} catch (err) {
 			console.error('Fehler beim Laden des Kontakts:', err)

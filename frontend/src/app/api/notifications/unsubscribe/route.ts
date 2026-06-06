@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getStrapiPublicBaseUrl } from '@/lib/server/strapi-client'
 import { buildStrapiQuery } from '@/lib/strapi/filters'
 import { deleteEntity, fetchEntityList } from '@/lib/strapi/api'
 
@@ -8,7 +7,6 @@ const strapiToken = process.env.STRAPI_API_TOKEN
 function getApiOptions() {
 	return {
 		server: true as const,
-		baseUrl: getStrapiPublicBaseUrl(),
 		token: strapiToken ?? null,
 	}
 }

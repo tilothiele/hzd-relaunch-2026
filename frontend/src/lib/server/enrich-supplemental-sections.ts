@@ -138,14 +138,13 @@ function collectUniqueGroupRefs(sections: StartpageSection[]): GroupRef[] {
 }
 
 async function loadDocumentsForGroupRef(
-	baseUrl: string,
 	ref: GroupRef,
 ): Promise<SupplementalDocument[]> {
 	let docs: SupplementalDocument[] = []
 
 	if (ref.documentId) {
 		try {
-			const group = await fetchSupplementalDocumentGroup(ref.documentId, baseUrl)
+			const group = await fetchSupplementalDocumentGroup(ref.documentId)
 			if (group) {
 				docs = documentsFromGroupPayload(group)
 			}
@@ -154,10 +153,7 @@ async function loadDocumentsForGroupRef(
 		}
 		if (!docs.length) {
 			try {
-				const alt = await fetchSupplementalDocumentsForGroup(
-					ref.documentId,
-					baseUrl,
-				)
+				const alt = await fetchSupplementalDocumentsForGroup(ref.documentId)
 				docs = alt.map((item) => normalizeRestDocument(item))
 			} catch (err) {
 				console.error('supplementalDocuments(filters eq)', ref.documentId, err)
@@ -174,7 +170,6 @@ async function loadDocumentsForGroupRef(
  */
 export async function enrichSectionsWithSupplementalDocuments(
 	sections: StartpageSection[] | null | undefined,
-	baseUrl: string,
 ): Promise<StartpageSection[]> {
 	if (!sections?.length) {
 		return sections ?? []
@@ -193,7 +188,7 @@ export async function enrichSectionsWithSupplementalDocuments(
 			if (!key) {
 				return
 			}
-			const docs = await loadDocumentsForGroupRef(baseUrl, ref)
+			const docs = await loadDocumentsForGroupRef(ref)
 			if (docs.length > 0) {
 				byStableKey.set(key, docs)
 			}

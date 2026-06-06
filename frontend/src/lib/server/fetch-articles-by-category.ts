@@ -1,4 +1,3 @@
-import { getStrapiBaseUrl } from './strapi-client'
 import { buildStrapiQuery } from '@/lib/strapi/filters'
 import { fetchEntityList, fetchNewsArticles } from '@/lib/strapi/api'
 import { normalizeSections } from '@/lib/strapi/normalize'
@@ -10,7 +9,6 @@ import type { NewsArticleCategory, NewsArticle } from '@/types'
  */
 export async function fetchCategoryBySlug(slug: string): Promise<NewsArticleCategory | null> {
 	try {
-		const baseUrl = getStrapiBaseUrl()
 		const query = buildStrapiQuery({
 			filters: { Slug: { eq: slug } },
 			pagination: { pageSize: 1 },
@@ -19,7 +17,7 @@ export async function fetchCategoryBySlug(slug: string): Promise<NewsArticleCate
 		const categories = await fetchEntityList<NewsArticleCategory>(
 			'news-article-categories',
 			query,
-			{ server: true, baseUrl },
+			{ server: true },
 		)
 
 		const category = categories[0]
@@ -52,8 +50,6 @@ export async function fetchArticlesByCategory({
 	featuredFilter?: boolean | null
 }): Promise<NewsArticle[]> {
 	try {
-		const baseUrl = getStrapiBaseUrl()
-
 		const filters: Record<string, unknown> = {
 			category: { documentId: { eq: categoryId } },
 		}
@@ -71,7 +67,6 @@ export async function fetchArticlesByCategory({
 			filters,
 			pagination: { page, pageSize },
 			sort: ['publishedAt:desc'],
-			baseUrl,
 		})
 
 		return newsArticles as unknown as NewsArticle[]

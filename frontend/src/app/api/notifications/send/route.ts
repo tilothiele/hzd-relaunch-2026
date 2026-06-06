@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import webpush from 'web-push'
-import { getStrapiPublicBaseUrl } from '@/lib/server/strapi-client'
 import { buildStrapiQuery } from '@/lib/strapi/filters'
 import { fetchEntityList } from '@/lib/strapi/api'
 
@@ -40,7 +39,6 @@ export async function POST(request: NextRequest) {
 			channels?: Record<string, boolean> | null
 		}>('subscriptions', query, {
 			server: true,
-			baseUrl: getStrapiPublicBaseUrl(),
 			token: strapiToken ?? null,
 		})
 

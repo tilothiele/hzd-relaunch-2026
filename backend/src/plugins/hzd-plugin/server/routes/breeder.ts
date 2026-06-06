@@ -1,6 +1,14 @@
 export default [
   {
     method: 'GET',
+    path: '/breeders/search',
+    handler: 'breeder.search',
+    config: {
+      auth: false, // öffentlich
+    },
+  },
+  {
+    method: 'GET',
     path: '/breeders',
     handler: 'breeder.find',
     config: {

@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-
-const strapiBaseUrl = process.env.STRAPI_BASE_URL || process.env.NEXT_PUBLIC_STRAPI_BASE_URL || 'http://localhost:1337'
+import { getStrapiPublicBaseUrl } from '@/lib/server/strapi-client'
 
 export async function POST(request: Request) {
     try {
@@ -36,7 +35,7 @@ export async function POST(request: Request) {
 
         // Forward to Strapi sendmail API
         // We assuming the endpoint is /api/hzd-plugin/send-mail as per user request context
-        const strapiResponse = await fetch(`${strapiBaseUrl}/api/email`, {
+        const strapiResponse = await fetch(`${getStrapiPublicBaseUrl()}/api/email`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

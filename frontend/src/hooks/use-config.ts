@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { setStrapiBaseUrl } from '@/lib/strapi-client'
 
 interface ConfigResponse {
 	strapiBaseUrl?: string
@@ -32,14 +31,12 @@ export function useConfig() {
 
 				if (isMounted) {
 					setConfig({ strapiBaseUrl: data.strapiBaseUrl })
-					setStrapiBaseUrl(data.strapiBaseUrl)
 					setError(null)
 				}
 			} catch (err) {
 				console.error('Konfiguration konnte nicht geladen werden.', err)
 				if (isMounted) {
 					setConfig({})
-					setStrapiBaseUrl(null)
 					setError(err instanceof Error ? err : new Error('Unbekannter Fehler'))
 				}
 			} finally {

@@ -17,7 +17,7 @@ export interface PageBySlugResult {
 export async function fetchGlobalLayout(): Promise<{ globalLayout: GlobalLayout | null; baseUrl: string; error: Error | null }> {
 	try {
 		const baseUrl = getStrapiBaseUrl()
-		const layoutData = await fetchLayoutServer(baseUrl)
+		const layoutData = await fetchLayoutServer()
 
 		return {
 			globalLayout: layoutData.globalLayout,
@@ -47,8 +47,8 @@ export async function fetchPageBySlug(slug: string): Promise<PageBySlugResult> {
 		const normalizedSlug = slug.startsWith('/') ? slug : `/${slug}`
 
 		const [pageData, layoutData] = await Promise.all([
-			fetchPagesBySlug(normalizedSlug, { server: true, baseUrl }),
-			fetchLayoutServer(baseUrl),
+			fetchPagesBySlug(normalizedSlug, { server: true }),
+			fetchLayoutServer(),
 		])
 
 		let matchingPage = pageData.pages?.find((entity) => {
@@ -61,7 +61,6 @@ export async function fetchPageBySlug(slug: string): Promise<PageBySlugResult> {
 				...matchingPage,
 				Sections: await enrichSectionsWithSupplementalDocuments(
 					matchingPage.Sections,
-					baseUrl,
 				),
 			}
 		}

@@ -25,7 +25,7 @@ export async function fetchAuthorBySlug(slug: string): Promise<AuthorBySlugResul
 		})
 
 		const [authors, layoutData] = await Promise.all([
-			fetchEntityList<Author>('authors', query, { server: true, baseUrl }),
+			fetchEntityList<Author>('authors', query, { server: true }),
 			fetchGlobalLayout(),
 		])
 

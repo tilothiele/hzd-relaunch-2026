@@ -54,7 +54,7 @@ export function MeineHundeTab({ user, strapiBaseUrl }: MeineHundeTabProps) {
                     filters,
                     pagination: { pageSize: 100 },
                     sort: ['dateOfBirth:desc'],
-                }, { baseUrl: strapiBaseUrl })
+                }, {})
 
                 if (response?.hzdPluginDogs_connection?.nodes) {
                     setDogs(response.hzdPluginDogs_connection.nodes)

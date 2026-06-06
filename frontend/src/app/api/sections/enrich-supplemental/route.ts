@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { enrichSectionsWithSupplementalDocuments } from '@/lib/server/enrich-supplemental-sections'
-import { getStrapiPublicBaseUrl } from '@/lib/server/strapi-client'
 import type { StartpageSection } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -10,7 +9,6 @@ export async function POST(request: NextRequest) {
 	try {
 		const body = await request.json() as {
 			sections?: StartpageSection[]
-			baseUrl?: string
 		}
 
 		if (!Array.isArray(body.sections)) {
@@ -20,10 +18,8 @@ export async function POST(request: NextRequest) {
 			)
 		}
 
-		const baseUrl = body.baseUrl?.trim() || getStrapiPublicBaseUrl()
 		const enriched = await enrichSectionsWithSupplementalDocuments(
 			body.sections,
-			baseUrl,
 		)
 
 		return NextResponse.json({ sections: enriched })

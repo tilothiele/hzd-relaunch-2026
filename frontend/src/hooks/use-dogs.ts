@@ -50,7 +50,6 @@ export interface UseDogsOptions {
 	filters?: DogsFilters
 	pagination?: DogsPagination
 	autoLoad?: boolean
-	baseUrl?: string | null
 	/** Kein API-Aufruf (z. B. Züchter meldet „keine Hunde in der Zucht") */
 	queryDisabled?: boolean
 }
@@ -61,7 +60,6 @@ export function useDogs(options: UseDogsOptions = {}) {
 		filters = {},
 		pagination = {},
 		autoLoad = true,
-		baseUrl: optionsBaseUrl,
 		queryDisabled = false,
 	} = options
 
@@ -71,7 +69,7 @@ export function useDogs(options: UseDogsOptions = {}) {
 	const [totalDogs, setTotalDogs] = useState(0)
 	const [pageCount, setPageCount] = useState(0)
 
-	const baseUrl = optionsBaseUrl || config.strapiBaseUrl
+	const baseUrl = config.strapiBaseUrl
 	const nameFilter = filters.nameFilter ?? ''
 	const sexFilter = filters.sexFilter ?? ''
 	const colorFilter = filters.colorFilter ?? ''
@@ -127,7 +125,7 @@ export function useDogs(options: UseDogsOptions = {}) {
 					page,
 					pageSize,
 				},
-				{ baseUrl },
+				{},
 			)
 
 			const dogsArray = Array.isArray(data.hzdPluginDogs_connection?.nodes)

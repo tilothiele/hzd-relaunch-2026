@@ -71,7 +71,7 @@ export function FormsInstanceSearch({ strapiBaseUrl, user, isAuthenticated }: Fo
 								},
 							},
 						},
-						{ baseUrl: strapiBaseUrl },
+						{},
 					)
 
 					const instances = Array.isArray(data.formInstances) ? data.formInstances : []
@@ -154,7 +154,7 @@ export function FormsInstanceSearch({ strapiBaseUrl, user, isAuthenticated }: Fo
 			const formsArray = await fetchEntityList<Form>(
 				'forms',
 				query,
-				{ baseUrl: strapiBaseUrl },
+				{},
 			)
 			setForms(formsArray)
 

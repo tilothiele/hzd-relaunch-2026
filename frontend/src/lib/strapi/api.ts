@@ -14,7 +14,6 @@ import {
 	POPULATE_BREEDER_SEARCH,
 	POPULATE_CONTACT,
 	POPULATE_FORM,
-	POPULATE_LAYOUT,
 	POPULATE_NEWS_ARTICLE,
 	POPULATE_PAGE_SECTIONS,
 	POPULATE_PASSED_DOG,
@@ -35,6 +34,11 @@ import type {
 } from '@/types'
 
 type FilterValue = Record<string, unknown>
+
+export interface StrapiRequestOptions {
+	server?: boolean
+	token?: string | null
+}
 
 interface LayoutData {
 	globalLayout: GlobalLayout
@@ -66,24 +70,23 @@ function mergeLayoutPayload(
 type StrapiFetcher = (
 	path: string,
 	query?: URLSearchParams,
-	options?: { token?: string | null; baseUrl?: string | null; method?: 'GET' | 'POST' | 'PUT' | 'DELETE'; body?: unknown },
+	options?: { token?: string | null; method?: 'GET' | 'POST' | 'PUT' | 'DELETE'; body?: unknown },
 ) => Promise<unknown>
 
 async function fetchLayoutPayload(
 	fetcher: StrapiFetcher,
-	baseUrl?: string | null,
 	token?: string | null,
 ): Promise<LayoutData> {
 	const [layoutResponse, hzdSettingResponse, announcementsResponse] = await Promise.all([
-		fetcher('global-layout', POPULATE_LAYOUT, { token, baseUrl }),
-		fetcher('hzd-setting', new URLSearchParams({ populate: '*' }), { token, baseUrl }),
+		fetcher('global-layout', undefined, { token }),
+		fetcher('hzd-setting', new URLSearchParams({ populate: '*' }), { token }),
 		fetcher(
 			'announcements',
 			buildStrapiQuery({
 				pagination: { pageSize: 100 },
 				sort: 'createdAt:desc',
 			}),
-			{ token, baseUrl },
+			{ token },
 		),
 	])
 
@@ -105,31 +108,27 @@ async function fetchLayoutPayload(
 }
 
 export async function fetchLayoutServer(
-	baseUrl?: string | null,
 	token?: string | null,
 ): Promise<LayoutData> {
-	return fetchLayoutPayload(fetchStrapiServer, baseUrl, token)
+	return fetchLayoutPayload(fetchStrapiServer, token)
 }
 
 export async function fetchLayoutClient(
-	baseUrl?: string | null,
 	token?: string | null,
 ): Promise<LayoutData> {
 	return fetchLayoutPayload(
 		(path, query, options) => fetchStrapi(path, query, {
-			baseUrl: options?.baseUrl ?? baseUrl,
 			token: options?.token ?? token,
 			method: options?.method,
 			body: options?.body,
 		}),
-		baseUrl,
 		token,
 	)
 }
 
 export async function fetchMe(
 	token?: string | null,
-	options: { server?: boolean; baseUrl?: string | null } = {},
+	options: StrapiRequestOptions = {},
 ): Promise<{ me: AuthUser | null }> {
 	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
 	const response = await fetcher(
@@ -138,7 +137,7 @@ export async function fetchMe(
 			'populate[role]': '*',
 			'populate[member][populate]': '*',
 		}),
-		{ token, baseUrl: options.baseUrl },
+		{ token },
 	)
 
 	return {
@@ -148,7 +147,7 @@ export async function fetchMe(
 
 export async function fetchPagesBySlug(
 	slug: string,
-	options: { server?: boolean; baseUrl?: string | null; token?: string | null } = {},
+	options: StrapiRequestOptions = {},
 ): Promise<{ pages: Page[] }> {
 	const normalizedSlug = slug.startsWith('/') ? slug : `/${slug}`
 	const query = buildStrapiQuery({
@@ -160,7 +159,6 @@ export async function fetchPagesBySlug(
 	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
 	const response = await fetcher<unknown>('pages', query, {
 		token: options.token,
-		baseUrl: options.baseUrl,
 	})
 
 	const pages = extractStrapiList<Page>(response).map((page) => (
@@ -192,7 +190,7 @@ export interface DogSearchParams {
 
 export async function searchDogs(
 	params: DogSearchParams,
-	options: { server?: boolean; baseUrl?: string | null; token?: string | null } = {},
+	options: StrapiRequestOptions = {},
 ): Promise<DogSearchResult> {
 	const query = new URLSearchParams()
 
@@ -230,7 +228,6 @@ export async function searchDogs(
 	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
 	const response = await fetcher<unknown>('hzd-plugin/dogs/search', query, {
 		token: options.token,
-		baseUrl: options.baseUrl,
 	})
 
 	const items = extractStrapiList<Dog>(response)
@@ -251,7 +248,7 @@ export async function searchDogsGeneric(
 		pagination?: { page?: number; pageSize?: number; limit?: number }
 		sort?: string | string[]
 	},
-	options: { server?: boolean; baseUrl?: string | null; token?: string | null } = {},
+	options: StrapiRequestOptions = {},
 ): Promise<DogSearchResult> {
 	const query = buildStrapiQuery({
 		filters: variables.filters,
@@ -262,7 +259,6 @@ export async function searchDogsGeneric(
 	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
 	const response = await fetcher<unknown>('hzd-plugin/dogs', query, {
 		token: options.token,
-		baseUrl: options.baseUrl,
 	})
 
 	const items = extractStrapiList<Dog>(response)
@@ -278,7 +274,7 @@ export async function searchDogsGeneric(
 
 /** Züchter-cIds mit „keine Hunde in Zucht“ — für cBreederId-Filter (Relation-Filter auf breeder schlägt fehl). */
 export async function fetchBreederCIdsWithNoDogsAvailable(
-	options: { server?: boolean; baseUrl?: string | null; token?: string | null } = {},
+	options: StrapiRequestOptions = {},
 ): Promise<number[]> {
 	const query = buildStrapiQuery({
 		filters: { HasNoDogsAvailabe: { eq: true } },
@@ -289,7 +285,6 @@ export async function fetchBreederCIdsWithNoDogsAvailable(
 	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
 	const response = await fetcher<unknown>('hzd-plugin/breeders', query, {
 		token: options.token,
-		baseUrl: options.baseUrl,
 	})
 
 	return extractStrapiList<Breeder>(response)
@@ -297,16 +292,57 @@ export async function fetchBreederCIdsWithNoDogsAvailable(
 		.filter((cId): cId is number => typeof cId === 'number')
 }
 
+export interface BreederSearchParams {
+	name?: string
+	breederRole?: 'B' | 'S'
+	ownerMemberDocumentId?: string
+	sort?: string | string[]
+	page?: number
+	pageSize?: number
+}
+
 export async function searchBreeders(
+	params: BreederSearchParams,
+	options: StrapiRequestOptions = {},
+): Promise<BreederSearchResult> {
+	const query = new URLSearchParams()
+
+	if (params.name?.trim()) query.set('name', params.name.trim())
+	if (params.breederRole) query.set('breederRole', params.breederRole)
+	if (params.ownerMemberDocumentId?.trim()) {
+		query.set('ownerMemberDocumentId', params.ownerMemberDocumentId.trim())
+	}
+	if (params.sort) {
+		const sortValue = Array.isArray(params.sort) ? params.sort.join(',') : params.sort
+		if (sortValue.trim().length > 0) query.set('sort', sortValue)
+	}
+	if (params.page !== undefined) query.set('page', String(params.page))
+	if (params.pageSize !== undefined) query.set('pageSize', String(params.pageSize))
+
+	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
+	const response = await fetcher<unknown>('hzd-plugin/breeders/search', query, {
+		token: options.token,
+	})
+
+	const items = extractStrapiList<Breeder>(response)
+	const pagination = extractStrapiPagination(response)
+
+	return {
+		hzdPluginBreeders_connection: toConnectionResult({
+			items,
+			pagination,
+		}),
+	}
+}
+
+/** Generische Breeder-Suche mit freier Filter-Syntax */
+export async function searchBreedersGeneric(
 	variables: {
 		filters?: FilterValue
 		pagination?: { page?: number; pageSize?: number; limit?: number }
 		sort?: string | string[]
-		lat?: number
-		lng?: number
-		maxDistance?: number
 	},
-	options: { server?: boolean; baseUrl?: string | null; token?: string | null } = {},
+	options: StrapiRequestOptions = {},
 ): Promise<BreederSearchResult> {
 	const query = buildStrapiQuery({
 		filters: variables.filters,
@@ -318,7 +354,6 @@ export async function searchBreeders(
 	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
 	const response = await fetcher<unknown>('hzd-plugin/breeders', query, {
 		token: options.token,
-		baseUrl: options.baseUrl,
 	})
 
 	const items = extractStrapiList<Breeder>(response)
@@ -334,7 +369,7 @@ export async function searchBreeders(
 
 export async function getBreederByDocumentId(
 	documentId: string,
-	options: { server?: boolean; baseUrl?: string | null; token?: string | null; enriched?: boolean } = {},
+	options: StrapiRequestOptions & { enriched?: boolean } = {},
 ): Promise<Breeder | null> {
 	if (options.enriched !== false && !options.server) {
 		const response = await fetch(`/api/breeders/${documentId}`, {
@@ -356,7 +391,6 @@ export async function getBreederByDocumentId(
 	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
 	const response = await fetcher<unknown>(`hzd-plugin/breeders/${documentId}`, query, {
 		token: options.token,
-		baseUrl: options.baseUrl,
 	})
 
 	let breeder = extractStrapiSingle<Breeder>(response)
@@ -433,7 +467,7 @@ export interface LitterSearchParams {
 
 export async function searchLitters(
 	params: LitterSearchParams,
-	options: { server?: boolean; baseUrl?: string | null; token?: string | null } = {},
+	options: StrapiRequestOptions = {},
 ): Promise<LitterSearchResult> {
 	const query = new URLSearchParams()
 
@@ -458,7 +492,6 @@ export async function searchLitters(
 	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
 	const response = await fetcher<unknown>('hzd-plugin/litters/search', query, {
 		token: options.token,
-		baseUrl: options.baseUrl,
 	})
 
 	const items = extractStrapiList<Litter>(response)
@@ -475,12 +508,11 @@ export async function searchLitters(
 export async function fetchEntityList<T>(
 	path: string,
 	query: URLSearchParams,
-	options: { server?: boolean; baseUrl?: string | null; token?: string | null } = {},
+	options: StrapiRequestOptions = {},
 ): Promise<T[]> {
 	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
 	const response = await fetcher<unknown>(path, query, {
 		token: options.token,
-		baseUrl: options.baseUrl,
 	})
 	return extractStrapiList<T>(response)
 }
@@ -489,14 +521,13 @@ export async function fetchEntityByDocumentId<T>(
 	path: string,
 	documentId: string,
 	populate: URLSearchParams,
-	options: { server?: boolean; baseUrl?: string | null; token?: string | null } = {},
+	options: StrapiRequestOptions = {},
 ): Promise<T | null> {
 	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
 	try {
 		const response = await fetcher<unknown>(`${path}/${documentId}`, populate, {
-			token: options.token,
-			baseUrl: options.baseUrl,
-		})
+		token: options.token,
+	})
 		return extractStrapiSingle<T>(response)
 	} catch {
 		const query = buildStrapiQuery({
@@ -505,9 +536,8 @@ export async function fetchEntityByDocumentId<T>(
 			populate: Object.fromEntries(populate.entries()),
 		})
 		const listResponse = await fetcher<unknown>(path, query, {
-			token: options.token,
-			baseUrl: options.baseUrl,
-		})
+		token: options.token,
+	})
 		return extractStrapiList<T>(listResponse)[0] ?? null
 	}
 }
@@ -515,14 +545,13 @@ export async function fetchEntityByDocumentId<T>(
 export async function createEntity<T>(
 	path: string,
 	data: Record<string, unknown>,
-	options: { server?: boolean; baseUrl?: string | null; token?: string | null } = {},
+	options: StrapiRequestOptions = {},
 ): Promise<T> {
 	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
 	const response = await fetcher<{ data: T }>(path, undefined, {
 		method: 'POST',
 		body: { data },
 		token: options.token,
-		baseUrl: options.baseUrl,
 	})
 	return extractStrapiSingle<T>(response) as T
 }
@@ -531,14 +560,13 @@ export async function updateEntity<T>(
 	path: string,
 	documentId: string,
 	data: Record<string, unknown>,
-	options: { server?: boolean; baseUrl?: string | null; token?: string | null } = {},
+	options: StrapiRequestOptions = {},
 ): Promise<T> {
 	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
 	const response = await fetcher<{ data: T }>(`${path}/${documentId}`, undefined, {
 		method: 'PUT',
 		body: { data },
 		token: options.token,
-		baseUrl: options.baseUrl,
 	})
 	return extractStrapiSingle<T>(response) as T
 }
@@ -546,19 +574,18 @@ export async function updateEntity<T>(
 export async function deleteEntity(
 	path: string,
 	documentId: string,
-	options: { server?: boolean; baseUrl?: string | null; token?: string | null } = {},
+	options: StrapiRequestOptions = {},
 ): Promise<void> {
 	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
 	await fetcher(`${path}/${documentId}`, undefined, {
 		method: 'DELETE',
 		token: options.token,
-		baseUrl: options.baseUrl,
 	})
 }
 
 export async function fetchFormByDocumentId(
 	documentId: string,
-	options: { server?: boolean; baseUrl?: string | null } = {},
+	options: StrapiRequestOptions = {},
 ) {
 	const form = await fetchEntityByDocumentId<Record<string, unknown>>(
 		'forms',
@@ -581,7 +608,7 @@ export async function fetchFormByDocumentId(
 
 export async function fetchContactByDocumentId(
 	documentId: string,
-	options: { server?: boolean; baseUrl?: string | null } = {},
+	options: StrapiRequestOptions = {},
 ) {
 	const contact = await fetchEntityByDocumentId<Record<string, unknown>>(
 		'contacts',
@@ -594,7 +621,7 @@ export async function fetchContactByDocumentId(
 
 export async function countFormInstances(
 	filters?: FilterValue,
-	options: { server?: boolean; baseUrl?: string | null; token?: string | null } = {},
+	options: StrapiRequestOptions = {},
 ) {
 	const query = buildStrapiQuery({
 		filters,
@@ -616,7 +643,7 @@ export async function countFormInstances(
 
 export async function createFormInstance(
 	data: { form: string; Content: unknown },
-	options: { server?: boolean; baseUrl?: string | null } = {},
+	options: StrapiRequestOptions = {},
 ): Promise<FormInstance> {
 	return createEntity<FormInstance>('form-instances', data, options)
 }
@@ -636,9 +663,7 @@ export async function changePassword(
 	})
 }
 
-export async function fetchSitemapData(
-	baseUrl?: string | null,
-): Promise<{
+export async function fetchSitemapData(): Promise<{
 	indexPage: { updatedAt: string }
 	pages: { slug: string; updatedAt: string }[]
 	newsArticles: { Slug: string; updatedAt: string }[]
@@ -664,14 +689,14 @@ export async function fetchSitemapData(
 		litters,
 		calendarEntries,
 	] = await Promise.all([
-		fetchLayoutServer(baseUrl),
-		fetchEntityList<{ slug: string; updatedAt: string }>('pages', limitQuery, { server: true, baseUrl }),
-		fetchEntityList<{ Slug: string; updatedAt: string }>('news-articles', limitQuery, { server: true, baseUrl }),
-		fetchEntityList<{ Slug: string; updatedAt: string }>('news-article-categories', limitQuery, { server: true, baseUrl }),
-		fetchEntityList<{ updatedAt: string }>('hzd-plugin/dogs', oneQuery, { server: true, baseUrl }),
-		fetchEntityList<{ updatedAt: string }>('hzd-plugin/breeders', oneQuery, { server: true, baseUrl }),
-		fetchEntityList<{ updatedAt: string }>('hzd-plugin/litters', oneQuery, { server: true, baseUrl }),
-		fetchEntityList<{ updatedAt: string }>('calendar-entries', oneQuery, { server: true, baseUrl }),
+		fetchLayoutServer(),
+		fetchEntityList<{ slug: string; updatedAt: string }>('pages', limitQuery, { server: true }),
+		fetchEntityList<{ Slug: string; updatedAt: string }>('news-articles', limitQuery, { server: true }),
+		fetchEntityList<{ Slug: string; updatedAt: string }>('news-article-categories', limitQuery, { server: true }),
+		fetchEntityList<{ updatedAt: string }>('hzd-plugin/dogs', oneQuery, { server: true }),
+		fetchEntityList<{ updatedAt: string }>('hzd-plugin/breeders', oneQuery, { server: true }),
+		fetchEntityList<{ updatedAt: string }>('hzd-plugin/litters', oneQuery, { server: true }),
+		fetchEntityList<{ updatedAt: string }>('calendar-entries', oneQuery, { server: true }),
 	])
 
 	const indexUpdated = (layoutData.globalLayout.page as { updatedAt?: string } | null | undefined)?.updatedAt
@@ -693,7 +718,6 @@ export async function fetchSitemapData(
 export async function fetchApprovedPassedDogsPage(
 	page: number,
 	pageSize: number,
-	baseUrl?: string | null,
 ) {
 	const query = buildStrapiQuery({
 		filters: {
@@ -719,7 +743,6 @@ export async function fetchApprovedPassedDogsPage(
 
 export async function fetchSupplementalDocumentGroup(
 	documentId: string,
-	baseUrl?: string | null,
 ) {
 	const populate = new URLSearchParams({
 		'populate[supplemental_documents][populate][DownloadDocument]': 'true',
@@ -728,13 +751,12 @@ export async function fetchSupplementalDocumentGroup(
 		'supplemental-document-groups',
 		documentId,
 		populate,
-		{ server: true, baseUrl },
+		{ server: true },
 	)
 }
 
 export async function fetchSupplementalDocumentsForGroup(
 	groupDocumentId: string,
-	baseUrl?: string | null,
 ) {
 	const query = buildStrapiQuery({
 		filters: {
@@ -748,13 +770,12 @@ export async function fetchSupplementalDocumentsForGroup(
 	return fetchEntityList<Record<string, unknown>>(
 		'supplemental-documents',
 		query,
-		{ server: true, baseUrl },
+		{ server: true },
 	)
 }
 
 export async function fetchNewsArticleBySlug(
 	slug: string,
-	baseUrl?: string | null,
 ) {
 	const query = buildStrapiQuery({
 		filters: { Slug: { eq: slug } },
@@ -764,7 +785,7 @@ export async function fetchNewsArticleBySlug(
 	const items = await fetchEntityList<Record<string, unknown>>(
 		'news-articles',
 		query,
-		{ server: true, baseUrl },
+		{ server: true },
 	)
 	const article = items[0]
 	if (!article) {
@@ -784,7 +805,6 @@ export async function fetchNewsArticles(
 		filters?: FilterValue
 		pagination?: { page?: number; pageSize?: number; limit?: number }
 		sort?: string | string[]
-		baseUrl?: string | null
 	} = {},
 ) {
 	const query = buildStrapiQuery({
@@ -796,14 +816,13 @@ export async function fetchNewsArticles(
 	const items = await fetchEntityList<Record<string, unknown>>(
 		'news-articles',
 		query,
-		{ server: true, baseUrl: options.baseUrl },
+		{ server: true },
 	)
 	return { newsArticles: items }
 }
 
 export async function fetchMyPhotoboxCollections(
 	token: string,
-	baseUrl?: string | null,
 ) {
 	const query = buildStrapiQuery({
 		populate: Object.fromEntries(POPULATE_PHOTOBOX_COLLECTION.entries()),
@@ -812,7 +831,7 @@ export async function fetchMyPhotoboxCollections(
 	const items = await fetchEntityList<Record<string, unknown>>(
 		'photobox-image-collections',
 		query,
-		{ token, baseUrl },
+		{ token },
 	)
 	return { photoboxImageCollections: items }
 }

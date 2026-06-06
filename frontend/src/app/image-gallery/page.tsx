@@ -1,5 +1,4 @@
 
-import { getStrapiBaseUrl } from '@/lib/server/strapi-client'
 import { buildStrapiQuery } from '@/lib/strapi/filters'
 import { fetchEntityList } from '@/lib/strapi/api'
 import type { GalleryImage } from '@/types'
@@ -11,7 +10,6 @@ import { ImageGalleryView } from '@/components/image-gallery/image-gallery-view'
 export const dynamic = 'force-dynamic'
 
 export default async function ImageGalleryPage() {
-    const strapiBaseUrl = process.env.STRAPI_BASE_URL || ''
     const { globalLayout, baseUrl, error: layoutError } = await fetchGlobalLayout()
     const theme = globalTheme
 
@@ -29,13 +27,13 @@ export default async function ImageGalleryPage() {
         images = await fetchEntityList<GalleryImage>(
             'gallery-images',
             query,
-            { server: true, baseUrl: getStrapiBaseUrl() },
+            { server: true },
         )
     } catch (error) {
         console.error('Error fetching gallery images:', error)
     }
 
-    const strapiUrl = baseUrl || strapiBaseUrl
+    const strapiUrl = baseUrl
 
     if (layoutError) {
         console.error('Layout error:', layoutError)

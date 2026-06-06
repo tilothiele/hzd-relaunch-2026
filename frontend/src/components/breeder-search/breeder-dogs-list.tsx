@@ -46,8 +46,7 @@ export function BreederDogsList({
 				page,
 				pageSize,
 			},
-			baseUrl: strapiBaseUrl,
-			queryDisabled: breederHidesDogListing || !canQueryDogs,
+						queryDisabled: breederHidesDogListing || !canQueryDogs,
 		}), [resolvedOwnerCIds.join(','), page, pageSize, strapiBaseUrl, breederHidesDogListing, canQueryDogs])
 	)
 

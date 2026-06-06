@@ -46,7 +46,7 @@ export function MeinZwingerTab({ breeder, strapiBaseUrl }: MeinZwingerTabProps) 
                     BreederEmail: breederEmail,
                     Address: address,
                 },
-                { baseUrl: strapiBaseUrl },
+                {},
             )
             setSaveMessage({ type: 'success', text: 'Änderungen erfolgreich gespeichert.' })
         } catch (error) {

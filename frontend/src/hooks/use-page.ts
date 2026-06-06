@@ -13,10 +13,10 @@ interface StatusState {
 	message: string | null
 }
 
-async function loadPageBySlug(rawSlug: string, baseUrl: string) {
+async function loadPageBySlug(rawSlug: string) {
 	const slug = `/${rawSlug}`
 
-	const { pages } = await fetchPagesBySlug(slug, { baseUrl })
+	const { pages } = await fetchPagesBySlug(slug)
 
 	const matchingPage = pages?.find((entity) => {
 		const entitySlug = entity?.slug
@@ -58,17 +58,16 @@ export function usePage(params: Promise<{ slug: string }>): PageData {
 	const baseUrl = config.strapiBaseUrl
 	const normalizedSlug = slug ?? ''
 
-	const loadPage = useCallback(async (resolvedBaseUrl?: string) => {
+	const loadPage = useCallback(async () => {
 		if (!normalizedSlug) {
 			return
 		}
 
 		try {
 			setIsLoading(true)
-			const effectiveBaseUrl = resolvedBaseUrl ?? baseUrl ?? ''
 			const [pageData, layoutData] = await Promise.all([
-				loadPageBySlug(normalizedSlug, effectiveBaseUrl),
-				fetchLayoutClient(effectiveBaseUrl),
+				loadPageBySlug(normalizedSlug),
+				fetchLayoutClient(),
 			])
 
 			let enrichedPage = pageData
@@ -78,7 +77,6 @@ export function usePage(params: Promise<{ slug: string }>): PageData {
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
 						sections: pageData.Sections,
-						baseUrl: effectiveBaseUrl,
 					}),
 				})
 
@@ -115,7 +113,7 @@ export function usePage(params: Promise<{ slug: string }>): PageData {
 			return
 		}
 
-		void loadPage(baseUrl)
+		void loadPage()
 	}, [baseUrl, loadPage, normalizedSlug])
 
 	const isBusy = isConfigLoading || isLoading

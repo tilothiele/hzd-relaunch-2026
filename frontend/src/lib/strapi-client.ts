@@ -5,7 +5,6 @@ import {
 } from '@/lib/strapi-errors'
 
 let persistedAuthToken: string | null = null
-let persistedBaseUrl: string | null = null
 let unauthorizedHandler: (() => void) | null = null
 let isHandlingUnauthorized = false
 
@@ -36,36 +35,15 @@ export function setStrapiAuthToken(token?: string | null) {
 /** @deprecated Use setStrapiAuthToken */
 export const setGraphQLAuthToken = setStrapiAuthToken
 
-export function setStrapiBaseUrl(baseUrl?: string | null) {
-	if (typeof baseUrl === 'string' && baseUrl.trim().length > 0) {
-		persistedBaseUrl = baseUrl.trim()
-	} else {
-		persistedBaseUrl = null
-	}
-}
-
-/** @deprecated Use setStrapiBaseUrl */
-export const setGraphQLBaseUrl = setStrapiBaseUrl
-
 interface FetchStrapiOptions {
 	token?: string | null
-	baseUrl?: string | null
 	method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
 	body?: unknown
 }
 
-function buildProxyPath(path: string, baseUrl?: string | null): string {
+function buildProxyPath(path: string): string {
 	const normalizedPath = path.replace(/^\//, '').replace(/^api\//, '')
-	const params = new URLSearchParams()
-
-	if (baseUrl?.trim()) {
-		params.set('baseUrl', baseUrl.trim().replace(/\/$/, ''))
-	}
-
-	const query = params.toString()
-	return query
-		? `/api/strapi/${normalizedPath}?${query}`
-		: `/api/strapi/${normalizedPath}`
+	return `/api/strapi/${normalizedPath}`
 }
 
 export async function fetchStrapi<T>(
@@ -74,9 +52,9 @@ export async function fetchStrapi<T>(
 	options: FetchStrapiOptions = {},
 ): Promise<T> {
 	const effectiveToken = options.token ?? persistedAuthToken
-	const proxyPath = buildProxyPath(path, options.baseUrl ?? persistedBaseUrl)
+	const proxyPath = buildProxyPath(path)
 	const queryString = query?.toString()
-	const url = queryString ? `${proxyPath}&${queryString}` : proxyPath
+	const url = queryString ? `${proxyPath}?${queryString}` : proxyPath
 
 	const headers: Record<string, string> = {
 		Accept: 'application/json',

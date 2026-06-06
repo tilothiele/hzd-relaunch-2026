@@ -18,8 +18,8 @@ export async function fetchNewsArticleBySlug(slug: string): Promise<NewsArticleB
 		const baseUrl = getStrapiBaseUrl()
 
 		const [articleData, layoutData] = await Promise.all([
-			fetchNewsArticleBySlugApi(slug, baseUrl),
-			fetchLayoutServer(baseUrl),
+			fetchNewsArticleBySlugApi(slug),
+			fetchLayoutServer(),
 		])
 
 		const matchingArticle = (articleData.newsArticles?.[0] ?? null) as unknown as NewsArticle | null

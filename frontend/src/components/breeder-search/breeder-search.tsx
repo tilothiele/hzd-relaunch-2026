@@ -62,34 +62,13 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 		setError(null)
 
 		try {
-			const filterConditions: Array<Record<string, unknown>> = [
-				{ BreederRole: { eq: 'B' } },
-				{ IsActive: { eq: true } },
-				{
-					or: [
-						{ Disable: { eq: false } },
-						{ Disable: { null: true } },
-					],
-				},
-			]
-
-			if (nameFilter.trim()) {
-				filterConditions.push({
-					or: [
-						{ kennelName: { containsi: nameFilter.trim() } },
-						{ member: { lastName: { containsi: nameFilter.trim() } } },
-						{ member: { firstName: { containsi: nameFilter.trim() } } },
-						{ member: { DisplayName: { containsi: nameFilter.trim() } } },
-						{ member: { username: { containsi: nameFilter.trim() } } },
-					],
-				})
-			}
-
 			const data = await searchBreedersApi({
-				filters: { and: filterConditions },
-				pagination: { page, pageSize },
+				name: nameFilter.trim() || undefined,
+				breederRole: 'B',
+				page,
+				pageSize,
 				sort: [getBreederApiSort(sortField, sortDirection)],
-			}, { baseUrl: strapiBaseUrl })
+			}, {})
 
 			const breedersArray = sortBreedersByField(
 				await enrichBreedersWithMembers(

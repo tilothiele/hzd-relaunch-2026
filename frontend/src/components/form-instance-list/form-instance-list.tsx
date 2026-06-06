@@ -91,7 +91,7 @@ export function FormInstanceList({ form, strapiBaseUrl, theme }: FormInstanceLis
 						},
 					},
 				},
-				{ baseUrl: strapiBaseUrl },
+				{},
 			)
 
 			const instances = data.formInstances as FormInstance[]

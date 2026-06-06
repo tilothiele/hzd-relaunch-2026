@@ -28,10 +28,10 @@ export function useIndexPage(): IndexPage {
 
 	const baseUrl = config.strapiBaseUrl
 
-	const loadIndexPage = useCallback(async (resolvedBaseUrl?: string | null) => {
+	const loadIndexPage = useCallback(async () => {
 		try {
 			setIsLoading(true)
-			const layoutData = await fetchLayoutClient(resolvedBaseUrl ?? baseUrl)
+			const layoutData = await fetchLayoutClient()
 
 			const combinedLayout: GlobalLayout = {
 				...layoutData.globalLayout,
@@ -49,14 +49,14 @@ export function useIndexPage(): IndexPage {
 		} finally {
 			setIsLoading(false)
 		}
-	}, [baseUrl])
+	}, [])
 
 	useEffect(() => {
 		if (!baseUrl || baseUrl.trim().length === 0) {
 			return
 		}
 
-		void loadIndexPage(baseUrl)
+		void loadIndexPage()
 	}, [baseUrl, loadIndexPage])
 
 	const isBusy = isConfigLoading || isLoading

@@ -12,7 +12,6 @@ pnpm install
 2. Erstelle eine `.env.local` Datei im `frontend` Verzeichnis:
 ```env
 STRAPI_BASE_URL=http://localhost:1337
-NEXT_PUBLIC_STRAPI_BASE_URL=http://localhost:1337
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=change-me
 AUTHENTIK_ISSUER=https://auth.example.org/application/o/hzd/
@@ -40,6 +39,10 @@ pnpm dev
 Das Frontend kommuniziert mit Strapi über die REST API (`/api/...`). Client-seitige
 Aufrufe laufen über den Next.js-Proxy `/api/strapi/*`, serverseitige direkt gegen
 `STRAPI_BASE_URL`. Zentrale Funktionen liegen in `src/lib/strapi/api.ts`.
+
+`STRAPI_BASE_URL` ist eine reine Runtime-Variable im BFF (kein `NEXT_PUBLIC_*`).
+Der Browser erhält die öffentliche Strapi-URL über `GET /api/config` (Hook
+`useConfig`) – nur für Medien-URLs (`/uploads/...`), nicht für API-Aufrufe.
 
 ## Authentifizierung
 
