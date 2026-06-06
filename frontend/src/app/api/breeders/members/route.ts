@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
 			'fields[3]': 'lastName',
 			'fields[4]': 'region',
 			'fields[5]': 'phone',
-			'fields[6]': 'email',
+			'fields[6]': 'cEmail',
 			'fields[7]': 'city',
 			'fields[8]': 'address1',
 			'fields[9]': 'address2',

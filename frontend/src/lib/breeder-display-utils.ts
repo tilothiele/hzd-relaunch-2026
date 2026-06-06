@@ -118,9 +118,9 @@ export function resolveBreederContact(breeder: Breeder): BreederContactInfo {
 			primaryUser?.phone,
 		),
 		email: pickFirstString(
-			...ownerMembers.map((user) => user.email),
-			member?.email,
-			primaryUser?.email,
+			...ownerMembers.map((user) => user.cEmail),
+			member?.cEmail,
+			primaryUser?.cEmail,
 			breeder.BreederEmail,
 		),
 		region: pickFirstString(

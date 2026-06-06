@@ -64,8 +64,8 @@ export function FormComponent({ form, privacyPolicy, strapiBaseUrl }: FormCompon
 		if (standardIdentifierField.LastName && standardIdentifierField.LastName !== 'Nein' && user.lastName) {
 			newValues.lastName = user.lastName
 		}
-		if (standardIdentifierField.EMail && standardIdentifierField.EMail !== 'Nein' && user.email) {
-			newValues.email = user.email
+		if (standardIdentifierField.EMail && standardIdentifierField.EMail !== 'Nein' && user.cEmail) {
+			newValues.email = user.cEmail
 		}
 		if (standardIdentifierField.Street && standardIdentifierField.Street !== 'Nein' && user.address1) {
 			newValues.street = user.address1

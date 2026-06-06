@@ -261,7 +261,7 @@ export function MeinProfilTab({ user: initialUser }: MeinProfilTabProps) {
                     </Box>
                     <Box>
                         <Typography variant="subtitle2" color="text.secondary">E-Mail</Typography>
-                        <Typography variant="body1">{user.email}</Typography>
+                        <Typography variant="body1">{user.cEmail}</Typography>
                     </Box>
                     <Box>
                         <Typography variant="subtitle2" color="text.secondary">Mitgliedsnummer</Typography>

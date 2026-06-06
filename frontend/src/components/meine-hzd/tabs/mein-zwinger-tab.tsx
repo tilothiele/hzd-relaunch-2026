@@ -150,7 +150,7 @@ export function MeinZwingerTab({ breeder, strapiBaseUrl }: MeinZwingerTabProps) 
                                 {breeder.owner_members.map(om => (
                                     <Box key={om.documentId} sx={{ mb: 1 }}>
                                         <Typography variant='body1'>{om.firstName} {om.lastName}</Typography>
-                                        <Typography variant='body2' color='text.secondary'>{om.email}</Typography>
+                                        <Typography variant='body2' color='text.secondary'>{om.cEmail}</Typography>
                                     </Box>
                                 ))}
                             </Box>

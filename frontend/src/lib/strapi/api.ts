@@ -24,6 +24,9 @@ import type {
 	AuthUser,
 	Breeder,
 	BreederSearchResult,
+	Champion,
+	ChampionSearchPageResult,
+	ChampionSearchParams,
 	Dog,
 	DogSearchResult,
 	FormInstance,
@@ -412,7 +415,7 @@ export async function getBreederByDocumentId(
 			'fields[3]': 'lastName',
 			'fields[4]': 'region',
 			'fields[5]': 'phone',
-			'fields[6]': 'email',
+			'fields[6]': 'cEmail',
 			'fields[7]': 'city',
 			'fields[8]': 'address1',
 			'fields[9]': 'address2',
@@ -712,6 +715,37 @@ export async function fetchSitemapData(): Promise<{
 		hzdPluginBreeders: breeders,
 		hzdPluginLitters: litters,
 		calendarEntries,
+	}
+}
+
+export async function searchChampions(
+	params: ChampionSearchParams = {},
+	options: StrapiRequestOptions = {},
+): Promise<ChampionSearchPageResult> {
+	const query = new URLSearchParams()
+
+	if (params.sort) {
+		const sortValue = Array.isArray(params.sort) ? params.sort.join(',') : params.sort
+		if (sortValue.trim().length > 0) query.set('sort', sortValue)
+	}
+	if (params.page !== undefined) query.set('page', String(params.page))
+	if (params.pageSize !== undefined) query.set('pageSize', String(params.pageSize))
+	if (typeof params.year === 'number' && params.year > 0) {
+		query.set('year', String(params.year))
+	}
+	if (params.dogName?.trim()) query.set('dogName', params.dogName.trim())
+
+	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
+	const response = await fetcher<unknown>('champions/search', query, {
+		token: options.token,
+	})
+
+	const nodes = extractStrapiList<Champion>(response)
+	const pagination = extractStrapiPagination(response)
+
+	return {
+		nodes,
+		pageInfo: toConnectionResult({ items: nodes, pagination }).pageInfo,
 	}
 }
 

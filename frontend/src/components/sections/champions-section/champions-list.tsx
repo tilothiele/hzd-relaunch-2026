@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import type { ThemeDefinition } from '@/themes'
-import type { HzdSetting } from '@/types'
+import type { Champion, ChampionSearchPageResult, HzdSetting } from '@/types'
 import { getMoreChampions } from '@/lib/server/champion-actions'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { Avatar, Box, CircularProgress, Typography, Dialog, IconButton } from '@mui/material'
@@ -10,7 +10,8 @@ import CloseIcon from '@mui/icons-material/Close'
 import { BlocksRenderer } from '@strapi/blocks-react-renderer'
 
 interface ChampionsListProps {
-    initialChampions: any[]
+    initialChampions: Champion[]
+    initialPageInfo: ChampionSearchPageResult['pageInfo']
     theme: ThemeDefinition
     strapiBaseUrl: string
     hzdSetting?: HzdSetting | null
@@ -18,14 +19,17 @@ interface ChampionsListProps {
 
 export function ChampionsList({
     initialChampions,
+    initialPageInfo,
     theme,
     strapiBaseUrl,
     hzdSetting
 }: ChampionsListProps) {
-    const [champions, setChampions] = useState<any[]>(initialChampions)
+    const [champions, setChampions] = useState<Champion[]>(initialChampions)
     const [page, setPage] = useState(1)
     const [loading, setLoading] = useState(false)
-    const [hasMore, setHasMore] = useState(true)
+    const [hasMore, setHasMore] = useState(
+        initialPageInfo.page < initialPageInfo.pageCount,
+    )
     const [selectedImage, setSelectedImage] = useState<string | null>(null)
     const observer = useRef<IntersectionObserver | null>(null)
 
@@ -45,11 +49,12 @@ export function ChampionsList({
 
         const loadMore = async () => {
             setLoading(true)
-            const newChampions = await getMoreChampions(page, 20)
+            const { nodes: newChampions, pageInfo } = await getMoreChampions(page, 20)
             if (newChampions.length === 0) {
                 setHasMore(false)
             } else {
                 setChampions(prev => [...prev, ...newChampions])
+                setHasMore(pageInfo.page < pageInfo.pageCount)
             }
             setLoading(false)
         }
@@ -57,7 +62,7 @@ export function ChampionsList({
         loadMore()
     }, [page])
 
-    const getAvatarUrl = (champion: any) => {
+    const getAvatarUrl = (champion: Champion) => {
         const championAvatar = champion.ChampinAvatar
         if (championAvatar) return resolveMediaUrl(championAvatar, strapiBaseUrl) || undefined
 
@@ -68,8 +73,10 @@ export function ChampionsList({
         return resolveMediaUrl(defaultAvatar, strapiBaseUrl) || undefined
     }
 
-    const groupedChampions = champions.reduce((groups: any, champion: any) => {
-        const year = new Date(champion.DateOfChampionship).getFullYear()
+    const groupedChampions = champions.reduce((groups: Record<string, Champion[]>, champion) => {
+        const year = champion.DateOfChampionship
+            ? new Date(champion.DateOfChampionship).getFullYear()
+            : 0
         if (!groups[year]) {
             groups[year] = []
         }
@@ -109,7 +116,7 @@ export function ChampionsList({
                                 </tr>
                             </thead>
                             <tbody>
-                                {groupedChampions[year].map((champion: any, index: number) => {
+                                {groupedChampions[year].map((champion, index: number) => {
                                     const dogName = champion.hzd_plugin_dog?.fullKennelName || champion.hzd_plugin_dog?.givenName || 'Unbekannter Name'
 
                                     return (

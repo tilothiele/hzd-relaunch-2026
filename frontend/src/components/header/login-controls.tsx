@@ -46,7 +46,7 @@ export function LoginControls({
 		}
 
 		// Fallback auf username oder email
-		return user.username ?? user.email ?? 'Account'
+		return user.username ?? user.cEmail ?? 'Account'
 	}, [user])
 
 	// Close menu when clicking outside

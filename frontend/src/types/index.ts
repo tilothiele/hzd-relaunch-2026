@@ -254,6 +254,24 @@ export interface Champion {
 	hzd_plugin_dog?: Dog | null
 }
 
+export interface ChampionSearchParams {
+	page?: number
+	pageSize?: number
+	sort?: string | string[]
+	year?: number
+	dogName?: string
+}
+
+export interface ChampionSearchPageResult {
+	nodes: Champion[]
+	pageInfo: {
+		total: number
+		page: number
+		pageSize: number
+		pageCount: number
+	}
+}
+
 export interface ChampionsSection {
 	__typename: 'ComponentBlocksChampionsSection'
 	id: string
@@ -410,6 +428,7 @@ export interface AuthUser {
 	cId?: number | null
 	username: string
 	email?: string | null
+	cEmail?: string | null
 	confirmed?: boolean | null
 	blocked?: boolean | null
 	role?: UsersPermissionsMeRole | null
@@ -470,6 +489,7 @@ export interface Dog {
 		countryCode?: string | null
 		phone?: string | null
 		email?: string | null
+		cEmail?: string | null
 		locationLat?: number | null
 		locationLng?: number | null
 	} | null
@@ -481,6 +501,13 @@ export interface Dog {
 	BreedersIntroduction?: string | null
 	MemosReleased?: string | null
 	breeder?: {
+		kennelName?: string | null
+		member?: {
+			documentId?: string
+			firstName?: string | null
+			lastName?: string | null
+			city?: string | null
+		} | null
 		BreedersIntroduction?: string | null
 		HasNoDogsAvailabe?: boolean | null
 	} | null
@@ -531,6 +558,7 @@ export interface Breeder {
 		region?: string | null
 		phone?: string | null
 		email?: string | null
+		cEmail?: string | null
 		city?: string | null
 		address1?: string | null
 		address2?: string | null

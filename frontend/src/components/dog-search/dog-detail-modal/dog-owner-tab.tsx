@@ -31,7 +31,7 @@ export function DogOwnerTab({ dog }: DogOwnerTabProps) {
         owner.countryCode,
     ].filter(Boolean)
 
-    const hasContact = owner.phone || owner.email
+    const hasContact = owner.phone || owner.cEmail
 
     return (
         <div className='space-y-6'>
@@ -87,7 +87,7 @@ export function DogOwnerTab({ dog }: DogOwnerTabProps) {
                                 </div>
                             )}
 
-                            {owner.email && (
+                            {owner.cEmail && (
                                 <div className='flex items-center gap-4'>
                                     <Tooltip title='E-Mail' arrow>
                                         <div className='flex h-10 w-10 shrink-0 cursor-help items-center justify-center rounded-full bg-gray-100 text-gray-600'>
@@ -95,8 +95,8 @@ export function DogOwnerTab({ dog }: DogOwnerTabProps) {
                                         </div>
                                     </Tooltip>
                                     <div>
-                                        <a href={`mailto:${owner.email}`} className='text-base text-blue-600 hover:underline'>
-                                            {owner.email}
+                                        <a href={`mailto:${owner.cEmail}`} className='text-base text-blue-600 hover:underline'>
+                                            {owner.cEmail}
                                         </a>
                                     </div>
                                 </div>
