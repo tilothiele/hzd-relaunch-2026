@@ -99,6 +99,7 @@ public class ImportService {
 
 			List<Member> members = memberReader.read(membersPath);
 			LOG.infof("Loaded %d members from %s", members.size(), membersPath);
+			strapiMemberAdapter.setCsvMembers(members);
 
 			List<Dog> dogs = dogReader.read(dogsPath);
 			LOG.infof("Loaded %d dogs from %s", dogs.size(), dogsPath);

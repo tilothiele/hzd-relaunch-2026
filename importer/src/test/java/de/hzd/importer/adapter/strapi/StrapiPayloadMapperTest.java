@@ -173,6 +173,47 @@ class StrapiPayloadMapperTest {
 	}
 
 	@Test
+	void mapsStudBreederInputForDeckrueden() {
+		Map<String, Object> payload = StrapiPayloadMapper.toStudBreederInput(
+			42001,
+			Optional.of("owner-doc-1"),
+			Optional.of("Max Mustermann")
+		);
+
+		assertEquals(42001, payload.get("cId"));
+		assertEquals(true, payload.get("IsActive"));
+		assertEquals("S", payload.get("BreederRole"));
+		assertEquals("Max Mustermann", payload.get("kennelName"));
+		assertTrue(!payload.containsKey("member"));
+		assertEquals(
+			java.util.List.of("owner-doc-1"),
+			((Map<?, ?>) payload.get("owner_members")).get("connect")
+		);
+	}
+
+	@Test
+	void formatOwnerKennelNameJoinsFirstAndLastName() {
+		assertEquals(
+			Optional.of("Max Mustermann"),
+			StrapiPayloadMapper.formatOwnerKennelName(
+				Optional.of("Max"),
+				Optional.of("Mustermann")
+			)
+		);
+		assertEquals(
+			Optional.of("Peter & Sabine Adams"),
+			StrapiPayloadMapper.formatOwnerKennelName(
+				Optional.empty(),
+				Optional.of("Peter & Sabine Adams")
+			)
+		);
+		assertEquals(
+			Optional.empty(),
+			StrapiPayloadMapper.formatOwnerKennelName(Optional.empty(), Optional.empty())
+		);
+	}
+
+	@Test
 	void mapsBreederIsActiveFromMember() {
 		assertEquals(
 			false,
