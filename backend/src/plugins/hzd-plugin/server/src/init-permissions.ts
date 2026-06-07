@@ -26,6 +26,7 @@ const DEFAULT_PERMISSIONS: string[] = [
 	// API – Website-Inhalte
 	...apiActions('page', ['find', 'findOne']),
 	...apiActions('news-article', ['find', 'findOne']),
+	'api::news-article.news-article.search',
 	...apiActions('news-article-category', ['find', 'findOne']),
 	...apiActions('news-article-tag', ['find', 'findOne']),
 	...apiActions('author', ['find', 'findOne']),

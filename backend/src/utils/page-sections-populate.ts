@@ -98,6 +98,14 @@ const sectionComponentPopulate = (
 					},
 				},
 			}
+		case 'blocks.news-articles-section':
+			return {
+				populate: {
+					news_article_category: {
+						fields: ['documentId', 'CategoryName', 'CategoryDescription'],
+					},
+				},
+			}
 		default:
 			return true
 	}

@@ -191,23 +191,68 @@ public class StrapiMemberAdapter {
 			}
 		}
 
+		return fetchOwnerUserFromStrapi(ownerCId)
+			.flatMap(user -> StrapiPayloadMapper.formatOwnerKennelName(
+				StrapiResponseReader.readTextField(user, "firstName"),
+				StrapiResponseReader.readTextField(user, "lastName")
+			));
+	}
+
+	public Optional<Map<String, Object>> resolveOwnerAddress(int ownerCId) {
+		Member csvMember = csvMembersByCid.get(ownerCId);
+		if (csvMember != null) {
+			Optional<Map<String, Object>> address = toOwnerAddressFromMember(csvMember);
+			if (address.isPresent()) {
+				return address;
+			}
+		}
+
+		return fetchOwnerUserFromStrapi(ownerCId)
+			.flatMap(this::toOwnerAddressFromUser);
+	}
+
+	private Optional<JsonNode> fetchOwnerUserFromStrapi(int ownerCId) {
 		JsonNode response = client.list(
 			StrapiResources.USERS,
 			Map.of(
 				"filters[cId][$eq]", Integer.toString(ownerCId),
 				"fields[0]", "firstName",
-				"fields[1]", "lastName"
+				"fields[1]", "lastName",
+				"fields[2]", "address1",
+				"fields[3]", "address2",
+				"fields[4]", "city",
+				"fields[5]", "zip",
+				"fields[6]", "countryCode"
 			)
 		);
 		JsonNode items = StrapiResponseReader.readResultItems(response);
 		if (items == null || items.isEmpty()) {
 			return Optional.empty();
 		}
+		return Optional.of(items.get(0));
+	}
 
-		JsonNode user = items.get(0);
-		return StrapiPayloadMapper.formatOwnerKennelName(
+	private Optional<Map<String, Object>> toOwnerAddressFromUser(JsonNode user) {
+		return StrapiPayloadMapper.toOwnerAddressComponent(
 			StrapiResponseReader.readTextField(user, "firstName"),
-			StrapiResponseReader.readTextField(user, "lastName")
+			StrapiResponseReader.readTextField(user, "lastName"),
+			StrapiResponseReader.readTextField(user, "address1"),
+			StrapiResponseReader.readTextField(user, "address2"),
+			StrapiResponseReader.readTextField(user, "city"),
+			StrapiResponseReader.readTextField(user, "zip"),
+			StrapiResponseReader.readTextField(user, "countryCode")
+		);
+	}
+
+	private Optional<Map<String, Object>> toOwnerAddressFromMember(Member member) {
+		return StrapiPayloadMapper.toOwnerAddressComponent(
+			member.firstName(),
+			member.lastName(),
+			member.address1(),
+			Optional.empty(),
+			member.city(),
+			member.zip(),
+			member.countryCode()
 		);
 	}
 

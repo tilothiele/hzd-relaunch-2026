@@ -1,4 +1,4 @@
-import { fetchNewsArticles as fetchNewsArticlesApi } from '@/lib/strapi/api'
+import { searchNewsArticles } from '@/lib/strapi/api'
 import type { Image } from '@/types'
 
 export interface NewsArticle {
@@ -36,17 +36,15 @@ export async function fetchNewsArticles({
 	limit?: number
 	categoryDocumentId?: string
 } = {}): Promise<NewsArticle[]> {
-	const filters: Record<string, unknown> = {}
-	if (categoryDocumentId) {
-		filters.category = { documentId: { eq: categoryDocumentId } }
-	}
-
 	try {
-		const { newsArticles } = await fetchNewsArticlesApi({
-			filters,
-			pagination: { pageSize: limit },
-			sort: ['publishedAt:desc'],
-		})
+		const { newsArticles } = await searchNewsArticles(
+			{
+				categoryDocumentId,
+				pageSize: limit,
+				sort: ['publishedAt:desc'],
+			},
+			{ server: true },
+		)
 
 		return newsArticles as unknown as NewsArticle[]
 	} catch (error) {
