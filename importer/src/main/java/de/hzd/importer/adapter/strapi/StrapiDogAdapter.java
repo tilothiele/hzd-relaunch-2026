@@ -17,6 +17,9 @@ public class StrapiDogAdapter {
 	@Inject
 	StrapiRestClient client;
 
+	@Inject
+	StrapiMemberAdapter strapiMemberAdapter;
+
 	private final Map<Integer, String> documentIdsByCId = new HashMap<>();
 
 	public enum UpsertResult {
@@ -28,11 +31,42 @@ public class StrapiDogAdapter {
 		documentIdsByCId.clear();
 	}
 
+	public boolean ensureStudBreeder(int breederCId, Optional<String> ownerMemberDocumentId) {
+		Optional<String> existingBreederId = client.findDocumentIdByCId(
+			StrapiResources.BREEDERS,
+			breederCId
+		);
+		if (existingBreederId.isPresent()) {
+			return false;
+		}
+
+		strapiMemberAdapter.ensureOwnerMembersPublishMyDataBeforeBreederSave(
+			breederCId,
+			ownerMemberDocumentId.isPresent() ? Optional.of(breederCId) : Optional.empty()
+		);
+
+		Map<String, Object> payload = StrapiPayloadMapper.toStudBreederInput(
+			breederCId,
+			ownerMemberDocumentId,
+			strapiMemberAdapter.resolveOwnerKennelName(breederCId)
+		);
+		client.create(StrapiResources.BREEDERS, payload, true);
+		LOG.infof("Created stud breeder cId=%d from dog import", breederCId);
+		return true;
+	}
+
 	public boolean ensureBreeder(int breederCId, Optional<String> kennelName, Optional<Boolean> isActiveBreeder) {
 		Optional<String> existingBreederId = client.findDocumentIdByCId(
 			StrapiResources.BREEDERS,
 			breederCId
 		);
+
+		// Strapi beforeUpdate verknüpft per cId automatisch owner_members (linkBreederMemberFromCId).
+		strapiMemberAdapter.ensureOwnerMembersPublishMyDataBeforeBreederSave(
+			breederCId,
+			Optional.of(breederCId)
+		);
+
 		Map<String, Object> payload = StrapiPayloadMapper.toBreederInput(
 			breederCId,
 			kennelName,

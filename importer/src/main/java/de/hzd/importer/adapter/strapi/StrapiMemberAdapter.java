@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,6 +34,7 @@ public class StrapiMemberAdapter {
 
 	private Map<Integer, StrapiMemberSnapshot> membersByCid = Map.of();
 	private Map<String, StrapiMemberSnapshot> membersByUsername = Map.of();
+	private Map<Integer, Member> csvMembersByCid = Map.of();
 	private int authenticatedRoleId = -1;
 
 	public StrapiMemberSnapshot cachedMemberByCid(int cId) {
@@ -171,6 +173,166 @@ public class StrapiMemberAdapter {
 		return members;
 	}
 
+	public void setCsvMembers(List<Member> members) {
+		this.csvMembersByCid = members != null
+			? members.stream().collect(Collectors.toMap(Member::cId, member -> member, (left, right) -> left))
+			: Map.of();
+	}
+
+	public Optional<String> resolveOwnerKennelName(int ownerCId) {
+		Member csvMember = csvMembersByCid.get(ownerCId);
+		if (csvMember != null) {
+			Optional<String> name = StrapiPayloadMapper.formatOwnerKennelName(
+				csvMember.firstName(),
+				csvMember.lastName()
+			);
+			if (name.isPresent()) {
+				return name;
+			}
+		}
+
+		JsonNode response = client.list(
+			StrapiResources.USERS,
+			Map.of(
+				"filters[cId][$eq]", Integer.toString(ownerCId),
+				"fields[0]", "firstName",
+				"fields[1]", "lastName"
+			)
+		);
+		JsonNode items = StrapiResponseReader.readResultItems(response);
+		if (items == null || items.isEmpty()) {
+			return Optional.empty();
+		}
+
+		JsonNode user = items.get(0);
+		return StrapiPayloadMapper.formatOwnerKennelName(
+			StrapiResponseReader.readTextField(user, "firstName"),
+			StrapiResponseReader.readTextField(user, "lastName")
+		);
+	}
+
+	private record OwnerMemberRef(
+		int userId,
+		int cId,
+		Optional<Boolean> publishMyData
+	) {
+	}
+
+	public void ensureOwnerMembersPublishMyDataBeforeBreederSave(
+		int breederCId,
+		Optional<Integer> connectingOwnerCId
+	) {
+		for (OwnerMemberRef owner : fetchBreederOwnerMembers(breederCId)) {
+			ensurePublishMyDataForUser(owner);
+		}
+		connectingOwnerCId.ifPresent(this::ensurePublishMyDataForBreederOwner);
+	}
+
+	public void ensurePublishMyDataForBreederOwner(int cId) {
+		StrapiMemberSnapshot snapshot = membersByCid.get(cId);
+		if (snapshot != null && snapshot.publishMyData().orElse(false)) {
+			return;
+		}
+
+		if (snapshot != null) {
+			updateUserPublishMyData(snapshot.id(), cId, snapshot.documentId());
+			return;
+		}
+
+		Optional<StrapiUserRef> userRef = client.findUserRefByCId(cId);
+		if (userRef.isEmpty()) {
+			LOG.warnf(
+				"Cannot set publishMyData=true for breeder owner cId=%d: Strapi user not found",
+				cId
+			);
+			return;
+		}
+
+		updateUserPublishMyData(
+			userRef.get().numericId(),
+			cId,
+			userRef.get().documentId()
+		);
+	}
+
+	private void ensurePublishMyDataForUser(OwnerMemberRef owner) {
+		if (owner.publishMyData().orElse(false)) {
+			return;
+		}
+		updateUserPublishMyData(owner.userId(), owner.cId(), null);
+	}
+
+	private void updateUserPublishMyData(int userId, int cId, String documentId) {
+		client.updateUser(userId, Map.of("publishMyData", true));
+		LOG.infof(
+			"Updated Strapi user publishMyData=true for breeder owner cId=%d userId=%d documentId=%s",
+			cId,
+			userId,
+			documentId != null ? documentId : "?"
+		);
+	}
+
+	private List<OwnerMemberRef> fetchBreederOwnerMembers(int breederCId) {
+		Map<String, String> query = new LinkedHashMap<>();
+		query.put("filters[cId][$eq]", Integer.toString(breederCId));
+		query.put("populate[owner_members][fields][0]", "id");
+		query.put("populate[owner_members][fields][1]", "cId");
+		query.put("populate[owner_members][fields][2]", "publishMyData");
+		query.put("populate[member][fields][0]", "id");
+		query.put("populate[member][fields][1]", "cId");
+		query.put("populate[member][fields][2]", "publishMyData");
+
+		JsonNode response = client.list(StrapiResources.BREEDERS, query);
+		JsonNode items = StrapiResponseReader.readResultItems(response);
+		if (items == null || items.isEmpty()) {
+			return List.of();
+		}
+
+		JsonNode breeder = items.get(0);
+		Map<Integer, OwnerMemberRef> ownersByUserId = new LinkedHashMap<>();
+		for (OwnerMemberRef owner : parseOwnerMembers(breeder.path("owner_members"))) {
+			ownersByUserId.put(owner.userId(), owner);
+		}
+		parseOwnerMember(breeder.path("member")).ifPresent(owner ->
+			ownersByUserId.putIfAbsent(owner.userId(), owner)
+		);
+		return List.copyOf(ownersByUserId.values());
+	}
+
+	private List<OwnerMemberRef> parseOwnerMembers(JsonNode ownerMembers) {
+		if (ownerMembers == null || ownerMembers.isNull()) {
+			return List.of();
+		}
+
+		JsonNode array = ownerMembers.isArray() ? ownerMembers : ownerMembers.path("data");
+		if (!array.isArray()) {
+			return List.of();
+		}
+
+		List<OwnerMemberRef> result = new ArrayList<>();
+		for (JsonNode owner : array) {
+			parseOwnerMember(owner).ifPresent(result::add);
+		}
+		return result;
+	}
+
+	private Optional<OwnerMemberRef> parseOwnerMember(JsonNode owner) {
+		if (owner == null || owner.isNull() || owner.isMissingNode()) {
+			return Optional.empty();
+		}
+
+		Optional<Integer> userId = StrapiResponseReader.readNumericId(owner);
+		if (userId.isEmpty()) {
+			return Optional.empty();
+		}
+
+		return Optional.of(new OwnerMemberRef(
+			userId.get(),
+			owner.path("cId").asInt(-1),
+			StrapiResponseReader.readBooleanField(owner, "publishMyData")
+		));
+	}
+
 	public void setImportCache(Collection<StrapiMemberSnapshot> members) {
 		this.membersByCid = members != null 
 				? members.stream().collect(Collectors.toMap(m -> m.cId, m -> m)) 
@@ -183,6 +345,7 @@ public class StrapiMemberAdapter {
 	public void clearImportCache() {
 		membersByCid = Map.of();
 		membersByUsername = Map.of();
+		csvMembersByCid = Map.of();
 		authenticatedRoleId = -1;
 	}
 
@@ -209,23 +372,23 @@ public class StrapiMemberAdapter {
 
 		if (existingUser.isPresent()) {
 			StrapiUserRef userRef = existingUser.get();
-			LOG.infof(
-				"Update Strapi user cId=%d documentId=%s numericId=%d email=%s",
-				member.cId(),
-				userRef.documentId(),
-				userRef.numericId(),
-				member.strapiEmail()
-			);
+//			LOG.infof(
+//				"Update Strapi user cId=%d documentId=%s numericId=%d email=%s",
+//				member.cId(),
+//				userRef.documentId(),
+//				userRef.numericId(),
+//				member.strapiEmail()
+//			);
 			client.updateUser(userRef.numericId(), payload);
 			return new UpsertResult(UpsertResult.UpsertAction.UPDATED, userRef.documentId());
 		}
 
-		LOG.infof(
-			"Create Strapi user cId=%d username=%s email=%s",
-			member.cId(),
-			member.username(),
-			member.strapiEmail()
-		);
+//		LOG.infof(
+//			"Create Strapi user cId=%d username=%s email=%s",
+//			member.cId(),
+//			member.username(),
+//			member.strapiEmail()
+//		);
 		JsonNode response = client.create(StrapiResources.USERS, payload, false);
 		String documentId = client.readDocumentId(response)
 			.orElseGet(() -> StrapiResponseReader.readResourceId(response).orElse(null));
@@ -241,18 +404,23 @@ public class StrapiMemberAdapter {
 		if(u==null || u.isEmpty()) return;
 		
 		client.updateUser(u.get().id(), Map.of("email", email));
-		LOG.infof(
-			"Updated Strapi user email cId=%d documentId=%s to %s",
-			cId,
-			u.get().documentId(),
-			email
-		);
+//		LOG.infof(
+//			"Updated Strapi user email cId=%d documentId=%s to %s",
+//			cId,
+//			u.get().documentId(),
+//			email
+//		);
 	}
 
 	public boolean upsertBreeder(Member member, String memberDocumentId) {
 		if (!member.isBreeder()) {
 			return false;
 		}
+
+		ensureOwnerMembersPublishMyDataBeforeBreederSave(
+			member.cId(),
+			Optional.of(member.cId())
+		);
 
 		Optional<String> existingBreederId = client.findDocumentIdByCId(
 			StrapiResources.BREEDERS,
@@ -274,12 +442,12 @@ public class StrapiMemberAdapter {
 				payload,
 				true
 			);
-			LOG.infof("Updated breeder cId=%d documentId=%s", member.cId(), existingBreederId.get());
+			//LOG.infof("Updated breeder cId=%d documentId=%s", member.cId(), existingBreederId.get());
 			return false;
 		}
 
 		client.create(StrapiResources.BREEDERS, payload, true);
-		LOG.infof("Created breeder cId=%d for member documentId=%s", member.cId(), memberDocumentId);
+		//LOG.infof("Created breeder cId=%d for member documentId=%s", member.cId(), memberDocumentId);
 		return true;
 	}
 

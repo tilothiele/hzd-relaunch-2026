@@ -3,15 +3,18 @@ package de.hzd.importer.application;
 import de.hzd.importer.adapter.strapi.StrapiDogAdapter;
 import de.hzd.importer.adapter.strapi.StrapiRestClient;
 import de.hzd.importer.domain.Dog;
+import de.hzd.importer.domain.DogSex;
 import de.hzd.importer.port.DogSyncPort;
 import de.hzd.util.Ticker;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.jboss.logging.Logger;
 
 @ApplicationScoped
@@ -66,7 +69,50 @@ public class DogSyncService implements DogSyncPort {
 				breederCache.put(entry.getKey(), Optional.empty());
 			}
 		}
+
+		Set<Integer> studBreederOwnerCIds = new LinkedHashSet<>();
+		for (Dog dog : dogs) {
+			if (!isStudDog(dog)) {
+				continue;
+			}
+			dog.ownerId().ifPresent(studBreederOwnerCIds::add);
+		}
+
+		long t1 = System.currentTimeMillis();
+		i = 0;
+		for (Integer ownerCId : studBreederOwnerCIds) {
+			if (breederCache.containsKey(ownerCId)) {
+				continue;
+			}
+			final int j = i++;
+			logTicker.tick(() -> Log.info(Ticker.formatProceedingMessage(
+				t1,
+				studBreederOwnerCIds.size(),
+				j,
+				"Stud breeder"
+			)));
+			try {
+				Optional<String> ownerDocumentId = strapiDogAdapter.findOwnerDocumentId(ownerCId);
+				boolean created = strapiDogAdapter.ensureStudBreeder(ownerCId, ownerDocumentId);
+				if (created) {
+					breedersCreated++;
+				}
+				breederCache.put(
+					ownerCId,
+					strapiDogAdapter.findBreederDocumentId(ownerCId)
+				);
+				strapiRestClient.delayBetweenRequests();
+			} catch (RuntimeException exception) {
+				LOG.errorf(exception, "Failed to ensure stud breeder cId=%d", ownerCId);
+				breederCache.put(ownerCId, Optional.empty());
+			}
+		}
 		return new DogSyncPort.BreederPreparationResult(breedersCreated);
+	}
+
+	private static boolean isStudDog(Dog dog) {
+		return dog.cFertile().orElse(false)
+			&& dog.sex().map(DogSex.M::equals).orElse(false);
 	}
 
 	@Override

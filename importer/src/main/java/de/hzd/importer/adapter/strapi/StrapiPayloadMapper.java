@@ -46,7 +46,7 @@ final class StrapiPayloadMapper {
 		member.memberSince().ifPresent(value -> payload.put("memberSince", value.toString()));
 		member.cancellationOn().ifPresent(value -> payload.put("cancellationOn", value.toString()));
 		member.region().map(UserRegion::strapiValue).ifPresent(value -> payload.put("region", value));
-		payload.put("publishMyData", resolvePublishMyData(member));
+		payload.put("publishMyData", shouldPublishMyData(member));
 
 		if (includePassword) {
 			payload.put(
@@ -57,7 +57,7 @@ final class StrapiPayloadMapper {
 		return payload;
 	}
 
-	private static boolean resolvePublishMyData(Member member) {
+	static boolean shouldPublishMyData(Member member) {
 		if (member.isBreeder()) {
 			return true;
 		}
@@ -83,6 +83,35 @@ final class StrapiPayloadMapper {
 			payload.put("owner_members", Map.of("connect", java.util.List.of(documentId)));
 		});
 		return payload;
+	}
+
+	/** Deckrüden-Zwinger: Rolle S, member leer, owner_members = Besitzer des Hundes. */
+	static Map<String, Object> toStudBreederInput(
+		int breederCId,
+		Optional<String> ownerMemberDocumentId,
+		Optional<String> kennelName
+	) {
+		Map<String, Object> payload = new HashMap<>();
+		payload.put("cId", breederCId);
+		payload.put("IsActive", true);
+		payload.put("BreederRole", "S");
+		kennelName
+			.map(value -> truncate(value, 200))
+			.ifPresent(value -> payload.put("kennelName", "DRB "+value));
+		ownerMemberDocumentId.ifPresent(documentId ->
+			payload.put("owner_members", Map.of("connect", java.util.List.of(documentId)))
+		);
+		return payload;
+	}
+
+	static Optional<String> formatOwnerKennelName(
+		Optional<String> firstName,
+		Optional<String> lastName
+	) {
+		String first = firstName.map(String::trim).filter(value -> !value.isEmpty()).orElse("");
+		String last = lastName.map(String::trim).filter(value -> !value.isEmpty()).orElse("");
+		String combined = (first + " " + last).trim();
+		return combined.isEmpty() ? Optional.empty() : Optional.of(combined);
 	}
 
 	static Map<String, Object> toDogInput(Dog dog) {
