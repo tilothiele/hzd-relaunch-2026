@@ -231,7 +231,7 @@ backup_application "$BASE_DIR" "vaultwarden" \
 backup_application "$BASE_DIR" "n8n"\
     "n8n-ikcc8gsgcco4o84oscsoss08" \
     -- \
-    "ikcc8gsgcco4o84oscsoss08_n8n-data"https://auth.hovawarte.com/if/admin/#/flow/flows;%7B%22ak-flow-list-search%22%3A%22recovery%22%7D
+    "ikcc8gsgcco4o84oscsoss08_n8n-data"
 
 # authentik
 dump_file="authentik_db_dump_$(date +%F).sql"
