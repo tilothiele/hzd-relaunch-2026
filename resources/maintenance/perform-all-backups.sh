@@ -9,7 +9,7 @@ SECONDS=0
 
 BASE_DIR="/home/kyno/backups"
 
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+SCRIPT_DIR="$(dirname "$0")"
 
 . $SCRIPT_DIR/.env
 
@@ -144,8 +144,8 @@ backup_application() {
 }
 
 backup_files_in_dir() {
-	local base_dir = "$1"
-	local prefix = "$2"
+	local base_dir="$1"
+	local prefix="$2"
 	docker run --rm \
 		-v "$base_dir:/backup/data:ro" \
 		-e AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" \
@@ -162,7 +162,7 @@ backup_files_in_dir() {
 			_bv_ensure_start
 			die "Volume-Backup fehlgeschlagen: $vol"
 		}
-	echo "Backup von $vol erfolgreich"
+	echo "Backup von $base_dir erfolgreich"
 }
 
 mkdir -p "$BASE_DIR" || die "BASE_DIR anlegen fehlgeschlagen: $BASE_DIR"
@@ -223,7 +223,7 @@ backup_application "$BASE_DIR" "opencloud" \
 
 # Vaultwarden
 backup_application "$BASE_DIR" "vaultwarden" \
-    "vaultwarden-e0c4woggs40w4swo8w0kcw48-123741972336" \
+    "vaultwarden-e0c4woggs40w4swo8w0kcw48-093235645179" \
     -- \
     "e0c4woggs40w4swo8w0kcw48_vaultwarden-data"
 
@@ -231,7 +231,7 @@ backup_application "$BASE_DIR" "vaultwarden" \
 backup_application "$BASE_DIR" "n8n"\
     "n8n-ikcc8gsgcco4o84oscsoss08" \
     -- \
-    "ikcc8gsgcco4o84oscsoss08_n8n-data"https://auth.hovawarte.com/if/admin/#/flow/flows;%7B%22ak-flow-list-search%22%3A%22recovery%22%7D
+    "ikcc8gsgcco4o84oscsoss08_n8n-data"
 
 # authentik
 dump_file="authentik_db_dump_$(date +%F).sql"
