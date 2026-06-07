@@ -254,6 +254,24 @@ export interface Champion {
 	hzd_plugin_dog?: Dog | null
 }
 
+export interface NewsArticleSearchParams {
+	categoryDocumentId?: string
+	categorySlug?: string
+	page?: number
+	pageSize?: number
+	sort?: string | string[]
+}
+
+export interface NewsArticleSearchPageResult {
+	newsArticles: NewsArticle[]
+	pageInfo: {
+		total: number
+		page: number
+		pageSize: number
+		pageCount: number
+	}
+}
+
 export interface ChampionSearchParams {
 	page?: number
 	pageSize?: number

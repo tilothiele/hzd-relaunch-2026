@@ -48,7 +48,8 @@ public class StrapiDogAdapter {
 		Map<String, Object> payload = StrapiPayloadMapper.toStudBreederInput(
 			breederCId,
 			ownerMemberDocumentId,
-			strapiMemberAdapter.resolveOwnerKennelName(breederCId)
+			strapiMemberAdapter.resolveOwnerKennelName(breederCId),
+			strapiMemberAdapter.resolveOwnerAddress(breederCId)
 		);
 		client.create(StrapiResources.BREEDERS, payload, true);
 		LOG.infof("Created stud breeder cId=%d from dog import", breederCId);

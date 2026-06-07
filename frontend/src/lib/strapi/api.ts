@@ -27,6 +27,8 @@ import type {
 	Champion,
 	ChampionSearchPageResult,
 	ChampionSearchParams,
+	NewsArticleSearchPageResult,
+	NewsArticleSearchParams,
 	Dog,
 	DogSearchResult,
 	FormInstance,
@@ -806,6 +808,39 @@ export async function fetchSupplementalDocumentsForGroup(
 		query,
 		{ server: true },
 	)
+}
+
+export async function searchNewsArticles(
+	params: NewsArticleSearchParams = {},
+	options: StrapiRequestOptions = {},
+): Promise<NewsArticleSearchPageResult> {
+	const query = new URLSearchParams()
+
+	if (params.categoryDocumentId?.trim()) {
+		query.set('categoryDocumentId', params.categoryDocumentId.trim())
+	}
+	if (params.categorySlug?.trim()) {
+		query.set('categorySlug', params.categorySlug.trim())
+	}
+	if (params.sort) {
+		const sortValue = Array.isArray(params.sort) ? params.sort.join(',') : params.sort
+		if (sortValue.trim().length > 0) query.set('sort', sortValue)
+	}
+	if (params.page !== undefined) query.set('page', String(params.page))
+	if (params.pageSize !== undefined) query.set('pageSize', String(params.pageSize))
+
+	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
+	const response = await fetcher<unknown>('news-articles/search', query, {
+		token: options.token,
+	})
+
+	const newsArticles = extractStrapiList<Record<string, unknown>>(response)
+	const pagination = extractStrapiPagination(response)
+
+	return {
+		newsArticles: newsArticles as unknown as NewsArticleSearchPageResult['newsArticles'],
+		pageInfo: toConnectionResult({ items: newsArticles, pagination }).pageInfo,
+	}
 }
 
 export async function fetchNewsArticleBySlug(

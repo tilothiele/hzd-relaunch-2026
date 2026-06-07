@@ -16,12 +16,13 @@ export async function NewsArticlesSectionComponent({
     strapiBaseUrl,
     theme,
 }: NewsArticlesSectionComponentProps) {
-    const articles = await fetchNewsArticles({
-        limit: 100, // Fetch more articles to allow client-side filtering by year
-        categoryDocumentId: section.news_article_category?.documentId,
-    })
+    const categoryDocumentId = section.news_article_category?.documentId
+    const articleLimit = section.MaxArticles > 0 ? section.MaxArticles : 100
 
-    console.log('NewsArticlesSectionComponent fetched:', articles.length, 'articles')
+    const articles = await fetchNewsArticles({
+        limit: articleLimit,
+        categoryDocumentId,
+    })
 
     if (!articles.length) {
         return null

@@ -174,21 +174,50 @@ class StrapiPayloadMapperTest {
 
 	@Test
 	void mapsStudBreederInputForDeckrueden() {
+		Map<String, Object> address = Map.of(
+			"FullName", "Max Mustermann",
+			"Address1", "Hauptstraße 1",
+			"City", "Berlin",
+			"Zip", "10115",
+			"CountryCode", "DE"
+		);
 		Map<String, Object> payload = StrapiPayloadMapper.toStudBreederInput(
 			42001,
 			Optional.of("owner-doc-1"),
-			Optional.of("Max Mustermann")
+			Optional.of("Max Mustermann"),
+			Optional.of(address)
 		);
 
 		assertEquals(42001, payload.get("cId"));
 		assertEquals(true, payload.get("IsActive"));
 		assertEquals("S", payload.get("BreederRole"));
-		assertEquals("Max Mustermann", payload.get("kennelName"));
+		assertEquals("DRB Max Mustermann", payload.get("kennelName"));
+		assertEquals(address, payload.get("Address"));
 		assertTrue(!payload.containsKey("member"));
 		assertEquals(
 			java.util.List.of("owner-doc-1"),
 			((Map<?, ?>) payload.get("owner_members")).get("connect")
 		);
+	}
+
+	@Test
+	void mapsOwnerAddressComponentFromMemberFields() {
+		Optional<Map<String, Object>> address = StrapiPayloadMapper.toOwnerAddressComponent(
+			Optional.of("Max"),
+			Optional.of("Mustermann"),
+			Optional.of("Hauptstraße 1"),
+			Optional.empty(),
+			Optional.of("Berlin"),
+			Optional.of("10115"),
+			Optional.of("DE")
+		);
+
+		assertTrue(address.isPresent());
+		assertEquals("Max Mustermann", address.get().get("FullName"));
+		assertEquals("Hauptstraße 1", address.get().get("Address1"));
+		assertEquals("Berlin", address.get().get("City"));
+		assertEquals("10115", address.get().get("Zip"));
+		assertEquals("DE", address.get().get("CountryCode"));
 	}
 
 	@Test
