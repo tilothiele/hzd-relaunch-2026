@@ -5,7 +5,7 @@ set -euo pipefail
 # 0. .env laden
 #############################################
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(dirname "$0")"
 
 if [ ! -f "$SCRIPT_DIR/.env" ]; then
   echo "Fehler: .env Datei nicht gefunden!"
