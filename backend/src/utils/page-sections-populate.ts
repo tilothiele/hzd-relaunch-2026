@@ -7,6 +7,7 @@ export const PAGE_SECTION_BLOCK_COMPONENTS = [
 	'blocks.teaser-text-with-image',
 	'blocks.text-columns-section',
 	'blocks.image-gallery-section',
+	'blocks.detailed-image-gallery-section',
 	'blocks.simple-cta-section',
 	'blocks.news-articles-section',
 	'blocks.contact-group-section',
@@ -82,6 +83,16 @@ const sectionComponentPopulate = (
 			return {
 				populate: {
 					GalleryImages: true,
+				},
+			}
+		case 'blocks.detailed-image-gallery-section':
+			return {
+				populate: {
+					DetailedImage: {
+						populate: {
+							DetailedImage: true,
+						},
+					},
 				},
 			}
 		case 'blocks.contact-group-section':

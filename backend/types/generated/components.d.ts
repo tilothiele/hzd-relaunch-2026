@@ -86,6 +86,39 @@ export interface BlocksContactMailerSection extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksDetailedImage extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_detailed_images';
+  info: {
+    displayName: 'DetailedImage';
+  };
+  attributes: {
+    DetailedImage: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
+    DetailedImageDescription: Schema.Attribute.RichText &
+      Schema.Attribute.CustomField<
+        'plugin::ckeditor5.CKEditor',
+        {
+          preset: 'defaultHtml';
+        }
+      >;
+    DetailedImageHeadline: Schema.Attribute.String;
+  };
+}
+
+export interface BlocksDetailedImageGallerySection
+  extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_detailed_image_gallery_sections';
+  info: {
+    displayName: 'DetailedImageGallerySection';
+  };
+  attributes: {
+    DetailedImage: Schema.Attribute.Component<'blocks.detailed-image', true>;
+    DetailedImagesAnchor: Schema.Attribute.String;
+    DetailedImagesHeadline: Schema.Attribute.String;
+  };
+}
+
 export interface BlocksDocumentBundle extends Struct.ComponentSchema {
   collectionName: 'components_blocks_document_bundles';
   info: {
@@ -746,6 +779,8 @@ declare module '@strapi/strapi' {
       'blocks.champions-section': BlocksChampionsSection;
       'blocks.contact-group-section': BlocksContactGroupSection;
       'blocks.contact-mailer-section': BlocksContactMailerSection;
+      'blocks.detailed-image': BlocksDetailedImage;
+      'blocks.detailed-image-gallery-section': BlocksDetailedImageGallerySection;
       'blocks.document-bundle': BlocksDocumentBundle;
       'blocks.document-bundle-section': BlocksDocumentBundleSection;
       'blocks.email-addresses': BlocksEmailAddresses;

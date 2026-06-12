@@ -26,7 +26,6 @@ const MEMBER_CONTACT_FIELDS = [
 
 const CHAMPION_SEARCH_POPULATE = {
 	ChampinAvatar: true,
-	ChampionshipTitles: true,
 	hzd_plugin_dog: {
 		fields: ['documentId', 'givenName', 'fullKennelName', 'cBreederId'],
 		populate: {

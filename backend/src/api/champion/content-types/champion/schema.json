@@ -31,6 +31,10 @@
         "videos",
         "audios"
       ]
+    },
+    "DisplayName": {
+      "type": "string",
+      "maxLength": 255
     }
   }
 }

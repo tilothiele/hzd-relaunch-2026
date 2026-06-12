@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_blocks_detailed_image_gallery_sections",
+  "info": {
+    "displayName": "DetailedImageGallerySection"
+  },
+  "options": {},
+  "attributes": {
+    "DetailedImagesHeadline": {
+      "type": "string"
+    },
+    "DetailedImagesAnchor": {
+      "type": "string"
+    },
+    "DetailedImage": {
+      "type": "component",
+      "component": "blocks.detailed-image",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}

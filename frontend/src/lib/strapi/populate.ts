@@ -17,6 +17,7 @@ const SECTION_BLOCK_COMPONENTS = [
 	'blocks.teaser-text-with-image',
 	'blocks.text-columns-section',
 	'blocks.image-gallery-section',
+	'blocks.detailed-image-gallery-section',
 	'blocks.simple-cta-section',
 	'blocks.news-articles-section',
 	'blocks.contact-group-section',
@@ -36,6 +37,7 @@ const NEWS_ARTICLE_SECTION_COMPONENTS = [
 	'blocks.simple-cta-section',
 	'blocks.rich-text-section',
 	'blocks.image-gallery-section',
+	'blocks.detailed-image-gallery-section',
 	'blocks.contact-group-section',
 	'blocks.card-section',
 ] as const
@@ -85,6 +87,9 @@ function appendSectionsDeepPopulate(
 				break
 			case 'blocks.image-gallery-section':
 				params.set(`${base}[GalleryImages]`, 'true')
+				break
+			case 'blocks.detailed-image-gallery-section':
+				params.set(`${base}[DetailedImage][populate][DetailedImage]`, 'true')
 				break
 			case 'blocks.contact-group-section':
 				params.set(`${base}[ContactGroup][populate][contacts][populate][avatar]`, 'true')

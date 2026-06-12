@@ -1,0 +1,30 @@
+{
+  "collectionName": "components_blocks_detailed_images",
+  "info": {
+    "displayName": "DetailedImage"
+  },
+  "options": {},
+  "attributes": {
+    "DetailedImageHeadline": {
+      "type": "string"
+    },
+    "DetailedImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "DetailedImageDescription": {
+      "type": "customField",
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultHtml"
+      }
+    }
+  },
+  "config": {}
+}

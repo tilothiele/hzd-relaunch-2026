@@ -155,6 +155,20 @@ export interface ImageGallerySection {
 	ImageGalleryAnchor?: string | null
 }
 
+export interface DetailedImageItem {
+	id?: string
+	DetailedImageHeadline?: string | null
+	DetailedImage?: Image | null
+	DetailedImageDescription?: string | null
+}
+
+export interface DetailedImageGallerySection {
+	__typename: 'ComponentBlocksDetailedImageGallerySection'
+	DetailedImagesHeadline?: string | null
+	DetailedImagesAnchor?: string | null
+	DetailedImage?: DetailedImageItem[] | null
+}
+
 export interface SimpleCtaSection {
 	__typename: 'ComponentBlocksSimpleCtaSection'
 	CtaHeadline?: string | null
@@ -300,7 +314,7 @@ export interface PassedDogsSection {
 	id: string
 }
 
-export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | SimpleCtaSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection | DocumentBundleSection | TableOfContentSection | ChampionsSection | PassedDogsSection
+export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | DetailedImageGallerySection | SimpleCtaSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection | DocumentBundleSection | TableOfContentSection | ChampionsSection | PassedDogsSection
 
 export type PageSection = StartpageSection
 

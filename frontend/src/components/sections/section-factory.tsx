@@ -9,6 +9,7 @@ import { SupplementalDocumentGroupSectionComponent } from './supplemental-docume
 import { TeaserTextWithImageSectionComponent } from './teaser-text-with-image-section/teaser-text-with-image-section'
 import { TextColumnsSectionComponent } from './text-columns-section/text-columns-section'
 import { ImageGallerySectionComponent } from './image-gallery-section/image-gallery-section'
+import { DetailedImageGallerySectionComponent } from './detailed-image-gallery-section/detailed-image-gallery-section'
 import { SimpleCtaSectionComponent } from './simple-cta-section/simple-cta-section'
 import { ContactGroupSectionComponent } from './contact-group-section/contact-group-section'
 import { NewsArticlesSectionComponent } from './news-articles-section/news-articles-section'
@@ -99,6 +100,15 @@ function renderStartpageSection({
 		case 'ComponentBlocksImageGallerySection':
 			return (
 				<ImageGallerySectionComponent
+					key={key}
+					section={section}
+					strapiBaseUrl={strapiBaseUrl}
+					theme={theme}
+				/>
+			)
+		case 'ComponentBlocksDetailedImageGallerySection':
+			return (
+				<DetailedImageGallerySectionComponent
 					key={key}
 					section={section}
 					strapiBaseUrl={strapiBaseUrl}

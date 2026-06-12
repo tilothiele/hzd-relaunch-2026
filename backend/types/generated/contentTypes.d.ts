@@ -667,6 +667,10 @@ export interface ApiChampionChampion extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     DateOfChampionship: Schema.Attribute.Date;
+    DisplayName: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
     hzd_plugin_dog: Schema.Attribute.Relation<
       'oneToOne',
       'plugin::hzd-plugin.dog'
@@ -1199,6 +1203,7 @@ export interface ApiNewsArticleNewsArticle extends Struct.CollectionTypeSchema {
         'blocks.image-gallery-section',
         'blocks.contact-group-section',
         'blocks.card-section',
+        'blocks.detailed-image-gallery-section',
       ]
     >;
     publishedAt: Schema.Attribute.DateTime;
@@ -1329,6 +1334,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.table-of-content-section',
         'blocks.champions-section',
         'blocks.passed-dogs-section',
+        'blocks.detailed-image-gallery-section',
       ]
     >;
     SEO: Schema.Attribute.Component<'seo.seo', true>;

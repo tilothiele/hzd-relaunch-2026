@@ -69,7 +69,8 @@
         "blocks.rich-text-section",
         "blocks.image-gallery-section",
         "blocks.contact-group-section",
-        "blocks.card-section"
+        "blocks.card-section",
+        "blocks.detailed-image-gallery-section"
       ]
     },
     "news_article_tags": {
