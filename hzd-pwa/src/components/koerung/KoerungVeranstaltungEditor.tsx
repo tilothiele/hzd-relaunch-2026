@@ -273,7 +273,7 @@ export function KoerungVeranstaltungEditor({
 						<table className="min-w-full text-left text-sm">
 							<thead className="bg-gray-50 font-medium text-gray-500 dark:bg-gray-700 dark:text-gray-400">
 								<tr>
-									<th className="px-2 py-2">Nr.</th>
+									<th className="px-2 py-2" colSpan={2}>Nr.</th>
 									<th className="px-2 py-2">Voller Zwingername</th>
 									<th className="px-2 py-2">Zuchtbuch-Nr.</th>
 									<th className="px-2 py-2">Geschlecht</th>
@@ -304,7 +304,7 @@ export function KoerungVeranstaltungEditor({
 													: ''
 										} cursor-grab active:cursor-grabbing`}
 									>
-<td className="px-2 py-2">
+										<td className="px-2 py-2">
 											<svg
 												xmlns="http://www.w3.org/2000/svg"
 												fill="none"
