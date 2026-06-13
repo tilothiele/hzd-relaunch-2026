@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Dog } from '@/services/db';
+import SyncButton from '@/components/SyncButton';
 
 const farbe = (f: string) => {
     switch (f) {
@@ -186,9 +187,8 @@ export default function HundePage() {
     return (
         <div className="flex flex-col gap-4">
             <h1 className="text-2xl font-bold">Hunde</h1>
-            <p>Hier sehen Sie Ihre synchronisierten Hunde.</p>
+            <SyncButton />
 
-            {/* Sync Alert when no dogs or loading */}
             {!dogs || dogs.length === 0 ? null : (
                 <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm flex flex-col gap-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -11,9 +11,8 @@ export default function Navigation() {
 
     const navItems = [
         { name: "Körung", href: "/koerungen" },
-        { name: "Hunde", href: "/hunde" },
         { name: "Zucht", href: "/wurfabnahmen" },
-        { name: "Synchronization", href: "/synchronization" },
+        { name: "HZD-Hunde-Stammdaten", href: "/hunde" },
     ];
 
     const isActive = (href: string) => {
