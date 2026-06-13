@@ -1,5 +1,14 @@
-import { redirect } from 'next/navigation'
+'use client'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function MeineKoerboegenRedirectPage() {
-	redirect('/koerungen')
+	const router = useRouter()
+
+	useEffect(() => {
+		router.replace('/koerungen')
+	}, [router])
+
+	return null
 }
