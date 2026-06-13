@@ -1,5 +1,5 @@
-import { KoerungVeranstaltungEditor } from '@/components/koerung/KoerungVeranstaltungEditor'
+import { redirect } from 'next/navigation'
 
-export default function NeueKoerungVeranstaltungPage() {
-	return <KoerungVeranstaltungEditor />
+export default function MeineKoerboegenNeuRedirectPage() {
+	redirect('/koerungen/neu')
 }

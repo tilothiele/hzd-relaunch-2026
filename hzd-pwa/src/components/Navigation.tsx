@@ -10,9 +10,8 @@ export default function Navigation() {
     const [isOpen, setIsOpen] = useState(false);
 
     const navItems = [
-        { name: "Körung", href: "/meine-koerboegen" },
+        { name: "Körung", href: "/koerungen" },
         { name: "Hunde", href: "/hunde" },
-        { name: "Veranstaltungen", href: "/veranstaltungen" },
         { name: "Zucht", href: "/wurfabnahmen" },
         { name: "Synchronization", href: "/synchronization" },
     ];
@@ -20,6 +19,10 @@ export default function Navigation() {
     const isActive = (href: string) => {
         if (href === "/wurfabnahmen") {
             return pathname.startsWith("/wurfabnahmen");
+        }
+
+        if (href === "/koerungen") {
+            return pathname.startsWith("/koerungen");
         }
 
         return pathname === href;

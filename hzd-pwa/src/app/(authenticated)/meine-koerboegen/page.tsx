@@ -1,5 +1,5 @@
-import { KoerungVeranstaltungenList } from '@/components/koerung/KoerungVeranstaltungenList'
+import { redirect } from 'next/navigation'
 
-export default function MeineKoerboegenPage() {
-	return <KoerungVeranstaltungenList />
+export default function MeineKoerboegenRedirectPage() {
+	redirect('/koerungen')
 }

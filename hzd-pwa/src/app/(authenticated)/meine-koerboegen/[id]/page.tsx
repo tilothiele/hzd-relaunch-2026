@@ -1,11 +1,10 @@
-import { KoerungVeranstaltungEditor } from '@/components/koerung/KoerungVeranstaltungEditor'
+import { redirect } from 'next/navigation'
 
-export default async function KoerungVeranstaltungDetailPage({
+export default async function MeineKoerboegenDetailRedirectPage({
 	params,
 }: {
 	params: Promise<{ id: string }>
 }) {
 	const { id } = await params
-
-	return <KoerungVeranstaltungEditor veranstaltungId={id} />
+	redirect(`/koerungen/${id}`)
 }

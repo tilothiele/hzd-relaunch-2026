@@ -32,7 +32,7 @@ export function KoerungVeranstaltungenList() {
 		<div className="flex flex-col gap-4">
 			<div className="flex justify-end">
 				<Link
-					href="/meine-koerboegen/neu"
+					href="/koerungen/neu"
 					className="rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
 				>
 					Neu
@@ -87,7 +87,7 @@ export function KoerungVeranstaltungenList() {
 												type="button"
 												onClick={() =>
 													router.push(
-														`/meine-koerboegen/${veranstaltung.id}`,
+														`/koerungen/${veranstaltung.id}`,
 													)
 												}
 												className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"

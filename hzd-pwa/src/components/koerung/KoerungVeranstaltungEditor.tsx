@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { DogSearchModal } from '@/components/koerung/DogSearchModal'
+import { mapDogToKoerungHundFields } from '@/lib/dog-to-koerung-hund'
+import type { Dog } from '@/services/db'
 import {
 	getKoerungVeranstaltung,
 	saveKoerungVeranstaltung,
@@ -38,6 +41,7 @@ export function KoerungVeranstaltungEditor({
 	const [isLoading, setIsLoading] = useState(!isNew)
 	const [loadError, setLoadError] = useState<string | null>(null)
 	const [isSaving, setIsSaving] = useState(false)
+	const [searchHundId, setSearchHundId] = useState<string | null>(null)
 
 	useEffect(() => {
 		if (!veranstaltungId) {
@@ -96,6 +100,23 @@ export function KoerungVeranstaltungEditor({
 		}))
 	}
 
+	const handleApplyDog = (dog: Dog) => {
+		if (!searchHundId) {
+			return
+		}
+
+		const fields = mapDogToKoerungHundFields(dog)
+		setVeranstaltung((current) => ({
+			...current,
+			hunde: current.hunde.map((hund) =>
+				hund.id === searchHundId
+					? { ...hund, ...fields }
+					: hund,
+			),
+		}))
+		setSearchHundId(null)
+	}
+
 	const handleSave = async () => {
 		setIsSaving(true)
 		const now = new Date().toISOString()
@@ -108,7 +129,7 @@ export function KoerungVeranstaltungEditor({
 		})
 
 		setIsSaving(false)
-		router.push('/meine-koerboegen')
+		router.push('/koerungen')
 	}
 
 	if (isLoading) {
@@ -121,6 +142,11 @@ export function KoerungVeranstaltungEditor({
 
 	return (
 		<div className="flex flex-col gap-6">
+			<DogSearchModal
+				isOpen={searchHundId !== null}
+				onClose={() => setSearchHundId(null)}
+				onSelect={handleApplyDog}
+			/>
 			<div className="rounded-lg bg-white p-4 shadow-sm dark:bg-gray-800">
 				<h2 className="mb-4 text-lg font-semibold">Veranstaltung</h2>
 				<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -208,6 +234,7 @@ export function KoerungVeranstaltungEditor({
 									<th className="px-2 py-2">Wurftag</th>
 									<th className="px-2 py-2">Farbe</th>
 									<th className="px-2 py-2">Besitzer</th>
+									<th className="px-2 py-2" />
 									<th className="px-2 py-2" />
 								</tr>
 							</thead>
@@ -316,6 +343,17 @@ export function KoerungVeranstaltungEditor({
 										<td className="px-2 py-2">
 											<button
 												type="button"
+												onClick={() => setSearchHundId(hund.id)}
+												className="rounded px-2 py-1 text-sm font-medium text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-gray-700"
+												title="Hund aus Datenbank übernehmen"
+												aria-label="Hund aus Datenbank übernehmen"
+											>
+												…
+											</button>
+										</td>
+										<td className="px-2 py-2">
+											<button
+												type="button"
 												onClick={() => handleRemoveHund(hund.id)}
 												className="rounded bg-red-600 px-2 py-1 text-xs font-medium text-white hover:bg-red-700"
 											>
@@ -341,7 +379,7 @@ export function KoerungVeranstaltungEditor({
 				</button>
 				<button
 					type="button"
-					onClick={() => router.push('/meine-koerboegen')}
+					onClick={() => router.push('/koerungen')}
 					className="rounded border border-gray-300 px-4 py-2 text-sm font-medium hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700"
 				>
 					Abbrechen
