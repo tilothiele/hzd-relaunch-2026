@@ -584,7 +584,65 @@
 	margin-bottom: 8px;
 }
 
+.wurfabnahme-app .wa-welpen-actions {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 12px;
+	flex-wrap: wrap;
+}
+
+.wurfabnahme-app .wa-welpen-count {
+	font-size: 13px;
+	color: var(--wa-text-muted);
+}
+
+.wurfabnahme-app .wa-welpen-count strong {
+	color: var(--wa-text);
+}
+
+.wurfabnahme-app .wa-btn-row-action {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.wurfabnahme-app .wa-btn-icon {
+	border: 1px solid var(--wa-border);
+	background: white;
+	color: var(--wa-accent);
+	border-radius: 4px;
+	width: 28px;
+	height: 28px;
+	cursor: pointer;
+	font-size: 16px;
+	line-height: 1;
+	padding: 0;
+}
+
+.wurfabnahme-app .wa-btn-icon:hover:not(:disabled) {
+	background: var(--wa-accent-light);
+}
+
+.wurfabnahme-app .wa-btn-icon:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+}
+
+.wurfabnahme-app .wa-btn-add-row {
+	font-size: 13px;
+	padding: 6px 12px;
+}
+
 @media print {
+	.wurfabnahme-app .wa-welpen-actions,
+	.wurfabnahme-app .wa-btn-icon,
+	.wurfabnahme-app th.wa-col-actions,
+	.wurfabnahme-app td.wa-col-actions {
+		display: none !important;
+	}
+
 	.wurfabnahme-app .wa-nav,
 	.wurfabnahme-app .wa-btn-row,
 	.wurfabnahme-app .wa-sig-toolbar .wa-btn-clear,

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
 	BesonderheitInput,
 	Card,
@@ -13,28 +13,41 @@ import {
 	SignatureGrid,
 } from './FormControls'
 
+const DEFAULT_WELPEN_ROWS = 5
+const MIN_WELPEN_ROWS = 1
+const MAX_WELPEN_ROWS = 15
+
 interface WelpenRow {
+	id: string
 	r: boolean
 	h: boolean
 }
 
+function createWelpenRow(): WelpenRow {
+	return {
+		id: crypto.randomUUID(),
+		r: false,
+		h: false,
+	}
+}
+
+function createInitialWelpenRows(): WelpenRow[] {
+	return Array.from({ length: DEFAULT_WELPEN_ROWS }, createWelpenRow)
+}
+
 interface StammblattPageProps {
-	welpenAnzahl: number
-	onWelpenAnzahlChange: (value: number) => void
 	onNext: () => void
 }
 
 function WelpenTable({
-	count,
 	rows,
 	onToggle,
+	onRemove,
 }: {
-	count: number
 	rows: WelpenRow[]
 	onToggle: (index: number, field: 'r' | 'h') => void
+	onRemove: (index: number) => void
 }) {
-	const welpenCount = Math.min(Math.max(count, 1), 14)
-
 	return (
 		<div style={{ overflowX: 'auto' }}>
 			<table className="wa-welpen-table">
@@ -48,11 +61,16 @@ function WelpenTable({
 						<th style={{ width: 70 }}>Farbe</th>
 						<th>Chipnummer</th>
 						<th>Gechippt am</th>
+						<th
+							className="wa-col-actions"
+							style={{ width: 40, textAlign: 'center' }}
+							aria-label="Aktionen"
+						/>
 					</tr>
 				</thead>
 				<tbody>
-					{Array.from({ length: welpenCount }, (_, i) => (
-						<tr key={i}>
+					{rows.map((row, i) => (
+						<tr key={row.id}>
 							<td style={{ textAlign: 'center', fontWeight: 600 }}>{i + 1}</td>
 							<td>
 								<span style={{ color: 'var(--wa-text-muted)', fontSize: 12 }}>
@@ -62,10 +80,10 @@ function WelpenTable({
 							</td>
 							<td style={{ textAlign: 'center' }}>
 								<div
-									className={`wa-cb-small${rows[i]?.r ? ' checked' : ''}`}
+									className={`wa-cb-small${row.r ? ' checked' : ''}`}
 									onClick={() => onToggle(i, 'r')}
 									role="checkbox"
-									aria-checked={rows[i]?.r ?? false}
+									aria-checked={row.r}
 									tabIndex={0}
 									onKeyDown={(e) => {
 										if (e.key === ' ' || e.key === 'Enter') {
@@ -77,10 +95,10 @@ function WelpenTable({
 							</td>
 							<td style={{ textAlign: 'center' }}>
 								<div
-									className={`wa-cb-small${rows[i]?.h ? ' checked' : ''}`}
+									className={`wa-cb-small${row.h ? ' checked' : ''}`}
 									onClick={() => onToggle(i, 'h')}
 									role="checkbox"
-									aria-checked={rows[i]?.h ?? false}
+									aria-checked={row.h}
 									tabIndex={0}
 									onKeyDown={(e) => {
 										if (e.key === ' ' || e.key === 'Enter') {
@@ -106,6 +124,18 @@ function WelpenTable({
 							<td>
 								<input type="date" />
 							</td>
+							<td className="wa-col-actions" style={{ textAlign: 'center' }}>
+								<button
+									type="button"
+									className="wa-btn-icon"
+									onClick={() => onRemove(i)}
+									disabled={rows.length <= MIN_WELPEN_ROWS}
+									title="Zeile entfernen"
+									aria-label={`Welpe ${i + 1} entfernen`}
+								>
+									×
+								</button>
+							</td>
 						</tr>
 					))}
 				</tbody>
@@ -114,28 +144,31 @@ function WelpenTable({
 	)
 }
 
-export function StammblattPage({
-	welpenAnzahl,
-	onWelpenAnzahlChange,
-	onNext,
-}: StammblattPageProps) {
-	const [welpenRows, setWelpenRows] = useState<WelpenRow[]>([])
-
-	useEffect(() => {
-		const count = Math.min(Math.max(welpenAnzahl, 1), 14)
-		setWelpenRows((prev) =>
-			Array.from({ length: count }, (_, i) => prev[i] ?? { r: false, h: false }),
-		)
-	}, [welpenAnzahl])
+export function StammblattPage({ onNext }: StammblattPageProps) {
+	const [welpenRows, setWelpenRows] = useState(createInitialWelpenRows)
 
 	const handleToggle = (index: number, field: 'r' | 'h') => {
 		setWelpenRows((prev) =>
 			prev.map((row, i) => {
 				if (i !== index) return row
-				if (field === 'r') return { r: !row.r, h: false }
-				return { r: false, h: !row.h }
+				if (field === 'r') return { ...row, r: !row.r, h: false }
+				return { ...row, r: false, h: !row.h }
 			}),
 		)
+	}
+
+	const handleAddRow = () => {
+		setWelpenRows((prev) => {
+			if (prev.length >= MAX_WELPEN_ROWS) return prev
+			return [...prev, createWelpenRow()]
+		})
+	}
+
+	const handleRemoveRow = (index: number) => {
+		setWelpenRows((prev) => {
+			if (prev.length <= MIN_WELPEN_ROWS) return prev
+			return prev.filter((_, i) => i !== index)
+		})
 	}
 
 	return (
@@ -181,29 +214,33 @@ export function StammblattPage({
 			</Card>
 
 			<Card title="Wurfinformationen">
-				<FieldRow cols={2}>
+				<FieldRow>
 					<Field label="Wurf gefallen am">
 						<input type="date" />
-					</Field>
-					<Field label="Anzahl Welpen">
-						<input
-							type="number"
-							min={1}
-							max={14}
-							value={welpenAnzahl}
-							onChange={(e) =>
-								onWelpenAnzahlChange(Number(e.target.value) || 1)
-							}
-						/>
 					</Field>
 				</FieldRow>
 			</Card>
 
 			<Card title="Welpen – Übersicht">
+				<div className="wa-welpen-actions">
+					<p className="wa-welpen-count">
+						Anzahl Welpen: <strong>{welpenRows.length}</strong>
+					</p>
+					<div className="wa-btn-row-action">
+						<button
+							type="button"
+							className="wa-btn-secondary wa-btn-add-row"
+							onClick={handleAddRow}
+							disabled={welpenRows.length >= MAX_WELPEN_ROWS}
+						>
+							+ Zeile hinzufügen
+						</button>
+					</div>
+				</div>
 				<WelpenTable
-					count={welpenAnzahl}
 					rows={welpenRows}
 					onToggle={handleToggle}
+					onRemove={handleRemoveRow}
 				/>
 			</Card>
 

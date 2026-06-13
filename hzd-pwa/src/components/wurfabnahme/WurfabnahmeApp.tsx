@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useCallback, useState } from 'react'
+import { Suspense, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
 	DatenschutzPage,
@@ -17,7 +17,6 @@ import './wurfabnahme.css'
 function WurfabnahmeAppInner() {
 	const router = useRouter()
 	const searchParams = useSearchParams()
-	const [welpenAnzahl, setWelpenAnzahl] = useState(1)
 
 	const activePage = parseWurfabnahmePage(searchParams.get('seite'))
 
@@ -29,11 +28,7 @@ function WurfabnahmeAppInner() {
 	return (
 		<div className="wurfabnahme-app">
 			{activePage === 'stammblatt' && (
-				<StammblattPage
-					welpenAnzahl={welpenAnzahl}
-					onWelpenAnzahlChange={setWelpenAnzahl}
-					onNext={() => showPage('welpe1')}
-				/>
+				<StammblattPage onNext={() => showPage('welpe1')} />
 			)}
 
 			{activePage === 'welpe1' && (
