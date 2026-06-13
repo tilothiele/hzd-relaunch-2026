@@ -288,7 +288,7 @@ export function KoerungVeranstaltungEditor({
 
 				<div className="p-4">
 					{activeTab === 'teilnehmer' ? (
-						<TailnehmerTab
+						<TeilnehmerTab
 							hunde={veranstaltung.hunde}
 							inputClassName={inputClassName}
 							dragHundId={dragHundId}
