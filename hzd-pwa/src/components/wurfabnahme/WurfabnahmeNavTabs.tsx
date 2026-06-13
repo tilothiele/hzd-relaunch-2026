@@ -4,6 +4,7 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import {
+	getWurfabnahmeEditBasePath,
 	getWurfabnahmeHref,
 	parseWurfabnahmePage,
 	WURFABNAHME_TABS,
@@ -18,8 +19,9 @@ function WurfabnahmeNavTabsInner({
 }) {
 	const pathname = usePathname()
 	const searchParams = useSearchParams()
+	const basePath = getWurfabnahmeEditBasePath(pathname)
 
-	if (!pathname.startsWith('/wurfabnahme')) {
+	if (!basePath) {
 		return null
 	}
 
@@ -31,7 +33,7 @@ function WurfabnahmeNavTabsInner({
 				{WURFABNAHME_TABS.map((tab) => (
 					<Link
 						key={tab.id}
-						href={getWurfabnahmeHref(tab.id)}
+						href={getWurfabnahmeHref(basePath, tab.id)}
 						className={`inline-flex items-center rounded px-2 py-1 text-sm font-medium transition-colors ${
 							activePage === tab.id
 								? 'bg-[var(--color-kapitaensblau)] text-white'
@@ -53,7 +55,7 @@ function WurfabnahmeNavTabsInner({
 			{WURFABNAHME_TABS.map((tab) => (
 				<Link
 					key={tab.id}
-					href={getWurfabnahmeHref(tab.id)}
+					href={getWurfabnahmeHref(basePath, tab.id)}
 					onClick={onNavigate}
 					className={`block rounded py-2 pl-6 pr-4 text-base font-medium ${
 						activePage === tab.id

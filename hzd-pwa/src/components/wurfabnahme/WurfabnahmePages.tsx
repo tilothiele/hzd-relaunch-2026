@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import {
 	BesonderheitInput,
 	Card,
@@ -12,41 +11,29 @@ import {
 	RadioGroup,
 	SignatureGrid,
 } from './FormControls'
-
-const DEFAULT_WELPEN_ROWS = 5
-const MIN_WELPEN_ROWS = 1
-const MAX_WELPEN_ROWS = 15
-
-interface WelpenRow {
-	id: string
-	r: boolean
-	h: boolean
-}
-
-function createWelpenRow(): WelpenRow {
-	return {
-		id: crypto.randomUUID(),
-		r: false,
-		h: false,
-	}
-}
-
-function createInitialWelpenRows(): WelpenRow[] {
-	return Array.from({ length: DEFAULT_WELPEN_ROWS }, createWelpenRow)
-}
+import {
+	createWelpenRow,
+	MAX_WELPEN_ROWS,
+	MIN_WELPEN_ROWS,
+	type StammblattData,
+	type WelpenRowData,
+} from '@/types/wurfabnahme-form'
 
 interface StammblattPageProps {
-	onNext: () => void
+	data: StammblattData
+	onChange: (data: StammblattData) => void
 }
 
 function WelpenTable({
 	rows,
 	onToggle,
 	onRemove,
+	onUpdate,
 }: {
-	rows: WelpenRow[]
+	rows: WelpenRowData[]
 	onToggle: (index: number, field: 'r' | 'h') => void
 	onRemove: (index: number) => void
+	onUpdate: (index: number, field: keyof WelpenRowData, value: string | boolean) => void
 }) {
 	return (
 		<div style={{ overflowX: 'auto' }}>
@@ -76,7 +63,15 @@ function WelpenTable({
 								<span style={{ color: 'var(--wa-text-muted)', fontSize: 12 }}>
 									VDH-HZD{' '}
 								</span>
-								<input type="text" placeholder="Nr." style={{ width: 100 }} />
+								<input
+									type="text"
+									placeholder="Nr."
+									style={{ width: 100 }}
+									value={row.zuchtbuchNr}
+									onChange={(e) =>
+										onUpdate(i, 'zuchtbuchNr', e.target.value)
+									}
+								/>
 							</td>
 							<td style={{ textAlign: 'center' }}>
 								<div
@@ -109,20 +104,36 @@ function WelpenTable({
 								/>
 							</td>
 							<td>
-								<input type="text" placeholder="Name" />
+								<input
+									type="text"
+									placeholder="Name"
+									value={row.name}
+									onChange={(e) => onUpdate(i, 'name', e.target.value)}
+								/>
 							</td>
 							<td>
 								<input
 									type="text"
 									placeholder="sm/b/s"
 									style={{ width: 60 }}
+									value={row.farbe}
+									onChange={(e) => onUpdate(i, 'farbe', e.target.value)}
 								/>
 							</td>
 							<td>
-								<input type="text" placeholder="Chip-Nr." />
+								<input
+									type="text"
+									placeholder="Chip-Nr."
+									value={row.chipNr}
+									onChange={(e) => onUpdate(i, 'chipNr', e.target.value)}
+								/>
 							</td>
 							<td>
-								<input type="date" />
+								<input
+									type="date"
+									value={row.gechiptAm}
+									onChange={(e) => onUpdate(i, 'gechiptAm', e.target.value)}
+								/>
 							</td>
 							<td className="wa-col-actions" style={{ textAlign: 'center' }}>
 								<button
@@ -144,12 +155,18 @@ function WelpenTable({
 	)
 }
 
-export function StammblattPage({ onNext }: StammblattPageProps) {
-	const [welpenRows, setWelpenRows] = useState(createInitialWelpenRows)
+export function StammblattPage({ data, onChange }: StammblattPageProps) {
+	const updateField = <K extends keyof StammblattData>(
+		field: K,
+		value: StammblattData[K],
+	) => {
+		onChange({ ...data, [field]: value })
+	}
 
 	const handleToggle = (index: number, field: 'r' | 'h') => {
-		setWelpenRows((prev) =>
-			prev.map((row, i) => {
+		updateField(
+			'welpen',
+			data.welpen.map((row, i) => {
 				if (i !== index) return row
 				if (field === 'r') return { ...row, r: !row.r, h: false }
 				return { ...row, r: false, h: !row.h }
@@ -158,17 +175,29 @@ export function StammblattPage({ onNext }: StammblattPageProps) {
 	}
 
 	const handleAddRow = () => {
-		setWelpenRows((prev) => {
-			if (prev.length >= MAX_WELPEN_ROWS) return prev
-			return [...prev, createWelpenRow()]
-		})
+		if (data.welpen.length >= MAX_WELPEN_ROWS) return
+		updateField('welpen', [...data.welpen, createWelpenRow()])
 	}
 
 	const handleRemoveRow = (index: number) => {
-		setWelpenRows((prev) => {
-			if (prev.length <= MIN_WELPEN_ROWS) return prev
-			return prev.filter((_, i) => i !== index)
-		})
+		if (data.welpen.length <= MIN_WELPEN_ROWS) return
+		updateField(
+			'welpen',
+			data.welpen.filter((_, i) => i !== index),
+		)
+	}
+
+	const handleWelpeUpdate = (
+		index: number,
+		field: keyof WelpenRowData,
+		value: string | boolean,
+	) => {
+		updateField(
+			'welpen',
+			data.welpen.map((row, i) =>
+				i === index ? { ...row, [field]: value } : row,
+			),
+		)
 	}
 
 	return (
@@ -181,34 +210,66 @@ export function StammblattPage({ onNext }: StammblattPageProps) {
 			<Card title="Züchter">
 				<FieldRow cols={2}>
 					<Field label="Name">
-						<input type="text" />
+						<input
+							type="text"
+							value={data.zuechterName}
+							onChange={(e) => updateField('zuechterName', e.target.value)}
+						/>
 					</Field>
 					<Field label="Datum">
-						<input type="date" />
+						<input
+							type="date"
+							value={data.datum}
+							onChange={(e) => updateField('datum', e.target.value)}
+						/>
 					</Field>
 				</FieldRow>
 				<FieldRow cols={2}>
 					<Field label="Zwingername">
-						<input type="text" />
+						<input
+							type="text"
+							value={data.zwingername}
+							onChange={(e) => updateField('zwingername', e.target.value)}
+						/>
 					</Field>
 					<Field label="Wurf im Zwinger (Nr.)">
-						<input type="text" />
+						<input
+							type="text"
+							value={data.wurfNr}
+							onChange={(e) => updateField('wurfNr', e.target.value)}
+						/>
 					</Field>
 				</FieldRow>
 				<FieldRow cols={2}>
 					<Field label="Straße / Nr.">
-						<input type="text" />
+						<input
+							type="text"
+							value={data.strasse}
+							onChange={(e) => updateField('strasse', e.target.value)}
+						/>
 					</Field>
 					<Field label="PLZ / Ort">
-						<input type="text" />
+						<input
+							type="text"
+							value={data.plzOrt}
+							onChange={(e) => updateField('plzOrt', e.target.value)}
+						/>
 					</Field>
 				</FieldRow>
 				<FieldRow cols={2}>
 					<Field label="Telefon">
-						<input type="text" />
+						<input
+							type="text"
+							value={data.telefon}
+							onChange={(e) => updateField('telefon', e.target.value)}
+						/>
 					</Field>
 					<Field label="E-Mail">
-						<input type="email" />
+						<input
+							type="email"
+							value={data.email}
+							onChange={(e) => updateField('email', e.target.value)}
+						/>
 					</Field>
 				</FieldRow>
 			</Card>
@@ -216,7 +277,13 @@ export function StammblattPage({ onNext }: StammblattPageProps) {
 			<Card title="Wurfinformationen">
 				<FieldRow>
 					<Field label="Wurf gefallen am">
-						<input type="date" />
+						<input
+							type="date"
+							value={data.wurfGefallenAm}
+							onChange={(e) =>
+								updateField('wurfGefallenAm', e.target.value)
+							}
+						/>
 					</Field>
 				</FieldRow>
 			</Card>
@@ -224,40 +291,56 @@ export function StammblattPage({ onNext }: StammblattPageProps) {
 			<Card title="Welpen – Übersicht">
 				<div className="wa-welpen-actions">
 					<p className="wa-welpen-count">
-						Anzahl Welpen: <strong>{welpenRows.length}</strong>
+						Anzahl Welpen: <strong>{data.welpen.length}</strong>
 					</p>
 					<div className="wa-btn-row-action">
 						<button
 							type="button"
 							className="wa-btn-secondary wa-btn-add-row"
 							onClick={handleAddRow}
-							disabled={welpenRows.length >= MAX_WELPEN_ROWS}
+							disabled={data.welpen.length >= MAX_WELPEN_ROWS}
 						>
 							+ Zeile hinzufügen
 						</button>
 					</div>
 				</div>
 				<WelpenTable
-					rows={welpenRows}
+					rows={data.welpen}
 					onToggle={handleToggle}
 					onRemove={handleRemoveRow}
+					onUpdate={handleWelpeUpdate}
 				/>
 			</Card>
 
 			<Card title="Beurteilung">
 				<FieldRow>
 					<Field label="Gesamteindruck">
-						<textarea />
+						<textarea
+							value={data.gesamteindruck}
+							onChange={(e) =>
+								updateField('gesamteindruck', e.target.value)
+							}
+						/>
 					</Field>
 				</FieldRow>
 				<FieldRow>
 					<Field label="Pflegezustand / Aufzuchtbedingungen">
-						<textarea />
+						<textarea
+							value={data.pflegezustand}
+							onChange={(e) =>
+								updateField('pflegezustand', e.target.value)
+							}
+						/>
 					</Field>
 				</FieldRow>
 				<FieldRow>
 					<Field label="Zustand der Hündin">
-						<textarea />
+						<textarea
+							value={data.zustandHundin}
+							onChange={(e) =>
+								updateField('zustandHundin', e.target.value)
+							}
+						/>
 					</Field>
 				</FieldRow>
 			</Card>
@@ -272,32 +355,28 @@ export function StammblattPage({ onNext }: StammblattPageProps) {
 				/>
 				<FieldRow cols={2} style={{ marginTop: 16 }}>
 					<Field label="Ort">
-						<input type="text" />
+						<input
+							type="text"
+							value={data.ortStamm}
+							onChange={(e) => updateField('ortStamm', e.target.value)}
+						/>
 					</Field>
 					<Field label="Datum">
-						<input type="date" />
+						<input
+							type="date"
+							value={data.datumStamm}
+							onChange={(e) => updateField('datumStamm', e.target.value)}
+						/>
 					</Field>
 				</FieldRow>
 			</Card>
 
 			<PdfAnleitung />
-
-			<div className="wa-btn-row">
-				<button type="button" className="wa-btn-primary" onClick={onNext}>
-					Weiter zu Welpe 1 →
-				</button>
-			</div>
 		</div>
 	)
 }
 
-export function WelpePage({
-	onBack,
-	onNext,
-}: {
-	onBack: () => void
-	onNext: () => void
-}) {
+export function WelpePage() {
 	return (
 		<div className="wa-page active" id="page-welpe1">
 			<div className="wa-badge">Welpe 1</div>
@@ -307,15 +386,15 @@ export function WelpePage({
 			<Card title="Grunddaten">
 				<FieldRow cols={2}>
 					<Field label="Zuchtbuch-Nr. VDH-HZD">
-						<input type="text" />
+						<input type="text" name="w1-zbnr" />
 					</Field>
 					<Field label="Wurftag">
-						<input type="date" />
+						<input type="date" name="w1-wurftag" />
 					</Field>
 				</FieldRow>
 				<FieldRow cols={3}>
 					<Field label="Gewicht Geburt (g)">
-						<input type="number" />
+						<input type="number" name="w1-gewicht-geburt" />
 					</Field>
 					<div
 						className="wa-field"
@@ -341,18 +420,18 @@ export function WelpePage({
 				</FieldRow>
 				<FieldRow cols={3}>
 					<Field label="Entwurmt mit">
-						<input type="text" />
+						<input type="text" name="w1-entwurmt" />
 					</Field>
 					<Field label="Zuletzt am">
-						<input type="date" />
+						<input type="date" name="w1-entwurmt-am" />
 					</Field>
 					<Field label="Anzahl Wurmkuren">
-						<input type="number" min={0} />
+						<input type="number" min={0} name="w1-wurmkuren" />
 					</Field>
 				</FieldRow>
 				<FieldRow cols={2}>
 					<Field label="Wurfbesichtigung am">
-						<input type="date" />
+						<input type="date" name="w1-wurfbesichtigung" />
 					</Field>
 				</FieldRow>
 			</Card>
@@ -360,18 +439,18 @@ export function WelpePage({
 			<Card title="Feststellungen bei der Wurfabnahme">
 				<FieldRow cols={3}>
 					<Field label="Chip Nr.">
-						<input type="text" />
+						<input type="text" name="w1-chip" />
 					</Field>
 					<Field label="Gechippt am">
-						<input type="date" />
+						<input type="date" name="w1-gechipt" />
 					</Field>
 					<Field label="Gewicht Wurfabnahme (g)">
-						<input type="number" />
+						<input type="number" name="w1-gewicht-wa" />
 					</Field>
 				</FieldRow>
 				<FieldRow cols={2}>
 					<Field label="Geimpft am">
-						<input type="date" />
+						<input type="date" name="w1-geimpft" />
 					</Field>
 					<div
 						className="wa-field"
@@ -383,7 +462,7 @@ export function WelpePage({
 						}}
 					>
 						<label className="wa-cb-item">
-							<input type="checkbox" />
+							<input type="checkbox" name="w1-impfungen-io" />
 							<span className="wa-cb-box" />
 							<span>Impfungen lt. Heimtierausweis i.O.</span>
 						</label>
@@ -406,11 +485,11 @@ export function WelpePage({
 				</CheckRow>
 				<CheckRow label="Ohren">
 					<RadioGroup name="w1-ohren" options={['groß', 'mittel', 'klein']} />
-					<BesonderheitInput />
+					<BesonderheitInput name="w1-ohren-bes" />
 				</CheckRow>
 				<CheckRow label="Augen">
 					<RadioGroup name="w1-augen" options={['dunkel', 'mittel', 'hell']} />
-					<BesonderheitInput />
+					<BesonderheitInput name="w1-augen-bes" />
 				</CheckRow>
 				<CheckRow label="Gebiss">
 					<RadioGroup
@@ -420,7 +499,7 @@ export function WelpePage({
 				</CheckRow>
 				<CheckRow label="Stellung Canini">
 					<RadioGroup name="w1-canini" options={['korrekt']} />
-					<BesonderheitInput />
+					<BesonderheitInput name="w1-canini-bes" />
 				</CheckRow>
 				<CheckRow label="Rute">
 					<RadioGroup name="w1-rute" options={['korrekt', 'Rutenveränderung']} />
@@ -428,7 +507,7 @@ export function WelpePage({
 				</CheckRow>
 				<CheckRow label="Nabel">
 					<RadioGroup name="w1-nabel" options={['korrekt']} />
-					<BesonderheitInput />
+					<BesonderheitInput name="w1-nabel-bes" />
 				</CheckRow>
 				<CheckRow label="Hoden">
 					<RadioGroup
@@ -525,6 +604,7 @@ export function WelpePage({
 					<div className="wa-farbe-header">Weiße Abzeichen</div>
 					<div className="wa-farbe-body">
 						<CheckboxGroup
+							name="w1-weiss"
 							options={[
 								'Nasenrücken',
 								'Oberkopf',
@@ -552,6 +632,7 @@ export function WelpePage({
 
 			<Card title="Verhalten">
 				<CheckboxGroup
+					name="w1-verhalten"
 					options={[
 						'unerschrocken',
 						'kontaktfreudig',
@@ -571,20 +652,20 @@ export function WelpePage({
 			<Card title="Bemerkungen">
 				<FieldRow>
 					<Field label="Abweichungen / Bemerkungen zum Welpen">
-						<textarea style={{ minHeight: 80 }} />
+						<textarea style={{ minHeight: 80 }} name="w1-bemerkungen" />
 					</Field>
 				</FieldRow>
 				<FieldRow cols={2}>
 					<Field label="Hinweis aus der Deckgenehmigung">
-						<textarea />
+						<textarea name="w1-deckgenehmigung" />
 					</Field>
 					<Field label="Aufzuchtbedingungen">
-						<textarea />
+						<textarea name="w1-aufzucht" />
 					</Field>
 				</FieldRow>
 				<FieldRow>
 					<Field label="Zustand der Hündin">
-						<textarea />
+						<textarea name="w1-hundin" />
 					</Field>
 				</FieldRow>
 			</Card>
@@ -599,29 +680,20 @@ export function WelpePage({
 				/>
 				<FieldRow cols={2} style={{ marginTop: 16 }}>
 					<Field label="Ort">
-						<input type="text" />
+						<input type="text" name="w1-ort" />
 					</Field>
 					<Field label="Datum">
-						<input type="date" />
+						<input type="date" name="w1-datum" />
 					</Field>
 				</FieldRow>
 			</Card>
 
 			<PdfAnleitung />
-
-			<div className="wa-btn-row">
-				<button type="button" className="wa-btn-secondary" onClick={onBack}>
-					← Stammblatt
-				</button>
-				<button type="button" className="wa-btn-primary" onClick={onNext}>
-					Weiter: Datenschutz →
-				</button>
-			</div>
 		</div>
 	)
 }
 
-export function DatenschutzPage({ onBack }: { onBack: () => void }) {
+export function DatenschutzPage() {
 	return (
 		<div className="wa-page active" id="page-datenschutz1">
 			<div className="wa-badge">Welpe 1</div>
@@ -631,26 +703,26 @@ export function DatenschutzPage({ onBack }: { onBack: () => void }) {
 			<Card title="Welpenkäufer">
 				<FieldRow cols={2}>
 					<Field label="Name, Vorname">
-						<input type="text" />
+						<input type="text" name="ds1-name" />
 					</Field>
 					<Field label="Geburtsdatum">
-						<input type="date" />
+						<input type="date" name="ds1-geburt" />
 					</Field>
 				</FieldRow>
 				<FieldRow cols={2}>
 					<Field label="PLZ / Ort">
-						<input type="text" />
+						<input type="text" name="ds1-plz" />
 					</Field>
 					<Field label="Straße / Nr.">
-						<input type="text" />
+						<input type="text" name="ds1-strasse" />
 					</Field>
 				</FieldRow>
 				<FieldRow cols={2}>
 					<Field label="E-Mail">
-						<input type="email" />
+						<input type="email" name="ds1-email" />
 					</Field>
 					<Field label="Telefon">
-						<input type="text" />
+						<input type="text" name="ds1-telefon" />
 					</Field>
 				</FieldRow>
 			</Card>
@@ -658,13 +730,13 @@ export function DatenschutzPage({ onBack }: { onBack: () => void }) {
 			<Card title="Hundedaten">
 				<FieldRow cols={3}>
 					<Field label="Welpe (Name)">
-						<input type="text" />
+						<input type="text" name="ds1-welpe" />
 					</Field>
 					<Field label="Zwinger">
-						<input type="text" />
+						<input type="text" name="ds1-zwinger" />
 					</Field>
 					<Field label="Züchter">
-						<input type="text" />
+						<input type="text" name="ds1-zuechter" />
 					</Field>
 				</FieldRow>
 				<div className="wa-info-box" style={{ marginTop: 8 }}>
@@ -679,6 +751,7 @@ export function DatenschutzPage({ onBack }: { onBack: () => void }) {
 			<Card title="Wurfabnahmeprotokoll">
 				<CheckboxGroup
 					vertical
+					name="ds1-protokoll"
 					options={[
 						'Das Wurfabnahmeprotokoll wurde mit mir besprochen.',
 						'Auf besondere Feststellungen wurde ich hingewiesen.',
@@ -689,7 +762,7 @@ export function DatenschutzPage({ onBack }: { onBack: () => void }) {
 
 			<Card title="Deckgenehmigung">
 				<label className="wa-cb-item">
-					<input type="checkbox" />
+					<input type="checkbox" name="ds1-deckgenehmigung" />
 					<span className="wa-cb-box" />
 					<span>
 						Der Hinweis aus der Deckgenehmigung, sofern vorhanden, wurde mir
@@ -702,7 +775,7 @@ export function DatenschutzPage({ onBack }: { onBack: () => void }) {
 				<div className="wa-consent-text">Datenweitergabe an die HZD e.V.</div>
 				<div className="wa-check-group vertical" style={{ marginBottom: 16 }}>
 					<label className="wa-rb-item">
-						<input type="radio" name="ds1-datenweitergabe" />
+						<input type="radio" name="ds1-datenweitergabe" value="ja" />
 						<span className="wa-rb-dot" />
 						<span>
 							Ich willige ein, dass meine personenbezogenen Daten (Name,
@@ -712,7 +785,7 @@ export function DatenschutzPage({ onBack }: { onBack: () => void }) {
 						</span>
 					</label>
 					<label className="wa-rb-item">
-						<input type="radio" name="ds1-datenweitergabe" />
+						<input type="radio" name="ds1-datenweitergabe" value="nein" />
 						<span className="wa-rb-dot" />
 						<span>Ich willige nicht ein.</span>
 					</label>
@@ -723,7 +796,7 @@ export function DatenschutzPage({ onBack }: { onBack: () => void }) {
 				</div>
 				<div className="wa-check-group vertical">
 					<label className="wa-rb-item">
-						<input type="radio" name="ds1-info" />
+						<input type="radio" name="ds1-info" value="ja" />
 						<span className="wa-rb-dot" />
 						<span>
 							Ich willige ein, dass die HZD e.V. mir Informationen zum Verein
@@ -732,7 +805,7 @@ export function DatenschutzPage({ onBack }: { onBack: () => void }) {
 						</span>
 					</label>
 					<label className="wa-rb-item">
-						<input type="radio" name="ds1-info" />
+						<input type="radio" name="ds1-info" value="nein" />
 						<span className="wa-rb-dot" />
 						<span>Ich willige nicht ein.</span>
 					</label>
@@ -742,7 +815,7 @@ export function DatenschutzPage({ onBack }: { onBack: () => void }) {
 			<Card title="Unterschrift Welpenkäufer">
 				<FieldRow cols={2} style={{ marginBottom: 12 }}>
 					<Field label="Ort / Datum">
-						<input type="text" />
+						<input type="text" name="ds1-ort-datum" />
 					</Field>
 				</FieldRow>
 				<div style={{ maxWidth: 400 }}>
@@ -753,12 +826,6 @@ export function DatenschutzPage({ onBack }: { onBack: () => void }) {
 			</Card>
 
 			<PdfAnleitung />
-
-			<div className="wa-btn-row">
-				<button type="button" className="wa-btn-secondary" onClick={onBack}>
-					← Welpe 1
-				</button>
-			</div>
 		</div>
 	)
 }

@@ -74,15 +74,20 @@ export function RadioGroup({
 export function CheckboxGroup({
 	options,
 	vertical = false,
+	name,
 }: {
 	options: string[]
 	vertical?: boolean
+	name?: string
 }) {
 	return (
 		<div className={`wa-check-group${vertical ? ' vertical' : ''}`}>
-			{options.map((option) => (
+			{options.map((option, index) => (
 				<label key={option} className="wa-cb-item">
-					<input type="checkbox" />
+					<input
+						type="checkbox"
+						name={name ? `${name}-${index}` : undefined}
+					/>
 					<span className="wa-cb-box" />
 					<span>{option}</span>
 				</label>
@@ -106,11 +111,11 @@ export function CheckRow({
 	)
 }
 
-export function BesonderheitInput() {
+export function BesonderheitInput({ name }: { name?: string }) {
 	return (
 		<div className="wa-field" style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
 			<span className="wa-inline-label">Besonderheit:</span>
-			<input type="text" className="wa-inline-input" />
+			<input type="text" className="wa-inline-input" name={name} />
 		</div>
 	)
 }

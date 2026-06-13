@@ -1,5 +1,5 @@
-import WurfabnahmeApp from '@/components/wurfabnahme/WurfabnahmeApp'
+import { redirect } from 'next/navigation'
 
-export default function WurfabnahmePage() {
-	return <WurfabnahmeApp />
+export default function WurfabnahmeRedirectPage() {
+	redirect('/wurfabnahmen')
 }

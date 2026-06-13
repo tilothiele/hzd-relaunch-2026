@@ -6,8 +6,11 @@ export const WURFABNAHME_TABS: { id: WurfabnahmePageId; label: string }[] = [
 	{ id: 'datenschutz1', label: 'Datenschutz' },
 ]
 
-export function getWurfabnahmeHref(id: WurfabnahmePageId): string {
-	return id === 'stammblatt' ? '/wurfabnahme' : `/wurfabnahme?seite=${id}`
+export function getWurfabnahmeHref(
+	basePath: string,
+	id: WurfabnahmePageId,
+): string {
+	return id === 'stammblatt' ? basePath : `${basePath}?seite=${id}`
 }
 
 export function parseWurfabnahmePage(
@@ -18,4 +21,21 @@ export function parseWurfabnahmePage(
 	}
 
 	return 'stammblatt'
+}
+
+export function isWurfabnahmeEditPath(pathname: string): boolean {
+	if (pathname === '/wurfabnahmen/neu') {
+		return true
+	}
+
+	return /^\/wurfabnahmen\/[^/]+$/.test(pathname)
+		&& pathname !== '/wurfabnahmen'
+}
+
+export function getWurfabnahmeEditBasePath(pathname: string): string | null {
+	if (!isWurfabnahmeEditPath(pathname)) {
+		return null
+	}
+
+	return pathname
 }

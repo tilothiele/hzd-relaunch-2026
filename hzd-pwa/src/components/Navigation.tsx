@@ -13,13 +13,13 @@ export default function Navigation() {
         { name: "Meine Körbewertungen", href: "/meine-koerboegen" },
         { name: "Hunde", href: "/hunde" },
         { name: "Veranstaltungen", href: "/veranstaltungen" },
-        { name: "Wurfabnahme", href: "/wurfabnahme" },
+        { name: "Wurfabnahmen", href: "/wurfabnahmen" },
         { name: "Synchronization", href: "/synchronization" },
     ];
 
     const isActive = (href: string) => {
-        if (href === "/wurfabnahme") {
-            return pathname.startsWith("/wurfabnahme");
+        if (href === "/wurfabnahmen") {
+            return pathname.startsWith("/wurfabnahmen");
         }
 
         return pathname === href;
