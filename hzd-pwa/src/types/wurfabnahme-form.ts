@@ -186,7 +186,8 @@ export function createEmptyFormData(): WurfabnahmeFormData {
 export function getWurfabnahmeListLabel(wurfabnahme: Wurfabnahme): string {
 	const zwinger = wurfabnahme.zwingername.trim() || 'Ohne Zwingername'
 	const datum = wurfabnahme.datum.trim()
-	return datum ? `${zwinger} · ${formatDateDe(datum)}` : zwinger
+	const wurfNr = wurfabnahme.wurfNr.trim()
+	return datum ? `${zwinger} - ${wurfNr}-Wurf · ${formatDateDe(datum)}` : zwinger
 }
 
 export function getLatestWurfabnahmeRecord(
