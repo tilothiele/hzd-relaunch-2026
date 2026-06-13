@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { WurfabnahmeNavTabs } from "@/components/wurfabnahme/WurfabnahmeNavTabs";
 
 export default function Navigation() {
     const pathname = usePathname();
@@ -12,25 +13,37 @@ export default function Navigation() {
         { name: "Meine Körbewertungen", href: "/meine-koerboegen" },
         { name: "Hunde", href: "/hunde" },
         { name: "Veranstaltungen", href: "/veranstaltungen" },
+        { name: "Wurfabnahme", href: "/wurfabnahme" },
         { name: "Synchronization", href: "/synchronization" },
     ];
+
+    const isActive = (href: string) => {
+        if (href === "/wurfabnahme") {
+            return pathname.startsWith("/wurfabnahme");
+        }
+
+        return pathname === href;
+    };
 
     return (
         <>
             {/* Desktop Navigation */}
-            <div className="hidden sm:flex sm:space-x-8">
-                {navItems.map((item) => (
-                    <Link
-                        key={item.href}
-                        href={item.href}
-                        className={`inline-flex items-center border-b-2 px-1 pt-1 text-base font-medium ${pathname === item.href
-                            ? "border-indigo-500 text-gray-900 dark:text-white"
-                            : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
-                            }`}
-                    >
-                        {item.name}
-                    </Link>
-                ))}
+            <div className="hidden sm:flex sm:items-center sm:gap-2">
+                <div className="flex sm:space-x-6">
+                    {navItems.map((item) => (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            className={`inline-flex items-center border-b-2 px-1 pt-1 text-base font-medium ${isActive(item.href)
+                                ? "border-indigo-500 text-gray-900 dark:text-white"
+                                : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
+                                }`}
+                        >
+                            {item.name}
+                        </Link>
+                    ))}
+                </div>
+                <WurfabnahmeNavTabs variant="desktop" />
             </div>
 
             {/* Mobile Menu Button */}
@@ -43,7 +56,6 @@ export default function Navigation() {
                     aria-expanded={isOpen}
                 >
                     <span className="sr-only">Menü öffnen</span>
-                    {/* Icon when menu is closed. */}
                     <svg
                         className={`${isOpen ? "hidden" : "block"} h-6 w-6`}
                         xmlns="http://www.w3.org/2000/svg"
@@ -59,7 +71,6 @@ export default function Navigation() {
                             d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
                         />
                     </svg>
-                    {/* Icon when menu is open. */}
                     <svg
                         className={`${isOpen ? "block" : "hidden"} h-6 w-6`}
                         xmlns="http://www.w3.org/2000/svg"
@@ -86,7 +97,7 @@ export default function Navigation() {
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`block border-l-4 py-2 pl-3 pr-4 text-lg font-medium ${pathname === item.href
+                                className={`block border-l-4 py-2 pl-3 pr-4 text-lg font-medium ${isActive(item.href)
                                     ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-gray-700 dark:text-white"
                                     : "border-transparent text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
                                     }`}
@@ -95,6 +106,10 @@ export default function Navigation() {
                                 {item.name}
                             </Link>
                         ))}
+                        <WurfabnahmeNavTabs
+                            variant="mobile"
+                            onNavigate={() => setIsOpen(false)}
+                        />
                     </div>
                 </div>
             )}

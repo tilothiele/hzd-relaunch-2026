@@ -1,0 +1,659 @@
+.wurfabnahme-app {
+	--wa-bg: #ddeef7;
+	--wa-paper: #ffffff;
+	--wa-border: #a8c8de;
+	--wa-border-light: #c8dfed;
+	--wa-text: #000000;
+	--wa-text-muted: #444444;
+	--wa-accent: #1a6a9a;
+	--wa-accent-light: #e4f1f9;
+	--wa-check-color: #1a6a9a;
+	--wa-section-bg: #cce2f0;
+	--wa-header-bg: #1a6a9a;
+
+	background: var(--wa-bg);
+	font-family: Arial, Helvetica, sans-serif;
+	color: var(--wa-text);
+	font-size: 14px;
+	line-height: 1.5;
+	margin: -1rem -1rem 0;
+	padding-bottom: 2rem;
+}
+
+@media (min-width: 640px) {
+	.wurfabnahme-app {
+		margin: -2rem -2rem 0;
+	}
+}
+
+.wurfabnahme-app * {
+	box-sizing: border-box;
+}
+
+.wurfabnahme-app .wa-nav {
+	background: var(--wa-header-bg);
+	color: white;
+	padding: 12px 20px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	position: sticky;
+	top: 0;
+	z-index: 50;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.wurfabnahme-app .wa-nav-title {
+	font-size: 16px;
+	font-weight: 600;
+}
+
+.wurfabnahme-app .wa-nav-sub {
+	font-size: 11px;
+	opacity: 0.7;
+	margin-top: 2px;
+}
+
+.wurfabnahme-app .wa-nav-tabs {
+	display: flex;
+	gap: 4px;
+	flex-wrap: wrap;
+}
+
+.wurfabnahme-app .wa-nav-tab {
+	background: rgba(255, 255, 255, 0.1);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	color: white;
+	padding: 6px 14px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 12px;
+	font-family: inherit;
+	transition: background 0.2s;
+}
+
+.wurfabnahme-app .wa-nav-tab.active {
+	background: rgba(255, 255, 255, 0.25);
+}
+
+.wurfabnahme-app .wa-nav-tab:hover {
+	background: rgba(255, 255, 255, 0.2);
+}
+
+.wurfabnahme-app .wa-page {
+	display: none;
+	max-width: 860px;
+	margin: 0 auto;
+	padding: 20px 16px 60px;
+}
+
+.wurfabnahme-app .wa-page.active {
+	display: block;
+}
+
+.wurfabnahme-app .wa-card {
+	background: var(--wa-paper);
+	border: 1px solid var(--wa-border-light);
+	border-radius: 6px;
+	padding: 20px;
+	margin-bottom: 16px;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.wurfabnahme-app .wa-section-header {
+	font-size: 13px;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--wa-accent);
+	border-bottom: 1px solid var(--wa-border-light);
+	padding-bottom: 8px;
+	margin-bottom: 16px;
+}
+
+.wurfabnahme-app .wa-page-title {
+	font-size: 22px;
+	font-weight: 600;
+	color: var(--wa-header-bg);
+	margin-bottom: 4px;
+}
+
+.wurfabnahme-app .wa-page-subtitle {
+	font-size: 12px;
+	color: var(--wa-text-muted);
+	margin-bottom: 20px;
+}
+
+.wurfabnahme-app .wa-field-row {
+	display: grid;
+	gap: 12px;
+	margin-bottom: 12px;
+}
+
+.wurfabnahme-app .wa-field-row.col-2 {
+	grid-template-columns: 1fr 1fr;
+}
+
+.wurfabnahme-app .wa-field-row.col-3 {
+	grid-template-columns: 1fr 1fr 1fr;
+}
+
+.wurfabnahme-app .wa-field {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.wurfabnahme-app .wa-field label {
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: var(--wa-text-muted);
+}
+
+.wurfabnahme-app .wa-field input[type='text'],
+.wurfabnahme-app .wa-field input[type='date'],
+.wurfabnahme-app .wa-field input[type='number'],
+.wurfabnahme-app .wa-field input[type='email'],
+.wurfabnahme-app .wa-field textarea,
+.wurfabnahme-app .wa-field select {
+	border: 1px solid var(--wa-border);
+	border-radius: 4px;
+	padding: 8px 10px;
+	font-family: inherit;
+	font-size: 14px;
+	color: var(--wa-text);
+	background: white;
+	transition: border-color 0.2s, box-shadow 0.2s;
+	width: 100%;
+}
+
+.wurfabnahme-app .wa-field input:focus,
+.wurfabnahme-app .wa-field textarea:focus,
+.wurfabnahme-app .wa-field select:focus {
+	outline: none;
+	border-color: var(--wa-accent);
+	box-shadow: 0 0 0 3px var(--wa-accent-light);
+}
+
+.wurfabnahme-app .wa-field textarea {
+	resize: vertical;
+	min-height: 60px;
+}
+
+.wurfabnahme-app .wa-check-group {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 12px;
+}
+
+.wurfabnahme-app .wa-check-group.vertical {
+	flex-direction: column;
+	gap: 6px;
+}
+
+.wurfabnahme-app .wa-check-row {
+	display: grid;
+	grid-template-columns: 140px 1fr;
+	align-items: start;
+	gap: 8px;
+	margin-bottom: 8px;
+	padding: 6px 0;
+	border-bottom: 1px solid var(--wa-border-light);
+}
+
+.wurfabnahme-app .wa-check-row:last-child {
+	border-bottom: none;
+}
+
+.wurfabnahme-app .wa-check-label {
+	font-weight: 600;
+	font-size: 13px;
+	padding-top: 2px;
+}
+
+.wurfabnahme-app .wa-check-options {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+}
+
+.wurfabnahme-app .wa-cb-item,
+.wurfabnahme-app .wa-rb-item {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	cursor: pointer;
+	padding: 4px 10px;
+	border: 1px solid var(--wa-border);
+	border-radius: 4px;
+	background: white;
+	transition: all 0.15s;
+	font-size: 13px;
+	user-select: none;
+}
+
+.wurfabnahme-app .wa-cb-item:hover,
+.wurfabnahme-app .wa-rb-item:hover {
+	border-color: var(--wa-accent);
+	background: var(--wa-accent-light);
+}
+
+.wurfabnahme-app .wa-cb-item input,
+.wurfabnahme-app .wa-rb-item input {
+	display: none;
+}
+
+.wurfabnahme-app .wa-cb-box {
+	width: 16px;
+	height: 16px;
+	border: 2px solid var(--wa-border);
+	border-radius: 3px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	transition: all 0.15s;
+}
+
+.wurfabnahme-app .wa-rb-dot {
+	width: 16px;
+	height: 16px;
+	border: 2px solid var(--wa-border);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	transition: all 0.15s;
+}
+
+.wurfabnahme-app .wa-cb-item input:checked ~ .wa-cb-box {
+	background: var(--wa-check-color);
+	border-color: var(--wa-check-color);
+}
+
+.wurfabnahme-app .wa-cb-item input:checked ~ .wa-cb-box::after {
+	content: '✓';
+	color: white;
+	font-size: 11px;
+	font-weight: 700;
+}
+
+.wurfabnahme-app .wa-cb-item input:checked ~ span:last-child,
+.wurfabnahme-app .wa-rb-item input:checked ~ span:last-child {
+	color: var(--wa-accent);
+	font-weight: 600;
+}
+
+.wurfabnahme-app .wa-rb-item input:checked ~ .wa-rb-dot {
+	border-color: var(--wa-check-color);
+}
+
+.wurfabnahme-app .wa-rb-item input:checked ~ .wa-rb-dot::after {
+	content: '';
+	width: 8px;
+	height: 8px;
+	background: var(--wa-check-color);
+	border-radius: 50%;
+}
+
+.wurfabnahme-app .wa-welpen-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13px;
+}
+
+.wurfabnahme-app .wa-welpen-table th {
+	background: var(--wa-section-bg);
+	font-weight: 600;
+	font-size: 11px;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: var(--wa-text-muted);
+	padding: 8px 10px;
+	border: 1px solid var(--wa-border-light);
+	text-align: left;
+}
+
+.wurfabnahme-app .wa-welpen-table td {
+	padding: 6px 8px;
+	border: 1px solid var(--wa-border-light);
+	vertical-align: middle;
+}
+
+.wurfabnahme-app .wa-welpen-table tr:nth-child(even) td {
+	background: #faf8f5;
+}
+
+.wurfabnahme-app .wa-welpen-table input[type='text'],
+.wurfabnahme-app .wa-welpen-table input[type='date'] {
+	border: none;
+	background: transparent;
+	font-family: inherit;
+	font-size: 13px;
+	width: 100%;
+	padding: 2px 4px;
+	color: var(--wa-text);
+}
+
+.wurfabnahme-app .wa-welpen-table input:focus {
+	outline: 1px solid var(--wa-accent);
+	border-radius: 2px;
+	background: white;
+}
+
+.wurfabnahme-app .wa-cb-small {
+	width: 18px;
+	height: 18px;
+	border: 2px solid var(--wa-border);
+	border-radius: 3px;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.15s;
+}
+
+.wurfabnahme-app .wa-cb-small.checked {
+	background: var(--wa-check-color);
+	border-color: var(--wa-check-color);
+}
+
+.wurfabnahme-app .wa-cb-small.checked::after {
+	content: '✓';
+	color: white;
+	font-size: 11px;
+}
+
+.wurfabnahme-app .wa-sig-container {
+	border: 1px solid var(--wa-border);
+	border-radius: 4px;
+	overflow: hidden;
+	background: white;
+}
+
+.wurfabnahme-app .wa-sig-canvas {
+	display: block;
+	width: 100%;
+	height: 120px;
+	cursor: crosshair;
+	touch-action: none;
+}
+
+.wurfabnahme-app .wa-sig-toolbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 6px 10px;
+	background: var(--wa-section-bg);
+	border-top: 1px solid var(--wa-border-light);
+}
+
+.wurfabnahme-app .wa-sig-label {
+	font-size: 11px;
+	color: var(--wa-text-muted);
+	font-weight: 600;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+}
+
+.wurfabnahme-app .wa-btn-clear {
+	font-size: 11px;
+	color: var(--wa-accent);
+	background: none;
+	border: 1px solid var(--wa-border);
+	border-radius: 3px;
+	padding: 3px 10px;
+	cursor: pointer;
+	font-family: inherit;
+}
+
+.wurfabnahme-app .wa-btn-clear:hover {
+	background: var(--wa-accent-light);
+}
+
+.wurfabnahme-app .wa-sig-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	gap: 16px;
+	margin-top: 8px;
+}
+
+.wurfabnahme-app .wa-farbe-section {
+	border: 1px solid var(--wa-border-light);
+	border-radius: 4px;
+	overflow: hidden;
+	margin-bottom: 8px;
+}
+
+.wurfabnahme-app .wa-farbe-header {
+	background: var(--wa-section-bg);
+	padding: 6px 12px;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--wa-text-muted);
+}
+
+.wurfabnahme-app .wa-farbe-body {
+	padding: 10px 12px;
+}
+
+.wurfabnahme-app .wa-farbe-row {
+	display: grid;
+	grid-template-columns: 100px 1fr;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 8px;
+}
+
+.wurfabnahme-app .wa-farbe-row:last-child {
+	margin-bottom: 0;
+}
+
+.wurfabnahme-app .wa-farbe-row-label {
+	font-size: 12px;
+	color: var(--wa-text-muted);
+}
+
+.wurfabnahme-app .wa-btn-primary {
+	background: var(--wa-header-bg);
+	color: white;
+	border: none;
+	padding: 12px 28px;
+	border-radius: 5px;
+	font-family: inherit;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 0.2s;
+}
+
+.wurfabnahme-app .wa-btn-primary:hover {
+	background: var(--wa-accent);
+}
+
+.wurfabnahme-app .wa-btn-secondary {
+	background: white;
+	color: var(--wa-text);
+	border: 1px solid var(--wa-border);
+	padding: 10px 20px;
+	border-radius: 5px;
+	font-family: inherit;
+	font-size: 14px;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.wurfabnahme-app .wa-btn-secondary:hover {
+	background: var(--wa-section-bg);
+}
+
+.wurfabnahme-app .wa-btn-row {
+	display: flex;
+	gap: 12px;
+	margin-top: 20px;
+	justify-content: flex-end;
+	flex-wrap: wrap;
+}
+
+.wurfabnahme-app .wa-pdf-anleitung {
+	background: #e4f1f9;
+	border: 1px solid #a8c8de;
+	border-radius: 6px;
+	padding: 14px 16px;
+	margin-bottom: 16px;
+	font-size: 13px;
+}
+
+.wurfabnahme-app .wa-pdf-anleitung strong {
+	display: block;
+	margin-bottom: 8px;
+	font-size: 14px;
+}
+
+.wurfabnahme-app .wa-pdf-anleitung ol {
+	padding-left: 18px;
+}
+
+.wurfabnahme-app .wa-pdf-anleitung li {
+	margin-bottom: 5px;
+}
+
+.wurfabnahme-app .wa-pdf-btn {
+	background: #1a6a9a;
+	color: white;
+	border: none;
+	padding: 12px 24px;
+	border-radius: 5px;
+	font-family: inherit;
+	font-size: 14px;
+	font-weight: bold;
+	cursor: pointer;
+	width: 100%;
+	margin-top: 10px;
+}
+
+.wurfabnahme-app .wa-pdf-btn:active {
+	background: #145580;
+}
+
+.wurfabnahme-app .wa-badge {
+	display: inline-block;
+	background: var(--wa-accent-light);
+	color: var(--wa-accent);
+	border: 1px solid #c8dff0;
+	border-radius: 12px;
+	font-size: 11px;
+	font-weight: 600;
+	padding: 2px 10px;
+	margin-bottom: 16px;
+}
+
+.wurfabnahme-app .wa-info-box {
+	background: var(--wa-accent-light);
+	border: 1px solid #c8dff0;
+	border-radius: 4px;
+	padding: 10px 14px;
+	font-size: 13px;
+	color: var(--wa-accent);
+	margin-bottom: 16px;
+}
+
+.wurfabnahme-app .wa-inline-input {
+	border: 1px solid var(--wa-border);
+	border-radius: 4px;
+	padding: 4px 8px;
+	font-size: 13px;
+	width: 160px;
+}
+
+.wurfabnahme-app .wa-inline-label {
+	font-size: 12px;
+	color: var(--wa-text-muted);
+	white-space: nowrap;
+}
+
+.wurfabnahme-app .wa-consent-text {
+	font-weight: 600;
+	margin-bottom: 8px;
+}
+
+@media print {
+	.wurfabnahme-app .wa-nav,
+	.wurfabnahme-app .wa-btn-row,
+	.wurfabnahme-app .wa-sig-toolbar .wa-btn-clear,
+	.wurfabnahme-app .wa-pdf-anleitung {
+		display: none !important;
+	}
+
+	.wurfabnahme-app .wa-page {
+		display: block !important;
+		page-break-after: always;
+		padding: 10px;
+	}
+
+	.wurfabnahme-app {
+		background: white;
+		font-size: 12px;
+		margin: 0;
+	}
+
+	.wurfabnahme-app .wa-card {
+		box-shadow: none;
+		border: 1px solid #ccc;
+		margin-bottom: 10px;
+		padding: 12px;
+	}
+
+	.wurfabnahme-app .wa-sig-canvas {
+		border: 1px solid #ccc;
+	}
+
+	.wurfabnahme-app input,
+	.wurfabnahme-app textarea {
+		border: none !important;
+		border-bottom: 1px solid #999 !important;
+		border-radius: 0 !important;
+		padding: 2px 4px !important;
+	}
+
+	.wurfabnahme-app .wa-cb-item,
+	.wurfabnahme-app .wa-rb-item {
+		border: none;
+		padding: 2px 6px;
+	}
+
+	.wurfabnahme-app .wa-farbe-section,
+	.wurfabnahme-app .wa-check-row {
+		break-inside: avoid;
+	}
+}
+
+@media (max-width: 600px) {
+	.wurfabnahme-app .wa-field-row.col-2,
+	.wurfabnahme-app .wa-field-row.col-3 {
+		grid-template-columns: 1fr;
+	}
+
+	.wurfabnahme-app .wa-sig-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.wurfabnahme-app .wa-check-row {
+		grid-template-columns: 1fr;
+	}
+
+	.wurfabnahme-app .wa-farbe-row {
+		grid-template-columns: 1fr;
+	}
+
+	.wurfabnahme-app .wa-nav-tabs {
+		display: none;
+	}
+}

@@ -1,0 +1,256 @@
+import type { NextAuthOptions } from 'next-auth'
+import AuthentikProvider from 'next-auth/providers/authentik'
+import type { JWT } from 'next-auth/jwt'
+
+const defaultOidcScope = 'openid email profile offline_access'
+const tokenRefreshBufferMs = 60 * 1000
+
+function logAuthentikToken(name: string, value?: unknown) {
+	if (process.env.AUTHENTIK_LOG_TOKENS !== 'true' || typeof value !== 'string') {
+		return
+	}
+
+	console.log(`[authentik] ${name}:`, value)
+}
+
+function getIssuer(): string {
+	return (process.env.AUTHENTIK_ISSUER ?? '').replace(/\/$/, '')
+}
+
+function getTokenEndpoint(): string {
+	const configuredEndpoint = process.env.AUTHENTIK_TOKEN_ENDPOINT?.trim()
+	if (configuredEndpoint) {
+		return configuredEndpoint
+	}
+
+	return `${getIssuer()}/token/`
+}
+
+function getAuthentikClientSecret(): string {
+	return process.env.AUTHENTIK_CLIENT_SECRET?.trim() ?? ''
+}
+
+function isConfidentialAuthentikClient(): boolean {
+	return getAuthentikClientSecret().length > 0
+}
+
+function getAuthentikTokenEndpointAuthMethod():
+	| 'none'
+	| 'client_secret_post'
+	| 'client_secret_basic' {
+	const configured = process.env.AUTHENTIK_TOKEN_ENDPOINT_AUTH_METHOD?.trim()
+	if (
+		configured === 'none'
+		|| configured === 'client_secret_post'
+		|| configured === 'client_secret_basic'
+	) {
+		return configured
+	}
+
+	return isConfidentialAuthentikClient() ? 'client_secret_post' : 'none'
+}
+
+function buildAuthentikTokenRequestBody(
+	params: Record<string, string>,
+): URLSearchParams {
+	const body = new URLSearchParams(params)
+
+	if (isConfidentialAuthentikClient()) {
+		body.set('client_secret', getAuthentikClientSecret())
+	}
+
+	return body
+}
+
+function getAuthentikScope(): string {
+	const configured = process.env.AUTHENTIK_SCOPE?.trim() ?? defaultOidcScope
+	if (configured.includes('offline_access')) {
+		return configured
+	}
+
+	return `${configured} offline_access`.trim()
+}
+
+function getAuthentikAuthorizationParams(): Record<string, string> {
+	const params: Record<string, string> = {
+		scope: getAuthentikScope(),
+	}
+
+	const prompt = process.env.AUTHENTIK_PROMPT?.trim()
+	if (
+		prompt === 'login'
+		|| prompt === 'consent'
+		|| prompt === 'none'
+		|| prompt === 'select_account'
+	) {
+		params.prompt = prompt
+	}
+
+	const maxAge = process.env.AUTHENTIK_MAX_AGE?.trim()
+	if (maxAge !== undefined && maxAge !== '' && !Number.isNaN(Number(maxAge))) {
+		params.max_age = maxAge
+	}
+
+	return params
+}
+
+function getAccessTokenExpiresAt(account: {
+	expires_at?: number
+	expires_in?: number
+}): number {
+	if (typeof account.expires_at === 'number') {
+		return account.expires_at * 1000
+	}
+
+	if (typeof account.expires_in === 'number') {
+		return Date.now() + account.expires_in * 1000
+	}
+
+	return Date.now()
+}
+
+async function refreshAuthentikToken(token: JWT): Promise<JWT> {
+	if (!token.refreshToken) {
+		return {
+			...token,
+			error: 'RefreshTokenMissing',
+		}
+	}
+
+	const response = await fetch(getTokenEndpoint(), {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/x-www-form-urlencoded',
+		},
+		body: buildAuthentikTokenRequestBody({
+			client_id: process.env.AUTHENTIK_CLIENT_ID ?? '',
+			grant_type: 'refresh_token',
+			refresh_token: token.refreshToken,
+		}),
+		cache: 'no-store',
+	})
+
+	const refreshedTokens = await response.json()
+
+	if (!response.ok) {
+		console.error('[authentik] token refresh failed', refreshedTokens)
+		return {
+			...token,
+			error: 'RefreshAccessTokenError',
+		}
+	}
+
+	if (typeof refreshedTokens.access_token === 'string') {
+		logAuthentikToken('refreshed_access_token', refreshedTokens.access_token)
+	}
+
+	if (typeof refreshedTokens.id_token === 'string') {
+		logAuthentikToken('refreshed_id_token', refreshedTokens.id_token)
+	}
+
+	return {
+		...token,
+		accessToken: typeof refreshedTokens.access_token === 'string'
+			? refreshedTokens.access_token
+			: token.accessToken,
+		idToken: typeof refreshedTokens.id_token === 'string'
+			? refreshedTokens.id_token
+			: token.idToken,
+		accessTokenExpiresAt: Date.now() + Number(refreshedTokens.expires_in ?? 0) * 1000,
+		refreshToken: typeof refreshedTokens.refresh_token === 'string'
+			? refreshedTokens.refresh_token
+			: token.refreshToken,
+		error: undefined,
+	}
+}
+
+function getNextAuthPublicUrl(): string {
+	return (process.env.NEXTAUTH_URL ?? '').replace(/\/$/, '')
+}
+
+export const authOptions: NextAuthOptions = {
+	secret: process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET,
+	debug: process.env.NEXTAUTH_DEBUG === 'true',
+	useSecureCookies: getNextAuthPublicUrl().startsWith('https://'),
+	providers: [
+		AuthentikProvider({
+			clientId: process.env.AUTHENTIK_CLIENT_ID ?? '',
+			clientSecret: getAuthentikClientSecret(),
+			issuer: getIssuer(),
+			authorization: {
+				params: getAuthentikAuthorizationParams(),
+			},
+			client: {
+				token_endpoint_auth_method: getAuthentikTokenEndpointAuthMethod(),
+			},
+		}),
+	],
+	session: {
+		strategy: 'jwt',
+	},
+	events: {
+		async signIn(message) {
+			if (process.env.NEXTAUTH_DEBUG === 'true') {
+				console.log('[next-auth] signIn success', {
+					provider: message.account?.provider,
+					userId: message.user?.id,
+					callbackUrl: `${getNextAuthPublicUrl()}/api/auth/callback/authentik`,
+				})
+			}
+		},
+	},
+	logger: {
+		error(code, metadata) {
+			console.error('[next-auth]', code, metadata)
+		},
+	},
+	callbacks: {
+		async jwt({ token, account }) {
+			if (account) {
+				token.accessTokenExpiresAt = getAccessTokenExpiresAt(account)
+
+				if (account.refresh_token) {
+					token.refreshToken = account.refresh_token
+				}
+
+				if (account.access_token) {
+					logAuthentikToken('access_token', account.access_token)
+					token.accessToken = account.access_token
+				}
+
+				if (account.id_token) {
+					logAuthentikToken('id_token', account.id_token)
+					token.idToken = account.id_token
+				}
+
+				return token
+			}
+
+			if (
+				typeof token.accessTokenExpiresAt === 'number'
+				&& Date.now() < token.accessTokenExpiresAt - tokenRefreshBufferMs
+			) {
+				return token
+			}
+
+			if (token.accessToken || token.idToken) {
+				return refreshAuthentikToken(token)
+			}
+
+			return token
+		},
+		async session({ session, token }) {
+			session.accessToken = typeof token.accessToken === 'string'
+				? token.accessToken
+				: undefined
+			session.idToken = typeof token.idToken === 'string'
+				? token.idToken
+				: undefined
+			session.error = typeof token.error === 'string'
+				? token.error
+				: undefined
+
+			return session
+		},
+	},
+}
