@@ -187,7 +187,7 @@ export function getWurfabnahmeListLabel(wurfabnahme: Wurfabnahme): string {
 	const zwinger = wurfabnahme.zwingername.trim() || 'Ohne Zwingername'
 	const datum = wurfabnahme.datum.trim()
 	const l = wurfabnahme.records.length;
-	const wurfNr = l > 0 ? `${wurfabnahme.records[l-1].wurfNr}-Wurf ` : '';
+	const wurfNr = l > 0 ? `${wurfabnahme.records[l-1].formData.stammblatt.wurfNr}-Wurf ` : '';
 	return datum ? `${zwinger} - ${wurfNr} · ${formatDateDe(datum)}` : zwinger
 }
 
