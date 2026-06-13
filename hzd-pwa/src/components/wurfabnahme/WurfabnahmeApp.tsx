@@ -19,12 +19,14 @@ interface WurfabnahmeAppProps {
 	formData: WurfabnahmeFormData
 	onFormDataChange: (data: WurfabnahmeFormData) => void
 	formRef: React.RefObject<HTMLDivElement | null>
+	readOnly?: boolean
 }
 
 function WurfabnahmeAppInner({
 	formData,
 	onFormDataChange,
 	formRef,
+	readOnly = false,
 }: WurfabnahmeAppProps) {
 	const searchParams = useSearchParams()
 	const fieldsAppliedRef = useRef<string>('')
@@ -33,16 +35,18 @@ function WurfabnahmeAppInner({
 
 	const handleStammblattChange = useCallback(
 		(stammblatt: WurfabnahmeFormData['stammblatt']) => {
+			if (readOnly) return
 			onFormDataChange({
 				...formData,
 				stammblatt,
 			})
 		},
-		[formData, onFormDataChange],
+		[formData, onFormDataChange, readOnly],
 	)
 
 	const handleSignatureChange = useCallback(
 		(id: string, dataUrl: string) => {
+			if (readOnly) return
 			onFormDataChange({
 				...formData,
 				signatures: {
@@ -51,12 +55,13 @@ function WurfabnahmeAppInner({
 				},
 			})
 		},
-		[formData, onFormDataChange],
+		[formData, onFormDataChange, readOnly],
 	)
 
 	const signatureProps = {
 		signatures: formData.signatures,
 		onSignatureChange: handleSignatureChange,
+		readOnly,
 	}
 
 	useEffect(() => {
@@ -71,21 +76,26 @@ function WurfabnahmeAppInner({
 	}, [activePage, formData.fields, formRef])
 
 	return (
-		<div className="wurfabnahme-app" ref={formRef}>
-			{activePage === 'stammblatt' && (
-				<StammblattPage
-					data={formData.stammblatt}
-					onChange={handleStammblattChange}
-					{...signatureProps}
-				/>
-			)}
+		<fieldset
+			disabled={readOnly}
+			className="min-w-0 border-0 p-0 m-0"
+		>
+			<div className="wurfabnahme-app" ref={formRef}>
+				{activePage === 'stammblatt' && (
+					<StammblattPage
+						data={formData.stammblatt}
+						onChange={handleStammblattChange}
+						{...signatureProps}
+					/>
+				)}
 
-			{activePage === 'welpe1' && <WelpePage {...signatureProps} />}
+				{activePage === 'welpe1' && <WelpePage {...signatureProps} />}
 
-			{activePage === 'datenschutz1' && (
-				<DatenschutzPage {...signatureProps} />
-			)}
-		</div>
+				{activePage === 'datenschutz1' && (
+					<DatenschutzPage {...signatureProps} />
+				)}
+			</div>
+		</fieldset>
 	)
 }
 

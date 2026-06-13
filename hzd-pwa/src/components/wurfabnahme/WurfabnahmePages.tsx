@@ -27,6 +27,7 @@ import {
 interface SignatureProps {
 	signatures: Record<string, string>
 	onSignatureChange: (id: string, dataUrl: string) => void
+	readOnly?: boolean
 }
 
 interface StammblattPageProps extends SignatureProps {
@@ -178,6 +179,7 @@ export function StammblattPage({
 	onChange,
 	signatures,
 	onSignatureChange,
+	readOnly,
 }: StammblattPageProps) {
 	const updateField = <K extends keyof StammblattData>(
 		field: K,
@@ -371,6 +373,7 @@ export function StammblattPage({
 					]}
 					values={signatures}
 					onChange={onSignatureChange}
+					readOnly={readOnly}
 				/>
 				<FieldRow cols={2} style={{ marginTop: 16 }}>
 					<Field label="Ort">
@@ -398,6 +401,7 @@ export function StammblattPage({
 export function WelpePage({
 	signatures,
 	onSignatureChange,
+	readOnly,
 }: SignatureProps) {
 	return (
 		<div className="wa-page active" id="page-welpe1">
@@ -701,6 +705,7 @@ export function WelpePage({
 					]}
 					values={signatures}
 					onChange={onSignatureChange}
+					readOnly={readOnly}
 				/>
 				<FieldRow cols={2} style={{ marginTop: 16 }}>
 					<Field label="Ort">
@@ -720,6 +725,7 @@ export function WelpePage({
 export function DatenschutzPage({
 	signatures,
 	onSignatureChange,
+	readOnly,
 }: SignatureProps) {
 	return (
 		<div className="wa-page active" id="page-datenschutz1">
@@ -852,6 +858,7 @@ export function DatenschutzPage({
 						]}
 						values={signatures}
 						onChange={onSignatureChange}
+						readOnly={readOnly}
 					/>
 				</div>
 			</Card>

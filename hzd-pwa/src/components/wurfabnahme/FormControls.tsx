@@ -152,10 +152,12 @@ export function SignatureGrid({
 	signatures,
 	values = {},
 	onChange,
+	readOnly = false,
 }: {
 	signatures: { id: string; label: string }[]
 	values?: Record<string, string>
 	onChange?: (id: string, dataUrl: string) => void
+	readOnly?: boolean
 }) {
 	return (
 		<div className="wa-sig-grid">
@@ -166,6 +168,7 @@ export function SignatureGrid({
 						label={sig.label}
 						value={values[sig.id] ?? ''}
 						onChange={(dataUrl) => onChange?.(sig.id, dataUrl)}
+						readOnly={readOnly}
 					/>
 				</div>
 			))}

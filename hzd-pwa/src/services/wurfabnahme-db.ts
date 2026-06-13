@@ -1,20 +1,20 @@
 import { db } from '@/services/db'
-import type { WurfabnahmeRecord } from '@/types/wurfabnahme-form'
+import type { Wurfabnahme } from '@/types/wurfabnahme-form'
 
-export async function listWurfabnahmen(): Promise<WurfabnahmeRecord[]> {
+export async function listWurfabnahmen(): Promise<Wurfabnahme[]> {
 	return db.wurfabnahmen.orderBy('updatedAt').reverse().toArray()
 }
 
 export async function getWurfabnahme(
 	id: string,
-): Promise<WurfabnahmeRecord | undefined> {
+): Promise<Wurfabnahme | undefined> {
 	return db.wurfabnahmen.get(id)
 }
 
 export async function saveWurfabnahme(
-	record: WurfabnahmeRecord,
+	wurfabnahme: Wurfabnahme,
 ): Promise<void> {
-	await db.wurfabnahmen.put(record)
+	await db.wurfabnahmen.put(wurfabnahme)
 }
 
 export async function deleteWurfabnahme(id: string): Promise<void> {

@@ -54,6 +54,17 @@ export interface WurfabnahmeRecord {
 	formData: WurfabnahmeFormData
 }
 
+/** Lokale Wurfabnahme mit Versionshistorie (IndexedDB) */
+export interface Wurfabnahme {
+	id: string
+	createdAt: string
+	updatedAt: string
+	zwingername: string
+	datum: string
+	welpenCount: number
+	records: WurfabnahmeRecord[]
+}
+
 interface LegacyWelpenRow {
 	id?: string
 	zuchtbuchNr?: string
@@ -142,10 +153,69 @@ export function createEmptyFormData(): WurfabnahmeFormData {
 	}
 }
 
-export function getWurfabnahmeListLabel(record: WurfabnahmeRecord): string {
-	const zwinger = record.zwingername.trim() || 'Ohne Zwingername'
-	const datum = record.datum.trim()
+export function getWurfabnahmeListLabel(wurfabnahme: Wurfabnahme): string {
+	const zwinger = wurfabnahme.zwingername.trim() || 'Ohne Zwingername'
+	const datum = wurfabnahme.datum.trim()
 	return datum ? `${zwinger} · ${formatDateDe(datum)}` : zwinger
+}
+
+export function getLatestWurfabnahmeRecord(
+	wurfabnahme: Wurfabnahme,
+): WurfabnahmeRecord {
+	const { records } = wurfabnahme
+	if (records.length === 0) {
+		throw new Error('Wurfabnahme ohne Einträge')
+	}
+	return records[records.length - 1]
+}
+
+export function getWurfabnahmeHistoryRecords(
+	wurfabnahme: Wurfabnahme,
+): WurfabnahmeRecord[] {
+	return [...wurfabnahme.records].reverse()
+}
+
+export function getWurfabnahmeRecordLabel(
+	record: WurfabnahmeRecord,
+	options: { isLatest?: boolean } = {},
+): string {
+	const zwinger = record.zwingername.trim() || 'Ohne Zwingername'
+	const savedAt = formatDateTimeDe(record.createdAt)
+	if (options.isLatest) {
+		return `Aktuell · ${zwinger} · ${savedAt}`
+	}
+	const datum = record.datum.trim()
+	const datumPart = datum ? `${formatDateDe(datum)} · ` : ''
+	return `${datumPart}${savedAt} · ${zwinger}`
+}
+
+export function createWurfabnahme(
+	id: string,
+	firstRecord: WurfabnahmeRecord,
+): Wurfabnahme {
+	return {
+		id,
+		createdAt: firstRecord.createdAt,
+		updatedAt: firstRecord.updatedAt,
+		zwingername: firstRecord.zwingername,
+		datum: firstRecord.datum,
+		welpenCount: firstRecord.welpenCount,
+		records: [firstRecord],
+	}
+}
+
+export function appendWurfabnahmeRecord(
+	wurfabnahme: Wurfabnahme,
+	record: WurfabnahmeRecord,
+): Wurfabnahme {
+	return {
+		...wurfabnahme,
+		updatedAt: record.updatedAt,
+		zwingername: record.zwingername,
+		datum: record.datum,
+		welpenCount: record.welpenCount,
+		records: [...wurfabnahme.records, record],
+	}
 }
 
 function formatDateDe(isoDate: string): string {
@@ -155,16 +225,22 @@ function formatDateDe(isoDate: string): string {
 	return date.toLocaleDateString('de-DE')
 }
 
+export function formatDateTimeDe(iso: string): string {
+	if (!iso) return ''
+	const date = new Date(iso)
+	if (Number.isNaN(date.getTime())) return iso
+	return date.toLocaleString('de-DE')
+}
+
 export function buildRecordFromForm(
 	id: string,
 	formData: WurfabnahmeFormData,
-	existing?: Pick<WurfabnahmeRecord, 'createdAt'>,
 ): WurfabnahmeRecord {
 	const now = new Date().toISOString()
 
 	return {
 		id,
-		createdAt: existing?.createdAt ?? now,
+		createdAt: now,
 		updatedAt: now,
 		zwingername: formData.stammblatt.zwingername,
 		datum: formData.stammblatt.datum || formData.stammblatt.wurfGefallenAm,

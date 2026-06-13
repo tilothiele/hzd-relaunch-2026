@@ -6,12 +6,19 @@ import WurfabnahmeApp from '@/components/wurfabnahme/WurfabnahmeApp'
 import { mergeFormDataFromDom } from '@/lib/wurfabnahme-form-serialize'
 import { getWurfabnahme, saveWurfabnahme } from '@/services/wurfabnahme-db'
 import {
+	appendWurfabnahmeRecord,
 	buildRecordFromForm,
 	createEmptyFormData,
+	createWurfabnahme,
+	getLatestWurfabnahmeRecord,
+	getWurfabnahmeHistoryRecords,
+	getWurfabnahmeRecordLabel,
 	normalizeFormData,
+	type Wurfabnahme,
 	type WurfabnahmeFormData,
-	type WurfabnahmeRecord,
 } from '@/types/wurfabnahme-form'
+
+const LATEST_HISTORY_VALUE = 'latest'
 
 interface WurfabnahmeEditorProps {
 	basePath: string
@@ -27,12 +34,22 @@ export function WurfabnahmeEditor({
 	const [formData, setFormData] = useState<WurfabnahmeFormData>(
 		createEmptyFormData,
 	)
-	const [existingRecord, setExistingRecord] = useState<
-		Pick<WurfabnahmeRecord, 'createdAt'> | null
-	>(null)
+	const [wurfabnahme, setWurfabnahme] = useState<Wurfabnahme | null>(null)
+	const [selectedHistoryValue, setSelectedHistoryValue] = useState(
+		LATEST_HISTORY_VALUE,
+	)
 	const [isLoading, setIsLoading] = useState(Boolean(recordId))
 	const [isSaving, setIsSaving] = useState(false)
 	const [loadError, setLoadError] = useState<string | null>(null)
+
+	const isHistoryView = selectedHistoryValue !== LATEST_HISTORY_VALUE
+	const showHistorySelect = Boolean(
+		wurfabnahme && wurfabnahme.records.length > 1,
+	)
+
+	const loadFormFromRecord = useCallback((recordFormData: WurfabnahmeFormData) => {
+		setFormData(normalizeFormData(recordFormData))
+	}, [])
 
 	useEffect(() => {
 		if (!recordId) {
@@ -42,45 +59,74 @@ export function WurfabnahmeEditor({
 
 		let cancelled = false
 
-		getWurfabnahme(recordId).then((record) => {
+		getWurfabnahme(recordId).then((loaded) => {
 			if (cancelled) return
 
-			if (!record) {
+			if (!loaded || loaded.records.length === 0) {
 				setLoadError('Wurfabnahme nicht gefunden.')
 				setIsLoading(false)
 				return
 			}
 
-			setFormData(normalizeFormData(record.formData))
-			setExistingRecord({ createdAt: record.createdAt })
+			setWurfabnahme(loaded)
+			loadFormFromRecord(getLatestWurfabnahmeRecord(loaded).formData)
+			setSelectedHistoryValue(LATEST_HISTORY_VALUE)
 			setIsLoading(false)
 		})
 
 		return () => {
 			cancelled = true
 		}
-	}, [recordId])
+	}, [recordId, loadFormFromRecord])
+
+	const handleHistoryChange = useCallback(
+		(value: string) => {
+			if (!wurfabnahme) return
+
+			setSelectedHistoryValue(value)
+
+			if (value === LATEST_HISTORY_VALUE) {
+				loadFormFromRecord(getLatestWurfabnahmeRecord(wurfabnahme).formData)
+				return
+			}
+
+			const historicalRecord = wurfabnahme.records.find(
+				(record) => record.id === value,
+			)
+			if (historicalRecord) {
+				loadFormFromRecord(historicalRecord.formData)
+			}
+		},
+		[wurfabnahme, loadFormFromRecord],
+	)
 
 	const handleCancel = useCallback(() => {
 		router.push('/wurfabnahmen')
 	}, [router])
 
 	const handleSave = useCallback(async () => {
-		if (!formRef.current) return
+		if (!formRef.current || isHistoryView) return
 
 		setIsSaving(true)
 
 		try {
 			const merged = mergeFormDataFromDom(formData, formRef.current)
-			const id = recordId ?? crypto.randomUUID()
-			const record = buildRecordFromForm(id, merged, existingRecord ?? undefined)
+			const newRecord = buildRecordFromForm(crypto.randomUUID(), merged)
 
-			await saveWurfabnahme(record)
+			if (recordId && wurfabnahme) {
+				await saveWurfabnahme(
+					appendWurfabnahmeRecord(wurfabnahme, newRecord),
+				)
+			} else {
+				const id = crypto.randomUUID()
+				await saveWurfabnahme(createWurfabnahme(id, newRecord))
+			}
+
 			router.push('/wurfabnahmen')
 		} finally {
 			setIsSaving(false)
 		}
-	}, [formData, recordId, existingRecord, router])
+	}, [formData, recordId, wurfabnahme, isHistoryView, router])
 
 	if (isLoading) {
 		return <p>Lade Wurfabnahme…</p>
@@ -101,24 +147,69 @@ export function WurfabnahmeEditor({
 		)
 	}
 
+	const latestRecordId = wurfabnahme
+		? getLatestWurfabnahmeRecord(wurfabnahme).id
+		: null
+
 	return (
 		<div className="flex flex-col gap-4">
+			{showHistorySelect && wurfabnahme ? (
+				<div className="wa-editor-header flex flex-wrap items-end gap-3 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+					<div className="flex min-w-[240px] flex-1 flex-col gap-1">
+						<label
+							htmlFor="wurfabnahme-history"
+							className="text-sm font-medium text-gray-700 dark:text-gray-200"
+						>
+							Historie
+						</label>
+						<select
+							id="wurfabnahme-history"
+							value={selectedHistoryValue}
+							onChange={(event) => handleHistoryChange(event.target.value)}
+							className="rounded border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-900"
+						>
+							<option value={LATEST_HISTORY_VALUE}>
+								{getWurfabnahmeRecordLabel(
+									getLatestWurfabnahmeRecord(wurfabnahme),
+									{ isLatest: true },
+								)}
+							</option>
+							{getWurfabnahmeHistoryRecords(wurfabnahme)
+								.filter((record) => record.id !== latestRecordId)
+								.map((record) => (
+									<option key={record.id} value={record.id}>
+										{getWurfabnahmeRecordLabel(record)}
+									</option>
+								))}
+						</select>
+					</div>
+					{isHistoryView ? (
+						<p className="text-sm text-amber-700 dark:text-amber-300">
+							Archivstand — nur Ansicht, nicht bearbeitbar.
+						</p>
+					) : null}
+				</div>
+			) : null}
+
 			<WurfabnahmeApp
 				basePath={basePath}
 				formData={formData}
 				onFormDataChange={setFormData}
 				formRef={formRef}
+				readOnly={isHistoryView}
 			/>
 
 			<div className="wa-editor-actions flex flex-wrap gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
-				<button
-					type="button"
-					onClick={handleSave}
-					disabled={isSaving}
-					className="rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
-				>
-					{isSaving ? 'Speichern…' : 'Speichern'}
-				</button>
+				{!isHistoryView ? (
+					<button
+						type="button"
+						onClick={handleSave}
+						disabled={isSaving}
+						className="rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+					>
+						{isSaving ? 'Speichern…' : 'Speichern'}
+					</button>
+				) : null}
 				<button
 					type="button"
 					onClick={handleCancel}

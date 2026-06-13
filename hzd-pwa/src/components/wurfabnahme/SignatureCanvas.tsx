@@ -7,6 +7,7 @@ interface SignatureCanvasProps {
 	label: string
 	value?: string
 	onChange?: (dataUrl: string) => void
+	readOnly?: boolean
 }
 
 export function SignatureCanvas({
@@ -14,6 +15,7 @@ export function SignatureCanvas({
 	label,
 	value = '',
 	onChange,
+	readOnly = false,
 }: SignatureCanvasProps) {
 	const canvasRef = useRef<HTMLCanvasElement>(null)
 	const valueRef = useRef(value)
@@ -67,7 +69,7 @@ export function SignatureCanvas({
 
 	useEffect(() => {
 		const canvas = canvasRef.current
-		if (!canvas) return
+		if (!canvas || readOnly) return
 
 		const ctx = canvas.getContext('2d')
 		if (!ctx) return
@@ -152,9 +154,10 @@ export function SignatureCanvas({
 			canvas.removeEventListener('touchmove', handleMove)
 			canvas.removeEventListener('touchend', handleEnd)
 		}
-	}, [id, notifyChange, redrawFromValue])
+	}, [id, notifyChange, redrawFromValue, readOnly])
 
 	const handleClear = () => {
+		if (readOnly) return
 		valueRef.current = ''
 		redrawFromValue('')
 		onChange?.('')
@@ -165,7 +168,12 @@ export function SignatureCanvas({
 			<canvas ref={canvasRef} id={id} className="wa-sig-canvas" />
 			<div className="wa-sig-toolbar">
 				<span className="wa-sig-label">{label}</span>
-				<button type="button" className="wa-btn-clear" onClick={handleClear}>
+				<button
+					type="button"
+					className="wa-btn-clear"
+					onClick={handleClear}
+					disabled={readOnly}
+				>
 					Löschen
 				</button>
 			</div>
