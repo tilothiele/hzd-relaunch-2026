@@ -52,6 +52,7 @@ export function mapDogToKoerungHundFields(
 	| 'wurftag'
 	| 'farbe'
 	| 'besitzer'
+	| 'mitgliedsnummer'
 > {
 	return {
 		vollerZwingername: dog.fullkennelname ?? '',
@@ -60,5 +61,6 @@ export function mapDogToKoerungHundFields(
 		wurftag: normalizeDateForInput(dog.dateofbirth),
 		farbe: normalizeKoerungFarbe(dog.color),
 		besitzer: dog.ownerName ?? '',
+		mitgliedsnummer: dog.ownerMembershipNumber ?? '',
 	}
 }

@@ -13,6 +13,7 @@ export interface KoerungHund {
 	wurftag: string
 	farbe: KoerungFarbe
 	besitzer: string
+	mitgliedsnummer: string
 }
 
 export interface KoerungVeranstaltung {
@@ -43,6 +44,7 @@ export function createKoerungHund(): KoerungHund {
 		wurftag: '',
 		farbe: '',
 		besitzer: '',
+		mitgliedsnummer: '',
 	}
 }
 
@@ -75,6 +77,7 @@ export function normalizeKoerungVeranstaltung(
 				wurftag: hund.wurftag ?? '',
 				farbe: hund.farbe ?? '',
 				besitzer: hund.besitzer ?? '',
+				mitgliedsnummer: hund.mitgliedsnummer ?? '',
 			})),
 		),
 	}

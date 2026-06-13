@@ -102,6 +102,11 @@ export async function syncDogs(onProgress?: (current: number, total: number) => 
             sex: item.sex || item.Sex || '',
             color: item.color || item.Color || '',
             ownerName: item.owner?.name || item.owner?.Name || item.owner?.username || '',
+            ownerMembershipNumber: String(
+                item.owner?.membershipNumber
+                ?? item.owner?.MembershipNumber
+                ?? '',
+            ),
             cStudBookNumber: item.cStudBookNumber || item.CStudBookNumber || '',
             cFertile: item.cFertile === true ? 'Ja' : (item.cFertile === false ? 'Nein' : (item.cFertile || item.CFertile || '')),
         }));

@@ -11,6 +11,7 @@ interface Dog {
     sex: string;
     color: string;
     ownerName: string; // Flattened from owner.name
+    ownerMembershipNumber: string;
     cStudBookNumber: string;
     cFertile: string;
 }

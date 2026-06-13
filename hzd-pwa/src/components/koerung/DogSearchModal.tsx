@@ -124,6 +124,12 @@ export function DogSearchModal({
 											Zuchtbuch: {dog.cStudBookNumber || '–'}
 											{' · '}
 											Chip: {dog.microchipNo || '–'}
+											{dog.ownerMembershipNumber ? (
+												<>
+													{' · '}
+													Mitglieds-Nr.: {dog.ownerMembershipNumber}
+												</>
+											) : null}
 										</p>
 									</div>
 									<button

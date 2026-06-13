@@ -42,6 +42,8 @@ export function KoerungVeranstaltungEditor({
 	const [loadError, setLoadError] = useState<string | null>(null)
 	const [isSaving, setIsSaving] = useState(false)
 	const [searchHundId, setSearchHundId] = useState<string | null>(null)
+	const [dragHundId, setDragHundId] = useState<string | null>(null)
+	const [dragOverHundId, setDragOverHundId] = useState<string | null>(null)
 
 	useEffect(() => {
 		if (!veranstaltungId) {
@@ -115,6 +117,50 @@ export function KoerungVeranstaltungEditor({
 			),
 		}))
 		setSearchHundId(null)
+	}
+
+	const handleDragStart = (hundId: string) => {
+		setDragHundId(hundId)
+	}
+
+	const handleDragOver = (
+		event: React.DragEvent<HTMLTableRowElement>,
+		hundId: string,
+	) => {
+		event.preventDefault()
+		if (dragHundId === hundId) {
+			return
+		}
+		setDragOverHundId(hundId)
+	}
+
+	const handleDrop = (targetHundId: string) => {
+		if (!dragHundId || dragHundId === targetHundId) {
+			return
+		}
+
+		setVeranstaltung((current) => {
+			const hunde = [...current.hunde]
+			const fromIndex = hunde.findIndex((h) => h.id === dragHundId)
+			const toIndex = hunde.findIndex((h) => h.id === targetHundId)
+
+			if (fromIndex === -1 || toIndex === -1) {
+				return current
+			}
+
+			const [moved] = hunde.splice(fromIndex, 1)
+			hunde.splice(toIndex, 0, moved)
+
+			return {
+				...current,
+				hunde: renumberKoerungHunde(hunde),
+			}
+		})
+	}
+
+	const handleDragEnd = () => {
+		setDragHundId(null)
+		setDragOverHundId(null)
 	}
 
 	const handleSave = async () => {
@@ -234,13 +280,47 @@ export function KoerungVeranstaltungEditor({
 									<th className="px-2 py-2">Wurftag</th>
 									<th className="px-2 py-2">Farbe</th>
 									<th className="px-2 py-2">Besitzer</th>
+									<th className="px-2 py-2">Mitgliedsnummer</th>
 									<th className="px-2 py-2" />
 									<th className="px-2 py-2" />
 								</tr>
 							</thead>
 							<tbody className="divide-y divide-gray-200 dark:divide-gray-700">
 								{veranstaltung.hunde.map((hund) => (
-									<tr key={hund.id}>
+									<tr
+										key={hund.id}
+										draggable
+										onDragStart={() => handleDragStart(hund.id)}
+										onDragOver={(event) =>
+											handleDragOver(event, hund.id)
+										}
+										onDrop={() => handleDrop(hund.id)}
+										onDragEnd={handleDragEnd}
+										className={`${
+											dragHundId === hund.id
+												? 'opacity-40'
+												: dragOverHundId === hund.id
+													? 'bg-indigo-50 dark:bg-indigo-900/30'
+													: ''
+										} cursor-grab active:cursor-grabbing`}
+									>
+<td className="px-2 py-2">
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+												strokeWidth="1.5"
+												stroke="currentColor"
+												className="h-4 w-4 text-gray-400"
+												aria-hidden="true"
+											>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													d="M3.75 9h16.5m-16.5 6.75h16.5"
+												/>
+											</svg>
+										</td>
 										<td className="px-2 py-2 font-medium">
 											{hund.startnummer}
 										</td>
@@ -341,14 +421,42 @@ export function KoerungVeranstaltungEditor({
 											/>
 										</td>
 										<td className="px-2 py-2">
+											<input
+												type="text"
+												value={hund.mitgliedsnummer}
+												onChange={(e) =>
+													updateHund(
+														hund.id,
+														'mitgliedsnummer',
+														e.target.value,
+													)
+												}
+												className={inputClassName}
+											/>
+										</td>
+										<td className="px-2 py-2">
 											<button
 												type="button"
 												onClick={() => setSearchHundId(hund.id)}
-												className="rounded px-2 py-1 text-sm font-medium text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-gray-700"
+												className="inline-flex rounded p-1.5 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-gray-700"
 												title="Hund aus Datenbank übernehmen"
 												aria-label="Hund aus Datenbank übernehmen"
 											>
-												…
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													fill="none"
+													viewBox="0 0 24 24"
+													strokeWidth="1.5"
+													stroke="currentColor"
+													className="h-5 w-5"
+													aria-hidden="true"
+												>
+													<path
+														strokeLinecap="round"
+														strokeLinejoin="round"
+														d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+													/>
+												</svg>
 											</button>
 										</td>
 										<td className="px-2 py-2">
