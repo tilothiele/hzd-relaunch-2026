@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import WurfabnahmeApp from '@/components/wurfabnahme/WurfabnahmeApp'
-import { mergeFormDataFromDom } from '@/lib/wurfabnahme-form-serialize'
 import { getWurfabnahme, saveWurfabnahme } from '@/services/wurfabnahme-db'
 import {
 	appendWurfabnahmeRecord,
@@ -18,6 +17,7 @@ import {
 	type Wurfabnahme,
 	type WurfabnahmeFormData,
 } from '@/types/wurfabnahme-form'
+import { parseWurfabnahmePage } from './constants'
 
 const CURRENT_DRAFT_VALUE = 'draft'
 
@@ -49,17 +49,13 @@ export function WurfabnahmeEditor({
 	const [deletedWelpenIds, setDeletedWelpenIds] = useState<Set<string>>(
 		new Set(),
 	)
+	const [activeTab, setActiveTab] = useState<string>('stammblatt')
 
 	const isViewingHistory = selectedHistoryValue !== CURRENT_DRAFT_VALUE
 	const isReadOnly = !isNewForm && isViewingHistory
 	const showHistorySelect = Boolean(
 		wurfabnahme && wurfabnahme.records.length > 0,
 	)
-
-	const syncDraftFromDom = useCallback((): WurfabnahmeFormData => {
-		if (!formRef.current) return draftFormData
-		return mergeFormDataFromDom(draftFormData, formRef.current)
-	}, [draftFormData])
 
 	const handleFormDataChange = useCallback(
 		(data: WurfabnahmeFormData) => {
@@ -111,7 +107,7 @@ export function WurfabnahmeEditor({
 			if (value === CURRENT_DRAFT_VALUE) {
 				const draft = isViewingHistory
 					? draftFormData
-					: syncDraftFromDom()
+					: formData
 				setDraftFormData(draft)
 				setFormData(draft)
 				setSelectedHistoryValue(CURRENT_DRAFT_VALUE)
@@ -119,7 +115,7 @@ export function WurfabnahmeEditor({
 			}
 
 			if (!isViewingHistory) {
-				setDraftFormData(syncDraftFromDom())
+				setDraftFormData(formData)
 			}
 
 			const historicalRecord = wurfabnahme.records.find(
@@ -130,7 +126,7 @@ export function WurfabnahmeEditor({
 				setSelectedHistoryValue(value)
 			}
 		},
-		[wurfabnahme, isViewingHistory, draftFormData, syncDraftFromDom],
+		[wurfabnahme, isViewingHistory, draftFormData, formData],
 	)
 
 	const handleCancel = useCallback(() => {
@@ -150,15 +146,12 @@ export function WurfabnahmeEditor({
 	}, [])
 
 	const handleSave = useCallback(async () => {
-		if (!formRef.current || isReadOnly) return
+		if (isReadOnly) return
 
 		setIsSaving(true)
 
 		try {
-			let merged = mergeFormDataFromDom(
-				isNewForm ? formData : syncDraftFromDom(),
-				formRef.current,
-			)
+			let merged = formData
 
 			if (deletedWelpenIds.size > 0) {
 				const now = new Date().toISOString()
@@ -193,8 +186,6 @@ export function WurfabnahmeEditor({
 		recordId,
 		wurfabnahme,
 		isReadOnly,
-		isNewForm,
-		syncDraftFromDom,
 		deletedWelpenIds,
 		router,
 	])
@@ -253,6 +244,33 @@ export function WurfabnahmeEditor({
 				</div>
 			) : null}
 
+			<div className="wa-nav-tabs" style={{ marginBottom: '12px' }}>
+				<button
+					type="button"
+					className={`wa-nav-tab ${activeTab === 'stammblatt' ? 'active' : ''}`}
+					onClick={() => setActiveTab('stammblatt')}
+				>
+					Stammblatt
+				</button>
+				{formData.stammblatt.welpen.filter(w => !w.deletedAt).map((welpe, idx) => (
+					<button
+						key={welpe.id}
+						type="button"
+						className={`wa-nav-tab ${activeTab === `welpe-${welpe.id}` ? 'active' : ''}`}
+						onClick={() => setActiveTab(`welpe-${welpe.id}`)}
+					>
+						Welpe {idx + 1}
+					</button>
+				))}
+				<button
+					type="button"
+					className={`wa-nav-tab ${activeTab === 'datenschutz1' ? 'active' : ''}`}
+					onClick={() => setActiveTab('datenschutz1')}
+				>
+					Datenschutz
+				</button>
+			</div>
+
 			<WurfabnahmeApp
 				key={`${selectedHistoryValue}-${isReadOnly ? 'ro' : 'ed'}`}
 				basePath={basePath}
@@ -263,6 +281,8 @@ export function WurfabnahmeEditor({
 				deletedWelpenIds={deletedWelpenIds}
 				onMarkWelpeDelete={handleMarkWelpeDelete}
 				onUndoWelpeDelete={handleUndoWelpeDelete}
+				activeTab={activeTab}
+				onTabChange={setActiveTab}
 			/>
 
 			<div className="wa-editor-actions flex flex-wrap gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { WurfabnahmeNavTabs } from "@/components/wurfabnahme/WurfabnahmeNavTabs";
 
 export default function Navigation() {
     const pathname = usePathname();
@@ -45,7 +44,6 @@ export default function Navigation() {
                         </Link>
                     ))}
                 </div>
-                <WurfabnahmeNavTabs variant="desktop" />
             </div>
 
             {/* Mobile Menu Button */}
@@ -108,10 +106,6 @@ export default function Navigation() {
                                 {item.name}
                             </Link>
                         ))}
-                        <WurfabnahmeNavTabs
-                            variant="mobile"
-                            onNavigate={() => setIsOpen(false)}
-                        />
                     </div>
                 </div>
             )}

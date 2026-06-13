@@ -19,6 +19,53 @@ export interface WelpenRowData {
 	gechiptAm: string
 	verstorbenAm: string
 	deletedAt?: string
+	// Grunddaten
+	wurftag: string
+	gewichtGeburt: string
+	rh: WelpenGeschlecht
+	entwurmt: string
+	entwurmtAm: string
+	wurmkuren: string
+	wurfbesichtigung: string
+	// Feststellungen
+	gewichtWa: string
+	geimpft: string
+	impfungenIo: boolean
+	// Exterieur
+	koerperbau: string
+	kopfform: string
+	stopp: string
+	ohren: string
+	ohrenBes: string
+	augen: string
+	augenBes: string
+	gebiss: string
+	canini: string
+	caniniBes: string
+	rute: string
+	rutePos: string
+	nabel: string
+	nabelBes: string
+	hoden: string
+	// Farbbeschreibung
+	swDeckhaar: string
+	markenfarbe: string
+	markenzeichnung: string
+	blDeckhaar: string
+	aufhellungen: string
+	sw2Deckhaar: string
+	weiss: string[]
+	pigment: string
+	// Verhalten
+	verhalten: string[]
+	// Bemerkungen
+	bemerkungen: string
+	deckgenehmigung: string
+	aufzucht: string
+	hundin: string
+	// Unterschriften
+	ort: string
+	datum: string
 }
 
 export interface StammblattData {
@@ -46,7 +93,6 @@ export interface StammblattData {
 
 export interface WurfabnahmeFormData {
 	stammblatt: StammblattData
-	fields: Record<string, string | boolean>
 	signatures: Record<string, string>
 }
 
@@ -71,37 +117,61 @@ export interface Wurfabnahme {
 	records: WurfabnahmeRecord[]
 }
 
-interface LegacyWelpenRow {
-	id?: string
-	zuchtbuchNr?: string
-	r?: boolean
-	h?: boolean
-	geschlecht?: WelpenGeschlecht
-	name?: string
-	farbe?: string
-	chipNr?: string
-	gechiptAm?: string
-	verstorbenAm?: string
-	deletedAt?: string
-}
-
-export function normalizeWelpenRow(row: LegacyWelpenRow): WelpenRowData {
+export function normalizeWelpenRow(row: Partial<WelpenRowData>): WelpenRowData {
 	let geschlecht: WelpenGeschlecht = row.geschlecht ?? ''
-	if (!geschlecht && row.r) geschlecht = 'R'
-	if (!geschlecht && row.h) geschlecht = 'H'
-
-	const farbe = (row.farbe ?? '') as WelpenFarbe
+	if (!geschlecht && (row as any).r) geschlecht = 'R'
+	if (!geschlecht && (row as any).h) geschlecht = 'H'
 
 	return {
 		id: row.id ?? crypto.randomUUID(),
 		zuchtbuchNr: row.zuchtbuchNr ?? '',
 		geschlecht,
 		name: row.name ?? '',
-		farbe,
+		farbe: (row.farbe ?? '') as WelpenFarbe,
 		chipNr: row.chipNr ?? '',
 		gechiptAm: row.gechiptAm ?? '',
 		verstorbenAm: row.verstorbenAm ?? '',
 		deletedAt: row.deletedAt,
+		wurftag: row.wurftag ?? '',
+		gewichtGeburt: row.gewichtGeburt ?? '',
+		rh: row.rh ?? geschlecht,
+		entwurmt: row.entwurmt ?? '',
+		entwurmtAm: row.entwurmtAm ?? '',
+		wurmkuren: row.wurmkuren ?? '',
+		wurfbesichtigung: row.wurfbesichtigung ?? '',
+		gewichtWa: row.gewichtWa ?? '',
+		geimpft: row.geimpft ?? '',
+		impfungenIo: row.impfungenIo ?? false,
+		koerperbau: row.koerperbau ?? '',
+		kopfform: row.kopfform ?? '',
+		stopp: row.stopp ?? '',
+		ohren: row.ohren ?? '',
+		ohrenBes: row.ohrenBes ?? '',
+		augen: row.augen ?? '',
+		augenBes: row.augenBes ?? '',
+		gebiss: row.gebiss ?? '',
+		canini: row.canini ?? '',
+		caniniBes: row.caniniBes ?? '',
+		rute: row.rute ?? '',
+		rutePos: row.rutePos ?? '',
+		nabel: row.nabel ?? '',
+		nabelBes: row.nabelBes ?? '',
+		hoden: row.hoden ?? '',
+		swDeckhaar: row.swDeckhaar ?? '',
+		markenfarbe: row.markenfarbe ?? '',
+		markenzeichnung: row.markenzeichnung ?? '',
+		blDeckhaar: row.blDeckhaar ?? '',
+		aufhellungen: row.aufhellungen ?? '',
+		sw2Deckhaar: row.sw2Deckhaar ?? '',
+		weiss: row.weiss ?? [],
+		pigment: row.pigment ?? '',
+		verhalten: row.verhalten ?? [],
+		bemerkungen: row.bemerkungen ?? '',
+		deckgenehmigung: row.deckgenehmigung ?? '',
+		aufzucht: row.aufzucht ?? '',
+		hundin: row.hundin ?? '',
+		ort: row.ort ?? '',
+		datum: row.datum ?? '',
 	}
 }
 
@@ -121,7 +191,6 @@ export function normalizeFormData(data: WurfabnahmeFormData): WurfabnahmeFormDat
 	}
 }
 
-/** Klont den letzten Stand für eine neue Bearbeitungsrunde; Unterschriften werden geleert. */
 export function cloneFormDataForEdit(
 	formData: WurfabnahmeFormData,
 ): WurfabnahmeFormData {
@@ -131,10 +200,11 @@ export function cloneFormDataForEdit(
 			...normalized.stammblatt,
 			welpen: normalized.stammblatt.welpen.map((row) => ({ ...row })),
 		},
-		fields: { ...normalized.fields },
 		signatures: {},
 	}
 }
+
+/** Klont den letzten Stand für eine neue Bearbeitungsrunde; Unterschriften werden geleert. */
 
 export function createWelpenRow(): WelpenRowData {
 	return {
@@ -146,6 +216,46 @@ export function createWelpenRow(): WelpenRowData {
 		chipNr: '',
 		gechiptAm: '',
 		verstorbenAm: '',
+		wurftag: '',
+		gewichtGeburt: '',
+		rh: '',
+		entwurmt: '',
+		entwurmtAm: '',
+		wurmkuren: '',
+		wurfbesichtigung: '',
+		gewichtWa: '',
+		geimpft: '',
+		impfungenIo: false,
+		koerperbau: '',
+		kopfform: '',
+		stopp: '',
+		ohren: '',
+		ohrenBes: '',
+		augen: '',
+		augenBes: '',
+		gebiss: '',
+		canini: '',
+		caniniBes: '',
+		rute: '',
+		rutePos: '',
+		nabel: '',
+		nabelBes: '',
+		hoden: '',
+		swDeckhaar: '',
+		markenfarbe: '',
+		markenzeichnung: '',
+		blDeckhaar: '',
+		aufhellungen: '',
+		sw2Deckhaar: '',
+		weiss: [],
+		pigment: '',
+		verhalten: [],
+		bemerkungen: '',
+		deckgenehmigung: '',
+		aufzucht: '',
+		hundin: '',
+		ort: '',
+		datum: '',
 	}
 }
 
@@ -181,7 +291,6 @@ export function createEmptyStammblatt(): StammblattData {
 export function createEmptyFormData(): WurfabnahmeFormData {
 	return {
 		stammblatt: createEmptyStammblatt(),
-		fields: {},
 		signatures: {},
 	}
 }

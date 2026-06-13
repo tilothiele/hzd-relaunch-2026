@@ -7,10 +7,7 @@ import {
 	StammblattPage,
 	WelpePage,
 } from './WurfabnahmePages'
-import {
-	parseWurfabnahmePage,
-} from './constants'
-import { applyNamedFields } from '@/lib/wurfabnahme-form-serialize'
+import { parseWurfabnahmePage } from './constants'
 import type { WurfabnahmeFormData } from '@/types/wurfabnahme-form'
 import './wurfabnahme.css'
 
@@ -23,6 +20,8 @@ interface WurfabnahmeAppProps {
 	deletedWelpenIds?: Set<string>
 	onMarkWelpeDelete?: (id: string) => void
 	onUndoWelpeDelete?: (id: string) => void
+	activeTab: string
+	onTabChange: (tab: string) => void
 }
 
 function WurfabnahmeAppInner({
@@ -33,6 +32,8 @@ function WurfabnahmeAppInner({
 	deletedWelpenIds = new Set(),
 	onMarkWelpeDelete,
 	onUndoWelpeDelete,
+	activeTab,
+	onTabChange,
 }: WurfabnahmeAppProps) {
 	const searchParams = useSearchParams()
 	const fieldsAppliedRef = useRef<string>('')
@@ -64,22 +65,53 @@ function WurfabnahmeAppInner({
 		[formData, onFormDataChange, readOnly],
 	)
 
+	const handleWelpeChange = useCallback(
+		(welpeIndex: number, data: WurfabnahmeFormData['stammblatt']['welpen'][number]) => {
+			if (readOnly) return
+			const newWelpen = [...formData.stammblatt.welpen]
+			newWelpen[welpeIndex] = data
+			onFormDataChange({
+				...formData,
+				stammblatt: {
+					...formData.stammblatt,
+					welpen: newWelpen,
+				},
+			})
+		},
+		[formData, onFormDataChange, readOnly],
+	)
+
 	const signatureProps = {
 		signatures: formData.signatures,
 		onSignatureChange: handleSignatureChange,
 		readOnly,
 	}
 
+	const showPage = (tab: string) => {
+		if (tab === 'stammblatt') return activeTab === 'stammblatt'
+		if (tab === 'datenschutz1') return activeTab === 'datenschutz1'
+		return activeTab.startsWith('welpe-')
+	}
+
+	const activeWelpeId = activeTab.startsWith('welpe-')
+		? activeTab.replace('welpe-', '')
+		: null
+	const activeWelpeIdx = activeWelpeId
+		? formData.stammblatt.welpen.findIndex(w => w.id === activeWelpeId)
+		: -1
+	const activeWelpe = activeWelpeIdx >= 0
+		? formData.stammblatt.welpen[activeWelpeIdx]
+		: null
+
 	useEffect(() => {
 		const root = formRef.current
 		if (!root) return
 
-		const key = `${activePage}:${JSON.stringify(formData.fields)}`
+		const key = `${activeTab}`
 		if (fieldsAppliedRef.current === key) return
 
-		applyNamedFields(root, formData.fields)
 		fieldsAppliedRef.current = key
-	}, [activePage, formData.fields, formRef])
+	}, [activeTab, formRef])
 
 	return (
 		<fieldset
@@ -87,7 +119,7 @@ function WurfabnahmeAppInner({
 			className="min-w-0 border-0 p-0 m-0"
 		>
 			<div className="wurfabnahme-app" ref={formRef}>
-				{activePage === 'stammblatt' && (
+				{showPage('stammblatt') && (
 					<StammblattPage
 						data={formData.stammblatt}
 						onChange={handleStammblattChange}
@@ -98,9 +130,15 @@ function WurfabnahmeAppInner({
 					/>
 				)}
 
-				{activePage === 'welpe1' && <WelpePage {...signatureProps} />}
+				{showPage('welpe1') && (
+					<WelpePage
+						welpe={activeWelpe}
+						onChange={activeWelpe ? (data) => handleWelpeChange(activeWelpeIdx, data) : undefined}
+						{...signatureProps}
+					/>
+				)}
 
-				{activePage === 'datenschutz1' && (
+				{showPage('datenschutz1') && (
 					<DatenschutzPage {...signatureProps} />
 				)}
 			</div>
