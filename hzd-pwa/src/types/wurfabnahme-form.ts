@@ -108,6 +108,21 @@ export function normalizeFormData(data: WurfabnahmeFormData): WurfabnahmeFormDat
 	}
 }
 
+/** Klont den letzten Stand für eine neue Bearbeitungsrunde; Unterschriften werden geleert. */
+export function cloneFormDataForEdit(
+	formData: WurfabnahmeFormData,
+): WurfabnahmeFormData {
+	const normalized = normalizeFormData(formData)
+	return {
+		stammblatt: {
+			...normalized.stammblatt,
+			welpen: normalized.stammblatt.welpen.map((row) => ({ ...row })),
+		},
+		fields: { ...normalized.fields },
+		signatures: {},
+	}
+}
+
 export function createWelpenRow(): WelpenRowData {
 	return {
 		id: crypto.randomUUID(),
