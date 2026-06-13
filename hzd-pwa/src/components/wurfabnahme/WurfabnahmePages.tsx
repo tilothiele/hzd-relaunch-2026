@@ -33,15 +33,22 @@ interface SignatureProps {
 interface StammblattPageProps extends SignatureProps {
 	data: StammblattData
 	onChange: (data: StammblattData) => void
+	deletedIds?: Set<string>
+	onMarkDelete?: (id: string) => void
+	onUndoDelete?: (id: string) => void
 }
 
 function WelpenTable({
 	rows,
-	onRemove,
+	onMarkDelete,
+	onUndoDelete,
+	deletedIds,
 	onUpdate,
 }: {
 	rows: WelpenRowData[]
-	onRemove: (index: number) => void
+	onMarkDelete: (id: string) => void
+	onUndoDelete: (id: string) => void
+	deletedIds: Set<string>
 	onUpdate: (
 		index: number,
 		field: keyof WelpenRowData,
@@ -68,35 +75,48 @@ function WelpenTable({
 						/>
 					</tr>
 				</thead>
-				<tbody>
-					{rows.map((row, i) => (
-						<tr key={row.id}>
-							<td style={{ textAlign: 'center', fontWeight: 600 }}>{i + 1}</td>
-							<td>
-								<span style={{ color: 'var(--wa-text-muted)', fontSize: 12 }}>
-									VDH-HZD{' '}
-								</span>
+<tbody>
+				{rows.map((row) => {
+					const isDeleted = deletedIds.has(row.id)
+					return (
+						<tr
+							key={row.id}
+							className={isDeleted ? 'opacity-40' : ''}
+						>
+							<td style={{ textAlign: 'center', fontWeight: 600 }}>
+								{isDeleted ? (
+									<span className="text-red-400 line-through" title="Zum Löschen vorgemerkt">
+										–
+									</span>
+								) : (
+									row.zuchtbuchNr || ''
+								)}
+							</td>
+							<td className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}>
 								<input
 									type="text"
 									placeholder="Nr."
 									style={{ width: 100 }}
 									value={row.zuchtbuchNr}
 									onChange={(e) =>
-										onUpdate(i, 'zuchtbuchNr', e.target.value)
+										onUpdate(rows.indexOf(row), 'zuchtbuchNr', e.target.value)
 									}
+									disabled={isDeleted}
+									className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}
 								/>
 							</td>
-							<td>
+							<td className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}>
 								<select
-									className="wa-select-compact"
+									className={`wa-select-compact${isDeleted ? ' bg-red-100 dark:bg-red-900/30' : ''}`}
 									value={row.geschlecht}
 									onChange={(e) =>
 										onUpdate(
-											i,
+											rows.indexOf(row),
 											'geschlecht',
 											e.target.value as WelpenGeschlecht,
 										)
 									}
+									disabled={isDeleted}
 								>
 									<option value="">–</option>
 									{WELPEN_GESCHLECHT_OPTIONS.map((option) => (
@@ -106,21 +126,24 @@ function WelpenTable({
 									))}
 								</select>
 							</td>
-							<td>
+							<td className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}>
 								<input
 									type="text"
 									placeholder="Name"
 									value={row.name}
-									onChange={(e) => onUpdate(i, 'name', e.target.value)}
+									onChange={(e) => onUpdate(rows.indexOf(row), 'name', e.target.value)}
+									disabled={isDeleted}
+									className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}
 								/>
 							</td>
-							<td>
+							<td className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}>
 								<select
-									className="wa-select-compact"
+									className={`wa-select-compact${isDeleted ? ' bg-red-100 dark:bg-red-900/30' : ''}`}
 									value={row.farbe}
 									onChange={(e) =>
-										onUpdate(i, 'farbe', e.target.value as WelpenFarbe)
+										onUpdate(rows.indexOf(row), 'farbe', e.target.value as WelpenFarbe)
 									}
+									disabled={isDeleted}
 								>
 									<option value="">–</option>
 									{WELPEN_FARBE_OPTIONS.map((option) => (
@@ -130,45 +153,63 @@ function WelpenTable({
 									))}
 								</select>
 							</td>
-							<td>
+							<td className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}>
 								<input
 									type="text"
 									placeholder="Chip-Nr."
 									value={row.chipNr}
-									onChange={(e) => onUpdate(i, 'chipNr', e.target.value)}
+									onChange={(e) => onUpdate(rows.indexOf(row), 'chipNr', e.target.value)}
+									disabled={isDeleted}
+									className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}
 								/>
 							</td>
-							<td>
+							<td className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}>
 								<input
 									type="date"
 									value={row.gechiptAm}
-									onChange={(e) => onUpdate(i, 'gechiptAm', e.target.value)}
+									onChange={(e) => onUpdate(rows.indexOf(row), 'gechiptAm', e.target.value)}
+									disabled={isDeleted}
+									className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}
 								/>
 							</td>
-							<td>
+							<td className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}>
 								<input
 									type="date"
 									value={row.verstorbenAm}
 									onChange={(e) =>
-										onUpdate(i, 'verstorbenAm', e.target.value)
+										onUpdate(rows.indexOf(row), 'verstorbenAm', e.target.value)
 									}
+									disabled={isDeleted}
+									className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}
 								/>
 							</td>
 							<td className="wa-col-actions" style={{ textAlign: 'center' }}>
-								<button
-									type="button"
-									className="wa-btn-icon"
-									onClick={() => onRemove(i)}
-									disabled={rows.length <= MIN_WELPEN_ROWS}
-									title="Zeile entfernen"
-									aria-label={`Welpe ${i + 1} entfernen`}
-								>
-									×
-								</button>
+								{isDeleted ? (
+									<button
+										type="button"
+										className="wa-btn-icon"
+										onClick={() => onUndoDelete(row.id)}
+										title="Löschen rückgängig"
+										aria-label="Löschen rückgängig"
+									>
+										↩
+									</button>
+								) : (
+									<button
+										type="button"
+										className="wa-btn-icon"
+										onClick={() => onMarkDelete(row.id)}
+										title="Welpe zum Löschen vormerken"
+										aria-label="Welpe zum Löschen vormerken"
+									>
+										×
+									</button>
+								)}
 							</td>
 						</tr>
-					))}
-				</tbody>
+					)
+				})}
+			</tbody>
 			</table>
 		</div>
 	)
@@ -180,6 +221,9 @@ export function StammblattPage({
 	signatures,
 	onSignatureChange,
 	readOnly,
+	deletedIds = new Set(),
+	onMarkDelete,
+	onUndoDelete,
 }: StammblattPageProps) {
 	const updateField = <K extends keyof StammblattData>(
 		field: K,
@@ -346,7 +390,9 @@ export function StammblattPage({
 				</div>
 				<WelpenTable
 					rows={data.welpen}
-					onRemove={handleRemoveRow}
+					deletedIds={deletedIds}
+					onMarkDelete={onMarkDelete ?? (() => {})}
+					onUndoDelete={onUndoDelete ?? (() => {})}
 					onUpdate={handleWelpeUpdate}
 				/>
 			</Card>

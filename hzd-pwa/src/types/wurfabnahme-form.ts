@@ -18,6 +18,7 @@ export interface WelpenRowData {
 	chipNr: string
 	gechiptAm: string
 	verstorbenAm: string
+	deletedAt?: string
 }
 
 export interface StammblattData {
@@ -99,6 +100,7 @@ export function normalizeWelpenRow(row: LegacyWelpenRow): WelpenRowData {
 		chipNr: row.chipNr ?? '',
 		gechiptAm: row.gechiptAm ?? '',
 		verstorbenAm: row.verstorbenAm ?? '',
+		deletedAt: row.deletedAt,
 	}
 }
 
@@ -269,6 +271,9 @@ export function buildRecordFromForm(
 	formData: WurfabnahmeFormData,
 ): WurfabnahmeRecord {
 	const now = new Date().toISOString()
+	const activeWelpen = formData.stammblatt.welpen.filter(
+		(w) => !w.deletedAt,
+	)
 
 	return {
 		id,
@@ -276,7 +281,13 @@ export function buildRecordFromForm(
 		updatedAt: now,
 		zwingername: formData.stammblatt.zwingername,
 		datum: formData.stammblatt.datum || formData.stammblatt.wurfGefallenAm,
-		welpenCount: formData.stammblatt.welpen.length,
-		formData,
+		welpenCount: activeWelpen.length,
+		formData: {
+			...formData,
+			stammblatt: {
+				...formData.stammblatt,
+				welpen: activeWelpen,
+			},
+		},
 	}
 }

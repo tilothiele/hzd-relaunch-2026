@@ -20,6 +20,9 @@ interface WurfabnahmeAppProps {
 	onFormDataChange: (data: WurfabnahmeFormData) => void
 	formRef: React.RefObject<HTMLDivElement | null>
 	readOnly?: boolean
+	deletedWelpenIds?: Set<string>
+	onMarkWelpeDelete?: (id: string) => void
+	onUndoWelpeDelete?: (id: string) => void
 }
 
 function WurfabnahmeAppInner({
@@ -27,6 +30,9 @@ function WurfabnahmeAppInner({
 	onFormDataChange,
 	formRef,
 	readOnly = false,
+	deletedWelpenIds = new Set(),
+	onMarkWelpeDelete,
+	onUndoWelpeDelete,
 }: WurfabnahmeAppProps) {
 	const searchParams = useSearchParams()
 	const fieldsAppliedRef = useRef<string>('')
@@ -85,6 +91,9 @@ function WurfabnahmeAppInner({
 					<StammblattPage
 						data={formData.stammblatt}
 						onChange={handleStammblattChange}
+						deletedIds={deletedWelpenIds}
+						onMarkDelete={onMarkWelpeDelete}
+						onUndoDelete={onUndoWelpeDelete}
 						{...signatureProps}
 					/>
 				)}

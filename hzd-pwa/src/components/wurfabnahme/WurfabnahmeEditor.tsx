@@ -46,6 +46,9 @@ export function WurfabnahmeEditor({
 	const [isLoading, setIsLoading] = useState(Boolean(recordId))
 	const [isSaving, setIsSaving] = useState(false)
 	const [loadError, setLoadError] = useState<string | null>(null)
+	const [deletedWelpenIds, setDeletedWelpenIds] = useState<Set<string>>(
+		new Set(),
+	)
 
 	const isViewingHistory = selectedHistoryValue !== CURRENT_DRAFT_VALUE
 	const isReadOnly = !isNewForm && isViewingHistory
@@ -134,16 +137,42 @@ export function WurfabnahmeEditor({
 		router.push('/wurfabnahmen')
 	}, [router])
 
+	const handleMarkWelpeDelete = useCallback((id: string) => {
+		setDeletedWelpenIds((prev) => new Set([...prev, id]))
+	}, [])
+
+	const handleUndoWelpeDelete = useCallback((id: string) => {
+		setDeletedWelpenIds((prev) => {
+			const next = new Set(prev)
+			next.delete(id)
+			return next
+		})
+	}, [])
+
 	const handleSave = useCallback(async () => {
 		if (!formRef.current || isReadOnly) return
 
 		setIsSaving(true)
 
 		try {
-			const merged = mergeFormDataFromDom(
+			let merged = mergeFormDataFromDom(
 				isNewForm ? formData : syncDraftFromDom(),
 				formRef.current,
 			)
+
+			if (deletedWelpenIds.size > 0) {
+				const now = new Date().toISOString()
+				merged = {
+					...merged,
+					stammblatt: {
+						...merged.stammblatt,
+						welpen: merged.stammblatt.welpen.map((w) =>
+							deletedWelpenIds.has(w.id) ? { ...w, deletedAt: now } : w,
+						),
+					},
+				}
+			}
+
 			const newRecord = buildRecordFromForm(crypto.randomUUID(), merged)
 
 			if (recordId && wurfabnahme) {
@@ -166,6 +195,7 @@ export function WurfabnahmeEditor({
 		isReadOnly,
 		isNewForm,
 		syncDraftFromDom,
+		deletedWelpenIds,
 		router,
 	])
 
@@ -189,9 +219,9 @@ export function WurfabnahmeEditor({
 	}
 
 	return (
-		<div className="flex flex-col gap-4">
+		<div className="wa-card">
 			{showHistorySelect && wurfabnahme ? (
-				<div className="wa-editor-header flex flex-wrap items-end gap-3 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+				<div className="wa-editor-header flex flex-wrap items-end gap-3">
 					<div className="flex min-w-[240px] flex-1 flex-col gap-1">
 						<label
 							htmlFor="wurfabnahme-history"
@@ -230,6 +260,9 @@ export function WurfabnahmeEditor({
 				onFormDataChange={handleFormDataChange}
 				formRef={formRef}
 				readOnly={isReadOnly}
+				deletedWelpenIds={deletedWelpenIds}
+				onMarkWelpeDelete={handleMarkWelpeDelete}
+				onUndoWelpeDelete={handleUndoWelpeDelete}
 			/>
 
 			<div className="wa-editor-actions flex flex-wrap gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
