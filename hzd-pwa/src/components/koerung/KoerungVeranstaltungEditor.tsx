@@ -293,6 +293,7 @@ export function KoerungVeranstaltungEditor({
 							inputClassName={inputClassName}
 							dragHundId={dragHundId}
 							dragOverHundId={dragOverHundId}
+							isSaving={isSaving}
 							onAddHund={handleAddHund}
 							onRemoveHund={handleRemoveHund}
 							onUpdateHund={updateHund}
@@ -301,29 +302,13 @@ export function KoerungVeranstaltungEditor({
 							onDrop={handleDrop}
 							onDragEnd={handleDragEnd}
 							onOpenSearch={setSearchHundId}
+							onSave={handleSave}
+							onCancel={() => router.push('/koerungen')}
 						/>
 					) : (
 						<BewertungenTab />
 					)}
 				</div>
-			</div>
-
-			<div className="flex flex-wrap gap-3">
-				<button
-					type="button"
-					onClick={handleSave}
-					disabled={isSaving}
-					className="rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
-				>
-					{isSaving ? 'Speichern…' : 'Speichern'}
-				</button>
-				<button
-					type="button"
-					onClick={() => router.push('/koerungen')}
-					className="rounded border border-gray-300 px-4 py-2 text-sm font-medium hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700"
-				>
-					Abbrechen
-				</button>
 			</div>
 		</div>
 	)

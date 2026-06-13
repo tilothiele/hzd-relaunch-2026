@@ -9,6 +9,7 @@ interface TeilnehmerTabProps {
 	inputClassName: string
 	dragHundId: string | null
 	dragOverHundId: string | null
+	isSaving: boolean
 	onAddHund: () => void
 	onRemoveHund: (hundId: string) => void
 	onUpdateHund: (
@@ -21,6 +22,8 @@ interface TeilnehmerTabProps {
 	onDrop: (targetHundId: string) => void
 	onDragEnd: () => void
 	onOpenSearch: (hundId: string) => void
+	onSave: () => void
+	onCancel: () => void
 }
 
 export function TeilnehmerTab({
@@ -28,6 +31,7 @@ export function TeilnehmerTab({
 	inputClassName,
 	dragHundId,
 	dragOverHundId,
+	isSaving,
 	onAddHund,
 	onRemoveHund,
 	onUpdateHund,
@@ -36,6 +40,8 @@ export function TeilnehmerTab({
 	onDrop,
 	onDragEnd,
 	onOpenSearch,
+	onSave,
+	onCancel,
 }: TeilnehmerTabProps) {
 	return (
 		<>
@@ -46,7 +52,7 @@ export function TeilnehmerTab({
 					onClick={onAddHund}
 					className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
 				>
-					Hund hinzufügen
+					Teilnehmer hinzufügen
 				</button>
 			</div>
 
@@ -252,6 +258,24 @@ export function TeilnehmerTab({
 					</table>
 				</div>
 			)}
+
+			<div className="mt-6 flex flex-wrap gap-3">
+				<button
+					type="button"
+					onClick={onSave}
+					disabled={isSaving}
+					className="rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+				>
+					{isSaving ? 'Speichern…' : 'Speichern'}
+				</button>
+				<button
+					type="button"
+					onClick={onCancel}
+					className="rounded border border-gray-300 px-4 py-2 text-sm font-medium hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700"
+				>
+					Abbrechen
+				</button>
+			</div>
 		</>
 	)
 }
