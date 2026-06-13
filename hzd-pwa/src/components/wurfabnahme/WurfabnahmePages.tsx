@@ -15,25 +15,37 @@ import {
 	createWelpenRow,
 	MAX_WELPEN_ROWS,
 	MIN_WELPEN_ROWS,
+	WELPEN_FARBE_OPTIONS,
+	WELPEN_GESCHLECHT_OPTIONS,
+	WURF_NR_OPTIONS,
 	type StammblattData,
+	type WelpenFarbe,
+	type WelpenGeschlecht,
 	type WelpenRowData,
 } from '@/types/wurfabnahme-form'
 
-interface StammblattPageProps {
+interface SignatureProps {
+	signatures: Record<string, string>
+	onSignatureChange: (id: string, dataUrl: string) => void
+}
+
+interface StammblattPageProps extends SignatureProps {
 	data: StammblattData
 	onChange: (data: StammblattData) => void
 }
 
 function WelpenTable({
 	rows,
-	onToggle,
 	onRemove,
 	onUpdate,
 }: {
 	rows: WelpenRowData[]
-	onToggle: (index: number, field: 'r' | 'h') => void
 	onRemove: (index: number) => void
-	onUpdate: (index: number, field: keyof WelpenRowData, value: string | boolean) => void
+	onUpdate: (
+		index: number,
+		field: keyof WelpenRowData,
+		value: string,
+	) => void
 }) {
 	return (
 		<div style={{ overflowX: 'auto' }}>
@@ -42,12 +54,12 @@ function WelpenTable({
 					<tr>
 						<th style={{ width: 36 }}>#</th>
 						<th>Zuchtbuch-Nr. / Register-Nr.</th>
-						<th style={{ width: 36, textAlign: 'center' }}>R</th>
-						<th style={{ width: 36, textAlign: 'center' }}>H</th>
+						<th style={{ width: 70 }}>R/H</th>
 						<th>Name Welpe</th>
 						<th style={{ width: 70 }}>Farbe</th>
 						<th>Chipnummer</th>
 						<th>Gechippt am</th>
+						<th>Verstorben am</th>
 						<th
 							className="wa-col-actions"
 							style={{ width: 40, textAlign: 'center' }}
@@ -73,35 +85,25 @@ function WelpenTable({
 									}
 								/>
 							</td>
-							<td style={{ textAlign: 'center' }}>
-								<div
-									className={`wa-cb-small${row.r ? ' checked' : ''}`}
-									onClick={() => onToggle(i, 'r')}
-									role="checkbox"
-									aria-checked={row.r}
-									tabIndex={0}
-									onKeyDown={(e) => {
-										if (e.key === ' ' || e.key === 'Enter') {
-											e.preventDefault()
-											onToggle(i, 'r')
-										}
-									}}
-								/>
-							</td>
-							<td style={{ textAlign: 'center' }}>
-								<div
-									className={`wa-cb-small${row.h ? ' checked' : ''}`}
-									onClick={() => onToggle(i, 'h')}
-									role="checkbox"
-									aria-checked={row.h}
-									tabIndex={0}
-									onKeyDown={(e) => {
-										if (e.key === ' ' || e.key === 'Enter') {
-											e.preventDefault()
-											onToggle(i, 'h')
-										}
-									}}
-								/>
+							<td>
+								<select
+									className="wa-select-compact"
+									value={row.geschlecht}
+									onChange={(e) =>
+										onUpdate(
+											i,
+											'geschlecht',
+											e.target.value as WelpenGeschlecht,
+										)
+									}
+								>
+									<option value="">–</option>
+									{WELPEN_GESCHLECHT_OPTIONS.map((option) => (
+										<option key={option} value={option}>
+											{option}
+										</option>
+									))}
+								</select>
 							</td>
 							<td>
 								<input
@@ -112,13 +114,20 @@ function WelpenTable({
 								/>
 							</td>
 							<td>
-								<input
-									type="text"
-									placeholder="sm/b/s"
-									style={{ width: 60 }}
+								<select
+									className="wa-select-compact"
 									value={row.farbe}
-									onChange={(e) => onUpdate(i, 'farbe', e.target.value)}
-								/>
+									onChange={(e) =>
+										onUpdate(i, 'farbe', e.target.value as WelpenFarbe)
+									}
+								>
+									<option value="">–</option>
+									{WELPEN_FARBE_OPTIONS.map((option) => (
+										<option key={option} value={option}>
+											{option}
+										</option>
+									))}
+								</select>
 							</td>
 							<td>
 								<input
@@ -133,6 +142,15 @@ function WelpenTable({
 									type="date"
 									value={row.gechiptAm}
 									onChange={(e) => onUpdate(i, 'gechiptAm', e.target.value)}
+								/>
+							</td>
+							<td>
+								<input
+									type="date"
+									value={row.verstorbenAm}
+									onChange={(e) =>
+										onUpdate(i, 'verstorbenAm', e.target.value)
+									}
 								/>
 							</td>
 							<td className="wa-col-actions" style={{ textAlign: 'center' }}>
@@ -155,23 +173,17 @@ function WelpenTable({
 	)
 }
 
-export function StammblattPage({ data, onChange }: StammblattPageProps) {
+export function StammblattPage({
+	data,
+	onChange,
+	signatures,
+	onSignatureChange,
+}: StammblattPageProps) {
 	const updateField = <K extends keyof StammblattData>(
 		field: K,
 		value: StammblattData[K],
 	) => {
 		onChange({ ...data, [field]: value })
-	}
-
-	const handleToggle = (index: number, field: 'r' | 'h') => {
-		updateField(
-			'welpen',
-			data.welpen.map((row, i) => {
-				if (i !== index) return row
-				if (field === 'r') return { ...row, r: !row.r, h: false }
-				return { ...row, r: false, h: !row.h }
-			}),
-		)
 	}
 
 	const handleAddRow = () => {
@@ -190,7 +202,7 @@ export function StammblattPage({ data, onChange }: StammblattPageProps) {
 	const handleWelpeUpdate = (
 		index: number,
 		field: keyof WelpenRowData,
-		value: string | boolean,
+		value: string,
 	) => {
 		updateField(
 			'welpen',
@@ -233,11 +245,17 @@ export function StammblattPage({ data, onChange }: StammblattPageProps) {
 						/>
 					</Field>
 					<Field label="Wurf im Zwinger (Nr.)">
-						<input
-							type="text"
+						<select
 							value={data.wurfNr}
 							onChange={(e) => updateField('wurfNr', e.target.value)}
-						/>
+						>
+							<option value="">–</option>
+							{WURF_NR_OPTIONS.map((letter) => (
+								<option key={letter} value={letter}>
+									{letter}
+								</option>
+							))}
+						</select>
 					</Field>
 				</FieldRow>
 				<FieldRow cols={2}>
@@ -306,7 +324,6 @@ export function StammblattPage({ data, onChange }: StammblattPageProps) {
 				</div>
 				<WelpenTable
 					rows={data.welpen}
-					onToggle={handleToggle}
 					onRemove={handleRemoveRow}
 					onUpdate={handleWelpeUpdate}
 				/>
@@ -352,6 +369,8 @@ export function StammblattPage({ data, onChange }: StammblattPageProps) {
 						{ id: 'sig-zue-stamm', label: 'Züchter' },
 						{ id: 'sig-zwa-stamm', label: 'Zuchtwartanwärter' },
 					]}
+					values={signatures}
+					onChange={onSignatureChange}
 				/>
 				<FieldRow cols={2} style={{ marginTop: 16 }}>
 					<Field label="Ort">
@@ -376,7 +395,10 @@ export function StammblattPage({ data, onChange }: StammblattPageProps) {
 	)
 }
 
-export function WelpePage() {
+export function WelpePage({
+	signatures,
+	onSignatureChange,
+}: SignatureProps) {
 	return (
 		<div className="wa-page active" id="page-welpe1">
 			<div className="wa-badge">Welpe 1</div>
@@ -677,6 +699,8 @@ export function WelpePage() {
 						{ id: 'sig-zue-w1', label: 'Züchter' },
 						{ id: 'sig-zwa-w1', label: 'Zuchtwartanwärter' },
 					]}
+					values={signatures}
+					onChange={onSignatureChange}
 				/>
 				<FieldRow cols={2} style={{ marginTop: 16 }}>
 					<Field label="Ort">
@@ -693,7 +717,10 @@ export function WelpePage() {
 	)
 }
 
-export function DatenschutzPage() {
+export function DatenschutzPage({
+	signatures,
+	onSignatureChange,
+}: SignatureProps) {
 	return (
 		<div className="wa-page active" id="page-datenschutz1">
 			<div className="wa-badge">Welpe 1</div>
@@ -820,7 +847,11 @@ export function DatenschutzPage() {
 				</FieldRow>
 				<div style={{ maxWidth: 400 }}>
 					<SignatureGrid
-						signatures={[{ id: 'sig-ds1', label: 'Unterschrift Welpenkäufer' }]}
+						signatures={[
+							{ id: 'sig-ds1', label: 'Unterschrift Welpenkäufer' },
+						]}
+						values={signatures}
+						onChange={onSignatureChange}
 					/>
 				</div>
 			</Card>

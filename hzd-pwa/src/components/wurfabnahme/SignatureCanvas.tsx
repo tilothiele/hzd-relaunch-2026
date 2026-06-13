@@ -1,14 +1,69 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 
 interface SignatureCanvasProps {
 	id: string
 	label: string
+	value?: string
+	onChange?: (dataUrl: string) => void
 }
 
-export function SignatureCanvas({ id, label }: SignatureCanvasProps) {
+export function SignatureCanvas({
+	id,
+	label,
+	value = '',
+	onChange,
+}: SignatureCanvasProps) {
 	const canvasRef = useRef<HTMLCanvasElement>(null)
+	const valueRef = useRef(value)
+	const drawingRef = useRef(false)
+
+	const redrawFromValue = useCallback((dataUrl: string) => {
+		const canvas = canvasRef.current
+		if (!canvas) return
+
+		const ctx = canvas.getContext('2d')
+		if (!ctx) return
+
+		ctx.clearRect(0, 0, canvas.width, canvas.height)
+		ctx.strokeStyle = '#1a1714'
+		ctx.lineWidth = 2
+		ctx.lineCap = 'round'
+		ctx.lineJoin = 'round'
+
+		if (!dataUrl) return
+
+		const image = new Image()
+		image.onload = () => {
+			ctx.drawImage(image, 0, 0, canvas.width, canvas.height)
+		}
+		image.src = dataUrl
+	}, [])
+
+	const notifyChange = useCallback(() => {
+		const canvas = canvasRef.current
+		if (!canvas || !onChange) return
+
+		const ctx = canvas.getContext('2d')
+		if (!ctx) return
+
+		const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data
+		const hasInk = pixels.some((channel, index) => {
+			return index % 4 === 3 && channel > 0
+		})
+
+		const dataUrl = hasInk ? canvas.toDataURL('image/png') : ''
+		valueRef.current = dataUrl
+		onChange(dataUrl)
+	}, [onChange])
+
+	useEffect(() => {
+		valueRef.current = value
+		if (!drawingRef.current) {
+			redrawFromValue(value)
+		}
+	}, [value, redrawFromValue])
 
 	useEffect(() => {
 		const canvas = canvasRef.current
@@ -17,7 +72,6 @@ export function SignatureCanvas({ id, label }: SignatureCanvasProps) {
 		const ctx = canvas.getContext('2d')
 		if (!ctx) return
 
-		let drawing = false
 		let lastX = 0
 		let lastY = 0
 
@@ -40,6 +94,7 @@ export function SignatureCanvas({ id, label }: SignatureCanvasProps) {
 		}
 
 		const resize = () => {
+			const savedValue = valueRef.current
 			const rect = canvas.parentElement?.getBoundingClientRect()
 			if (!rect) return
 			canvas.width = rect.width
@@ -48,11 +103,12 @@ export function SignatureCanvas({ id, label }: SignatureCanvasProps) {
 			ctx.lineWidth = 2
 			ctx.lineCap = 'round'
 			ctx.lineJoin = 'round'
+			redrawFromValue(savedValue)
 		}
 
 		const handleStart = (e: MouseEvent | TouchEvent) => {
 			if ('touches' in e) e.preventDefault()
-			drawing = true
+			drawingRef.current = true
 			const p = getPos(e)
 			lastX = p.x
 			lastY = p.y
@@ -60,7 +116,7 @@ export function SignatureCanvas({ id, label }: SignatureCanvasProps) {
 
 		const handleMove = (e: MouseEvent | TouchEvent) => {
 			if ('touches' in e) e.preventDefault()
-			if (!drawing) return
+			if (!drawingRef.current) return
 			const p = getPos(e)
 			ctx.beginPath()
 			ctx.moveTo(lastX, lastY)
@@ -71,7 +127,9 @@ export function SignatureCanvas({ id, label }: SignatureCanvasProps) {
 		}
 
 		const handleEnd = () => {
-			drawing = false
+			if (!drawingRef.current) return
+			drawingRef.current = false
+			notifyChange()
 		}
 
 		resize()
@@ -94,14 +152,12 @@ export function SignatureCanvas({ id, label }: SignatureCanvasProps) {
 			canvas.removeEventListener('touchmove', handleMove)
 			canvas.removeEventListener('touchend', handleEnd)
 		}
-	}, [id])
+	}, [id, notifyChange, redrawFromValue])
 
 	const handleClear = () => {
-		const canvas = canvasRef.current
-		if (!canvas) return
-		const ctx = canvas.getContext('2d')
-		if (!ctx) return
-		ctx.clearRect(0, 0, canvas.width, canvas.height)
+		valueRef.current = ''
+		redrawFromValue('')
+		onChange?.('')
 	}
 
 	return (

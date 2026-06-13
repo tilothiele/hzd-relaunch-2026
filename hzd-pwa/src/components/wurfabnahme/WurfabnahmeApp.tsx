@@ -41,6 +41,24 @@ function WurfabnahmeAppInner({
 		[formData, onFormDataChange],
 	)
 
+	const handleSignatureChange = useCallback(
+		(id: string, dataUrl: string) => {
+			onFormDataChange({
+				...formData,
+				signatures: {
+					...formData.signatures,
+					[id]: dataUrl,
+				},
+			})
+		},
+		[formData, onFormDataChange],
+	)
+
+	const signatureProps = {
+		signatures: formData.signatures,
+		onSignatureChange: handleSignatureChange,
+	}
+
 	useEffect(() => {
 		const root = formRef.current
 		if (!root) return
@@ -58,12 +76,15 @@ function WurfabnahmeAppInner({
 				<StammblattPage
 					data={formData.stammblatt}
 					onChange={handleStammblattChange}
+					{...signatureProps}
 				/>
 			)}
 
-			{activePage === 'welpe1' && <WelpePage />}
+			{activePage === 'welpe1' && <WelpePage {...signatureProps} />}
 
-			{activePage === 'datenschutz1' && <DatenschutzPage />}
+			{activePage === 'datenschutz1' && (
+				<DatenschutzPage {...signatureProps} />
+			)}
 		</div>
 	)
 }

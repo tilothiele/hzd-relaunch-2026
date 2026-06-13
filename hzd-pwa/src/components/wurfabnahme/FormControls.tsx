@@ -150,14 +150,23 @@ export function PdfAnleitung() {
 
 export function SignatureGrid({
 	signatures,
+	values = {},
+	onChange,
 }: {
 	signatures: { id: string; label: string }[]
+	values?: Record<string, string>
+	onChange?: (id: string, dataUrl: string) => void
 }) {
 	return (
 		<div className="wa-sig-grid">
 			{signatures.map((sig) => (
 				<div key={sig.id}>
-					<SignatureCanvas id={sig.id} label={sig.label} />
+					<SignatureCanvas
+						id={sig.id}
+						label={sig.label}
+						value={values[sig.id] ?? ''}
+						onChange={(dataUrl) => onChange?.(sig.id, dataUrl)}
+					/>
 				</div>
 			))}
 		</div>

@@ -53,7 +53,7 @@ export function applyNamedFields(
 
 		const input = root.querySelector(
 			`[name="${cssEscape(name)}"]`,
-		) as HTMLInputElement | HTMLTextAreaElement | null
+		) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null
 		if (input) {
 			input.value = String(value)
 		}

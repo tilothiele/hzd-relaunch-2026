@@ -2,15 +2,22 @@ export const DEFAULT_WELPEN_ROWS = 5
 export const MIN_WELPEN_ROWS = 1
 export const MAX_WELPEN_ROWS = 15
 
+export const WURF_NR_OPTIONS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+export const WELPEN_FARBE_OPTIONS = ['S', 'SM', 'B'] as const
+export const WELPEN_GESCHLECHT_OPTIONS = ['R', 'H'] as const
+
+export type WelpenGeschlecht = '' | 'R' | 'H'
+export type WelpenFarbe = '' | 'S' | 'SM' | 'B'
+
 export interface WelpenRowData {
 	id: string
 	zuchtbuchNr: string
-	r: boolean
-	h: boolean
+	geschlecht: WelpenGeschlecht
 	name: string
-	farbe: string
+	farbe: WelpenFarbe
 	chipNr: string
 	gechiptAm: string
+	verstorbenAm: string
 }
 
 export interface StammblattData {
@@ -34,6 +41,7 @@ export interface StammblattData {
 export interface WurfabnahmeFormData {
 	stammblatt: StammblattData
 	fields: Record<string, string | boolean>
+	signatures: Record<string, string>
 }
 
 export interface WurfabnahmeRecord {
@@ -46,16 +54,59 @@ export interface WurfabnahmeRecord {
 	formData: WurfabnahmeFormData
 }
 
+interface LegacyWelpenRow {
+	id?: string
+	zuchtbuchNr?: string
+	r?: boolean
+	h?: boolean
+	geschlecht?: WelpenGeschlecht
+	name?: string
+	farbe?: string
+	chipNr?: string
+	gechiptAm?: string
+	verstorbenAm?: string
+}
+
+export function normalizeWelpenRow(row: LegacyWelpenRow): WelpenRowData {
+	let geschlecht: WelpenGeschlecht = row.geschlecht ?? ''
+	if (!geschlecht && row.r) geschlecht = 'R'
+	if (!geschlecht && row.h) geschlecht = 'H'
+
+	const farbe = (row.farbe ?? '') as WelpenFarbe
+
+	return {
+		id: row.id ?? crypto.randomUUID(),
+		zuchtbuchNr: row.zuchtbuchNr ?? '',
+		geschlecht,
+		name: row.name ?? '',
+		farbe,
+		chipNr: row.chipNr ?? '',
+		gechiptAm: row.gechiptAm ?? '',
+		verstorbenAm: row.verstorbenAm ?? '',
+	}
+}
+
+export function normalizeFormData(data: WurfabnahmeFormData): WurfabnahmeFormData {
+	return {
+		...data,
+		signatures: data.signatures ?? {},
+		stammblatt: {
+			...data.stammblatt,
+			welpen: data.stammblatt.welpen.map(normalizeWelpenRow),
+		},
+	}
+}
+
 export function createWelpenRow(): WelpenRowData {
 	return {
 		id: crypto.randomUUID(),
 		zuchtbuchNr: '',
-		r: false,
-		h: false,
+		geschlecht: '',
 		name: '',
 		farbe: '',
 		chipNr: '',
 		gechiptAm: '',
+		verstorbenAm: '',
 	}
 }
 
@@ -87,6 +138,7 @@ export function createEmptyFormData(): WurfabnahmeFormData {
 	return {
 		stammblatt: createEmptyStammblatt(),
 		fields: {},
+		signatures: {},
 	}
 }
 

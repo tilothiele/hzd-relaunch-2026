@@ -330,7 +330,8 @@
 }
 
 .wurfabnahme-app .wa-welpen-table input[type='text'],
-.wurfabnahme-app .wa-welpen-table input[type='date'] {
+.wurfabnahme-app .wa-welpen-table input[type='date'],
+.wurfabnahme-app .wa-welpen-table select {
 	border: none;
 	background: transparent;
 	font-family: inherit;
@@ -340,7 +341,13 @@
 	color: var(--wa-text);
 }
 
-.wurfabnahme-app .wa-welpen-table input:focus {
+.wurfabnahme-app .wa-welpen-table select.wa-select-compact {
+	min-width: 52px;
+	width: auto;
+}
+
+.wurfabnahme-app .wa-welpen-table input:focus,
+.wurfabnahme-app .wa-welpen-table select:focus {
 	outline: 1px solid var(--wa-accent);
 	border-radius: 2px;
 	background: white;
@@ -636,6 +643,16 @@
 }
 
 @media print {
+	.app-shell-header,
+	.app-shell-footer,
+	.wa-editor-actions {
+		display: none !important;
+	}
+
+	.app-shell-main {
+		padding: 0 !important;
+	}
+
 	.wurfabnahme-app .wa-welpen-actions,
 	.wurfabnahme-app .wa-btn-icon,
 	.wurfabnahme-app th.wa-col-actions,
@@ -674,11 +691,14 @@
 	}
 
 	.wurfabnahme-app input,
-	.wurfabnahme-app textarea {
+	.wurfabnahme-app textarea,
+	.wurfabnahme-app select {
 		border: none !important;
 		border-bottom: 1px solid #999 !important;
 		border-radius: 0 !important;
 		padding: 2px 4px !important;
+		appearance: none;
+		background: transparent !important;
 	}
 
 	.wurfabnahme-app .wa-cb-item,

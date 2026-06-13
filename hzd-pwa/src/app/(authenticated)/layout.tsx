@@ -12,7 +12,7 @@ export default function AuthenticatedLayout({
 }) {
 	return (
 		<div className="flex min-h-screen flex-col font-[family-name:var(--font-geist-sans)] text-[var(--color-kapitaensblau)]">
-			<header className="flex w-full items-center justify-between p-4 shadow-sm z-10 relative bg-[var(--color-goldbeige)] text-[var(--color-kapitaensblau)]">
+			<header className="app-shell-header flex w-full items-center justify-between p-4 shadow-sm z-10 relative bg-[var(--color-goldbeige)] text-[var(--color-kapitaensblau)]">
 				<Link href="/" className="flex items-center gap-4 hover:opacity-80 transition-opacity">
 					<Image
 						src="/android/android-launchericon-192-192.png"
@@ -33,7 +33,7 @@ export default function AuthenticatedLayout({
 				</div>
 			</header>
 
-			<main className="flex flex-1 flex-col p-4 sm:p-8">
+			<main className="app-shell-main flex flex-1 flex-col p-4 sm:p-8">
 				{children}
 			</main>
 

@@ -8,6 +8,7 @@ import { getWurfabnahme, saveWurfabnahme } from '@/services/wurfabnahme-db'
 import {
 	buildRecordFromForm,
 	createEmptyFormData,
+	normalizeFormData,
 	type WurfabnahmeFormData,
 	type WurfabnahmeRecord,
 } from '@/types/wurfabnahme-form'
@@ -50,7 +51,7 @@ export function WurfabnahmeEditor({
 				return
 			}
 
-			setFormData(record.formData)
+			setFormData(normalizeFormData(record.formData))
 			setExistingRecord({ createdAt: record.createdAt })
 			setIsLoading(false)
 		})
@@ -109,7 +110,7 @@ export function WurfabnahmeEditor({
 				formRef={formRef}
 			/>
 
-			<div className="flex flex-wrap gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
+			<div className="wa-editor-actions flex flex-wrap gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
 				<button
 					type="button"
 					onClick={handleSave}
