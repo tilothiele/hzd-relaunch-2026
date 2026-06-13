@@ -19,7 +19,7 @@ import {
 	type WurfabnahmeFormData,
 } from '@/types/wurfabnahme-form'
 
-const LATEST_HISTORY_VALUE = 'latest'
+const CURRENT_DRAFT_VALUE = 'draft'
 
 interface WurfabnahmeEditorProps {
 	basePath: string
@@ -36,27 +36,37 @@ export function WurfabnahmeEditor({
 	const [formData, setFormData] = useState<WurfabnahmeFormData>(
 		createEmptyFormData,
 	)
+	const [draftFormData, setDraftFormData] = useState<WurfabnahmeFormData>(
+		createEmptyFormData,
+	)
 	const [wurfabnahme, setWurfabnahme] = useState<Wurfabnahme | null>(null)
 	const [selectedHistoryValue, setSelectedHistoryValue] = useState(
-		LATEST_HISTORY_VALUE,
+		CURRENT_DRAFT_VALUE,
 	)
-	const [isEditing, setIsEditing] = useState(isNewForm)
 	const [isLoading, setIsLoading] = useState(Boolean(recordId))
 	const [isSaving, setIsSaving] = useState(false)
 	const [loadError, setLoadError] = useState<string | null>(null)
 
-	const isViewingHistory = selectedHistoryValue !== LATEST_HISTORY_VALUE
-	const isReadOnly = isNewForm ? false : !isEditing || isViewingHistory
+	const isViewingHistory = selectedHistoryValue !== CURRENT_DRAFT_VALUE
+	const isReadOnly = !isNewForm && isViewingHistory
 	const showHistorySelect = Boolean(
 		wurfabnahme && wurfabnahme.records.length > 0,
 	)
-	const showBearbeitenButton = Boolean(
-		recordId && wurfabnahme && !isEditing && !isViewingHistory,
-	)
 
-	const loadFormFromRecord = useCallback((recordFormData: WurfabnahmeFormData) => {
-		setFormData(normalizeFormData(recordFormData))
-	}, [])
+	const syncDraftFromDom = useCallback((): WurfabnahmeFormData => {
+		if (!formRef.current) return draftFormData
+		return mergeFormDataFromDom(draftFormData, formRef.current)
+	}, [draftFormData])
+
+	const handleFormDataChange = useCallback(
+		(data: WurfabnahmeFormData) => {
+			setFormData(data)
+			if (!isViewingHistory) {
+				setDraftFormData(data)
+			}
+		},
+		[isViewingHistory],
+	)
 
 	useEffect(() => {
 		if (!recordId) {
@@ -75,47 +85,50 @@ export function WurfabnahmeEditor({
 				return
 			}
 
+			const draft = cloneFormDataForEdit(
+				getLatestWurfabnahmeRecord(loaded).formData,
+			)
+
 			setWurfabnahme(loaded)
-			loadFormFromRecord(getLatestWurfabnahmeRecord(loaded).formData)
-			setSelectedHistoryValue(LATEST_HISTORY_VALUE)
-			setIsEditing(false)
+			setDraftFormData(draft)
+			setFormData(draft)
+			setSelectedHistoryValue(CURRENT_DRAFT_VALUE)
 			setIsLoading(false)
 		})
 
 		return () => {
 			cancelled = true
 		}
-	}, [recordId, loadFormFromRecord])
+	}, [recordId])
 
 	const handleHistoryChange = useCallback(
 		(value: string) => {
-			if (!wurfabnahme || isEditing) return
+			if (!wurfabnahme) return
 
-			setSelectedHistoryValue(value)
-
-			if (value === LATEST_HISTORY_VALUE) {
-				loadFormFromRecord(getLatestWurfabnahmeRecord(wurfabnahme).formData)
+			if (value === CURRENT_DRAFT_VALUE) {
+				const draft = isViewingHistory
+					? draftFormData
+					: syncDraftFromDom()
+				setDraftFormData(draft)
+				setFormData(draft)
+				setSelectedHistoryValue(CURRENT_DRAFT_VALUE)
 				return
+			}
+
+			if (!isViewingHistory) {
+				setDraftFormData(syncDraftFromDom())
 			}
 
 			const historicalRecord = wurfabnahme.records.find(
 				(record) => record.id === value,
 			)
 			if (historicalRecord) {
-				loadFormFromRecord(historicalRecord.formData)
+				setFormData(normalizeFormData(historicalRecord.formData))
+				setSelectedHistoryValue(value)
 			}
 		},
-		[wurfabnahme, isEditing, loadFormFromRecord],
+		[wurfabnahme, isViewingHistory, draftFormData, syncDraftFromDom],
 	)
-
-	const handleStartEdit = useCallback(() => {
-		if (!wurfabnahme) return
-
-		const latest = getLatestWurfabnahmeRecord(wurfabnahme)
-		setFormData(cloneFormDataForEdit(latest.formData))
-		setSelectedHistoryValue(LATEST_HISTORY_VALUE)
-		setIsEditing(true)
-	}, [wurfabnahme])
 
 	const handleCancel = useCallback(() => {
 		router.push('/wurfabnahmen')
@@ -127,7 +140,10 @@ export function WurfabnahmeEditor({
 		setIsSaving(true)
 
 		try {
-			const merged = mergeFormDataFromDom(formData, formRef.current)
+			const merged = mergeFormDataFromDom(
+				isNewForm ? formData : syncDraftFromDom(),
+				formRef.current,
+			)
 			const newRecord = buildRecordFromForm(crypto.randomUUID(), merged)
 
 			if (recordId && wurfabnahme) {
@@ -143,7 +159,15 @@ export function WurfabnahmeEditor({
 		} finally {
 			setIsSaving(false)
 		}
-	}, [formData, recordId, wurfabnahme, isReadOnly, router])
+	}, [
+		formData,
+		recordId,
+		wurfabnahme,
+		isReadOnly,
+		isNewForm,
+		syncDraftFromDom,
+		router,
+	])
 
 	if (isLoading) {
 		return <p>Lade Wurfabnahme…</p>
@@ -164,71 +188,46 @@ export function WurfabnahmeEditor({
 		)
 	}
 
-	const latestRecordId = wurfabnahme
-		? getLatestWurfabnahmeRecord(wurfabnahme).id
-		: null
-
 	return (
 		<div className="flex flex-col gap-4">
-			{(showHistorySelect || showBearbeitenButton) && wurfabnahme ? (
+			{showHistorySelect && wurfabnahme ? (
 				<div className="wa-editor-header flex flex-wrap items-end gap-3 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-					{showHistorySelect ? (
-						<div className="flex min-w-[240px] flex-1 flex-col gap-1">
-							<label
-								htmlFor="wurfabnahme-history"
-								className="text-sm font-medium text-gray-700 dark:text-gray-200"
-							>
-								Historie
-							</label>
-							<select
-								id="wurfabnahme-history"
-								value={selectedHistoryValue}
-								onChange={(event) => handleHistoryChange(event.target.value)}
-								disabled={isEditing}
-								className="rounded border border-gray-300 bg-white px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900"
-							>
-								<option value={LATEST_HISTORY_VALUE}>
-									{getWurfabnahmeRecordLabel(
-										getLatestWurfabnahmeRecord(wurfabnahme),
-										{ isLatest: true },
-									)}
-								</option>
-								{getWurfabnahmeHistoryRecords(wurfabnahme)
-									.filter((record) => record.id !== latestRecordId)
-									.map((record) => (
-										<option key={record.id} value={record.id}>
-											{getWurfabnahmeRecordLabel(record)}
-										</option>
-									))}
-							</select>
-						</div>
-					) : null}
-
-					{showBearbeitenButton ? (
-						<button
-							type="button"
-							onClick={handleStartEdit}
-							className="rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+					<div className="flex min-w-[240px] flex-1 flex-col gap-1">
+						<label
+							htmlFor="wurfabnahme-history"
+							className="text-sm font-medium text-gray-700 dark:text-gray-200"
 						>
-							Bearbeiten
-						</button>
-					) : null}
-
-					{isReadOnly && !isNewForm ? (
+							Historie
+						</label>
+						<select
+							id="wurfabnahme-history"
+							value={selectedHistoryValue}
+							onChange={(event) => handleHistoryChange(event.target.value)}
+							className="rounded border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-900"
+						>
+							<option value={CURRENT_DRAFT_VALUE}>
+								Aktueller Entwurf
+							</option>
+							{getWurfabnahmeHistoryRecords(wurfabnahme).map((record) => (
+								<option key={record.id} value={record.id}>
+									{getWurfabnahmeRecordLabel(record)}
+								</option>
+							))}
+						</select>
+					</div>
+					{isViewingHistory ? (
 						<p className="text-sm text-amber-700 dark:text-amber-300">
-							{isViewingHistory
-								? 'Archivstand — nur Ansicht.'
-								: 'Aktueller Stand — nur Ansicht. Zum Bearbeiten „Bearbeiten“ wählen.'}
+							Archivstand — nur Ansicht.
 						</p>
 					) : null}
 				</div>
 			) : null}
 
 			<WurfabnahmeApp
-				key={isEditing ? 'edit' : `view-${selectedHistoryValue}`}
+				key={`${selectedHistoryValue}-${isReadOnly ? 'ro' : 'ed'}`}
 				basePath={basePath}
 				formData={formData}
-				onFormDataChange={setFormData}
+				onFormDataChange={handleFormDataChange}
 				formRef={formRef}
 				readOnly={isReadOnly}
 			/>

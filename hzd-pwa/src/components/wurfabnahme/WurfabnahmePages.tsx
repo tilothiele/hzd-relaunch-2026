@@ -295,6 +295,26 @@ export function StammblattPage({
 			</Card>
 
 			<Card title="Wurfinformationen">
+				<FieldRow cols={2}>
+					<Field label="Zuchthündin">
+						<input
+							type="text"
+							value={data.zuchthuendin}
+							onChange={(e) =>
+								updateField('zuchthuendin', e.target.value)
+							}
+						/>
+					</Field>
+					<Field label="Zuchtbuch-Nr.">
+						<input
+							type="text"
+							value={data.zuchtbuchNrHuendin}
+							onChange={(e) =>
+								updateField('zuchtbuchNrHuendin', e.target.value)
+							}
+						/>
+					</Field>
+				</FieldRow>
 				<FieldRow>
 					<Field label="Wurf gefallen am">
 						<input
@@ -375,6 +395,35 @@ export function StammblattPage({
 					onChange={onSignatureChange}
 					readOnly={readOnly}
 				/>
+				<FieldRow cols={3} style={{ marginTop: 16 }}>
+					<Field label="Zuchtwart">
+						<input
+							type="text"
+							value={data.zuchtwartName}
+							onChange={(e) =>
+								updateField('zuchtwartName', e.target.value)
+							}
+						/>
+					</Field>
+					<Field label="Züchtername">
+						<input
+							type="text"
+							value={data.zuechterUnterschriftName}
+							onChange={(e) =>
+								updateField('zuechterUnterschriftName', e.target.value)
+							}
+						/>
+					</Field>
+					<Field label="Zuchtanwärtername">
+						<input
+							type="text"
+							value={data.zuchtanwaerterName}
+							onChange={(e) =>
+								updateField('zuchtanwaerterName', e.target.value)
+							}
+						/>
+					</Field>
+				</FieldRow>
 				<FieldRow cols={2} style={{ marginTop: 16 }}>
 					<Field label="Ort">
 						<input

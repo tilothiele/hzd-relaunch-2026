@@ -30,10 +30,15 @@ export interface StammblattData {
 	telefon: string
 	email: string
 	wurfGefallenAm: string
+	zuchthuendin: string
+	zuchtbuchNrHuendin: string
 	welpen: WelpenRowData[]
 	gesamteindruck: string
 	pflegezustand: string
 	zustandHundin: string
+	zuchtwartName: string
+	zuechterUnterschriftName: string
+	zuchtanwaerterName: string
 	ortStamm: string
 	datumStamm: string
 }
@@ -103,6 +108,11 @@ export function normalizeFormData(data: WurfabnahmeFormData): WurfabnahmeFormDat
 		signatures: data.signatures ?? {},
 		stammblatt: {
 			...data.stammblatt,
+			zuchthuendin: data.stammblatt.zuchthuendin ?? '',
+			zuchtbuchNrHuendin: data.stammblatt.zuchtbuchNrHuendin ?? '',
+			zuchtwartName: data.stammblatt.zuchtwartName ?? '',
+			zuechterUnterschriftName: data.stammblatt.zuechterUnterschriftName ?? '',
+			zuchtanwaerterName: data.stammblatt.zuchtanwaerterName ?? '',
 			welpen: data.stammblatt.welpen.map(normalizeWelpenRow),
 		},
 	}
@@ -151,10 +161,15 @@ export function createEmptyStammblatt(): StammblattData {
 		telefon: '',
 		email: '',
 		wurfGefallenAm: '',
+		zuchthuendin: '',
+		zuchtbuchNrHuendin: '',
 		welpen: createInitialWelpenRows(),
 		gesamteindruck: '',
 		pflegezustand: '',
 		zustandHundin: '',
+		zuchtwartName: '',
+		zuechterUnterschriftName: '',
+		zuchtanwaerterName: '',
 		ortStamm: '',
 		datumStamm: '',
 	}
