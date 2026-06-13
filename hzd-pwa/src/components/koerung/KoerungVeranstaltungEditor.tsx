@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { DogSearchModal } from '@/components/koerung/DogSearchModal'
+import { TeilnehmerTab } from '@/components/koerung/TeilnehmerTab'
+import { BewertungenTab } from '@/components/koerung/BewertungenTab'
 import { mapDogToKoerungHundFields } from '@/lib/dog-to-koerung-hund'
 import type { Dog } from '@/services/db'
 import {
@@ -12,12 +14,8 @@ import {
 import {
 	createEmptyKoerungVeranstaltung,
 	createKoerungHund,
-	KOERUNG_FARBE_OPTIONS,
-	KOERUNG_GESCHLECHT_OPTIONS,
 	normalizeKoerungVeranstaltung,
 	renumberKoerungHunde,
-	type KoerungFarbe,
-	type KoerungGeschlecht,
 	type KoerungHund,
 	type KoerungVeranstaltung,
 } from '@/types/koerung-veranstaltung'
@@ -114,9 +112,7 @@ export function KoerungVeranstaltungEditor({
 		setVeranstaltung((current) => ({
 			...current,
 			hunde: current.hunde.map((hund) =>
-				hund.id === searchHundId
-					? { ...hund, ...fields }
-					: hund,
+				hund.id === searchHundId ? { ...hund, ...fields } : hund,
 			),
 		}))
 		setSearchHundId(null)
@@ -196,6 +192,7 @@ export function KoerungVeranstaltungEditor({
 				onClose={() => setSearchHundId(null)}
 				onSelect={handleApplyDog}
 			/>
+
 			<div className="rounded-lg bg-white p-4 shadow-sm dark:bg-gray-800">
 				<h2 className="mb-4 text-lg font-semibold">Veranstaltung</h2>
 				<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -291,239 +288,27 @@ export function KoerungVeranstaltungEditor({
 
 				<div className="p-4">
 					{activeTab === 'teilnehmer' ? (
-								<>
-									<div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-										<h2 className="text-lg font-semibold">Teilnehmer</h2>
-										<button
-											type="button"
-											onClick={handleAddHund}
-											className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
-										>
-											Hund hinzufügen
-										</button>
-									</div>
-
-				{veranstaltung.hunde.length === 0 ? (
-					<p className="text-sm text-gray-500 dark:text-gray-400">
-						Noch keine Hunde erfasst.
-					</p>
-				) : (
-					<div className="overflow-x-auto">
-						<table className="min-w-full text-left text-sm">
-							<thead className="bg-gray-50 font-medium text-gray-500 dark:bg-gray-700 dark:text-gray-400">
-								<tr>
-									<th className="px-2 py-2" colSpan={2}>Nr.</th>
-									<th className="px-2 py-2">Zwingername</th>
-									<th className="px-2 py-2">Zuchtbuch-Nr.</th>
-									<th className="px-2 py-2">Geschlecht</th>
-									<th className="px-2 py-2">Wurftag</th>
-									<th className="px-2 py-2">Farbe</th>
-									<th className="px-2 py-2">Besitzer</th>
-									<th className="px-2 py-2">Mitgliedsnummer</th>
-									<th className="px-2 py-2" />
-									<th className="px-2 py-2" />
-								</tr>
-							</thead>
-							<tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-								{veranstaltung.hunde.map((hund) => (
-									<tr
-										key={hund.id}
-										draggable
-										onDragStart={() => handleDragStart(hund.id)}
-										onDragOver={(event) =>
-											handleDragOver(event, hund.id)
-										}
-										onDrop={() => handleDrop(hund.id)}
-										onDragEnd={handleDragEnd}
-										className={`${
-											dragHundId === hund.id
-												? 'opacity-40'
-												: dragOverHundId === hund.id
-													? 'bg-indigo-50 dark:bg-indigo-900/30'
-													: ''
-										} cursor-grab active:cursor-grabbing`}
-									>
-										<td className="px-2 py-2">
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												fill="none"
-												viewBox="0 0 24 24"
-												strokeWidth="1.5"
-												stroke="currentColor"
-												className="h-4 w-4 text-gray-400"
-												aria-hidden="true"
-											>
-												<path
-													strokeLinecap="round"
-													strokeLinejoin="round"
-													d="M3.75 9h16.5m-16.5 6.75h16.5"
-												/>
-											</svg>
-										</td>
-										<td className="px-2 py-2 font-medium">
-											{hund.startnummer}
-										</td>
-										<td className="px-2 py-2">
-											<input
-												type="text"
-												value={hund.vollerZwingername}
-												onChange={(e) =>
-													updateHund(
-														hund.id,
-														'vollerZwingername',
-														e.target.value,
-													)
-												}
-												className={inputClassName}
-											/>
-										</td>
-										<td className="px-2 py-2">
-											<input
-												type="text"
-												value={hund.zuchtbuchnummer}
-												onChange={(e) =>
-													updateHund(
-														hund.id,
-														'zuchtbuchnummer',
-														e.target.value,
-													)
-												}
-												className={inputClassName}
-											/>
-										</td>
-										<td className="px-2 py-2">
-											<select
-												value={hund.geschlecht}
-												onChange={(e) =>
-													updateHund(
-														hund.id,
-														'geschlecht',
-														e.target.value as KoerungGeschlecht,
-													)
-												}
-												className={inputClassName}
-											>
-												<option value="">–</option>
-												{KOERUNG_GESCHLECHT_OPTIONS.map((option) => (
-													<option key={option} value={option}>
-														{option}
-													</option>
-												))}
-											</select>
-										</td>
-										<td className="px-2 py-2">
-											<input
-												type="date"
-												value={hund.wurftag}
-												onChange={(e) =>
-													updateHund(
-														hund.id,
-														'wurftag',
-														e.target.value,
-													)
-												}
-												className={inputClassName}
-											/>
-										</td>
-										<td className="px-2 py-2">
-											<select
-												value={hund.farbe}
-												onChange={(e) =>
-													updateHund(
-														hund.id,
-														'farbe',
-														e.target.value as KoerungFarbe,
-													)
-												}
-												className={inputClassName}
-											>
-												<option value="">–</option>
-												{KOERUNG_FARBE_OPTIONS.map((option) => (
-													<option key={option} value={option}>
-														{option}
-													</option>
-												))}
-											</select>
-										</td>
-										<td className="px-2 py-2">
-											<input
-												type="text"
-												value={hund.besitzer}
-												onChange={(e) =>
-													updateHund(
-														hund.id,
-														'besitzer',
-														e.target.value,
-													)
-												}
-												className={inputClassName}
-											/>
-										</td>
-										<td className="px-2 py-2">
-											<input
-												type="text"
-												value={hund.mitgliedsnummer}
-												onChange={(e) =>
-													updateHund(
-														hund.id,
-														'mitgliedsnummer',
-														e.target.value,
-													)
-												}
-												className={inputClassName}
-											/>
-										</td>
-										<td className="px-2 py-2">
-											<button
-												type="button"
-												onClick={() => setSearchHundId(hund.id)}
-												className="inline-flex rounded p-1.5 text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-gray-700"
-												title="Hund aus Datenbank übernehmen"
-												aria-label="Hund aus Datenbank übernehmen"
-											>
-												<svg
-													xmlns="http://www.w3.org/2000/svg"
-													fill="none"
-													viewBox="0 0 24 24"
-													strokeWidth="1.5"
-													stroke="currentColor"
-													className="h-5 w-5"
-													aria-hidden="true"
-												>
-													<path
-														strokeLinecap="round"
-														strokeLinejoin="round"
-														d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-													/>
-												</svg>
-											</button>
-										</td>
-										<td className="px-2 py-2">
-											<button
-												type="button"
-												onClick={() => handleRemoveHund(hund.id)}
-												className="rounded bg-red-600 px-2 py-1 text-xs font-medium text-white hover:bg-red-700"
-											>
-												Löschen
-											</button>
-										</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-					</div>
-				) : (
-								<>
-									<p className="text-sm text-gray-500 dark:text-gray-400">
-										Noch keine Bewertungen erfasst.
-									</p>
-								</>
-							)}
-						</div>
-					</div>
+						<TailnehmerTab
+							hunde={veranstaltung.hunde}
+							inputClassName={inputClassName}
+							dragHundId={dragHundId}
+							dragOverHundId={dragOverHundId}
+							onAddHund={handleAddHund}
+							onRemoveHund={handleRemoveHund}
+							onUpdateHund={updateHund}
+							onDragStart={handleDragStart}
+							onDragOver={handleDragOver}
+							onDrop={handleDrop}
+							onDragEnd={handleDragEnd}
+							onOpenSearch={setSearchHundId}
+						/>
+					) : (
+						<BewertungenTab />
+					)}
 				</div>
+			</div>
 
-				<div className="flex flex-wrap gap-3">
+			<div className="flex flex-wrap gap-3">
 				<button
 					type="button"
 					onClick={handleSave}
