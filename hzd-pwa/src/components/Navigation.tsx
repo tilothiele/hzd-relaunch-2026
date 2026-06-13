@@ -10,10 +10,10 @@ export default function Navigation() {
     const [isOpen, setIsOpen] = useState(false);
 
     const navItems = [
-        { name: "Meine Körbewertungen", href: "/meine-koerboegen" },
+        { name: "Körung", href: "/meine-koerboegen" },
         { name: "Hunde", href: "/hunde" },
         { name: "Veranstaltungen", href: "/veranstaltungen" },
-        { name: "Wurfabnahmen", href: "/wurfabnahmen" },
+        { name: "Zucht", href: "/wurfabnahmen" },
         { name: "Synchronization", href: "/synchronization" },
     ];
 

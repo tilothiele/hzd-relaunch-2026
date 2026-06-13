@@ -1,4 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie';
+import type { KoerungVeranstaltung } from '@/types/koerung-veranstaltung';
 import type { Wurfabnahme } from '@/types/wurfabnahme-form';
 
 interface Dog {
@@ -21,6 +22,10 @@ const db = new Dexie('HzdDatabase') as Dexie & {
     >;
     wurfabnahmen: EntityTable<
         Wurfabnahme,
+        'id'
+    >;
+    koerungVeranstaltungen: EntityTable<
+        KoerungVeranstaltung,
         'id'
     >;
 };
@@ -61,6 +66,12 @@ db.version(3).stores({
         }]
         delete item.formData
     })
+})
+
+db.version(4).stores({
+    dogs: 'documentId, fullkennelname, microchipNo, cStudBookNumber',
+    wurfabnahmen: 'id, updatedAt, zwingername, datum',
+    koerungVeranstaltungen: 'id, updatedAt, datum, name',
 })
 
 export type { Dog };
