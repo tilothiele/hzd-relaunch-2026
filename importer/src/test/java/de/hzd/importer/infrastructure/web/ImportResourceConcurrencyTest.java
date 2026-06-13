@@ -18,7 +18,8 @@ import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ImportResourceConcurrencyTest extends QuarkusIntegrationTest {
+@QuarkusIntegrationTest
+public class ImportResourceConcurrencyTest {
 
 	@InjectMock
 	MemberSyncPort memberSyncPort;

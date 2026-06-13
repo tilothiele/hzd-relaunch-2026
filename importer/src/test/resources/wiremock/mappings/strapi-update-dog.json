@@ -2,7 +2,7 @@
 	"priority": 1,
 	"request": {
 		"method": "PUT",
-		"urlPathPattern": "/api/dogs/.*"
+		"urlPathPattern": "/api/hzd-plugin/dogs/.*"
 	},
 	"response": {
 		"status": 200,

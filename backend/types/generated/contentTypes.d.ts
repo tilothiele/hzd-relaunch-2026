@@ -936,6 +936,87 @@ export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiHzdFormDefinitionHzdFormDefinition
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'hzd_form_definitions';
+  info: {
+    displayName: 'HzdFormDefinition';
+    pluralName: 'hzd-form-definitions';
+    singularName: 'hzd-form-definition';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    FormDefinitionId: Schema.Attribute.String & Schema.Attribute.Unique;
+    FormDescription: Schema.Attribute.Text;
+    FormularName: Schema.Attribute.String;
+    hzd_form_instances: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::hzd-form-instance.hzd-form-instance'
+    >;
+    InitialValue: Schema.Attribute.JSON;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::hzd-form-definition.hzd-form-definition'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    Version: Schema.Attribute.Integer;
+  };
+}
+
+export interface ApiHzdFormInstanceHzdFormInstance
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'hzd_form_instances';
+  info: {
+    displayName: 'HzdFormInstance';
+    pluralName: 'hzd-form-instances';
+    singularName: 'hzd-form-instance';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    CreationDate: Schema.Attribute.DateTime;
+    Creator: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    FormInstanceId: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    FormInstanceUid: Schema.Attribute.UID<''> & Schema.Attribute.Required;
+    hzd_form_definition: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::hzd-form-definition.hzd-form-definition'
+    >;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::hzd-form-instance.hzd-form-instance'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    StateHistory: Schema.Attribute.DynamicZone<
+      ['hzd-form.stage-state', 'hzd-form.stage-signature']
+    >;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiHzdSettingHzdSetting extends Struct.SingleTypeSchema {
   collectionName: 'hzd_settings';
   info: {
@@ -2450,6 +2531,8 @@ declare module '@strapi/strapi' {
       'api::form.form': ApiFormForm;
       'api::gallery-image.gallery-image': ApiGalleryImageGalleryImage;
       'api::global-layout.global-layout': ApiGlobalLayoutGlobalLayout;
+      'api::hzd-form-definition.hzd-form-definition': ApiHzdFormDefinitionHzdFormDefinition;
+      'api::hzd-form-instance.hzd-form-instance': ApiHzdFormInstanceHzdFormInstance;
       'api::hzd-setting.hzd-setting': ApiHzdSettingHzdSetting;
       'api::local-cummunity.local-cummunity': ApiLocalCummunityLocalCummunity;
       'api::merchandising-product.merchandising-product': ApiMerchandisingProductMerchandisingProduct;

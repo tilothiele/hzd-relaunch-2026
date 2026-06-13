@@ -616,6 +616,35 @@ export interface FormTextArea extends Struct.ComponentSchema {
   };
 }
 
+export interface HzdFormStageSignature extends Struct.ComponentSchema {
+  collectionName: 'components_hzd_form_stage_signatures';
+  info: {
+    displayName: 'StageSignature';
+  };
+  attributes: {
+    DateOfSignature: Schema.Attribute.Date;
+    LocationOfSignature: Schema.Attribute.String;
+    SignatureData: Schema.Attribute.Text;
+    SignatureType: Schema.Attribute.Enumeration<
+      ['SignatureImage', 'CryptoSignature']
+    >;
+    SigneeName: Schema.Attribute.String;
+    StageNumber: Schema.Attribute.Integer;
+  };
+}
+
+export interface HzdFormStageState extends Struct.ComponentSchema {
+  collectionName: 'components_hzd_form_stage_states';
+  info: {
+    displayName: 'StageState';
+  };
+  attributes: {
+    CreationDateOfStage: Schema.Attribute.DateTime;
+    StageNumber: Schema.Attribute.Integer;
+    StageValue: Schema.Attribute.JSON;
+  };
+}
+
 export interface LayoutColorTheme extends Struct.ComponentSchema {
   collectionName: 'components_layout_color_themes';
   info: {
@@ -814,6 +843,8 @@ declare module '@strapi/strapi' {
       'form.short-text-input': FormShortTextInput;
       'form.standard-identifiers': FormStandardIdentifiers;
       'form.text-area': FormTextArea;
+      'hzd-form.stage-signature': HzdFormStageSignature;
+      'hzd-form.stage-state': HzdFormStageState;
       'layout.color-theme': LayoutColorTheme;
       'layout.footer': LayoutFooter;
       'layout.padding': LayoutPadding;

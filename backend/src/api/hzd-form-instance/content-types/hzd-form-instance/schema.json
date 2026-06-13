@@ -1,0 +1,46 @@
+{
+  "kind": "collectionType",
+  "collectionName": "hzd_form_instances",
+  "info": {
+    "singularName": "hzd-form-instance",
+    "pluralName": "hzd-form-instances",
+    "displayName": "HzdFormInstance"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "CreationDate": {
+      "type": "datetime"
+    },
+    "Creator": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "hzd_form_definition": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::hzd-form-definition.hzd-form-definition",
+      "inversedBy": "hzd_form_instances"
+    },
+    "FormInstanceId": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "FormInstanceUid": {
+      "type": "uid",
+      "targetField": "",
+      "required": true
+    },
+    "StateHistory": {
+      "type": "dynamiczone",
+      "components": [
+        "hzd-form.stage-state",
+        "hzd-form.stage-signature"
+      ]
+    }
+  }
+}

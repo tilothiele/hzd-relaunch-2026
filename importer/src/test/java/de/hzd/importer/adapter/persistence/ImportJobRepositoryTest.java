@@ -10,8 +10,8 @@ import java.time.Instant;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
-class ImportJobRepositoryTest extends QuarkusIntegrationTest {
-
+@QuarkusIntegrationTest
+public class ImportJobRepositoryTest {
 	@Inject
 	ImportJobRepository repository;
 

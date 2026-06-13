@@ -25,12 +25,6 @@ public class ImporterTestResource implements QuarkusTestResourceLifecycleManager
 	private GenericContainer<?> wireMock;
 
 	@Override
-	public void init(Map<String, String> initArgs) {
-		System.setProperty("quarkus.jacoco.enabled", "false");
-		System.setProperty("quarkus.jacoco.report", "false");
-	}
-
-	@Override
 	public Map<String, String> start() {
 		postgres = new PostgreSQLContainer<>(POSTGRES_IMAGE)
 			.withDatabaseName("importer_test")
@@ -60,8 +54,6 @@ public class ImporterTestResource implements QuarkusTestResourceLifecycleManager
 		config.put("quarkus.flyway.migrate-at-start", "true");
 		config.put("quarkus.flyway.baseline-on-migrate", "true");
 		config.put("quarkus.flyway.baseline-version", "1");
-		config.put("quarkus.jacoco.enabled", "false");
-		config.put("quarkus.jacoco.report", "false");
 		config.put("importer.strapi.base-url", wireMockBaseUrl + "/api");
 		config.put("importer.strapi.api-token", "test-token");
 		config.put("importer.authentik.base-url", wireMockBaseUrl);
