@@ -2,6 +2,7 @@
   "name": "hzd-pwa",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.1.2",
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build --webpack",
