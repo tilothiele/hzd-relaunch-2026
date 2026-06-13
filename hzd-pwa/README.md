@@ -2,23 +2,24 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+First, install dependencies and run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Authentifizierung
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Die Anmeldung läuft über **Authentik (OIDC)** via NextAuth — analog zum `frontend`-Projekt.
+
+1. `.env` aus `.env.example` anlegen und Werte setzen
+2. In Authentik eine eigene OAuth-Application für die PWA anlegen
+3. Redirect-URI: `{NEXTAUTH_URL}/api/auth/callback/authentik`
+
+Wichtige Variablen: `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `AUTHENTIK_ISSUER`, `AUTHENTIK_CLIENT_ID`, `STRAPI_BASE_URL`.
 
 ## Learn More
 

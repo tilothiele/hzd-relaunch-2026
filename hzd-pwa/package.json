@@ -2,6 +2,7 @@
   "name": "hzd-pwa",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.1.2",
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build --webpack",
@@ -13,6 +14,7 @@
     "dexie": "^4.3.0",
     "dexie-react-hooks": "^4.2.0",
     "next": "16.1.6",
+    "next-auth": "^4.24.14",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
