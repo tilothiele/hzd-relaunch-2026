@@ -82,6 +82,7 @@ interface LegacyWelpenRow {
 	chipNr?: string
 	gechiptAm?: string
 	verstorbenAm?: string
+	deletedAt?: string
 }
 
 export function normalizeWelpenRow(row: LegacyWelpenRow): WelpenRowData {
