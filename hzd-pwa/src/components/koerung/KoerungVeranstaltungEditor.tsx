@@ -44,6 +44,9 @@ export function KoerungVeranstaltungEditor({
 	const [searchHundId, setSearchHundId] = useState<string | null>(null)
 	const [dragHundId, setDragHundId] = useState<string | null>(null)
 	const [dragOverHundId, setDragOverHundId] = useState<string | null>(null)
+	const [activeTab, setActiveTab] = useState<'teilnehmer' | 'bewertungen'>(
+		'teilnehmer',
+	)
 
 	useEffect(() => {
 		if (!veranstaltungId) {
@@ -252,17 +255,53 @@ export function KoerungVeranstaltungEditor({
 				</div>
 			</div>
 
-			<div className="rounded-lg bg-white p-4 shadow-sm dark:bg-gray-800">
-				<div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-					<h2 className="text-lg font-semibold">Hunde</h2>
-					<button
-						type="button"
-						onClick={handleAddHund}
-						className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
-					>
-						Hund hinzufügen
-					</button>
+			<div className="rounded-lg bg-white shadow-sm dark:bg-gray-800">
+				<div className="border-b border-gray-200 dark:border-gray-700">
+					<nav className="flex gap-0 px-4" aria-label="Tabs">
+						<button
+							type="button"
+							onClick={() => setActiveTab('teilnehmer')}
+							className={`relative px-4 py-3 text-sm font-medium transition-colors ${
+								activeTab === 'teilnehmer'
+									? 'text-indigo-600 dark:text-indigo-400'
+									: 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+							}`}
+						>
+							Teilnehmer
+							{activeTab === 'teilnehmer' && (
+								<span className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600 dark:bg-indigo-400" />
+							)}
+						</button>
+						<button
+							type="button"
+							onClick={() => setActiveTab('bewertungen')}
+							className={`relative px-4 py-3 text-sm font-medium transition-colors ${
+								activeTab === 'bewertungen'
+									? 'text-indigo-600 dark:text-indigo-400'
+									: 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+							}`}
+						>
+							Bewertungen
+							{activeTab === 'bewertungen' && (
+								<span className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600 dark:bg-indigo-400" />
+							)}
+						</button>
+					</nav>
 				</div>
+
+				<div className="p-4">
+					{activeTab === 'teilnehmer' ? (
+								<>
+									<div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+										<h2 className="text-lg font-semibold">Teilnehmer</h2>
+										<button
+											type="button"
+											onClick={handleAddHund}
+											className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
+										>
+											Hund hinzufügen
+										</button>
+									</div>
 
 				{veranstaltung.hunde.length === 0 ? (
 					<p className="text-sm text-gray-500 dark:text-gray-400">
@@ -274,7 +313,7 @@ export function KoerungVeranstaltungEditor({
 							<thead className="bg-gray-50 font-medium text-gray-500 dark:bg-gray-700 dark:text-gray-400">
 								<tr>
 									<th className="px-2 py-2" colSpan={2}>Nr.</th>
-									<th className="px-2 py-2">Voller Zwingername</th>
+									<th className="px-2 py-2">Zwingername</th>
 									<th className="px-2 py-2">Zuchtbuch-Nr.</th>
 									<th className="px-2 py-2">Geschlecht</th>
 									<th className="px-2 py-2">Wurftag</th>
@@ -473,10 +512,18 @@ export function KoerungVeranstaltungEditor({
 							</tbody>
 						</table>
 					</div>
-				)}
-			</div>
+				) : (
+								<>
+									<p className="text-sm text-gray-500 dark:text-gray-400">
+										Noch keine Bewertungen erfasst.
+									</p>
+								</>
+							)}
+						</div>
+					</div>
+				</div>
 
-			<div className="flex flex-wrap gap-3">
+				<div className="flex flex-wrap gap-3">
 				<button
 					type="button"
 					onClick={handleSave}
