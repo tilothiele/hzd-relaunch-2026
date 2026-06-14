@@ -387,7 +387,7 @@ export interface Contact {
 	avatar?: Image | null
 	position?: number | null
 	member?: {
-		id?: number
+		id?: string | number
 		documentId: string
 		firstName?: string | null
 		lastName?: string | null
@@ -512,7 +512,7 @@ export interface Dog {
 	father?: Dog | null
 	mother?: Dog | null
 	owner?: {
-		id?: number
+		id?: string | number
 		documentId: string
 		firstName?: string | null
 		lastName?: string | null
@@ -584,6 +584,7 @@ export interface Breeder {
 	kennelName?: string | null
 	breedingLicenseSince?: string | null
 	member?: {
+		id?: string | number
 		documentId: string
 		cId?: number | null
 		firstName?: string | null
