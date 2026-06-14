@@ -387,6 +387,7 @@ export interface Contact {
 	avatar?: Image | null
 	position?: number | null
 	member?: {
+		id?: number
 		documentId: string
 		firstName?: string | null
 		lastName?: string | null
