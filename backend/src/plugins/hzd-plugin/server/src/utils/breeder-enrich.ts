@@ -192,19 +192,12 @@ async function resolveDogs(
 
 	const dogs = await strapi.db.query('plugin::hzd-plugin.dog').findMany({
 		where: {
-			owner: {
-				member: {
-					id: breeder.member.id,
-				},
-			},
 			sex: 'M',
+			cOwnerId: breeder.member.id,
 		},
 		select: ['documentId', 'avatar', 'sex'],
 		populate: {
 			avatar: true,
-			owner: {
-				fields: ['documentId', 'cId'],
-			},
 		},
 	})
 
