@@ -163,6 +163,12 @@ export const POPULATE_BREEDER_SEARCH = new URLSearchParams({
 	'populate[owner_members][fields][11]': 'countryCode',
 	'populate[owner_members][fields][12]': 'locationLat',
 	'populate[owner_members][fields][13]': 'locationLng',
+	'populate[dogs][fields][0]': 'documentId',
+	'populate[dogs][fields][1]': 'avatar',
+	'populate[dogs][fields][2]': 'sex',
+	'populate[dogs][fields][3]': 'cFertile',
+	'populate[dogs][populate][owner][fields][0]': 'documentId',
+	'populate[dogs][populate][owner][fields][1]': 'cId',
 })
 
 export const POPULATE_PASSED_DOG = new URLSearchParams({

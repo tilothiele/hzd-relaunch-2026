@@ -613,6 +613,7 @@ export interface Breeder {
 	Address?: Address | null
 	BreederEmail?: string | null
 	owner_members?: AuthUser[] | null
+	dogs?: Dog[] | null
 }
 
 export interface BreederSearchResult {

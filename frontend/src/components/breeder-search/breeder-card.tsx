@@ -19,6 +19,7 @@ interface BreederCardProps {
 	userLocation?: { lat: number; lng: number } | null
 	maxDistance?: number | string
 	hzdSetting?: HzdSetting | null
+	breederRole?: 'B' | 'S' | null
 }
 
 function formatDate(dateString: string | null | undefined): string {
@@ -38,10 +39,34 @@ function formatDate(dateString: string | null | undefined): string {
 	}
 }
 
-export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, maxDistance, hzdSetting }: BreederCardProps) {
+export function BreederCard({
+	breeder,
+	strapiBaseUrl,
+	onClick,
+	userLocation,
+	maxDistance,
+	hzdSetting,
+	breederRole,
+}: BreederCardProps) {
 	const kennelName = breeder.kennelName ?? 'Kein Zwingername bekannt'
 	const contact = resolveBreederContact(breeder)
 	const locationLabel = formatBreederLocation(contact)
+
+	// Avatar-Fallback für breederRole=S: wenn kein breeder.avatar gesetzt ist,
+	// nimm das avatar des ersten Hundes mit owner=breeder.member, sex=M, cFertile=true
+	const fallbackDogAvatar = (() => {
+		if (breederRole !== 'S' || breeder.avatar) return null
+		const dogs = breeder.dogs
+		if (!Array.isArray(dogs)) return null
+		const match = dogs.find(
+			(d) =>
+				d.avatar &&
+				d.owner?.documentId === breeder.member?.documentId &&
+				d.sex === 'M' &&
+				d.cFertile === true,
+		)
+		return match?.avatar ?? null
+	})()
 
 	let distance: number | null = null
 	let isDistanceExceeded = false
@@ -85,7 +110,7 @@ export function BreederCard({ breeder, strapiBaseUrl, onClick, userLocation, max
 			>
 				<Image
 					src={resolveMediaUrl(
-						breeder.avatar || hzdSetting?.DefaultBreederAvatar,
+						breeder.avatar || fallbackDogAvatar || hzdSetting?.DefaultBreederAvatar,
 						strapiBaseUrl
 					) || '/static-images/placeholder/user-avatar.png'}
 					alt={kennelName}
