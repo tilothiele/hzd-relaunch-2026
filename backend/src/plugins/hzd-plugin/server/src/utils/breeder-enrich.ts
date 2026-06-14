@@ -195,7 +195,7 @@ async function resolveDogs(
 			sex: 'M',
 			cOwnerId: breeder.member.id,
 		},
-		select: ['documentId', 'avatar', 'sex'],
+		select: ['documentId', 'sex'],
 		populate: {
 			avatar: true,
 		},
