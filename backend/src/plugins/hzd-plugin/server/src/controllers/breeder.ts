@@ -46,14 +46,6 @@ const BREEDER_SEARCH_POPULATE = {
 	owner_members: {
 		fields: [...MEMBER_CONTACT_FIELDS],
 	},
-	dogs: {
-		populate: {
-			avatar: true,
-			owner: {
-				fields: ['documentId', 'cId'],
-			},
-		},
-	},
 }
 
 const toStringArray = (value: unknown): string[] => {
