@@ -511,6 +511,7 @@ export interface Dog {
 	father?: Dog | null
 	mother?: Dog | null
 	owner?: {
+		id?: number
 		documentId: string
 		firstName?: string | null
 		lastName?: string | null

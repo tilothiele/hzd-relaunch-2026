@@ -198,6 +198,9 @@ async function resolveDogs(
 		select: ['documentId', 'sex'],
 		populate: {
 			avatar: true,
+			owner: {
+				select: ['id', 'documentId'],
+			},
 		},
 	})
 

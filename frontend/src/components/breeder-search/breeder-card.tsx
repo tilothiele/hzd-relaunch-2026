@@ -61,7 +61,7 @@ export function BreederCard({
 		const match = dogs.find(
 			(d) =>
 				d.avatar &&
-				d.owner?.documentId === breeder.member?.documentId &&
+				(d.owner?.id === breeder.member?.id || d.owner?.documentId === breeder.member?.documentId) &&
 				d.sex === 'M',
 		)
 		return match?.avatar ?? null
