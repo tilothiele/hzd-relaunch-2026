@@ -15,6 +15,7 @@ interface StudDogCardProps {
 	onClick?: () => void
 	userLocation?: { lat: number; lng: number } | null
 	hzdSetting?: HzdSetting | null
+	breederRole?: 'B' | 'S' | null
 }
 
 export function StudDogCard({
@@ -23,10 +24,27 @@ export function StudDogCard({
 	onClick,
 	userLocation,
 	hzdSetting,
+	breederRole,
 }: StudDogCardProps) {
 	const contact = resolveBreederContact(breeder)
 	const locationLabel = formatBreederLocation(contact)
 	const displayName = contact.ownerDisplayName
+
+	// Avatar-Fallback für breederRole=S: wenn kein breeder.avatar gesetzt ist,
+	// nimm das avatar des ersten Hundes mit owner=breeder.member, sex=M
+	const fallbackDogAvatar = (() => {
+		if (breederRole !== 'S' || breeder.avatar) return null
+		const dogs = breeder.dogs
+		if (!Array.isArray(dogs)) return null
+		const match = dogs.find(
+			(d) =>
+				d.avatar &&
+				d.owner?.documentId === breeder.member?.documentId &&
+				d.sex === 'M',
+		)
+		return match?.avatar ?? null
+	})()
+
 	let distance: number | null = null
 
 	if (
@@ -66,7 +84,7 @@ export function StudDogCard({
 			>
 				<Image
 					src={resolveMediaUrl(
-						breeder.avatar || hzdSetting?.DefaultBreederAvatar,
+						breeder.avatar || fallbackDogAvatar || hzdSetting?.DefaultBreederAvatar,
 						strapiBaseUrl,
 					) || '/static-images/placeholder/user-avatar.png'}
 					alt={displayName || 'Deckrüdenbesitzer'}

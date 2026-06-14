@@ -182,6 +182,35 @@ async function resolveOwnerMembers(
 	return []
 }
 
+async function resolveDogs(
+	strapi: Core.Strapi,
+	breeder: BreederRecord,
+): Promise<any[]> {
+	if (typeof breeder.id !== 'number' || !breeder.member?.id) {
+		return []
+	}
+
+	const dogs = await strapi.db.query('plugin::hzd-plugin.dog').findMany({
+		where: {
+			owner: {
+				member: {
+					id: breeder.member.id,
+				},
+			},
+			sex: 'M',
+		},
+		select: ['documentId', 'avatar', 'sex'],
+		populate: {
+			avatar: true,
+			owner: {
+				fields: ['documentId', 'cId'],
+			},
+		},
+	})
+
+	return dogs ?? []
+}
+
 export async function enrichBreederRecords(
 	strapi: Core.Strapi,
 	data: unknown,
@@ -197,6 +226,7 @@ export async function enrichBreederRecords(
 	for (const breeder of breeders) {
 		breeder.member = resolveMemberUser(breeder, usersByKey)
 		breeder.owner_members = await resolveOwnerMembers(strapi, breeder)
+		breeder.dogs = await resolveDogs(strapi, breeder)
 	}
 
 	return data

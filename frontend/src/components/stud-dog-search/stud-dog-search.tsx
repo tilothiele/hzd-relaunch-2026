@@ -328,6 +328,7 @@ export function StudDogSearch({
 									onClick={() => handleBreederClick(breeder)}
 									userLocation={userLocation}
 									hzdSetting={hzdSetting}
+									breederRole="S"
 								/>
 							))}
 						</div>

@@ -53,7 +53,7 @@ export function BreederCard({
 	const locationLabel = formatBreederLocation(contact)
 
 	// Avatar-Fallback für breederRole=S: wenn kein breeder.avatar gesetzt ist,
-	// nimm das avatar des ersten Hundes mit owner=breeder.member, sex=M, cFertile=true
+	// nimm das avatar des ersten Hundes mit owner=breeder.member, sex=M
 	const fallbackDogAvatar = (() => {
 		if (breederRole !== 'S' || breeder.avatar) return null
 		const dogs = breeder.dogs
@@ -62,8 +62,7 @@ export function BreederCard({
 			(d) =>
 				d.avatar &&
 				d.owner?.documentId === breeder.member?.documentId &&
-				d.sex === 'M' &&
-				d.cFertile === true,
+				d.sex === 'M',
 		)
 		return match?.avatar ?? null
 	})()
