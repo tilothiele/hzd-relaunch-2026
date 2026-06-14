@@ -3,23 +3,24 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { WurfabnahmeNavTabs } from "@/components/wurfabnahme/WurfabnahmeNavTabs";
 
 export default function Navigation() {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
 
     const navItems = [
-        { name: "Meine Körbewertungen", href: "/meine-koerboegen" },
-        { name: "Hunde", href: "/hunde" },
-        { name: "Veranstaltungen", href: "/veranstaltungen" },
-        { name: "Wurfabnahmen", href: "/wurfabnahmen" },
-        { name: "Synchronization", href: "/synchronization" },
+        { name: "Körung", href: "/koerungen" },
+        { name: "Zucht", href: "/wurfabnahmen" },
+        { name: "HZD-Hunde-Stammdaten", href: "/hunde" },
     ];
 
     const isActive = (href: string) => {
         if (href === "/wurfabnahmen") {
             return pathname.startsWith("/wurfabnahmen");
+        }
+
+        if (href === "/koerungen") {
+            return pathname.startsWith("/koerungen");
         }
 
         return pathname === href;
@@ -43,7 +44,6 @@ export default function Navigation() {
                         </Link>
                     ))}
                 </div>
-                <WurfabnahmeNavTabs variant="desktop" />
             </div>
 
             {/* Mobile Menu Button */}
@@ -106,10 +106,6 @@ export default function Navigation() {
                                 {item.name}
                             </Link>
                         ))}
-                        <WurfabnahmeNavTabs
-                            variant="mobile"
-                            onNavigate={() => setIsOpen(false)}
-                        />
                     </div>
                 </div>
             )}

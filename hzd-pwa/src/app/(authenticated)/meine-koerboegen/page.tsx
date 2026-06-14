@@ -1,8 +1,14 @@
-export default function MeineKoerboegenPage() {
-    return (
-        <div className="flex flex-col gap-4">
-            <h1 className="text-3xl font-bold">Meine Körbögen</h1>
-            <p>Hier finden Sie Ihre ausgefüllten Körbögen.</p>
-        </div>
-    );
+'use client'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+
+export default function MeineKoerboegenRedirectPage() {
+	const router = useRouter()
+
+	useEffect(() => {
+		router.replace('/koerungen')
+	}, [router])
+
+	return null
 }

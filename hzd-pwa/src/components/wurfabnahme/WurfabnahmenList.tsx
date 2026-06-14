@@ -47,21 +47,26 @@ export function WurfabnahmenList() {
 							</tr>
 						</thead>
 						<tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-							{records.map((record) => (
+							{records.map((wurfabnahme) => (
 								<tr
-									key={record.id}
+									key={wurfabnahme.id}
 									className="hover:bg-gray-50 dark:hover:bg-gray-700"
 								>
 									<td className="px-4 py-3 font-medium text-gray-900 dark:text-white">
-										{getWurfabnahmeListLabel(record)}
+										{getWurfabnahmeListLabel(wurfabnahme)}
 									</td>
-									<td className="px-4 py-3">{record.welpenCount}</td>
+									<td className="px-4 py-3">{wurfabnahme.welpenCount}</td>
 									<td className="px-4 py-3">
-										{formatDateTime(record.updatedAt)}
+										{formatDateTime(wurfabnahme.updatedAt)}
+										{wurfabnahme.records.length > 1 ? (
+											<span className="ml-2 text-xs text-gray-500">
+												({wurfabnahme.records.length} Stände)
+											</span>
+										) : null}
 									</td>
 									<td className="px-4 py-3 text-right">
 										<Link
-											href={`/wurfabnahmen/${record.id}`}
+											href={`/wurfabnahmen/${wurfabnahme.id}`}
 											className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
 										>
 											Öffnen

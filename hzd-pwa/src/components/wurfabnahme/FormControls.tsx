@@ -54,15 +54,25 @@ export function FieldRow({
 export function RadioGroup({
 	name,
 	options,
+	value,
+	onChange,
 }: {
 	name: string
 	options: string[]
+	value?: string
+	onChange?: (name: string, value: string) => void
 }) {
 	return (
 		<div className="wa-check-options">
 			{options.map((option) => (
 				<label key={option} className="wa-rb-item">
-					<input type="radio" name={name} value={option} />
+					<input
+						type="radio"
+						name={name}
+						value={option}
+						checked={value === option}
+						onChange={() => onChange?.(name, option)}
+					/>
 					<span className="wa-rb-dot" />
 					<span>{option}</span>
 				</label>
@@ -75,10 +85,14 @@ export function CheckboxGroup({
 	options,
 	vertical = false,
 	name,
+	values,
+	onChange,
 }: {
 	options: string[]
 	vertical?: boolean
 	name?: string
+	values?: string[]
+	onChange?: (name: string, option: string, checked: boolean) => void
 }) {
 	return (
 		<div className={`wa-check-group${vertical ? ' vertical' : ''}`}>
@@ -87,6 +101,8 @@ export function CheckboxGroup({
 					<input
 						type="checkbox"
 						name={name ? `${name}-${index}` : undefined}
+						checked={values?.includes(option) ?? false}
+						onChange={(e) => onChange?.(name ?? '', option, e.target.checked)}
 					/>
 					<span className="wa-cb-box" />
 					<span>{option}</span>
@@ -111,11 +127,25 @@ export function CheckRow({
 	)
 }
 
-export function BesonderheitInput({ name }: { name?: string }) {
+export function BesonderheitInput({
+	name,
+	value,
+	onChange,
+}: {
+	name?: string
+	value?: string
+	onChange?: (name: string, value: string) => void
+}) {
 	return (
 		<div className="wa-field" style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
 			<span className="wa-inline-label">Besonderheit:</span>
-			<input type="text" className="wa-inline-input" name={name} />
+			<input
+				type="text"
+				className="wa-inline-input"
+				name={name}
+				value={value ?? ''}
+				onChange={(e) => onChange?.(name ?? '', e.target.value)}
+			/>
 		</div>
 	)
 }
@@ -152,10 +182,12 @@ export function SignatureGrid({
 	signatures,
 	values = {},
 	onChange,
+	readOnly = false,
 }: {
 	signatures: { id: string; label: string }[]
 	values?: Record<string, string>
 	onChange?: (id: string, dataUrl: string) => void
+	readOnly?: boolean
 }) {
 	return (
 		<div className="wa-sig-grid">
@@ -166,6 +198,7 @@ export function SignatureGrid({
 						label={sig.label}
 						value={values[sig.id] ?? ''}
 						onChange={(dataUrl) => onChange?.(sig.id, dataUrl)}
+						readOnly={readOnly}
 					/>
 				</div>
 			))}

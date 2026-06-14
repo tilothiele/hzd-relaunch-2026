@@ -17,7 +17,8 @@ import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class DeleteAllUsersResourceConcurrencyTest extends QuarkusIntegrationTest {
+@QuarkusIntegrationTest
+public class DeleteAllUsersResourceConcurrencyTest {
 
 	@InjectMock
 	AuthentikUserAdapter authentikUserAdapter;

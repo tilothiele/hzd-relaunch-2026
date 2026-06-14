@@ -66,7 +66,6 @@ export function mergeFormDataFromDom(
 ): WurfabnahmeFormData {
 	return {
 		...formData,
-		fields: collectNamedFields(root),
 	}
 }
 

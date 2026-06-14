@@ -17,7 +17,8 @@ import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ImportResourceIntegrationTest extends QuarkusIntegrationTest {
+@QuarkusIntegrationTest
+public class ImportResourceIntegrationTest {
 
 	@Inject
 	ImportService importService;
@@ -56,7 +57,8 @@ class ImportResourceIntegrationTest extends QuarkusIntegrationTest {
 
 		var job = importService.getJob(UUID.fromString(jobId)).orElseThrow();
 		assertEquals(ImportJobStatus.SUCCESS, job.status());
-		assertEquals(1, job.statistics().membersCreated());
+		// Authentik- und Strapi-Anlage zählen jeweils als membersCreated
+		assertEquals(2, job.statistics().membersCreated());
 		assertEquals(1, job.statistics().dogsCreated());
 		assertEquals(1, job.statistics().breedersCreated());
 	}

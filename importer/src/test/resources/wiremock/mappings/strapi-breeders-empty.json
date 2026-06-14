@@ -2,7 +2,7 @@
 	"priority": 5,
 	"request": {
 		"method": "GET",
-		"urlPathPattern": "/api/breeders"
+		"urlPathPattern": "/api/hzd-plugin/breeders"
 	},
 	"response": {
 		"status": 200,

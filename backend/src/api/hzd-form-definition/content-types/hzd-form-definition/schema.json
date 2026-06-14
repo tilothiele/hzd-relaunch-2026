@@ -1,0 +1,37 @@
+{
+  "kind": "collectionType",
+  "collectionName": "hzd_form_definitions",
+  "info": {
+    "singularName": "hzd-form-definition",
+    "pluralName": "hzd-form-definitions",
+    "displayName": "HzdFormDefinition"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "FormularName": {
+      "type": "string"
+    },
+    "FormDefinitionId": {
+      "type": "string",
+      "unique": true
+    },
+    "Version": {
+      "type": "integer"
+    },
+    "FormDescription": {
+      "type": "text"
+    },
+    "InitialValue": {
+      "type": "json"
+    },
+    "hzd_form_instances": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::hzd-form-instance.hzd-form-instance",
+      "mappedBy": "hzd_form_definition"
+    }
+  }
+}

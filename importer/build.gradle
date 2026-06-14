@@ -27,7 +27,6 @@ dependencies {
 	implementation 'org.apache.commons:commons-csv:1.14.1'
 	testImplementation 'io.quarkus:quarkus-junit'
 	testImplementation 'io.quarkus:quarkus-junit-mockito'
-	testImplementation 'io.quarkus:quarkus-jacoco'
 	testImplementation 'io.rest-assured:rest-assured'
 	testImplementation 'org.awaitility:awaitility:4.3.0'
 	testImplementation 'org.mockito:mockito-core:5.20.0'
@@ -64,6 +63,7 @@ test {
 	// Gradle würde sonst bei unveränderten Quellen die Tests überspringen (BUILD in ~1s).
 	outputs.upToDateWhen { false }
 
+	// Coverage via Gradle-JaCoCo (build/jacoco/test.exec).
 	jacoco {
 		includeNoLocationClasses = true
 		excludes = [
@@ -88,7 +88,7 @@ jacocoTestReport {
 	dependsOn test
 
 	executionData.setFrom(fileTree(layout.buildDirectory) {
-		include 'jacoco/test.exec', 'jacoco-quarkus.exec'
+		include 'jacoco/test.exec'
 	})
 
 	reports {

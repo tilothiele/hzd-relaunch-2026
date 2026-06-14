@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_hzd_form_stage_states",
+  "info": {
+    "displayName": "StageState"
+  },
+  "options": {},
+  "attributes": {
+    "StageNumber": {
+      "type": "integer"
+    },
+    "StageValue": {
+      "type": "json"
+    },
+    "CreationDateOfStage": {
+      "type": "datetime"
+    }
+  },
+  "config": {}
+}

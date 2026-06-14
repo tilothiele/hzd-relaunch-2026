@@ -15,7 +15,8 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class CrossJobConcurrencyTest extends QuarkusIntegrationTest {
+@QuarkusIntegrationTest
+public class CrossJobConcurrencyTest {
 
 	@InjectMock
 	MemberSyncPort memberSyncPort;

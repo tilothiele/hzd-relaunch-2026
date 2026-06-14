@@ -27,20 +27,28 @@ import {
 interface SignatureProps {
 	signatures: Record<string, string>
 	onSignatureChange: (id: string, dataUrl: string) => void
+	readOnly?: boolean
 }
 
 interface StammblattPageProps extends SignatureProps {
 	data: StammblattData
 	onChange: (data: StammblattData) => void
+	deletedIds?: Set<string>
+	onMarkDelete?: (id: string) => void
+	onUndoDelete?: (id: string) => void
 }
 
 function WelpenTable({
 	rows,
-	onRemove,
+	onMarkDelete,
+	onUndoDelete,
+	deletedIds,
 	onUpdate,
 }: {
 	rows: WelpenRowData[]
-	onRemove: (index: number) => void
+	onMarkDelete: (id: string) => void
+	onUndoDelete: (id: string) => void
+	deletedIds: Set<string>
 	onUpdate: (
 		index: number,
 		field: keyof WelpenRowData,
@@ -67,35 +75,48 @@ function WelpenTable({
 						/>
 					</tr>
 				</thead>
-				<tbody>
-					{rows.map((row, i) => (
-						<tr key={row.id}>
-							<td style={{ textAlign: 'center', fontWeight: 600 }}>{i + 1}</td>
-							<td>
-								<span style={{ color: 'var(--wa-text-muted)', fontSize: 12 }}>
-									VDH-HZD{' '}
-								</span>
+<tbody>
+				{rows.map((row) => {
+					const isDeleted = deletedIds.has(row.id)
+					return (
+						<tr
+							key={row.id}
+							className={isDeleted ? 'opacity-40' : ''}
+						>
+							<td style={{ textAlign: 'center', fontWeight: 600 }}>
+								{isDeleted ? (
+									<span className="text-red-400 line-through" title="Zum Löschen vorgemerkt">
+										–
+									</span>
+								) : (
+									row.zuchtbuchNr || ''
+								)}
+							</td>
+							<td className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}>
 								<input
 									type="text"
 									placeholder="Nr."
 									style={{ width: 100 }}
 									value={row.zuchtbuchNr}
 									onChange={(e) =>
-										onUpdate(i, 'zuchtbuchNr', e.target.value)
+										onUpdate(rows.indexOf(row), 'zuchtbuchNr', e.target.value)
 									}
+									disabled={isDeleted}
+									className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}
 								/>
 							</td>
-							<td>
+							<td className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}>
 								<select
-									className="wa-select-compact"
+									className={`wa-select-compact${isDeleted ? ' bg-red-100 dark:bg-red-900/30' : ''}`}
 									value={row.geschlecht}
 									onChange={(e) =>
 										onUpdate(
-											i,
+											rows.indexOf(row),
 											'geschlecht',
 											e.target.value as WelpenGeschlecht,
 										)
 									}
+									disabled={isDeleted}
 								>
 									<option value="">–</option>
 									{WELPEN_GESCHLECHT_OPTIONS.map((option) => (
@@ -105,21 +126,24 @@ function WelpenTable({
 									))}
 								</select>
 							</td>
-							<td>
+							<td className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}>
 								<input
 									type="text"
 									placeholder="Name"
 									value={row.name}
-									onChange={(e) => onUpdate(i, 'name', e.target.value)}
+									onChange={(e) => onUpdate(rows.indexOf(row), 'name', e.target.value)}
+									disabled={isDeleted}
+									className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}
 								/>
 							</td>
-							<td>
+							<td className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}>
 								<select
-									className="wa-select-compact"
+									className={`wa-select-compact${isDeleted ? ' bg-red-100 dark:bg-red-900/30' : ''}`}
 									value={row.farbe}
 									onChange={(e) =>
-										onUpdate(i, 'farbe', e.target.value as WelpenFarbe)
+										onUpdate(rows.indexOf(row), 'farbe', e.target.value as WelpenFarbe)
 									}
+									disabled={isDeleted}
 								>
 									<option value="">–</option>
 									{WELPEN_FARBE_OPTIONS.map((option) => (
@@ -129,45 +153,63 @@ function WelpenTable({
 									))}
 								</select>
 							</td>
-							<td>
+							<td className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}>
 								<input
 									type="text"
 									placeholder="Chip-Nr."
 									value={row.chipNr}
-									onChange={(e) => onUpdate(i, 'chipNr', e.target.value)}
+									onChange={(e) => onUpdate(rows.indexOf(row), 'chipNr', e.target.value)}
+									disabled={isDeleted}
+									className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}
 								/>
 							</td>
-							<td>
+							<td className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}>
 								<input
 									type="date"
 									value={row.gechiptAm}
-									onChange={(e) => onUpdate(i, 'gechiptAm', e.target.value)}
+									onChange={(e) => onUpdate(rows.indexOf(row), 'gechiptAm', e.target.value)}
+									disabled={isDeleted}
+									className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}
 								/>
 							</td>
-							<td>
+							<td className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}>
 								<input
 									type="date"
 									value={row.verstorbenAm}
 									onChange={(e) =>
-										onUpdate(i, 'verstorbenAm', e.target.value)
+										onUpdate(rows.indexOf(row), 'verstorbenAm', e.target.value)
 									}
+									disabled={isDeleted}
+									className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}
 								/>
 							</td>
 							<td className="wa-col-actions" style={{ textAlign: 'center' }}>
-								<button
-									type="button"
-									className="wa-btn-icon"
-									onClick={() => onRemove(i)}
-									disabled={rows.length <= MIN_WELPEN_ROWS}
-									title="Zeile entfernen"
-									aria-label={`Welpe ${i + 1} entfernen`}
-								>
-									×
-								</button>
+								{isDeleted ? (
+									<button
+										type="button"
+										className="wa-btn-icon"
+										onClick={() => onUndoDelete(row.id)}
+										title="Löschen rückgängig"
+										aria-label="Löschen rückgängig"
+									>
+										↩
+									</button>
+								) : (
+									<button
+										type="button"
+										className="wa-btn-icon"
+										onClick={() => onMarkDelete(row.id)}
+										title="Welpe zum Löschen vormerken"
+										aria-label="Welpe zum Löschen vormerken"
+									>
+										×
+									</button>
+								)}
 							</td>
 						</tr>
-					))}
-				</tbody>
+					)
+				})}
+			</tbody>
 			</table>
 		</div>
 	)
@@ -178,6 +220,10 @@ export function StammblattPage({
 	onChange,
 	signatures,
 	onSignatureChange,
+	readOnly,
+	deletedIds = new Set(),
+	onMarkDelete,
+	onUndoDelete,
 }: StammblattPageProps) {
 	const updateField = <K extends keyof StammblattData>(
 		field: K,
@@ -293,6 +339,26 @@ export function StammblattPage({
 			</Card>
 
 			<Card title="Wurfinformationen">
+				<FieldRow cols={2}>
+					<Field label="Zuchthündin">
+						<input
+							type="text"
+							value={data.zuchthuendin}
+							onChange={(e) =>
+								updateField('zuchthuendin', e.target.value)
+							}
+						/>
+					</Field>
+					<Field label="Zuchtbuch-Nr.">
+						<input
+							type="text"
+							value={data.zuchtbuchNrHuendin}
+							onChange={(e) =>
+								updateField('zuchtbuchNrHuendin', e.target.value)
+							}
+						/>
+					</Field>
+				</FieldRow>
 				<FieldRow>
 					<Field label="Wurf gefallen am">
 						<input
@@ -324,7 +390,9 @@ export function StammblattPage({
 				</div>
 				<WelpenTable
 					rows={data.welpen}
-					onRemove={handleRemoveRow}
+					deletedIds={deletedIds}
+					onMarkDelete={onMarkDelete ?? (() => {})}
+					onUndoDelete={onUndoDelete ?? (() => {})}
 					onUpdate={handleWelpeUpdate}
 				/>
 			</Card>
@@ -371,7 +439,37 @@ export function StammblattPage({
 					]}
 					values={signatures}
 					onChange={onSignatureChange}
+					readOnly={readOnly}
 				/>
+				<FieldRow cols={3} style={{ marginTop: 16 }}>
+					<Field label="Zuchtwart">
+						<input
+							type="text"
+							value={data.zuchtwartName}
+							onChange={(e) =>
+								updateField('zuchtwartName', e.target.value)
+							}
+						/>
+					</Field>
+					<Field label="Züchtername">
+						<input
+							type="text"
+							value={data.zuechterUnterschriftName}
+							onChange={(e) =>
+								updateField('zuechterUnterschriftName', e.target.value)
+							}
+						/>
+					</Field>
+					<Field label="Zuchtanwärtername">
+						<input
+							type="text"
+							value={data.zuchtanwaerterName}
+							onChange={(e) =>
+								updateField('zuchtanwaerterName', e.target.value)
+							}
+						/>
+					</Field>
+				</FieldRow>
 				<FieldRow cols={2} style={{ marginTop: 16 }}>
 					<Field label="Ort">
 						<input
@@ -395,28 +493,72 @@ export function StammblattPage({
 	)
 }
 
+interface WelpePageProps extends SignatureProps {
+	welpe: WelpenRowData | null
+	onChange?: (data: WelpenRowData) => void
+}
+
+function updateWelpeField<K extends keyof WelpenRowData>(
+	welpe: WelpenRowData,
+	field: K,
+	value: WelpenRowData[K],
+): WelpenRowData {
+	return { ...welpe, [field]: value }
+}
+
 export function WelpePage({
+	welpe,
+	onChange,
 	signatures,
 	onSignatureChange,
-}: SignatureProps) {
+	readOnly,
+}: WelpePageProps) {
+	if (!welpe || !onChange) {
+		return (
+			<div className="wa-page active">
+				<p className="text-sm text-gray-500 p-4">Kein Welpe ausgewählt.</p>
+			</div>
+		)
+	}
+
+	const set = <K extends keyof WelpenRowData>(field: K, value: WelpenRowData[K]) => {
+		if (readOnly) return
+		onChange(updateWelpeField(welpe, field, value))
+	}
+
 	return (
 		<div className="wa-page active" id="page-welpe1">
-			<div className="wa-badge">Welpe 1</div>
+			<div className="wa-badge">Welpe</div>
 			<div className="wa-page-title">Wurfabnahmeprotokoll</div>
 			<div className="wa-page-subtitle">Einzelblatt Welpe</div>
 
 			<Card title="Grunddaten">
 				<FieldRow cols={2}>
 					<Field label="Zuchtbuch-Nr. VDH-HZD">
-						<input type="text" name="w1-zbnr" />
+						<input
+							type="text"
+							value={welpe.zuchtbuchNr}
+							onChange={(e) => set('zuchtbuchNr', e.target.value)}
+							disabled={readOnly}
+						/>
 					</Field>
 					<Field label="Wurftag">
-						<input type="date" name="w1-wurftag" />
+						<input
+							type="date"
+							value={welpe.wurftag}
+							onChange={(e) => set('wurftag', e.target.value)}
+							disabled={readOnly}
+						/>
 					</Field>
 				</FieldRow>
 				<FieldRow cols={3}>
 					<Field label="Gewicht Geburt (g)">
-						<input type="number" name="w1-gewicht-geburt" />
+						<input
+							type="number"
+							value={welpe.gewichtGeburt}
+							onChange={(e) => set('gewichtGeburt', e.target.value)}
+							disabled={readOnly}
+						/>
 					</Field>
 					<div
 						className="wa-field"
@@ -429,12 +571,26 @@ export function WelpePage({
 						}}
 					>
 						<label className="wa-rb-item">
-							<input type="radio" name="w1-rh" value="R" />
+							<input
+								type="radio"
+								name="rh"
+								value="R"
+								checked={welpe.rh === 'R'}
+								onChange={() => set('rh', 'R')}
+								disabled={readOnly}
+							/>
 							<span className="wa-rb-dot" />
 							<span>Rüde</span>
 						</label>
 						<label className="wa-rb-item">
-							<input type="radio" name="w1-rh" value="H" />
+							<input
+								type="radio"
+								name="rh"
+								value="H"
+								checked={welpe.rh === 'H'}
+								onChange={() => set('rh', 'H')}
+								disabled={readOnly}
+							/>
 							<span className="wa-rb-dot" />
 							<span>Hündin</span>
 						</label>
@@ -442,18 +598,39 @@ export function WelpePage({
 				</FieldRow>
 				<FieldRow cols={3}>
 					<Field label="Entwurmt mit">
-						<input type="text" name="w1-entwurmt" />
+						<input
+							type="text"
+							value={welpe.entwurmt}
+							onChange={(e) => set('entwurmt', e.target.value)}
+							disabled={readOnly}
+						/>
 					</Field>
 					<Field label="Zuletzt am">
-						<input type="date" name="w1-entwurmt-am" />
+						<input
+							type="date"
+							value={welpe.entwurmtAm}
+							onChange={(e) => set('entwurmtAm', e.target.value)}
+							disabled={readOnly}
+						/>
 					</Field>
 					<Field label="Anzahl Wurmkuren">
-						<input type="number" min={0} name="w1-wurmkuren" />
+						<input
+							type="number"
+							min={0}
+							value={welpe.wurmkuren}
+							onChange={(e) => set('wurmkuren', e.target.value)}
+							disabled={readOnly}
+						/>
 					</Field>
 				</FieldRow>
 				<FieldRow cols={2}>
 					<Field label="Wurfbesichtigung am">
-						<input type="date" name="w1-wurfbesichtigung" />
+						<input
+							type="date"
+							value={welpe.wurfbesichtigung}
+							onChange={(e) => set('wurfbesichtigung', e.target.value)}
+							disabled={readOnly}
+						/>
 					</Field>
 				</FieldRow>
 			</Card>
@@ -461,18 +638,38 @@ export function WelpePage({
 			<Card title="Feststellungen bei der Wurfabnahme">
 				<FieldRow cols={3}>
 					<Field label="Chip Nr.">
-						<input type="text" name="w1-chip" />
+						<input
+							type="text"
+							value={welpe.chipNr}
+							onChange={(e) => set('chipNr', e.target.value)}
+							disabled={readOnly}
+						/>
 					</Field>
 					<Field label="Gechippt am">
-						<input type="date" name="w1-gechipt" />
+						<input
+							type="date"
+							value={welpe.gechiptAm}
+							onChange={(e) => set('gechiptAm', e.target.value)}
+							disabled={readOnly}
+						/>
 					</Field>
 					<Field label="Gewicht Wurfabnahme (g)">
-						<input type="number" name="w1-gewicht-wa" />
+						<input
+							type="number"
+							value={welpe.gewichtWa}
+							onChange={(e) => set('gewichtWa', e.target.value)}
+							disabled={readOnly}
+						/>
 					</Field>
 				</FieldRow>
 				<FieldRow cols={2}>
 					<Field label="Geimpft am">
-						<input type="date" name="w1-geimpft" />
+						<input
+							type="date"
+							value={welpe.geimpft}
+							onChange={(e) => set('geimpft', e.target.value)}
+							disabled={readOnly}
+						/>
 					</Field>
 					<div
 						className="wa-field"
@@ -484,7 +681,12 @@ export function WelpePage({
 						}}
 					>
 						<label className="wa-cb-item">
-							<input type="checkbox" name="w1-impfungen-io" />
+							<input
+								type="checkbox"
+								checked={welpe.impfungenIo}
+								onChange={(e) => set('impfungenIo', e.target.checked)}
+								disabled={readOnly}
+							/>
 							<span className="wa-cb-box" />
 							<span>Impfungen lt. Heimtierausweis i.O.</span>
 						</label>
@@ -495,46 +697,104 @@ export function WelpePage({
 			<Card title="Exterieur">
 				<CheckRow label="Körperbau">
 					<RadioGroup
-						name="w1-koerperbau"
+						name="koerperbau"
 						options={['kräftig', 'mittelkräftig', 'leicht']}
+						value={welpe.koerperbau}
+						onChange={(n, v) => set('koerperbau' as keyof WelpenRowData, v as any)}
 					/>
 				</CheckRow>
 				<CheckRow label="Kopfform">
-					<RadioGroup name="w1-kopfform" options={['kräftig', 'mittel', 'zart']} />
+					<RadioGroup
+						name="kopfform"
+						options={['kräftig', 'mittel', 'zart']}
+						value={welpe.kopfform}
+						onChange={(n, v) => set('kopfform' as keyof WelpenRowData, v as any)}
+					/>
 				</CheckRow>
 				<CheckRow label="Stopp">
-					<RadioGroup name="w1-stopp" options={['mittel', 'stark', 'wenig']} />
+					<RadioGroup
+						name="stopp"
+						options={['mittel', 'stark', 'wenig']}
+						value={welpe.stopp}
+						onChange={(n, v) => set('stopp' as keyof WelpenRowData, v as any)}
+					/>
 				</CheckRow>
 				<CheckRow label="Ohren">
-					<RadioGroup name="w1-ohren" options={['groß', 'mittel', 'klein']} />
-					<BesonderheitInput name="w1-ohren-bes" />
+					<RadioGroup
+						name="ohren"
+						options={['groß', 'mittel', 'klein']}
+						value={welpe.ohren}
+						onChange={(n, v) => set('ohren' as keyof WelpenRowData, v as any)}
+					/>
+					<BesonderheitInput
+						value={welpe.ohrenBes}
+						onChange={(n, v) => set('ohrenBes' as keyof WelpenRowData, v as any)}
+					/>
 				</CheckRow>
 				<CheckRow label="Augen">
-					<RadioGroup name="w1-augen" options={['dunkel', 'mittel', 'hell']} />
-					<BesonderheitInput name="w1-augen-bes" />
+					<RadioGroup
+						name="augen"
+						options={['dunkel', 'mittel', 'hell']}
+						value={welpe.augen}
+						onChange={(n, v) => set('augen' as keyof WelpenRowData, v as any)}
+					/>
+					<BesonderheitInput
+						value={welpe.augenBes}
+						onChange={(n, v) => set('augenBes' as keyof WelpenRowData, v as any)}
+					/>
 				</CheckRow>
 				<CheckRow label="Gebiss">
 					<RadioGroup
-						name="w1-gebiss"
+						name="gebiss"
 						options={['Schere', 'Vorbiss', 'Rückbiss', 'Zange']}
+						value={welpe.gebiss}
+						onChange={(n, v) => set('gebiss' as keyof WelpenRowData, v as any)}
 					/>
 				</CheckRow>
 				<CheckRow label="Stellung Canini">
-					<RadioGroup name="w1-canini" options={['korrekt']} />
-					<BesonderheitInput name="w1-canini-bes" />
+					<RadioGroup
+						name="canini"
+						options={['korrekt']}
+						value={welpe.canini}
+						onChange={(n, v) => set('canini' as keyof WelpenRowData, v as any)}
+					/>
+					<BesonderheitInput
+						value={welpe.caniniBes}
+						onChange={(n, v) => set('caniniBes' as keyof WelpenRowData, v as any)}
+					/>
 				</CheckRow>
 				<CheckRow label="Rute">
-					<RadioGroup name="w1-rute" options={['korrekt', 'Rutenveränderung']} />
-					<RadioGroup name="w1-rute-pos" options={['Ansatz', 'Mitte', 'Spitze']} />
+					<RadioGroup
+						name="rute"
+						options={['korrekt', 'Rutenveränderung']}
+						value={welpe.rute}
+						onChange={(n, v) => set('rute' as keyof WelpenRowData, v as any)}
+					/>
+					<RadioGroup
+						name="rutePos"
+						options={['Ansatz', 'Mitte', 'Spitze']}
+						value={welpe.rutePos}
+						onChange={(n, v) => set('rutePos' as keyof WelpenRowData, v as any)}
+					/>
 				</CheckRow>
 				<CheckRow label="Nabel">
-					<RadioGroup name="w1-nabel" options={['korrekt']} />
-					<BesonderheitInput name="w1-nabel-bes" />
+					<RadioGroup
+						name="nabel"
+						options={['korrekt']}
+						value={welpe.nabel}
+						onChange={(n, v) => set('nabel' as keyof WelpenRowData, v as any)}
+					/>
+					<BesonderheitInput
+						value={welpe.nabelBes}
+						onChange={(n, v) => set('nabelBes' as keyof WelpenRowData, v as any)}
+					/>
 				</CheckRow>
 				<CheckRow label="Hoden">
 					<RadioGroup
-						name="w1-hoden"
+						name="hoden"
 						options={['beide tastbar', 'einer tastbar', 'keiner tastbar']}
+						value={welpe.hoden}
+						onChange={(n, v) => set('hoden' as keyof WelpenRowData, v as any)}
 					/>
 				</CheckRow>
 			</Card>
@@ -546,7 +806,7 @@ export function WelpePage({
 						<div className="wa-farbe-row">
 							<div className="wa-farbe-row-label">Deckhaar</div>
 							<RadioGroup
-								name="w1-sw-deckhaar"
+								name="swDeckhaar"
 								options={[
 									'tiefschwarz',
 									'schwarz',
@@ -554,30 +814,36 @@ export function WelpePage({
 									'gräulich',
 									'rötlich',
 								]}
+								value={welpe.swDeckhaar}
+								onChange={(n, v) => set('swDeckhaar' as keyof WelpenRowData, v as any)}
 							/>
 						</div>
 						<div className="wa-farbe-row">
 							<div className="wa-farbe-row-label">Markenfarbe</div>
 							<RadioGroup
-								name="w1-markenfarbe"
+								name="markenfarbe"
 								options={[
 									'mittelblond',
 									'dunkelblond',
 									'hellblond/weißlich',
 									'grau',
 								]}
+								value={welpe.markenfarbe}
+								onChange={(n, v) => set('markenfarbe' as keyof WelpenRowData, v as any)}
 							/>
 						</div>
 						<div className="wa-farbe-row">
 							<div className="wa-farbe-row-label">Markenzeichnung</div>
 							<RadioGroup
-								name="w1-markenzeichnung"
+								name="markenzeichnung"
 								options={[
 									'komplett',
 									'knapp',
 									'überzeichnet',
 									'teilweise fehlend',
 								]}
+								value={welpe.markenzeichnung}
+								onChange={(n, v) => set('markenzeichnung' as keyof WelpenRowData, v as any)}
 							/>
 						</div>
 					</div>
@@ -589,15 +855,19 @@ export function WelpePage({
 						<div className="wa-farbe-row">
 							<div className="wa-farbe-row-label">Deckhaar</div>
 							<RadioGroup
-								name="w1-bl-deckhaar"
+								name="blDeckhaar"
 								options={['mittelblond', 'dunkelblond', 'hellblond']}
+								value={welpe.blDeckhaar}
+								onChange={(n, v) => set('blDeckhaar' as keyof WelpenRowData, v as any)}
 							/>
 						</div>
 						<div className="wa-farbe-row">
 							<div className="wa-farbe-row-label">Aufhellungen</div>
 							<RadioGroup
-								name="w1-aufhellungen"
+								name="aufhellungen"
 								options={['vorhanden', 'wenig', 'keine']}
+								value={welpe.aufhellungen}
+								onChange={(n, v) => set('aufhellungen' as keyof WelpenRowData, v as any)}
 							/>
 						</div>
 					</div>
@@ -609,7 +879,7 @@ export function WelpePage({
 						<div className="wa-farbe-row">
 							<div className="wa-farbe-row-label">Deckhaar</div>
 							<RadioGroup
-								name="w1-sw2-deckhaar"
+								name="sw2Deckhaar"
 								options={[
 									'tiefschwarz',
 									'schwarz',
@@ -617,6 +887,8 @@ export function WelpePage({
 									'gräulich',
 									'rötlich',
 								]}
+								value={welpe.sw2Deckhaar}
+								onChange={(n, v) => set('sw2Deckhaar' as keyof WelpenRowData, v as any)}
 							/>
 						</div>
 					</div>
@@ -626,7 +898,7 @@ export function WelpePage({
 					<div className="wa-farbe-header">Weiße Abzeichen</div>
 					<div className="wa-farbe-body">
 						<CheckboxGroup
-							name="w1-weiss"
+							name="weiss"
 							options={[
 								'Nasenrücken',
 								'Oberkopf',
@@ -637,6 +909,14 @@ export function WelpePage({
 								'Pfoten',
 								'Zehenspitzen',
 							]}
+							values={welpe.weiss}
+							onChange={(name, option, checked) => {
+								if (checked) {
+									set('weiss' as keyof WelpenRowData, [...welpe.weiss, option] as any)
+								} else {
+									set('weiss' as keyof WelpenRowData, welpe.weiss.filter((w) => w !== option) as any)
+								}
+							}}
 						/>
 					</div>
 				</div>
@@ -645,8 +925,10 @@ export function WelpePage({
 					<div className="wa-farbe-header">Pigment</div>
 					<div className="wa-farbe-body">
 						<RadioGroup
-							name="w1-pigment"
+							name="pigment"
 							options={['durchgefärbt', 'mittel', 'schwach']}
+							value={welpe.pigment}
+							onChange={(n, v) => set('pigment' as keyof WelpenRowData, v as any)}
 						/>
 					</div>
 				</div>
@@ -654,7 +936,7 @@ export function WelpePage({
 
 			<Card title="Verhalten">
 				<CheckboxGroup
-					name="w1-verhalten"
+					name="verhalten"
 					options={[
 						'unerschrocken',
 						'kontaktfreudig',
@@ -668,26 +950,51 @@ export function WelpePage({
 						'apathisch',
 						'ängstlich',
 					]}
+					values={welpe.verhalten}
+					onChange={(name, option, checked) => {
+						if (checked) {
+							set('verhalten' as keyof WelpenRowData, [...welpe.verhalten, option] as any)
+						} else {
+							set('verhalten' as keyof WelpenRowData, welpe.verhalten.filter((v) => v !== option) as any)
+						}
+					}}
 				/>
 			</Card>
 
 			<Card title="Bemerkungen">
 				<FieldRow>
 					<Field label="Abweichungen / Bemerkungen zum Welpen">
-						<textarea style={{ minHeight: 80 }} name="w1-bemerkungen" />
+						<textarea
+							style={{ minHeight: 80 }}
+							value={welpe.bemerkungen}
+							onChange={(e) => set('bemerkungen', e.target.value)}
+							disabled={readOnly}
+						/>
 					</Field>
 				</FieldRow>
 				<FieldRow cols={2}>
 					<Field label="Hinweis aus der Deckgenehmigung">
-						<textarea name="w1-deckgenehmigung" />
+						<textarea
+							value={welpe.deckgenehmigung}
+							onChange={(e) => set('deckgenehmigung', e.target.value)}
+							disabled={readOnly}
+						/>
 					</Field>
 					<Field label="Aufzuchtbedingungen">
-						<textarea name="w1-aufzucht" />
+						<textarea
+							value={welpe.aufzucht}
+							onChange={(e) => set('aufzucht', e.target.value)}
+							disabled={readOnly}
+						/>
 					</Field>
 				</FieldRow>
 				<FieldRow>
 					<Field label="Zustand der Hündin">
-						<textarea name="w1-hundin" />
+						<textarea
+							value={welpe.hundin}
+							onChange={(e) => set('hundin', e.target.value)}
+							disabled={readOnly}
+						/>
 					</Field>
 				</FieldRow>
 			</Card>
@@ -695,19 +1002,30 @@ export function WelpePage({
 			<Card title="Unterschriften">
 				<SignatureGrid
 					signatures={[
-						{ id: 'sig-zw-w1', label: 'Zuchtwart' },
-						{ id: 'sig-zue-w1', label: 'Züchter' },
-						{ id: 'sig-zwa-w1', label: 'Zuchtwartanwärter' },
+						{ id: `sig-zw-${welpe.id}`, label: 'Zuchtwart' },
+						{ id: `sig-zue-${welpe.id}`, label: 'Züchter' },
+						{ id: `sig-zwa-${welpe.id}`, label: 'Zuchtwartanwärter' },
 					]}
 					values={signatures}
 					onChange={onSignatureChange}
+					readOnly={readOnly}
 				/>
 				<FieldRow cols={2} style={{ marginTop: 16 }}>
 					<Field label="Ort">
-						<input type="text" name="w1-ort" />
+						<input
+							type="text"
+							value={welpe.ort}
+							onChange={(e) => set('ort', e.target.value)}
+							disabled={readOnly}
+						/>
 					</Field>
 					<Field label="Datum">
-						<input type="date" name="w1-datum" />
+						<input
+							type="date"
+							value={welpe.datum}
+							onChange={(e) => set('datum', e.target.value)}
+							disabled={readOnly}
+						/>
 					</Field>
 				</FieldRow>
 			</Card>
@@ -720,6 +1038,7 @@ export function WelpePage({
 export function DatenschutzPage({
 	signatures,
 	onSignatureChange,
+	readOnly,
 }: SignatureProps) {
 	return (
 		<div className="wa-page active" id="page-datenschutz1">
@@ -852,6 +1171,7 @@ export function DatenschutzPage({
 						]}
 						values={signatures}
 						onChange={onSignatureChange}
+						readOnly={readOnly}
 					/>
 				</div>
 			</Card>

@@ -1,5 +1,6 @@
 import Dexie, { type EntityTable } from 'dexie';
-import type { WurfabnahmeRecord } from '@/types/wurfabnahme-form';
+import type { KoerungVeranstaltung } from '@/types/koerung-veranstaltung';
+import type { Wurfabnahme } from '@/types/wurfabnahme-form';
 
 interface Dog {
     documentId: string;
@@ -10,6 +11,7 @@ interface Dog {
     sex: string;
     color: string;
     ownerName: string; // Flattened from owner.name
+    ownerMembershipNumber: string;
     cStudBookNumber: string;
     cFertile: string;
 }
@@ -20,7 +22,11 @@ const db = new Dexie('HzdDatabase') as Dexie & {
         'documentId' // primary key "documentId" (for the typings only)
     >;
     wurfabnahmen: EntityTable<
-        WurfabnahmeRecord,
+        Wurfabnahme,
+        'id'
+    >;
+    koerungVeranstaltungen: EntityTable<
+        KoerungVeranstaltung,
         'id'
     >;
 };
@@ -34,6 +40,40 @@ db.version(2).stores({
     dogs: 'documentId, fullkennelname, microchipNo, cStudBookNumber',
     wurfabnahmen: 'id, updatedAt, zwingername, datum',
 });
+
+db.version(3).stores({
+    dogs: 'documentId, fullkennelname, microchipNo, cStudBookNumber',
+    wurfabnahmen: 'id, updatedAt, zwingername, datum',
+}).upgrade(async (tx) => {
+    await tx.table('wurfabnahmen').toCollection().modify((item) => {
+        if (Array.isArray(item.records)) {
+            return
+        }
+
+        if (!item.formData) {
+            item.records = []
+            return
+        }
+
+        const now = new Date().toISOString()
+        item.records = [{
+            id: crypto.randomUUID(),
+            createdAt: item.createdAt ?? now,
+            updatedAt: item.updatedAt ?? now,
+            zwingername: item.zwingername ?? '',
+            datum: item.datum ?? '',
+            welpenCount: item.welpenCount ?? 0,
+            formData: item.formData,
+        }]
+        delete item.formData
+    })
+})
+
+db.version(4).stores({
+    dogs: 'documentId, fullkennelname, microchipNo, cStudBookNumber',
+    wurfabnahmen: 'id, updatedAt, zwingername, datum',
+    koerungVeranstaltungen: 'id, updatedAt, datum, name',
+})
 
 export type { Dog };
 export { db };
