@@ -41,13 +41,14 @@ export function StudDogDetailView({
 	const fallbackDogAvatar = (() => {
 		if (breederRole !== 'S' || breeder.avatar) return null
 		const dogs = breeder.dogs
-		if (!Array.isArray(dogs)) return null
-		const match = dogs.find(
-			(d) =>
-				d.avatar &&
-				(d.owner?.id === breeder.member?.id || d.owner?.documentId === breeder.member?.documentId) &&
-				d.sex === 'M',
-		)
+		console.log('[DEBUG] breeder.id:', breeder.id, typeof breeder.id)
+		console.log('[DEBUG] breeder.documentId:', breeder.documentId)
+		console.log('[DEBUG] breeder.dogs:', JSON.stringify(dogs))
+		console.log('[DEBUG] breeder.member:', JSON.stringify(breeder.member))
+		if (!Array.isArray(dogs) || dogs.length === 0) return null
+		// Finde ersten Hund mit sex=M und avatar
+		const match = dogs.find((d) => d.avatar && d.sex === 'M')
+		console.log('[DEBUG] fallbackDogAvatar match:', JSON.stringify(match?.avatar))
 		return match?.avatar ?? null
 	})()
 

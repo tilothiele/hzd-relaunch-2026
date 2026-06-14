@@ -187,13 +187,19 @@ async function resolveDogs(
 	breeder: BreederRecord,
 ): Promise<any[]> {
 	if (typeof breeder.id !== 'number' || !breeder.member?.id) {
+		strapi.log.debug('[resolveDogs] early return: breeder.id=' + breeder.id + ', member.id=' + breeder.member?.id)
 		return []
 	}
+
+	strapi.log.debug('[resolveDogs] querying dogs for breeder.id=' + breeder.id + ', member.id=' + breeder.member.id + ', cId=' + breeder.member.cId)
+
+	// Probiere beide IDs: erst cId, dann member.id
+	const cOwnerId = breeder.member.cId ?? breeder.member.id
 
 	const dogs = await strapi.db.query('plugin::hzd-plugin.dog').findMany({
 		where: {
 			sex: 'M',
-			cOwnerId: breeder.member.id,
+			cOwnerId: cOwnerId,
 		},
 		select: ['documentId', 'sex'],
 		populate: {
@@ -204,6 +210,8 @@ async function resolveDogs(
 		},
 	})
 
+	strapi.log.debug('[resolveDogs] found dogs:', JSON.stringify(dogs))
+
 	return dogs ?? []
 }
 
@@ -212,6 +220,7 @@ export async function enrichBreederRecords(
 	data: unknown,
 ): Promise<unknown> {
 	const breeders = collectBreederList(data)
+	strapi.log.debug('[enrichBreederRecords] found breeders:', breeders.length)
 
 	if (breeders.length === 0) {
 		return data
@@ -220,9 +229,12 @@ export async function enrichBreederRecords(
 	const usersByKey = await loadUsersForBreeders(strapi, breeders)
 
 	for (const breeder of breeders) {
+		strapi.log.debug('[enrichBreederRecords] processing breeder id:', breeder.id, 'typeof:', typeof breeder.id)
+		strapi.log.debug('[enrichBreederRecords] breeder keys:', Object.keys(breeder))
 		breeder.member = resolveMemberUser(breeder, usersByKey)
 		breeder.owner_members = await resolveOwnerMembers(strapi, breeder)
 		breeder.dogs = await resolveDogs(strapi, breeder)
+		strapi.log.debug('[enrichBreederRecords] breeder.dogs:', JSON.stringify(breeder.dogs))
 	}
 
 	return data

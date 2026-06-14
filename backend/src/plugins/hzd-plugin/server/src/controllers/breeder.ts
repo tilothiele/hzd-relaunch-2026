@@ -39,12 +39,12 @@ const MEMBER_CONTACT_FIELDS = [
 
 const BREEDER_SEARCH_POPULATE = {
 	member: {
-		fields: [...MEMBER_CONTACT_FIELDS],
+		fields: ['id', ...MEMBER_CONTACT_FIELDS],
 	},
 	avatar: true,
 	Address: true,
 	owner_members: {
-		fields: [...MEMBER_CONTACT_FIELDS],
+		fields: ['id', ...MEMBER_CONTACT_FIELDS],
 	},
 }
 
@@ -138,13 +138,28 @@ const coreControllerFactory = factories.createCoreController(
 		},
 
 		async findOne(ctx: any) {
-			const response = await Object.getPrototypeOf(this).findOne.call(this, ctx)
+			const documentId = ctx.params.documentId
+			const token = process.env.STRAPI_API_TOKEN ?? null
 
-			if (response?.data) {
-				response.data = await enrichBreederRecords(strapi, response.data)
+			const entity = await strapi.db
+				.query('plugin::hzd-plugin.breeder')
+				.findOne({
+					where: { documentId },
+					populate: {
+						member: { fields: ['id', ...MEMBER_CONTACT_FIELDS] },
+						avatar: true,
+						Address: true,
+						owner_members: { fields: ['id', ...MEMBER_CONTACT_FIELDS] },
+					},
+				})
+
+			if (!entity) {
+				return ctx.notFound()
 			}
 
-			return response
+			const enriched = await enrichBreederRecords(strapi, entity)
+
+			return ctx.json({ data: enriched })
 		},
 
 		async search(ctx: any) {
