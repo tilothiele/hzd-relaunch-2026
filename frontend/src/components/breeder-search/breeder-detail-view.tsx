@@ -18,6 +18,7 @@ interface BreederDetailViewProps {
     strapiBaseUrl?: string | null
     hzdSetting?: HzdSetting | null
     onBack: () => void
+    breederRole?: 'B' | 'S' | null
 }
 
 function formatDate(dateString: string | null | undefined): string {
@@ -44,7 +45,7 @@ function getRegionLabel(region: string | null | undefined): string {
     return region
 }
 
-export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack }: BreederDetailViewProps) {
+export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack, breederRole }: BreederDetailViewProps) {
     const [selectedDog, setSelectedDog] = useState<Dog | null>(null)
     const [breederDetails, setBreederDetails] = useState<Breeder>(breeder)
     const kennelName = breederDetails.kennelName ?? 'Kein Zwingername bekannt'
@@ -75,8 +76,24 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack }
             cancelled = true
         }
     }, [breeder.documentId])
+
+    // Avatar-Fallback für breederRole=S: wenn kein breeder.avatar gesetzt ist,
+    // nimm das avatar des ersten Hundes mit owner=breeder.member, sex=M
+    const fallbackDogAvatar = (() => {
+        if (breederRole !== 'S' || breeder.avatar) return null
+        const dogs = breeder.dogs
+        if (!Array.isArray(dogs)) return null
+        const match = dogs.find(
+            (d) =>
+                d.avatar &&
+                (d.owner?.id === breeder.member?.id || d.owner?.documentId === breeder.member?.documentId) &&
+                d.sex === 'M',
+        )
+        return match?.avatar ?? null
+    })()
+
     const avatarUrl = resolveMediaUrl(
-        breederDetails.avatar || hzdSetting?.DefaultBreederAvatar,
+        breederDetails.avatar || fallbackDogAvatar || hzdSetting?.DefaultBreederAvatar,
         strapiBaseUrl
     ) || '/static-images/placeholder/user-avatar.png'
 

@@ -194,6 +194,7 @@ export function StudDogSearch({
 				strapiBaseUrl={strapiBaseUrl}
 				hzdSetting={hzdSetting}
 				onBack={handleBackToSearch}
+				breederRole='S'
 			/>
 		)
 	}
