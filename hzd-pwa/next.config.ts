@@ -8,7 +8,7 @@ const pwaConfig = withPWA({
 	skipWaiting: true,
 	runtimeCaching: [
 		{
-			urlPattern: /^https:\/\\/.*\.(?:png|jpg|jpeg|svg|gif|webp|ico|css|js)$/,
+			urlPattern: /^https:\/\/.*\.(png|jpg|jpeg|svg|gif|webp|ico|css|js)$/,
 			handler: 'CacheFirst',
 			options: {
 				cacheName: 'static-assets',
@@ -41,7 +41,7 @@ const pwaConfig = withPWA({
 			},
 		},
 		{
-			urlPattern: /^https:\/\/.*\.hovawarte\.com\/api\/.*/,
+			urlPattern: /^https:\/\/.*hovawarte\.com\/api\/.*/,
 			handler: 'NetworkFirst',
 			options: {
 				cacheName: 'api-cache',
