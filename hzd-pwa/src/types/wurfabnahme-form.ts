@@ -80,7 +80,6 @@ export interface StammblattData {
 	wurfGefallenAm: string
 	zuchthuendin: string
 	zuchtbuchNrHuendin: string
-	welpen: WelpenRowData[]
 	gesamteindruck: string
 	pflegezustand: string
 	zustandHundin: string
@@ -93,6 +92,7 @@ export interface StammblattData {
 
 export interface WurfabnahmeFormData {
 	stammblatt: StammblattData
+	welpen: WelpenRowData[]
 	signatures: Record<string, string>
 }
 
@@ -179,6 +179,7 @@ export function normalizeFormData(data: WurfabnahmeFormData): WurfabnahmeFormDat
 	return {
 		...data,
 		signatures: data.signatures ?? {},
+		welpen: (data.welpen ?? data.stammblatt?.welpen ?? []).map(normalizeWelpenRow),
 		stammblatt: {
 			...data.stammblatt,
 			zuchthuendin: data.stammblatt.zuchthuendin ?? '',
@@ -186,7 +187,6 @@ export function normalizeFormData(data: WurfabnahmeFormData): WurfabnahmeFormDat
 			zuchtwartName: data.stammblatt.zuchtwartName ?? '',
 			zuechterUnterschriftName: data.stammblatt.zuechterUnterschriftName ?? '',
 			zuchtanwaerterName: data.stammblatt.zuchtanwaerterName ?? '',
-			welpen: data.stammblatt.welpen.map(normalizeWelpenRow),
 		},
 	}
 }
@@ -198,8 +198,8 @@ export function cloneFormDataForEdit(
 	return {
 		stammblatt: {
 			...normalized.stammblatt,
-			welpen: normalized.stammblatt.welpen.map((row) => ({ ...row })),
 		},
+		welpen: normalized.welpen.map((row) => ({ ...row })),
 		signatures: {},
 	}
 }
@@ -291,6 +291,7 @@ export function createEmptyStammblatt(): StammblattData {
 export function createEmptyFormData(): WurfabnahmeFormData {
 	return {
 		stammblatt: createEmptyStammblatt(),
+		welpen: [],
 		signatures: {},
 	}
 }
@@ -381,7 +382,7 @@ export function buildRecordFromForm(
 	formData: WurfabnahmeFormData,
 ): WurfabnahmeRecord {
 	const now = new Date().toISOString()
-	const activeWelpen = formData.stammblatt.welpen.filter(
+	const activeWelpen = formData.welpen.filter(
 		(w) => !w.deletedAt,
 	)
 

@@ -66,16 +66,13 @@ function WurfabnahmeAppInner({
 	)
 
 	const handleWelpeChange = useCallback(
-		(welpeIndex: number, data: WurfabnahmeFormData['stammblatt']['welpen'][number]) => {
+		(welpeIndex: number, data: WurfabnahmeFormData['welpen'][number]) => {
 			if (readOnly) return
-			const newWelpen = [...formData.stammblatt.welpen]
+			const newWelpen = [...formData.welpen]
 			newWelpen[welpeIndex] = data
 			onFormDataChange({
 				...formData,
-				stammblatt: {
-					...formData.stammblatt,
-					welpen: newWelpen,
-				},
+				welpen: newWelpen,
 			})
 		},
 		[formData, onFormDataChange, readOnly],
@@ -97,10 +94,10 @@ function WurfabnahmeAppInner({
 		? activeTab.replace('welpe-', '')
 		: null
 	const activeWelpeIdx = activeWelpeId
-		? formData.stammblatt.welpen.findIndex(w => w.id === activeWelpeId)
+		? formData.welpen.findIndex(w => w.id === activeWelpeId)
 		: -1
 	const activeWelpe = activeWelpeIdx >= 0
-		? formData.stammblatt.welpen[activeWelpeIdx]
+		? formData.welpen[activeWelpeIdx]
 		: null
 
 	useEffect(() => {

@@ -155,15 +155,12 @@ export function WurfabnahmeEditor({
 
 			if (deletedWelpenIds.size > 0) {
 				const now = new Date().toISOString()
-				merged = {
-					...merged,
-					stammblatt: {
-						...merged.stammblatt,
-						welpen: merged.stammblatt.welpen.map((w) =>
-							deletedWelpenIds.has(w.id) ? { ...w, deletedAt: now } : w,
-						),
-					},
-				}
+			merged = {
+				...merged,
+				welpen: merged.welpen.map((w) =>
+					deletedWelpenIds.has(w.id) ? { ...w, deletedAt: now } : w,
+				),
+			}
 			}
 
 			const newRecord = buildRecordFromForm(crypto.randomUUID(), merged)
@@ -252,7 +249,7 @@ export function WurfabnahmeEditor({
 				>
 					Stammblatt
 				</button>
-				{formData.stammblatt.welpen.filter(w => !w.deletedAt).map((welpe, idx) => (
+				{formData.welpen.filter(w => !w.deletedAt).map((welpe, idx) => (
 					<button
 						key={welpe.id}
 						type="button"
