@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useCallback, useEffect, useRef } from 'react'
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import {
 	DatenschutzPage,
@@ -9,6 +9,8 @@ import {
 } from './WurfabnahmePages'
 import { parseWurfabnahmePage } from './constants'
 import type { WurfabnahmeFormData } from '@/types/wurfabnahme-form'
+import { DogSearchModal } from '@/components/koerung/DogSearchModal'
+import type { Dog } from '@/services/db'
 import './wurfabnahme.css'
 
 interface WurfabnahmeAppProps {
@@ -37,6 +39,22 @@ function WurfabnahmeAppInner({
 }: WurfabnahmeAppProps) {
 	const searchParams = useSearchParams()
 	const fieldsAppliedRef = useRef<string>('')
+	const [searchHundinId, setSearchHundinId] = useState<string | null>(null)
+
+	const handleApplyHundin = useCallback(
+		(dog: Dog) => {
+			onFormDataChange({
+				...formData,
+				stammblatt: {
+					...formData.stammblatt,
+					zuchthuendin: dog.fullkennelname ?? '',
+					zuchtbuchNrHuendin: dog.cStudBookNumber ?? '',
+				},
+			})
+			setSearchHundinId(null)
+		},
+		[formData, onFormDataChange],
+	)
 
 	const activePage = parseWurfabnahmePage(searchParams.get('seite'))
 
@@ -126,6 +144,12 @@ function WurfabnahmeAppInner({
 			disabled={readOnly}
 			className="min-w-0 border-0 p-0 m-0"
 		>
+			<DogSearchModal
+				isOpen={searchHundinId !== null}
+				onClose={() => setSearchHundinId(null)}
+				onSelect={handleApplyHundin}
+			/>
+
 			<div className="wurfabnahme-app" ref={formRef}>
 				{showPage('stammblatt') && (
 					<StammblattPage
@@ -136,6 +160,7 @@ function WurfabnahmeAppInner({
 						deletedIds={deletedWelpenIds}
 						onMarkDelete={onMarkWelpeDelete}
 						onUndoDelete={onUndoWelpeDelete}
+						onOpenHundinSearch={() => setSearchHundinId('search')}
 						{...signatureProps}
 					/>
 				)}

@@ -38,6 +38,7 @@ interface StammblattPageProps extends SignatureProps {
 	deletedIds?: Set<string>
 	onMarkDelete?: (id: string) => void
 	onUndoDelete?: (id: string) => void
+	onOpenHundinSearch?: () => void
 }
 
 function WelpenTable({
@@ -228,6 +229,7 @@ export function StammblattPage({
 	deletedIds = new Set(),
 	onMarkDelete,
 	onUndoDelete,
+	onOpenHundinSearch,
 }: StammblattPageProps) {
 	const updateField = <K extends keyof StammblattData>(
 		field: K,
@@ -341,13 +343,26 @@ export function StammblattPage({
 			<Card title="Wurfinformationen">
 				<FieldRow cols={2}>
 					<Field label="Zuchthündin">
-						<input
-							type="text"
-							value={data.zuchthuendin}
-							onChange={(e) =>
-								updateField('zuchthuendin', e.target.value)
-							}
-						/>
+						<div className="flex gap-2">
+							<input
+								type="text"
+								value={data.zuchthuendin}
+								onChange={(e) =>
+									updateField('zuchthuendin', e.target.value)
+								}
+								className="flex-1"
+							/>
+							{onOpenHundinSearch && (
+								<button
+									type="button"
+									onClick={onOpenHundinSearch}
+									title="Aus Datenbank übernehmen"
+									className="flex items-center justify-center rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
+								>
+									🔍
+								</button>
+							)}
+						</div>
 					</Field>
 					<Field label="Zuchtbuch-Nr.">
 						<input
