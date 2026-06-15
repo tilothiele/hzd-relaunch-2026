@@ -179,7 +179,7 @@ export function normalizeFormData(data: WurfabnahmeFormData): WurfabnahmeFormDat
 	return {
 		...data,
 		signatures: data.signatures ?? {},
-		welpen: (data.welpen ?? data.stammblatt?.welpen ?? []).map(normalizeWelpenRow),
+		welpen: (data.welpen ?? []).map(normalizeWelpenRow),
 		stammblatt: {
 			...data.stammblatt,
 			zuchthuendin: data.stammblatt.zuchthuendin ?? '',
@@ -276,7 +276,6 @@ export function createEmptyStammblatt(): StammblattData {
 		wurfGefallenAm: '',
 		zuchthuendin: '',
 		zuchtbuchNrHuendin: '',
-		welpen: createInitialWelpenRows(),
 		gesamteindruck: '',
 		pflegezustand: '',
 		zustandHundin: '',
@@ -395,10 +394,7 @@ export function buildRecordFromForm(
 		welpenCount: activeWelpen.length,
 		formData: {
 			...formData,
-			stammblatt: {
-				...formData.stammblatt,
-				welpen: activeWelpen,
-			},
+			welpen: activeWelpen,
 		},
 	}
 }
