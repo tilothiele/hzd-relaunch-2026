@@ -78,6 +78,17 @@ function WurfabnahmeAppInner({
 		[formData, onFormDataChange, readOnly],
 	)
 
+	const handleWelpenChange = useCallback(
+		(newWelpen: WurfabnahmeFormData['welpen']) => {
+			if (readOnly) return
+			onFormDataChange({
+				...formData,
+				welpen: newWelpen,
+			})
+		},
+		[formData, onFormDataChange, readOnly],
+	)
+
 	const signatureProps = {
 		signatures: formData.signatures,
 		onSignatureChange: handleSignatureChange,
@@ -119,6 +130,8 @@ function WurfabnahmeAppInner({
 				{showPage('stammblatt') && (
 					<StammblattPage
 						data={formData.stammblatt}
+						welpen={formData.welpen}
+						onWelpenChange={handleWelpenChange}
 						onChange={handleStammblattChange}
 						deletedIds={deletedWelpenIds}
 						onMarkDelete={onMarkWelpeDelete}

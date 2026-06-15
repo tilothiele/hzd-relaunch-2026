@@ -32,6 +32,8 @@ interface SignatureProps {
 
 interface StammblattPageProps extends SignatureProps {
 	data: StammblattData
+	welpen: WelpenRowData[]
+	onWelpenChange: (welpen: WelpenRowData[]) => void
 	onChange: (data: StammblattData) => void
 	deletedIds?: Set<string>
 	onMarkDelete?: (id: string) => void
@@ -217,6 +219,8 @@ function WelpenTable({
 
 export function StammblattPage({
 	data,
+	welpen,
+	onWelpenChange,
 	onChange,
 	signatures,
 	onSignatureChange,
@@ -233,16 +237,13 @@ export function StammblattPage({
 	}
 
 	const handleAddRow = () => {
-		if (data.welpen.length >= MAX_WELPEN_ROWS) return
-		updateField('welpen', [...data.welpen, createWelpenRow()])
+		if (welpen.length >= MAX_WELPEN_ROWS) return
+		onWelpenChange([...welpen, createWelpenRow()])
 	}
 
 	const handleRemoveRow = (index: number) => {
-		if (data.welpen.length <= MIN_WELPEN_ROWS) return
-		updateField(
-			'welpen',
-			data.welpen.filter((_, i) => i !== index),
-		)
+		if (welpen.length <= MIN_WELPEN_ROWS) return
+		onWelpenChange(welpen.filter((_, i) => i !== index))
 	}
 
 	const handleWelpeUpdate = (
@@ -250,9 +251,8 @@ export function StammblattPage({
 		field: keyof WelpenRowData,
 		value: string,
 	) => {
-		updateField(
-			'welpen',
-			data.welpen.map((row, i) =>
+		onWelpenChange(
+			welpen.map((row, i) =>
 				i === index ? { ...row, [field]: value } : row,
 			),
 		)
@@ -375,21 +375,21 @@ export function StammblattPage({
 			<Card title="Welpen – Übersicht">
 				<div className="wa-welpen-actions">
 					<p className="wa-welpen-count">
-						Anzahl Welpen: <strong>{data.welpen.length}</strong>
+						Anzahl Welpen: <strong>{welpen.length}</strong>
 					</p>
 					<div className="wa-btn-row-action">
 						<button
 							type="button"
 							className="wa-btn-secondary wa-btn-add-row"
 							onClick={handleAddRow}
-							disabled={data.welpen.length >= MAX_WELPEN_ROWS}
+							disabled={welpen.length >= MAX_WELPEN_ROWS}
 						>
 							+ Zeile hinzufügen
 						</button>
 					</div>
 				</div>
 				<WelpenTable
-					rows={data.welpen}
+					rows={welpen}
 					deletedIds={deletedIds}
 					onMarkDelete={onMarkDelete ?? (() => {})}
 					onUndoDelete={onUndoDelete ?? (() => {})}
