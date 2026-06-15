@@ -5,7 +5,6 @@ const pwaConfig = withPWA({
 	dest: 'public',
 	disable: process.env.NODE_ENV === 'development',
 	register: true,
-	skipWaiting: true,
 	runtimeCaching: [
 		{
 			urlPattern: /^https:\/\/.*\.(png|jpg|jpeg|svg|gif|webp|ico|css|js)$/,
