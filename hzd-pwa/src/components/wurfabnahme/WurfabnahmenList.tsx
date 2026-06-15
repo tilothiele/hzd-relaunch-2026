@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db'
 import { getWurfabnahmeListLabel } from '@/types/wurfabnahme-form'
@@ -12,6 +12,7 @@ function formatDateTime(iso: string): string {
 }
 
 export function WurfabnahmenList() {
+	const router = useRouter()
 	const records = useLiveQuery(() =>
 		db.wurfabnahmen.orderBy('updatedAt').reverse().toArray(),
 	)
@@ -23,12 +24,13 @@ export function WurfabnahmenList() {
 					<h1 className="text-2xl font-bold">Wurfabnahmen</h1>
 					<p>Lokal gespeicherte Wurfabnahmeprotokolle auf diesem Gerät.</p>
 				</div>
-				<Link
-					href="/wurfabnahmen/neu"
+				<button
+					type="button"
+					onClick={() => router.push('/wurfabnahmen/neu')}
 					className="rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
 				>
 					Neu
-				</Link>
+				</button>
 			</div>
 
 			{records === undefined ? (
@@ -65,12 +67,13 @@ export function WurfabnahmenList() {
 										) : null}
 									</td>
 									<td className="px-4 py-3 text-right">
-										<Link
-											href={`/wurfabnahmen/${wurfabnahme.id}`}
+										<button
+											type="button"
+											onClick={() => router.push(`/wurfabnahmen/${wurfabnahme.id}`)}
 											className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
 										>
 											Öffnen
-										</Link>
+										</button>
 									</td>
 								</tr>
 							))}

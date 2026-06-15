@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db'
@@ -31,12 +30,13 @@ export function KoerungVeranstaltungenList() {
 	return (
 		<div className="flex flex-col gap-4">
 			<div className="flex justify-end">
-				<Link
-					href="/koerungen/neu"
+				<button
+					type="button"
+					onClick={() => router.push('/koerungen/neu')}
 					className="rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
 				>
 					Neu
-				</Link>
+				</button>
 			</div>
 
 			{records === undefined ? (

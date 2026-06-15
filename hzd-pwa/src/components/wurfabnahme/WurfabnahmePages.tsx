@@ -76,7 +76,7 @@ function WelpenTable({
 					</tr>
 				</thead>
 <tbody>
-				{rows.map((row) => {
+				{rows.map((row, idx) => {
 					const isDeleted = deletedIds.has(row.id)
 					return (
 						<tr
@@ -89,7 +89,7 @@ function WelpenTable({
 										–
 									</span>
 								) : (
-									row.zuchtbuchNr || ''
+									idx + 1
 								)}
 							</td>
 							<td className={isDeleted ? 'bg-red-100 dark:bg-red-900/30' : ''}>
