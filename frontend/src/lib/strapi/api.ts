@@ -82,9 +82,10 @@ async function fetchLayoutPayload(
 	fetcher: StrapiFetcher,
 	token?: string | null,
 ): Promise<LayoutData> {
+	// global-layout & hzd-setting: kein populate-Parameter, Backend liefert implizit populate=*
 	const [layoutResponse, hzdSettingResponse, announcementsResponse] = await Promise.all([
 		fetcher('global-layout', undefined, { token }),
-		fetcher('hzd-setting', new URLSearchParams({ populate: '*' }), { token }),
+		fetcher('hzd-setting', undefined, { token }),
 		fetcher(
 			'announcements',
 			buildStrapiQuery({

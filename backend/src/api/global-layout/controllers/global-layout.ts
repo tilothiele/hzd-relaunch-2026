@@ -1,26 +1,13 @@
 /**
  * global-layout controller
+ *
+ * Überschreibt den Default-`find` so, dass `populate` implizit aus dem
+ * global-layout-populate Service gesetzt wird. Eingehende Query-Parameter
+ * bleiben erhalten und werden mit dem Default-Populate zusammengeführt.
  */
 
 import { factories } from '@strapi/strapi'
-import { PAGE_RELATION_POPULATE } from '../../../utils/page-sections-populate'
-
-const GLOBAL_LAYOUT_POPULATE = {
-	Logo: true,
-	Footer: true,
-	SOS: true,
-	PartnerLink: {
-		populate: {
-			Logo: true,
-		},
-	},
-	Impressum: {
-		fields: ['documentId', 'slug', 'title'],
-	},
-	PrivacyPolicy: true,
-	page: PAGE_RELATION_POPULATE,
-	authenticated_page: PAGE_RELATION_POPULATE,
-}
+import { buildGlobalLayoutPopulate } from '../services/global-layout-populate'
 
 export default factories.createCoreController(
 	'api::global-layout.global-layout',
@@ -28,7 +15,7 @@ export default factories.createCoreController(
 		async find(ctx) {
 			ctx.query = {
 				...ctx.query,
-				populate: GLOBAL_LAYOUT_POPULATE,
+				...buildGlobalLayoutPopulate(),
 			}
 
 			return Object.getPrototypeOf(this).find.call(this, ctx)
