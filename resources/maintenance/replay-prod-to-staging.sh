@@ -6,7 +6,7 @@ set -euo pipefail
 ### ================================
 
 # Container-Namen
-CONTAINERS=("hzd-frontend-prod" "hzd-backend-prod" "hzd-backend-staging" "hzd-backend-staging")
+CONTAINERS=("hzd-frontend-prod" "hzd-backend-prod" "hzd-backend-staging" "hzd-frontend-staging")
 
 # PostgreSQL
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
