@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { getReadArticles } from '@/lib/client/db'
 import type { NewsArticle } from '@/lib/server/news-utils'
 import type { ThemeDefinition } from '@/themes'
@@ -43,32 +43,36 @@ export function NewsArticleList({ articles, strapiBaseUrl, theme }: NewsArticleL
         return () => clearTimeout(timer)
     }, [searchInput])
 
-    const filteredArticles = articles
-        .filter((article) => {
-            const publicationDate = article.DateOfPublication || article.publishedAt
-            if (!publicationDate) return false
+    const filteredArticles = useMemo(
+        () =>
+            articles
+                .filter((article) => {
+                    const publicationDate = article.DateOfPublication || article.publishedAt
+                    if (!publicationDate) return false
 
-            const date = new Date(publicationDate)
-            if (Number.isNaN(date.getTime())) return false
+                    const date = new Date(publicationDate)
+                    if (Number.isNaN(date.getTime())) return false
 
-            const year = date.getFullYear()
-            const yearMatch = year === selectedYear || year === selectedYear - 1
+                    const year = date.getFullYear()
+                    const yearMatch = year === selectedYear || year === selectedYear - 1
 
-            if (!yearMatch) return false
+                    if (!yearMatch) return false
 
-            if (!searchQuery.trim()) return true
+                    if (!searchQuery.trim()) return true
 
-            const query = searchQuery.toLowerCase().trim()
-            const headlineMatch = article.Headline?.toLowerCase().includes(query) ?? false
-            const subheadlineMatch = article.SubHeadline?.toLowerCase().includes(query) ?? false
+                    const query = searchQuery.toLowerCase().trim()
+                    const headlineMatch = article.Headline?.toLowerCase().includes(query) ?? false
+                    const subheadlineMatch = article.SubHeadline?.toLowerCase().includes(query) ?? false
 
-            return headlineMatch || subheadlineMatch
-        })
-        .sort((a, b) => {
-            const aDate = new Date(a.DateOfPublication || a.publishedAt || 0).getTime()
-            const bDate = new Date(b.DateOfPublication || b.publishedAt || 0).getTime()
-            return bDate - aDate
-        })
+                    return headlineMatch || subheadlineMatch
+                })
+                .sort((a, b) => {
+                    const aDate = new Date(a.DateOfPublication || a.publishedAt || 0).getTime()
+                    const bDate = new Date(b.DateOfPublication || b.publishedAt || 0).getTime()
+                    return bDate - aDate
+                }),
+        [articles, selectedYear, searchQuery],
+    )
 
     // Left button: Go to Past (Decrease Year)
     const handleOlderYears = () => {

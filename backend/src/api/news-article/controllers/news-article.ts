@@ -51,7 +51,9 @@ const toInt = (value: unknown, fallback: number): number => {
 
 const toSortArray = (value: unknown): string[] => {
 	const list = toStringArray(value)
-	return list.length > 0 ? list : ['publishedAt:desc']
+	// Primär nach DateOfPublication (redaktionell gepflegt), sekundär nach
+	// publishedAt (Strapi-Publish-Zeitpunkt) als Stabilisierungs-Key.
+	return list.length > 0 ? list : ['DateOfPublication:desc', 'publishedAt:desc']
 }
 
 const parsePagination = (
