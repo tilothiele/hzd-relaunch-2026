@@ -200,6 +200,12 @@ export function buildNewsArticleCategoryPopulate(): URLSearchParams {
 
 export const POPULATE_NEWS_ARTICLE_CATEGORY = buildNewsArticleCategoryPopulate()
 
+/**
+ * Standard-Sortierung für News-Article-Listen: redaktionelles Datum primär,
+ * Strapi-Publish-Zeitpunkt als stabiler Tie-Breaker.
+ */
+export const NEWS_ARTICLE_DEFAULT_SORT = ['DateOfPublication:desc', 'publishedAt:desc'] as const
+
 export const POPULATE_PHOTOBOX_COLLECTION = new URLSearchParams({
 	'populate[photogapher][fields][0]': 'documentId',
 	'populate[photobox_images][populate][Thumbnail]': 'true',

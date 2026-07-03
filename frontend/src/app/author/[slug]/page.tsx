@@ -4,6 +4,7 @@ import { MainPageStructure } from '../../main-page-structure'
 import { theme as globalTheme } from '@/themes'
 import { fetchAuthorBySlug } from '@/lib/server/fetch-author-by-slug'
 import { fetchNewsArticles } from '@/lib/strapi/api'
+import { NEWS_ARTICLE_DEFAULT_SORT } from '@/lib/strapi/populate'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import NotFoundSection from '@/components/sections/not-found-section/not-found-section'
 
@@ -70,7 +71,7 @@ export default async function AuthorPage({ params }: PageProps) {
     const authorArticlesResult = await fetchNewsArticles({
         filters: { SEO: { author: { Slug: { eq: slugParam } } } },
         pagination: { pageSize: 20 },
-        sort: ['DateOfPublication:desc', 'publishedAt:desc'],
+        sort: [...NEWS_ARTICLE_DEFAULT_SORT],
     })
     const authorArticles = (authorArticlesResult.newsArticles ?? []).filter(
         (article): article is { documentId: string; Headline: string; Slug: string } =>

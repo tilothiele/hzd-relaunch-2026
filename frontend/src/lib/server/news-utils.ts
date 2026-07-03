@@ -1,4 +1,5 @@
 import { searchNewsArticles } from '@/lib/strapi/api'
+import { NEWS_ARTICLE_DEFAULT_SORT } from '@/lib/strapi/populate'
 import type { Image } from '@/types'
 
 export interface NewsArticle {
@@ -41,7 +42,7 @@ export async function fetchNewsArticles({
 			{
 				categoryDocumentId,
 				pageSize: limit,
-				sort: ['publishedAt:desc'],
+				sort: [...NEWS_ARTICLE_DEFAULT_SORT],
 			},
 			{ server: true },
 		)

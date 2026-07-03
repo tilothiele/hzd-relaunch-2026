@@ -1,7 +1,7 @@
 import { buildStrapiQuery } from '@/lib/strapi/filters'
 import { fetchEntityList, fetchNewsArticles } from '@/lib/strapi/api'
 import { normalizeSections } from '@/lib/strapi/normalize'
-import { POPULATE_NEWS_ARTICLE_CATEGORY } from '@/lib/strapi/populate'
+import { NEWS_ARTICLE_DEFAULT_SORT, POPULATE_NEWS_ARTICLE_CATEGORY } from '@/lib/strapi/populate'
 import type { NewsArticleCategory, NewsArticle } from '@/types'
 
 /**
@@ -66,7 +66,7 @@ export async function fetchArticlesByCategory({
 		const { newsArticles } = await fetchNewsArticles({
 			filters,
 			pagination: { page, pageSize },
-			sort: ['publishedAt:desc'],
+			sort: [...NEWS_ARTICLE_DEFAULT_SORT],
 		})
 
 		return newsArticles as unknown as NewsArticle[]
