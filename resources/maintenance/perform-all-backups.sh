@@ -248,6 +248,9 @@ backup_application "$BASE_DIR" "open-archiver"\
 
 rm -rf "${BASE_DIR}/"*
 
+# authentik geht dem traefik verloren - muss neu initialisiert werden
+docker restart authentik-server-m8kgkksks00c8cskw04w4wgs
+
 # Minuten und Sekunden berechnen
 minutes=$((SECONDS / 60))
 seconds=$((SECONDS % 60))
