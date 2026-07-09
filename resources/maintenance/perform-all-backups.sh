@@ -185,7 +185,7 @@ backup_application "$BASE_DIR" "website" \
 dump_file="redmine_db_dump_$(date +%F).sql"
 mysql_dump_docker "$BASE_DIR" "redmine" "$dump_file"
 backup_application "$BASE_DIR" "redmine" \
-	"redmine-ik4k40sg4ckg8cc0wc44k8sk-201443598345" -- \
+	"redmine-ik4k40sg4ckg8cc0wc44k8sk-090024895984" -- \
 	"$BASE_DIR/$dump_file" \
 	"ik4k40sg4ckg8cc0wc44k8sk_redmine-files" \
 	"ik4k40sg4ckg8cc0wc44k8sk_redmine-plugins" \
