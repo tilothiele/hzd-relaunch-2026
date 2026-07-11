@@ -825,13 +825,23 @@ export interface StandardIdentifier {
 	Phone?: 'Erforderlich' | 'Ja' | 'Nein' | null
 }
 
+export interface DogStandardIdentifier {
+	__typename: 'ComponentFormDogStandardIdentifier'
+	id?: string
+	GivenName?: 'Erforderlich' | 'Ja' | 'Nein' | null
+	KennelName?: 'Erforderlich' | 'Ja' | 'Nein' | null
+	ChipNo?: 'Erforderlich' | 'Ja' | 'Nein' | null
+	Zuchtbuchnummer?: 'Erforderlich' | 'Ja' | 'Nein' | null
+	DateOfBirth?: 'Erforderlich' | 'Ja' | 'Nein' | null
+}
+
 export interface FormSubmitButton {
 	__typename: 'ComponentFormFormSubmitButton'
 	id?: string
 	FSBName?: string | null
 }
 
-export type FormField = ShortTextInput | EmailAddress | TextArea | NumberInput | Choice | BooleanChoice | GroupSeparator | StaticText | FormSubmitButton | StandardIdentifier
+export type FormField = ShortTextInput | EmailAddress | TextArea | NumberInput | Choice | BooleanChoice | GroupSeparator | StaticText | FormSubmitButton | StandardIdentifier | DogStandardIdentifier
 
 export interface Form {
 	documentId: string
