@@ -21,6 +21,7 @@ import type {
 	GroupSeparator,
 	StaticText,
 	StandardIdentifier,
+	DogStandardIdentifier,
 } from '@/types'
 import { CountryCodeInput } from './country-code-input'
 import { BlocksRenderer } from '@strapi/blocks-react-renderer'
@@ -291,6 +292,90 @@ export function renderFormField(
 		case 'ComponentFormFormSubmitButton': {
 			// Submit Button wird separat gerendert
 			return null
+		}
+
+		case 'ComponentFormDogStandardIdentifier': {
+			const dogIdentifier = field as DogStandardIdentifier
+
+			const inputs = {
+				dogGivenName: { label: 'Name des Hundes', required: dogIdentifier.GivenName },
+				dogKennelName: { label: 'Zwingername', required: dogIdentifier.KennelName },
+				dogChipNo: { label: 'Chipnummer', required: dogIdentifier.ChipNo },
+				dogZuchtbuchnummer: { label: 'Zuchtbuchnummer', required: dogIdentifier.Zuchtbuchnummer },
+				dogDateOfBirth: { label: 'Geburtsdatum', required: dogIdentifier.DateOfBirth },
+			} as const
+
+			const renderInput = (key: keyof typeof inputs) => {
+				const config = inputs[key]
+				const status = config.required
+				if (!status || status === 'Nein') {
+					return null
+				}
+				const isRequired = status === 'Erforderlich'
+
+				if (key === 'dateOfBirth') {
+					return (
+						<TextField
+							key={`${uniqueKey}-${key}`}
+							label={config.label}
+							name={key}
+							type='date'
+							value={values[key] ?? ''}
+							onChange={(e) => onChange(key, e.target.value)}
+							fullWidth
+							required={isRequired}
+							size='small'
+							InputLabelProps={{ shrink: true }}
+						/>
+					)
+				}
+
+				return (
+					<TextField
+						key={`${uniqueKey}-${key}`}
+						label={config.label}
+						name={key}
+						value={values[key] ?? ''}
+						onChange={(e) => onChange(key, e.target.value)}
+						fullWidth
+						required={isRequired}
+						size='small'
+					/>
+				)
+			}
+
+			return (
+				<Box key={uniqueKey} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+					{/* Rüdenname, Kennlername */}
+					{(inputs.givenName.required || inputs.kennelName.required) ? (
+						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+							{renderInput('givenName')}
+							{renderInput('kennelName')}
+						</Box>
+					) : null}
+
+					{/* Chipnummer */}
+					{inputs.chipNo.required ? (
+						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+							{renderInput('chipNo')}
+						</Box>
+					) : null}
+
+					{/* Zuchtbuchnummer */}
+					{inputs.zuchtbuchnummer.required ? (
+						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+							{renderInput('zuchtbuchnummer')}
+						</Box>
+					) : null}
+
+					{/* Geburtsdatum */}
+					{inputs.dateOfBirth.required ? (
+						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+							{renderInput('dateOfBirth')}
+						</Box>
+					) : null}
+				</Box>
+			)
 		}
 
 		default:
