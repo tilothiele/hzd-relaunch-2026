@@ -313,7 +313,7 @@ export function renderFormField(
 				}
 				const isRequired = status === 'Erforderlich'
 
-				if (key === 'dateOfBirth') {
+				if (key === 'dogDateOfBirth') {
 					return (
 						<TextField
 							key={`${uniqueKey}-${key}`}
@@ -347,31 +347,31 @@ export function renderFormField(
 			return (
 				<Box key={uniqueKey} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
 					{/* Rüdenname, Kennlername */}
-					{(inputs.givenName.required || inputs.kennelName.required) ? (
+					{(inputs.dogGivenName.required || inputs.dogKennelName.required) ? (
 						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-							{renderInput('givenName')}
-							{renderInput('kennelName')}
+							{renderInput('dogGivenName')}
+							{renderInput('dogKennelName')}
 						</Box>
 					) : null}
 
 					{/* Chipnummer */}
-					{inputs.chipNo.required ? (
+					{inputs.dogChipNo.required ? (
 						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-							{renderInput('chipNo')}
+							{renderInput('dogChipNo')}
 						</Box>
 					) : null}
 
 					{/* Zuchtbuchnummer */}
-					{inputs.zuchtbuchnummer.required ? (
+					{inputs.dogZuchtbuchnummer.required ? (
 						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-							{renderInput('zuchtbuchnummer')}
+							{renderInput('dogZuchtbuchnummer')}
 						</Box>
 					) : null}
 
 					{/* Geburtsdatum */}
-					{inputs.dateOfBirth.required ? (
+					{inputs.dogDateOfBirth.required ? (
 						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-							{renderInput('dateOfBirth')}
+							{renderInput('dogDateOfBirth')}
 						</Box>
 					) : null}
 				</Box>
