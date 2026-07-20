@@ -187,7 +187,7 @@ const coreControllerFactory = factories.createCoreController(
           'plugin::hzd-plugin.litter',
           {
             populate: LITTERED_FIRST_POPULATE,
-            sort: ['dateOfBirth:desc', 'expectedDateOfBirth:desc'],
+            sort: ['dateOfBirth:asc', 'expectedDateOfBirth:asc'],
             page: 1,
             pageSize: 10000,
             filters: filterConditions.length > 0
@@ -200,7 +200,7 @@ const coreControllerFactory = factories.createCoreController(
           'plugin::hzd-plugin.litter',
           {
             populate: LITTERED_FIRST_POPULATE,
-            sort: ['expectedDateOfBirth:desc', 'plannedDateOfBirth:desc'],
+            sort: ['expectedDateOfBirth:asc', 'plannedDateOfBirth:asc'],
             page: 1,
             pageSize: 10000,
             filters: filterConditions.length > 0
