@@ -156,6 +156,7 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				filters: variables.filters as Record<string, unknown>,
 				sort: variables.sort as string[],
 				populate: Object.fromEntries(POPULATE_CALENDAR_ENTRY.entries()),
+				pagination: { limit: -1 },
 			})
 			const itemsArray = await fetchEntityList<CalendarItem>(
 				'calendar-entries',
@@ -234,6 +235,7 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				filters: variables.filters as Record<string, unknown>,
 				sort: variables.sort as string[],
 				populate: Object.fromEntries(POPULATE_CALENDAR_ENTRY.entries()),
+				pagination: { limit: -1 },
 			})
 			const itemsArray = await fetchEntityList<CalendarItem>(
 				'calendar-entries',
