@@ -161,33 +161,71 @@ const coreControllerFactory = factories.createCoreController(
             ? sortRaw.filter((s): s is string => typeof s === 'string').filter(Boolean)
             : []
 
-      let sort: string[]
       if (sortList.length > 0) {
-        sort = sortList
-      } else {
-        sort = [
-          'LitterStatus:asc',
-          'COALESCE(dateOfBirth, expectedDateOfBirth, plannedDateOfBirth):desc',
-        ]
+        const result = await findDocumentsPage(
+          strapi,
+          'plugin::hzd-plugin.litter',
+          {
+            populate: LITTERED_FIRST_POPULATE,
+            sort: sortList,
+            page,
+            pageSize,
+            filters: filterConditions.length > 0
+              ? { $and: filterConditions }
+              : undefined,
+          },
+        )
+        return {
+          data: result.results,
+          meta: { pagination: result.pagination },
+        }
       }
 
-      const result = await findDocumentsPage(
-        strapi,
-        'plugin::hzd-plugin.litter',
-        {
-          populate: LITTERED_FIRST_POPULATE,
-          sort,
-          page,
-          pageSize,
-          filters: filterConditions.length > 0
-            ? { $and: filterConditions }
-            : undefined,
-        },
-      )
+      const [litteredResult, otherResult] = await Promise.all([
+        findDocumentsPage(
+          strapi,
+          'plugin::hzd-plugin.litter',
+          {
+            populate: LITTERED_FIRST_POPULATE,
+            sort: ['dateOfBirth:desc', 'expectedDateOfBirth:desc'],
+            page: 1,
+            pageSize: 10000,
+            filters: filterConditions.length > 0
+              ? { $and: [...filterConditions, { LitterStatus: { $eq: 'Littered' } }] }
+              : { LitterStatus: { $eq: 'Littered' } },
+          },
+        ),
+        findDocumentsPage(
+          strapi,
+          'plugin::hzd-plugin.litter',
+          {
+            populate: LITTERED_FIRST_POPULATE,
+            sort: ['expectedDateOfBirth:desc', 'plannedDateOfBirth:desc'],
+            page: 1,
+            pageSize: 10000,
+            filters: filterConditions.length > 0
+              ? { $and: [...filterConditions, { LitterStatus: { $ne: 'Littered' } }] }
+              : { LitterStatus: { $ne: 'Littered' } },
+          },
+        ),
+      ])
+
+      const merged = [...litteredResult.results, ...otherResult.results]
+
+      const total = merged.length
+      const start = (page - 1) * pageSize
+      const paged = merged.slice(start, start + pageSize)
 
       return {
-        data: result.results,
-        meta: { pagination: result.pagination },
+        data: paged,
+        meta: {
+          pagination: {
+            page,
+            pageSize,
+            pageCount: Math.max(1, Math.ceil(total / pageSize)),
+            total,
+          },
+        },
       }
     },
   }),
