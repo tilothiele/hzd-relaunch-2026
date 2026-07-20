@@ -6,9 +6,6 @@ import { factories } from '@strapi/strapi'
 import type { Core } from '@strapi/strapi'
 import { findDocumentsPage } from '../utils/document-pagination'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyController = Record<string, any>
-
 const VALID_STATUSES = ['Planned', 'Manted', 'Littered', 'Closed'] as const
 const VALID_PUPPY_COLORS = ['S', 'SM', 'B'] as const
 
@@ -123,6 +120,31 @@ const toFilterConditions = (query: LitterSearchQuery): Array<Record<string, unkn
   return conditions
 }
 
+const LITTERED_FIRST_POPULATE = {
+  breeder: {
+    fields: ['documentId', 'kennelName', 'WebsiteUrl'],
+    populate: {
+      member: {
+        fields: ['documentId', 'firstName', 'lastName', 'zip', 'city', 'locationLat', 'locationLng'],
+      },
+    },
+  },
+  mother: {
+    fields: ['documentId', 'fullKennelName', 'givenName', 'color'],
+    populate: { avatar: true },
+  },
+  stuntDog: {
+    fields: ['documentId', 'fullKennelName', 'givenName', 'color'],
+    populate: { avatar: true },
+  },
+  AmountRS: true,
+  AmountRSM: true,
+  AmountRB: true,
+  AmountHS: true,
+  AmountHSM: true,
+  AmountHB: true,
+}
+
 const coreControllerFactory = factories.createCoreController(
   'plugin::hzd-plugin.litter',
   ({ strapi }: { strapi: Core.Strapi }) => ({
@@ -138,36 +160,22 @@ const coreControllerFactory = factories.createCoreController(
           : Array.isArray(sortRaw)
             ? sortRaw.filter((s): s is string => typeof s === 'string').filter(Boolean)
             : []
-      const sort = sortList.length > 0 ? sortList : ['dateOfBirth:desc', 'expectedDateOfBirth:desc']
+
+      let sort: string[]
+      if (sortList.length > 0) {
+        sort = sortList
+      } else {
+        sort = [
+          'LitterStatus:asc',
+          'COALESCE(dateOfBirth, expectedDateOfBirth, plannedDateOfBirth):desc',
+        ]
+      }
 
       const result = await findDocumentsPage(
         strapi,
         'plugin::hzd-plugin.litter',
         {
-          populate: {
-            breeder: {
-              fields: ['documentId', 'kennelName', 'WebsiteUrl'],
-              populate: {
-                member: {
-                  fields: ['documentId', 'firstName', 'lastName', 'zip', 'city', 'locationLat', 'locationLng'],
-                },
-              },
-            },
-            mother: {
-              fields: ['documentId', 'fullKennelName', 'givenName', 'color'],
-              populate: { avatar: true },
-            },
-            stuntDog: {
-              fields: ['documentId', 'fullKennelName', 'givenName', 'color'],
-              populate: { avatar: true },
-            },
-            AmountRS: true,
-            AmountRSM: true,
-            AmountRB: true,
-            AmountHS: true,
-            AmountHSM: true,
-            AmountHB: true,
-          },
+          populate: LITTERED_FIRST_POPULATE,
           sort,
           page,
           pageSize,
