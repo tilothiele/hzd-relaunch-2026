@@ -16,4 +16,5 @@ export default ({ env }) => ({
     remote: {
       enabled: true,
     },
+  }
 });
