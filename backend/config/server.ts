@@ -9,12 +9,4 @@ export default ({ env }) => ({
       level: env('LOG_LEVEL', 'debug'),
     },
   },
-  transfer: {
-    token: {
-      salt: env("API_TOKEN_SALT"),
-    },
-    remote: {
-      enabled: true,
-    },
-  }
 });
