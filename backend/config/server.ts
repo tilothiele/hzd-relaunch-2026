@@ -9,4 +9,11 @@ export default ({ env }) => ({
       level: env('LOG_LEVEL', 'debug'),
     },
   },
+  transfer: {
+    token: {
+      salt: env("TRANSFER_TOKEN_SALT"),
+    },
+    remote: {
+      enabled: true,
+    },
 });
