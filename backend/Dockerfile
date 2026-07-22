@@ -57,13 +57,13 @@ WORKDIR /opt/app
 # Install pnpm globally so the CMD works without relying on node_modules/.bin/pnpm.
 RUN npm install -g pnpm@10.20.0
 
-# Pull in only what is needed at runtime: production node_modules + built artefacts.
-COPY --from=build --chown=node:node /opt/app/package.json ./
-COPY --from=build --chown=node:node /opt/app/pnpm-lock.yaml ./
-COPY --from=build --chown=node:node /opt/scripts ./scripts
+# Copy built artefacts (compiled config/, dist/, public/, ...) into the runtime image.
+COPY --from=build --chown=node:node /opt/app ./
 
 # Copy node_modules (incl. already-built native binaries for Node 24) from the deps stage.
-COPY --from=deps --chown=node:node /opt/node_modules ./node_modules
+# This must come AFTER the app copy to keep the correct node_modules (the COPY ./. above
+# would otherwise be overwritten by this layer).
+COPY --from=deps --chown=node:node /opt/node_modules /opt/app/node_modules
 
 EXPOSE 1337
 CMD ["pnpm", "run", "start"]
