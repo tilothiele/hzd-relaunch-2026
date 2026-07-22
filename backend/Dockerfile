@@ -49,21 +49,21 @@ RUN apk add --no-cache postgresql-client sqlite vips git
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
+ENV PNPM_HOME=/usr/local/share/pnpm \
+    PATH=/usr/local/share/pnpm:/opt/app/node_modules/.bin:$PATH
 
 WORKDIR /opt/app
+
+# Install pnpm globally so the CMD works without relying on node_modules/.bin/pnpm.
+RUN npm install -g pnpm@10.20.0
 
 # Pull in only what is needed at runtime: production node_modules + built artefacts.
 COPY --from=build --chown=node:node /opt/app/package.json ./
 COPY --from=build --chown=node:node /opt/app/pnpm-lock.yaml ./
 COPY --from=build --chown=node:node /opt/scripts ./scripts
 
-# Re-install production-only deps without running native rebuild scripts.
-# We copy the .pnpm store and the symlinked node_modules from the deps stage so
-# native binaries built for Node 24 are reused untouched.
-# COPY --from=deps /opt/node_modules ./node_modules
+# Copy node_modules (incl. already-built native binaries for Node 24) from the deps stage.
+COPY --from=deps --chown=node:node /opt/node_modules ./node_modules
 
-RUN chown -R node:node /opt/app
-USER node
-ENV PATH=/opt/app/node_modules/.bin:$PATH
 EXPOSE 1337
 CMD ["pnpm", "run", "start"]
