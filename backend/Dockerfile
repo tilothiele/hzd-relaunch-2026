@@ -41,6 +41,11 @@ RUN if [ -f "package.json" ]; then pnpm install && pnpm run build; fi
 WORKDIR /opt/app
 RUN pnpm run build
 
+# Drop the dev-time node_modules (with all the @strapi/sdk-plugin devDeps etc.) so that
+# the production stage can COPY its own pre-built node_modules in without colliding
+# with an existing directory from the build stage.
+RUN rm -rf /opt/app/node_modules
+
 # Creating final production image
 FROM node:24-alpine AS production
 
@@ -61,8 +66,8 @@ RUN npm install -g pnpm@10.20.0
 COPY --from=build --chown=node:node /opt/app ./
 
 # Copy node_modules (incl. already-built native binaries for Node 24) from the deps stage.
-# This must come AFTER the app copy to keep the correct node_modules (the COPY ./. above
-# would otherwise be overwritten by this layer).
+# The build-stage node_modules was already removed above so this COPY does not collide
+# with an existing directory.
 COPY --from=deps --chown=node:node /opt/node_modules /opt/app/node_modules
 
 EXPOSE 1337
