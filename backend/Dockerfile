@@ -1,21 +1,36 @@
 # Creating multi-stage build for production
-FROM node:22-alpine AS build
+FROM node:24-alpine AS deps
 
-RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev git > /dev/null 2>&1
+# Build dependencies for native modules (better-sqlite3, sharp).
+RUN apk update && apk add --no-cache \
+    build-base \
+    gcc \
+    g++ \
+    make \
+    autoconf \
+    automake \
+    libtool \
+    python3 \
+    zlib-dev \
+    libpng-dev \
+    vips-dev \
+    git \
+    > /dev/null 2>&1
 
 # Install pnpm
 RUN npm install -g pnpm@10.20.0
-
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
 
 WORKDIR /opt/
 COPY package.json pnpm-lock.yaml ./
 COPY scripts ./scripts
 
-# Generate lockfile with overrides
-RUN pnpm install
+# Install all dependencies (incl. devDependencies for the build step).
+# Native modules are compiled here against the correct Node 24 ABI.
+RUN pnpm install --frozen-lockfile
 ENV PATH=/opt/node_modules/.bin:$PATH
+
+# === Build stage: compile TypeScript / webpack bundles ===
+FROM deps AS build
 
 WORKDIR /opt/app
 COPY . .
@@ -27,27 +42,28 @@ WORKDIR /opt/app
 RUN pnpm run build
 
 # Creating final production image
-FROM node:22-alpine AS production
+FROM node:24-alpine AS production
 
-RUN apk add --no-cache postgresql-client sqlite
+# Runtime-only deps for sqlite + vips + git (Strapi plugins sometimes shell-out to git).
+RUN apk add --no-cache postgresql-client sqlite vips git
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-WORKDIR /opt/
-COPY --from=build /opt/package.json /opt/pnpm-lock.yaml ./
-COPY --from=build /opt/scripts ./scripts
-
-# Install pnpm
-RUN npm install -g pnpm@10.20.0
-
-RUN pnpm install --frozen-lockfile --prod --force
-ENV PATH=/opt/node_modules/.bin:$PATH
-
 WORKDIR /opt/app
-COPY --from=build /opt/app ./
+
+# Pull in only what is needed at runtime: production node_modules + built artefacts.
+COPY --from=build --chown=node:node /opt/app/package.json ./
+COPY --from=build --chown=node:node /opt/app/pnpm-lock.yaml ./
+COPY --from=build --chown=node:node /opt/scripts ./scripts
+
+# Re-install production-only deps without running native rebuild scripts.
+# We copy the .pnpm store and the symlinked node_modules from the deps stage so
+# native binaries built for Node 24 are reused untouched.
+# COPY --from=deps /opt/node_modules ./node_modules
 
 RUN chown -R node:node /opt/app
 USER node
+ENV PATH=/opt/app/node_modules/.bin:$PATH
 EXPOSE 1337
 CMD ["pnpm", "run", "start"]

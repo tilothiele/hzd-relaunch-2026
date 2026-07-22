@@ -33,7 +33,9 @@
     "bottleneck": "^2.19.5",
     "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.11.5",
+    "node-addon-api": "^8.3.0",
     "node-cron": "^4.2.1",
+    "node-gyp": "^11.5.0",
     "pg": "^8.16.3",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
@@ -52,7 +54,7 @@
     "typescript": "5.9.2"
   },
   "engines": {
-    "node": ">=20.0.0 <=22.x.x",
+    "node": ">=22.0.0 <=26.x.x",
     "pnpm": ">=9.0.0"
   },
   "strapi": {
@@ -61,11 +63,7 @@
   },
   "pnpm": {
     "overrides": {
-      "@strapi/admin": "5.45.1",
-      "@strapi/content-manager": "5.45.1",
-      "@strapi/core": "5.45.1",
-      "@strapi/types": "5.45.1",
-      "@strapi/utils": "5.45.1"
+      "sharp": "^0.34.5"
     },
     "onlyBuiltDependencies": [
       "@swc/core",
