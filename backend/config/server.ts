@@ -4,6 +4,11 @@ export default ({ env }) => ({
   app: {
     keys: env.array('APP_KEYS'),
   },
+  transfer: {
+    remote: {
+      enabled: true, // must NOT be false
+    }
+  },
   logger: {
     config: {
       level: env('LOG_LEVEL', 'debug'),

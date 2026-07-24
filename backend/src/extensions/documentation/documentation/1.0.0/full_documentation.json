@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-07-21T21:26:18.054Z"
+    "x-generation-date": "2026-07-24T10:01:06.410Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -183,7 +183,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -689,7 +699,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -1195,7 +1215,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -1701,7 +1731,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -2207,7 +2247,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -2713,7 +2763,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -3219,7 +3279,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -3725,7 +3795,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -4231,7 +4311,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -4737,7 +4827,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -5243,7 +5343,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -5566,7 +5676,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -6072,7 +6192,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -6578,7 +6708,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -6901,7 +7041,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -7407,7 +7557,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -7913,7 +8073,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -8419,7 +8589,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -8925,7 +9105,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -9431,7 +9621,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -9937,7 +10137,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -10443,7 +10653,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -10949,7 +11169,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -11455,7 +11685,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -11961,7 +12201,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -12467,7 +12717,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -12973,7 +13233,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -13479,7 +13749,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
@@ -13985,7 +14265,17 @@
             "deprecated": false,
             "required": false,
             "schema": {
-              "type": "string"
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
             }
           },
           {
