@@ -61,6 +61,13 @@ const sectionComponentPopulate = (
 					HeroCta: true,
 				},
 			}
+		case 'blocks.simple-cta-section':
+			return {
+				populate: {
+					CtaBackgroundImage: true,
+					CtaActionButton: true,
+				},
+			}
 		case 'blocks.teaser-text-with-image':
 			return {
 				populate: {

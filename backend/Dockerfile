@@ -17,16 +17,14 @@ RUN apk update && apk add --no-cache \
     git \
     > /dev/null 2>&1
 
-# Install pnpm
-RUN npm install -g pnpm@10.20.0
-
 WORKDIR /opt/
-COPY package.json pnpm-lock.yaml ./
+COPY package.json package-lock.json ./
+COPY .npmrc ./
 COPY scripts ./scripts
 
 # Install all dependencies (incl. devDependencies for the build step).
 # Native modules are compiled here against the correct Node 24 ABI.
-RUN pnpm install --frozen-lockfile
+RUN npm ci
 ENV PATH=/opt/node_modules/.bin:$PATH
 
 # === Build stage: compile TypeScript / webpack bundles ===
@@ -37,9 +35,9 @@ COPY . .
 
 # Build plugin first before building Strapi
 WORKDIR /opt/app/src/plugins/hzd-plugin
-RUN if [ -f "package.json" ]; then pnpm install && pnpm run build; fi
+RUN if [ -f "package.json" ]; then npm install && npm run build; fi
 WORKDIR /opt/app
-RUN pnpm run build
+RUN npm run build
 
 # Drop the dev-time node_modules (with all the @strapi/sdk-plugin devDeps etc.) so that
 # the production stage can COPY its own pre-built node_modules in without colliding
@@ -54,13 +52,9 @@ RUN apk add --no-cache postgresql-client sqlite vips git
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
-ENV PNPM_HOME=/usr/local/share/pnpm \
-    PATH=/usr/local/share/pnpm:/opt/app/node_modules/.bin:$PATH
+ENV PATH=/opt/app/node_modules/.bin:$PATH
 
 WORKDIR /opt/app
-
-# Install pnpm globally so the CMD works without relying on node_modules/.bin/pnpm.
-RUN npm install -g pnpm@10.20.0
 
 # Copy built artefacts (compiled config/, dist/, public/, ...) into the runtime image.
 COPY --from=build --chown=node:node /opt/app ./
@@ -71,4 +65,4 @@ COPY --from=build --chown=node:node /opt/app ./
 COPY --from=deps --chown=node:node /opt/node_modules /opt/app/node_modules
 
 EXPOSE 1337
-CMD ["pnpm", "run", "start"]
+CMD ["npm", "run", "start"]

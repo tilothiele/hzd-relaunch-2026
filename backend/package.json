@@ -5,6 +5,7 @@
   "description": "HZD Website Relaunch 2026",
   "scripts": {
     "build": "NODE_OPTIONS=--max-old-space-size=4096 strapi build",
+    "build:plugin": "npm --prefix src/plugins/hzd-plugin run build",
     "console": "strapi console",
     "deploy": "strapi deploy",
     "dev": "strapi develop",
@@ -22,8 +23,9 @@
     "@_sh/strapi-plugin-ckeditor": "^7.1.1",
     "@ckeditor/strapi-plugin-ckeditor": "^1.1.2",
     "@sklinet/strapi-plugin-tinymce": "^1.1.8",
+    "@strapi/icons": "^2.2.3",
     "@strapi/plugin-cloud": "5.50.2",
-    "@strapi/plugin-documentation": "^5.35.0",
+    "@strapi/plugin-documentation": "5.50.2",
     "@strapi/plugin-users-permissions": "5.50.2",
     "@strapi/provider-email-nodemailer": "5.50.2",
     "@strapi/strapi": "5.50.2",
@@ -31,19 +33,28 @@
     "@types/node-cron": "^3.0.11",
     "better-sqlite3": "11.3.0",
     "bottleneck": "^2.19.5",
+    "debug": "4.4.3",
+    "es-toolkit": "1.39.5",
+    "extend": "3.0.2",
+    "fuzzysort": "3.1.0",
     "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.11.5",
+    "nanoclone": "0.2.1",
     "node-addon-api": "^8.3.0",
     "node-cron": "^4.2.1",
     "node-gyp": "^11.5.0",
     "pg": "^8.16.3",
+    "property-expr": "2.0.6",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "react-intl": "^6.6.2",
     "react-router-dom": "^6.0.0",
     "strapi-plugin-backup": "^2.0.1",
     "strapi-plugin-webp-converter": "^1.0.4",
     "strapi-plugin-wysiwyg-react-md-editor": "^5.8.2",
-    "styled-components": "^6.0.0"
+    "styled-components": "^6.0.0",
+    "toposort": "2.0.2",
+    "yup": "0.32.9"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -53,34 +64,16 @@
     "ts-node": "^10.9.2",
     "typescript": "5.9.2"
   },
+  "overrides": {
+    "sharp": "^0.34.5",
+    "@strapi/admin": "5.50.2"
+  },
   "engines": {
     "node": ">=22.0.0 <=26.x.x",
-    "pnpm": ">=9.0.0"
+    "npm": ">=10.0.0"
   },
   "strapi": {
     "uuid": "c9487574-a864-47e3-a97f-45ca3fd7af01",
     "installId": "d7ec222baeace4a0333c8d0f3ab3bea09258efc3cd77b3e8c9fb31fccb62aba6"
-  },
-  "pnpm": {
-    "overrides": {
-      "sharp": "^0.34.5"
-    },
-    "onlyBuiltDependencies": [
-      "@swc/core",
-      "aws-sdk",
-      "better-sqlite3",
-      "core-js-pure",
-      "esbuild",
-      "sharp"
-    ],
-    "peerDependencyRules": {
-      "allowAny": [
-        "@ai-sdk/google",
-        "@ai-sdk/provider-utils",
-        "@ai-sdk/react",
-        "@ai-sdk/gateway",
-        "ai"
-      ]
-    }
   }
 }

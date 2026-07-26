@@ -1,6 +1,6 @@
 /**
  * Debug-Skript zum Prüfen der Rollen
- * Führe aus: pnpm strapi console
+ * Führe aus: npm run strapi console
  * Dann: require('./src/plugins/hzd-plugin/server/src/debug-roles').default(strapi)
  */
 

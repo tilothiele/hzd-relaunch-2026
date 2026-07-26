@@ -77,6 +77,10 @@ function appendSectionsDeepPopulate(
 				params.set(`${base}[HeroImage]`, 'true')
 				params.set(`${base}[HeroCta]`, '*')
 				break
+			case 'blocks.simple-cta-section':
+				params.set(`${base}[CtaBackgroundImage]`, 'true')
+				params.set(`${base}[CtaActionButton]`, '*')
+				break
 			case 'blocks.teaser-text-with-image':
 				params.set(`${base}[Image]`, 'true')
 				params.set(`${base}[ActionButton]`, '*')

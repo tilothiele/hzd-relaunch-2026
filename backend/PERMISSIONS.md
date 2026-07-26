@@ -59,7 +59,7 @@ Alternativ kannst du die Permissions auch über die Strapi Console setzen:
 
 ```bash
 cd backend
-pnpm strapi console
+npm run strapi console
 ```
 
 Dann in der Console:

@@ -1,6 +1,6 @@
 /**
  * Direktes Skript zum Anlegen der Rollen
- * Führe aus: pnpm strapi console
+ * Führe aus: npm run strapi console
  * Dann: require('./src/plugins/hzd-plugin/server/src/create-roles').default(strapi)
  */
 
