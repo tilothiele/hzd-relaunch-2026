@@ -104,7 +104,9 @@ function appendSectionsDeepPopulate(
 				params.set(`${base}[news_article_category][fields][2]`, 'CategoryDescription')
 				break
 			default:
-				params.set(base, 'true')
+				// Kein `[populate]=true` — Strapi 5 interpretiert den Wert sonst als Key "true".
+				// Für Blocks ohne Relationen reicht, den Block selbst zu aktivieren.
+				params.set(`${on}[${component}]`, 'true')
 				break
 		}
 	}
