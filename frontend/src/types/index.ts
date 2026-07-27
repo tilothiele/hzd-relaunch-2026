@@ -751,6 +751,7 @@ export interface CalendarItem {
 	DueDate?: string | null
 	AnmeldeLinkVisibleFrom?: string | null
 	ErgebnisLinkVisibleFrom?: string | null
+	FlagHide?: boolean | null
 	createdAt?: string | null
 	updatedAt?: string | null
 	publishedAt?: string | null

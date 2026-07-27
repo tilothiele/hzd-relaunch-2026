@@ -586,6 +586,7 @@ export interface ApiCalendarEntryCalendarEntry
           preset: 'defaultHtml';
         }
       >;
+    FlagHide: Schema.Attribute.Boolean;
     form: Schema.Attribute.Relation<'oneToOne', 'api::form.form'>;
     Headline: Schema.Attribute.String & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;

@@ -21,6 +21,18 @@ function getLocalDateIso(d: Date): string {
 	return `${y}-${m}-${day}`
 }
 
+/** FlagHide muss null oder false sein (nicht true). */
+const FLAG_HIDE_VISIBLE_FILTER = {
+	or: [
+		{ FlagHide: { null: true } },
+		{ FlagHide: { eq: false } },
+	],
+}
+
+function isFlagHideVisible(item: CalendarItem): boolean {
+	return item.FlagHide !== true
+}
+
 interface CalendarSearchProps {
 	strapiBaseUrl?: string | null
 	theme?: ThemeDefinition
@@ -203,6 +215,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 						},
 					},
 				},
+				FLAG_HIDE_VISIBLE_FILTER,
 				{
 					or: [
 						{ Date: { gte: todayIso } },
@@ -244,7 +257,10 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 			)
 			const nowTs = Date.now()
 			const visibleItems = itemsArray.filter(
-				(item) => isWithinVisibility(item, nowTs) && isTodayOrFuture(item),
+				(item) =>
+					isFlagHideVisible(item)
+					&& isWithinVisibility(item, nowTs)
+					&& isTodayOrFuture(item),
 			)
 			setAllCalendarItems(visibleItems)
 		} catch (err) {
@@ -273,6 +289,7 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 						},
 					},
 				},
+				FLAG_HIDE_VISIBLE_FILTER,
 				{
 					or: [
 						{ Date: { gte: todayIso } },
@@ -323,7 +340,10 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 			)
 			const nowTs = Date.now()
 			const visibleItems = itemsArray.filter(
-				(item) => isWithinVisibility(item, nowTs) && isTodayOrFuture(item),
+				(item) =>
+					isFlagHideVisible(item)
+					&& isWithinVisibility(item, nowTs)
+					&& isTodayOrFuture(item),
 			)
 			setCalendarItems(visibleItems)
 		} catch (err) {

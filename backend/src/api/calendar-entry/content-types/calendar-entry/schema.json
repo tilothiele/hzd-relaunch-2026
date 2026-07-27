@@ -89,6 +89,9 @@
     },
     "ErgebnisLinkVisibleFrom": {
       "type": "datetime"
+    },
+    "FlagHide": {
+      "type": "boolean"
     }
   }
 }
