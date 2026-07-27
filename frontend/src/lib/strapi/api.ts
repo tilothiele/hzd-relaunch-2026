@@ -29,6 +29,7 @@ import type {
 	ChampionSearchParams,
 	NewsArticleSearchPageResult,
 	NewsArticleSearchParams,
+	NewsArticleTag,
 	Dog,
 	DogSearchResult,
 	FormInstance,
@@ -811,6 +812,39 @@ export async function fetchSupplementalDocumentsForGroup(
 	)
 }
 
+/**
+ * Tags, die an mind. einem Artikel der gegebenen Kategorie hängen.
+ */
+export async function fetchNewsArticleTagsByCategory(
+	categoryDocumentId: string,
+	options: StrapiRequestOptions = {},
+): Promise<NewsArticleTag[]> {
+	const trimmedId = categoryDocumentId.trim()
+	if (!trimmedId) {
+		return []
+	}
+
+	const query = buildStrapiQuery({
+		filters: {
+			news_articles: {
+				category: {
+					documentId: { eq: trimmedId },
+				},
+			},
+		},
+		fields: ['documentId', 'Label', 'TagColorHexCode', 'TagBgColorHexCode'],
+		sort: ['Label:asc'],
+		pagination: { pageSize: 200 },
+	})
+
+	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
+	const response = await fetcher<unknown>('news-article-tags', query, {
+		token: options.token,
+	})
+
+	return extractStrapiList<NewsArticleTag>(response)
+}
+
 export async function searchNewsArticles(
 	params: NewsArticleSearchParams = {},
 	options: StrapiRequestOptions = {},
@@ -822,6 +856,12 @@ export async function searchNewsArticles(
 	}
 	if (params.categorySlug?.trim()) {
 		query.set('categorySlug', params.categorySlug.trim())
+	}
+	if (params.searchPhrase?.trim()) {
+		query.set('searchPhrase', params.searchPhrase.trim())
+	}
+	if (params.newsArticleTagIds && params.newsArticleTagIds.length > 0) {
+		query.set('newsArticleTagIds', params.newsArticleTagIds.join(','))
 	}
 	if (params.sort) {
 		const sortValue = Array.isArray(params.sort) ? params.sort.join(',') : params.sort

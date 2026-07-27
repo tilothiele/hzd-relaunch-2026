@@ -198,19 +198,13 @@ export default async function ArticlesCategoryPage({ params, searchParams }: Pag
 			{/* All Articles */}
 			<SectionContainer variant='max-width'>
 				<div className='py-12'>
-					{articles.length > 0 ? (
-						<>
-							<ArticleListWithToggle
-								articles={articles}
-								strapiBaseUrl={baseUrl}
-								theme={theme}
-							/>
-						</>
-					) : (
-						<p className='text-center text-gray-600'>
-							Keine Artikel in dieser Kategorie gefunden.
-						</p>
-					)}
+					<ArticleListWithToggle
+						articles={articles}
+						strapiBaseUrl={baseUrl}
+						theme={theme}
+						categoryDocumentId={category.documentId}
+						pageSize={pageSize}
+					/>
 				</div>
 			</SectionContainer>
 		</MainPageStructure>

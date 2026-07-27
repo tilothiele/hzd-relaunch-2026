@@ -271,9 +271,18 @@ export interface Champion {
 export interface NewsArticleSearchParams {
 	categoryDocumentId?: string
 	categorySlug?: string
+	searchPhrase?: string
+	newsArticleTagIds?: string[]
 	page?: number
 	pageSize?: number
 	sort?: string | string[]
+}
+
+export interface NewsArticleTag {
+	documentId: string
+	Label?: string | null
+	TagColorHexCode?: string | null
+	TagBgColorHexCode?: string | null
 }
 
 export interface NewsArticleSearchPageResult {

@@ -9,6 +9,10 @@ import { findDocumentsPage } from '../../../plugins/hzd-plugin/server/src/utils/
 interface NewsArticleSearchQuery {
 	categoryDocumentId?: string
 	categorySlug?: string
+	searchPhrase?: string
+	newsArticleTagIds?: string | string[]
+	/** Alias: kommagetrennte documentIds oder Array */
+	newsArticleTag?: string | string[]
 	page?: string | number
 	pageSize?: string | number
 	sort?: string | string[]
@@ -79,16 +83,39 @@ const toFilterConditions = (
 				documentId: categoryDocumentId,
 			},
 		})
-		return conditions
+	} else {
+		const categorySlug = typeof query.categorySlug === 'string'
+			? query.categorySlug.trim()
+			: ''
+		if (categorySlug.length > 0) {
+			conditions.push({
+				category: {
+					Slug: categorySlug,
+				},
+			})
+		}
 	}
 
-	const categorySlug = typeof query.categorySlug === 'string'
-		? query.categorySlug.trim()
+	const searchPhrase = typeof query.searchPhrase === 'string'
+		? query.searchPhrase.trim()
 		: ''
-	if (categorySlug.length > 0) {
+	if (searchPhrase.length > 0) {
 		conditions.push({
-			category: {
-				Slug: categorySlug,
+			$or: [
+				{ Headline: { $containsi: searchPhrase } },
+				{ SubHeadline: { $containsi: searchPhrase } },
+				{ TeaserText: { $containsi: searchPhrase } },
+			],
+		})
+	}
+
+	const newsArticleTagIds = toStringArray(
+		query.newsArticleTagIds ?? query.newsArticleTag,
+	)
+	if (newsArticleTagIds.length > 0) {
+		conditions.push({
+			news_article_tags: {
+				documentId: { $in: newsArticleTagIds },
 			},
 		})
 	}

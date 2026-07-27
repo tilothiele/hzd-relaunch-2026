@@ -72,6 +72,8 @@ export async function NewsArticlesSectionComponent({
                     articles={articles}
                     strapiBaseUrl={strapiBaseUrl}
                     theme={theme}
+                    categoryDocumentId={categoryDocumentId}
+                    pageSize={articleLimit}
                 />
             </Box>
         </SectionContainer>

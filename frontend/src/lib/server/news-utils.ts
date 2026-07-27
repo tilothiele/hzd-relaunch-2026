@@ -24,6 +24,7 @@ export interface NewsArticle {
 		CategoryName?: string | null
 	} | null
 	news_article_tags?: {
+		documentId?: string
 		Label?: string | null
 		TagColorHexCode?: string | null
 		TagBgColorHexCode?: string | null
@@ -33,14 +34,20 @@ export interface NewsArticle {
 export async function fetchNewsArticles({
 	limit = 3,
 	categoryDocumentId,
+	searchPhrase,
+	newsArticleTagIds,
 }: {
 	limit?: number
 	categoryDocumentId?: string
+	searchPhrase?: string
+	newsArticleTagIds?: string[]
 } = {}): Promise<NewsArticle[]> {
 	try {
 		const { newsArticles } = await searchNewsArticles(
 			{
 				categoryDocumentId,
+				searchPhrase,
+				newsArticleTagIds,
 				pageSize: limit,
 				sort: [...NEWS_ARTICLE_DEFAULT_SORT],
 			},
