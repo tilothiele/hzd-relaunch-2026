@@ -4,7 +4,7 @@ import { useDogs } from '@/hooks/use-dogs'
 import { Box, CircularProgress, Pagination, Typography, Modal, IconButton, Chip } from '@mui/material'
 import Image from 'next/image'
 import { useMemo, useState } from 'react'
-import { resolveDogImage } from '@/lib/dog-utils'
+import { resolveDogImage, formatSexWithHeight } from '@/lib/dog-utils'
 import { formatDate } from '@/lib/date-utils'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import CloseIcon from '@mui/icons-material/Close'
@@ -114,6 +114,11 @@ export function BreederDogsList({
 										</button>
 									</h4>
 									<div className='text-xs text-gray-600 space-y-0.5'>
+										{dog.Height ? (
+											<p>
+												<span className='font-medium'>Schulterhöhe:</span> {dog.Height}cm
+											</p>
+										) : null}
 										{dog.dateOfBirth && (
 											<p>
 												<span className='font-medium'>Geb.:</span> {formatDate(dog.dateOfBirth)}

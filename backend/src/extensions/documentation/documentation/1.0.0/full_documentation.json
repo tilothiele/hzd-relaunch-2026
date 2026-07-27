@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-07-26T20:12:50.029Z"
+    "x-generation-date": "2026-07-27T10:08:46.204Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -19816,6 +19816,12 @@
                               "Disabled": {
                                 "type": "boolean"
                               },
+                              "Height": {
+                                "type": "integer"
+                              },
+                              "NonHzdOriginNote": {
+                                "type": "string"
+                              },
                               "createdAt": {
                                 "type": "string",
                                 "format": "date-time"
@@ -24763,6 +24769,12 @@
                                     "Disabled": {
                                       "type": "boolean"
                                     },
+                                    "Height": {
+                                      "type": "integer"
+                                    },
+                                    "NonHzdOriginNote": {
+                                      "type": "string"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -29389,6 +29401,12 @@
               "Disabled": {
                 "type": "boolean"
               },
+              "Height": {
+                "type": "integer"
+              },
+              "NonHzdOriginNote": {
+                "type": "string"
+              },
               "createdAt": {
                 "type": "string",
                 "format": "date-time"
@@ -32745,6 +32763,12 @@
                               },
                               "Disabled": {
                                 "type": "boolean"
+                              },
+                              "Height": {
+                                "type": "integer"
+                              },
+                              "NonHzdOriginNote": {
+                                "type": "string"
                               },
                               "createdAt": {
                                 "type": "string",
@@ -37001,6 +37025,12 @@
                                     "Disabled": {
                                       "type": "boolean"
                                     },
+                                    "Height": {
+                                      "type": "integer"
+                                    },
+                                    "NonHzdOriginNote": {
+                                      "type": "string"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -41116,6 +41146,12 @@
                                 "Disabled": {
                                   "type": "boolean"
                                 },
+                                "Height": {
+                                  "type": "integer"
+                                },
+                                "NonHzdOriginNote": {
+                                  "type": "string"
+                                },
                                 "createdAt": {
                                   "type": "string",
                                   "format": "date-time"
@@ -44448,6 +44484,12 @@
                                     },
                                     "Disabled": {
                                       "type": "boolean"
+                                    },
+                                    "Height": {
+                                      "type": "integer"
+                                    },
+                                    "NonHzdOriginNote": {
+                                      "type": "string"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -48224,6 +48266,12 @@
                               },
                               "Disabled": {
                                 "type": "boolean"
+                              },
+                              "Height": {
+                                "type": "integer"
+                              },
+                              "NonHzdOriginNote": {
+                                "type": "string"
                               },
                               "createdAt": {
                                 "type": "string",
@@ -56865,6 +56913,12 @@
                                     "Disabled": {
                                       "type": "boolean"
                                     },
+                                    "Height": {
+                                      "type": "integer"
+                                    },
+                                    "NonHzdOriginNote": {
+                                      "type": "string"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -60621,6 +60675,12 @@
                               },
                               "Disabled": {
                                 "type": "boolean"
+                              },
+                              "Height": {
+                                "type": "integer"
+                              },
+                              "NonHzdOriginNote": {
+                                "type": "string"
                               },
                               "createdAt": {
                                 "type": "string",
@@ -67443,6 +67503,12 @@
                                         },
                                         "Disabled": {
                                           "type": "boolean"
+                                        },
+                                        "Height": {
+                                          "type": "integer"
+                                        },
+                                        "NonHzdOriginNote": {
+                                          "type": "string"
                                         },
                                         "createdAt": {
                                           "type": "string",
@@ -81488,6 +81554,12 @@
                               "Disabled": {
                                 "type": "boolean"
                               },
+                              "Height": {
+                                "type": "integer"
+                              },
+                              "NonHzdOriginNote": {
+                                "type": "string"
+                              },
                               "createdAt": {
                                 "type": "string",
                                 "format": "date-time"
@@ -85432,6 +85504,12 @@
                               },
                               "Disabled": {
                                 "type": "boolean"
+                              },
+                              "Height": {
+                                "type": "integer"
+                              },
+                              "NonHzdOriginNote": {
+                                "type": "string"
                               },
                               "createdAt": {
                                 "type": "string",
@@ -89473,6 +89551,12 @@
                               "Disabled": {
                                 "type": "boolean"
                               },
+                              "Height": {
+                                "type": "integer"
+                              },
+                              "NonHzdOriginNote": {
+                                "type": "string"
+                              },
                               "createdAt": {
                                 "type": "string",
                                 "format": "date-time"
@@ -93114,6 +93198,12 @@
                                         },
                                         "Disabled": {
                                           "type": "boolean"
+                                        },
+                                        "Height": {
+                                          "type": "integer"
+                                        },
+                                        "NonHzdOriginNote": {
+                                          "type": "string"
                                         },
                                         "createdAt": {
                                           "type": "string",

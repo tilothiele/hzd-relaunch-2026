@@ -6,7 +6,7 @@ import { useConfig } from '@/hooks/use-config'
 import type { Litter, LitterSearchResult } from '@/types'
 
 export type LitterStatus = 'Planned' | 'Manted' | 'Littered' | 'Closed' | ''
-export type PageSize = 5 | 10 | 20 | 50 | 100
+export type PageSize = 10 | 20 | 50 | 100
 
 interface LittersFilters {
     breederFilter?: string
@@ -58,7 +58,7 @@ export function useLitters(options: UseLittersOptions = {}) {
     const selectedMaleColors = filters.selectedMaleColors ?? []
     const selectedFemaleColors = filters.selectedFemaleColors ?? []
     const page = pagination.page ?? 1
-    const pageSize = pagination.pageSize ?? 10
+    const pageSize = pagination.pageSize ?? 20
 
     const searchLitters = useCallback(async () => {
         if (!baseUrl || baseUrl.trim().length === 0) {

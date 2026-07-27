@@ -82,7 +82,7 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 	const [selectedMaleColors, setSelectedMaleColors] = useState<string[]>(['S', 'SM', 'B'])
 	const [selectedFemaleColors, setSelectedFemaleColors] = useState<string[]>(['S', 'SM', 'B'])
 	const [page, setPage] = useState(1)
-	const [pageSize, setPageSize] = useState<PageSize>(10)
+	const [pageSize, setPageSize] = useState<PageSize>(20)
 	const [selectedLitter, setSelectedLitter] = useState<Litter | null>(null)
 	const [showMap, setShowMap] = useState(false)
 	const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
@@ -454,7 +454,6 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 						className='rounded border border-gray-300 px-2 py-1 text-sm focus:outline-none'
 						style={{ borderColor: 'transparent', outlineColor: theme.submitButtonColor }}
 					>
-						<option value={5}>5</option>
 						<option value={10}>10</option>
 						<option value={20}>20</option>
 						<option value={50}>50</option>

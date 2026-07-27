@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { Checkbox, Tooltip } from '@mui/material'
 import type { Dog, HzdSetting } from '@/types'
+import { formatSexWithHeight } from '@/lib/dog-utils'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 
 interface DogDataTabProps {
@@ -19,17 +20,6 @@ function getColorLabel(color: string | null | undefined): string {
 			return 'Schwarzmarken'
 		case 'B':
 			return 'Blond'
-		default:
-			return '-'
-	}
-}
-
-function getSexLabel(sex: string | null | undefined): string {
-	switch (sex) {
-		case 'M':
-			return 'Rüde'
-		case 'F':
-			return 'Hündin'
 		default:
 			return '-'
 	}
@@ -156,7 +146,9 @@ export function DogDataTab({ dog, strapiBaseUrl, hzdSetting }: DogDataTabProps) 
 							</div>
 						</Tooltip>
 						<div>
-							<p className='text-base text-gray-900'>{getSexLabel(dog.sex)}</p>
+							<p className='text-base text-gray-900'>
+								{formatSexWithHeight(dog.sex, dog.Height)}
+							</p>
 						</div>
 					</div>
 

@@ -13,7 +13,7 @@ import {
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import CloseIcon from '@mui/icons-material/Close'
 import { useDogs } from '@/hooks/use-dogs'
-import { resolveDogImage } from '@/lib/dog-utils'
+import { resolveDogImage, formatSexWithHeight } from '@/lib/dog-utils'
 import { formatDate } from '@/lib/date-utils'
 import { theme } from '@/themes'
 import type { Dog, HzdSetting } from '@/types'
@@ -103,6 +103,11 @@ export function StudDogsList({
 									</button>
 								</h4>
 								<div className='space-y-0.5 text-xs text-gray-600'>
+									{dog.Height ? (
+										<p>
+											<span className='font-medium'>Schulterhöhe:</span> {dog.Height}cm
+										</p>
+									) : null}
 									{dog.dateOfBirth ? (
 										<p>
 											<span className='font-medium'>Geb.:</span>{' '}

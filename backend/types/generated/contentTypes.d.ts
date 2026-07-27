@@ -1916,6 +1916,7 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
       }>;
     HD: Schema.Attribute.Enumeration<['A1', 'A2', 'B1', 'B2']>;
     HeartCheck: Schema.Attribute.Boolean;
+    Height: Schema.Attribute.Integer;
     Images: Schema.Attribute.Media<'images', true>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -1943,6 +1944,7 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
         maxLength: 30;
       }>;
     mother: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.dog'>;
+    NonHzdOriginNote: Schema.Attribute.String;
     owner: Schema.Attribute.Relation<
       'oneToOne',
       'plugin::users-permissions.user'

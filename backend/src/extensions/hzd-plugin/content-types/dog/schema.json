@@ -172,6 +172,12 @@
     },
     "Disabled": {
       "type": "boolean"
+    },
+    "Height": {
+      "type": "integer"
+    },
+    "NonHzdOriginNote": {
+      "type": "string"
     }
   }
 }

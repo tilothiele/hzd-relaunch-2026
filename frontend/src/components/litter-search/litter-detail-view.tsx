@@ -70,6 +70,7 @@ export function LitterDetailView({
     const breederMember = ((litter.breeder?.member?.firstName || '') + ' ' + (litter.breeder?.member?.lastName || '')).trim()
     const motherName = litter.mother?.fullKennelName ?? litter.mother?.givenName ?? 'Unbekannt'
     const stuntDogName = litter.stuntDog?.fullKennelName ?? litter.stuntDog?.givenName
+    const stuntDogNonHzdOriginNote = litter.stuntDog?.NonHzdOriginNote?.trim()
 
     // Helper to render a Section Header with Back Button
     const SectionHeader = ({ title }: { title: string }) => (
@@ -131,6 +132,7 @@ export function LitterDetailView({
             strapiBaseUrl
         ) || ''
         const name = stuntDogName || 'Unbekannt'
+        const fullKennelName = litter.stuntDog?.fullKennelName ?? name
 
         return (
             <div className='flex flex-col items-center'>
@@ -151,7 +153,14 @@ export function LitterDetailView({
                         </div>
                     </div>
                 </div>
-                <span className="font-semibold text-gray-700 text-sm md:text-base">Vater: {name}</span>
+                <span className="font-semibold text-gray-700 text-sm md:text-base text-center">
+                    {fullKennelName}
+                </span>
+                {stuntDogNonHzdOriginNote ? (
+                    <span className="mt-1 text-center text-sm text-gray-600">
+                        {stuntDogNonHzdOriginNote}
+                    </span>
+                ) : null}
             </div>
         )
     }

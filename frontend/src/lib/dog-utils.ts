@@ -1,5 +1,27 @@
 import type { Dog, HzdSetting } from '@/types'
 
+export function getSexLabel(sex: string | null | undefined): string {
+	switch (sex) {
+		case 'M':
+			return 'Rüde'
+		case 'F':
+			return 'Hündin'
+		default:
+			return '-'
+	}
+}
+
+export function formatSexWithHeight(
+	sex: string | null | undefined,
+	height: number | null | undefined,
+): string {
+	const sexLabel = getSexLabel(sex)
+	if (sexLabel === '-' || height == null || height <= 0) {
+		return sexLabel
+	}
+	return `${sexLabel}, ${height}cm`
+}
+
 /**
  * Resolves the display image for a dog.
  * Priority:

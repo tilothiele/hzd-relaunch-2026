@@ -505,6 +505,7 @@ export interface Dog {
 	fullKennelName?: string | null
 	sex?: 'M' | 'F' | null
 	color?: 'S' | 'SM' | 'B' | null
+	Height?: number | null
 	dateOfBirth?: string | null
 	dateOfDeath?: string | null
 	microchipNo?: string | null
@@ -534,6 +535,7 @@ export interface Dog {
 	Disabled?: boolean | null
 	BreedersIntroduction?: string | null
 	MemosReleased?: string | null
+	NonHzdOriginNote?: string | null
 	breeder?: {
 		kennelName?: string | null
 		member?: {
@@ -659,6 +661,7 @@ export interface Litter {
 		documentId: string
 		fullKennelName?: string | null
 		givenName?: string | null
+		NonHzdOriginNote?: string | null
 		avatar?: Image | null
 		color?: 'S' | 'SM' | 'B' | null
 	} | null

@@ -134,7 +134,7 @@ const LITTERED_FIRST_POPULATE = {
     populate: { avatar: true },
   },
   stuntDog: {
-    fields: ['documentId', 'fullKennelName', 'givenName', 'color'],
+    fields: ['documentId', 'fullKennelName', 'givenName', 'color', 'NonHzdOriginNote'],
     populate: { avatar: true },
   },
   AmountRS: true,
