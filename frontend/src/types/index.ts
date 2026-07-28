@@ -178,6 +178,18 @@ export interface SimpleCtaSection {
 	SimpleCtaAnchor?: string | null
 }
 
+export interface ActionImage {
+	id?: string
+	LinkImage?: Image | null
+	ActionLink?: string | null
+	ActionTitle?: string | null
+}
+
+export interface ActionImagesSection {
+	__typename: 'ComponentBlocksActionImagesSection'
+	ActionImage?: (ActionImage | null)[] | null
+}
+
 export type HeroLayout =
 	| 'Image_left'
 	| 'Image_right'
@@ -324,7 +336,7 @@ export interface PassedDogsSection {
 	id: string
 }
 
-export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | DetailedImageGallerySection | SimpleCtaSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection | DocumentBundleSection | TableOfContentSection | ChampionsSection | PassedDogsSection
+export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | DetailedImageGallerySection | SimpleCtaSection | ActionImagesSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection | DocumentBundleSection | TableOfContentSection | ChampionsSection | PassedDogsSection
 
 export type PageSection = StartpageSection
 

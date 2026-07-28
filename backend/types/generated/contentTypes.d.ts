@@ -1418,6 +1418,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.champions-section',
         'blocks.passed-dogs-section',
         'blocks.detailed-image-gallery-section',
+        'blocks.action-images-section',
       ]
     >;
     SEO: Schema.Attribute.Component<'seo.seo', true>;

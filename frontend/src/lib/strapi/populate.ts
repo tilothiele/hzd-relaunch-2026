@@ -19,6 +19,7 @@ const SECTION_BLOCK_COMPONENTS = [
 	'blocks.image-gallery-section',
 	'blocks.detailed-image-gallery-section',
 	'blocks.simple-cta-section',
+	'blocks.action-images-section',
 	'blocks.news-articles-section',
 	'blocks.contact-group-section',
 	'blocks.contact-mailer-section',
@@ -81,6 +82,9 @@ function appendSectionsDeepPopulate(
 			case 'blocks.simple-cta-section':
 				params.set(`${base}[CtaBackgroundImage]`, 'true')
 				params.set(`${base}[CtaActionButton]`, '*')
+				break
+			case 'blocks.action-images-section':
+				params.set(`${base}[ActionImage][populate][LinkImage]`, 'true')
 				break
 			case 'blocks.teaser-text-with-image':
 				params.set(`${base}[Image]`, 'true')

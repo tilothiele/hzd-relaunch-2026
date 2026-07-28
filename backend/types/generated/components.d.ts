@@ -1,5 +1,15 @@
 import type { Schema, Struct } from '@strapi/strapi';
 
+export interface BlocksActionImagesSection extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_action_images_sections';
+  info: {
+    displayName: 'ActionImagesSection';
+  };
+  attributes: {
+    ActionImage: Schema.Attribute.Component<'links.action-image', true>;
+  };
+}
+
 export interface BlocksBundleDocuments extends Struct.ComponentSchema {
   collectionName: 'components_blocks_bundle_documents';
   info: {
@@ -710,6 +720,18 @@ export interface LinksActionButton extends Struct.ComponentSchema {
   };
 }
 
+export interface LinksActionImage extends Struct.ComponentSchema {
+  collectionName: 'components_links_action_images';
+  info: {
+    displayName: 'ActionImage';
+  };
+  attributes: {
+    ActionLink: Schema.Attribute.String;
+    ActionTitle: Schema.Attribute.String;
+    LinkImage: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+  };
+}
+
 export interface LinksPartnerlLink extends Struct.ComponentSchema {
   collectionName: 'components_links_partnerl_links';
   info: {
@@ -805,6 +827,7 @@ export interface SeoSeo extends Struct.ComponentSchema {
 declare module '@strapi/strapi' {
   export namespace Public {
     export interface ComponentSchemas {
+      'blocks.action-images-section': BlocksActionImagesSection;
       'blocks.bundle-documents': BlocksBundleDocuments;
       'blocks.card-item': BlocksCardItem;
       'blocks.card-section': BlocksCardSection;
@@ -853,6 +876,7 @@ declare module '@strapi/strapi' {
       'layout.padding': LayoutPadding;
       'layout.sos': LayoutSos;
       'links.action-button': LinksActionButton;
+      'links.action-image': LinksActionImage;
       'links.partnerl-link': LinksPartnerlLink;
       'permission.groups': PermissionGroups;
       'permission.restriction': PermissionRestriction;

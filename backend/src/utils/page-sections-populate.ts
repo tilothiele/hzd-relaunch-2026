@@ -9,6 +9,7 @@ export const PAGE_SECTION_BLOCK_COMPONENTS = [
 	'blocks.image-gallery-section',
 	'blocks.detailed-image-gallery-section',
 	'blocks.simple-cta-section',
+	'blocks.action-images-section',
 	'blocks.news-articles-section',
 	'blocks.contact-group-section',
 	'blocks.contact-mailer-section',
@@ -67,6 +68,16 @@ const sectionComponentPopulate = (
 				populate: {
 					CtaBackgroundImage: true,
 					CtaActionButton: true,
+				},
+			}
+		case 'blocks.action-images-section':
+			return {
+				populate: {
+					ActionImage: {
+						populate: {
+							LinkImage: true,
+						},
+					},
 				},
 			}
 		case 'blocks.teaser-text-with-image':

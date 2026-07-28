@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_blocks_action_images_sections",
+  "info": {
+    "displayName": "ActionImagesSection"
+  },
+  "options": {},
+  "attributes": {
+    "ActionImage": {
+      "type": "component",
+      "component": "links.action-image",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}

@@ -41,7 +41,8 @@
         "blocks.table-of-content-section",
         "blocks.champions-section",
         "blocks.passed-dogs-section",
-        "blocks.detailed-image-gallery-section"
+        "blocks.detailed-image-gallery-section",
+        "blocks.action-images-section"
       ]
     },
     "ColorTheme": {

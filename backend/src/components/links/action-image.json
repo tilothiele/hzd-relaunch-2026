@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_links_action_images",
+  "info": {
+    "displayName": "ActionImage"
+  },
+  "options": {},
+  "attributes": {
+    "LinkImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "ActionLink": {
+      "type": "string"
+    },
+    "ActionTitle": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}
