@@ -265,6 +265,9 @@ export interface BlocksSimpleHeroSection extends Struct.ComponentSchema {
     HeroCta: Schema.Attribute.Component<'links.action-button', false>;
     HeroHeadline: Schema.Attribute.String & Schema.Attribute.Required;
     HeroImage: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    HeroImageMouseOver: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
     HeroLayout: Schema.Attribute.Enumeration<
       ['Image left', 'Image right', 'full width', 'full text below']
     > &

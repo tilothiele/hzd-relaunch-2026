@@ -7,6 +7,7 @@ import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { ActionButton } from '@/components/ui/action-button'
 import { SectionContainer } from '../section-container/section-container'
 import { useScrollAnimation } from '@/hooks/use-scroll-animation'
+import { useState } from 'react'
 
 import { FullWidthHeroSectionComponent } from './full-width-hero-section'
 
@@ -56,7 +57,9 @@ export function SimpleHeroSectionComponent({
         triggerOnce: false,
     })
 
+    const [isImageHovered, setIsImageHovered] = useState(false)
     const imageUrl = resolveMediaUrl(section.HeroImage, strapiBaseUrl)
+    const mouseOverImageUrl = resolveMediaUrl(section.HeroImageMouseOver, strapiBaseUrl)
     const imageAlt = section.HeroImage?.alternativeText ?? 'Hero Bild'
     const layout = normalizeHeroLayout(section.HeroLayout)
     const headline = section.HeroHeadline
@@ -104,7 +107,11 @@ export function SimpleHeroSectionComponent({
                     }}
                 >
                     {imageUrl ? (
-                        <div className={`relative w-full ${heightClass}`}>
+                        <div
+                            className={`relative w-full ${heightClass}`}
+                            onMouseEnter={() => setIsImageHovered(true)}
+                            onMouseLeave={() => setIsImageHovered(false)}
+                        >
                             <Image
                                 src={imageUrl}
                                 alt={imageAlt}
@@ -113,6 +120,16 @@ export function SimpleHeroSectionComponent({
                                 priority
                                 unoptimized
                             />
+                            {mouseOverImageUrl ? (
+                                <Image
+                                    src={mouseOverImageUrl}
+                                    alt={section.HeroImageMouseOver?.alternativeText ?? imageAlt}
+                                    fill
+                                    className="object-cover object-center transition-opacity duration-500"
+                                    style={{ opacity: isImageHovered ? 1 : 0 }}
+                                    unoptimized
+                                />
+                            ) : null}
                         </div>
                     ) : null}
 
@@ -164,6 +181,8 @@ export function SimpleHeroSectionComponent({
             <div
                 ref={elementRef}
                 className={`hero relative flex flex-col overflow-hidden md:flex-row ${minHeightClass}`}
+                onMouseEnter={() => setIsImageHovered(true)}
+                onMouseLeave={() => setIsImageHovered(false)}
                 style={{
                     opacity: isVisible ? 1 : 0,
                     transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
@@ -229,6 +248,16 @@ export function SimpleHeroSectionComponent({
                             priority
                             unoptimized
                         />
+                        {mouseOverImageUrl ? (
+                            <Image
+                                src={mouseOverImageUrl}
+                                alt={section.HeroImageMouseOver?.alternativeText ?? imageAlt}
+                                fill
+                                className="object-cover transition-opacity duration-500"
+                                style={{ opacity: isImageHovered ? 1 : 0 }}
+                                unoptimized
+                            />
+                        ) : null}
                         {/* Fade Effect - fades the image edge towards the content side */}
                         {section.FadingBorder ? (
                             <div

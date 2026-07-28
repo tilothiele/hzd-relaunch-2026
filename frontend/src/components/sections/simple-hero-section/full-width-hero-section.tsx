@@ -7,6 +7,7 @@ import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { ActionButton } from '@/components/ui/action-button'
 import { SectionContainer } from '../section-container/section-container'
 import { useScrollAnimation } from '@/hooks/use-scroll-animation'
+import { useState } from 'react'
 
 interface FullWidthHeroSectionComponentProps {
     section: SimpleHeroSection
@@ -24,7 +25,9 @@ export function FullWidthHeroSectionComponent({
         triggerOnce: false,
     })
 
+    const [isImageHovered, setIsImageHovered] = useState(false)
     const imageUrl = resolveMediaUrl(section.HeroImage, strapiBaseUrl)
+    const mouseOverImageUrl = resolveMediaUrl(section.HeroImageMouseOver, strapiBaseUrl)
     const imageAlt = section.HeroImage?.alternativeText ?? 'Hero Bild'
     const headline = section.HeroHeadline
     const teaserText = section.HeroTeaser
@@ -51,6 +54,8 @@ export function FullWidthHeroSectionComponent({
             <div
                 ref={elementRef}
                 className={`hero relative flex w-full flex-col justify-end overflow-hidden ${heightClass}`}
+                onMouseEnter={() => setIsImageHovered(true)}
+                onMouseLeave={() => setIsImageHovered(false)}
                 style={{
                     opacity: isVisible ? 1 : 0,
                     transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
@@ -68,6 +73,16 @@ export function FullWidthHeroSectionComponent({
                         priority
                         unoptimized
                     />
+                    {mouseOverImageUrl ? (
+                        <Image
+                            src={mouseOverImageUrl}
+                            alt={section.HeroImageMouseOver?.alternativeText ?? imageAlt}
+                            fill
+                            className="object-cover object-center transition-opacity duration-500"
+                            style={{ opacity: isImageHovered ? 1 : 0 }}
+                            unoptimized
+                        />
+                    ) : null}
                 </div>
 
                 {/* Backdrop Gradient: Transparent top -> Dark bottom - only shown if there is content */}

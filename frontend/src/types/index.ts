@@ -194,6 +194,7 @@ export interface SimpleHeroSection {
 	HeroHeadline?: string | null
 	HeroTeaser?: string | null
 	HeroImage?: Image | null
+	HeroImageMouseOver?: Image | null
 	HeroLayout?: HeroLayout | null
 	HeroCta?: ActionButton | null
 	FullWidth?: boolean | null

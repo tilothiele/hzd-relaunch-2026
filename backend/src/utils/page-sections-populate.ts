@@ -58,6 +58,7 @@ const sectionComponentPopulate = (
 			return {
 				populate: {
 					HeroImage: true,
+					HeroImageMouseOver: true,
 					HeroCta: true,
 				},
 			}

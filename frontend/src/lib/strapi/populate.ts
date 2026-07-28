@@ -75,6 +75,7 @@ function appendSectionsDeepPopulate(
 				break
 			case 'blocks.simple-hero-section':
 				params.set(`${base}[HeroImage]`, 'true')
+				params.set(`${base}[HeroImageMouseOver]`, 'true')
 				params.set(`${base}[HeroCta]`, '*')
 				break
 			case 'blocks.simple-cta-section':
