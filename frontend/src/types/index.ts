@@ -50,6 +50,7 @@ export interface CardItem {
 	Subheadline?: string | null
 	TeaserText?: string | null
 	BackgroundImage?: Image | null
+	DisplayFormat?: 'fill' | 'fit' | null
 	ActionButton?: ActionButton | null
 }
 

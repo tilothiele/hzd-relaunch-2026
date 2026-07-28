@@ -128,6 +128,7 @@ export function CardSectionComponent({
 					const key = card.id ?? card.Headline ?? `card-${index}`
 					const imageUrl = resolveMediaUrl(card.BackgroundImage, strapiBaseUrl)
 					const currentCardTheme = globalTheme
+					const backgroundSize = card.DisplayFormat === 'fit' ? 'contain' : 'cover'
 
 					return (
 						<Box
@@ -168,8 +169,9 @@ export function CardSectionComponent({
 												position: 'absolute',
 												inset: 0,
 												backgroundImage: `url('${imageUrl}')`,
-												backgroundSize: 'cover',
+												backgroundSize,
 												backgroundPosition: 'center',
+												backgroundRepeat: 'no-repeat',
 											}}
 										/>
 									) : null}

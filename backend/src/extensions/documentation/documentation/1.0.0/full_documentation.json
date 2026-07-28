@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-07-28T20:54:56.468Z"
+    "x-generation-date": "2026-07-28T21:14:59.112Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -52491,6 +52491,13 @@
                 }
               }
             }
+          },
+          "DisplayFormat": {
+            "type": "string",
+            "enum": [
+              "fill",
+              "fit"
+            ]
           },
           "ColorTheme": {
             "$ref": "#/components/schemas/LayoutColorThemeComponent"

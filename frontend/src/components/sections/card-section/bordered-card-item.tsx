@@ -14,6 +14,7 @@ interface BorderedCardItemProps {
 
 export function BorderedCardItem({ card, strapiBaseUrl, theme, isUnread }: BorderedCardItemProps) {
     const imageUrl = resolveMediaUrl(card.BackgroundImage, strapiBaseUrl)
+    const objectFit = card.DisplayFormat === 'fit' ? 'contain' : 'cover'
 
     return (
         <div
@@ -34,7 +35,7 @@ export function BorderedCardItem({ card, strapiBaseUrl, theme, isUnread }: Borde
                         src={imageUrl}
                         alt={card.BackgroundImage?.alternativeText ?? card.Headline ?? ''}
                         fill
-                        style={{ objectFit: 'cover' }}
+                        style={{ objectFit }}
                         unoptimized
                     />
                 </div>

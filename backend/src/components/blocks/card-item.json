@@ -22,6 +22,15 @@
         "files"
       ]
     },
+    "DisplayFormat": {
+      "type": "enumeration",
+      "required": true,
+      "default": "fit",
+      "enum": [
+        "fill",
+        "fit"
+      ]
+    },
     "ColorTheme": {
       "type": "component",
       "component": "layout.color-theme",
