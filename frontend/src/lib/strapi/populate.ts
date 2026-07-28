@@ -108,6 +108,9 @@ function appendSectionsDeepPopulate(
 				params.set(`${base}[news_article_category][fields][1]`, 'CategoryName')
 				params.set(`${base}[news_article_category][fields][2]`, 'CategoryDescription')
 				break
+			case 'blocks.rich-text-section':
+				params.set(`${base}[RichTextPadding]`, 'true')
+				break
 			default:
 				// Kein `[populate]=true` — Strapi 5 interpretiert den Wert sonst als Key "true".
 				// Für Blocks ohne Relationen reicht, den Block selbst zu aktivieren.

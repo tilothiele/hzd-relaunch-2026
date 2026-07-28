@@ -136,6 +136,12 @@ const sectionComponentPopulate = (
 					},
 				},
 			}
+		case 'blocks.rich-text-section':
+			return {
+				populate: {
+					RichTextPadding: true,
+				},
+			}
 		default:
 			return true
 	}
