@@ -37,9 +37,14 @@ export function MeineHundeTab({ user, strapiBaseUrl }: MeineHundeTabProps) {
             setError(null)
             try {
                 const filters: Record<string, unknown> = {}
+                const hasValidDocumentId = typeof user.documentId === 'string'
+                    && user.documentId.length > 0
+                    && !user.documentId.includes('@')
 
                 if (typeof user.cId === 'number') {
                     filters.cOwnerId = { eq: user.cId }
+                } else if (hasValidDocumentId) {
+                    filters.owner = { documentId: { eq: user.documentId } }
                 } else {
                     setError('Benutzer-cId fehlt — Hunde konnten nicht geladen werden.')
                     setDogs([])

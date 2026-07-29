@@ -141,15 +141,38 @@ export async function fetchMe(
 	const response = await fetcher(
 		'users/me',
 		new URLSearchParams({
-			'populate[role]': '*',
-			'populate[member][populate]': '*',
+			'populate[role]': 'true',
 		}),
 		{ token },
 	)
 
 	return {
-		me: extractStrapiSingle<AuthUser>(response),
+		me: extractUsersPermissionsMe(response),
 	}
+}
+
+/** /users/me liefert den User flach (ohne { data }), anders als Content-API. */
+function extractUsersPermissionsMe(payload: unknown): AuthUser | null {
+	const wrapped = extractStrapiSingle<AuthUser>(payload)
+	if (wrapped) {
+		return wrapped
+	}
+
+	if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+		return null
+	}
+
+	const record = payload as Record<string, unknown>
+	if (
+		typeof record.documentId === 'string'
+		|| typeof record.username === 'string'
+		|| typeof record.id === 'number'
+		|| typeof record.id === 'string'
+	) {
+		return record as AuthUser
+	}
+
+	return null
 }
 
 export async function fetchPagesBySlug(

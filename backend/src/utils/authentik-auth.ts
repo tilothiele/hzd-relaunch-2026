@@ -370,10 +370,41 @@ function readClaim(claims: AuthentikClaims, claimName: string): string | null {
 		: null
 }
 
+function readNumericClaim(claims: AuthentikClaims, claimName: string): number | null {
+	const value = claims[claimName]
+	if (typeof value === 'number' && Number.isFinite(value)) {
+		return value
+	}
+	if (typeof value === 'string' && /^\d+$/.test(value.trim())) {
+		return Number.parseInt(value.trim(), 10)
+	}
+	return null
+}
+
 function createFallbackEmail(username: string, subject: string): string {
 	const normalizedUsername = username.replace(/[^a-zA-Z0-9._-]/g, '-')
 	const normalizedSubject = subject.replace(/[^a-zA-Z0-9._-]/g, '-')
 	return `${normalizedUsername || normalizedSubject}@authentik.local`
+}
+
+function parseCIdFromUsername(username: string): number | null {
+	const match = /^c\.(\d+)$/i.exec(username.trim())
+	if (!match) {
+		return null
+	}
+
+	return Number.parseInt(match[1], 10)
+}
+
+function resolveClaimEmail(claims: AuthentikClaims): string | null {
+	return readClaim(claims, getEmailClaim()) || readClaim(claims, 'email')
+}
+
+function resolveClaimCId(claims: AuthentikClaims, username: string): number | null {
+	return readNumericClaim(claims, 'cId')
+		|| readNumericClaim(claims, 'c_id')
+		|| readNumericClaim(claims, 'hzd_cid')
+		|| parseCIdFromUsername(username)
 }
 
 async function findAuthenticatedRole(strapi: any) {
@@ -388,6 +419,78 @@ async function findAuthenticatedRole(strapi: any) {
 	return role
 }
 
+async function findUserByUsername(strapi: any, username: string) {
+	return strapi.db.query('plugin::users-permissions.user').findOne({
+		where: { username },
+		populate: ['role'],
+	})
+}
+
+async function findUserByEmailOrCEmail(strapi: any, email: string) {
+	const normalized = email.trim()
+	if (!normalized) {
+		return null
+	}
+
+	const byEmail = await strapi.db.query('plugin::users-permissions.user').findOne({
+		where: { email: normalized },
+		populate: ['role'],
+	})
+	if (byEmail) {
+		return byEmail
+	}
+
+	return strapi.db.query('plugin::users-permissions.user').findOne({
+		where: { cEmail: normalized },
+		populate: ['role'],
+	})
+}
+
+async function findUserByCId(strapi: any, cId: number) {
+	return strapi.db.query('plugin::users-permissions.user').findOne({
+		where: { cId },
+		populate: ['role'],
+	})
+}
+
+function preferUserWithCId(primary: any | null, secondary: any | null) {
+	if (primary && typeof primary.cId === 'number') {
+		return primary
+	}
+	if (secondary && typeof secondary.cId === 'number') {
+		return secondary
+	}
+	return primary || secondary || null
+}
+
+async function findExistingUser(strapi: any, claims: AuthentikClaims, username: string) {
+	const email = resolveClaimEmail(claims)
+	const cId = resolveClaimCId(claims, username)
+
+	const byUsername = await findUserByUsername(strapi, username)
+	const byEmail = email ? await findUserByEmailOrCEmail(strapi, email) : null
+	const byCId = typeof cId === 'number' ? await findUserByCId(strapi, cId) : null
+
+	// Importierte Mitglieder haben cId; frisch via Authentik angelegte Schatten-User nicht.
+	const matched = preferUserWithCId(
+		preferUserWithCId(byUsername, byEmail),
+		byCId,
+	)
+
+	if (matched) {
+		strapi.log.info('[Authentik Auth] Matched existing Strapi user', {
+			matchedId: matched.id,
+			matchedUsername: matched.username,
+			hasCId: typeof matched.cId === 'number',
+			viaUsername: Boolean(byUsername && byUsername.id === matched.id),
+			viaEmail: Boolean(byEmail && byEmail.id === matched.id),
+			viaCId: Boolean(byCId && byCId.id === matched.id),
+		})
+	}
+
+	return matched
+}
+
 async function findOrCreateUser(strapi: any, claims: AuthentikClaims) {
 	const username = readClaim(claims, getUsernameClaim())
 		|| readClaim(claims, 'preferred_username')
@@ -397,33 +500,29 @@ async function findOrCreateUser(strapi: any, claims: AuthentikClaims) {
 		throw new Error('Authentik token does not contain a usable username claim')
 	}
 
+	const email = resolveClaimEmail(claims)
+	const cId = resolveClaimCId(claims, username)
+
 	strapi.log.info('[Authentik Auth] Token accepted', {
 		username,
-		hasEmail: Boolean(readClaim(claims, getEmailClaim()) || readClaim(claims, 'email')),
+		hasEmail: Boolean(email),
+		cId,
 		issuer: typeof claims.iss === 'string' ? claims.iss : undefined,
 		audience: claims.aud,
 		confidentialClient: isConfidentialAuthentikClient(),
 	})
 
-	const existingUser = await strapi.db
-		.query('plugin::users-permissions.user')
-		.findOne({
-			where: { username },
-			populate: ['role'],
-		})
+	const existingUser = await findExistingUser(strapi, claims, username)
 
 	if (existingUser) {
 		if (existingUser.blocked) {
-			throw new Error(`Strapi user "${username}" is blocked`)
+			throw new Error(`Strapi user "${existingUser.username}" is blocked`)
 		}
 
 		return existingUser
 	}
 
 	const subject = readClaim(claims, 'sub') || username
-	const email = readClaim(claims, getEmailClaim())
-		|| readClaim(claims, 'email')
-		|| createFallbackEmail(username, subject)
 	const role = await findAuthenticatedRole(strapi)
 
 	const createdUser = await strapi.db
@@ -431,18 +530,22 @@ async function findOrCreateUser(strapi: any, claims: AuthentikClaims) {
 		.create({
 			data: {
 				username,
-				email,
+				email: email || createFallbackEmail(username, subject),
 				provider: 'authentik',
 				confirmed: true,
 				blocked: false,
 				role: role.id,
 				firstName: readClaim(claims, 'given_name'),
 				lastName: readClaim(claims, 'family_name'),
+				...(typeof cId === 'number' ? { cId } : {}),
+				...(email ? { cEmail: email } : {}),
 			},
 			populate: ['role'],
 		})
 
-	strapi.log.info(`[Authentik Auth] Created Strapi user "${username}"`)
+	strapi.log.info(`[Authentik Auth] Created Strapi user "${username}"`, {
+		hasCId: typeof createdUser.cId === 'number',
+	})
 
 	return createdUser
 }

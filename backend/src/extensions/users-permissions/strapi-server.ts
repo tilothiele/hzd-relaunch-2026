@@ -172,7 +172,7 @@ export default (plugin: any) => {
 					// In Strapi 5, documentId is the main identifier, but auth uses ID (integer)
 					const userEntity = await strapi.documents('plugin::users-permissions.user').findFirst({
 						where: { id: user.id },
-						populate: ['role', 'member'], // Standard populate + member
+						populate: ['role'],
 					})
 
 					if (!userEntity) {
