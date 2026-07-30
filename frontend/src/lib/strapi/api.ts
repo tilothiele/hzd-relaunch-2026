@@ -169,7 +169,7 @@ function extractUsersPermissionsMe(payload: unknown): AuthUser | null {
 		|| typeof record.id === 'number'
 		|| typeof record.id === 'string'
 	) {
-		return record as AuthUser
+		return record as unknown as AuthUser
 	}
 
 	return null
