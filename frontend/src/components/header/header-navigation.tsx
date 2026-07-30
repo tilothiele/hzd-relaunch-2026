@@ -77,6 +77,11 @@ export function HeaderNavigation({
     // We use a CSS variable for the logo size to handle fluid scaling and scroll state smoothly
     // Scaling from 158px (100%) down to 47.4px (30%) at 1000px width
     // Formula: size = 0.25 * width - 203px (hits ~158 at 1440 and ~47 at 1000)
+    // Linker Abstand: auf schmalen Viewports näher am Rand, auf breiten etwas Luft.
+    const logoLeft = isScrolled
+        ? 'clamp(0.25rem, 0.8vw + 0.15rem, 2rem)'
+        : 'clamp(0.15rem, 1.2vw + 0.1rem, 2.25rem)'
+
     const logoSizeStyle = {
         '--logo-size': isScrolled
             ? `${logoMinSize}px` // Min size when scrolled
@@ -87,7 +92,9 @@ export function HeaderNavigation({
     const logoContainerStyle = {
         ...(logoBackground ? {
             backgroundColor: 'var(--color-logo-background-face)',
-            padding: isScrolled ? '6px 12px' : '15px 30px',
+            padding: isScrolled
+                ? '6px clamp(6px, 1vw, 12px)'
+                : 'clamp(8px, 1.2vw, 15px) clamp(6px, 1.5vw, 20px)',
             borderRadius: '0',
             boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
         } : {}),
@@ -114,9 +121,10 @@ export function HeaderNavigation({
                     className={cn(
                         'absolute z-[110] flex items-center justify-center transition-all duration-500 ease-in-out hover:opacity-80',
                         isScrolled
-                            ? 'top-1/2 -translate-y-1/2 left-10 md:left-12'
-                            : '-top-8 left-12'
+                            ? 'top-1/2 -translate-y-1/2'
+                            : '-top-8'
                     )}
+                    style={{ left: logoLeft }}
                     aria-label='Zur Startseite'
                 >
                     {/* Logo Image */}

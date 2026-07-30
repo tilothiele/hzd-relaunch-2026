@@ -327,7 +327,8 @@ function DesktopMenuItem({
 
 export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 	const muiTheme = useTheme()
-	const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'))
+	// Desktop-Nav erst ab ~1000px; darunter Hamburger
+	const isMobile = useMediaQuery(muiTheme.breakpoints.down(1000))
 	const [mobileOpen, setMobileOpen] = useState(false)
 	const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({})
 
