@@ -353,3 +353,13 @@ h5 {
 .prose [style*="background-color"] {
 	background-color: transparent !important;
 }
+
+/* Mobile Logo Fix - Ensure logo displays correctly on small screens */
+@media (max-width: 375px) {
+	.header-logo-link {
+		position: relative !important;
+		left: auto !important;
+		transform: none !important;
+		top: auto !important;
+	}
+}

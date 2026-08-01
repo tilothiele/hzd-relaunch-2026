@@ -86,6 +86,11 @@ export function HeaderNavigation({
         '--logo-size': isScrolled
             ? `${logoMinSize}px` // Min size when scrolled
             : `clamp(${logoMinSize}px, calc(0.25 * 100vw - 203px), ${logoBaseSize}px)`,
+        aspectRatio: '1 / 1',
+        minWidth: '40px',
+        minHeight: '40px',
+        maxWidth: '158px',
+        maxHeight: '158px',
     } as React.CSSProperties
 
     // Logo Background Logic
@@ -119,7 +124,7 @@ export function HeaderNavigation({
                 <Link
                     href='/'
                     className={cn(
-                        'absolute z-[110] flex items-center justify-center transition-all duration-500 ease-in-out hover:opacity-80',
+                        'header-logo-link absolute z-[110] flex items-center justify-center transition-all duration-500 ease-in-out hover:opacity-80',
                         isScrolled
                             ? 'top-1/2 -translate-y-1/2'
                             : '-top-8'
@@ -140,9 +145,10 @@ export function HeaderNavigation({
                                     width={logoBaseSize}
                                     height={logoBaseSize}
                                     style={{
-                                        // Use mobile size if < 768px (md breakpoint)
                                         height: 'var(--logo-size)',
                                         width: 'var(--logo-size)',
+                                        maxWidth: '100%',
+                                        maxHeight: '100%',
                                     }}
                                     className='mb-1 object-contain transition-all duration-500 ease-in-out'
                                     unoptimized
