@@ -36,10 +36,11 @@ export async function performFederatedLogout(
 
 	await signOut({ redirect: false })
 
-	if (endSessionUrl) {
-		window.location.assign(endSessionUrl)
-		return
-	}
+	// Skip federated logout - go directly to local logout / homepage
+	// if (endSessionUrl) {
+	//     window.location.assign(endSessionUrl)
+	//     return
+	// }
 
 	window.location.assign(redirectUri)
 }

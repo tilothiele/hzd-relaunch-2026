@@ -206,10 +206,9 @@ export function SimpleHeroSectionComponent({
                         />
                     </div>
                 ) : null}
-                {/* Content Side */}
+                {/* Content Side - On mobile: order-2 (below image). On desktop: order based on layout */}
                 <div
-                    className={`z-10 flex flex-1 flex-col justify-end px-6 pb-6 pt-12 md:px-12 md:pt-24 lg:px-24 lg:pt-32 ${isImageLeft ? 'md:order-2' : 'md:order-1'
-                        }`}
+                    className={`z-10 flex flex-1 flex-col justify-end px-6 pb-6 pt-12 md:px-12 md:pt-24 lg:px-24 lg:pt-32 order-2 md:order-2 ${isImageLeft ? '' : 'md:order-1'}`}
                 >
                     <div className="max-w-xl">
 
@@ -237,14 +236,14 @@ export function SimpleHeroSectionComponent({
                     </div>
                 </div>
 
-                {/* Image Side */}
+                {/* Image Side - On mobile: always top (order-1). On desktop: positioned based on layout */}
                 {imageUrl ? (
-                    <div className={`hidden md:block relative w-full md:h-auto md:w-1/2 ${isImageLeft ? 'md:order-1' : 'md:order-2'}`}>
+                    <div className={`relative h-64 md:h-auto md:w-1/2 w-full order-1 md:order-1 ${isImageLeft ? 'md:order-1' : 'md:order-2'}`}>
                         <Image
                             src={imageUrl}
                             alt={imageAlt}
                             fill
-                            className="object-cover"
+                            className="object-cover object-center md:object-cover"
                             priority
                             unoptimized
                         />
@@ -253,12 +252,12 @@ export function SimpleHeroSectionComponent({
                                 src={mouseOverImageUrl}
                                 alt={section.HeroImageMouseOver?.alternativeText ?? imageAlt}
                                 fill
-                                className="object-cover transition-opacity duration-500"
+                                className="object-cover object-center md:object-cover transition-opacity duration-500"
                                 style={{ opacity: isImageHovered ? 1 : 0 }}
                                 unoptimized
                             />
                         ) : null}
-                        {/* Fade Effect - fades the image edge towards the content side */}
+                        {/* Fade Effect - only on desktop */}
                         {section.FadingBorder ? (
                             <div
                                 className={`absolute inset-0 hidden md:block ${isImageLeft
