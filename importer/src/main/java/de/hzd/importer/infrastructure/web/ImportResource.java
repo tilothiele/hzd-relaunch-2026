@@ -106,9 +106,6 @@ public class ImportResource {
         Map<String, Object> status = new HashMap<>();
 
         ImportStatistics stats = importService.getStatistics();
-        status.put("usersInCache", userCache.size());
-        status.put("dogsInCache", dogCache.size());
-        status.put("breedersInCache", breederCache.size());
         status.put("statistics", stats);
 
         return status;

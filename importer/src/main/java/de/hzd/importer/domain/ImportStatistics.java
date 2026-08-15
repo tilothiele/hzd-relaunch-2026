@@ -2,12 +2,17 @@ package de.hzd.importer.domain;
 
 public class ImportStatistics {
 
-    private int membersRead;
+    private int strapiUsersRead;
+    private int authentikUsersRead;
     private int dogsRead;
     private int breedersIdentified;
 
-    public void incrementMembersRead(int count) {
-        this.membersRead += count;
+    public void incrementStrapiUsersRead(int count) {
+        this.strapiUsersRead += count;
+    }
+
+    public void incrementAuthentikUsersRead(int count) {
+        this.authentikUsersRead += count;
     }
 
     public void incrementDogsRead(int count) {
@@ -18,8 +23,12 @@ public class ImportStatistics {
         this.breedersIdentified += count;
     }
 
-    public int getMembersRead() {
-        return membersRead;
+    public int getStrapiUsersRead() {
+        return strapiUsersRead;
+    }
+
+    public int getAuthentikUsersRead() {
+        return authentikUsersRead;
     }
 
     public int getDogsRead() {
@@ -33,7 +42,8 @@ public class ImportStatistics {
     @Override
     public String toString() {
         return "ImportStatistics{" +
-            "membersRead=" + membersRead +
+            "strapiUsersRead=" + strapiUsersRead +
+            ", authentikUsersRead=" + authentikUsersRead +
             ", dogsRead=" + dogsRead +
             ", breedersIdentified=" + breedersIdentified +
             '}';

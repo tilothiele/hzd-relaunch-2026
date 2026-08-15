@@ -1,6 +1,8 @@
 package de.hzd.importer.application;
 
+import de.hzd.importer.adapter.authentik.AuthentikClient;
 import de.hzd.importer.adapter.strapi.StrapiClient;
+import de.hzd.importer.domain.AuthentikUserCache;
 import de.hzd.importer.domain.BreederCache;
 import de.hzd.importer.domain.DogCache;
 import de.hzd.importer.domain.ImportStatistics;
@@ -21,7 +23,13 @@ public class ImportService {
     StrapiClient strapiClient;
 
     @Inject
+    AuthentikClient authentikClient;
+
+    @Inject
     StrapiUserCache userCache;
+
+    @Inject
+    AuthentikUserCache authentikUserCache;
 
     @Inject
     DogCache dogCache;
@@ -47,6 +55,10 @@ public class ImportService {
         return userCache;
     }
 
+    public AuthentikUserCache getAuthentikUserCache() {
+        return authentikUserCache;
+    }
+
     public DogCache getDogCache() {
         return dogCache;
     }
@@ -58,10 +70,18 @@ public class ImportService {
     public void importStrapiUser() throws Exception {
         LOG.info("Starting Strapi import user process...");
         Ticker ticker = new Ticker(tickerInterval);
-        LOG.info("Fetching all users from Strapi (with pagination)...");
-        int usersCount = strapiClient.fetchAllUsers(userCache, ticker);
-        statistics.incrementMembersRead(usersCount);
-        LOG.info("Loaded " + usersCount + " users from Strapi");
+        
+        // Import users from Authentik (directly to cache) - optional, don't fail if unreachable
+        ticker = new Ticker(tickerInterval);
+        LOG.info("Fetching all users from Authentik...");
+        int authentikUsersCount = authentikClient.fetchAllUsers(authentikUserCache, ticker);
+        statistics.incrementAuthentikUsersRead(authentikUsersCount);
+        LOG.info("Loaded " + authentikUsersCount + " users from Authentik");
+
+//        LOG.info("Fetching all users from Strapi (with pagination)...");
+//        int usersCount = strapiClient.fetchAllUsers(userCache, ticker);
+//        statistics.incrementStrapiUsersRead(usersCount);
+//        LOG.info("Loaded " + usersCount + " users from Strapi");
     }
 
     public void importAll() {
@@ -71,16 +91,25 @@ public class ImportService {
         try {
             // Clear caches
             userCache.clear();
+            authentikUserCache.clear();
             dogCache.clear();
             breederCache.clear();
 
             // Create ticker for progress logging
             Ticker ticker = new Ticker(tickerInterval);
 
+            // Import users from Authentik (directly to cache) - optional, don't fail if unreachable
+            ticker = new Ticker(tickerInterval);
+            LOG.info("Fetching all users from Authentik...");
+            int authentikUsersCount = authentikClient.fetchAllUsers(authentikUserCache, ticker);
+            statistics.incrementAuthentikUsersRead(authentikUsersCount);
+            LOG.info("Loaded " + authentikUsersCount + " users from Authentik");
+
             // Import users from Strapi (directly to cache)
+            ticker = new Ticker(tickerInterval);
             LOG.info("Fetching all users from Strapi (with pagination)...");
             int usersCount = strapiClient.fetchAllUsers(userCache, ticker);
-            statistics.incrementMembersRead(usersCount);
+            statistics.incrementStrapiUsersRead(usersCount);
             LOG.info("Loaded " + usersCount + " users from Strapi");
 
             // Import breeders from Strapi (directly to cache)
