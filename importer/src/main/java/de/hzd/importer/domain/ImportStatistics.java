@@ -1,120 +1,41 @@
 package de.hzd.importer.domain;
 
-public record ImportStatistics(
-		int membersCreated,
-		int membersUpdated,
-		int membersSkipped,
-		int membersFailed,
-		int dogsCreated,
-		int dogsUpdated,
-		int dogsFailed,
-		int breedersCreated
-) {
-	public static ImportStatistics empty() {
-		return new ImportStatistics(0, 0, 0, 0, 0, 0, 0, 0);
-	}
+public class ImportStatistics {
 
-	public ImportStatistics withMembersCreated(int count) {
-		return new ImportStatistics(
-			membersCreated + count,
-			membersUpdated,
-			membersSkipped,
-			membersFailed,
-			dogsCreated,
-			dogsUpdated,
-			dogsFailed,
-			breedersCreated
-		);
-	}
+    private int membersRead;
+    private int dogsRead;
+    private int breedersIdentified;
 
-	public ImportStatistics withMembersUpdated(int count) {
-		return new ImportStatistics(
-			membersCreated,
-			membersUpdated + count,
-			membersSkipped,
-			membersFailed,
-			dogsCreated,
-			dogsUpdated,
-			dogsFailed,
-			breedersCreated
-		);
-	}
+    public void incrementMembersRead(int count) {
+        this.membersRead += count;
+    }
 
-	public ImportStatistics withMembersSkipped(int count) {
-		return new ImportStatistics(
-			membersCreated,
-			membersUpdated,
-			membersSkipped + count,
-			membersFailed,
-			dogsCreated,
-			dogsUpdated,
-			dogsFailed,
-			breedersCreated
-		);
-	}
+    public void incrementDogsRead(int count) {
+        this.dogsRead += count;
+    }
 
-	public ImportStatistics withMembersFailed(int count) {
-		return new ImportStatistics(
-			membersCreated,
-			membersUpdated,
-			membersSkipped,
-			membersFailed + count,
-			dogsCreated,
-			dogsUpdated,
-			dogsFailed,
-			breedersCreated
-		);
-	}
+    public void incrementBreedersIdentified(int count) {
+        this.breedersIdentified += count;
+    }
 
-	public ImportStatistics withDogsCreated(int count) {
-		return new ImportStatistics(
-			membersCreated,
-			membersUpdated,
-			membersSkipped,
-			membersFailed,
-			dogsCreated + count,
-			dogsUpdated,
-			dogsFailed,
-			breedersCreated
-		);
-	}
+    public int getMembersRead() {
+        return membersRead;
+    }
 
-	public ImportStatistics withDogsUpdated(int count) {
-		return new ImportStatistics(
-			membersCreated,
-			membersUpdated,
-			membersSkipped,
-			membersFailed,
-			dogsCreated,
-			dogsUpdated + count,
-			dogsFailed,
-			breedersCreated
-		);
-	}
+    public int getDogsRead() {
+        return dogsRead;
+    }
 
-	public ImportStatistics withDogsFailed(int count) {
-		return new ImportStatistics(
-			membersCreated,
-			membersUpdated,
-			membersSkipped,
-			membersFailed,
-			dogsCreated,
-			dogsUpdated,
-			dogsFailed + count,
-			breedersCreated
-		);
-	}
+    public int getBreedersIdentified() {
+        return breedersIdentified;
+    }
 
-	public ImportStatistics withBreedersCreated(int count) {
-		return new ImportStatistics(
-			membersCreated,
-			membersUpdated,
-			membersSkipped,
-			membersFailed,
-			dogsCreated,
-			dogsUpdated,
-			dogsFailed,
-			breedersCreated + count
-		);
-	}
+    @Override
+    public String toString() {
+        return "ImportStatistics{" +
+            "membersRead=" + membersRead +
+            ", dogsRead=" + dogsRead +
+            ", breedersIdentified=" + breedersIdentified +
+            '}';
+    }
 }

@@ -1,11 +1,11 @@
 pluginManagement {
-	repositories {
-		mavenCentral()
-		gradlePluginPortal()
-		mavenLocal()
-	}
-	plugins {
-		id "${quarkusPluginId}" version "${quarkusPluginVersion}"
-	}
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    plugins {
+        id 'io.quarkus' version '3.8.0'
+    }
 }
+
 rootProject.name = 'hzd-importer'

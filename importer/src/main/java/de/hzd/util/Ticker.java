@@ -1,34 +1,49 @@
 package de.hzd.util;
 
+import org.jboss.logging.Logger;
 
+/**
+ * Utility class for progress logging at configurable intervals.
+ * Logs a tick message every N processed items to show import progress.
+ */
 public class Ticker {
 
-	private long intervall;
-	private long recentInvocation;
+    private static final Logger LOG = Logger.getLogger(Ticker.class);
 
-	public Ticker(long intervall) {
-		this.intervall = intervall;
-	}
+    private final long interval;
+    private int processed = 0;
+    private long startTime;
 
-	public void tick(Runnable cmd) {
-		long now = System.currentTimeMillis();
-		if (now > recentInvocation + intervall) {
-			recentInvocation = now;
-			cmd.run();
-		}
-	}
+    public Ticker(long interval) {
+        this.interval = interval;
+        this.startTime = System.currentTimeMillis();
+    }
 
-	public static String formatProceedingMessage(final long t0, final int totalcount, final long ith, final String what) {
-		if (totalcount == 0) {
-			return "#" + what + " -> no items to process";
-		}
-		long d = System.currentTimeMillis() - t0;
-		long dtotal = ith == 0 ? 1 : totalcount * d / ith;
-		String dtotal_part = dtotal == 0 ? "?" : "" + (totalcount * 60l * 1000 / dtotal );
-		String msg = "#" + what + " items: " + ith + "/" + totalcount + " durationSoFar=" + DateHelper.formatDauer(d) + " estimatedTotal="
-				+ DateHelper.formatDauer(dtotal) + " => " + dtotal_part + " items/min " + DateHelper.formatDauer(dtotal - d)
-				+ " left";
-		return msg;
-	}
-	
+    /**
+     * Call this method after processing each item.
+     * Logs progress at configured intervals.
+     * @param debugLog anonymous class that provides debug output
+     */
+    public void tick(Runnable debugLog) {
+        processed++;
+        if (processed % interval == 0) {
+            long elapsed = System.currentTimeMillis() - startTime;
+            double rate = processed / (elapsed / 1000.0);
+            LOG.info("Processed " + processed + " items (" + String.format("%.1f", rate) + " items/sec)");
+            debugLog.run();
+        }
+    }
+
+    /**
+     * Logs the final summary.
+     */
+    public void finish() {
+        long elapsed = System.currentTimeMillis() - startTime;
+        double rate = processed / (elapsed / 1000.0);
+        LOG.info("Finished: " + processed + " items processed in " + (elapsed / 1000) + "s (" + String.format("%.1f", rate) + " items/sec)");
+    }
+
+    public int getProcessed() {
+        return processed;
+    }
 }

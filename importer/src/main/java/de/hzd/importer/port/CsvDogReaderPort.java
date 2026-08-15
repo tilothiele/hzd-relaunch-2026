@@ -5,5 +5,5 @@ import java.nio.file.Path;
 import java.util.List;
 
 public interface CsvDogReaderPort {
-	List<Dog> read(Path filePath);
+    List<Dog> readDogs(Path csvPath);
 }

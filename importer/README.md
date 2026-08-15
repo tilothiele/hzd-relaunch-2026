@@ -1,139 +1,106 @@
 # HZD Importer
 
-Quarkus-Microservice zum Import von Chromosoft-CSV-Daten (Mitglieder und Hunde)
-in Strapi und Authentik.
+Quarkus-basiertes Import-Tool für die Synchronisation von Mitgliedern, Hunden und Züchtern aus Strapi.
 
-## Architektur
+## Projektstruktur
 
-Ports & Adapters mit klarer Trennung:
+```
+importer/
+├── src/main/java/de/hzd/importer/
+│   ├── domain/           # Domain Objects und Caches
+│   ├── adapter/          # Strapi, Authentik Adapter
+│   ├── application/      # Services
+│   ├── infrastructure/   # REST Resources, Config
+│   └── port/             # Interfaces
+├── src/main/resources/
+│   ├── application.yaml
+│   └── application-prod.yaml
+└── build.gradle
+```
 
-- **Domain**: `Member`, `Dog`, `ImportJob`
-- **Ports**: CSV-Reader, Job-Repository, Member-/Dog-Sync
-- **Adapter**: CSV, Strapi REST, Authentik REST, JPA/Panache
-- **Application**: `ImportService`, Sync-Services
-- **Infrastructure**: REST (`POST /import`), Scheduler, Konfiguration
+## Quick Start
 
-## Voraussetzungen
-
-- Java 21+
-- Strapi (Dev: `http://localhost:1337`)
-- Authentik (`https://auth.hovawarte.com` oder lokal)
-- CSV-Dateien: `members.csv`, `dogs.csv` (Pfade konfigurierbar)
-
-## Start
-
-### Lokal (Entwicklung)
+1. Kopiere die `.env.example` nach `.env` und passe die Werte an:
 
 ```bash
-cd importer
 cp .env.example .env
-# .env bearbeiten (Tokens, CSV-Pfade)
-set -a && source .env && set +a
+```
+
+2. Setze in `.env` die Strapi-URL und das API-Token:
+
+```
+IMPORTER_STRAPI_BASE_URL=http://localhost:1337/api
+IMPORTER_STRAPI_API_TOKEN=dein-strapi-api-token
+```
+
+3. Starte die Anwendung im Dev-Modus:
+
+```bash
 ./gradlew quarkusDev
 ```
 
-Der Scheduler ist in `dev` standardmäßig **deaktiviert**. Import manuell auslösen:
+4. Import starten:
 
 ```bash
-curl -X POST http://localhost:8081/import
+# Synchron (blockiert bis fertig)
+curl -X POST "http://localhost:8081/api/import"
+
+# Asynchron (idempotent, gibt sofort zurück)
+curl "http://localhost:8081/api/import/job/start"
 ```
 
-### Produktion (mit Scheduler)
-
-Der Scheduler läuft im Profil `prod` täglich um **02:00 Uhr** (Cron konfigurierbar).
-Voraussetzung: PostgreSQL für Job-Persistenz und gültige API-Tokens in `.env`.
+5. Status und Cache abfragen:
 
 ```bash
-cd importer
-cp .env.example .env
-# IMPORTER_STRAPI_API_TOKEN, IMPORTER_AUTHENTIK_API_TOKEN, DB-Zugang setzen
-set -a && source .env && set +a
-./gradlew quarkusRun -Dquarkus.profile=prod
+curl http://localhost:8081/api/import/status
+curl http://localhost:8081/api/import/members
+curl http://localhost:8081/api/import/dogs
+curl http://localhost:8081/api/import/breeders
 ```
 
-Scheduler manuell aktivieren (ohne prod-Profil):
+## API Endpoints
+
+### Import (synchron)
+
+| Methode | Pfad | Beschreibung |
+|---------|------|-------------|
+| POST | /api/import | Import starten (synchron, blockiert bis fertig) |
+| GET | /api/import/status | Import-Status |
+| GET | /api/import/members | Mitglieder aus Cache |
+| GET | /api/import/dogs | Hunde aus Cache |
+| GET | /api/import/breeders | Züchter aus Cache |
+
+### Job (asynchron, idempotent)
+
+| Methode | Pfad | Beschreibung |
+|---------|------|-------------|
+| GET | /api/import/job/start | Import starten (asynchron, gibt sofort zurück) |
+| GET | /api/import/job/status | Job-Status (running/idle) |
+
+**Job-Endpoint Verhalten:**
+
+- **GET /api/import/job/start**: Startet den Import, wenn noch keiner läuft
+  - Wenn nicht laufend: `{ "status": "started" }`
+  - Wenn bereits laufend: `{ "status": "running" }`
+- **GET /api/import/job/status**: Gibt aktuellen Status zurück
+  - Wenn Import läuft: `{ "status": "running" }`
+  - Wenn idle: `{ "status": "idle" }`
+
+## Entwicklung
+
+### Voraussetzungen
+
+- Java 21+
+- Gradle 8+
+
+### Build
 
 ```bash
-IMPORTER_SCHEDULER_ENABLED=true ./gradlew quarkusRun
+./gradlew build
 ```
 
-## REST API
-
-### Import starten
-
-```http
-POST /import
-```
-
-Antwort bei Erfolg: `202 Accepted` mit `{ "jobId": "..." }`
-
-Bei laufendem Job: `409 Conflict`
-
-### Job-Status abfragen
-
-```http
-GET /import/{jobId}
-```
-
-## Konfiguration
-
-Kopiere `.env.example` nach `.env`. Quarkus liest Umgebungsvariablen automatisch
-(Property `importer.strapi.base-url` → `IMPORTER_STRAPI_BASE_URL`).
-
-| Property | Umgebungsvariable | Beschreibung |
-|---|---|---|
-| `importer.csv.members-path` | `IMPORTER_CSV_MEMBERS_PATH` | Pfad zu `members.csv` |
-| `importer.csv.dogs-path` | `IMPORTER_CSV_DOGS_PATH` | Pfad zu `dogs.csv` |
-| `importer.scheduler.enabled` | `IMPORTER_SCHEDULER_ENABLED` | Cron-Import aktivieren |
-| `importer.scheduler.cron` | `IMPORTER_SCHEDULER_CRON` | Cron-Ausdruck (Quartz) |
-| `importer.strapi.base-url` | `IMPORTER_STRAPI_BASE_URL` | Strapi REST API Basis-URL |
-| `importer.strapi.api-token` | `IMPORTER_STRAPI_API_TOKEN` | Strapi API Token |
-| `importer.authentik.base-url` | `IMPORTER_AUTHENTIK_BASE_URL` | Authentik Basis-URL |
-| `importer.authentik.api-token` | `IMPORTER_AUTHENTIK_API_TOKEN` | Authentik API Token (Priorität vor Username/Passwort) |
-| `importer.authentik.username` | `IMPORTER_AUTHENTIK_USERNAME` | Login-Identifikator wie im Authentik-Webformular (oft E-Mail) |
-| `importer.authentik.password` | `IMPORTER_AUTHENTIK_PASSWORD` | Passwort für Session-Login |
-| `importer.authentik.auth-flow` | `IMPORTER_AUTHENTIK_AUTH_FLOW` | Optionaler Flow-Slug (Standard: `default-authentication-flow`) |
-| `importer.authentik.default-groups` | `IMPORTER_AUTHENTIK_DEFAULT_GROUPS` | Authentik-Gruppen bei User-Upsert (Standard: `website-users`, kommagetrennt) |
-| `quarkus.datasource.jdbc.url` | `QUARKUS_DATASOURCE_JDBC_URL` | Job-DB (prod: PostgreSQL) |
-
-## Job-Locking
-
-Nur ein Import-Job darf gleichzeitig laufen. Der Status wird in der
-Datenbank persistiert (`RUNNING`, `SUCCESS`, `FAILED`).
-
-## Strapi-Datenmodell
-
-Die Mapper orientieren sich an den Schemas unter `backend/src/extensions/`:
-
-### User (`plugin::users-permissions.user`)
-
-- Login: `username = hzd.{membershipNumber}` (Fallback: `hzd.{cId}`)
-- Pflichtfeld `email`: CSV-E-Mail oder Fallback `user-{cId}@hovawarte.com`
-- Original-E-Mail in `cEmail`
-- Rolle: standardmäßig `Authenticated` (`type=authenticated`, per `/api/users-permissions/roles`)
-- Region als Strapi-Enum (`Süd`, nicht `Sued`)
-- Züchter: bei `cFlagBreeder` wird `plugin::hzd-plugin.breeder` mit `BreederRole=B` angelegt
-
-### Dog (`plugin::hzd-plugin.dog`)
-
-- Chromosoft-Felder: `cId`, `cOwnerId`, `cBreederId`, Gesundheits-Enums, `Exhibitions`, `BreedSurvey`
-- Relationen: `owner` (User per `cOwnerId`), `breeder` (Breeder per `cBreederId`)
-- Zuchtbuch: `cStudBookNumber`, `cStudBookNumberFather`, `cStudBookNumberMother`
-
-## Tests
-
-Voraussetzung: **Docker** muss laufen (Testcontainers).
+### Test
 
 ```bash
 ./gradlew test
 ```
-
-Der Testlauf dauert typischerweise **20–30 Sekunden** (PostgreSQL- und WireMock-Container).
-Am Ende erscheint eine **Code-Coverage-Zusammenfassung** in der Konsole; der HTML-Report liegt unter
-`build/reports/jacoco/test/html/index.html`.
-
-Integrationstests starten automatisch:
-- **PostgreSQL** (`postgres:16-alpine`) für Job-Persistenz
-- **WireMock** (`wiremock/wiremock:3.9.1`) als Strapi-/Authentik-Stub
-
-Reine Unit-Tests (ohne Docker): `./gradlew test --tests "de.hzd.importer.adapter.csv.*" --tests "de.hzd.importer.adapter.strapi.StrapiPayloadMapperTest"`

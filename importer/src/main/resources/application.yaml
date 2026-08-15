@@ -1,0 +1,27 @@
+quarkus:
+  http:
+    port: ${QUARKUS_HTTP_PORT:8081}
+
+  profile:
+    dev: ${QUARKUS_PROFILE:dev}
+
+importer:
+  strapi:
+    base-url: ${IMPORTER_STRAPI_BASE_URL:http://127.0.0.1:1337/api}
+    api-token: ${IMPORTER_STRAPI_API_TOKEN:}
+    page-size: ${IMPORTER_STRAPI_PAGE_SIZE:100}
+
+  authentik:
+    base-url: ${IMPORTER_AUTHENTIK_BASE_URL:https://auth.hovawarte.com}
+    api-token: ${IMPORTER_AUTHENTIK_API_TOKEN:}
+    default-groups: ${IMPORTER_AUTHENTIK_DEFAULT_GROUPS:website-users}
+    page-size: ${IMPORTER_AUTHENTIK_PAGE_SIZE:100}
+
+  http:
+    timeout: ${IMPORTER_STRAPI_HTTP_TIMEOUT:30s}
+
+  scheduler:
+    enabled: ${IMPORTER_SCHEDULER_ENABLED:false}
+
+  logging:
+    ticker-interval: ${IMPORTER_LOGGING_TICKER_INTERVAL:10000}

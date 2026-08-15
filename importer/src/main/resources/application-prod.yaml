@@ -1,0 +1,8 @@
+quarkus:
+  profile:
+    prod: true
+
+importer:
+  scheduler:
+    enabled: true
+    cron: "0 0 2 * * ?"

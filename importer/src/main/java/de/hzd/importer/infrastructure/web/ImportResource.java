@@ -1,48 +1,116 @@
 package de.hzd.importer.infrastructure.web;
 
 import de.hzd.importer.application.ImportService;
-import de.hzd.importer.domain.ImportJob;
+import de.hzd.importer.domain.BreederCache;
+import de.hzd.importer.domain.DogCache;
+import de.hzd.importer.domain.ImportStatistics;
+import de.hzd.importer.domain.StrapiUserCache;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.util.Optional;
-import java.util.UUID;
+import org.jboss.logging.Logger;
 
-@Path("/import")
+import java.util.HashMap;
+import java.util.Map;
+
+@Path("/api/import")
 @Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
 public class ImportResource {
 
-	@Inject
-	ImportService importService;
+    private static final Logger LOG = Logger.getLogger(ImportResource.class);
 
-	@POST
-	public Response startImport() {
-		Optional<UUID> jobId = importService.startImportAsync();
-		if (jobId.isEmpty()) {
-			return Response.status(Response.Status.CONFLICT)
-				.entity(new ErrorResponse("Another import job is already running"))
-				.build();
-		}
-		return Response.accepted(new StartImportResponse(jobId.get())).build();
-	}
+    @Inject
+    ImportService importService;
 
-	@GET
-	@Path("/{jobId}")
-	public Response getJob(@PathParam("jobId") UUID jobId) {
-		Optional<ImportJob> job = importService.getJob(jobId);
-		return job.map(value -> Response.ok(ImportJobResponse.from(value)).build())
-			.orElseGet(() -> Response.status(Response.Status.NOT_FOUND)
-				.entity(new ErrorResponse("Import job not found"))
-				.build());
-	}
+    @Inject
+    StrapiUserCache userCache;
 
-	public record ErrorResponse(String message) {
-	}
+    @Inject
+    DogCache dogCache;
+
+    @Inject
+    BreederCache breederCache;
+
+    @POST
+    public Response startImport() {
+        LOG.info("Starting Strapi import (synchronous)");
+
+        importService.importAll();
+
+        return Response.ok(getImportStatus()).build();
+    }
+
+    @GET
+    @Path("/status")
+    public Response getImportStatusResponse() {
+        return Response.ok(getImportStatus()).build();
+    }
+
+    @GET
+    @Path("/members")
+    public Response getMembers(@QueryParam("limit") Integer limit) {
+        var users = userCache.getAll();
+        int size = users.size();
+
+        if (limit != null && limit > 0 && limit < size) {
+            users = users.subList(0, limit);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("total", size);
+        result.put("users", users);
+
+        return Response.ok(result).build();
+    }
+
+    @GET
+    @Path("/dogs")
+    public Response getDogs(@QueryParam("limit") Integer limit) {
+        var dogs = dogCache.getAll();
+        int size = dogs.size();
+
+        if (limit != null && limit > 0 && limit < size) {
+            dogs = dogs.subList(0, limit);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("total", size);
+        result.put("dogs", dogs);
+
+        return Response.ok(result).build();
+    }
+
+    @GET
+    @Path("/breeders")
+    public Response getBreeders(@QueryParam("limit") Integer limit) {
+        var breeders = breederCache.getAll();
+        int size = breeders.size();
+
+        if (limit != null && limit > 0 && limit < size) {
+            breeders = breeders.subList(0, limit);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("total", size);
+        result.put("breeders", breeders);
+
+        return Response.ok(result).build();
+    }
+
+    private Map<String, Object> getImportStatus() {
+        Map<String, Object> status = new HashMap<>();
+
+        ImportStatistics stats = importService.getStatistics();
+        status.put("usersInCache", userCache.size());
+        status.put("dogsInCache", dogCache.size());
+        status.put("breedersInCache", breederCache.size());
+        status.put("statistics", stats);
+
+        return status;
+    }
 }
