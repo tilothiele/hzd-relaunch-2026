@@ -147,10 +147,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		setAuthError(null)
 
 		try {
-			await signIn('authentik', {
-				callbackUrl: getLoginCallbackUrl(),
-				redirect: true,
-			})
+			const callbackUrl = getLoginCallbackUrl()
+
+		console.log('[login] callbackUrl:', callbackUrl)
+		console.log('[login] location:', window.location.href)
+
+		await signIn('authentik', {
+			callbackUrl,
+			redirect: true,
+		})
 		} finally {
 			setIsAuthenticating(false)
 		}
