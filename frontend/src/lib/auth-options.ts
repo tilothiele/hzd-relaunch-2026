@@ -94,6 +94,8 @@ function getAuthentikAuthorizationParams(): Record<string, string> {
 		params.max_age = maxAge
 	}
 
+	console.log('[authentik] authorization params:', params)
+
 	return params
 }
 
