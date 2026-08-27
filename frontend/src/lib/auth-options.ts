@@ -64,11 +64,14 @@ function buildAuthentikTokenRequestBody(
 
 function getAuthentikScope(): string {
 	const configured = process.env.AUTHENTIK_SCOPE?.trim() ?? defaultOidcScope
+	return configured
+	/*
 	if (configured.includes('offline_access')) {
 		return configured
 	}
 
 	return `${configured} offline_access`.trim()
+	*/
 }
 
 function getAuthentikAuthorizationParams(): Record<string, string> {
