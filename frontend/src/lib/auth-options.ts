@@ -2,7 +2,7 @@ import type { NextAuthOptions } from 'next-auth'
 import AuthentikProvider from 'next-auth/providers/authentik'
 import type { JWT } from 'next-auth/jwt'
 
-const defaultOidcScope = 'openid email profile offline_access'
+const defaultOidcScope = 'openid email profile'
 const tokenRefreshBufferMs = 60 * 1000
 
 function logAuthentikToken(name: string, value?: unknown) {
