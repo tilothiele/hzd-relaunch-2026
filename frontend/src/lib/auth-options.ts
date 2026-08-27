@@ -174,6 +174,7 @@ export const authOptions: NextAuthOptions = {
 			clientId: process.env.AUTHENTIK_CLIENT_ID ?? '',
 			clientSecret: getAuthentikClientSecret(),
 			issuer: getIssuer(),
+			checks: ['state'],
 			authorization: {
 				params: getAuthentikAuthorizationParams(),
 			},
