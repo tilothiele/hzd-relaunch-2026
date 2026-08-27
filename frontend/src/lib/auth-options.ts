@@ -153,9 +153,9 @@ async function refreshAuthentikToken(token: JWT): Promise<JWT> {
 		accessToken: typeof refreshedTokens.access_token === 'string'
 			? refreshedTokens.access_token
 			: token.accessToken,
-		idToken: typeof refreshedTokens.id_token === 'string'
-			? refreshedTokens.id_token
-			: token.idToken,
+		// idToken: typeof refreshedTokens.id_token === 'string'
+		// 	? refreshedTokens.id_token
+		// 	: token.idToken,
 		accessTokenExpiresAt: Date.now() + Number(refreshedTokens.expires_in ?? 0) * 1000,
 		refreshToken: typeof refreshedTokens.refresh_token === 'string'
 			? refreshedTokens.refresh_token
@@ -220,10 +220,10 @@ export const authOptions: NextAuthOptions = {
 					token.accessToken = account.access_token
 				}
 
-				if (account.id_token) {
-					logAuthentikToken('id_token', account.id_token)
-					token.idToken = account.id_token
-				}
+				// if (account.id_token) {
+				// 	logAuthentikToken('id_token', account.id_token)
+				// 	token.idToken = account.id_token
+				// }
 
 				return token
 			}
@@ -245,9 +245,9 @@ export const authOptions: NextAuthOptions = {
 			session.accessToken = typeof token.accessToken === 'string'
 				? token.accessToken
 				: undefined
-			session.idToken = typeof token.idToken === 'string'
-				? token.idToken
-				: undefined
+			// session.idToken = typeof token.idToken === 'string'
+			// 	? token.idToken
+			// 	: undefined
 			session.error = typeof token.error === 'string'
 				? token.error
 				: undefined
