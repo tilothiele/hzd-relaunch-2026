@@ -152,9 +152,13 @@
 		font-size: 1.1rem;
 	}
 
-	/* Override inline styles from editors */
+	/* Override inline styles from editors and migrated content */
 	.prose [style*="font-size: medium"],
-	.prose [style*="font-size:medium"] {
+	.prose [style*="font-size:medium"],
+	.prose [style*="font-size:14px"],
+	.prose [style*="font-size: 14px"],
+	.prose [style*="font-size:small"],
+	.prose [style*="font-size: small"] {
 		font-size: 1.1rem !important;
 	}
 

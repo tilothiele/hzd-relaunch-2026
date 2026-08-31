@@ -46,6 +46,11 @@
     },
     "TeaserAnchor": {
       "type": "string"
+    },
+    "TTWI_Padding": {
+      "type": "component",
+      "component": "layout.padding",
+      "repeatable": false
     }
   },
   "config": {}

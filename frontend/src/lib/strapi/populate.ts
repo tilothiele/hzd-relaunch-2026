@@ -89,6 +89,7 @@ function appendSectionsDeepPopulate(
 			case 'blocks.teaser-text-with-image':
 				params.set(`${base}[Image]`, 'true')
 				params.set(`${base}[ActionButton]`, '*')
+				params.set(`${base}[TTWI_Padding]`, 'true')
 				break
 			case 'blocks.text-columns-section':
 				params.set(`${base}[TextColumn][populate][ColumnActionButton]`, '*')

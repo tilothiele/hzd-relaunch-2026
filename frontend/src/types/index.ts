@@ -123,6 +123,7 @@ export interface TeaserTextWithImageSection {
 	ImagePosition?: 'left' | 'right' | null
 	ActionButton?: ActionButton | null
 	TeaserAnchor?: string | null
+	TTWI_Padding?: ComponentLayoutPadding | null
 }
 
 export interface BulletItem {

@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-08-01T14:29:43.492Z"
+    "x-generation-date": "2026-08-31T19:15:59.076Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -52896,6 +52896,9 @@
           },
           "TeaserAnchor": {
             "type": "string"
+          },
+          "TTWI_Padding": {
+            "$ref": "#/components/schemas/LayoutPaddingComponent"
           }
         }
       },

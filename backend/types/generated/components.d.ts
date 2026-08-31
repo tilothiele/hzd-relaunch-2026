@@ -353,6 +353,7 @@ export interface BlocksTeaserTextWithImage extends Struct.ComponentSchema {
           preset: 'defaultHtml';
         }
       >;
+    TTWI_Padding: Schema.Attribute.Component<'layout.padding', false>;
   };
 }
 
