@@ -18,6 +18,7 @@ import { DocumentBundleSectionComponent } from './document-bundle-section/docume
 import { TableOfContentSectionComponent } from './table-of-content-section/table-of-content-section'
 import { ChampionsSectionComponent } from './champions-section/champions-section'
 import { PassedDogsSectionComponent } from './passed-dogs-section/passed-dogs-section'
+import { BlackBoardSectionServerComponent } from './black-board-section/black-board-section-server'
 
 interface RenderSectionParams {
 	section: StartpageSection
@@ -196,6 +197,15 @@ function renderSection({
 				<PassedDogsSectionComponent
 					key={key}
 					section={section as any}
+					theme={theme}
+				/>
+			)
+		case 'ComponentBlocksBlackBoardSection':
+			return (
+				<BlackBoardSectionServerComponent
+					key={key}
+					section={section}
+					strapiBaseUrl={strapiBaseUrl}
 					theme={theme}
 				/>
 			)
