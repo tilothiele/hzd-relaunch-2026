@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_blocks_bb_documents",
+  "info": {
+    "displayName": "BBDocument"
+  },
+  "options": {},
+  "attributes": {
+    "Description": {
+      "type": "string"
+    },
+    "Ord": {
+      "type": "integer"
+    },
+    "BBFile": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  },
+  "config": {}
+}

@@ -338,7 +338,37 @@ export interface PassedDogsSection {
 	id: string
 }
 
-export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | DetailedImageGallerySection | SimpleCtaSection | ActionImagesSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection | DocumentBundleSection | TableOfContentSection | ChampionsSection | PassedDogsSection
+export interface BbDocument {
+	id?: string | number | null
+	Description?: string | null
+	BBFile?: File | null
+	Ord?: number | null
+}
+
+export interface BlackBoardEntry {
+	id?: string | number | null
+	Headline?: string | null
+	TeaserText?: string | null
+	BBMessage?: BlocksContent | string | null
+	BBDateOfPublication?: string | null
+	BBDocument?: BbDocument[] | null
+}
+
+export interface BlackBoard {
+	id?: string | number | null
+	documentId?: string | null
+	BBHeadline?: string | null
+	BBDescription?: BlocksContent | string | null
+	BlackBoardEntry?: BlackBoardEntry[] | null
+}
+
+export interface BlackBoardSection {
+	__typename: 'ComponentBlocksBlackBoardSection'
+	id?: string | number | null
+	black_board?: BlackBoard | null
+}
+
+export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | DetailedImageGallerySection | SimpleCtaSection | ActionImagesSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection | DocumentBundleSection | TableOfContentSection | ChampionsSection | PassedDogsSection | BlackBoardSection
 
 export type PageSection = StartpageSection
 

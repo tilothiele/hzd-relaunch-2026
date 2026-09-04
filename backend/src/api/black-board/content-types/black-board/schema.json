@@ -1,0 +1,26 @@
+{
+  "kind": "collectionType",
+  "collectionName": "black_boards",
+  "info": {
+    "singularName": "black-board",
+    "pluralName": "black-boards",
+    "displayName": "BlackBoard"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "BBHeadline": {
+      "type": "string"
+    },
+    "BBDescription": {
+      "type": "blocks"
+    },
+    "BlackBoardEntry": {
+      "type": "component",
+      "component": "blocks.bb-entry",
+      "repeatable": true
+    }
+  }
+}

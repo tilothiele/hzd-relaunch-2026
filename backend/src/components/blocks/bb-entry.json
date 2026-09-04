@@ -1,0 +1,27 @@
+{
+  "collectionName": "components_blocks_bb_entries",
+  "info": {
+    "displayName": "BBEntry"
+  },
+  "options": {},
+  "attributes": {
+    "Headline": {
+      "type": "string"
+    },
+    "TeaserText": {
+      "type": "text"
+    },
+    "BBMessage": {
+      "type": "blocks"
+    },
+    "BBDateOfPublication": {
+      "type": "date"
+    },
+    "BBDocument": {
+      "type": "component",
+      "component": "blocks.bb-document",
+      "repeatable": true
+    }
+  },
+  "config": {}
+}

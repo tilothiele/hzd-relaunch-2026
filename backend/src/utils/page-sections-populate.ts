@@ -18,6 +18,7 @@ export const PAGE_SECTION_BLOCK_COMPONENTS = [
 	'blocks.table-of-content-section',
 	'blocks.champions-section',
 	'blocks.passed-dogs-section',
+	'blocks.black-board-section',
 ] as const
 
 type PopulateValue = boolean | Record<string, unknown>
@@ -142,6 +143,25 @@ const sectionComponentPopulate = (
 			return {
 				populate: {
 					RichTextPadding: true,
+				},
+			}
+		case 'blocks.black-board-section':
+			return {
+				populate: {
+					black_board: {
+						populate: {
+							BlackBoardEntry: {
+								sort: ['BBDateOfPublication:desc'],
+								populate: {
+									BBDocument: {
+										populate: {
+											BBFile: true,
+										},
+									},
+								},
+							},
+						},
+					},
 				},
 			}
 		default:

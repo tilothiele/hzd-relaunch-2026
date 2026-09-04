@@ -47,6 +47,7 @@ const DEFAULT_PERMISSIONS: string[] = [
 	...apiActions('local-cummunity', ['find', 'findOne']),
 	...apiActions('supplemental-document', ['find', 'findOne']),
 	...apiActions('supplemental-document-group', ['find', 'findOne']),
+	...apiActions('black-board', ['find', 'findOne']),
 	...apiActions('merchandising-product', ['find', 'findOne']),
 ]
 

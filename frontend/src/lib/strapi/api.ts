@@ -19,6 +19,8 @@ import {
 	POPULATE_PASSED_DOG,
 	POPULATE_PHOTOBOX_COLLECTION,
 	POPULATE_SUPPLEMENTAL_DOCUMENT,
+	POPULATE_BLACK_BOARD,
+	BLACK_BOARD_PAGE_SIZE,
 } from '@/lib/strapi/populate'
 import type {
 	AuthUser,
@@ -37,6 +39,7 @@ import type {
 	Litter,
 	LitterSearchResult,
 	Page,
+	BlackBoard,
 } from '@/types'
 
 type FilterValue = Record<string, unknown>
@@ -833,6 +836,29 @@ export async function fetchSupplementalDocumentsForGroup(
 		query,
 		{ server: true },
 	)
+}
+
+export async function fetchBlackBoard(
+	documentId: string,
+	options: StrapiRequestOptions = {},
+): Promise<BlackBoard | null> {
+	const trimmedId = documentId.trim()
+	if (!trimmedId) {
+		return null
+	}
+
+	const query = buildStrapiQuery({
+		filters: { documentId: { eq: trimmedId } },
+		pagination: { pageSize: BLACK_BOARD_PAGE_SIZE },
+		populate: Object.fromEntries(POPULATE_BLACK_BOARD.entries()),
+	})
+
+	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
+	const response = await fetcher<unknown>('black-boards', query, {
+		token: options.token,
+	})
+
+	return extractStrapiList<BlackBoard>(response)[0] ?? null
 }
 
 /**

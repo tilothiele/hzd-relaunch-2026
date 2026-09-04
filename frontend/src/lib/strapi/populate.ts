@@ -28,6 +28,7 @@ const SECTION_BLOCK_COMPONENTS = [
 	'blocks.table-of-content-section',
 	'blocks.champions-section',
 	'blocks.passed-dogs-section',
+	'blocks.black-board-section',
 ] as const
 
 /** Dynamic Zone in news-article (schema) */
@@ -113,6 +114,16 @@ function appendSectionsDeepPopulate(
 				break
 			case 'blocks.rich-text-section':
 				params.set(`${base}[RichTextPadding]`, 'true')
+				break
+			case 'blocks.black-board-section':
+				params.set(
+					`${base}[black_board][populate][BlackBoardEntry][sort][0]`,
+					'BBDateOfPublication:desc',
+				)
+				params.set(
+					`${base}[black_board][populate][BlackBoardEntry][populate][BBDocument][populate][BBFile]`,
+					'true',
+				)
 				break
 			default:
 				// Kein `[populate]=true` — Strapi 5 interpretiert den Wert sonst als Key "true".
@@ -236,4 +247,11 @@ export const POPULATE_CALENDAR_ENTRY = new URLSearchParams({
 	'populate[calendar]': 'true',
 	'populate[form][fields][0]': 'documentId',
 	'populate[CalendarDocument][populate][MediaFile]': 'true',
+})
+
+export const BLACK_BOARD_PAGE_SIZE = 100
+
+export const POPULATE_BLACK_BOARD = new URLSearchParams({
+	'populate[BlackBoardEntry][sort][0]': 'BBDateOfPublication:desc',
+	'populate[BlackBoardEntry][populate][BBDocument][populate][BBFile]': 'true',
 })

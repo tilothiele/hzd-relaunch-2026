@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_blocks_black_board_sections",
+  "info": {
+    "displayName": "BlackBoardSection"
+  },
+  "options": {},
+  "attributes": {
+    "black_board": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::black-board.black-board"
+    }
+  },
+  "config": {}
+}
