@@ -6,7 +6,8 @@ import { Box, Typography, Card, CardMedia, CardContent } from '@mui/material'
 import type { ContactGroup, Contact } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { renderStrapiBlocks } from '@/lib/strapi-blocks'
-import { theme as globalTheme, type ThemeDefinition } from '@/themes'
+import { ActionButton } from '@/components/ui/action-button'
+import type { ThemeDefinition } from '@/themes'
 
 interface ContactGroupProps {
 	contactGroup: ContactGroup
@@ -153,7 +154,12 @@ function ContactCard({ contact, strapiBaseUrl, theme }: ContactCardProps) {
 
 export function ContactGroupComponent({ contactGroup, strapiBaseUrl, theme }: ContactGroupProps) {
 	const contacts = contactGroup.contacts || []
-	const detailsLink = Array.isArray(contactGroup.DetailsLink) ? contactGroup.DetailsLink[0] : contactGroup.DetailsLink
+	const detailsLinks = (Array.isArray(contactGroup.DetailsLink)
+		? contactGroup.DetailsLink
+		: contactGroup.DetailsLink
+			? [contactGroup.DetailsLink]
+			: []
+	).filter((link) => Boolean(link?.Link?.trim()))
 
 
 
@@ -248,19 +254,24 @@ export function ContactGroupComponent({ contactGroup, strapiBaseUrl, theme }: Co
 				</Box>
 			)}
 
-			{detailsLink && (detailsLink.Label || detailsLink.Link) && (
-				<Box sx={{ mt: 4, display: 'flex', justifyContent: 'center', width: '100%' }}>
-					<Link
-						href={detailsLink.Link || '#'}
-						className='inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold transition-colors duration-200'
-						style={{
-							backgroundColor: detailsLink.Primary ? theme.buttonColor : 'transparent',
-							color: detailsLink.Primary ? theme.buttonTextColor : theme.buttonColor,
-							border: detailsLink.Primary ? 'none' : `2px solid ${theme.buttonColor}`,
-						}}
-					>
-						{detailsLink.Label || 'Mehr erfahren'}
-					</Link>
+			{detailsLinks.length > 0 && (
+				<Box
+					sx={{
+						mt: 4,
+						display: 'flex',
+						flexWrap: 'wrap',
+						justifyContent: 'center',
+						gap: 2,
+						width: '100%',
+					}}
+				>
+					{detailsLinks.map((detailsLink, index) => (
+						<ActionButton
+							key={`${detailsLink.Link ?? detailsLink.Label ?? 'details'}-${index}`}
+							actionButton={detailsLink}
+							theme={theme}
+						/>
+					))}
 				</Box>
 			)}
 		</Box>

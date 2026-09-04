@@ -1,15 +1,18 @@
 'use client'
 
 import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { signIn, signOut, useSession } from 'next-auth/react'
-import { performFederatedLogout } from '@/lib/federated-logout'
+import { useRouter } from 'next/navigation'
 import {
 	setStrapiAuthToken,
 	setStrapiUnauthorizedHandler,
 } from '@/lib/strapi-client'
-import { isStrapiUnauthorizedError } from '@/lib/strapi-errors'
 import { fetchMe } from '@/lib/strapi/api'
-import { getLoginCallbackUrl } from '@/lib/auth-login'
+import {
+	fetchAuthSession,
+	loginWithPassword,
+	logoutFromBackend,
+} from '@/lib/auth-api'
+import { getLoginPageHref } from '@/lib/auth-login'
 import type { AuthUser } from '@/types'
 
 interface AuthState {
@@ -25,6 +28,8 @@ interface AuthContextValue {
 	isAuthenticating: boolean
 	handleLogin: () => Promise<void>
 	handleLogout: () => Promise<void>
+	login: (identifier: string, password: string) => Promise<void>
+	applyAuthSession: (jwt: string, user: AuthUser | null) => void
 	isInitialized: boolean
 }
 
@@ -35,39 +40,34 @@ interface AuthProviderProps {
 	strapiBaseUrl?: string | null
 }
 
-
-function createFallbackUser(sessionUser: {
-	name?: string | null
-	email?: string | null
-	image?: string | null
-} | undefined): AuthUser | null {
-	if (!sessionUser?.email && !sessionUser?.name) {
-		return null
-	}
-
-	const username = sessionUser.name ?? sessionUser.email ?? 'Account'
-
-	return {
-		id: sessionUser.email ?? username,
-		documentId: sessionUser.email ?? username,
-		username,
-		email: sessionUser.email ?? null,
-	}
-}
-
 export function AuthProvider({ children }: AuthProviderProps) {
-	const { data: session, status } = useSession()
+	const router = useRouter()
 	const [authState, setAuthState] = useState<AuthState>({ token: null, user: null })
 	const [authError, setAuthError] = useState<string | null>(null)
-	const [isAuthenticating, setIsAuthenticating] = useState(false)
+	const [isAuthenticating, setIsAuthenticating] = useState(true)
 	const [hasMounted, setHasMounted] = useState(false)
+	const [isInitialized, setIsInitialized] = useState(false)
 
-	const invalidateSession = useCallback(async () => {
+	const applyAuthSession = useCallback((jwt: string, user: AuthUser | null) => {
+		setStrapiAuthToken(jwt)
+		setAuthState({ token: jwt, user })
+		setAuthError(null)
+	}, [])
+
+	const clearAuthSession = useCallback(() => {
 		setStrapiAuthToken(null)
 		setAuthState({ token: null, user: null })
-		setAuthError('Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.')
-		await signOut({ callbackUrl: '/' })
 	}, [])
+
+	const invalidateSession = useCallback(async () => {
+		clearAuthSession()
+		setAuthError('Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.')
+		try {
+			await logoutFromBackend()
+		} catch (error) {
+			console.error('[Auth] Logout nach abgelaufener Sitzung fehlgeschlagen:', error)
+		}
+	}, [clearAuthSession])
 
 	useEffect(() => {
 		setHasMounted(true)
@@ -84,109 +84,140 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	}, [invalidateSession])
 
 	useEffect(() => {
+		if (!hasMounted) {
+			return
+		}
+
 		let isActive = true
-		const strapiToken = session?.idToken ?? session?.accessToken ?? null
 
-		async function syncSessionUser() {
-			if (!hasMounted || status === 'loading') {
-				return
-			}
-
-			if (session?.error) {
-				await invalidateSession()
-				return
-			}
-
-			if (!strapiToken) {
-				setStrapiAuthToken(null)
-				setAuthState({ token: null, user: null })
-				setAuthError(null)
-				return
-			}
-
-			setStrapiAuthToken(strapiToken)
-			setAuthError(null)
+		async function loadSession() {
+			setIsAuthenticating(true)
 
 			try {
-				const meData = await fetchMe(strapiToken)
+				const session = await fetchAuthSession()
 
 				if (!isActive) {
 					return
 				}
 
-				setAuthState({
-					token: strapiToken,
-					user: meData.me ?? createFallbackUser(session?.user),
-				})
+				if (!session.jwt) {
+					clearAuthSession()
+					setAuthError(null)
+					return
+				}
+
+				setStrapiAuthToken(session.jwt)
+
+				if (session.user) {
+					setAuthState({ token: session.jwt, user: session.user })
+					setAuthError(null)
+					return
+				}
+
+				try {
+					const meData = await fetchMe(session.jwt)
+					if (!isActive) {
+						return
+					}
+					setAuthState({
+						token: session.jwt,
+						user: meData.me,
+					})
+					setAuthError(null)
+				} catch (error) {
+					if (!isActive) {
+						return
+					}
+					console.error('[Auth] Fehler beim Laden des User-Profils:', error)
+					setAuthState({ token: session.jwt, user: null })
+				}
 			} catch (error) {
 				if (!isActive) {
 					return
 				}
-
-				if (isStrapiUnauthorizedError(error)) {
-					return
+				console.error('[Auth] Session konnte nicht geladen werden:', error)
+				clearAuthSession()
+			} finally {
+				if (isActive) {
+					setIsAuthenticating(false)
+					setIsInitialized(true)
 				}
-
-				console.error('[Auth] Fehler beim Laden des User-Profils:', error)
-				setAuthState({
-					token: strapiToken,
-					user: createFallbackUser(session?.user),
-				})
 			}
 		}
 
-		void syncSessionUser()
+		void loadSession()
 
 		return () => {
 			isActive = false
 		}
-	}, [hasMounted, invalidateSession, session, status])
+	}, [clearAuthSession, hasMounted])
 
-	const handleLogin = useCallback(async () => {
+	const login = useCallback(async (identifier: string, password: string) => {
 		setIsAuthenticating(true)
 		setAuthError(null)
 
 		try {
-			const callbackUrl = getLoginCallbackUrl()
+			const result = await loginWithPassword(identifier, password)
+			setStrapiAuthToken(result.jwt)
 
-			console.log('[login] callbackUrl:', callbackUrl)
-			console.log('[login] location:', window.location.href)
-
-			await signIn('authentik', {
-				callbackUrl,
-				redirect: true,
-			})
+			try {
+				const meData = await fetchMe(result.jwt)
+				setAuthState({
+					token: result.jwt,
+					user: meData.me ?? (result.user as AuthUser | null),
+				})
+			} catch (error) {
+				console.error('[Auth] Profil nach Login nicht geladen:', error)
+				setAuthState({
+					token: result.jwt,
+					user: result.user,
+				})
+			}
+		} catch (error) {
+			const message = error instanceof Error
+				? error.message
+				: 'Anmeldung fehlgeschlagen.'
+			setAuthError(message)
+			throw error instanceof Error ? error : new Error(message)
 		} finally {
 			setIsAuthenticating(false)
 		}
 	}, [])
+
+	const handleLogin = useCallback(async () => {
+		router.push(getLoginPageHref())
+	}, [router])
 
 	const handleLogout = useCallback(async () => {
 		setIsAuthenticating(true)
 		setAuthError(null)
-		setStrapiAuthToken(null)
-		setAuthState({ token: null, user: null })
+		clearAuthSession()
 
 		try {
-			await performFederatedLogout(`${window.location.origin}/`)
+			await logoutFromBackend()
+		} catch (error) {
+			console.error('[Auth] Logout fehlgeschlagen:', error)
 		} finally {
 			setIsAuthenticating(false)
+			window.location.assign('/')
 		}
-	}, [])
+	}, [clearAuthSession])
 
-	const isInitialized = hasMounted && status !== 'loading'
-	const isAuthenticated = hasMounted && status === 'authenticated' && Boolean(authState.token)
+	const isAuthenticated = hasMounted && Boolean(authState.token)
 
 	const value = useMemo<AuthContextValue>(() => ({
 		authState: hasMounted ? authState : { token: null, user: null },
 		isAuthenticated,
 		user: hasMounted ? authState.user : null,
 		authError,
-		isAuthenticating: hasMounted && (isAuthenticating || status === 'loading'),
+		isAuthenticating: hasMounted && (isAuthenticating || !isInitialized),
 		handleLogin,
 		handleLogout,
-		isInitialized,
+		login,
+		applyAuthSession,
+		isInitialized: hasMounted && isInitialized,
 	}), [
+		applyAuthSession,
 		authState,
 		authError,
 		hasMounted,
@@ -195,9 +226,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		isAuthenticated,
 		isAuthenticating,
 		isInitialized,
-		status,
+		login,
 	])
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
-

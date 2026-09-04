@@ -398,6 +398,8 @@ export interface GlobalLayout {
 	page?: Page | null
 	authenticated_page?: Page | null
 	announcements?: Announcement[] | null
+	CalendarHeader?: SimpleHeroSection | null
+	ResultsHeader?: SimpleHeroSection | null
 }
 
 export interface ComponentLayoutSOS {

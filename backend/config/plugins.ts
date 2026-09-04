@@ -25,12 +25,17 @@ export default ({ env }) => ({
       provider: 'nodemailer',
       providerOptions: {
         host: env('SMTP_HOST', 'smtp.example.com'),
-        port: env('SMTP_PORT', 587),
-        auth: {
-          user: env('SMTP_USERNAME'),
-          pass: env('SMTP_PASSWORD'),
-        },
-        // ... any custom nodemailer options
+        port: env.int('SMTP_PORT', 587),
+        secure: env.bool('SMTP_SECURE', false),
+        ignoreTLS: env.bool('SMTP_IGNORE_TLS', false),
+        ...(env('SMTP_USERNAME')
+          ? {
+              auth: {
+                user: env('SMTP_USERNAME'),
+                pass: env('SMTP_PASSWORD'),
+              },
+            }
+          : {}),
       },
       settings: {
         defaultFrom: env('SMTP_DEFAULT_FROM', 't.thiele@hovawarte.com'),

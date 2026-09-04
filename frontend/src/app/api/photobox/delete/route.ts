@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getStrapiPublicBaseUrl } from '@/lib/server/strapi-client'
 import { deleteEntity, fetchEntityByDocumentId, fetchMe } from '@/lib/strapi/api'
+import { getStrapiJwtFromRequest } from '@/lib/auth-cookie'
 import {
 	deletePhotoboxRawFile,
 	isPhotoboxWebDavConfigured,
@@ -14,7 +15,10 @@ const PHOTOBOX_IMAGE_POPULATE = new URLSearchParams({
 
 export async function POST(request: NextRequest) {
 	try {
-		const { documentId, token } = await request.json()
+		const { documentId, token: bodyToken } = await request.json()
+		const token = (typeof bodyToken === 'string' && bodyToken.length > 0)
+			? bodyToken
+			: getStrapiJwtFromRequest(request)
 
 		if (!documentId || !token) {
 			return NextResponse.json({ message: 'Document ID und Token erforderlich.' }, { status: 400 })

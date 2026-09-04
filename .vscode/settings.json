@@ -1,0 +1,18 @@
+{
+    "java.compile.nullAnalysis.mode": "disabled",
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/**": true,
+        "**/dist/**": true,
+        "**/.next/**": true,
+        "**/build/**": true,
+        "**/coverage/**": true,
+        "**/.cache/**": true,
+        "**/tmp/**": true,
+        "**/public/uploads/**": true,
+        "**/.strapi/**": true,
+        "**/playwright-report/**": true,
+        "**/test-results/**": true
+    }
+}

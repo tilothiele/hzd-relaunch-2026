@@ -1,7 +1,7 @@
 /**
  * global-layout populate
  *
- * Liefert das implizite `populate=*` für den global-layout Endpoint.
+ * Liefert das feste Populate für `GET /api/global-layout/website`.
  *
  * Hintergrund: Strapi v5 lehnt die Kombination `populate: { '*': true, ... }`
  * mit expliziten Sub-Populates ab (ValidationError "Invalid key *"). Statt
@@ -24,6 +24,20 @@ export function buildGlobalLayoutPopulate(): Record<string, unknown> {
 			PartnerLink: true,
 			Impressum: true,
 			PrivacyPolicy: true,
+			CalendarHeader: {
+				populate: {
+					HeroImage: true,
+					HeroImageMouseOver: true,
+					HeroCta: true,
+				},
+			},
+			ResultsHeader: {
+				populate: {
+					HeroImage: true,
+					HeroImageMouseOver: true,
+					HeroCta: true,
+				},
+			},
 			page: {
 				populate: {
 					Sections: buildPageSectionsPopulate(),

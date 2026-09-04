@@ -1,6 +1,6 @@
 'use client'
 
-import { Typography, Container, Box, CircularProgress } from '@mui/material'
+import { Typography, Container, Box, CircularProgress, Button } from '@mui/material'
 import { useAuth } from '@/hooks/use-auth'
 import { MeineHzdTabs } from './meine-hzd-tabs'
 
@@ -63,9 +63,12 @@ export function MeinHzdContent({ strapiBaseUrl }: MeinHzdContentProps) {
 					<Typography variant='h3' sx={{ mb: 2, textAlign: 'center' }}>
 						Meine HZD
 					</Typography>
-					<Typography variant='body1' color='text.secondary' sx={{ textAlign: 'center' }}>
+					<Typography variant='body1' color='text.secondary' sx={{ textAlign: 'center', mb: 3 }}>
 						Sie müssen angemeldet sein, um diese Seite zu sehen.
 					</Typography>
+					<Button variant='contained' href='/login'>
+						Anmelden
+					</Button>
 				</Container>
 			</Box>
 		)

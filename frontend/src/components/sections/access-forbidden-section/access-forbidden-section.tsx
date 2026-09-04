@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default function AccessForbiddenSection() {
     return (
@@ -21,6 +22,12 @@ export default function AccessForbiddenSection() {
                     <p className='max-w-lg text-base text-neutral-600'>
                         Sie haben keine Berechtigung, diese Seite aufzurufen. Bitte melden Sie sich an oder wenden Sie sich an den Administrator.
                     </p>
+                    <Link
+                        href='/login'
+                        className='rounded bg-yellow-500 px-4 py-2 font-medium text-neutral-900 hover:bg-yellow-400'
+                    >
+                        Anmelden
+                    </Link>
                 </div>
             </section>
         </div>

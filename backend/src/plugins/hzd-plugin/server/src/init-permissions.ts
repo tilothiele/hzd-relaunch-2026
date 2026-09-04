@@ -33,6 +33,7 @@ const DEFAULT_PERMISSIONS: string[] = [
 	...apiActions('contact', ['find', 'findOne']),
 	...apiActions('contact-group', ['find', 'findOne']),
 	...apiActions('global-layout', ['find']),
+	'api::global-layout.global-layout.website',
 	...apiActions('hzd-setting', ['find']),
 	...apiActions('announcement', ['find', 'findOne']),
 	...apiActions('calendar', ['find', 'findOne']),

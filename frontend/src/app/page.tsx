@@ -5,8 +5,8 @@ import { fetchLayoutServer, fetchMe } from '@/lib/strapi/api'
 import { enrichSectionsWithSupplementalDocuments } from '@/lib/server/enrich-supplemental-sections'
 import { renderServerSections } from '@/components/sections/server-section-factory'
 import type { GlobalLayout, Page } from '@/types'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
+import { cookies } from 'next/headers'
+import { STRAPI_JWT_COOKIE } from '@/lib/auth-cookie'
 
 export const dynamic = 'force-dynamic'
 
@@ -48,8 +48,8 @@ export default async function Home() {
 		const data = await fetchLayoutServer()
 		globalLayout = data.globalLayout
 
-		const session = await getServerSession(authOptions)
-		const authToken = session?.idToken ?? session?.accessToken ?? null
+		const cookieStore = await cookies()
+		const authToken = cookieStore.get(STRAPI_JWT_COOKIE)?.value ?? null
 
 		if (authToken) {
 			const meData = await fetchMe(authToken, { server: true })

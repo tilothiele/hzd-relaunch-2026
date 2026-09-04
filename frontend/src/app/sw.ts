@@ -17,10 +17,10 @@ const serwist = new Serwist({
     precacheEntries: self.__SW_MANIFEST,
     skipWaiting: false,
     clientsClaim: false,
-    // navigationPreload kann OAuth-Callbacks doppelt auslösen (Authorization-Code nur einmal gültig).
+    // navigationPreload bleibt aus, damit Auth-Requests nicht doppelt laufen.
     navigationPreload: false,
-    // /api/auth nicht vom SW abfangen: OAuth-Callback braucht Browser-Navigation inkl.
-    // Traefik-HTTP-Basic-Auth (SW-fetch sendet diese Credentials nicht zuverlässig).
+    // /api/auth nicht vom SW abfangen: Login, Logout und Passwort-Reset
+    // müssen immer live gegen das Next.js-BFF gehen.
     runtimeCaching: [
         {
             matcher: ({ request }) => request.destination === "style" || request.destination === "script" || request.destination === "worker",

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { draftMode } from 'next/headers'
-import { getToken } from 'next-auth/jwt'
+import { getStrapiJwtFromRequest } from '@/lib/auth-cookie'
 import {
 	resolveStrapiErrorStatus,
 } from '@/lib/strapi-errors'
@@ -38,10 +38,7 @@ async function forwardToStrapi(
 		? `${strapiBaseUrl}/api/${apiPath}?${forwardParams.toString()}`
 		: `${strapiBaseUrl}/api/${apiPath}`
 
-	const sessionToken = await getToken({
-		req: request,
-		secret: process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET,
-	})
+	const sessionToken = getStrapiJwtFromRequest(request)
 
 	const headerAuth = request.headers.get('authorization')
 	const headerToken = headerAuth?.startsWith('Bearer ')
@@ -61,9 +58,7 @@ async function forwardToStrapi(
 		}
 	}
 
-	const effectiveToken = headerToken
-		?? sessionToken?.idToken
-		?? sessionToken?.accessToken
+	const effectiveToken = headerToken ?? sessionToken
 	const headers: Record<string, string> = {
 		Accept: 'application/json',
 	}
