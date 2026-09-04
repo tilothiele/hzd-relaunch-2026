@@ -8,6 +8,15 @@ export default (config: UserConfig) => {
         '@': '/src',
       },
     },
+    // Avoid native inotify watchers. Linux defaults (often 65536) are easily
+    // exhausted by Cursor plus a Strapi/Vite admin build, which then crashes
+    // with ENOSPC while watching files such as `.env`.
+    server: {
+      watch: {
+        usePolling: true,
+        interval: 500,
+      },
+    },
     // Force Vite to pre-bundle CJS dependencies so ESM imports work in admin dev.
     // Without this, Vite serves raw CJS (`require(...)`) and the browser throws
     // "require is not defined".

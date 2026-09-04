@@ -103,6 +103,8 @@ function appendSectionsDeepPopulate(
 				break
 			case 'blocks.contact-group-section':
 				params.set(`${base}[ContactGroup][populate][contacts][populate][avatar]`, 'true')
+				params.set(`${base}[ContactGroup][populate][GroupImage]`, 'true')
+				params.set(`${base}[ContactGroup][populate][DetailsLink]`, '*')
 				break
 			case 'blocks.news-articles-section':
 				params.set(`${base}[news_article_category][fields][0]`, 'documentId')

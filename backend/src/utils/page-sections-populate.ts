@@ -124,6 +124,8 @@ const sectionComponentPopulate = (
 									avatar: true,
 								},
 							},
+							GroupImage: true,
+							DetailsLink: true,
 						},
 					},
 				},

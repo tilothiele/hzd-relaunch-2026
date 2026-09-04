@@ -1,24 +1,33 @@
 /**
  * global-layout controller
  *
- * Überschreibt den Default-`find` so, dass `populate` implizit aus dem
- * global-layout-populate Service gesetzt wird. Eingehende Query-Parameter
- * bleiben erhalten und werden mit dem Default-Populate zusammengeführt.
+ * `GET /api/global-layout/website` liefert das Layout für das Frontend.
+ * Populate ist fest im Backend definiert; Query-Parameter werden ignoriert.
  */
 
 import { factories } from '@strapi/strapi'
+import type { Core } from '@strapi/strapi'
 import { buildGlobalLayoutPopulate } from '../services/global-layout-populate'
 
+const GLOBAL_LAYOUT_UID = 'api::global-layout.global-layout' as const
+
 export default factories.createCoreController(
-	'api::global-layout.global-layout',
-	() => ({
-		async find(ctx) {
-			ctx.query = {
-				...ctx.query,
+	GLOBAL_LAYOUT_UID,
+	({ strapi }: { strapi: Core.Strapi }) => ({
+		async website(ctx) {
+			const entity = await strapi.documents(GLOBAL_LAYOUT_UID).findFirst({
 				...buildGlobalLayoutPopulate(),
+				status: 'published',
+			})
+
+			if (!entity) {
+				return ctx.notFound('GlobalLayout nicht gefunden.')
 			}
 
-			return Object.getPrototypeOf(this).find.call(this, ctx)
+			return {
+				data: entity,
+				meta: {},
+			}
 		},
 	}),
 )

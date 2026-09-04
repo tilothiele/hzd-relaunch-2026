@@ -81,6 +81,16 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::page.page"
+    },
+    "CalendarHeader": {
+      "type": "component",
+      "component": "blocks.simple-hero-section",
+      "repeatable": false
+    },
+    "ResultsHeader": {
+      "type": "component",
+      "component": "blocks.simple-hero-section",
+      "repeatable": false
     }
   }
 }

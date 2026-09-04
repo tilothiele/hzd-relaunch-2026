@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getStrapiPublicBaseUrl } from '@/lib/server/strapi-client'
 import { createEntity, fetchMe } from '@/lib/strapi/api'
+import { getStrapiJwtFromRequest } from '@/lib/auth-cookie'
 import {
 	buildPhotoboxStorageKey,
 	isPhotoboxWebDavConfigured,
@@ -29,7 +30,11 @@ export async function POST(request: NextRequest) {
 		const dogs = formData.get('dogs') as string
 		const message = formData.get('message') as string
 		const collectionId = formData.get('collectionId') as string
-		const token = formData.get('token') as string
+		const tokenField = formData.get('token')
+		const tokenFromForm = typeof tokenField === 'string' && tokenField.length > 0
+			? tokenField
+			: null
+		const token = tokenFromForm ?? getStrapiJwtFromRequest(request)
 
 		if (!image) {
 			return NextResponse.json({ message: 'Kein Bild empfangen.' }, { status: 400 })

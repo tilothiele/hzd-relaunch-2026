@@ -905,6 +905,10 @@ export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
   };
   attributes: {
     authenticated_page: Schema.Attribute.Relation<'oneToOne', 'api::page.page'>;
+    CalendarHeader: Schema.Attribute.Component<
+      'blocks.simple-hero-section',
+      false
+    >;
     Copyright: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -929,6 +933,10 @@ export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
       'images' | 'files' | 'videos' | 'audios'
     >;
     publishedAt: Schema.Attribute.DateTime;
+    ResultsHeader: Schema.Attribute.Component<
+      'blocks.simple-hero-section',
+      false
+    >;
     SocialLinkFB: Schema.Attribute.String;
     SocialLinkYT: Schema.Attribute.String;
     SOS: Schema.Attribute.Component<'layout.sos', false>;

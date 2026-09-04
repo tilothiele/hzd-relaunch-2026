@@ -74,8 +74,7 @@ await setPermissions(strapi)
 Nach dem Setup sollten REST-Anfragen funktionieren. Teste z. B.:
 
 ```bash
-curl -s "http://localhost:1337/api/global-layout?populate[Logo]=true" \
-  -H "Authorization: Bearer <API-TOKEN>"
+curl -s "http://localhost:1337/api/global-layout/website"
 ```
 
 Wenn du eine Antwort ohne „Forbidden access“ erhältst, sind die Permissions korrekt gesetzt.

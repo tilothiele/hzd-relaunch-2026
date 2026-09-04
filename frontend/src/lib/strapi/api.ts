@@ -83,9 +83,9 @@ async function fetchLayoutPayload(
 	fetcher: StrapiFetcher,
 	token?: string | null,
 ): Promise<LayoutData> {
-	// global-layout & hzd-setting: kein populate-Parameter, Backend liefert implizit populate=*
+	// global-layout: Custom-Route ohne Query; Populate sitzt im Strapi-Backend.
 	const [layoutResponse, hzdSettingResponse, announcementsResponse] = await Promise.all([
-		fetcher('global-layout', undefined, { token }),
+		fetcher('global-layout/website', undefined, { token }),
 		fetcher('hzd-setting', undefined, { token }),
 		fetcher(
 			'announcements',

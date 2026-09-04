@@ -148,7 +148,7 @@ export function LoginControls({
 				onClick={handleLogin}
 				className='flex items-center gap-2 transition-colors hover:text-yellow-400'
 				style={{ color: theme.headerFooterTextColor, fontSize: '1.2em', fontWeight: 400 }}
-				title={error ?? 'Mit Authentik anmelden'}
+				title={error ?? 'Anmelden'}
 				disabled={isAuthenticating}
 			>
 				<FontAwesomeIcon icon={faUser} style={{ color: theme.headerFooterTextColor, fontSize: '1.2em' }} />
