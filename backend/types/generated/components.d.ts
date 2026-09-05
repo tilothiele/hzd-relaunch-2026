@@ -10,45 +10,6 @@ export interface BlocksActionImagesSection extends Struct.ComponentSchema {
   };
 }
 
-export interface BlocksBbDocument extends Struct.ComponentSchema {
-  collectionName: 'components_blocks_bb_documents';
-  info: {
-    displayName: 'BBDocument';
-  };
-  attributes: {
-    BBFile: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
-    Description: Schema.Attribute.String;
-    Ord: Schema.Attribute.Integer;
-  };
-}
-
-export interface BlocksBbEntry extends Struct.ComponentSchema {
-  collectionName: 'components_blocks_bb_entries';
-  info: {
-    displayName: 'BBEntry';
-  };
-  attributes: {
-    BBDateOfPublication: Schema.Attribute.Date;
-    BBDocument: Schema.Attribute.Component<'blocks.bb-document', true>;
-    BBMessage: Schema.Attribute.Blocks;
-    Headline: Schema.Attribute.String;
-    TeaserText: Schema.Attribute.Text;
-  };
-}
-
-export interface BlocksBlackBoardSection extends Struct.ComponentSchema {
-  collectionName: 'components_blocks_black_board_sections';
-  info: {
-    displayName: 'BlackBoardSection';
-  };
-  attributes: {
-    black_board: Schema.Attribute.Relation<
-      'oneToOne',
-      'api::black-board.black-board'
-    >;
-  };
-}
-
 export interface BlocksBundleDocuments extends Struct.ComponentSchema {
   collectionName: 'components_blocks_bundle_documents';
   info: {
@@ -871,9 +832,6 @@ declare module '@strapi/strapi' {
   export namespace Public {
     export interface ComponentSchemas {
       'blocks.action-images-section': BlocksActionImagesSection;
-      'blocks.bb-document': BlocksBbDocument;
-      'blocks.bb-entry': BlocksBbEntry;
-      'blocks.black-board-section': BlocksBlackBoardSection;
       'blocks.bundle-documents': BlocksBundleDocuments;
       'blocks.card-item': BlocksCardItem;
       'blocks.card-section': BlocksCardSection;

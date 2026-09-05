@@ -551,36 +551,6 @@ export interface ApiAuthorAuthor extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiBlackBoardBlackBoard extends Struct.CollectionTypeSchema {
-  collectionName: 'black_boards';
-  info: {
-    displayName: 'BlackBoard';
-    pluralName: 'black-boards';
-    singularName: 'black-board';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    BBDescription: Schema.Attribute.Blocks;
-    BBHeadline: Schema.Attribute.String;
-    BlackBoardEntry: Schema.Attribute.Component<'blocks.bb-entry', true>;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::black-board.black-board'
-    > &
-      Schema.Attribute.Private;
-    publishedAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-  };
-}
-
 export interface ApiCalendarEntryCalendarEntry
   extends Struct.CollectionTypeSchema {
   collectionName: 'calendar_entries';
@@ -1457,7 +1427,6 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.passed-dogs-section',
         'blocks.detailed-image-gallery-section',
         'blocks.action-images-section',
-        'blocks.black-board-section',
       ]
     >;
     SEO: Schema.Attribute.Component<'seo.seo', true>;
@@ -2566,7 +2535,6 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::announcement.announcement': ApiAnnouncementAnnouncement;
       'api::author.author': ApiAuthorAuthor;
-      'api::black-board.black-board': ApiBlackBoardBlackBoard;
       'api::calendar-entry.calendar-entry': ApiCalendarEntryCalendarEntry;
       'api::calendar.calendar': ApiCalendarCalendar;
       'api::champion.champion': ApiChampionChampion;
