@@ -24,6 +24,7 @@ dependencies {
 	implementation 'io.quarkus:quarkus-arc'
 	implementation 'io.quarkus:quarkus-hibernate-orm'
 	implementation 'io.quarkus:quarkus-flyway'
+	implementation 'io.quarkus:quarkus-mailer'
 	implementation 'org.apache.commons:commons-csv:1.14.1'
 	testImplementation 'io.quarkus:quarkus-junit'
 	testImplementation 'io.quarkus:quarkus-junit-mockito'

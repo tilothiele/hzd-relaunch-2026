@@ -56,11 +56,10 @@ public class ImporterTestResource implements QuarkusTestResourceLifecycleManager
 		config.put("quarkus.flyway.baseline-version", "1");
 		config.put("importer.strapi.base-url", wireMockBaseUrl + "/api");
 		config.put("importer.strapi.api-token", "test-token");
-		config.put("importer.authentik.base-url", wireMockBaseUrl);
-		config.put("importer.authentik.api-token", "test-token");
-		config.put("importer.authentik.default-groups", "hzd-member");
 		config.put("quarkus.rest-client.strapi-api.url", wireMockBaseUrl + "/api");
-		config.put("quarkus.rest-client.authentik-api.url", wireMockBaseUrl);
+		config.put("importer.mail.enabled", "false");
+		config.put("importer.log.directory", "build/test-import-logs");
+		config.put("quarkus.mailer.mock", "true");
 		config.put(
 			"importer.csv.members-path",
 			resolveTestCsv("members.csv")

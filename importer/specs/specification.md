@@ -1,11 +1,10 @@
 ## Goal
 
 Implement a Quarkus-based microservice that imports CSV data (members and dogs),  
-validates and transforms it, and synchronizes it with both - 
-a remote Strapi Backend System for headles cms and authentik (users only). 
+validates and transforms it, and synchronizes it with a remote Strapi Backend  
+System for headless CMS.
 
 Strapi uses to run in dev mode on http://localhost:1337
-Authentik runs on https://auth.hovawarte.com
 
 The service to be created must follow clean code principles and support both REST-triggered  
 and scheduled (cron) executions.
@@ -27,12 +26,13 @@ Flow:
 3. Parse into domain objects
 4. Validate data
 5. For each member:
-  - Create or update in authentik
   - Create or update in Strapi
 6. For each dog:
   - Create or update in Strapi
   - Link to member
-7. Persist job result 
+7. Persist job result
+8. Write import report to `import-<timestamp>.log` and delete files older than the configured retention
+9. Send import report email (dashboard summary + detailed job log) via SMTP 
 
 ## Triggers
 
@@ -69,10 +69,7 @@ POST /import
 ### members.csv (users)
 
 ```
- ,ID Person,0/1 access,salutation,title,fir### Inputs
-
-- GraphQL schema will be provided
-stname,lastname,language,street,zipcode,city,oblast,country,organization,mobile,phone,email,internet,type of person,person is a breeder,person is a member,person is a subscriber,type of subscription,person is an active breeder,breeding station,given name first,membership number,membership status,role in association,other roles,date of birth,date of death,date of joining,date of leaving,IBAN,Bank Identifier Code (BIC), 
+ ,ID Person,0/1 access,salutation,title,firstname,lastname,language,street,zipcode,city,oblast,country,organization,mobile,phone,email,internet,type of person,person is a breeder,person is a member,person is a subscriber,type of subscription,person is an active breeder,breeding station,given name first,membership number,membership status,role in association,other roles,date of birth,date of death,date of joining,date of leaving,IBAN,Bank Identifier Code (BIC), 
 1,10927,0,Frau,-,Lena,Babel,deutsch,Brunnenweg 5,51580,Reichshof,West,Deutschland,Hovawart Zuchtgemeinschaft Deutschland (HZD),0160 2300683,-,lenacaspari@yahoo.de,-,E-Mail ist erlaubt ,0,1,0,-,0,-,1,152544,Mitglied,-,-,29/08/1989,-,23/02/2026,-,DE77384621350000001015,-
 2,10926,0,Herr,-,Mathias,Tost,deutsch,Ostring 23,52477,Alsdorf,West,Deutschland,Hovawart Zuchtgemeinschaft Deutschland (HZD),01511 9144932,-,mathias.tost@outlook.de,-,E-Mail ist erlaubt ,0,1,0,-,0,-,1,152543,Mitglied,-,-,24/06/1961,-,23/02/2026,-,DE73390500000019027275,-
 3,10925,0,Herr,-,Dirk,Bellwon,deutsch,Römerweg 32,44534,Lünen,West,Deutschland,Hovawart Zuchtgemeinschaft Deutschland (HZD),01511 1432123,-,dirk.bellwon@bellwon.de,-,E-Mail ist erlaubt ,0,1,0,-,0,-,1,152542,Mitglied,-,-,23/03/1966,-,23/02/2026,-,DE55441523700103102943,-
