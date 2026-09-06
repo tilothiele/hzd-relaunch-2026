@@ -26,6 +26,8 @@ public interface ImporterConfig {
 
 		@WithDefault("dogs.csv")
 		String dogsPath();
+
+		Optional<String> uploadDirectory();
 	}
 
 	interface SchedulerConfig {
@@ -37,7 +39,7 @@ public interface ImporterConfig {
 	}
 
 	interface StrapiConfig {
-		@WithDefault("http://localhost:1337/api")
+		@WithDefault("http://127.0.0.1:1337/api")
 		String baseUrl();
 
 		Optional<String> apiToken();

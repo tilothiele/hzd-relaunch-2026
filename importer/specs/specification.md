@@ -43,6 +43,18 @@ POST /import
 - Starts import job
 - Returns job ID
 
+POST /import/upload
+
+- Accepts multipart form files `members.csv` and `dogs.csv`
+- Stores them in a configurable temporary directory
+- Starts the same import job if no other job is running
+
+```
+curl -X POST http://localhost:8081/import/upload \
+  -F "members.csv=@members.csv" \
+  -F "dogs.csv=@dogs.csv"
+```
+  
 ### Scheduler
 
 - Cron-based execution (configurable)

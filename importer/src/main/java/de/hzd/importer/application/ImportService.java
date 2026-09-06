@@ -11,6 +11,8 @@ import org.eclipse.microprofile.context.ManagedExecutor;
 import org.jboss.logging.Logger;
 import org.jboss.logging.MDC;
 
+import de.hzd.importer.adapter.csv.CsvUploadStore;
+import de.hzd.importer.adapter.csv.UploadedCsvFiles;
 import de.hzd.importer.adapter.strapi.StrapiMemberAdapter;
 import de.hzd.importer.adapter.strapi.StrapiMemberAdapter.StrapiMemberSnapshot;
 import de.hzd.importer.domain.Dog;
@@ -37,6 +39,9 @@ public class ImportService {
 
 	@Inject
 	ImporterConfig config;
+
+	@Inject
+	CsvUploadStore csvUploadStore;
 
 	@Inject
 	CsvMemberReaderPort memberReader;
@@ -66,12 +71,37 @@ public class ImportService {
 	ManagedExecutor managedExecutor;
 
 	public Optional<UUID> startImportAsync() {
+		return startImportFromPaths(
+			Path.of(config.csv().membersPath()),
+			Path.of(config.csv().dogsPath()),
+			null
+		);
+	}
+
+	public Optional<UUID> startImportFromUpload(Path membersSource, Path dogsSource) {
+		UploadedCsvFiles uploaded = csvUploadStore.store(membersSource, dogsSource);
+		Optional<UUID> jobId = startImportFromPaths(
+			uploaded.membersPath(),
+			uploaded.dogsPath(),
+			uploaded
+		);
+		if (jobId.isEmpty()) {
+			uploaded.delete();
+		}
+		return jobId;
+	}
+
+	private Optional<UUID> startImportFromPaths(
+		Path membersPath,
+		Path dogsPath,
+		UploadedCsvFiles uploaded
+	) {
 		UUID jobId = UUID.randomUUID();
 		if (!jobRepository.tryAcquireLock(jobId)) {
 			LOG.warn("Import rejected: another job is already running");
 			return Optional.empty();
 		}
-		managedExecutor.runAsync(() -> runImport(jobId));
+		managedExecutor.runAsync(() -> runImport(jobId, membersPath, dogsPath, uploaded));
 		return Optional.of(jobId);
 	}
 
@@ -84,19 +114,43 @@ public class ImportService {
 	}
 
 	void runImport(UUID jobId) {
-		runImportInternal(jobId);
+		runImport(
+			jobId,
+			Path.of(config.csv().membersPath()),
+			Path.of(config.csv().dogsPath()),
+			null
+		);
 	}
 
-	private void runImportInternal(UUID jobId) {
+	private void runImport(
+		UUID jobId,
+		Path membersPath,
+		Path dogsPath,
+		UploadedCsvFiles uploaded
+	) {
+		runImportInternal(jobId, membersPath, dogsPath, uploaded);
+	}
+
+	private void runImportInternal(
+		UUID jobId,
+		Path membersPath,
+		Path dogsPath,
+		UploadedCsvFiles uploaded
+	) {
 		long t0 = System.currentTimeMillis();
 		MDC.put("jobId", jobId.toString());
 		jobLog.start(jobId);
 		jobLog.info("Import job %s started", jobId);
+		jobLog.info(
+			"Strapi base URL: %s (API-Token %s)",
+			config.strapi().baseUrl(),
+			config.strapi().apiToken().filter(token -> !token.isBlank()).isPresent()
+				? "gesetzt"
+				: "nicht gesetzt"
+		);
 		ImportStatistics statistics = ImportStatistics.empty();
 		ImportJob finishedJob = null;
 		try {
-			Path membersPath = Path.of(config.csv().membersPath());
-			Path dogsPath = Path.of(config.csv().dogsPath());
 
 			List<Member> members = memberReader.read(membersPath);
 			jobLog.info("Loaded %d members from %s", members.size(), membersPath);
@@ -140,6 +194,9 @@ public class ImportService {
 				reportNotifier.sendFor(finishedJob);
 			}
 			jobLog.clear();
+			if (uploaded != null) {
+				uploaded.delete();
+			}
 			MDC.remove("jobId");
 		}
 	}

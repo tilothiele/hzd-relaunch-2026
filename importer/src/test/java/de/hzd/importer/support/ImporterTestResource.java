@@ -68,6 +68,7 @@ public class ImporterTestResource implements QuarkusTestResourceLifecycleManager
 			"importer.csv.dogs-path",
 			resolveTestCsv("dogs.csv")
 		);
+		config.put("importer.csv.upload-directory", "build/test-csv-uploads");
 		return config;
 	}
 

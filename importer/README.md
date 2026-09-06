@@ -68,6 +68,23 @@ Antwort bei Erfolg: `202 Accepted` mit `{ "jobId": "..." }`
 
 Bei laufendem Job: `409 Conflict`
 
+### Import mit CSV-Upload starten
+
+```http
+POST /import/upload
+Content-Type: multipart/form-data
+```
+
+Formularfelder (Dateinamen):
+
+- `members.csv`
+- `dogs.csv`
+
+Die Dateien werden in `IMPORTER_CSV_UPLOAD_DIRECTORY` abgelegt (Standard:
+System-Temp/`hzd-importer`) und nach dem Job gelöscht. Antwort wie bei
+`POST /import`: `202 Accepted` oder `409 Conflict`. Fehlt eine Datei:
+`400 Bad Request`.
+
 ### Job-Status abfragen
 
 ```http
@@ -83,6 +100,7 @@ Kopiere `.env.example` nach `.env`. Quarkus liest Umgebungsvariablen automatisch
 |---|---|---|
 | `importer.csv.members-path` | `IMPORTER_CSV_MEMBERS_PATH` | Pfad zu `members.csv` |
 | `importer.csv.dogs-path` | `IMPORTER_CSV_DOGS_PATH` | Pfad zu `dogs.csv` |
+| `importer.csv.upload-directory` | `IMPORTER_CSV_UPLOAD_DIRECTORY` | Temp-Verzeichnis für CSV-Uploads |
 | `importer.scheduler.enabled` | `IMPORTER_SCHEDULER_ENABLED` | Cron-Import aktivieren |
 | `importer.scheduler.cron` | `IMPORTER_SCHEDULER_CRON` | Cron-Ausdruck (Quartz) |
 | `importer.strapi.base-url` | `IMPORTER_STRAPI_BASE_URL` | Strapi REST API Basis-URL |
