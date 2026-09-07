@@ -12,7 +12,5 @@ public interface MemberSyncPort {
 
 	SyncResult syncInStrapi(Member member);
 
-	SyncResult syncInAuthentik(Member member);
-
 	void setMemberEmailInStrapi(int cId, String email);
 }

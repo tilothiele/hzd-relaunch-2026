@@ -42,10 +42,6 @@ public record Member(
 	public String strapiEmail() {
 		return "c."+cId + "@hovawarte.com";
 	}
-	
-	public String authentikEmail() {
-		return cEmail().orElse(email().orElse(strapiEmail()));
-	}
 
 	public Optional<String> cEmail() {
 		return email().filter(value -> value.contains("@"));
@@ -62,11 +58,6 @@ public record Member(
 		return cFlagBreeder.orElse(false);
 	}
 
-	public boolean doImportInAuthentik() {
-		return isActive() && membershipNumber.isPresent();
-	}
-	
-	
 	public boolean isActive() {
 		if (cancellationOn.isPresent()) {
 			return cancellationOn.get().isBefore(LocalDate.now());

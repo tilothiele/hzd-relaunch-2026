@@ -9,18 +9,12 @@ public class JobExecutionGuard {
 
 	public boolean hasRunningJob() {
 		Long importRunning = ImportJobEntity.count("status", ImportJobStatus.RUNNING);
-		Long deleteRunning = DeleteAllUsersJobEntity.count("status", ImportJobStatus.RUNNING);
-		return hasRunningCount(importRunning) || hasRunningCount(deleteRunning);
+		return hasRunningCount(importRunning);
 	}
 
 	@Transactional
 	public void failAllRunningJobs() {
 		ImportJobEntity.update(
-			"status = ?1 where status = ?2",
-			ImportJobStatus.FAILED,
-			ImportJobStatus.RUNNING
-		);
-		DeleteAllUsersJobEntity.update(
 			"status = ?1 where status = ?2",
 			ImportJobStatus.FAILED,
 			ImportJobStatus.RUNNING

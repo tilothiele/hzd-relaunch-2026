@@ -8,6 +8,7 @@ import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -32,7 +33,9 @@ public class StrapiRestClient {
 	ObjectMapper objectMapper;
 
 	private final HttpClient httpClient = HttpClient.newBuilder()
-		.connectTimeout(Duration.ofSeconds(30))
+		.version(HttpClient.Version.HTTP_1_1)
+		.connectTimeout(Duration.ofSeconds(10))
+		.followRedirects(HttpClient.Redirect.NORMAL)
 		.build();
 
 	public JsonNode list(String resourcePath, Map<String, String> queryParams) {
@@ -180,9 +183,11 @@ public class StrapiRestClient {
 		try {
 			String url = config.strapi().baseUrl().replaceAll("/+$", "")
 				+ normalizeResourcePath(resourcePath);
+			URI requestUri = requestUri(url);
+			LOG.infof("Strapi %s %s", method, requestUri);
 
 			HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
-				.uri(URI.create(url))
+				.uri(requestUri)
 				.timeout(config.strapi().httpTimeout())
 				.header("Accept", "application/json");
 
@@ -205,6 +210,7 @@ public class StrapiRestClient {
 				requestBuilder.build(),
 				HttpResponse.BodyHandlers.ofString()
 			);
+			LOG.infof("Strapi %s %s → HTTP %d", method, requestUri, response.statusCode());
 
 			if (response.statusCode() >= 500) {
 				throw new StrapiTransientException(
@@ -241,6 +247,26 @@ public class StrapiRestClient {
 		return body;
 	}
 
+	static URI requestUri(String url) {
+		URI uri = URI.create(url);
+		if (!"localhost".equalsIgnoreCase(uri.getHost())) {
+			return uri;
+		}
+		try {
+			return new URI(
+				uri.getScheme(),
+				uri.getUserInfo(),
+				"127.0.0.1",
+				uri.getPort(),
+				uri.getPath(),
+				uri.getQuery(),
+				uri.getFragment()
+			);
+		} catch (URISyntaxException exception) {
+			throw new IllegalArgumentException("Invalid Strapi URL: " + url, exception);
+		}
+	}
+
 	private String normalizeResourcePath(String resourcePath) {
 		if (resourcePath.startsWith("/")) {
 			return resourcePath;
@@ -252,9 +278,11 @@ public class StrapiRestClient {
 		if (queryParams == null || queryParams.isEmpty()) {
 			return "";
 		}
-		return queryParams.entrySet().stream()
+		String rv= queryParams.entrySet().stream()
 			.map(entry -> encode(entry.getKey()) + "=" + encode(entry.getValue()))
 			.collect(Collectors.joining("&"));
+		Log.info("queryString="+rv);
+		return rv;
 	}
 
 	private String encode(String value) {

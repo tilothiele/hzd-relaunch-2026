@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,8 +11,8 @@ import org.eclipse.microprofile.context.ManagedExecutor;
 import org.jboss.logging.Logger;
 import org.jboss.logging.MDC;
 
-import de.hzd.importer.adapter.authentik.AuthentikGroupMapper;
-import de.hzd.importer.adapter.authentik.AuthentikUserAdapter;
+import de.hzd.importer.adapter.csv.CsvUploadStore;
+import de.hzd.importer.adapter.csv.UploadedCsvFiles;
 import de.hzd.importer.adapter.strapi.StrapiMemberAdapter;
 import de.hzd.importer.adapter.strapi.StrapiMemberAdapter.StrapiMemberSnapshot;
 import de.hzd.importer.domain.Dog;
@@ -25,11 +24,11 @@ import de.hzd.importer.infrastructure.config.ImporterConfig;
 import de.hzd.importer.port.CsvDogReaderPort;
 import de.hzd.importer.port.CsvMemberReaderPort;
 import de.hzd.importer.port.DogSyncPort;
+import de.hzd.importer.port.ImportJobLogPort;
 import de.hzd.importer.port.ImportJobRepositoryPort;
 import de.hzd.importer.port.MemberSyncPort;
 import de.hzd.util.DateHelper;
 import de.hzd.util.Ticker;
-import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -42,6 +41,9 @@ public class ImportService {
 	ImporterConfig config;
 
 	@Inject
+	CsvUploadStore csvUploadStore;
+
+	@Inject
 	CsvMemberReaderPort memberReader;
 
 	@Inject
@@ -49,9 +51,6 @@ public class ImportService {
 
 	@Inject
 	MemberSyncPort memberSyncPort;
-
-	@Inject
-	AuthentikUserAdapter authentikUserAdapter;
 
 	@Inject
 	StrapiMemberAdapter strapiMemberAdapter;
@@ -63,15 +62,46 @@ public class ImportService {
 	ImportJobRepositoryPort jobRepository;
 
 	@Inject
+	ImportJobLogPort jobLog;
+
+	@Inject
+	ImportReportNotifier reportNotifier;
+
+	@Inject
 	ManagedExecutor managedExecutor;
 
 	public Optional<UUID> startImportAsync() {
+		return startImportFromPaths(
+			Path.of(config.csv().membersPath()),
+			Path.of(config.csv().dogsPath()),
+			null
+		);
+	}
+
+	public Optional<UUID> startImportFromUpload(Path membersSource, Path dogsSource) {
+		UploadedCsvFiles uploaded = csvUploadStore.store(membersSource, dogsSource);
+		Optional<UUID> jobId = startImportFromPaths(
+			uploaded.membersPath(),
+			uploaded.dogsPath(),
+			uploaded
+		);
+		if (jobId.isEmpty()) {
+			uploaded.delete();
+		}
+		return jobId;
+	}
+
+	private Optional<UUID> startImportFromPaths(
+		Path membersPath,
+		Path dogsPath,
+		UploadedCsvFiles uploaded
+	) {
 		UUID jobId = UUID.randomUUID();
 		if (!jobRepository.tryAcquireLock(jobId)) {
 			LOG.warn("Import rejected: another job is already running");
 			return Optional.empty();
 		}
-		managedExecutor.runAsync(() -> runImport(jobId));
+		managedExecutor.runAsync(() -> runImport(jobId, membersPath, dogsPath, uploaded));
 		return Optional.of(jobId);
 	}
 
@@ -84,72 +114,95 @@ public class ImportService {
 	}
 
 	void runImport(UUID jobId) {
-		long t0 = System.currentTimeMillis();
-		runImportInternal(jobId);
-		Log.infof("Der Job %s dauerte %s", jobId.toString(), DateHelper.formatDauer(System.currentTimeMillis()-t0));
+		runImport(
+			jobId,
+			Path.of(config.csv().membersPath()),
+			Path.of(config.csv().dogsPath()),
+			null
+		);
 	}
 
-	private void runImportInternal(UUID jobId) {
+	private void runImport(
+		UUID jobId,
+		Path membersPath,
+		Path dogsPath,
+		UploadedCsvFiles uploaded
+	) {
+		runImportInternal(jobId, membersPath, dogsPath, uploaded);
+	}
+
+	private void runImportInternal(
+		UUID jobId,
+		Path membersPath,
+		Path dogsPath,
+		UploadedCsvFiles uploaded
+	) {
+		long t0 = System.currentTimeMillis();
 		MDC.put("jobId", jobId.toString());
-		LOG.infof("Import job %s started", jobId);
+		jobLog.start(jobId);
+		jobLog.info("Import job %s started", jobId);
+		jobLog.info(
+			"Strapi base URL: %s (API-Token %s)",
+			config.strapi().baseUrl(),
+			config.strapi().apiToken().filter(token -> !token.isBlank()).isPresent()
+				? "gesetzt"
+				: "nicht gesetzt"
+		);
 		ImportStatistics statistics = ImportStatistics.empty();
+		ImportJob finishedJob = null;
 		try {
-			Path membersPath = Path.of(config.csv().membersPath());
-			Path dogsPath = Path.of(config.csv().dogsPath());
 
 			List<Member> members = memberReader.read(membersPath);
-			LOG.infof("Loaded %d members from %s", members.size(), membersPath);
+			jobLog.info("Loaded %d members from %s", members.size(), membersPath);
 			strapiMemberAdapter.setCsvMembers(members);
 
 			List<Dog> dogs = dogReader.read(dogsPath);
-			LOG.infof("Loaded %d dogs from %s", dogs.size(), dogsPath);
-
-			Map<String, AuthentikUserAdapter.AuthentikUserSnapshot> authentikUsers =
-				authentikUserAdapter.fetchAllUsers();
-			LOG.infof("Loaded %d users from Authentik", authentikUsers.size());
-
-			AuthentikGroupMapper authentikGroups = authentikUserAdapter.fetchAllGroups();
-			LOG.infof("Loaded %d groups from Authentik", authentikGroups.size());
+			jobLog.info("Loaded %d dogs from %s", dogs.size(), dogsPath);
 
 			Collection<StrapiMemberAdapter.StrapiMemberSnapshot> strapiMembers =
 					strapiMemberAdapter.fetchAllMembers();
-			LOG.infof("Loaded %d members from Strapi", strapiMembers.size());
+			jobLog.info("Loaded %d members from Strapi", strapiMembers.size());
 
 			int authenticatedRoleId = strapiMemberAdapter.fetchAuthenticatedRoleId();
 
-			authentikUserAdapter.setGroupMapper(authentikGroups);
 			strapiMemberAdapter.setImportCache(strapiMembers);
 			strapiMemberAdapter.setAuthenticatedRoleId(authenticatedRoleId);
 			
 			try {
-				Log.info("start import Members");
-				statistics = importMembers(members, authentikUsers, statistics);
+				jobLog.info("start import Members");
+				statistics = importMembers(members, statistics);
 				
-				Log.info("start import Dogs");
+				jobLog.info("start import Dogs");
 				statistics = importDogs(dogs, statistics);
 			} finally {
-				authentikUserAdapter.clearImportCache();
 				strapiMemberAdapter.clearImportCache();
 			}
 
-			finishJob(jobId, ImportJobStatus.SUCCESS, "Import completed successfully", statistics);
-			LOG.infof("Import job %s finished successfully", jobId);
+			finishedJob = finishJob(jobId, ImportJobStatus.SUCCESS, "Import completed successfully", statistics);
+			jobLog.info("Import job %s finished successfully", jobId);
 		} catch (Exception exception) {
-			LOG.errorf(exception, "Import job %s failed", jobId);
-			finishJob(
+			jobLog.error("Import job %s failed", exception, jobId);
+			finishedJob = finishJob(
 				jobId,
 				ImportJobStatus.FAILED,
 				exception.getMessage() != null ? exception.getMessage() : exception.getClass().getSimpleName(),
 				statistics
 			);
 		} finally {
+			jobLog.info("Der Job %s dauerte %s", jobId, DateHelper.formatDauer(System.currentTimeMillis() - t0));
+			if (finishedJob != null) {
+				reportNotifier.sendFor(finishedJob);
+			}
+			jobLog.clear();
+			if (uploaded != null) {
+				uploaded.delete();
+			}
 			MDC.remove("jobId");
 		}
 	}
 
 	private ImportStatistics importMembers(
 		List<Member> members,
-		Map<String, AuthentikUserAdapter.AuthentikUserSnapshot> authenticUsers,
 		ImportStatistics statistics
 	) {
 		Ticker logTicker = new Ticker(10000l);
@@ -157,35 +210,7 @@ public class ImportService {
 		int i=0;
 		for (Member member : members) {
 			final int j = i++;
-			logTicker.tick(() -> Log.info(Ticker.formatProceedingMessage(t0, members.size(), j, "Authentik user")));
-			try {
-				Member memberToSync = enrichWithStrapiIdentity(member);
-				AuthentikUserAdapter.AuthentikUserSnapshot authenticUser = authenticUsers.get(memberToSync.username());
-				boolean doSync = authenticUser == null
-					|| authenticUser.fingerPrint() != AuthentikUserAdapter.AuthentikUserSnapshot.fingerPrint(
-						memberToSync.username(),
-						memberToSync.authentikEmail(),
-						memberToSync.isActive()
-					);
-				MemberSyncPort.SyncResult result = doSync
-					? memberSyncPort.syncInAuthentik(memberToSync)
-					: MemberSyncPort.SyncResult.SKIPPED;
-				statistics = switch (result) {
-					case CREATED -> statistics.withMembersCreated(1);
-					case UPDATED -> statistics.withMembersUpdated(1);
-					case DELETED -> statistics.withMembersUpdated(1);
-					case SKIPPED -> statistics.withMembersSkipped(1);
-				};
-			} catch (RuntimeException exception) {
-				LOG.warnf(exception, "Failed to import member cId=%d email=%s", member.cId(), member.strapiEmail());
-				statistics = statistics.withMembersFailed(1);
-			}
-		}
-		long t1 = System.currentTimeMillis();
-		i=0;
-		for (Member member : members) {
-			final int j = i++;
-			logTicker.tick(() -> Log.info(Ticker.formatProceedingMessage(t1, members.size(), j, "Strapi user")));
+			logTicker.tick(() -> jobLog.info(Ticker.formatProceedingMessage(t0, members.size(), j, "Strapi user")));
 			try {
 				Member memberToSync = enrichWithStrapiIdentity(member);
 				MemberSyncPort.SyncResult result = memberSyncPort.syncInStrapi(memberToSync);
@@ -196,7 +221,12 @@ public class ImportService {
 					case SKIPPED -> statistics.withMembersSkipped(1);
 				};
 			} catch (RuntimeException exception) {
-				LOG.warnf(exception, "Failed to import member cId=%d email=%s", member.cId(), member.strapiEmail());
+				jobLog.error(
+					"Failed to import member cId=%d email=%s",
+					exception,
+					member.cId(),
+					member.strapiEmail()
+				);
 				statistics = statistics.withMembersFailed(1);
 			}
 		}
@@ -230,21 +260,21 @@ public class ImportService {
 		int i=0;
 		for (Dog dog : dogs) {
 			final int j = i++;
-			logTicker.tick(() -> Log.info(Ticker.formatProceedingMessage(t0, dogs.size(), j, "Dog")));
+			logTicker.tick(() -> jobLog.info(Ticker.formatProceedingMessage(t0, dogs.size(), j, "Dog")));
 			try {
 				DogSyncPort.SyncResult result = dogSyncPort.sync(dog);
 				statistics = result == DogSyncPort.SyncResult.CREATED
 					? statistics.withDogsCreated(1)
 					: statistics.withDogsUpdated(1);
 			} catch (RuntimeException exception) {
-				LOG.warnf(exception, "Failed to import dog cId=%d", dog.cId());
+				jobLog.error("Failed to import dog cId=%d", exception, dog.cId());
 				statistics = statistics.withDogsFailed(1);
 			}
 		}
 		return statistics;
 	}
 
-	private void finishJob(
+	private ImportJob finishJob(
 		UUID jobId,
 		ImportJobStatus status,
 		String message,
@@ -259,5 +289,6 @@ public class ImportService {
 			statistics
 		);
 		jobRepository.save(finishedJob);
+		return finishedJob;
 	}
 }
