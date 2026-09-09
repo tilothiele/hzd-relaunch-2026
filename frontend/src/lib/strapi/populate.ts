@@ -107,6 +107,12 @@ function appendSectionsDeepPopulate(
 				params.set(`${base}[ContactGroup][populate][GroupImage]`, 'true')
 				params.set(`${base}[ContactGroup][populate][DetailsLink]`, '*')
 				break
+			case 'blocks.contact-mailer-section':
+				params.set(`${base}[ReceipientOptions]`, 'true')
+				break
+			case 'blocks.table-of-content-section':
+				params.set(`${base}[TocLink]`, 'true')
+				break
 			case 'blocks.news-articles-section':
 				params.set(`${base}[news_article_category][fields][0]`, 'documentId')
 				params.set(`${base}[news_article_category][fields][1]`, 'CategoryName')

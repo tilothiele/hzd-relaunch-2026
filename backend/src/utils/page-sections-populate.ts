@@ -131,6 +131,18 @@ const sectionComponentPopulate = (
 					},
 				},
 			}
+		case 'blocks.contact-mailer-section':
+			return {
+				populate: {
+					ReceipientOptions: true,
+				},
+			}
+		case 'blocks.table-of-content-section':
+			return {
+				populate: {
+					TocLink: true,
+				},
+			}
 		case 'blocks.news-articles-section':
 			return {
 				populate: {

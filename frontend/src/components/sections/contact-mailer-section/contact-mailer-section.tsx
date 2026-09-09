@@ -41,6 +41,37 @@ export function ContactMailerSectionComponent({
         }
     }, [user])
 
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search)
+        const toParam = params.get('to')?.trim()
+        const subjectParam = params.get('subject')?.trim()
+        if (!toParam && !subjectParam) {
+            return
+        }
+
+        setFormData((prev) => {
+            let next = prev
+
+            if (toParam) {
+                const match = recipients.find(
+                    (option) => option.Email?.trim().toLowerCase() === toParam.toLowerCase(),
+                )
+                if (match?.Email && next.to !== match.Email) {
+                    next = { ...next, to: match.Email }
+                }
+            }
+
+            if (subjectParam) {
+                const subject = subjectParam.slice(0, subjectLimit)
+                if (next.subject !== subject) {
+                    next = { ...next, subject }
+                }
+            }
+
+            return next
+        })
+    }, [recipients, subjectLimit])
+
     const handleChange = (e: any) => {
         const { name, value, type, checked } = e.target
         setFormData((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }))
