@@ -234,8 +234,8 @@ backup_application "$BASE_DIR" "n8n"\
     "ikcc8gsgcco4o84oscsoss08_n8n-data"
 
 # authentik
-dump_file="authentik_db_dump_$(date +%F).sql"
-pg_dump_docker "$BASE_DIR" "authentik" "$dump_file"
+# dump_file="authentik_db_dump_$(date +%F).sql"
+# pg_dump_docker "$BASE_DIR" "authentik" "$dump_file"
 
 # open-archiver
 # diesen Container nicht stoppen. Nach dem Hochfahren funktioniert der Zugriff auf den S3-Storage nicht mehr.
@@ -249,7 +249,7 @@ backup_application "$BASE_DIR" "open-archiver"\
 rm -rf "${BASE_DIR}/"*
 
 # authentik geht dem traefik verloren - muss neu initialisiert werden
-docker restart authentik-server-m8kgkksks00c8cskw04w4wgs
+# docker restart authentik-server-m8kgkksks00c8cskw04w4wgs
 
 # Minuten und Sekunden berechnen
 minutes=$((SECONDS / 60))
