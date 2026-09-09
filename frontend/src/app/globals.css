@@ -358,6 +358,20 @@ h5 {
 	background-color: transparent !important;
 }
 
+.rich-text-section-content a {
+	color: #0000ee;
+	text-decoration: none;
+}
+
+.rich-text-section-content a:visited {
+	color: #00008b;
+}
+
+.rich-text-section-content a:hover,
+.rich-text-section-content a:focus-visible {
+	text-decoration: none;
+}
+
 /* Mobile Logo Fix - Ensure logo displays correctly on small screens */
 @media (max-width: 375px) {
 	.header-logo-link {

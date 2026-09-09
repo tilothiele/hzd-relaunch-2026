@@ -137,6 +137,7 @@ const LITTERED_FIRST_POPULATE = {
     fields: ['documentId', 'fullKennelName', 'givenName', 'color', 'NonHzdOriginNote'],
     populate: { avatar: true },
   },
+  PuppyImage: true,
   AmountRS: true,
   AmountRSM: true,
   AmountRB: true,

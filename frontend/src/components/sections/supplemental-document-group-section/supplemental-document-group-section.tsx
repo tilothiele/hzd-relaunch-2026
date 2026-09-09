@@ -1,4 +1,4 @@
-import { Container, Box, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip } from '@mui/material'
+import { Box, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip } from '@mui/material'
 import DownloadIcon from '@mui/icons-material/Download'
 import type { SupplementalDocumentGroupSection, SupplementalDocument } from '@/types'
 import type { ThemeDefinition } from '@/themes'
@@ -125,7 +125,7 @@ export function SupplementalDocumentGroupSectionComponent({
 			paddingTop='2em'
 			paddingBottom='2em'
 		>
-			<Container className="pb-5">
+			<div className="w-full max-w-[1200px] pb-5">
 				{section.GroupHeadline ? (
 					<h2>
 						{section.GroupHeadline}
@@ -329,7 +329,7 @@ export function SupplementalDocumentGroupSectionComponent({
 					</Table>
 				</TableContainer>
 				) : null}
-			</Container>
+			</div>
 		</SectionContainer>
 	)
 }

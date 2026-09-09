@@ -46,7 +46,7 @@ export function RichTextSectionComponent({
 					</h3>
 				)}
 				{section.RichTextContent && <div
-					className='prose prose-xl max-w-none dark:prose-invert [&_p]:my-2'
+					className='rich-text-section-content prose prose-xl max-w-none dark:prose-invert [&_p]:my-2'
 					style={{
 						color: theme.textColor,
 						'--tw-prose-body': theme.textColor,
