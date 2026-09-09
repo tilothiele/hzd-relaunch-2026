@@ -184,7 +184,7 @@ export function TextColumnsSectionComponent({
 
 									{columnText ? (
 										<div
-											className="prose max-w-none dark:prose-invert [&_p]:my-2"
+											className="rich-text-section-content prose max-w-none dark:prose-invert [&_p]:my-2"
 											style={{
 												color: theme.textColor,
 												'--tw-prose-body': theme.textColor,
