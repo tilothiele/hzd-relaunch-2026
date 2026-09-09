@@ -8,12 +8,11 @@
  * der Wildcard listen wir alle Top-Level-Attribute explizit auf — semantisch
  * identisch zu `populate=*` für das aktuelle Schema, ohne Validation-Fehler.
  *
- * Dynamic Zones (`page.Sections`, `authenticated_page.Sections`) benötigen
- * die `on`-Syntax, um je Block-Typ die korrekten Felder zu laden. Diese
- * werden via `buildPageSectionsPopulate()` zusammengebaut.
+ * Dynamic Zones (`page.Sections`, `authenticated_page.Sections`) und
+ * `Restriction.user_groups` kommen aus `buildPageRelationPopulate()`.
  */
 
-import { buildPageSectionsPopulate } from '../../../utils/page-sections-populate'
+import { buildPageRelationPopulate } from '../../../utils/page-sections-populate'
 
 export function buildGlobalLayoutPopulate(): Record<string, unknown> {
 	return {
@@ -38,16 +37,8 @@ export function buildGlobalLayoutPopulate(): Record<string, unknown> {
 					HeroCta: true,
 				},
 			},
-			page: {
-				populate: {
-					Sections: buildPageSectionsPopulate(),
-				},
-			},
-			authenticated_page: {
-				populate: {
-					Sections: buildPageSectionsPopulate(),
-				},
-			},
+			page: buildPageRelationPopulate(),
+			authenticated_page: buildPageRelationPopulate(),
 		},
 	}
 }

@@ -812,6 +812,10 @@ export interface PermissionRestriction extends Struct.ComponentSchema {
     Public: Schema.Attribute.Boolean &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<true>;
+    user_groups: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::user-group.user-group'
+    >;
   };
 }
 

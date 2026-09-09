@@ -7,6 +7,7 @@ function getStrapiBaseUrl(): string {
 export async function fetchMe(token: string): Promise<AuthUser | null> {
 	const params = new URLSearchParams({
 		'populate[role]': '*',
+		'populate[user_groups]': '*',
 		'populate[member][populate]': '*',
 	})
 

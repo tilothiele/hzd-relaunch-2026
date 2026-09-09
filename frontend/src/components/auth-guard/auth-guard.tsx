@@ -2,22 +2,29 @@
 
 import React from 'react'
 import { useAuth } from '@/hooks/use-auth'
+import { hasRequiredUserGroups } from '@/lib/permissions'
+import type { ComponentPermissionRestriction } from '@/types'
 
 interface AuthGuardProps {
-    children: React.ReactNode
-    fallback: React.ReactNode
+	children: React.ReactNode
+	fallback: React.ReactNode
+	restriction?: ComponentPermissionRestriction | null
 }
 
-export function AuthGuard({ children, fallback }: AuthGuardProps) {
-    const { isAuthenticated, isInitialized } = useAuth()
+export function AuthGuard({ children, fallback, restriction }: AuthGuardProps) {
+	const { user, isAuthenticated, isInitialized } = useAuth()
 
-    if (!isInitialized) {
-        return null // Or a loading spinner
-    }
+	if (!isInitialized) {
+		return null
+	}
 
-    if (isAuthenticated) {
-        return <>{children}</>
-    }
+	if (!isAuthenticated) {
+		return <>{fallback}</>
+	}
 
-    return <>{fallback}</>
+	if (!hasRequiredUserGroups(user, restriction?.user_groups)) {
+		return <>{fallback}</>
+	}
+
+	return <>{children}</>
 }

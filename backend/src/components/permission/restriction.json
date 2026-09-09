@@ -14,6 +14,11 @@
       "type": "boolean",
       "required": true,
       "default": true
+    },
+    "user_groups": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::user-group.user-group"
     }
   },
   "config": {}

@@ -145,6 +145,7 @@ export async function fetchMe(
 		'users/me',
 		new URLSearchParams({
 			'populate[role]': 'true',
+			'populate[user_groups]': 'true',
 		}),
 		{ token },
 	)

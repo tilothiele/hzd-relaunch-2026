@@ -180,8 +180,15 @@ export function buildPageSectionsPopulate(): Record<string, PopulateValue> {
 	return { on }
 }
 
-export const PAGE_RELATION_POPULATE = {
-	populate: {
-		Sections: buildPageSectionsPopulate(),
-	},
+export function buildPageRelationPopulate(): Record<string, PopulateValue> {
+	return {
+		populate: {
+			Sections: buildPageSectionsPopulate(),
+			Restriction: {
+				populate: {
+					user_groups: true,
+				},
+			},
+		},
+	}
 }

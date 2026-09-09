@@ -1,4 +1,5 @@
 import type { MenuItem, AuthUser } from '@/types'
+import { isKoermeister, isSonderleiter } from './permissions'
 
 export function getMenuItemUrl(menuItem: MenuItem): string {
     return menuItem.url ?? ''
@@ -18,6 +19,12 @@ export function getMenuItemIcon(menuItem: MenuItem, _user: AuthUser | null): str
 export function getMenuItemEnabled(menuItem: MenuItem, _user: AuthUser | null): boolean {
     if (menuItem.id == 'mitgliederbereich' || menuItem.id == 'photobox') {
         return _user != null
+    }
+    if (menuItem.id == 'koermeisterbereich') {
+        return isKoermeister(_user)
+    }
+    if (menuItem.id == 'sonderleiterbereich') {
+        return isSonderleiter(_user)
     }
     return true
 }

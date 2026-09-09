@@ -194,6 +194,12 @@
       "relation": "manyToMany",
       "target": "plugin::hzd-plugin.breeder",
       "inversedBy": "owner_members"
+    },
+    "user_groups": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::user-group.user-group",
+      "inversedBy": "users"
     }
   }
 }

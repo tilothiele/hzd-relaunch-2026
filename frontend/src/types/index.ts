@@ -376,6 +376,7 @@ export interface ComponentPermissionRestriction {
 	id: string
 	Public: boolean
 	Authenticated: boolean
+	user_groups?: UserGroup[] | null
 }
 
 export interface Page {
@@ -511,16 +512,24 @@ export interface UsersPermissionsMeRole {
 	type?: string | null
 }
 
+export interface UserGroup {
+	id?: number | string | null
+	documentId?: string | null
+	Name?: string | null
+}
+
 export interface AuthUser {
 	id: string
 	documentId: string
 	cId?: number | null
+	cFlagBreeder?: boolean | null
 	username: string
 	email?: string | null
 	cEmail?: string | null
 	confirmed?: boolean | null
 	blocked?: boolean | null
 	role?: UsersPermissionsMeRole | null
+	user_groups?: UserGroup[] | null
 	title?: string | null
 	membershipNumber?: number | null
 	dateOfBirth?: string | null

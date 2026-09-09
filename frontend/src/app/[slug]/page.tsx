@@ -86,21 +86,16 @@ export default async function Page({ params }: PageProps) {
 	}
 
 	/*
-	 * Logic for Access Control (Client-Side Check):
-	 * 1. If page.Restriction exists:
-	 *    a. If Public is true -> Access Allowed
-	 *    b. If Public is false:
-	 *       i. If Authenticated is true -> Check User Login via AuthGuard
-	 *       ii. Else -> Forbidden (AccessForbiddenSection)
-	 *
-	 * Note: Since we are in a server component but auth is client-side, we must wrap sensitive content in AuthGuard if it requires authentication.
-	 * If the page is strictly forbidden (neither public nor accessible via auth, which is rare but possible if Public=false and Authenticated=false),
-	 * we show AccessForbiddenSection immediately.
+	 * Zugriff:
+	 * 1. Public und keine user_groups → Seite frei
+	 * 2. Weder Authenticated noch user_groups → immer verboten
+	 * 3. Sonst AuthGuard: Login plus ggf. Schnittmenge der user_groups
 	 */
 
-	const isPublicAccessible = page.Restriction?.Public ?? true // Default to public if no restriction defined
-	const isAuthenticatedRequired = page.Restriction?.Authenticated ?? false
-	// const needsAuth = page.Restriction && !page.Restriction.Public && page.Restriction.Authenticated
+	const restriction = page.Restriction
+	const isPublicAccessible = restriction?.Public ?? true
+	const isAuthenticatedRequired = restriction?.Authenticated ?? false
+	const hasGroupRestriction = Boolean(restriction?.user_groups?.length)
 
 	const sections = page.Sections || []
 	const theme = globalTheme
@@ -111,13 +106,7 @@ export default async function Page({ params }: PageProps) {
 		logo: globalLayout?.Logo
 	})
 
-	// If it's NOT public and NOT accessible via auth (e.g. strict internal only, or just disabled public access without auth fallback configured properly),
-	// show forbidden immediately.
-	// HOWEVER, usually "Authenticated" flag means "needs login".
-	// If Public=false, usually Authenticated=true (or explicit group checks).
-
-	// 1. Public Access -> Render immediately
-	if (isPublicAccessible) {
+	if (isPublicAccessible && !hasGroupRestriction) {
 		return (
 			<MainPageStructure
 				homepage={globalLayout}
@@ -130,9 +119,7 @@ export default async function Page({ params }: PageProps) {
 		)
 	}
 
-	// 2. Strictly Private (Not Public, Not Authenticated) -> Forbidden
-	// User requested to calculate isUserAuthenticated via hook here.
-	if (!isAuthenticatedRequired) {
+	if (!isAuthenticatedRequired && !hasGroupRestriction) {
 		return (
 			<MainPageStructure
 				homepage={globalLayout}
@@ -144,7 +131,6 @@ export default async function Page({ params }: PageProps) {
 		)
 	}
 
-	// 3. Authenticated Access -> Wrap in AuthGuard
 	return (
 		<MainPageStructure
 			homepage={globalLayout}
@@ -152,7 +138,10 @@ export default async function Page({ params }: PageProps) {
 			strapiBaseUrl={baseUrl}
 			pageTitle={page.title}
 		>
-			<AuthGuard fallback={<AccessForbiddenSection />}>
+			<AuthGuard
+				restriction={restriction}
+				fallback={<AccessForbiddenSection />}
+			>
 				{renderedSections}
 			</AuthGuard>
 		</MainPageStructure>
