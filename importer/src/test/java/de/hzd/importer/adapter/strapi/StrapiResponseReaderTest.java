@@ -113,6 +113,17 @@ class StrapiResponseReaderTest {
 	}
 
 	@Test
+	void readsIntegerFieldFromJson() throws Exception {
+		JsonNode item = objectMapper.readTree("""
+			{ "cId": 23824, "cOwnerId": "10745" }
+			""");
+
+		assertEquals(Optional.of(23824), StrapiResponseReader.readIntegerField(item, "cId"));
+		assertEquals(Optional.of(10745), StrapiResponseReader.readIntegerField(item, "cOwnerId"));
+		assertTrue(StrapiResponseReader.readIntegerField(item, "missing").isEmpty());
+	}
+
+	@Test
 	void readsBooleanFieldFromJson() throws Exception {
 		com.fasterxml.jackson.databind.ObjectMapper objectMapper =
 			new com.fasterxml.jackson.databind.ObjectMapper();
@@ -127,6 +138,25 @@ class StrapiResponseReaderTest {
 		assertEquals(
 			Optional.of(false),
 			StrapiResponseReader.readBooleanField(item, "cFlagAccess")
+		);
+	}
+
+	@Test
+	void readsRelationItemsFromArrayAndDataWrapper() throws Exception {
+		JsonNode array = objectMapper.readTree("""
+			[{ "documentId": "ug-1" }]
+			""");
+		JsonNode wrapped = objectMapper.readTree("""
+			{ "data": [{ "documentId": "ug-2" }] }
+			""");
+
+		assertEquals(1, StrapiResponseReader.readRelationItems(array).size());
+		assertEquals(1, StrapiResponseReader.readRelationItems(wrapped).size());
+		assertEquals(
+			"ug-1",
+			StrapiResponseReader.readResourceId(
+				StrapiResponseReader.readRelationItems(array).get(0)
+			).orElseThrow()
 		);
 	}
 

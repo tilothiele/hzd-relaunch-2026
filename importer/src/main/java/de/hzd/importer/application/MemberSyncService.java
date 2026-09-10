@@ -16,11 +16,20 @@ public class MemberSyncService implements MemberSyncPort {
 	@Inject
 	StrapiMemberAdapter strapiMemberAdapter;
 
+	@Inject
+	ImportHooks importHooks;
+
 	@Override
 	public SyncResult syncInStrapi(Member member) {
 		try {
+			if (!importHooks.needUpsertUser(member)) {
+				return SyncResult.SKIPPED;
+			}
+
 			StrapiMemberAdapter.UpsertResult strapiResult = strapiMemberAdapter.upsert(member);
-			strapiMemberAdapter.upsertBreeder(member, strapiResult.documentId());
+			if (importHooks.needUpsertBreeder(member)) {
+				strapiMemberAdapter.upsertBreeder(member, strapiResult.documentId());
+			}
 
 			return strapiResult.action() == StrapiMemberAdapter.UpsertResult.UpsertAction.CREATED
 				? SyncResult.CREATED
@@ -31,8 +40,5 @@ public class MemberSyncService implements MemberSyncPort {
 		}
 	}
 
-	@Override
-	public void setMemberEmailInStrapi(int cId, String email) {
-		strapiMemberAdapter.setEmail(cId, email);
-	}
+
 }

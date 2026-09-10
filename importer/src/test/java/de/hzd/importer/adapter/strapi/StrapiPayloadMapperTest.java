@@ -9,10 +9,12 @@ import de.hzd.importer.domain.DogHd;
 import de.hzd.importer.domain.DogSex;
 import de.hzd.importer.domain.DogSod1;
 import de.hzd.importer.domain.Member;
+import de.hzd.importer.domain.UserGroup;
 import de.hzd.importer.domain.UserRegion;
 import de.hzd.importer.domain.UserSex;
 import de.hzd.importer.infrastructure.config.ImporterConfig;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -89,6 +91,7 @@ class StrapiPayloadMapperTest {
 			Optional.empty(),
 			Optional.empty(),
 			Optional.empty(),
+			List.of(),
 			Member.UNDEFINED_DOCUMENT_ID,
 			Member.UNDEFINED_ID
 		);
@@ -104,6 +107,23 @@ class StrapiPayloadMapperTest {
 		assertEquals(true, payload.get("confirmed"));
 		assertEquals("local", payload.get("provider"));
 		assertEquals(2, payload.get("role"));
+		assertTrue(!payload.containsKey("user_groups"));
+	}
+
+	@Test
+	void mapsUserGroupsRelationFromMember() {
+		mockStrapiConfig();
+		Member member = breederMember(Optional.empty()).withUserGroups(List.of(
+			new UserGroup("ug-koermeister", 2, Optional.of("Körmeister")),
+			new UserGroup("ug-zuchtwart", 3, Optional.of("Zuchtwart"))
+		));
+
+		Map<String, Object> payload = StrapiPayloadMapper.toUserInput(member, config, false, 2);
+
+		assertEquals(
+			java.util.List.of("ug-koermeister", "ug-zuchtwart"),
+			((Map<?, ?>) payload.get("user_groups")).get("set")
+		);
 	}
 
 	@Test
@@ -163,6 +183,7 @@ class StrapiPayloadMapperTest {
 			Optional.empty(),
 			Optional.empty(),
 			Optional.empty(),
+			List.of(),
 			Member.UNDEFINED_DOCUMENT_ID,
 			Member.UNDEFINED_ID
 		);
@@ -350,6 +371,7 @@ class StrapiPayloadMapperTest {
 			Optional.empty(),
 			isActiveBreeder,
 			publishMyData,
+			List.of(),
 			"doc-1",
 			9
 		);
@@ -464,6 +486,7 @@ class StrapiPayloadMapperTest {
 			Optional.empty(),
 			Optional.empty(),
 			Optional.empty(),
+			List.of(),
 			Member.UNDEFINED_DOCUMENT_ID,
 			Member.UNDEFINED_ID
 		);

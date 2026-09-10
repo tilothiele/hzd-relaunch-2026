@@ -2,9 +2,11 @@ package de.hzd.importer.adapter.strapi;
 
 import de.hzd.importer.domain.Dog;
 import de.hzd.importer.domain.Member;
+import de.hzd.importer.domain.UserGroup;
 import de.hzd.importer.domain.UserRegion;
 import de.hzd.importer.infrastructure.config.ImporterConfig;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -47,6 +49,7 @@ final class StrapiPayloadMapper {
 		member.cancellationOn().ifPresent(value -> payload.put("cancellationOn", value.toString()));
 		member.region().map(UserRegion::strapiValue).ifPresent(value -> payload.put("region", value));
 		payload.put("publishMyData", shouldPublishMyData(member));
+		assignUserGroups(payload, member.userGroups());
 
 		if (includePassword) {
 			payload.put(
@@ -55,6 +58,21 @@ final class StrapiPayloadMapper {
 			);
 		}
 		return payload;
+	}
+
+	static void assignUserGroups(Map<String, Object> payload, List<UserGroup> userGroups) {
+		if (payload == null || userGroups == null || userGroups.isEmpty()) {
+			return;
+		}
+		List<String> documentIds = userGroups.stream()
+			.map(UserGroup::documentId)
+			.filter(documentId -> documentId != null && !documentId.isBlank())
+			.distinct()
+			.toList();
+		if (documentIds.isEmpty()) {
+			return;
+		}
+		payload.put("user_groups", Map.of("set", documentIds));
 	}
 
 	static boolean shouldPublishMyData(Member member) {

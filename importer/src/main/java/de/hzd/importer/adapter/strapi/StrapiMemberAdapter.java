@@ -2,7 +2,6 @@ package de.hzd.importer.adapter.strapi;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -15,7 +14,9 @@ import org.jboss.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import de.hzd.importer.application.UpsertOperation;
 import de.hzd.importer.domain.Member;
+import de.hzd.importer.domain.UserGroup;
 import de.hzd.importer.infrastructure.config.ImporterConfig;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -34,12 +35,18 @@ public class StrapiMemberAdapter {
 
 	private Map<Integer, StrapiMemberSnapshot> membersByCid = Map.of();
 	private Map<String, StrapiMemberSnapshot> membersByUsername = Map.of();
+	private Map<String, StrapiMemberSnapshot> membersByEmail = Map.of();
 	private Map<Integer, Member> csvMembersByCid = Map.of();
 	private int authenticatedRoleId = -1;
 
 	public StrapiMemberSnapshot cachedMemberByCid(int cId) {
 		return membersByCid.get(cId);
 	}
+
+	public Member cachedCsvMemberByCid(int cId) {
+		return csvMembersByCid.get(cId);
+	}
+
 	public StrapiMemberSnapshot cachedMemberByUsername(String username) {
 		return membersByUsername.get(username);
 	}
@@ -96,8 +103,13 @@ public class StrapiMemberAdapter {
 		int cId,
 		Optional<String> username,
 		Optional<String> email,
-		Optional<Boolean> publishMyData
+		Optional<Boolean> publishMyData,
+		List<UserGroup> userGroups
 	) {
+		public StrapiMemberSnapshot {
+			userGroups = userGroups == null ? List.of() : List.copyOf(userGroups);
+		}
+
 		StrapiUserRef toUserRef() {
 			return new StrapiUserRef(documentId, id);
 		}
@@ -114,7 +126,8 @@ public class StrapiMemberAdapter {
 				member.path("cId").asInt(-1),
 				StrapiResponseReader.readTextField(member, "username"),
 				StrapiResponseReader.readTextField(member, "email"),
-				StrapiResponseReader.readBooleanField(member, "publishMyData")
+				StrapiResponseReader.readBooleanField(member, "publishMyData"),
+				StrapiUserGroupMapper.fromRelation(member.get("user_groups"))
 			));
 		}
 	}
@@ -135,7 +148,15 @@ public class StrapiMemberAdapter {
 		
 		while (true) {
 			Log.info("fetching user from strapi - page #"+page);
-			JsonNode response = client.listAllPaginated(StrapiResources.USERS, page, pageSize);
+			JsonNode response = client.listAllPaginated(
+				StrapiResources.USERS,
+				page,
+				pageSize,
+				Map.of(
+					"sort[0]", "cId:asc",
+					"populate[user_groups]", "true"
+				)
+			);
 			JsonNode items = StrapiResponseReader.readResultItems(response);
 			if (items == null || items.isEmpty()) {
 				break;
@@ -263,43 +284,6 @@ public class StrapiMemberAdapter {
 	) {
 	}
 
-	public void ensureOwnerMembersPublishMyDataBeforeBreederSave(
-		int breederCId,
-		Optional<Integer> connectingOwnerCId
-	) {
-		for (OwnerMemberRef owner : fetchBreederOwnerMembers(breederCId)) {
-			ensurePublishMyDataForUser(owner);
-		}
-		connectingOwnerCId.ifPresent(this::ensurePublishMyDataForBreederOwner);
-	}
-
-	public void ensurePublishMyDataForBreederOwner(int cId) {
-		StrapiMemberSnapshot snapshot = membersByCid.get(cId);
-		if (snapshot != null && snapshot.publishMyData().orElse(false)) {
-			return;
-		}
-
-		if (snapshot != null) {
-			updateUserPublishMyData(snapshot.id(), cId, snapshot.documentId());
-			return;
-		}
-
-		Optional<StrapiUserRef> userRef = client.findUserRefByCId(cId);
-		if (userRef.isEmpty()) {
-			LOG.warnf(
-				"Cannot set publishMyData=true for breeder owner cId=%d: Strapi user not found",
-				cId
-			);
-			return;
-		}
-
-		updateUserPublishMyData(
-			userRef.get().numericId(),
-			cId,
-			userRef.get().documentId()
-		);
-	}
-
 	private void ensurePublishMyDataForUser(OwnerMemberRef owner) {
 		if (owner.publishMyData().orElse(false)) {
 			return;
@@ -385,11 +369,15 @@ public class StrapiMemberAdapter {
 		this.membersByUsername = members !=null
 				? members.stream().filter(m -> m.username()!=null && m.username().isPresent()).collect(Collectors.toMap(m -> m.username().get(), m -> m))
 				: Map.of();
+		this.membersByEmail = members != null
+				? members.stream().filter(m -> m.email()!=null && m.email().isPresent()).collect(Collectors.toMap(m -> m.email().get(), m -> m))
+				: Map.of();
 	}
 
 	public void clearImportCache() {
 		membersByCid = Map.of();
 		membersByUsername = Map.of();
+		membersByEmail = Map.of();
 		csvMembersByCid = Map.of();
 		authenticatedRoleId = -1;
 	}
@@ -401,31 +389,20 @@ public class StrapiMemberAdapter {
 			);
 		}
 
+		UpsertOperation op = operation(member);
+		
 		//resolveDuplicateEmails(member);
 
-		Optional<StrapiUserRef> existingUser = findExistingStrapiUser(member);
-		Optional<StrapiMemberSnapshot> ucid = findExistingUserRefByCId(member.cId());
-		if(existingUser.isEmpty()) existingUser = ucid.isEmpty() ? Optional.empty() : Optional.of(ucid.get().toUserRef());
-		if(existingUser.isEmpty()) existingUser = findExistingStrapiByUsername(member);
-		boolean isCreate = existingUser.isEmpty();
 		Map<String, Object> payload = StrapiPayloadMapper.toUserInput(
 			member,
 			config,
-			isCreate,
+			op==UpsertOperation.INSERT,
 			authenticatedRoleId
 		);
 
-		if (existingUser.isPresent()) {
-			StrapiUserRef userRef = existingUser.get();
-//			LOG.infof(
-//				"Update Strapi user cId=%d documentId=%s numericId=%d email=%s",
-//				member.cId(),
-//				userRef.documentId(),
-//				userRef.numericId(),
-//				member.strapiEmail()
-//			);
-			client.updateUser(userRef.numericId(), payload);
-			return new UpsertResult(UpsertResult.UpsertAction.UPDATED, userRef.documentId());
+		if (op==UpsertOperation.UPDATE) {
+			client.updateUser(member.id(), payload);
+			return new UpsertResult(UpsertResult.UpsertAction.UPDATED, member.documentId());
 		}
 
 //		LOG.infof(
@@ -444,17 +421,9 @@ public class StrapiMemberAdapter {
 		return new UpsertResult(UpsertResult.UpsertAction.CREATED, documentId);
 	}
 
-	public void setEmail(int cId, String email) {
-		Optional<StrapiMemberSnapshot> u = this.findExistingUserRefByCId(cId);
-		if(u==null || u.isEmpty()) return;
-		
-		client.updateUser(u.get().id(), Map.of("email", email));
-//		LOG.infof(
-//			"Updated Strapi user email cId=%d documentId=%s to %s",
-//			cId,
-//			u.get().documentId(),
-//			email
-//		);
+	private UpsertOperation operation(Member member) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	public boolean upsertBreeder(Member member, String memberDocumentId) {
@@ -462,59 +431,39 @@ public class StrapiMemberAdapter {
 			return false;
 		}
 
-		ensureOwnerMembersPublishMyDataBeforeBreederSave(
-			member.cId(),
-			Optional.of(member.cId())
-		);
-
-		Optional<String> existingBreederId = client.findDocumentIdByCId(
-			StrapiResources.BREEDERS,
-			member.cId()
-		);
+//		ensureOwnerMembersPublishMyDataBeforeBreederSave(
+//			member.cId(),
+//			Optional.of(member.cId())
+//		);
+//
+//		Optional<String> existingBreederId = client.findDocumentIdByCId(
+//			StrapiResources.BREEDERS,
+//			member.cId()
+//		);
 		Optional<String> kennelName = member.breedingStation();
 		Map<String, Object> payload = StrapiPayloadMapper.toBreederInput(
 			member.cId(),
 			kennelName,
-			existingBreederId.isEmpty(),
+			true,
 			member.isActiveBreeder(),
 			Optional.of(memberDocumentId)
 		);
 
-		if (existingBreederId.isPresent()) {
-			client.update(
-				StrapiResources.BREEDERS,
-				existingBreederId.get(),
-				payload,
-				true
-			);
-			//LOG.infof("Updated breeder cId=%d documentId=%s", member.cId(), existingBreederId.get());
-			return false;
-		}
+//		if (existingBreederId.isPresent()) {
+//			client.update(
+//				StrapiResources.BREEDERS,
+//				existingBreederId.get(),
+//				payload,
+//				true
+//			);
+//			//LOG.infof("Updated breeder cId=%d documentId=%s", member.cId(), existingBreederId.get());
+//			return false;
+//		}
 
 		client.create(StrapiResources.BREEDERS, payload, true);
 		//LOG.infof("Created breeder cId=%d for member documentId=%s", member.cId(), memberDocumentId);
 		return true;
 	}
 
-	private Optional<StrapiUserRef> findExistingStrapiUser(Member member) {
-		if (member.hasStrapiIdentity()) {
-			return Optional.of(new StrapiUserRef(
-				member.documentId(),
-				member.id()
-			));
-		}
-		return Optional.empty();
-	}
-
-	private Optional<StrapiUserRef> findExistingStrapiByUsername(Member member) {
-		return Optional.empty();
-	}
-
-	private Optional<StrapiMemberSnapshot> findExistingUserRefByCId(int cId) {
-		StrapiMemberSnapshot cachedMember = membersByCid.get(cId);
-		if (cachedMember != null) {
-			return Optional.of(cachedMember);
-		} else return Optional.empty();
-	}
 
 }

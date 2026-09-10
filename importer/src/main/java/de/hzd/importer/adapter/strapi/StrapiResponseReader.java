@@ -108,6 +108,31 @@ final class StrapiResponseReader {
 		return Optional.empty();
 	}
 
+	static Optional<Integer> readIntegerField(JsonNode item, String field) {
+		if (item == null || item.isNull()) {
+			return Optional.empty();
+		}
+		JsonNode value = item.get(field);
+		if (value == null || value.isNull()) {
+			return Optional.empty();
+		}
+		if (value.isNumber()) {
+			return Optional.of(value.asInt());
+		}
+		if (value.isTextual()) {
+			String text = value.asText().trim();
+			if (text.isEmpty()) {
+				return Optional.empty();
+			}
+			try {
+				return Optional.of(Integer.parseInt(text));
+			} catch (NumberFormatException exception) {
+				return Optional.empty();
+			}
+		}
+		return Optional.empty();
+	}
+
 	static Optional<String> readTextField(JsonNode item, String field) {
 		if (item == null || item.isNull()) {
 			return Optional.empty();
@@ -118,6 +143,20 @@ final class StrapiResponseReader {
 		}
 		String text = value.asText().trim();
 		return text.isEmpty() ? Optional.empty() : Optional.of(text);
+	}
+
+	static JsonNode readRelationItems(JsonNode relation) {
+		if (relation == null || relation.isNull() || relation.isMissingNode()) {
+			return null;
+		}
+		if (relation.isArray()) {
+			return relation;
+		}
+		JsonNode data = relation.get("data");
+		if (data != null && data.isArray()) {
+			return data;
+		}
+		return null;
 	}
 
 	static boolean hasNextPage(JsonNode response, int currentPage, int itemsOnPage, int pageSize) {

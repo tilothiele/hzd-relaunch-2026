@@ -1,0 +1,35 @@
+{
+	"priority": 1,
+	"request": {
+		"method": "GET",
+		"urlPath": "/api/user-groups"
+	},
+	"response": {
+		"status": 200,
+		"headers": {
+			"Content-Type": "application/json"
+		},
+		"jsonBody": {
+			"data": [
+				{
+					"id": 1,
+					"documentId": "ug-sonderleiter",
+					"Name": "Sonderleiter"
+				},
+				{
+					"id": 2,
+					"documentId": "ug-koermeister",
+					"Name": "Körmeister"
+				}
+			],
+			"meta": {
+				"pagination": {
+					"page": 1,
+					"pageSize": 100,
+					"pageCount": 1,
+					"total": 2
+				}
+			}
+		}
+	}
+}

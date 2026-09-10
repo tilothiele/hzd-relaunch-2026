@@ -50,11 +50,11 @@ public class StrapiRestClient {
 
 	public JsonNode update(
 		String resourcePath,
-		String documentId,
+		String objectId,
 		Map<String, Object> payload,
 		boolean wrapInData
 	) {
-		return send("PUT", resourcePath + "/" + documentId, wrapPayload(payload, wrapInData));
+		return send("PUT", resourcePath + "/" + objectId, wrapPayload(payload, wrapInData));
 	}
 
 	public JsonNode updateUser(int numericUserId, Map<String, Object> payload) {
@@ -66,56 +66,19 @@ public class StrapiRestClient {
 		);
 	}
 
-	public Optional<StrapiUserRef> findUserRefByCId(int cId) {
-		Optional<StrapiUserRef> rv = firstUserRef(
-			list(
-				StrapiResources.USERS,
-				Map.of("filters[cId][$eq]", Integer.toString(cId))
-			)
-		);
-		Log.infof("find user by cId=%d found=%b", cId, rv!=null && rv.isPresent());
-		return rv;
-	}
 
-	public Optional<StrapiUserRef> findUserRefByEmail(String email) {
-		return firstUserRef(
-			list(
-				StrapiResources.USERS,
-				Map.of("filters[email][$eq]", email)
-			)
-		);
-	}
-
-	public Optional<StrapiUserRef> findUserRefByUsername(String username) {
-		return firstUserRef(
-			list(
-				StrapiResources.USERS,
-				Map.of("filters[username][$eq]", username)
-			)
-		);
-	}
-
-	public Optional<String> findDocumentIdByCId(String resourcePath, int cId) {
-		JsonNode response = list(
-			resourcePath,
-			Map.of("filters[cId][$eq]", Integer.toString(cId))
-		);
-		return firstResourceId(response);
-	}
-
-	public Optional<String> findUserDocumentIdByEmail(String email) {
-		return findUserRefByEmail(email).map(StrapiUserRef::documentId);
-	}
-
-	public Optional<String> findUserDocumentIdByUsername(String username) {
-		return findUserRefByUsername(username).map(StrapiUserRef::documentId);
-	}
-
-	public JsonNode listAllPaginated(String resourcePath, int page, int pageSize) {
+	public JsonNode listAllPaginated(
+		String resourcePath,
+		int page,
+		int pageSize,
+		Map<String, String> extraQuery
+	) {
 		Map<String, String> query = new LinkedHashMap<>();
 		query.put("pagination[page]", Integer.toString(page));
 		query.put("pagination[pageSize]", Integer.toString(pageSize));
-		query.put("sort[0]", "cId:asc");
+		if (extraQuery != null) {
+			query.putAll(extraQuery);
+		}
 		return list(resourcePath, query);
 	}
 

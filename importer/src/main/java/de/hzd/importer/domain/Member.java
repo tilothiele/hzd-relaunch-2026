@@ -1,6 +1,7 @@
 package de.hzd.importer.domain;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 public record Member(
@@ -26,11 +27,16 @@ public record Member(
 		Optional<LocalDate> cancellationOn,
 		Optional<Boolean> isActiveBreeder,
 		Optional<Boolean> publishMyData,
+		List<UserGroup> userGroups,
 		String documentId,
 		int id
 ) {
 	public static final String UNDEFINED_DOCUMENT_ID = "";
 	public static final int UNDEFINED_ID = 0;
+
+	public Member {
+		userGroups = userGroups == null ? List.of() : List.copyOf(userGroups);
+	}
 
 	public String username() {
 		String cUsername = "c."+cId;
@@ -99,6 +105,37 @@ public record Member(
 			cancellationOn,
 			isActiveBreeder,
 			publishMyData,
+			userGroups,
+			documentId,
+			id
+		);
+	}
+
+	public Member withUserGroups(List<UserGroup> userGroups) {
+		return new Member(
+			cId,
+			cFlagAccess,
+			title,
+			firstName,
+			lastName,
+			address1,
+			zip,
+			city,
+			region,
+			countryCode,
+			phone,
+			email,
+			sex,
+			cFlagBreeder,
+			membershipNumber,
+			breedingStation,
+			dateOfBirth,
+			dateOfDeath,
+			memberSince,
+			cancellationOn,
+			isActiveBreeder,
+			publishMyData,
+			userGroups,
 			documentId,
 			id
 		);

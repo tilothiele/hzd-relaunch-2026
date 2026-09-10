@@ -13,13 +13,16 @@ import org.jboss.logging.MDC;
 
 import de.hzd.importer.adapter.csv.CsvUploadStore;
 import de.hzd.importer.adapter.csv.UploadedCsvFiles;
+import de.hzd.importer.adapter.strapi.StrapiDogAdapter;
 import de.hzd.importer.adapter.strapi.StrapiMemberAdapter;
 import de.hzd.importer.adapter.strapi.StrapiMemberAdapter.StrapiMemberSnapshot;
+import de.hzd.importer.adapter.strapi.StrapiUserGroupAdapter;
 import de.hzd.importer.domain.Dog;
 import de.hzd.importer.domain.ImportJob;
 import de.hzd.importer.domain.ImportJobStatus;
 import de.hzd.importer.domain.ImportStatistics;
 import de.hzd.importer.domain.Member;
+import de.hzd.importer.domain.UserGroup;
 import de.hzd.importer.infrastructure.config.ImporterConfig;
 import de.hzd.importer.port.CsvDogReaderPort;
 import de.hzd.importer.port.CsvMemberReaderPort;
@@ -54,6 +57,12 @@ public class ImportService {
 
 	@Inject
 	StrapiMemberAdapter strapiMemberAdapter;
+
+	@Inject
+	StrapiUserGroupAdapter strapiUserGroupAdapter;
+
+	@Inject
+	StrapiDogAdapter strapiDogAdapter;
 
 	@Inject
 	DogSyncPort dogSyncPort;
@@ -163,10 +172,19 @@ public class ImportService {
 					strapiMemberAdapter.fetchAllMembers();
 			jobLog.info("Loaded %d members from Strapi", strapiMembers.size());
 
+			List<UserGroup> userGroups = strapiUserGroupAdapter.fetchAll();
+			jobLog.info("Loaded %d user groups from Strapi", userGroups.size());
+
+			Collection<StrapiDogAdapter.StrapiDogSnapshot> strapiDogs =
+					strapiDogAdapter.fetchAllDogs();
+			jobLog.info("Loaded %d dogs from Strapi", strapiDogs.size());
+
 			int authenticatedRoleId = strapiMemberAdapter.fetchAuthenticatedRoleId();
 
 			strapiMemberAdapter.setImportCache(strapiMembers);
 			strapiMemberAdapter.setAuthenticatedRoleId(authenticatedRoleId);
+			strapiUserGroupAdapter.setImportCache(userGroups);
+			strapiDogAdapter.setImportCache(strapiDogs);
 			
 			try {
 				jobLog.info("start import Members");
@@ -176,6 +194,8 @@ public class ImportService {
 				statistics = importDogs(dogs, statistics);
 			} finally {
 				strapiMemberAdapter.clearImportCache();
+				strapiUserGroupAdapter.clearImportCache();
+				strapiDogAdapter.clearCache();
 			}
 
 			finishedJob = finishJob(jobId, ImportJobStatus.SUCCESS, "Import completed successfully", statistics);
@@ -263,9 +283,11 @@ public class ImportService {
 			logTicker.tick(() -> jobLog.info(Ticker.formatProceedingMessage(t0, dogs.size(), j, "Dog")));
 			try {
 				DogSyncPort.SyncResult result = dogSyncPort.sync(dog);
-				statistics = result == DogSyncPort.SyncResult.CREATED
-					? statistics.withDogsCreated(1)
-					: statistics.withDogsUpdated(1);
+				statistics = switch (result) {
+					case CREATED -> statistics.withDogsCreated(1);
+					case UPDATED -> statistics.withDogsUpdated(1);
+					case SKIPPED -> statistics;
+				};
 			} catch (RuntimeException exception) {
 				jobLog.error("Failed to import dog cId=%d", exception, dog.cId());
 				statistics = statistics.withDogsFailed(1);

@@ -1,6 +1,7 @@
 package de.hzd.importer.adapter.csv;
 
 import de.hzd.importer.domain.Member;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -48,6 +49,7 @@ final class MemberCsvMapper {
 			CsvParsingUtils.parseDate(row.get("date of leaving")),
 			CsvParsingUtils.parseBoolean(row.get("person is an active breeder")),
 			Optional.empty(),
+			List.of(),
 			Member.UNDEFINED_DOCUMENT_ID,
 			Member.UNDEFINED_ID
 		);
