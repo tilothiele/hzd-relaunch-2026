@@ -3,7 +3,8 @@ services:
     image: joomla:3-php7.4-apache
     container_name: joomla3
     restart: unless-stopped
-
+    networks:
+      - coolify
     volumes:
       - $JOOMLA_DATA_DIR:/var/www/html
 
@@ -12,4 +13,8 @@ services:
       JOOMLA_DB_NAME: $MYSQL_DATABASE
       JOOMLA_DB_USER: $MYSQL_USER
       JOOMLA_DB_PASSWORD: $MYSQL_PASSWORD
+
+networks:
+  coolify:
+    external: true
 
