@@ -16,6 +16,9 @@ services:
       JOOMLA_DB_USER: $MYSQL_USER
       JOOMLA_DB_PASSWORD: $MYSQL_PASSWORD
 
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.joomla-https.headers.customrequestheaders.X-Forwarded-Proto=https"
 networks:
   coolify:
     external: true
