@@ -6,7 +6,7 @@ services:
     networks:
       - coolify
     volumes:
-      - "${JOOMLA_DATA_DIR}:/var/www/html"
+      - "/srv/docker-volumes/joomla-website:/var/www/html"
 
     environment:
       JOOMLA_DB_HOST: $MYSQL_HOST
