@@ -5,11 +5,7 @@ import type { PassedDogCardData } from '@/lib/server/passed-dog-utils'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 
 export function passedDogCardTitle(dog: PassedDogCardData): string {
-	return (
-		dog.hzd_plugin_dog?.fullKennelName?.trim()
-		|| dog.DogName?.trim()
-		|| 'Unbekannt'
-	)
+	return dog.DogName?.trim() || 'Unbekannt'
 }
 
 /** Anzeige Sterbedatum (GraphQL `DatePassed`) im deutschsprachigen Kurzformat */

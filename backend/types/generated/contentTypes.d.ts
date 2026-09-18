@@ -1479,21 +1479,20 @@ export interface ApiPassedDogPassedDog extends Struct.CollectionTypeSchema {
     singularName: 'passed-dog';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
-    Approved: Schema.Attribute.Boolean;
+    Approved: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     Avatar: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    ClientIP: Schema.Attribute.String;
     Consent: Schema.Attribute.Boolean;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     DatePassed: Schema.Attribute.Date;
     DogName: Schema.Attribute.String;
-    hzd_plugin_dog: Schema.Attribute.Relation<
-      'oneToOne',
-      'plugin::hzd-plugin.dog'
-    >;
+    EMail: Schema.Attribute.Email;
+    HealthInfo: Schema.Attribute.Text;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -1505,10 +1504,7 @@ export interface ApiPassedDogPassedDog extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    users_permissions_user: Schema.Attribute.Relation<
-      'oneToOne',
-      'plugin::users-permissions.user'
-    >;
+    UserName: Schema.Attribute.String;
   };
 }
 

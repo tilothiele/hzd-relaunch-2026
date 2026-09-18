@@ -76,6 +76,7 @@ export function buildStrapiQuery(options: {
 	populate?: URLSearchParams | Record<string, string>
 	fields?: string[]
 	publicationState?: 'live' | 'preview'
+	status?: 'published' | 'draft'
 } = {}): URLSearchParams {
 	const params = new URLSearchParams()
 
@@ -110,6 +111,10 @@ export function buildStrapiQuery(options: {
 
 	if (options.publicationState === 'preview') {
 		params.set('publicationState', 'preview')
+	}
+
+	if (options.status) {
+		params.set('status', options.status)
 	}
 
 	if (options.populate instanceof URLSearchParams) {

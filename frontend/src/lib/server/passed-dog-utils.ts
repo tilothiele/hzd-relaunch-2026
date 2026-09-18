@@ -5,17 +5,16 @@ export interface PassedDogCardData {
 	DogName?: string | null
 	DatePassed?: string | null
 	Message?: string | null
+	HealthInfo?: string | null
 	Approved?: boolean | null
 	Consent?: boolean | null
+	UserName?: string | null
+	EMail?: string | null
 	Avatar?: {
 		url: string
 		alternativeText?: string | null
 		width?: number | null
 		height?: number | null
-	} | null
-	hzd_plugin_dog?: {
-		documentId: string
-		fullKennelName?: string | null
 	} | null
 }
 
