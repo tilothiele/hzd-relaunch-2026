@@ -787,13 +787,20 @@ export async function fetchApprovedPassedDogsPage(
 	const query = buildStrapiQuery({
 		filters: {
 			and: [
-				{ Approved: { eq: true } },
 				{ Consent: { eq: true } },
 			],
 		},
 		pagination: { page, pageSize },
-		sort: ['DatePassed:desc', 'publishedAt:desc'],
+		sort: ['DatePassed:desc', 'createdAt:desc'],
 		populate: Object.fromEntries(POPULATE_PASSED_DOG.entries()),
+		fields: [
+			'DogName',
+			'DatePassed',
+			'Message',
+			'Approved',
+			'Consent',
+			'UserName',
+		],
 	})
 
 	const response = await fetchStrapiServer<unknown>('passed-dogs', query)

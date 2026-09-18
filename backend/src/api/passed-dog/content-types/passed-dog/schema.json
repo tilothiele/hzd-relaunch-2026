@@ -7,20 +7,10 @@
     "displayName": "PassedDog"
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
-    "users_permissions_user": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "plugin::users-permissions.user"
-    },
-    "hzd_plugin_dog": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "plugin::hzd-plugin.dog"
-    },
     "DatePassed": {
       "type": "date"
     },
@@ -28,7 +18,8 @@
       "type": "text"
     },
     "Approved": {
-      "type": "boolean"
+      "type": "boolean",
+      "default": false
     },
     "Avatar": {
       "type": "media",
@@ -45,6 +36,18 @@
     },
     "Consent": {
       "type": "boolean"
+    },
+    "UserName": {
+      "type": "string"
+    },
+    "EMail": {
+      "type": "email"
+    },
+    "ClientIP": {
+      "type": "string"
+    },
+    "HealthInfo": {
+      "type": "text"
     }
   }
 }

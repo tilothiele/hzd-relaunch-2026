@@ -201,8 +201,6 @@ export const POPULATE_BREEDER_SEARCH = new URLSearchParams({
 
 export const POPULATE_PASSED_DOG = new URLSearchParams({
 	'populate[Avatar]': 'true',
-	'populate[hzd_plugin_dog][fields][0]': 'documentId',
-	'populate[hzd_plugin_dog][fields][1]': 'fullKennelName',
 })
 
 function buildNewsArticlePopulate(): URLSearchParams {

@@ -1,24 +1,24 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Box, Button, CircularProgress, Dialog, IconButton, Typography } from '@mui/material'
+import { Alert, Box, Button, CircularProgress, Dialog, IconButton, Typography } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import type { ThemeDefinition } from '@/themes'
 import { useAuth } from '@/hooks/use-auth'
-import { buildStrapiQuery } from '@/lib/strapi/filters'
-import { POPULATE_PASSED_DOG } from '@/lib/strapi/populate'
-import { fetchEntityList } from '@/lib/strapi/api'
-import { getMoreApprovedPassedDogs } from '@/lib/server/passed-dog-actions'
+import {
+	getMoreApprovedPassedDogs,
+	getMyPendingPassedDogs,
+} from '@/lib/server/passed-dog-actions'
 import type { PassedDogCardData } from '@/lib/server/passed-dog-utils'
 import { PassedDogCard, passedDogCardTitle } from './passed-dog-card'
 import { PassedDogFormModal } from './passed-dog-form-modal'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { MAX_PENDING_PASSED_DOGS } from '@/lib/passed-dogs-limits'
 
-const NOT_LOGGED_HINT =
-	'Bitte melden Sie sich an und teilen uns mit, wenn Ihr Hund verstorben ist'
-
 const PENDING_LIMIT_HINT = `Sie haben bereits ${MAX_PENDING_PASSED_DOGS} Einträge in Prüfung. Nach Freigabe können Sie weitere Meldungen einreichen.`
+
+const SUBMIT_SUCCESS_HINT =
+	'Vielen Dank. Ihr Eintrag wird geprüft und anschließend veröffentlicht.'
 
 interface PassedDogsSectionContentProps {
 	initialNodes: PassedDogCardData[]
@@ -40,7 +40,7 @@ export function PassedDogsSectionContent({
 	strapiBaseUrl,
 	theme,
 }: PassedDogsSectionContentProps) {
-	const { isAuthenticated, user, isInitialized } = useAuth()
+	const { isAuthenticated, isInitialized } = useAuth()
 	const [createOpen, setCreateOpen] = useState(false)
 	const [editTarget, setEditTarget] = useState<PassedDogCardData | null>(null)
 	const [pending, setPending] = useState<PassedDogCardData[]>([])
@@ -49,6 +49,7 @@ export function PassedDogsSectionContent({
 	const [page, setPage] = useState(1)
 	const [loading, setLoading] = useState(false)
 	const [lightbox, setLightbox] = useState<PassedDogCardData | null>(null)
+	const [successHint, setSuccessHint] = useState<string | null>(null)
 	const observer = useRef<IntersectionObserver | null>(null)
 
 	const publicCards = useMemo(
@@ -57,35 +58,28 @@ export function PassedDogsSectionContent({
 	)
 
 	const loadPending = useCallback(async () => {
-		if (!user?.documentId) {
+		if (!isAuthenticated) {
+			setPending([])
 			return
 		}
 		try {
-			const query = buildStrapiQuery({
-				filters: {
-					and: [
-						{ users_permissions_user: { documentId: { eq: user.documentId } } },
-						{ not: { Approved: { eq: true } } },
-					],
-				},
-				pagination: { pageSize: 100 },
-				sort: ['updatedAt:desc'],
-				populate: Object.fromEntries(POPULATE_PASSED_DOG.entries()),
-			})
-			const res = await fetchEntityList<PassedDogCardData>('passed-dogs', query)
+			const res = await getMyPendingPassedDogs()
 			setPending(res)
 		} catch (e) {
 			console.error(e)
 		}
-	}, [user?.documentId])
+	}, [isAuthenticated])
 
 	useEffect(() => {
-		if (isAuthenticated && user?.documentId) {
+		if (!isInitialized) {
+			return
+		}
+		if (isAuthenticated) {
 			loadPending()
 		} else {
 			setPending([])
 		}
-	}, [isAuthenticated, user?.documentId, loadPending])
+	}, [isAuthenticated, isInitialized, loadPending])
 
 	const hasMore = page < pageInfo.pageCount
 
@@ -137,6 +131,7 @@ export function PassedDogsSectionContent({
 	}, [page, pageSize])
 
 	const refreshAfterMutation = () => {
+		setSuccessHint(SUBMIT_SUCCESS_HINT)
 		loadPending()
 	}
 
@@ -144,8 +139,8 @@ export function PassedDogsSectionContent({
 		? resolveMediaUrl(lightbox.Avatar, strapiBaseUrl)
 		: null
 
-	const uid = user?.documentId
-	const atPendingLimit = pending.length >= MAX_PENDING_PASSED_DOGS
+	const atPendingLimit = isAuthenticated
+		&& pending.length >= MAX_PENDING_PASSED_DOGS
 
 	useEffect(() => {
 		if (createOpen && atPendingLimit) {
@@ -156,20 +151,23 @@ export function PassedDogsSectionContent({
 	return (
 		<div className="w-full space-y-10">
 			<div className="flex flex-col items-center gap-4">
-				{!isInitialized ? null : !isAuthenticated ? (
-					<span className="inline-flex" title={NOT_LOGGED_HINT}>
-						<button
-							type="button"
-							disabled
-							className="cursor-not-allowed rounded-full px-6 py-3 font-semibold text-white opacity-50 shadow"
-							style={{ backgroundColor: theme.buttonColor }}
-						>
-							Mein Hund ist verstorben
-						</button>
-					</span>
-				) : atPendingLimit ? (
+				{successHint ? (
+					<Alert
+						severity="success"
+						onClose={() => setSuccessHint(null)}
+						sx={{ maxWidth: '36rem', width: '100%' }}
+					>
+						{successHint}
+					</Alert>
+				) : null}
+				{atPendingLimit ? (
 					<>
-						<Typography color="textSecondary" textAlign="center" variant="body2" sx={{ maxWidth: '36rem', px: 1 }}>
+						<Typography
+							color="textSecondary"
+							textAlign="center"
+							variant="body2"
+							sx={{ maxWidth: '36rem', px: 1 }}
+						>
 							{PENDING_LIMIT_HINT}
 						</Typography>
 						<span className="inline-flex" title={PENDING_LIMIT_HINT}>
@@ -179,7 +177,7 @@ export function PassedDogsSectionContent({
 								className="cursor-not-allowed rounded-full px-6 py-3 font-semibold text-white opacity-50 shadow"
 								style={{ backgroundColor: theme.buttonColor }}
 							>
-								Mein Hund ist verstorben
+								Mitteilung: Mein Hund ist verstorben
 							</button>
 						</span>
 					</>
@@ -190,7 +188,7 @@ export function PassedDogsSectionContent({
 						className="rounded-full px-6 py-3 font-semibold text-white shadow-md transition hover:opacity-90"
 						style={{ backgroundColor: theme.buttonColor }}
 					>
-						Mein Hund ist verstorben
+						Mitteilung: Mein Hund ist verstorben
 					</button>
 				)}
 			</div>
@@ -234,7 +232,10 @@ export function PassedDogsSectionContent({
 										size="small"
 										variant="outlined"
 										onClick={() => setEditTarget(p)}
-										sx={{ borderColor: theme.buttonColor, color: theme.buttonColor }}
+										sx={{
+											borderColor: theme.buttonColor,
+											color: theme.buttonColor,
+										}}
 									>
 										Bearbeiten
 									</Button>
@@ -280,28 +281,22 @@ export function PassedDogsSectionContent({
 				) : null}
 			</div>
 
-			{uid ? (
-				<>
-					<PassedDogFormModal
-						open={createOpen}
-						onClose={() => setCreateOpen(false)}
-						mode="create"
-						initial={null}
-						theme={theme}
-						userDocumentId={uid}
-						onSuccess={refreshAfterMutation}
-					/>
-					<PassedDogFormModal
-						open={Boolean(editTarget)}
-						onClose={() => setEditTarget(null)}
-						mode="edit"
-						initial={editTarget}
-						theme={theme}
-						userDocumentId={uid}
-						onSuccess={refreshAfterMutation}
-					/>
-				</>
-			) : null}
+			<PassedDogFormModal
+				open={createOpen}
+				onClose={() => setCreateOpen(false)}
+				mode="create"
+				initial={null}
+				theme={theme}
+				onSuccess={refreshAfterMutation}
+			/>
+			<PassedDogFormModal
+				open={Boolean(editTarget)}
+				onClose={() => setEditTarget(null)}
+				mode="edit"
+				initial={editTarget}
+				theme={theme}
+				onSuccess={refreshAfterMutation}
+			/>
 
 			<Dialog open={Boolean(lightbox)} onClose={() => setLightbox(null)} maxWidth="md" fullWidth>
 				<Box sx={{ position: 'relative', p: 1 }}>

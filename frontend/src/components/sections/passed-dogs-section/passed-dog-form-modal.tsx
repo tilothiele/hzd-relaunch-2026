@@ -17,55 +17,35 @@ import {
 import { useTheme } from '@mui/material/styles'
 import CloseIcon from '@mui/icons-material/Close'
 import type { ThemeDefinition } from '@/themes'
-import { buildStrapiQuery } from '@/lib/strapi/filters'
-import { POPULATE_PASSED_DOG } from '@/lib/strapi/populate'
-import { createEntity, fetchEntityList, searchDogsGeneric, updateEntity } from '@/lib/strapi/api'
-import { MAX_PENDING_PASSED_DOGS } from '@/lib/passed-dogs-limits'
+import { passedDogDateBounds } from '@/lib/passed-dogs-limits'
 import type { PassedDogCardData } from '@/lib/server/passed-dog-utils'
+import {
+	submitPassedDog,
+	submitPassedDogUpdate,
+} from '@/lib/server/passed-dog-actions'
 import { useAuth } from '@/hooks/use-auth'
 
-interface AliveDog {
-	documentId: string
-	fullKennelName?: string | null
-}
-
-function ymd(d: Date): string {
-	return d.toISOString().slice(0, 10)
-}
-
-function dateBounds(): { min: string; max: string } {
-	const today = new Date()
-	const max = ymd(today)
-	const minD = new Date(today)
-	minD.setFullYear(minD.getFullYear() - 1)
-	return { min: ymd(minD), max }
-}
-
-async function uploadAvatar(
-	file: File,
-	token: string,
-): Promise<string | number> {
-	const fd = new FormData()
-	fd.append('files', file, file.name)
-	// JWT im Body (wie PhotoBox), kein Authorization-Header — sonst fehlt
-	// Basic-Auth für den Reverse-Proxy auf derselben Origin.
-	fd.append('token', token)
-	const res = await fetch('/api/strapi/upload', {
-		method: 'POST',
-		credentials: 'include',
-		body: fd,
-	})
-	if (!res.ok) {
-		const t = await res.text()
-		throw new Error(t || 'Bild-Upload fehlgeschlagen.')
+function sessionUserName(user: {
+	firstName?: string | null
+	lastName?: string | null
+	DisplayName?: string | null
+	username?: string | null
+} | null): string {
+	if (!user) {
+		return ''
 	}
-	const data = (await res.json()) as Array<{ id?: number; documentId?: string }>
-	const first = Array.isArray(data) ? data[0] : null
-	const id = first?.id ?? first?.documentId
-	if (id === undefined || id === null) {
-		throw new Error('Ungültige Upload-Antwort.')
-	}
-	return id
+	const fromParts = [user.firstName, user.lastName]
+		.filter(Boolean)
+		.join(' ')
+		.trim()
+	return user.DisplayName?.trim() || fromParts || user.username?.trim() || ''
+}
+
+function sessionEmail(user: {
+	cEmail?: string | null
+	email?: string | null
+} | null): string {
+	return user?.cEmail?.trim() || user?.email?.trim() || ''
 }
 
 interface PassedDogFormModalProps {
@@ -74,7 +54,6 @@ interface PassedDogFormModalProps {
 	mode: 'create' | 'edit'
 	initial: PassedDogCardData | null
 	theme: ThemeDefinition
-	userDocumentId: string
 	onSuccess: () => void
 }
 
@@ -84,19 +63,23 @@ export function PassedDogFormModal({
 	mode,
 	initial,
 	theme,
-	userDocumentId,
 	onSuccess,
 }: PassedDogFormModalProps) {
 	const muiTheme = useTheme()
-	const { authState } = useAuth()
+	const { user, isAuthenticated } = useAuth()
 	const fullScreen = useMediaQuery(muiTheme.breakpoints.down('sm'))
-	const { min: minDate, max: maxDate } = useMemo(() => dateBounds(), [])
+	const lockedEmail = isAuthenticated ? sessionEmail(user) : ''
+	const { min: minDate, max: maxDate } = useMemo(
+		() => passedDogDateBounds(),
+		[],
+	)
 
-	const [aliveDogs, setAliveDogs] = useState<AliveDog[]>([])
-	const [dogId, setDogId] = useState('')
 	const [dogName, setDogName] = useState('')
+	const [userName, setUserName] = useState('')
+	const [email, setEmail] = useState('')
 	const [datePassed, setDatePassed] = useState(maxDate)
 	const [message, setMessage] = useState('')
+	const [healthInfo, setHealthInfo] = useState('')
 	const [consentPublish, setConsentPublish] = useState(true)
 	const [file, setFile] = useState<File | null>(null)
 	const [filePreviewUrl, setFilePreviewUrl] = useState<string | null>(null)
@@ -115,75 +98,56 @@ export function PassedDogFormModal({
 		}
 	}, [file])
 
-	const loadAliveDogs = useCallback(async () => {
-		const userCId = authState.user?.cId
-		if (typeof userCId !== 'number') {
-			setAliveDogs([])
-			return
-		}
-
-		try {
-			const res = await searchDogsGeneric({
-				filters: {
-					and: [
-						{ cOwnerId: { eq: userCId } },
-						{ dateOfDeath: { null: true } },
-					],
-				},
-				pagination: { pageSize: 500 },
-				sort: ['fullKennelName:asc'],
-			})
-			setAliveDogs(
-				(res.hzdPluginDogs_connection?.nodes ?? []).map((d) => ({
-					documentId: d.documentId,
-					fullKennelName: d.fullKennelName,
-				})),
-			)
-		} catch (e) {
-			console.error(e)
-			setAliveDogs([])
-		}
-	}, [authState.user?.cId])
-
-	useEffect(() => {
-		if (!open) {
-			return
-		}
+	const resetFromInitial = useCallback(() => {
 		setFormError(null)
-		loadAliveDogs()
+		setFile(null)
 		if (mode === 'edit' && initial) {
-			setDogId(initial.hzd_plugin_dog?.documentId ?? '')
 			setDogName(initial.DogName ?? '')
+			setUserName(initial.UserName ?? sessionUserName(user))
+			setEmail(initial.EMail ?? sessionEmail(user))
 			setDatePassed(
 				initial.DatePassed
 					? String(initial.DatePassed).slice(0, 10)
 					: maxDate,
 			)
 			setMessage(initial.Message ?? '')
+			setHealthInfo(initial.HealthInfo ?? '')
 			setConsentPublish(initial.Consent === true)
-			setFile(null)
-		} else {
-			setDogId('')
-			setDogName('')
-			setDatePassed(maxDate)
-			setMessage('')
-			setConsentPublish(true)
-			setFile(null)
+			return
 		}
-	}, [open, mode, initial, loadAliveDogs, maxDate])
+		setDogName('')
+		setUserName(sessionUserName(user))
+		setEmail(sessionEmail(user))
+		setDatePassed(maxDate)
+		setMessage('')
+		setHealthInfo('')
+		setConsentPublish(true)
+	}, [mode, initial, user, maxDate])
 
-	const selectedDog = aliveDogs.find((d) => d.documentId === dogId)
-	const nameRequired = !dogId
+	useEffect(() => {
+		if (!open) {
+			return
+		}
+		resetFromInitial()
+	}, [open, resetFromInitial])
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setFormError(null)
 
-		if (nameRequired && !dogName.trim()) {
+		if (!dogName.trim()) {
 			setFormError('Bitte geben Sie den Namen des Hundes an.')
 			return
 		}
-
+		if (!userName.trim()) {
+			setFormError('Bitte geben Sie Ihren Namen an.')
+			return
+		}
+		const contactEmail = (lockedEmail || email).trim()
+		if (!contactEmail) {
+			setFormError('Bitte geben Sie Ihre E-Mail-Adresse an.')
+			return
+		}
 		if (!datePassed) {
 			setFormError('Bitte wählen Sie das Sterbedatum.')
 			return
@@ -191,76 +155,25 @@ export function PassedDogFormModal({
 
 		setSubmitting(true)
 		try {
-			if (mode === 'create') {
-				const pendingQuery = buildStrapiQuery({
-					filters: {
-						and: [
-							{ users_permissions_user: { documentId: { eq: userDocumentId } } },
-							{ not: { Approved: { eq: true } } },
-						],
-					},
-					pagination: { pageSize: 100 },
-					populate: Object.fromEntries(POPULATE_PASSED_DOG.entries()),
-				})
-				const pendingCheck = await fetchEntityList<{ documentId: string }>(
-					'passed-dogs',
-					pendingQuery,
-				)
-				const pendingCount = pendingCheck.length
-				if (pendingCount >= MAX_PENDING_PASSED_DOGS) {
-					setFormError(
-						`Sie dürfen höchstens ${MAX_PENDING_PASSED_DOGS} Einträge gleichzeitig in Prüfung haben.`,
-					)
-					return
-				}
-			}
-
-			let avatarId: string | number | undefined
+			const fd = new FormData()
+			fd.set('dogName', dogName.trim())
+			fd.set('userName', userName.trim())
+			fd.set('email', contactEmail)
+			fd.set('datePassed', datePassed)
+			fd.set('message', message.trim())
+			fd.set('healthInfo', healthInfo.trim())
+			fd.set('consent', consentPublish ? 'true' : 'false')
 			if (file) {
-				const token = authState.token
-				if (!token) {
-					throw new Error('Nicht angemeldet.')
-				}
-				avatarId = await uploadAvatar(file, token)
+				fd.set('avatar', file, file.name)
 			}
 
-			const label = selectedDog?.fullKennelName?.trim() ?? ''
+			const result = mode === 'edit' && initial
+				? await submitPassedDogUpdate(initial.documentId, fd)
+				: await submitPassedDog(fd)
 
-			if (mode === 'create') {
-				const data: Record<string, unknown> = {
-					users_permissions_user: userDocumentId,
-					DatePassed: datePassed,
-					Message: message.trim() || null,
-					Approved: false,
-					Consent: consentPublish,
-					publishedAt: new Date().toISOString(),
-				}
-				if (dogId) {
-					data.hzd_plugin_dog = dogId
-					data.DogName = dogName.trim() || label || null
-				} else {
-					data.DogName = dogName.trim()
-				}
-				if (avatarId !== undefined) {
-					data.Avatar = avatarId
-				}
-				await createEntity('passed-dogs', data)
-			} else if (initial) {
-				const data: Record<string, unknown> = {
-					DatePassed: datePassed,
-					Message: message.trim() || null,
-					Consent: consentPublish,
-				}
-				if (dogId) {
-					data.hzd_plugin_dog = dogId
-					data.DogName = dogName.trim() || label || null
-				} else {
-					data.DogName = dogName.trim()
-				}
-				if (avatarId !== undefined) {
-					data.Avatar = avatarId
-				}
-				await updateEntity('passed-dogs', initial.documentId, data)
+			if (!result.ok) {
+				setFormError(result.error)
+				return
 			}
 
 			onSuccess()
@@ -305,52 +218,46 @@ export function PassedDogFormModal({
 				</IconButton>
 			</DialogTitle>
 			<form onSubmit={handleSubmit}>
-				<DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+				<DialogContent
+					dividers
+					sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+				>
 					{formError ? (
 						<Typography color="error" variant="body2">
 							{formError}
 						</Typography>
 					) : null}
 
-					<div>
-						<label htmlFor="passed-dog-select" className="mb-1 block text-sm font-medium text-neutral-700">
-							Hund auswählen (optional)
-						</label>
-						<select
-							id="passed-dog-select"
-							className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm"
-							value={dogId}
-							onChange={(e) => {
-								setDogId(e.target.value)
-								const next = aliveDogs.find(
-									(d) => d.documentId === e.target.value,
-								)
-								if (next?.fullKennelName) {
-									setDogName(next.fullKennelName)
-								}
-							}}
-							disabled={submitting}
-						>
-							<option value="">— kein Eintrag aus der Datenbank —</option>
-							{aliveDogs.map((d) => (
-								<option key={d.documentId} value={d.documentId}>
-									{d.fullKennelName || d.documentId}
-								</option>
-							))}
-						</select>
-					</div>
-
 					<TextField
-						label="Name des Hundes"
+						label="Zwingername"
 						value={dogName}
 						onChange={(e) => setDogName(e.target.value)}
-						required={nameRequired}
+						required
 						fullWidth
 						disabled={submitting}
+					/>
+
+					<TextField
+						label="Ihr Name"
+						value={userName}
+						onChange={(e) => setUserName(e.target.value)}
+						required
+						fullWidth
+						disabled={submitting}
+					/>
+
+					<TextField
+						label="Ihre E-Mail-Adresse"
+						type="email"
+						value={lockedEmail || email}
+						onChange={(e) => setEmail(e.target.value)}
+						required
+						fullWidth
+						disabled={submitting || Boolean(lockedEmail)}
 						helperText={
-							dogId
-								? 'Optional, wenn ein Hund aus der Liste gewählt ist.'
-								: 'Pflichtfeld, wenn kein Hund ausgewählt wurde.'
+							lockedEmail
+								? 'Wir verwenden die E-Mail-Adresse Ihres Kontos.'
+								: undefined
 						}
 					/>
 
@@ -387,8 +294,22 @@ export function PassedDogFormModal({
 						label="Meine Mitteilung gerne hier veröffentlichen"
 					/>
 
+					<TextField
+						label="Gesundheitsinformationen (optional/vertraulich)"
+						value={healthInfo}
+						onChange={(e) => setHealthInfo(e.target.value)}
+						fullWidth
+						multiline
+						minRows={2}
+						disabled={submitting}
+						helperText="Wichtiger Hinweis: nur interne Information - wird nicht veröffentlicht"
+					/>
+
 					<div>
-						<label htmlFor="passed-dog-avatar" className="mb-1 block text-sm font-medium text-neutral-700">
+						<label
+							htmlFor="passed-dog-avatar"
+							className="mb-1 block text-sm font-medium text-neutral-700"
+						>
 							Bild (optional)
 						</label>
 						<input
@@ -420,7 +341,10 @@ export function PassedDogFormModal({
 						type="submit"
 						variant="contained"
 						disabled={submitting}
-						sx={{ bgcolor: theme.buttonColor, '&:hover': { bgcolor: theme.buttonColor } }}
+						sx={{
+							bgcolor: theme.buttonColor,
+							'&:hover': { bgcolor: theme.buttonColor },
+						}}
 					>
 						{submitting ? '…' : 'Abschicken'}
 					</Button>
