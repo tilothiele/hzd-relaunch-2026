@@ -1,0 +1,15 @@
+services:
+  joomla:
+    image: joomla:3-php7.4-apache
+    container_name: joomla3
+    restart: unless-stopped
+
+    volumes:
+      - $JOOMLA_DATA_DIR:/var/www/html
+
+    environment:
+      JOOMLA_DB_HOST: $MYSQL_HOST
+      JOOMLA_DB_NAME: $MYSQL_DATABASE
+      JOOMLA_DB_USER: $MYSQL_USER
+      JOOMLA_DB_PASSWORD: $MYSQL_PASSWORD
+

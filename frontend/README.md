@@ -64,3 +64,27 @@ Die folgenden Content-Types müssen in Strapi erstellt werden:
 ## Permissions
 
 Stelle sicher, dass die öffentlichen Permissions für alle Content-Types in Strapi aktiviert sind.
+
+## Notizen
+
+im Menü erstmal rausgenommen
+
+```
+    {
+      "url": "/hovipedia",
+      "name": "HoviKosmos"
+    },
+```
+
+
+Im Powermenü erstmal rausgenommen:
+
+```
+    {
+      "id": "photobox",
+      "url": "/photo-box",
+      "icon": "fa-camera",
+      "name": "Fotobox"
+    },
+```
+
