@@ -1,6 +1,6 @@
 services:
   joomla:
-    image: joomla:3-php5.4-apache
+    image: php:5.6-apache
     container_name: joomla3
     restart: unless-stopped
     networks:
