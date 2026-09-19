@@ -229,7 +229,7 @@ export function PassedDogFormModal({
 					) : null}
 
 					<TextField
-						label="Zwingername"
+						label="Name + Zwingername"
 						value={dogName}
 						onChange={(e) => setDogName(e.target.value)}
 						required
