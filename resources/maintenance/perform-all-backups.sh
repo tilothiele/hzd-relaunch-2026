@@ -182,14 +182,14 @@ backup_application "$BASE_DIR" "website" \
 	"iws80ks8w8g8ckogs84gggsw-hzd-strapi-prod"
 
 # Redmine
-dump_file="redmine_db_dump_$(date +%F).sql"
-mysql_dump_docker "$BASE_DIR" "redmine" "$dump_file"
-backup_application "$BASE_DIR" "redmine" \
-	"redmine-ik4k40sg4ckg8cc0wc44k8sk-090024895984" -- \
-	"$BASE_DIR/$dump_file" \
-	"ik4k40sg4ckg8cc0wc44k8sk_redmine-files" \
-	"ik4k40sg4ckg8cc0wc44k8sk_redmine-plugins" \
-	"ik4k40sg4ckg8cc0wc44k8sk_redmine-themes"
+#dump_file="redmine_db_dump_$(date +%F).sql"
+#mysql_dump_docker "$BASE_DIR" "redmine" "$dump_file"
+#backup_application "$BASE_DIR" "redmine" \
+#	"redmine-ik4k40sg4ckg8cc0wc44k8sk-090024895984" -- \
+#	"$BASE_DIR/$dump_file" \
+#	"ik4k40sg4ckg8cc0wc44k8sk_redmine-files" \
+#	"ik4k40sg4ckg8cc0wc44k8sk_redmine-plugins" \
+#	"ik4k40sg4ckg8cc0wc44k8sk_redmine-themes"
 
 # GLPI
 dump_file="glpi_db_dump_$(date +%F).sql"

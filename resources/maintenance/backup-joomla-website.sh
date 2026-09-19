@@ -24,6 +24,8 @@ BACKUP_DATE=$(date +%F)
 WORKDIR="/tmp/joomla_backup_${BACKUP_DATE}"
 ARCHIVE_NAME="joomla_backup_${BACKUP_DATE}.tar.gz"
 
+set -x
+
 mkdir -p "${WORKDIR}"
 chmod 700 "${WORKDIR}"
 
@@ -74,45 +76,6 @@ sshpass -p ${JOOMLA_WEBSITE_SSH_PASS} ssh \
   "${JOOMLA_WEBSITE_SSH_USER}@${JOOMLA_WEBSITE_HOST}" \
   "rm -f ${REMOTE_ARCHIVE}"
 echo "-> Packe Dateibaum auf Remote-Host..."
-
-REMOTE_ARCHIVE="/tmp/joomla_files_${BACKUP_DATE}.tar.gz"
-
-# 2.1 Archiv auf dem Remote-Host erstellen
-sshpass -p ${JOOMLA_WEBSITE_SSH_PASS} ssh \
-  -o IdentityAgent=none \
-  -o PubkeyAuthentication=no \
-  -o PreferredAuthentications=password,keyboard-interactive \
-  -o StrictHostKeyChecking=no \
-  -o UserKnownHostsFile=/dev/null \
-  -p "${JOOMLA_WEBSITE_SSH_PORT}" \
-  "${JOOMLA_WEBSITE_SSH_USER}@${JOOMLA_WEBSITE_HOST}" \
-  "tar czf ${REMOTE_ARCHIVE} -C ${JOOMLA_WEBSITE_DIR} ."
-
-echo "-> Übertrage Archiv..."
-
-# 2.2 Archiv lokal herunterladen
-sshpass -p ${JOOMLA_WEBSITE_SSH_PASS} scp \
-  -o IdentityAgent=none \
-  -o PubkeyAuthentication=no \
-  -o PreferredAuthentications=password,keyboard-interactive \
-  -o StrictHostKeyChecking=no \
-  -o UserKnownHostsFile=/dev/null \
-  -P "${JOOMLA_WEBSITE_SSH_PORT}" \
-  "${JOOMLA_WEBSITE_SSH_USER}@${JOOMLA_WEBSITE_HOST}:${REMOTE_ARCHIVE}" \
-  "${WORKDIR}/files.tar.gz"
-
-echo "-> Entferne Remote-Archiv..."
-
-# 2.3 Remote-Archiv löschen
-sshpass -p ${JOOMLA_WEBSITE_SSH_PASS} ssh \
-  -o IdentityAgent=none \
-  -o PubkeyAuthentication=no \
-  -o PreferredAuthentications=password,keyboard-interactive \
-  -o StrictHostKeyChecking=no \
-  -o UserKnownHostsFile=/dev/null \
-  -p "${JOOMLA_WEBSITE_SSH_PORT}" \
-  "${JOOMLA_WEBSITE_SSH_USER}@${JOOMLA_WEBSITE_HOST}" \
-  "rm -f ${REMOTE_ARCHIVE}"
 
 #############################################
 # 3. MySQL Dump erstellen
