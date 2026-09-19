@@ -1,5 +1,5 @@
 import type { MenuItem, AuthUser } from '@/types'
-import { isKoermeister, isSonderleiter } from './permissions'
+import { isBreeder, isDeckruedenbesitzer, isKoermeister, isSonderleiter } from './permissions'
 
 export function getMenuItemUrl(menuItem: MenuItem): string {
     return menuItem.url ?? ''
@@ -20,11 +20,17 @@ export function getMenuItemEnabled(menuItem: MenuItem, _user: AuthUser | null): 
     if (menuItem.id == 'mitgliederbereich' || menuItem.id == 'photobox') {
         return _user != null
     }
-    if (menuItem.id == 'koermeisterbereich') {
+    if (menuItem.id == 'koermeister') {
         return isKoermeister(_user)
     }
-    if (menuItem.id == 'sonderleiterbereich') {
+    if (menuItem.id == 'sonderleiter' || menuItem.id == 'anmeldungen') {
         return isSonderleiter(_user)
+    }
+    if (menuItem.id == 'zuechter') {
+        return isBreeder(_user)
+    }
+    if (menuItem.id == 'deckruedenbesitzer') {
+        return isDeckruedenbesitzer(_user)
     }
     return true
 }

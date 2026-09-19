@@ -179,6 +179,11 @@ function extractUsersPermissionsMe(payload: unknown): AuthUser | null {
 	return null
 }
 
+/**
+ * Lädt Pages per Slug.
+ * Serverseitig mit API-Token, sonst fehlt Restriction.user_groups
+ * (sanitize entfernt die Relation ohne user-group find-Permission).
+ */
 export async function fetchPagesBySlug(
 	slug: string,
 	options: StrapiRequestOptions = {},
@@ -191,8 +196,13 @@ export async function fetchPagesBySlug(
 	})
 
 	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
+	const token = options.token ?? (
+		options.server
+			? process.env.STRAPI_API_TOKEN ?? null
+			: null
+	)
 	const response = await fetcher<unknown>('pages', query, {
-		token: options.token,
+		token,
 	})
 
 	const pages = extractStrapiList<Page>(response).map((page) => (

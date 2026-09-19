@@ -1,7 +1,11 @@
 import type { Core } from '@strapi/strapi';
 import cron from 'node-cron';
 import { extendJWT } from './extend-jwt';
-import { initPermissions, waitForUsersPermissions } from './init-permissions';
+import {
+	ensureUserGroupReadPermissions,
+	initPermissions,
+	waitForUsersPermissions,
+} from './init-permissions';
 import { setupRoles } from './setup-roles';
 import { enrichBreederRecords } from './utils/breeder-enrich';
 
@@ -56,6 +60,8 @@ const bootstrap = async ({ strapi }: { strapi: Core.Strapi }) => {
 
 		// Lege Roles an
 		await setupRoles(strapi);
+
+		await ensureUserGroupReadPermissions(strapi)
 
 		if (process.env.INIT_PERMISSIONS === 'true') {
 			await initPermissions(strapi)

@@ -128,6 +128,33 @@ async function ensurePermissionForRole(
 }
 
 /**
+ * Restriction.user_groups wird sonst aus der Page-API gestrippt,
+ * weil sanitize ohne find-Permission die Relation entfernt.
+ */
+export async function ensureUserGroupReadPermissions(
+	strapi: Core.Strapi,
+): Promise<void> {
+	const actions = apiActions('user-group', ['find', 'findOne'])
+
+	for (const roleType of ROLE_TYPES) {
+		const role = await strapi
+			.query('plugin::users-permissions.role')
+			.findOne({ where: { type: roleType } })
+
+		if (!role) {
+			strapi.log.warn(
+				`[HZD Plugin] Role "${roleType}" not found, skipping user-group permissions`,
+			)
+			continue
+		}
+
+		for (const action of actions) {
+			await ensurePermissionForRole(strapi, role.id, roleType, action)
+		}
+	}
+}
+
+/**
  * Setzt fehlende users-permissions für public und authenticated.
  * Idempotent – vorhandene Einträge werden nicht doppelt angelegt.
  */

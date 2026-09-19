@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { useAuth } from '@/hooks/use-auth'
-import { hasRequiredUserGroups } from '@/lib/permissions'
+import { hasRequiredGroups } from '@/lib/permissions'
 import type { ComponentPermissionRestriction } from '@/types'
 
 interface AuthGuardProps {
@@ -22,7 +22,7 @@ export function AuthGuard({ children, fallback, restriction }: AuthGuardProps) {
 		return <>{fallback}</>
 	}
 
-	if (!hasRequiredUserGroups(user, restriction?.user_groups)) {
+	if (!hasRequiredGroups(user, restriction)) {
 		return <>{fallback}</>
 	}
 

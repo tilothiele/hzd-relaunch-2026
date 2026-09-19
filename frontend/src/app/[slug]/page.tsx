@@ -5,6 +5,7 @@ import { renderServerSections } from '@/components/sections/server-section-facto
 import NotFoundSection from '@/components/sections/not-found-section/not-found-section'
 import AccessForbiddenSection from '@/components/sections/access-forbidden-section/access-forbidden-section'
 import { AuthGuard } from '@/components/auth-guard/auth-guard'
+import { hasUserGroupRestriction } from '@/lib/permissions'
 import { StrictlyPrivatePage } from '@/components/auth/strictly-private-page'
 import type { Metadata } from 'next'
 
@@ -95,7 +96,7 @@ export default async function Page({ params }: PageProps) {
 	const restriction = page.Restriction
 	const isPublicAccessible = restriction?.Public ?? true
 	const isAuthenticatedRequired = restriction?.Authenticated ?? false
-	const hasGroupRestriction = Boolean(restriction?.user_groups?.length)
+	const hasGroupRestriction = hasUserGroupRestriction(restriction)
 
 	const sections = page.Sections || []
 	const theme = globalTheme
