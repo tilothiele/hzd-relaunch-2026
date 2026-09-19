@@ -104,7 +104,8 @@ export default async function Page({ params }: PageProps) {
 		sections,
 		strapiBaseUrl: baseUrl,
 		theme,
-		logo: globalLayout?.Logo
+		logo: globalLayout?.Logo,
+		privacyPolicy: globalLayout?.PrivacyPolicy ?? null,
 	})
 
 	if (isPublicAccessible && !hasGroupRestriction) {

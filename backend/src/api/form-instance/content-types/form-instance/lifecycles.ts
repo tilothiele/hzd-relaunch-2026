@@ -1,5 +1,4 @@
 export default {
-  // afterCreate(event) {
-  //   // Logic moved to form-instance service 
-  // },
-};
+	// Mail-Versand sitzt im Document-Service-Hook (bootstrap)
+	// und läuft beim Insert, unabhängig von Draft/Publish.
+}

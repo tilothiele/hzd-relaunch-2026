@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_blocks_form_sections",
+  "info": {
+    "displayName": "FormSection"
+  },
+  "options": {},
+  "attributes": {
+    "form": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::form.form"
+    }
+  },
+  "config": {}
+}

@@ -820,6 +820,7 @@ export interface ApiFormInstanceFormInstance
     draftAndPublish: false;
   };
   attributes: {
+    ClientIP: Schema.Attribute.String;
     Content: Schema.Attribute.JSON;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -846,7 +847,7 @@ export interface ApiFormForm extends Struct.CollectionTypeSchema {
     singularName: 'form';
   };
   options: {
-    draftAndPublish: true;
+    draftAndPublish: false;
   };
   attributes: {
     createdAt: Schema.Attribute.DateTime;
@@ -879,6 +880,9 @@ export interface ApiFormForm extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     Name: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
+    SendConfirmationMail: Schema.Attribute.Boolean;
+    SuccessEMail: Schema.Attribute.Email;
+    SuccessUrl: Schema.Attribute.String;
     ThankYouMessage: Schema.Attribute.Blocks;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1027,6 +1031,7 @@ export interface ApiHzdFormInstanceHzdFormInstance
     draftAndPublish: true;
   };
   attributes: {
+    ClientIP: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1460,6 +1465,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.detailed-image-gallery-section',
         'blocks.action-images-section',
         'blocks.black-board-section',
+        'blocks.form-section',
       ]
     >;
     SEO: Schema.Attribute.Component<'seo.seo', true>;

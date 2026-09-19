@@ -1,5 +1,6 @@
-import { cookies, headers } from 'next/headers'
+import { cookies } from 'next/headers'
 import { STRAPI_JWT_COOKIE } from '@/lib/auth-cookie'
+import { getRequestClientIp } from '@/lib/server/request-ip'
 import {
 	createEntity,
 	fetchEntityList,
@@ -59,17 +60,7 @@ function normalizeEmail(value: string): string {
 	return value.trim().toLowerCase()
 }
 
-export async function getRequestClientIp(): Promise<string | null> {
-	const h = await headers()
-	const forwarded = h.get('x-forwarded-for')
-	const realIp = h.get('x-real-ip')
-	const cfConnectingIp = h.get('cf-connecting-ip')
-	const ip = forwarded?.split(',')[0]?.trim()
-		|| realIp
-		|| cfConnectingIp
-		|| null
-	return ip && ip.length > 0 ? ip : null
-}
+export { getRequestClientIp }
 
 export async function getSessionUser(): Promise<AuthUser | null> {
 	const jwt = (await cookies()).get(STRAPI_JWT_COOKIE)?.value

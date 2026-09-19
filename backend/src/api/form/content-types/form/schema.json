@@ -7,7 +7,7 @@
     "displayName": "Form"
   },
   "options": {
-    "draftAndPublish": true
+    "draftAndPublish": false
   },
   "pluginOptions": {},
   "attributes": {
@@ -43,6 +43,15 @@
       "relation": "oneToMany",
       "target": "plugin::users-permissions.user",
       "mappedBy": "form"
+    },
+    "SuccessUrl": {
+      "type": "string"
+    },
+    "SuccessEMail": {
+      "type": "email"
+    },
+    "SendConfirmationMail": {
+      "type": "boolean"
     }
   }
 }

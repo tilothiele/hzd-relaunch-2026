@@ -18,6 +18,9 @@
     },
     "Content": {
       "type": "json"
+    },
+    "ClientIP": {
+      "type": "string"
     }
   }
 }

@@ -1,4 +1,4 @@
-import type { StartpageSection } from '@/types'
+import type { Image, StartpageSection } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { HeroSectionSlideShowComponent } from './hero-section-slide-show/hero-section-slide-show'
 import { CardSectionComponent } from './card-section/card-section'
@@ -19,6 +19,7 @@ import { TableOfContentSectionComponent } from './table-of-content-section/table
 import { ChampionsSectionComponent } from './champions-section/champions-section'
 import { PassedDogsSectionComponent } from './passed-dogs-section/passed-dogs-section'
 import { BlackBoardSectionServerComponent } from './black-board-section/black-board-section-server'
+import { FormSectionServerComponent } from './form-section/form-section-server'
 
 interface RenderSectionParams {
 	section: StartpageSection
@@ -27,6 +28,7 @@ interface RenderSectionParams {
 	key: string
 	logo?: any // Add logo prop
 	hzdSetting?: any // Add hzdSetting prop
+	privacyPolicy?: Image | null
 }
 
 function renderSection({
@@ -36,6 +38,7 @@ function renderSection({
 	key,
 	logo,
 	hzdSetting,
+	privacyPolicy,
 }: RenderSectionParams) {
 	//console.log('Server Factory Rendering:', section.__typename)
 	switch (section.__typename) {
@@ -209,6 +212,16 @@ function renderSection({
 					theme={theme}
 				/>
 			)
+		case 'ComponentBlocksFormSection':
+			return (
+				<FormSectionServerComponent
+					key={key}
+					section={section}
+					strapiBaseUrl={strapiBaseUrl}
+					theme={theme}
+					privacyPolicy={privacyPolicy}
+				/>
+			)
 		default:
 			return null
 	}
@@ -220,12 +233,14 @@ export function renderServerSections({
 	theme,
 	logo,
 	hzdSetting,
+	privacyPolicy,
 }: {
 	sections: StartpageSection[] | null | undefined
 	strapiBaseUrl: string
 	theme: ThemeDefinition
 	logo?: any // Add logo prop
 	hzdSetting?: any // Add hzdSetting prop
+	privacyPolicy?: Image | null
 }) {
 	if (!sections?.length) {
 		return null
@@ -234,7 +249,15 @@ export function renderServerSections({
 	return sections
 		.map((section, index) => {
 			const key = `${section.__typename}-${index}`
-			return renderSection({ section, strapiBaseUrl, theme, key, logo, hzdSetting })
+			return renderSection({
+				section,
+				strapiBaseUrl,
+				theme,
+				key,
+				logo,
+				hzdSetting,
+				privacyPolicy,
+			})
 		})
 		.filter((node) => node !== null)
 }

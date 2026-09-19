@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-09-19T10:53:00.045Z"
+    "x-generation-date": "2026-09-19T19:58:39.251Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -20146,6 +20146,16 @@
                       }
                     }
                   },
+                  "SuccessUrl": {
+                    "type": "string"
+                  },
+                  "SuccessEMail": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "SendConfirmationMail": {
+                    "type": "boolean"
+                  },
                   "createdAt": {
                     "type": "string",
                     "format": "date-time"
@@ -27344,6 +27354,16 @@
                   }
                 }
               },
+              "SuccessUrl": {
+                "type": "string"
+              },
+              "SuccessEMail": {
+                "type": "string",
+                "format": "email"
+              },
+              "SendConfirmationMail": {
+                "type": "boolean"
+              },
               "createdAt": {
                 "type": "string",
                 "format": "date-time"
@@ -30061,6 +30081,16 @@
                             }
                           }
                         }
+                      },
+                      "SuccessUrl": {
+                        "type": "string"
+                      },
+                      "SuccessEMail": {
+                        "type": "string",
+                        "format": "email"
+                      },
+                      "SendConfirmationMail": {
+                        "type": "boolean"
                       },
                       "createdAt": {
                         "type": "string",
@@ -33958,6 +33988,16 @@
                         }
                       }
                     }
+                  },
+                  "SuccessUrl": {
+                    "type": "string"
+                  },
+                  "SuccessEMail": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "SendConfirmationMail": {
+                    "type": "boolean"
                   },
                   "createdAt": {
                     "type": "string",
@@ -38341,6 +38381,16 @@
                             }
                           }
                         },
+                        "SuccessUrl": {
+                          "type": "string"
+                        },
+                        "SuccessEMail": {
+                          "type": "string",
+                          "format": "email"
+                        },
+                        "SendConfirmationMail": {
+                          "type": "boolean"
+                        },
                         "createdAt": {
                           "type": "string",
                           "format": "date-time"
@@ -40714,6 +40764,16 @@
                   "example": "string or id"
                 }
               },
+              "SuccessUrl": {
+                "type": "string"
+              },
+              "SuccessEMail": {
+                "type": "string",
+                "format": "email"
+              },
+              "SendConfirmationMail": {
+                "type": "boolean"
+              },
               "locale": {
                 "type": "string"
               },
@@ -42287,6 +42347,16 @@
                           }
                         }
                       }
+                    },
+                    "SuccessUrl": {
+                      "type": "string"
+                    },
+                    "SuccessEMail": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "SendConfirmationMail": {
+                      "type": "boolean"
                     },
                     "createdAt": {
                       "type": "string",
@@ -44211,6 +44281,16 @@
               }
             }
           },
+          "SuccessUrl": {
+            "type": "string"
+          },
+          "SuccessEMail": {
+            "type": "string",
+            "format": "email"
+          },
+          "SendConfirmationMail": {
+            "type": "boolean"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -44317,6 +44397,9 @@
                 "example": "string or id"
               },
               "Content": {},
+              "ClientIP": {
+                "type": "string"
+              },
               "locale": {
                 "type": "string"
               },
@@ -47671,6 +47754,16 @@
                   }
                 }
               },
+              "SuccessUrl": {
+                "type": "string"
+              },
+              "SuccessEMail": {
+                "type": "string",
+                "format": "email"
+              },
+              "SendConfirmationMail": {
+                "type": "boolean"
+              },
               "createdAt": {
                 "type": "string",
                 "format": "date-time"
@@ -47746,6 +47839,9 @@
             }
           },
           "Content": {},
+          "ClientIP": {
+            "type": "string"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -47834,6 +47930,9 @@
                   }
                 },
                 "Content": {},
+                "ClientIP": {
+                  "type": "string"
+                },
                 "createdAt": {
                   "type": "string",
                   "format": "date-time"
@@ -49945,6 +50044,16 @@
                         }
                       }
                     }
+                  },
+                  "SuccessUrl": {
+                    "type": "string"
+                  },
+                  "SuccessEMail": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "SendConfirmationMail": {
+                    "type": "boolean"
                   },
                   "createdAt": {
                     "type": "string",
@@ -53359,6 +53468,9 @@
                     },
                     {
                       "$ref": "#/components/schemas/BlocksBlackBoardSectionComponent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/BlocksFormSectionComponent"
                     }
                   ]
                 },
@@ -53383,7 +53495,8 @@
                     "blocks.passed-dogs-section": "#/components/schemas/BlocksPassedDogsSectionComponent",
                     "blocks.detailed-image-gallery-section": "#/components/schemas/BlocksDetailedImageGallerySectionComponent",
                     "blocks.action-images-section": "#/components/schemas/BlocksActionImagesSectionComponent",
-                    "blocks.black-board-section": "#/components/schemas/BlocksBlackBoardSectionComponent"
+                    "blocks.black-board-section": "#/components/schemas/BlocksBlackBoardSectionComponent",
+                    "blocks.form-section": "#/components/schemas/BlocksFormSectionComponent"
                   }
                 }
               },
@@ -57291,6 +57404,45 @@
           }
         }
       },
+      "BlocksFormSectionComponent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "__component": {
+            "type": "string",
+            "enum": [
+              "blocks.form-section"
+            ]
+          },
+          "form": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ]
+              },
+              "documentId": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
       "PermissionRestrictionComponent": {
         "type": "object",
         "properties": {
@@ -58909,6 +59061,16 @@
                               }
                             }
                           }
+                        },
+                        "SuccessUrl": {
+                          "type": "string"
+                        },
+                        "SuccessEMail": {
+                          "type": "string",
+                          "format": "email"
+                        },
+                        "SendConfirmationMail": {
+                          "type": "boolean"
                         },
                         "createdAt": {
                           "type": "string",
@@ -60982,6 +61144,9 @@
                     }
                   }
                 },
+                "ClientIP": {
+                  "type": "string"
+                },
                 "createdAt": {
                   "type": "string",
                   "format": "date-time"
@@ -61279,6 +61444,9 @@
                     "hzd-form.stage-signature": "#/components/schemas/HzdFormStageSignatureComponent"
                   }
                 }
+              },
+              "ClientIP": {
+                "type": "string"
               },
               "locale": {
                 "type": "string"
@@ -62793,6 +62961,16 @@
                         }
                       }
                     }
+                  },
+                  "SuccessUrl": {
+                    "type": "string"
+                  },
+                  "SuccessEMail": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "SendConfirmationMail": {
+                    "type": "boolean"
                   },
                   "createdAt": {
                     "type": "string",
@@ -64829,6 +65007,9 @@
                         }
                       }
                     },
+                    "ClientIP": {
+                      "type": "string"
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time"
@@ -65003,6 +65184,9 @@
                 "hzd-form.stage-signature": "#/components/schemas/HzdFormStageSignatureComponent"
               }
             }
+          },
+          "ClientIP": {
+            "type": "string"
           },
           "createdAt": {
             "type": "string",
@@ -69746,6 +69930,16 @@
                                   }
                                 }
                               }
+                            },
+                            "SuccessUrl": {
+                              "type": "string"
+                            },
+                            "SuccessEMail": {
+                              "type": "string",
+                              "format": "email"
+                            },
+                            "SendConfirmationMail": {
+                              "type": "boolean"
                             },
                             "createdAt": {
                               "type": "string",
@@ -81918,6 +82112,9 @@
                     },
                     {
                       "$ref": "#/components/schemas/BlocksBlackBoardSectionComponent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/BlocksFormSectionComponent"
                     }
                   ]
                 },
@@ -81942,7 +82139,8 @@
                     "blocks.passed-dogs-section": "#/components/schemas/BlocksPassedDogsSectionComponent",
                     "blocks.detailed-image-gallery-section": "#/components/schemas/BlocksDetailedImageGallerySectionComponent",
                     "blocks.action-images-section": "#/components/schemas/BlocksActionImagesSectionComponent",
-                    "blocks.black-board-section": "#/components/schemas/BlocksBlackBoardSectionComponent"
+                    "blocks.black-board-section": "#/components/schemas/BlocksBlackBoardSectionComponent",
+                    "blocks.form-section": "#/components/schemas/BlocksFormSectionComponent"
                   }
                 }
               },
@@ -82099,6 +82297,9 @@
                 },
                 {
                   "$ref": "#/components/schemas/BlocksBlackBoardSectionComponent"
+                },
+                {
+                  "$ref": "#/components/schemas/BlocksFormSectionComponent"
                 }
               ]
             },
@@ -82123,7 +82324,8 @@
                 "blocks.passed-dogs-section": "#/components/schemas/BlocksPassedDogsSectionComponent",
                 "blocks.detailed-image-gallery-section": "#/components/schemas/BlocksDetailedImageGallerySectionComponent",
                 "blocks.action-images-section": "#/components/schemas/BlocksActionImagesSectionComponent",
-                "blocks.black-board-section": "#/components/schemas/BlocksBlackBoardSectionComponent"
+                "blocks.black-board-section": "#/components/schemas/BlocksBlackBoardSectionComponent",
+                "blocks.form-section": "#/components/schemas/BlocksFormSectionComponent"
               }
             }
           },
@@ -82277,6 +82479,9 @@
                       },
                       {
                         "$ref": "#/components/schemas/BlocksBlackBoardSectionComponent"
+                      },
+                      {
+                        "$ref": "#/components/schemas/BlocksFormSectionComponent"
                       }
                     ]
                   },
@@ -82301,7 +82506,8 @@
                       "blocks.passed-dogs-section": "#/components/schemas/BlocksPassedDogsSectionComponent",
                       "blocks.detailed-image-gallery-section": "#/components/schemas/BlocksDetailedImageGallerySectionComponent",
                       "blocks.action-images-section": "#/components/schemas/BlocksActionImagesSectionComponent",
-                      "blocks.black-board-section": "#/components/schemas/BlocksBlackBoardSectionComponent"
+                      "blocks.black-board-section": "#/components/schemas/BlocksBlackBoardSectionComponent",
+                      "blocks.form-section": "#/components/schemas/BlocksFormSectionComponent"
                     }
                   }
                 },
@@ -85590,6 +85796,16 @@
                         }
                       }
                     }
+                  },
+                  "SuccessUrl": {
+                    "type": "string"
+                  },
+                  "SuccessEMail": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "SendConfirmationMail": {
+                    "type": "boolean"
                   },
                   "createdAt": {
                     "type": "string",
@@ -89758,6 +89974,16 @@
                       }
                     }
                   },
+                  "SuccessUrl": {
+                    "type": "string"
+                  },
+                  "SuccessEMail": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "SendConfirmationMail": {
+                    "type": "boolean"
+                  },
                   "createdAt": {
                     "type": "string",
                     "format": "date-time"
@@ -93526,6 +93752,16 @@
                                   }
                                 }
                               }
+                            },
+                            "SuccessUrl": {
+                              "type": "string"
+                            },
+                            "SuccessEMail": {
+                              "type": "string",
+                              "format": "email"
+                            },
+                            "SendConfirmationMail": {
+                              "type": "boolean"
                             },
                             "createdAt": {
                               "type": "string",
@@ -101601,6 +101837,16 @@
                           }
                         }
                       }
+                    },
+                    "SuccessUrl": {
+                      "type": "string"
+                    },
+                    "SuccessEMail": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "SendConfirmationMail": {
+                      "type": "boolean"
                     },
                     "createdAt": {
                       "type": "string",

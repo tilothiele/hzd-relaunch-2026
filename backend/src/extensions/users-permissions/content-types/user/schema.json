@@ -160,8 +160,7 @@
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::form.form",
-      "inversedBy": "EventAdmin",
-      "configurable": false
+      "inversedBy": "EventAdmin"
     },
     "region": {
       "type": "enumeration",

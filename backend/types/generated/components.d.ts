@@ -205,6 +205,16 @@ export interface BlocksEmailAddresses extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksFormSection extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_form_sections';
+  info: {
+    displayName: 'FormSection';
+  };
+  attributes: {
+    form: Schema.Attribute.Relation<'oneToOne', 'api::form.form'>;
+  };
+}
+
 export interface BlocksHeroSectionSlideShow extends Struct.ComponentSchema {
   collectionName: 'components_blocks_hero_section_slide_shows';
   info: {
@@ -889,6 +899,7 @@ declare module '@strapi/strapi' {
       'blocks.document-bundle': BlocksDocumentBundle;
       'blocks.document-bundle-section': BlocksDocumentBundleSection;
       'blocks.email-addresses': BlocksEmailAddresses;
+      'blocks.form-section': BlocksFormSection;
       'blocks.hero-section-slide-show': BlocksHeroSectionSlideShow;
       'blocks.image-gallery-section': BlocksImageGallerySection;
       'blocks.item-list': BlocksItemList;

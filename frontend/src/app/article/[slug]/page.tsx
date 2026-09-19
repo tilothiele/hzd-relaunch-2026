@@ -180,7 +180,12 @@ export default async function ArticlePage({ params }: PageProps) {
             .filter(Boolean)
             .join(' ')
             .trim()
-    const renderedSections = renderServerSections({ sections, strapiBaseUrl: baseUrl, theme })
+    const renderedSections = renderServerSections({
+		sections,
+		strapiBaseUrl: baseUrl,
+		theme,
+		privacyPolicy: globalLayout?.PrivacyPolicy ?? null,
+	})
 
     const pageTitle = article.SEO?.MetaTitle || article.Headline || 'Artikel'
 

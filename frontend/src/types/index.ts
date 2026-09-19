@@ -368,7 +368,13 @@ export interface BlackBoardSection {
 	black_board?: BlackBoard | null
 }
 
-export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | DetailedImageGallerySection | SimpleCtaSection | ActionImagesSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection | DocumentBundleSection | TableOfContentSection | ChampionsSection | PassedDogsSection | BlackBoardSection
+export interface FormSection {
+	__typename: 'ComponentBlocksFormSection'
+	id?: string | number | null
+	form?: Form | null
+}
+
+export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | DetailedImageGallerySection | SimpleCtaSection | ActionImagesSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection | DocumentBundleSection | TableOfContentSection | ChampionsSection | PassedDogsSection | BlackBoardSection | FormSection
 
 export type PageSection = StartpageSection
 
@@ -922,6 +928,9 @@ export interface Form {
 	}[] | null
 	InclPrivacyPolicy?: boolean | null
 	ThankYouMessage?: string | null
+	SuccessUrl?: string | null
+	SuccessEMail?: string | null
+	SendConfirmationMail?: boolean | null
 	FormFields?: FormField[] | null
 	createdAt?: string | null
 	updatedAt?: string | null
@@ -938,6 +947,7 @@ export interface FormInstance {
 		Name?: string | null
 	} | null
 	Content?: Record<string, unknown> | null
+	ClientIP?: string | null
 	createdAt?: string | null
 	updatedAt?: string | null
 }

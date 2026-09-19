@@ -19,6 +19,7 @@ export const PAGE_SECTION_BLOCK_COMPONENTS = [
 	'blocks.champions-section',
 	'blocks.passed-dogs-section',
 	'blocks.black-board-section',
+	'blocks.form-section',
 ] as const
 
 type PopulateValue = boolean | Record<string, unknown>
@@ -173,6 +174,14 @@ const sectionComponentPopulate = (
 								},
 							},
 						},
+					},
+				},
+			}
+		case 'blocks.form-section':
+			return {
+				populate: {
+					form: {
+						fields: ['documentId', 'Name'],
 					},
 				},
 			}

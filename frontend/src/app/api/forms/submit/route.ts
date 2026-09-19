@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createFormInstance } from '@/lib/strapi/api'
+import { getRequestClientIp } from '@/lib/server/request-ip'
 
 /**
  * Server-Funktion zum Absenden von Formularen
@@ -28,11 +29,13 @@ export async function POST(request: NextRequest) {
 		const mutationData = {
 			form: documentId,
 			Content: formData,
+			ClientIP: await getRequestClientIp(),
 		}
 
 		try {
 			const result = await createFormInstance(mutationData, {
 				server: true,
+				token: process.env.STRAPI_API_TOKEN ?? null,
 			})
 
 			console.log('Formular erfolgreich gespeichert:', {

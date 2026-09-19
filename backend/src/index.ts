@@ -212,7 +212,7 @@ export default {
 
 					return result;
 				};
-				strapi.log.info('[Bootstrap] Extended form-instance document service with email logic');
+				strapi.log.info('[Bootstrap] Extended form-instance create with form notification emails');
 			}
 		} catch (error) {
 			strapi.log.error('Failed to extend form-instance document service', error);

@@ -43,7 +43,8 @@
         "blocks.passed-dogs-section",
         "blocks.detailed-image-gallery-section",
         "blocks.action-images-section",
-        "blocks.black-board-section"
+        "blocks.black-board-section",
+        "blocks.form-section"
       ]
     },
     "ColorTheme": {

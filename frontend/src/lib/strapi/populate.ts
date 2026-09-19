@@ -29,6 +29,7 @@ const SECTION_BLOCK_COMPONENTS = [
 	'blocks.champions-section',
 	'blocks.passed-dogs-section',
 	'blocks.black-board-section',
+	'blocks.form-section',
 ] as const
 
 /** Dynamic Zone in news-article (schema) */
@@ -130,6 +131,10 @@ function appendSectionsDeepPopulate(
 					`${base}[black_board][populate][BlackBoardEntry][populate][BBDocument][populate][BBFile]`,
 					'true',
 				)
+				break
+			case 'blocks.form-section':
+				params.set(`${base}[form][fields][0]`, 'documentId')
+				params.set(`${base}[form][fields][1]`, 'Name')
 				break
 			default:
 				// Kein `[populate]=true` — Strapi 5 interpretiert den Wert sonst als Key "true".

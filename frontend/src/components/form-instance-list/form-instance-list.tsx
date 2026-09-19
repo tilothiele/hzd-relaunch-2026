@@ -161,7 +161,7 @@ export function FormInstanceList({ form, strapiBaseUrl, theme }: FormInstanceLis
 		}
 
 		// Erstelle CSV-Header
-		const headers = ['Nr.', 'Erstellt', ...fieldNames]
+		const headers = ['Nr.', 'Erstellt', 'Client-IP', ...fieldNames]
 		const csvRows: string[] = []
 
 		// Header-Zeile
@@ -172,6 +172,7 @@ export function FormInstanceList({ form, strapiBaseUrl, theme }: FormInstanceLis
 			const row: string[] = [
 				String(index + 1),
 				'"' + (instance.createdAt ? formatDate(instance.createdAt) : '') + '"',
+				`"${formatValueForCSV(instance.ClientIP)}"`,
 			]
 
 			fieldNames.forEach((fieldName) => {
@@ -285,6 +286,7 @@ export function FormInstanceList({ form, strapiBaseUrl, theme }: FormInstanceLis
 							<TableRow>
 								<TableCell sx={{ fontWeight: 600 }}>Nr.</TableCell>
 								<TableCell sx={{ fontWeight: 600 }}>Erstellt</TableCell>
+								<TableCell sx={{ fontWeight: 600 }}>Client-IP</TableCell>
 								{fieldNames.map((fieldName) => (
 									<TableCell key={fieldName} sx={{ fontWeight: 600 }}>
 										{fieldName}
@@ -303,6 +305,11 @@ export function FormInstanceList({ form, strapiBaseUrl, theme }: FormInstanceLis
 									<TableCell>
 										<Typography variant='body2' className='text-gray-600'>
 											{formatDate(instance.createdAt)}
+										</Typography>
+									</TableCell>
+									<TableCell>
+										<Typography variant='body2' className='text-gray-600'>
+											{instance.ClientIP || '-'}
 										</Typography>
 									</TableCell>
 									{fieldNames.map((fieldName) => {

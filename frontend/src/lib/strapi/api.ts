@@ -670,13 +670,13 @@ export async function countFormInstances(
 	const query = buildStrapiQuery({
 		filters,
 		pagination: { pageSize: 500 },
-		fields: ['documentId', 'Content', 'createdAt', 'updatedAt'],
 	})
 	const items = await fetchEntityList<{
 		documentId: string
 		Content?: unknown
 		createdAt?: string
 		updatedAt?: string
+		ClientIP?: string | null
 	}>(
 		'form-instances',
 		query,
@@ -686,7 +686,7 @@ export async function countFormInstances(
 }
 
 export async function createFormInstance(
-	data: { form: string; Content: unknown },
+	data: { form: string; Content: unknown; ClientIP?: string | null },
 	options: StrapiRequestOptions = {},
 ): Promise<FormInstance> {
 	return createEntity<FormInstance>('form-instances', data, options)

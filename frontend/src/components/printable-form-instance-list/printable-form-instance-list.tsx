@@ -215,6 +215,9 @@ export function PrintableFormInstanceList({ form, strapiBaseUrl }: PrintableForm
 										<Typography variant='body2' className='text-gray-600'>
 											<strong>Erstellt am:</strong> {formatDate(instance.createdAt)}
 										</Typography>
+										<Typography variant='body2' className='text-gray-600'>
+											<strong>Client-IP:</strong> {instance.ClientIP || '-'}
+										</Typography>
 									</Box>
 
 									<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>

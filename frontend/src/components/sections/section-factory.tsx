@@ -20,6 +20,7 @@ import { SimpleHeroSectionComponent } from './simple-hero-section/simple-hero-se
 import { TableOfContentSectionComponent } from './table-of-content-section/table-of-content-section'
 import { PassedDogsSectionClientLoader } from './passed-dogs-section/passed-dogs-section-client-loader'
 import { BlackBoardSectionComponent } from './black-board-section/black-board-section'
+import { FormSectionClientLoader } from './form-section/form-section-client-loader'
 
 
 interface RenderStartpageSectionsParams {
@@ -192,6 +193,15 @@ function renderStartpageSection({
 		case 'ComponentBlocksBlackBoardSection':
 			return (
 				<BlackBoardSectionComponent
+					key={key}
+					section={section}
+					strapiBaseUrl={strapiBaseUrl}
+					theme={theme}
+				/>
+			)
+		case 'ComponentBlocksFormSection':
+			return (
+				<FormSectionClientLoader
 					key={key}
 					section={section}
 					strapiBaseUrl={strapiBaseUrl}

@@ -67,7 +67,40 @@ function normalizeBlockSection(
 		}
 	}
 
+	if (normalized.__typename === 'ComponentBlocksFormSection') {
+		const form = unwrapRelatedRecord(normalized.form)
+		if (form && Array.isArray(form.FormFields)) {
+			return {
+				...normalized,
+				form: {
+					...form,
+					FormFields: normalizeFormFields(form.FormFields),
+				},
+			}
+		}
+
+		return {
+			...normalized,
+			form,
+		}
+	}
+
 	return normalized
+}
+
+function unwrapRelatedRecord(
+	value: unknown,
+): Record<string, unknown> | null {
+	if (!value || typeof value !== 'object') {
+		return null
+	}
+
+	const record = value as Record<string, unknown>
+	if (record.data && typeof record.data === 'object' && !Array.isArray(record.data)) {
+		return record.data as Record<string, unknown>
+	}
+
+	return record
 }
 
 export function normalizeSections(

@@ -41,6 +41,9 @@
         "hzd-form.stage-state",
         "hzd-form.stage-signature"
       ]
+    },
+    "ClientIP": {
+      "type": "string"
     }
   }
 }

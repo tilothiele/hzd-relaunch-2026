@@ -139,7 +139,8 @@ export default async function ArticlesCategoryPage({ params, searchParams }: Pag
 				sections: enrichedCategorySections,
 				strapiBaseUrl: baseUrl,
 				theme: theme,
-				logo: globalLayout?.Logo
+				logo: globalLayout?.Logo,
+				privacyPolicy: globalLayout?.PrivacyPolicy ?? null,
 			})}
 
 			{/* Category Header */}

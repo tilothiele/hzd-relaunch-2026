@@ -89,6 +89,7 @@ export default async function Home() {
 		theme,
 		logo: globalLayout?.Logo,
 		hzdSetting: globalLayout?.HzdSetting,
+		privacyPolicy: globalLayout?.PrivacyPolicy ?? null,
 	})
 
 	return (

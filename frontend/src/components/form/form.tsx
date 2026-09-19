@@ -29,7 +29,57 @@ interface FormComponentProps {
 	strapiBaseUrl?: string | null
 }
 
-export function FormComponent({ form, privacyPolicy, strapiBaseUrl }: FormComponentProps) {
+function resolveSuccessTarget(raw: string | null | undefined): {
+	href: string
+	external: boolean
+} | null {
+	const trimmed = raw?.trim()
+	if (!trimmed) {
+		return null
+	}
+
+	const toTarget = (url: URL): { href: string; external: boolean } => {
+		if (typeof window !== 'undefined' && url.origin === window.location.origin) {
+			return {
+				href: `${url.pathname}${url.search}${url.hash}`,
+				external: false,
+			}
+		}
+
+		return {
+			href: url.href,
+			external: true,
+		}
+	}
+
+	if (trimmed.startsWith('//')) {
+		try {
+			return toTarget(new URL(`https:${trimmed}`))
+		} catch {
+			return null
+		}
+	}
+
+	if (/^https?:\/\//i.test(trimmed)) {
+		try {
+			return toTarget(new URL(trimmed))
+		} catch {
+			return null
+		}
+	}
+
+	const path = trimmed.startsWith('/') ? trimmed : `/${trimmed}`
+	return {
+		href: path,
+		external: false,
+	}
+}
+
+export function FormComponent({
+	form,
+	privacyPolicy,
+	strapiBaseUrl,
+}: FormComponentProps) {
 	const router = useRouter()
 	const { isAuthenticated, authState } = useAuth()
 	const [values, setValues] = useState<Record<string, unknown>>({})
@@ -100,8 +150,18 @@ export function FormComponent({ form, privacyPolicy, strapiBaseUrl }: FormCompon
 
 	const handleCloseModal = useCallback(() => {
 		setShowThankYouModal(false)
-		router.push('/calendar')
-	}, [router])
+		const target = resolveSuccessTarget(form.SuccessUrl)
+		if (!target) {
+			return
+		}
+
+		if (target.external) {
+			window.location.assign(target.href)
+			return
+		}
+
+		router.push(target.href)
+	}, [form.SuccessUrl, router])
 
 	const handleChange = useCallback((name: string, value: unknown) => {
 		setValues((prev) => ({
