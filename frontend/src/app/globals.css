@@ -382,6 +382,7 @@ h5 {
 .rich-text-section-content table th,
 .rich-text-section-content table td {
 	padding: 0.25rem;
+	vertical-align: top;
 }
 
 /* Mobile Logo Fix - Ensure logo displays correctly on small screens */
