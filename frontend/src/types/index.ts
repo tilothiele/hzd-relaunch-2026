@@ -685,6 +685,7 @@ export interface Breeder {
 	WebsiteUrl?: string | null
 	WebsiteUrlDraft?: string | null
 	InternalNotes?: string | null
+	BreedersMessage?: string | null
 	avatar?: Image | null
 	Address?: Address | null
 	BreederEmail?: string | null

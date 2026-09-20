@@ -11,11 +11,9 @@ import {
     Paper,
     CircularProgress,
     Alert,
-    FormControlLabel,
-    Switch
 } from '@mui/material'
 import { searchDogsGeneric } from '@/lib/strapi/api'
-import type { AuthUser, Dog, DogSearchResult } from '@/types'
+import type { AuthUser, Dog } from '@/types'
 import { formatDate } from '@/lib/utils'
 
 interface MeineHundeTabProps {
@@ -27,7 +25,6 @@ export function MeineHundeTab({ user, strapiBaseUrl }: MeineHundeTabProps) {
     const [dogs, setDogs] = useState<Dog[]>([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const [showOnlyFertile, setShowOnlyFertile] = useState(false)
 
     useEffect(() => {
         async function loadDogs() {
@@ -36,7 +33,9 @@ export function MeineHundeTab({ user, strapiBaseUrl }: MeineHundeTabProps) {
             setLoading(true)
             setError(null)
             try {
-                const filters: Record<string, unknown> = {}
+                const filters: Record<string, unknown> = {
+                    cFertile: { eq: true },
+                }
                 const hasValidDocumentId = typeof user.documentId === 'string'
                     && user.documentId.length > 0
                     && !user.documentId.includes('@')
@@ -49,10 +48,6 @@ export function MeineHundeTab({ user, strapiBaseUrl }: MeineHundeTabProps) {
                     setError('Benutzer-cId fehlt — Hunde konnten nicht geladen werden.')
                     setDogs([])
                     return
-                }
-
-                if (showOnlyFertile) {
-                    filters.cFertile = { eq: true }
                 }
 
                 const response = await searchDogsGeneric({
@@ -75,11 +70,7 @@ export function MeineHundeTab({ user, strapiBaseUrl }: MeineHundeTabProps) {
         }
 
         loadDogs()
-    }, [user, strapiBaseUrl, showOnlyFertile])
-
-    const handleFertileToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setShowOnlyFertile(event.target.checked)
-    }
+    }, [user, strapiBaseUrl])
 
     if (loading && dogs.length === 0) {
         return (
@@ -103,25 +94,15 @@ export function MeineHundeTab({ user, strapiBaseUrl }: MeineHundeTabProps) {
                 <Typography variant='h6'>
                     Meine Zuchthunde
                 </Typography>
-                <FormControlLabel
-                    control={
-                        <Switch
-                            checked={showOnlyFertile}
-                            onChange={handleFertileToggle}
-                            color="primary"
-                        />
-                    }
-                    label="Nur zuchtfähige Hunde"
-                />
             </Box>
 
             {!dogs.length ? (
                 <Box sx={{ p: 2 }}>
-                    <Typography>Keine Hunde gefunden.</Typography>
+                    <Typography>Keine zuchtfähigen Hunde gefunden.</Typography>
                 </Box>
             ) : (
                 <TableContainer component={Paper} variant="outlined">
-                    <Table sx={{ minWidth: 650 }} aria-label="meine hunde tabelle">
+                    <Table sx={{ minWidth: 650 }} aria-label="meine zuchthunde tabelle">
                         <TableHead>
                             <TableRow>
                                 <TableCell>Name</TableCell>
@@ -133,33 +114,23 @@ export function MeineHundeTab({ user, strapiBaseUrl }: MeineHundeTabProps) {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {dogs.map((dog) => {
-                                const isFertile = dog.cFertile === true
-                                return (
-                                    <TableRow
-                                        key={dog.documentId}
-                                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                    >
-                                        <TableCell component="th" scope="row">
-                                            <Box component="span" sx={!isFertile ? { fontStyle: 'italic' } : {}}>
-                                                {dog.fullKennelName || dog.givenName}
-                                            </Box>
-                                            {!isFertile && (
-                                                <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                                                    (nicht zuchtfähig)
-                                                </Typography>
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            {dog.dateOfBirth ? formatDate(dog.dateOfBirth) : '-'}
-                                        </TableCell>
-                                        <TableCell>{dog.sex}</TableCell>
-                                        <TableCell>{dog.color || '-'}</TableCell>
-                                        <TableCell>{dog.cStudBookNumber || '-'}</TableCell>
-                                        <TableCell>{dog.microchipNo || '-'}</TableCell>
-                                    </TableRow>
-                                )
-                            })}
+                            {dogs.map((dog) => (
+                                <TableRow
+                                    key={dog.documentId}
+                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                >
+                                    <TableCell component="th" scope="row">
+                                        {dog.fullKennelName || dog.givenName}
+                                    </TableCell>
+                                    <TableCell>
+                                        {dog.dateOfBirth ? formatDate(dog.dateOfBirth) : '-'}
+                                    </TableCell>
+                                    <TableCell>{dog.sex}</TableCell>
+                                    <TableCell>{dog.color || '-'}</TableCell>
+                                    <TableCell>{dog.cStudBookNumber || '-'}</TableCell>
+                                    <TableCell>{dog.microchipNo || '-'}</TableCell>
+                                </TableRow>
+                            ))}
                         </TableBody>
                     </Table>
                 </TableContainer>

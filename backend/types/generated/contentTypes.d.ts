@@ -1900,6 +1900,7 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
           preset: 'defaultHtml';
         }
       >;
+    BreedersMessage: Schema.Attribute.Text;
     breedingLicenseSince: Schema.Attribute.Date;
     cId: Schema.Attribute.Integer & Schema.Attribute.Unique;
     createdAt: Schema.Attribute.DateTime;

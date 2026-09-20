@@ -1,7 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import { Box, Typography, TextField, Button, Avatar, Chip, Divider } from '@mui/material'
+import {
+    Box,
+    Typography,
+    TextField,
+    Button,
+    Avatar,
+    Chip,
+    Divider,
+    FormControlLabel,
+    Switch,
+} from '@mui/material'
 import type { Breeder } from '@/types'
 import { updateEntity } from '@/lib/strapi/api'
 
@@ -15,6 +25,8 @@ export function MeinZwingerTab({ breeder, strapiBaseUrl }: MeinZwingerTabProps) 
     // BreedersIntroDraft is now available in schema
     const [breederIntroDraft, setBreederIntroDraft] = useState(breeder.BreedersIntroDraft || '')
     const [breederEmail, setBreederEmail] = useState(breeder.BreederEmail || '')
+    const [isDirty, setIsDirty] = useState(breeder.isDirty === true)
+    const [breedersMessage, setBreedersMessage] = useState(breeder.BreedersMessage || '')
 
     const [address, setAddress] = useState({
         FullName: breeder.Address?.FullName || '',
@@ -45,6 +57,8 @@ export function MeinZwingerTab({ breeder, strapiBaseUrl }: MeinZwingerTabProps) 
                     BreedersIntroDraft: breederIntroDraft,
                     BreederEmail: breederEmail,
                     Address: address,
+                    isDirty,
+                    BreedersMessage: breedersMessage,
                 },
                 {},
             )
@@ -81,7 +95,7 @@ export function MeinZwingerTab({ breeder, strapiBaseUrl }: MeinZwingerTabProps) 
                             color={isActive ? 'success' : 'default'}
                             variant='outlined'
                         />
-                        {breeder.isDirty && (
+                        {isDirty && (
                             <Chip
                                 label='Änderungen müssen noch freigegeben werden'
                                 color='warning'
@@ -123,9 +137,23 @@ export function MeinZwingerTab({ breeder, strapiBaseUrl }: MeinZwingerTabProps) 
 
             <Box sx={{ mb: 3 }}>
                 <Typography variant='subtitle2' color='text.secondary'>Persönliche Worte (Veröffentlicht)</Typography>
-                <Typography variant='body1' sx={{ whiteSpace: 'pre-wrap', mb: 2, border: '1px solid #eee', p: 1, borderRadius: 1, maxHeight: 100, overflow: 'auto' }}>
-                    {breeder.BreedersIntroduction || '-'}
-                </Typography>
+                {breeder.BreedersIntroduction ? (
+                    <Box
+                        sx={{
+                            mb: 2,
+                            border: '1px solid #eee',
+                            p: 1,
+                            borderRadius: 1,
+                            maxHeight: 160,
+                            overflow: 'auto',
+                            '& p': { m: 0, mb: 1 },
+                            '& p:last-child': { mb: 0 },
+                        }}
+                        dangerouslySetInnerHTML={{ __html: breeder.BreedersIntroduction }}
+                    />
+                ) : (
+                    <Typography variant='body1' sx={{ mb: 2 }}>-</Typography>
+                )}
                 <TextField
                     label='Persönliche Worte (Entwurf)'
                     fullWidth
@@ -218,7 +246,31 @@ export function MeinZwingerTab({ breeder, strapiBaseUrl }: MeinZwingerTabProps) 
                 </Box>
             </Box>
 
-            <Box sx={{ mt: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ mt: 4 }}>
+                <TextField
+                    label='Mitteilung an das TIK'
+                    fullWidth
+                    multiline
+                    rows={4}
+                    variant='outlined'
+                    value={breedersMessage}
+                    onChange={(e) => setBreedersMessage(e.target.value)}
+                    sx={{ mb: 2 }}
+                />
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={isDirty}
+                            onChange={(event) => setIsDirty(event.target.checked)}
+                            color='primary'
+                        />
+                    }
+                    label='Meine Änderungen bitte veröffentlichen'
+                    sx={{ mb: 2 }}
+                />
+            </Box>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Button
                     variant='contained'
                     color='primary'

@@ -12,12 +12,16 @@ export const GraphQLUnauthorizedError = StrapiUnauthorizedError
 
 export function isUnauthorizedMessage(message: string): boolean {
 	const normalized = message.toLowerCase()
-	return normalized.includes('401')
-		|| normalized.includes('unauthorized')
+	return normalized.includes('unauthorized')
 		|| normalized.includes('nicht authentifiziert')
 		|| normalized.includes('jwt expired')
 		|| normalized.includes('invalid token')
-		|| normalized.includes('forbidden')
+		|| normalized.includes('invalid jwt')
+		|| normalized.includes('missing or invalid credentials')
+}
+
+export function isAuthFailureStatus(status: number): boolean {
+	return status === 401
 }
 
 export function isStrapiUnauthorizedError(error: unknown): boolean {
@@ -43,7 +47,7 @@ export function resolveStrapiErrorStatus(error: unknown): number {
 	if (error && typeof error === 'object' && 'response' in error) {
 		const response = (error as { response?: { status?: number } }).response
 		const status = response?.status
-		if (status === 401 || status === 403) {
+		if (status === 401) {
 			return 401
 		}
 	}

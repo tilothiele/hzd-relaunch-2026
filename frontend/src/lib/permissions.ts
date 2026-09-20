@@ -175,11 +175,11 @@ export function isKoermeister(user: AuthUser | null): boolean {
 	return belongsToGroupId(user, KOERMEISTER_GROUP_ID)
 }
 
-export function isSonderleiter(user: AuthUser | null): boolean {
-	return belongsToGroupId(user, SONDERLEITER_GROUP_ID)
+export function isDeckruedenbesitzer(user: AuthUser | null): boolean {
+	return belongsToGroupId(user, DECKRUEDENBESITZER_GROUP_ID)
 }
 
-export function isDeckruedenbesitzer(user: AuthUser | null): boolean {
+export function isSonderleiter(user: AuthUser | null): boolean {
 	return belongsToGroupId(user, SONDERLEITER_GROUP_ID)
 }
 

@@ -372,6 +372,18 @@ h5 {
 	text-decoration: none;
 }
 
+.rich-text-section-content figure:has(table),
+.rich-text-section-content figure.table {
+	margin-left: auto;
+	margin-right: auto;
+	width: fit-content;
+}
+
+.rich-text-section-content table th,
+.rich-text-section-content table td {
+	padding: 0.25rem;
+}
+
 /* Mobile Logo Fix - Ensure logo displays correctly on small screens */
 @media (max-width: 375px) {
 	.header-logo-link {

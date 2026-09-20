@@ -2,8 +2,11 @@ export default ({ env }) => ({
   'users-permissions': {
     enabled: true,
     jwtSecret: env('JWT_SECRET') || 'your-secret-key',
-    jwt: {
-      expiresIn: '7d',
+    config: {
+      jwtManagement: 'legacy-support',
+      jwt: {
+        expiresIn: '7d',
+      },
     },
   },
   'webp-converter': {

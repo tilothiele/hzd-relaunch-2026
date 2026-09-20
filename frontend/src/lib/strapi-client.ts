@@ -1,7 +1,7 @@
 import {
 	StrapiUnauthorizedError,
+	isAuthFailureStatus,
 	isStrapiUnauthorizedError,
-	isUnauthorizedMessage,
 } from '@/lib/strapi-errors'
 
 let persistedAuthToken: string | null = null
@@ -85,7 +85,7 @@ export async function fetchStrapi<T>(
 			const errorMessage = errorData?.error?.message
 				?? 'Strapi-Anfrage fehlgeschlagen'
 
-			if (response.status === 401 || isUnauthorizedMessage(errorMessage)) {
+			if (isAuthFailureStatus(response.status)) {
 				notifyUnauthorized()
 				throw new StrapiUnauthorizedError(errorMessage)
 			}

@@ -82,7 +82,7 @@ export async function fetchStrapiServer<T>(
 		const message = payload?.error?.message
 			?? `Strapi-Anfrage fehlgeschlagen (${response.status})`
 
-		if (response.status === 401 || response.status === 403 || isUnauthorizedMessage(message)) {
+		if (response.status === 401 || isUnauthorizedMessage(message)) {
 			throw new StrapiUnauthorizedError(message)
 		}
 

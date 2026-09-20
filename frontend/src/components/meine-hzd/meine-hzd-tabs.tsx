@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Tabs, Tab, Box } from '@mui/material'
 import { searchBreeders } from '@/lib/strapi/api'
+import { isBreeder, isDeckruedenbesitzer } from '@/lib/permissions'
 import { MeinProfilTab } from './tabs/mein-profil-tab'
 import { MeinZwingerTab } from './tabs/mein-zwinger-tab'
 import { MeineWuerfeTab } from './tabs/meine-wuerfe-tab'
 import { MeineHundeTab } from './tabs/meine-hunde-tab'
-import type { AuthUser, BreederSearchResult, Breeder } from '@/types'
+import type { AuthUser, Breeder } from '@/types'
 
 type TabId = 0 | 1 | 2 | 3
 
@@ -17,10 +18,8 @@ interface MeineHzdTabsProps {
 export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 	const [activeTab, setActiveTab] = useState<TabId>(0)
 	const [breeder, setBreeder] = useState<Breeder | null>(null)
-
-	if (!user) {
-		return null
-	}
+	const canSeeWuerfe = isBreeder(user)
+	const canSeeHunde = isBreeder(user) || isDeckruedenbesitzer(user)
 
 	useEffect(() => {
 		async function loadBreeder() {
@@ -30,14 +29,12 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 			}
 
 			try {
-				//console.log('Fetching breeder for user:', user.documentId)
 				const data = await searchBreeders(
 					{
 						ownerMemberDocumentId: user.documentId,
 					},
 					{},
 				)
-				//console.log('Breeder fetch result:', data)
 
 				if (data?.hzdPluginBreeders_connection?.nodes?.length) {
 					setBreeder(data.hzdPluginBreeders_connection.nodes[0])
@@ -54,14 +51,27 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 	}, [user, strapiBaseUrl])
 
 	useEffect(() => {
-		// If active tab is Mein Zwinger (1) and user is not a breeder, switch to Profile (0)
 		if (activeTab === 1 && !breeder) {
 			setActiveTab(0)
+			return
 		}
-	}, [breeder, activeTab])
+
+		if (activeTab === 2 && !canSeeWuerfe) {
+			setActiveTab(0)
+			return
+		}
+
+		if (activeTab === 3 && !canSeeHunde) {
+			setActiveTab(0)
+		}
+	}, [breeder, activeTab, canSeeWuerfe, canSeeHunde])
 
 	const handleTabChange = (_event: React.SyntheticEvent, newValue: TabId) => {
 		setActiveTab(newValue)
+	}
+
+	if (!user) {
+		return null
 	}
 
 	return (
@@ -87,16 +97,20 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 				>
 					<Tab label='Mein Profil' value={0} />
 					{breeder && <Tab label='Mein Zwinger' value={1} />}
-					<Tab label='Meine Würfe' value={2} />
-					<Tab label='Meine Hunde' value={3} />
+					{canSeeWuerfe && <Tab label='Meine Würfe' value={2} />}
+					{canSeeHunde && <Tab label='Meine Zuchthunde' value={3} />}
 				</Tabs>
 			</Box>
 
 			<Box sx={{ mt: 3, minHeight: '400px' }}>
 				{activeTab === 0 && <MeinProfilTab user={user} />}
 				{activeTab === 1 && breeder && <MeinZwingerTab breeder={breeder} strapiBaseUrl={strapiBaseUrl} />}
-				{activeTab === 2 && breeder && <MeineWuerfeTab breeder={breeder} strapiBaseUrl={strapiBaseUrl} />}
-				{activeTab === 3 && <MeineHundeTab user={user} strapiBaseUrl={strapiBaseUrl} />}
+				{activeTab === 2 && canSeeWuerfe && breeder && (
+					<MeineWuerfeTab breeder={breeder} strapiBaseUrl={strapiBaseUrl} />
+				)}
+				{activeTab === 3 && canSeeHunde && (
+					<MeineHundeTab user={user} strapiBaseUrl={strapiBaseUrl} />
+				)}
 			</Box>
 		</Box>
 	)

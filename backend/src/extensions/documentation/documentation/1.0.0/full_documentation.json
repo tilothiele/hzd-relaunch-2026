@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-09-19T19:58:39.251Z"
+    "x-generation-date": "2026-09-20T14:46:03.712Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -21517,6 +21517,9 @@
                       "type": "string",
                       "format": "email"
                     },
+                    "BreedersMessage": {
+                      "type": "string"
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time"
@@ -27087,6 +27090,9 @@
                             "type": "string",
                             "format": "email"
                           },
+                          "BreedersMessage": {
+                            "type": "string"
+                          },
                           "createdAt": {
                             "type": "string",
                             "format": "date-time"
@@ -30842,6 +30848,9 @@
                         "BreederEmail": {
                           "type": "string",
                           "format": "email"
+                        },
+                        "BreedersMessage": {
+                          "type": "string"
                         },
                         "createdAt": {
                           "type": "string",
@@ -35360,6 +35369,9 @@
                       "type": "string",
                       "format": "email"
                     },
+                    "BreedersMessage": {
+                      "type": "string"
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time"
@@ -39752,6 +39764,9 @@
                             "type": "string",
                             "format": "email"
                           },
+                          "BreedersMessage": {
+                            "type": "string"
+                          },
                           "createdAt": {
                             "type": "string",
                             "format": "date-time"
@@ -44014,6 +44029,9 @@
                         "type": "string",
                         "format": "email"
                       },
+                      "BreedersMessage": {
+                        "type": "string"
+                      },
                       "createdAt": {
                         "type": "string",
                         "format": "date-time"
@@ -47486,6 +47504,9 @@
                           "BreederEmail": {
                             "type": "string",
                             "format": "email"
+                          },
+                          "BreedersMessage": {
+                            "type": "string"
                           },
                           "createdAt": {
                             "type": "string",
@@ -51415,6 +51436,9 @@
                     "BreederEmail": {
                       "type": "string",
                       "format": "email"
+                    },
+                    "BreedersMessage": {
+                      "type": "string"
                     },
                     "createdAt": {
                       "type": "string",
@@ -60728,6 +60752,9 @@
                             "type": "string",
                             "format": "email"
                           },
+                          "BreedersMessage": {
+                            "type": "string"
+                          },
                           "createdAt": {
                             "type": "string",
                             "format": "date-time"
@@ -64627,6 +64654,9 @@
                     "BreederEmail": {
                       "type": "string",
                       "format": "email"
+                    },
+                    "BreedersMessage": {
+                      "type": "string"
                     },
                     "createdAt": {
                       "type": "string",
@@ -71596,6 +71626,9 @@
                               "BreederEmail": {
                                 "type": "string",
                                 "format": "email"
+                              },
+                              "BreedersMessage": {
+                                "type": "string"
                               },
                               "createdAt": {
                                 "type": "string",
@@ -87463,6 +87496,9 @@
                       "type": "string",
                       "format": "email"
                     },
+                    "BreedersMessage": {
+                      "type": "string"
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time"
@@ -91640,6 +91676,9 @@
                       "type": "string",
                       "format": "email"
                     },
+                    "BreedersMessage": {
+                      "type": "string"
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time"
@@ -95418,6 +95457,9 @@
                               "BreederEmail": {
                                 "type": "string",
                                 "format": "email"
+                              },
+                              "BreedersMessage": {
+                                "type": "string"
                               },
                               "createdAt": {
                                 "type": "string",
@@ -103503,6 +103545,9 @@
                       "BreederEmail": {
                         "type": "string",
                         "format": "email"
+                      },
+                      "BreedersMessage": {
+                        "type": "string"
                       },
                       "createdAt": {
                         "type": "string",
