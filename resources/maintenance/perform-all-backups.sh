@@ -217,7 +217,7 @@ backup_application "$BASE_DIR" "umami" \
 
 # OpenCloud
 backup_application "$BASE_DIR" "opencloud" \
-	"opencloud-qoksokw84wcsokkgokksww8c-210424654229" -- \
+	"opencloud-qoksokw84wcsokkgokksww8c-212301008759" -- \
 	"qoksokw84wcsokkgokksww8c_opencloud-config" \
 	"qoksokw84wcsokkgokksww8c_opencloud-data"
 
