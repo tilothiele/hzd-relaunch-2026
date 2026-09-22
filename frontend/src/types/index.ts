@@ -536,6 +536,7 @@ export interface AuthUser {
 	blocked?: boolean | null
 	role?: UsersPermissionsMeRole | null
 	user_groups?: UserGroup[] | null
+	deckrueden_info?: { documentId: string } | null
 	title?: string | null
 	membershipNumber?: number | null
 	dateOfBirth?: string | null

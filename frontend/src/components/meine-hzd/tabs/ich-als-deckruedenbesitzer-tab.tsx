@@ -90,7 +90,7 @@ export function IchAlsDeckruedenbesitzerTab({
                 </Avatar>
                 <Box>
                     <Typography variant='h5' gutterBottom>
-                        Zwinger: {breeder.kennelName}
+                        {breeder.kennelName}
                     </Typography>
                     <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                         <Chip

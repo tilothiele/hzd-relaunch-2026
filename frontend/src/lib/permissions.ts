@@ -181,7 +181,7 @@ export function isKoermeister(user: AuthUser | null): boolean {
 }
 
 export function isDeckruedenbesitzer(user: AuthUser | null): boolean {
-	return user?.cFlagBreeder === true && belongsToGroupId(user, DECKRUEDENBESITZER_GROUP_ID)
+	return belongsToGroupId(user, DECKRUEDENBESITZER_GROUP_ID)
 }
 
 export function isSonderleiter(user: AuthUser | null): boolean {

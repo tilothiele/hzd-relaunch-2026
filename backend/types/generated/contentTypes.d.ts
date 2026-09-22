@@ -2536,6 +2536,10 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.Private;
     dateOfBirth: Schema.Attribute.Date;
     dateOfDeath: Schema.Attribute.Date;
+    deckrueden_info: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::hzd-plugin.breeder'
+    >;
     DisplayName: Schema.Attribute.String;
     email: Schema.Attribute.Email &
       Schema.Attribute.Required &

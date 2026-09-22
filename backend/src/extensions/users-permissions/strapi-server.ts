@@ -21,6 +21,19 @@ function buildResetPasswordBaseUrl(rawUrl: string): string {
 	return url
 }
 
+function serializeDeckruedenInfo(value: unknown): { documentId: string } | null {
+	if (!value || typeof value !== 'object' || Array.isArray(value)) {
+		return null
+	}
+
+	const documentId = (value as { documentId?: unknown }).documentId
+	if (typeof documentId !== 'string' || documentId.length === 0) {
+		return null
+	}
+
+	return { documentId }
+}
+
 function serializeUserGroups(groups: unknown): Array<{
 	id: number | string | null
 	documentId: string | null
@@ -190,7 +203,7 @@ export default (plugin: any) => {
 					// In Strapi 5, documentId is the main identifier, but auth uses ID (integer)
 					const userEntity = await strapi.documents('plugin::users-permissions.user').findFirst({
 						where: { id: user.id },
-						populate: ['role', 'user_groups'],
+						populate: ['role', 'user_groups', 'deckrueden_info'],
 					})
 
 					if (!userEntity) {
@@ -213,6 +226,9 @@ export default (plugin: any) => {
 					// contentAPI.sanitize kann Relationen ohne REST-Permission entfernen.
 					// user_groups werden daher explizit aus der Document-Service-Antwort gesetzt.
 					sanitizedUser.user_groups = serializeUserGroups(userEntity.user_groups)
+					sanitizedUser.deckrueden_info = serializeDeckruedenInfo(
+						userEntity.deckrueden_info,
+					)
 
 					ctx.body = sanitizedUser
 				} catch (err) {

@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-09-22T11:31:42.727Z"
+    "x-generation-date": "2026-09-22T12:21:10.863Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -20046,6 +20046,27 @@
               "membershipNumber": {
                 "type": "integer"
               },
+              "region": {
+                "type": "string",
+                "enum": [
+                  "Nord",
+                  "Ost",
+                  "Mitte",
+                  "West",
+                  "Süd"
+                ]
+              },
+              "locationLng": {
+                "type": "number",
+                "format": "float"
+              },
+              "locationLat": {
+                "type": "number",
+                "format": "float"
+              },
+              "DisplayName": {
+                "type": "string"
+              },
               "form": {
                 "type": "object",
                 "properties": {
@@ -20229,27 +20250,6 @@
                     }
                   }
                 }
-              },
-              "region": {
-                "type": "string",
-                "enum": [
-                  "Nord",
-                  "Ost",
-                  "Mitte",
-                  "West",
-                  "Süd"
-                ]
-              },
-              "locationLng": {
-                "type": "number",
-                "format": "float"
-              },
-              "locationLat": {
-                "type": "number",
-                "format": "float"
-              },
-              "DisplayName": {
-                "type": "string"
               },
               "publishMyData": {
                 "type": "boolean"
@@ -21709,6 +21709,24 @@
                         }
                       }
                     }
+                  }
+                }
+              },
+              "deckrueden_info": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ]
+                  },
+                  "documentId": {
+                    "type": "string"
                   }
                 }
               },
@@ -25785,24 +25803,6 @@
                     "membershipNumber": {
                       "type": "integer"
                     },
-                    "form": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ]
-                        },
-                        "documentId": {
-                          "type": "string"
-                        }
-                      }
-                    },
                     "region": {
                       "type": "string",
                       "enum": [
@@ -25823,6 +25823,24 @@
                     },
                     "DisplayName": {
                       "type": "string"
+                    },
+                    "form": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ]
+                        },
+                        "documentId": {
+                          "type": "string"
+                        }
+                      }
                     },
                     "publishMyData": {
                       "type": "boolean"
@@ -27282,6 +27300,24 @@
                               }
                             }
                           }
+                        }
+                      }
+                    },
+                    "deckrueden_info": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ]
+                        },
+                        "documentId": {
+                          "type": "string"
                         }
                       }
                     },
@@ -29988,6 +30024,27 @@
                   "membershipNumber": {
                     "type": "integer"
                   },
+                  "region": {
+                    "type": "string",
+                    "enum": [
+                      "Nord",
+                      "Ost",
+                      "Mitte",
+                      "West",
+                      "Süd"
+                    ]
+                  },
+                  "locationLng": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "locationLat": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "DisplayName": {
+                    "type": "string"
+                  },
                   "form": {
                     "type": "object",
                     "properties": {
@@ -30171,27 +30228,6 @@
                         }
                       }
                     }
-                  },
-                  "region": {
-                    "type": "string",
-                    "enum": [
-                      "Nord",
-                      "Ost",
-                      "Mitte",
-                      "West",
-                      "Süd"
-                    ]
-                  },
-                  "locationLng": {
-                    "type": "number",
-                    "format": "float"
-                  },
-                  "locationLat": {
-                    "type": "number",
-                    "format": "float"
-                  },
-                  "DisplayName": {
-                    "type": "string"
                   },
                   "publishMyData": {
                     "type": "boolean"
@@ -31041,6 +31077,24 @@
                             }
                           }
                         }
+                      }
+                    }
+                  },
+                  "deckrueden_info": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          }
+                        ]
+                      },
+                      "documentId": {
+                        "type": "string"
                       }
                     }
                   },
@@ -33898,6 +33952,27 @@
               "membershipNumber": {
                 "type": "integer"
               },
+              "region": {
+                "type": "string",
+                "enum": [
+                  "Nord",
+                  "Ost",
+                  "Mitte",
+                  "West",
+                  "Süd"
+                ]
+              },
+              "locationLng": {
+                "type": "number",
+                "format": "float"
+              },
+              "locationLat": {
+                "type": "number",
+                "format": "float"
+              },
+              "DisplayName": {
+                "type": "string"
+              },
               "form": {
                 "type": "object",
                 "properties": {
@@ -34081,27 +34156,6 @@
                     }
                   }
                 }
-              },
-              "region": {
-                "type": "string",
-                "enum": [
-                  "Nord",
-                  "Ost",
-                  "Mitte",
-                  "West",
-                  "Süd"
-                ]
-              },
-              "locationLng": {
-                "type": "number",
-                "format": "float"
-              },
-              "locationLat": {
-                "type": "number",
-                "format": "float"
-              },
-              "DisplayName": {
-                "type": "string"
               },
               "publishMyData": {
                 "type": "boolean"
@@ -35561,6 +35615,24 @@
                         }
                       }
                     }
+                  }
+                }
+              },
+              "deckrueden_info": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ]
+                  },
+                  "documentId": {
+                    "type": "string"
                   }
                 }
               },
@@ -38293,6 +38365,27 @@
                     "membershipNumber": {
                       "type": "integer"
                     },
+                    "region": {
+                      "type": "string",
+                      "enum": [
+                        "Nord",
+                        "Ost",
+                        "Mitte",
+                        "West",
+                        "Süd"
+                      ]
+                    },
+                    "locationLng": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "locationLat": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "DisplayName": {
+                      "type": "string"
+                    },
                     "form": {
                       "type": "object",
                       "properties": {
@@ -38476,27 +38569,6 @@
                           }
                         }
                       }
-                    },
-                    "region": {
-                      "type": "string",
-                      "enum": [
-                        "Nord",
-                        "Ost",
-                        "Mitte",
-                        "West",
-                        "Süd"
-                      ]
-                    },
-                    "locationLng": {
-                      "type": "number",
-                      "format": "float"
-                    },
-                    "locationLat": {
-                      "type": "number",
-                      "format": "float"
-                    },
-                    "DisplayName": {
-                      "type": "string"
                     },
                     "publishMyData": {
                       "type": "boolean"
@@ -39956,6 +40028,24 @@
                               }
                             }
                           }
+                        }
+                      }
+                    },
+                    "deckrueden_info": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ]
+                        },
+                        "documentId": {
+                          "type": "string"
                         }
                       }
                     },
@@ -42263,6 +42353,27 @@
                 "membershipNumber": {
                   "type": "integer"
                 },
+                "region": {
+                  "type": "string",
+                  "enum": [
+                    "Nord",
+                    "Ost",
+                    "Mitte",
+                    "West",
+                    "Süd"
+                  ]
+                },
+                "locationLng": {
+                  "type": "number",
+                  "format": "float"
+                },
+                "locationLat": {
+                  "type": "number",
+                  "format": "float"
+                },
+                "DisplayName": {
+                  "type": "string"
+                },
                 "form": {
                   "type": "object",
                   "properties": {
@@ -42446,27 +42557,6 @@
                       }
                     }
                   }
-                },
-                "region": {
-                  "type": "string",
-                  "enum": [
-                    "Nord",
-                    "Ost",
-                    "Mitte",
-                    "West",
-                    "Süd"
-                  ]
-                },
-                "locationLng": {
-                  "type": "number",
-                  "format": "float"
-                },
-                "locationLat": {
-                  "type": "number",
-                  "format": "float"
-                },
-                "DisplayName": {
-                  "type": "string"
                 },
                 "publishMyData": {
                   "type": "boolean"
@@ -44224,6 +44314,24 @@
                     }
                   }
                 },
+                "deckrueden_info": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ]
+                    },
+                    "documentId": {
+                      "type": "string"
+                    }
+                  }
+                },
                 "createdAt": {
                   "type": "string",
                   "format": "date-time"
@@ -45905,24 +46013,6 @@
                     "membershipNumber": {
                       "type": "integer"
                     },
-                    "form": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ]
-                        },
-                        "documentId": {
-                          "type": "string"
-                        }
-                      }
-                    },
                     "region": {
                       "type": "string",
                       "enum": [
@@ -45943,6 +46033,24 @@
                     },
                     "DisplayName": {
                       "type": "string"
+                    },
+                    "form": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ]
+                        },
+                        "documentId": {
+                          "type": "string"
+                        }
+                      }
                     },
                     "publishMyData": {
                       "type": "boolean"
@@ -47697,6 +47805,24 @@
                               }
                             }
                           }
+                        }
+                      }
+                    },
+                    "deckrueden_info": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ]
+                        },
+                        "documentId": {
+                          "type": "string"
                         }
                       }
                     },
@@ -49966,6 +50092,27 @@
               "membershipNumber": {
                 "type": "integer"
               },
+              "region": {
+                "type": "string",
+                "enum": [
+                  "Nord",
+                  "Ost",
+                  "Mitte",
+                  "West",
+                  "Süd"
+                ]
+              },
+              "locationLng": {
+                "type": "number",
+                "format": "float"
+              },
+              "locationLat": {
+                "type": "number",
+                "format": "float"
+              },
+              "DisplayName": {
+                "type": "string"
+              },
               "form": {
                 "type": "object",
                 "properties": {
@@ -50149,27 +50296,6 @@
                     }
                   }
                 }
-              },
-              "region": {
-                "type": "string",
-                "enum": [
-                  "Nord",
-                  "Ost",
-                  "Mitte",
-                  "West",
-                  "Süd"
-                ]
-              },
-              "locationLng": {
-                "type": "number",
-                "format": "float"
-              },
-              "locationLat": {
-                "type": "number",
-                "format": "float"
-              },
-              "DisplayName": {
-                "type": "string"
               },
               "publishMyData": {
                 "type": "boolean"
@@ -51629,6 +51755,24 @@
                         }
                       }
                     }
+                  }
+                }
+              },
+              "deckrueden_info": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ]
+                  },
+                  "documentId": {
+                    "type": "string"
                   }
                 }
               },
@@ -58986,6 +59130,27 @@
                     "membershipNumber": {
                       "type": "integer"
                     },
+                    "region": {
+                      "type": "string",
+                      "enum": [
+                        "Nord",
+                        "Ost",
+                        "Mitte",
+                        "West",
+                        "Süd"
+                      ]
+                    },
+                    "locationLng": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "locationLat": {
+                      "type": "number",
+                      "format": "float"
+                    },
+                    "DisplayName": {
+                      "type": "string"
+                    },
                     "form": {
                       "type": "object",
                       "properties": {
@@ -59169,27 +59334,6 @@
                           }
                         }
                       }
-                    },
-                    "region": {
-                      "type": "string",
-                      "enum": [
-                        "Nord",
-                        "Ost",
-                        "Mitte",
-                        "West",
-                        "Süd"
-                      ]
-                    },
-                    "locationLng": {
-                      "type": "number",
-                      "format": "float"
-                    },
-                    "locationLat": {
-                      "type": "number",
-                      "format": "float"
-                    },
-                    "DisplayName": {
-                      "type": "string"
                     },
                     "publishMyData": {
                       "type": "boolean"
@@ -60944,6 +61088,24 @@
                               }
                             }
                           }
+                        }
+                      }
+                    },
+                    "deckrueden_info": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ]
+                        },
+                        "documentId": {
+                          "type": "string"
                         }
                       }
                     },
@@ -62889,6 +63051,27 @@
               "membershipNumber": {
                 "type": "integer"
               },
+              "region": {
+                "type": "string",
+                "enum": [
+                  "Nord",
+                  "Ost",
+                  "Mitte",
+                  "West",
+                  "Süd"
+                ]
+              },
+              "locationLng": {
+                "type": "number",
+                "format": "float"
+              },
+              "locationLat": {
+                "type": "number",
+                "format": "float"
+              },
+              "DisplayName": {
+                "type": "string"
+              },
               "form": {
                 "type": "object",
                 "properties": {
@@ -63072,27 +63255,6 @@
                     }
                   }
                 }
-              },
-              "region": {
-                "type": "string",
-                "enum": [
-                  "Nord",
-                  "Ost",
-                  "Mitte",
-                  "West",
-                  "Süd"
-                ]
-              },
-              "locationLng": {
-                "type": "number",
-                "format": "float"
-              },
-              "locationLat": {
-                "type": "number",
-                "format": "float"
-              },
-              "DisplayName": {
-                "type": "string"
               },
               "publishMyData": {
                 "type": "boolean"
@@ -64847,6 +65009,24 @@
                         }
                       }
                     }
+                  }
+                }
+              },
+              "deckrueden_info": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ]
+                  },
+                  "documentId": {
+                    "type": "string"
                   }
                 }
               },
@@ -69861,6 +70041,27 @@
                         "membershipNumber": {
                           "type": "integer"
                         },
+                        "region": {
+                          "type": "string",
+                          "enum": [
+                            "Nord",
+                            "Ost",
+                            "Mitte",
+                            "West",
+                            "Süd"
+                          ]
+                        },
+                        "locationLng": {
+                          "type": "number",
+                          "format": "float"
+                        },
+                        "locationLat": {
+                          "type": "number",
+                          "format": "float"
+                        },
+                        "DisplayName": {
+                          "type": "string"
+                        },
                         "form": {
                           "type": "object",
                           "properties": {
@@ -70044,27 +70245,6 @@
                               }
                             }
                           }
-                        },
-                        "region": {
-                          "type": "string",
-                          "enum": [
-                            "Nord",
-                            "Ost",
-                            "Mitte",
-                            "West",
-                            "Süd"
-                          ]
-                        },
-                        "locationLng": {
-                          "type": "number",
-                          "format": "float"
-                        },
-                        "locationLat": {
-                          "type": "number",
-                          "format": "float"
-                        },
-                        "DisplayName": {
-                          "type": "string"
                         },
                         "publishMyData": {
                           "type": "boolean"
@@ -71819,6 +71999,24 @@
                                   }
                                 }
                               }
+                            }
+                          }
+                        },
+                        "deckrueden_info": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "oneOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "number"
+                                }
+                              ]
+                            },
+                            "documentId": {
+                              "type": "string"
                             }
                           }
                         },
@@ -85730,6 +85928,27 @@
               "membershipNumber": {
                 "type": "integer"
               },
+              "region": {
+                "type": "string",
+                "enum": [
+                  "Nord",
+                  "Ost",
+                  "Mitte",
+                  "West",
+                  "Süd"
+                ]
+              },
+              "locationLng": {
+                "type": "number",
+                "format": "float"
+              },
+              "locationLat": {
+                "type": "number",
+                "format": "float"
+              },
+              "DisplayName": {
+                "type": "string"
+              },
               "form": {
                 "type": "object",
                 "properties": {
@@ -85913,27 +86132,6 @@
                     }
                   }
                 }
-              },
-              "region": {
-                "type": "string",
-                "enum": [
-                  "Nord",
-                  "Ost",
-                  "Mitte",
-                  "West",
-                  "Süd"
-                ]
-              },
-              "locationLng": {
-                "type": "number",
-                "format": "float"
-              },
-              "locationLat": {
-                "type": "number",
-                "format": "float"
-              },
-              "DisplayName": {
-                "type": "string"
               },
               "publishMyData": {
                 "type": "boolean"
@@ -87688,6 +87886,24 @@
                         }
                       }
                     }
+                  }
+                }
+              },
+              "deckrueden_info": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ]
+                  },
+                  "documentId": {
+                    "type": "string"
                   }
                 }
               },
@@ -89910,6 +90126,27 @@
               "membershipNumber": {
                 "type": "integer"
               },
+              "region": {
+                "type": "string",
+                "enum": [
+                  "Nord",
+                  "Ost",
+                  "Mitte",
+                  "West",
+                  "Süd"
+                ]
+              },
+              "locationLng": {
+                "type": "number",
+                "format": "float"
+              },
+              "locationLat": {
+                "type": "number",
+                "format": "float"
+              },
+              "DisplayName": {
+                "type": "string"
+              },
               "form": {
                 "type": "object",
                 "properties": {
@@ -90093,27 +90330,6 @@
                     }
                   }
                 }
-              },
-              "region": {
-                "type": "string",
-                "enum": [
-                  "Nord",
-                  "Ost",
-                  "Mitte",
-                  "West",
-                  "Süd"
-                ]
-              },
-              "locationLng": {
-                "type": "number",
-                "format": "float"
-              },
-              "locationLat": {
-                "type": "number",
-                "format": "float"
-              },
-              "DisplayName": {
-                "type": "string"
               },
               "publishMyData": {
                 "type": "boolean"
@@ -91868,6 +92084,24 @@
                         }
                       }
                     }
+                  }
+                }
+              },
+              "deckrueden_info": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ]
+                  },
+                  "documentId": {
+                    "type": "string"
                   }
                 }
               },
@@ -93692,6 +93926,27 @@
                         "membershipNumber": {
                           "type": "integer"
                         },
+                        "region": {
+                          "type": "string",
+                          "enum": [
+                            "Nord",
+                            "Ost",
+                            "Mitte",
+                            "West",
+                            "Süd"
+                          ]
+                        },
+                        "locationLng": {
+                          "type": "number",
+                          "format": "float"
+                        },
+                        "locationLat": {
+                          "type": "number",
+                          "format": "float"
+                        },
+                        "DisplayName": {
+                          "type": "string"
+                        },
                         "form": {
                           "type": "object",
                           "properties": {
@@ -93875,27 +94130,6 @@
                               }
                             }
                           }
-                        },
-                        "region": {
-                          "type": "string",
-                          "enum": [
-                            "Nord",
-                            "Ost",
-                            "Mitte",
-                            "West",
-                            "Süd"
-                          ]
-                        },
-                        "locationLng": {
-                          "type": "number",
-                          "format": "float"
-                        },
-                        "locationLat": {
-                          "type": "number",
-                          "format": "float"
-                        },
-                        "DisplayName": {
-                          "type": "string"
                         },
                         "publishMyData": {
                           "type": "boolean"
@@ -95650,6 +95884,24 @@
                                   }
                                 }
                               }
+                            }
+                          }
+                        },
+                        "deckrueden_info": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "oneOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "number"
+                                }
+                              ]
+                            },
+                            "documentId": {
+                              "type": "string"
                             }
                           }
                         },
@@ -101780,6 +102032,27 @@
                 "membershipNumber": {
                   "type": "integer"
                 },
+                "region": {
+                  "type": "string",
+                  "enum": [
+                    "Nord",
+                    "Ost",
+                    "Mitte",
+                    "West",
+                    "Süd"
+                  ]
+                },
+                "locationLng": {
+                  "type": "number",
+                  "format": "float"
+                },
+                "locationLat": {
+                  "type": "number",
+                  "format": "float"
+                },
+                "DisplayName": {
+                  "type": "string"
+                },
                 "form": {
                   "type": "object",
                   "properties": {
@@ -101963,27 +102236,6 @@
                       }
                     }
                   }
-                },
-                "region": {
-                  "type": "string",
-                  "enum": [
-                    "Nord",
-                    "Ost",
-                    "Mitte",
-                    "West",
-                    "Süd"
-                  ]
-                },
-                "locationLng": {
-                  "type": "number",
-                  "format": "float"
-                },
-                "locationLat": {
-                  "type": "number",
-                  "format": "float"
-                },
-                "DisplayName": {
-                  "type": "string"
                 },
                 "publishMyData": {
                   "type": "boolean"
@@ -103738,6 +103990,24 @@
                           }
                         }
                       }
+                    }
+                  }
+                },
+                "deckrueden_info": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ]
+                    },
+                    "documentId": {
+                      "type": "string"
                     }
                   }
                 },

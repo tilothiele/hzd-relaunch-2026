@@ -146,6 +146,7 @@ export async function fetchMe(
 		new URLSearchParams({
 			'populate[role]': 'true',
 			'populate[user_groups]': 'true',
+			'populate[deckrueden_info][fields][0]': 'documentId',
 		}),
 		{ token },
 	)

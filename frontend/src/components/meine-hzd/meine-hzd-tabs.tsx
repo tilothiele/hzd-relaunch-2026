@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Tabs, Tab, Box } from '@mui/material'
-import { searchBreeders } from '@/lib/strapi/api'
+import { fetchEntityByDocumentId, searchBreeders } from '@/lib/strapi/api'
+import { POPULATE_BREEDER_SEARCH } from '@/lib/strapi/populate'
 import { isDeckruedenbesitzer, isZuechter } from '@/lib/permissions'
 import { MeinProfilTab } from './tabs/mein-profil-tab'
 import { MeinZwingerTab } from './tabs/mein-zwinger-tab'
@@ -11,10 +12,6 @@ import type { AuthUser, Breeder } from '@/types'
 
 type TabId = 0 | 1 | 2 | 3 | 4
 
-type BreederWithRole = Breeder & {
-	BreederRole?: 'B' | 'S' | null
-}
-
 interface MeineHzdTabsProps {
 	user: AuthUser | null
 	strapiBaseUrl?: string | null
@@ -23,17 +20,16 @@ interface MeineHzdTabsProps {
 export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 	const [activeTab, setActiveTab] = useState<TabId>(0)
 	const [breeder, setBreeder] = useState<Breeder | null>(null)
-	const [studBreeder, setStudBreeder] = useState<Breeder | null>(null)
+	const [deckruedenInfo, setDeckruedenInfo] = useState<Breeder | null>(null)
 	const canSeeZuechterTabs = isZuechter(user)
 	const canSeeDeckruedenTab = isDeckruedenbesitzer(user)
 	const canSeeHunde = canSeeZuechterTabs || canSeeDeckruedenTab
-	const shouldLoadBreeder = canSeeZuechterTabs || canSeeDeckruedenTab
+	const deckruedenInfoDocumentId = user?.deckrueden_info?.documentId ?? null
 
 	useEffect(() => {
 		async function loadBreeder() {
-			if (!shouldLoadBreeder || !user?.documentId) {
+			if (!canSeeZuechterTabs || !user?.documentId) {
 				setBreeder(null)
-				setStudBreeder(null)
 				return
 			}
 
@@ -47,19 +43,40 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 				)
 				const nodes = data?.hzdPluginBreeders_connection?.nodes ?? []
 				setBreeder(nodes[0] ?? null)
-				const studOwner = nodes.find(
-					(node) => (node as BreederWithRole).BreederRole === 'S',
-				)
-				setStudBreeder(studOwner ?? nodes[0] ?? null)
 			} catch (error) {
 				console.error('Failed to load breeder data. Error details:', JSON.stringify(error, null, 2))
 				setBreeder(null)
-				setStudBreeder(null)
 			}
 		}
 
 		loadBreeder()
-	}, [user, strapiBaseUrl, shouldLoadBreeder])
+	}, [user, strapiBaseUrl, canSeeZuechterTabs])
+
+	useEffect(() => {
+		async function loadDeckruedenInfo() {
+			if (!canSeeDeckruedenTab || !deckruedenInfoDocumentId) {
+				setDeckruedenInfo(null)
+				return
+			}
+
+			try {
+				const data = await fetchEntityByDocumentId<Breeder>(
+					'hzd-plugin/breeders',
+					deckruedenInfoDocumentId,
+					POPULATE_BREEDER_SEARCH,
+				)
+				setDeckruedenInfo(data)
+			} catch (error) {
+				console.error(
+					'Failed to load deckrueden info. Error details:',
+					JSON.stringify(error, null, 2),
+				)
+				setDeckruedenInfo(null)
+			}
+		}
+
+		loadDeckruedenInfo()
+	}, [canSeeDeckruedenTab, deckruedenInfoDocumentId])
 
 	useEffect(() => {
 		const zwingerOrWuerfe = activeTab === 1 || activeTab === 2
@@ -78,12 +95,12 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 			return
 		}
 
-		if (activeTab === 4 && (!canSeeDeckruedenTab || !studBreeder)) {
+		if (activeTab === 4 && (!canSeeDeckruedenTab || !deckruedenInfo)) {
 			setActiveTab(0)
 		}
 	}, [
 		breeder,
-		studBreeder,
+		deckruedenInfo,
 		activeTab,
 		canSeeZuechterTabs,
 		canSeeHunde,
@@ -127,8 +144,8 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 					)}
 					{canSeeZuechterTabs && <Tab label='Meine Würfe' value={2} />}
 					{canSeeHunde && <Tab label='Meine Zuchthunde' value={3} />}
-					{canSeeDeckruedenTab && studBreeder && (
-						<Tab label='ich als Deckrüdenbesitzer' value={4} />
+					{canSeeDeckruedenTab && deckruedenInfo && (
+						<Tab label='Deckrüdenbesitzer-Infos' value={4} />
 					)}
 				</Tabs>
 			</Box>
@@ -144,9 +161,9 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 				{activeTab === 3 && canSeeHunde && (
 					<MeineHundeTab user={user} strapiBaseUrl={strapiBaseUrl} />
 				)}
-				{activeTab === 4 && canSeeDeckruedenTab && studBreeder && (
+				{activeTab === 4 && canSeeDeckruedenTab && deckruedenInfo && (
 					<IchAlsDeckruedenbesitzerTab
-						breeder={studBreeder}
+						breeder={deckruedenInfo}
 						strapiBaseUrl={strapiBaseUrl}
 					/>
 				)}
