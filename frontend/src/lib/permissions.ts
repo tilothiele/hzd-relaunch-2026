@@ -3,6 +3,7 @@ import type { AuthUser, ComponentPermissionRestriction, UserGroup } from '@/type
 const SONDERLEITER_GROUP_ID = 1
 const KOERMEISTER_GROUP_ID = 2
 const DECKRUEDENBESITZER_GROUP_ID = 3
+const ZUECHTER_GROUP_ID = 4
 
 type RestrictionLike = {
 	user_groups?: unknown
@@ -171,12 +172,16 @@ export function isBreeder(user: AuthUser | null): boolean {
 	return user?.cFlagBreeder === true
 }
 
+export function isZuechter(user: AuthUser | null): boolean {
+	return belongsToGroupId(user, ZUECHTER_GROUP_ID)
+}
+
 export function isKoermeister(user: AuthUser | null): boolean {
 	return belongsToGroupId(user, KOERMEISTER_GROUP_ID)
 }
 
 export function isDeckruedenbesitzer(user: AuthUser | null): boolean {
-	return belongsToGroupId(user, DECKRUEDENBESITZER_GROUP_ID)
+	return user?.cFlagBreeder === true && belongsToGroupId(user, DECKRUEDENBESITZER_GROUP_ID)
 }
 
 export function isSonderleiter(user: AuthUser | null): boolean {

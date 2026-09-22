@@ -36,7 +36,8 @@ export default [
     path: '/litters',
     handler: 'litter.create',
     config: {
-      // auth wird weggelassen, damit Standard-Authentifizierung verwendet wird
+      // Prüfung im Controller: eingeloggter Züchter und eigener Zwinger.
+      auth: false,
     },
   },
   {
@@ -44,7 +45,8 @@ export default [
     path: '/litters/:id',
     handler: 'litter.update',
     config: {
-      // auth wird weggelassen, damit Standard-Authentifizierung verwendet wird
+      // Prüfung im Controller: eingeloggter Züchter und eigener Zwinger.
+      auth: false,
     },
   },
 ];

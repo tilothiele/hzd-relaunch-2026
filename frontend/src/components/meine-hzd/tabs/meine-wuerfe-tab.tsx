@@ -88,6 +88,7 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
     const [editFormData, setEditFormData] = useState<LitterFormData | null>(null)
     const [isSaving, setIsSaving] = useState(false)
     const [isCreating, setIsCreating] = useState(false)
+    const [createError, setCreateError] = useState<string | null>(null)
     const [validationError, setValidationError] = useState<string | null>(null)
     const [validationWarning, setValidationWarning] = useState<string | null>(null)
 
@@ -289,40 +290,33 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
     const handleCreateLitter = async () => {
         if (!breeder?.documentId) return
         setIsCreating(true)
+        setCreateError(null)
         try {
-            // Create a new litter with default values
-            // We need to provide the minimal required fields
-            const newLitterData = {
-                LitterStatus: 'Planned',
-                breeder: breeder.documentId,
-                // These are likely required or good defaults
-                AmountRS: { Total: 0, Available: 0 },
-                AmountRSM: { Total: 0, Available: 0 },
-                AmountRB: { Total: 0, Available: 0 },
-                AmountHS: { Total: 0, Available: 0 },
-                AmountHSM: { Total: 0, Available: 0 },
-                AmountHB: { Total: 0, Available: 0 },
-                OrderLetter: 'A' // Backend might handle this or we might need to calculate it
-            }
-
             const newLitter = await createEntity<Litter>(
                 'hzd-plugin/litters',
-                newLitterData,
+                {
+                    breeder: breeder.documentId,
+                },
                 {},
             )
-            if (newLitter) {
-                // Refresh litters list
-                const data = await searchLitters({
-                    breederDocumentId: breeder.documentId,
-                    sort: ['dateOfBirth:desc'],
-                }, {})
-                setLitters(data.hzdPluginLitters_connection.nodes || [])
-
-                // Automatically start editing the new litter
-                handleEditClick(newLitter)
+            if (!newLitter?.documentId) {
+                setCreateError('Der Wurf konnte nicht angelegt werden.')
+                return
             }
+
+            const data = await searchLitters({
+                breederDocumentId: breeder.documentId,
+                sort: ['dateOfBirth:desc'],
+            }, {})
+            setLitters(data.hzdPluginLitters_connection.nodes || [])
+            handleEditClick(newLitter)
         } catch (error) {
             console.error('Failed to create litter:', error)
+            setCreateError(
+                error instanceof Error
+                    ? error.message
+                    : 'Der Wurf konnte nicht angelegt werden.',
+            )
         } finally {
             setIsCreating(false)
         }
@@ -330,10 +324,6 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
 
     if (loading) {
         return <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><CircularProgress /></Box>
-    }
-
-    if (litters.length === 0) {
-        return <Typography>Keine Würfe gefunden.</Typography>
     }
 
     const canEditPuppies = editFormData?.LitterStatus === 'Littered'
@@ -352,6 +342,12 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
                     {isCreating ? 'Wird angelegt...' : 'Neuen Wurf anlegen'}
                 </Button>
             </Box>
+            {createError && (
+                <Alert severity='error' sx={{ mb: 2 }}>{createError}</Alert>
+            )}
+            {litters.length === 0 ? (
+                <Typography>Keine Würfe gefunden.</Typography>
+            ) : (
             <TableContainer component={Paper} variant='outlined'>
                 <Table>
                     <TableHead>
@@ -410,6 +406,7 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
                     </TableBody>
                 </Table>
             </TableContainer>
+            )}
 
             {editingLitterId && editFormData && (() => {
                 const currentLitter = litters.find(l => l.documentId === editingLitterId)
