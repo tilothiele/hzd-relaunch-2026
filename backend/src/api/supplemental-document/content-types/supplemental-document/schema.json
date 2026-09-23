@@ -20,7 +20,7 @@
     },
     "SortOrd": {
       "type": "integer",
-      "unique": true
+      "unique": false
     },
     "ShortId": {
       "type": "string"

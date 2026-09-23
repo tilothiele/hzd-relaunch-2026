@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-09-22T12:21:10.863Z"
+    "x-generation-date": "2026-09-23T20:30:19.951Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -20067,88 +20067,131 @@
               "DisplayName": {
                 "type": "string"
               },
-              "form": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "oneOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "number"
-                      }
-                    ]
-                  },
-                  "documentId": {
-                    "type": "string"
-                  },
-                  "Name": {
-                    "type": "string"
-                  },
-                  "FormFields": {
-                    "type": "array",
-                    "items": {
-                      "anyOf": [
+              "forms": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "oneOf": [
                         {
-                          "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                          "type": "string"
                         },
                         {
-                          "$ref": "#/components/schemas/FormFldStaticTextComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormShortTextInputComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormChoiceComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormBooleanChoiceComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormEmailAdressComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormNumberInputComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormTextAreaComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                          "type": "number"
                         }
                       ]
                     },
-                    "discriminator": {
-                      "propertyName": "__component",
-                      "mapping": {
-                        "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
-                        "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
-                        "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
-                        "form.choice": "#/components/schemas/FormChoiceComponent",
-                        "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
-                        "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
-                        "form.number-input": "#/components/schemas/FormNumberInputComponent",
-                        "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
-                        "form.text-area": "#/components/schemas/FormTextAreaComponent",
-                        "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
-                        "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                    "documentId": {
+                      "type": "string"
+                    },
+                    "Name": {
+                      "type": "string"
+                    },
+                    "FormFields": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormFldStaticTextComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormShortTextInputComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormChoiceComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormBooleanChoiceComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormEmailAdressComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormNumberInputComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormTextAreaComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                          }
+                        ]
+                      },
+                      "discriminator": {
+                        "propertyName": "__component",
+                        "mapping": {
+                          "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
+                          "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
+                          "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
+                          "form.choice": "#/components/schemas/FormChoiceComponent",
+                          "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
+                          "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
+                          "form.number-input": "#/components/schemas/FormNumberInputComponent",
+                          "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
+                          "form.text-area": "#/components/schemas/FormTextAreaComponent",
+                          "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
+                          "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                        }
                       }
-                    }
-                  },
-                  "InclPrivacyPolicy": {
-                    "type": "boolean"
-                  },
-                  "ThankYouMessage": {},
-                  "EventAdmin": {
-                    "type": "array",
-                    "items": {
+                    },
+                    "InclPrivacyPolicy": {
+                      "type": "boolean"
+                    },
+                    "ThankYouMessage": {},
+                    "event_admins": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "documentId": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "SuccessUrl": {
+                      "type": "string"
+                    },
+                    "SuccessEMail": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "SendConfirmationMail": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "publishedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdBy": {
                       "type": "object",
                       "properties": {
                         "id": {
@@ -20165,72 +20208,8 @@
                           "type": "string"
                         }
                       }
-                    }
-                  },
-                  "SuccessUrl": {
-                    "type": "string"
-                  },
-                  "SuccessEMail": {
-                    "type": "string",
-                    "format": "email"
-                  },
-                  "SendConfirmationMail": {
-                    "type": "boolean"
-                  },
-                  "createdAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "updatedAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "publishedAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "createdBy": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "oneOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "number"
-                          }
-                        ]
-                      },
-                      "documentId": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "updatedBy": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "oneOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "number"
-                          }
-                        ]
-                      },
-                      "documentId": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "locale": {
-                    "type": "string"
-                  },
-                  "localizations": {
-                    "type": "array",
-                    "items": {
+                    },
+                    "updatedBy": {
                       "type": "object",
                       "properties": {
                         "id": {
@@ -20245,6 +20224,30 @@
                         },
                         "documentId": {
                           "type": "string"
+                        }
+                      }
+                    },
+                    "locale": {
+                      "type": "string"
+                    },
+                    "localizations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "documentId": {
+                            "type": "string"
+                          }
                         }
                       }
                     }
@@ -20870,6 +20873,12 @@
                                 "type": "integer"
                               },
                               "NonHzdOriginNote": {
+                                "type": "string"
+                              },
+                              "isDirty": {
+                                "type": "boolean"
+                              },
+                              "DogOwnersMessage": {
                                 "type": "string"
                               },
                               "createdAt": {
@@ -25118,7 +25127,7 @@
                 "type": "boolean"
               },
               "ThankYouMessage": {},
-              "EventAdmin": {
+              "event_admins": {
                 "type": "array",
                 "items": {
                   "type": "object",
@@ -25824,21 +25833,24 @@
                     "DisplayName": {
                       "type": "string"
                     },
-                    "form": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ]
-                        },
-                        "documentId": {
-                          "type": "string"
+                    "forms": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "documentId": {
+                            "type": "string"
+                          }
                         }
                       }
                     },
@@ -26461,6 +26473,12 @@
                                       "type": "integer"
                                     },
                                     "NonHzdOriginNote": {
+                                      "type": "string"
+                                    },
+                                    "isDirty": {
+                                      "type": "boolean"
+                                    },
+                                    "DogOwnersMessage": {
                                       "type": "string"
                                     },
                                     "createdAt": {
@@ -30045,88 +30063,131 @@
                   "DisplayName": {
                     "type": "string"
                   },
-                  "form": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "oneOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "number"
-                          }
-                        ]
-                      },
-                      "documentId": {
-                        "type": "string"
-                      },
-                      "Name": {
-                        "type": "string"
-                      },
-                      "FormFields": {
-                        "type": "array",
-                        "items": {
-                          "anyOf": [
+                  "forms": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "oneOf": [
                             {
-                              "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                              "type": "string"
                             },
                             {
-                              "$ref": "#/components/schemas/FormFldStaticTextComponent"
-                            },
-                            {
-                              "$ref": "#/components/schemas/FormShortTextInputComponent"
-                            },
-                            {
-                              "$ref": "#/components/schemas/FormChoiceComponent"
-                            },
-                            {
-                              "$ref": "#/components/schemas/FormBooleanChoiceComponent"
-                            },
-                            {
-                              "$ref": "#/components/schemas/FormEmailAdressComponent"
-                            },
-                            {
-                              "$ref": "#/components/schemas/FormNumberInputComponent"
-                            },
-                            {
-                              "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
-                            },
-                            {
-                              "$ref": "#/components/schemas/FormTextAreaComponent"
-                            },
-                            {
-                              "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
-                            },
-                            {
-                              "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                              "type": "number"
                             }
                           ]
                         },
-                        "discriminator": {
-                          "propertyName": "__component",
-                          "mapping": {
-                            "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
-                            "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
-                            "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
-                            "form.choice": "#/components/schemas/FormChoiceComponent",
-                            "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
-                            "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
-                            "form.number-input": "#/components/schemas/FormNumberInputComponent",
-                            "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
-                            "form.text-area": "#/components/schemas/FormTextAreaComponent",
-                            "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
-                            "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                        "documentId": {
+                          "type": "string"
+                        },
+                        "Name": {
+                          "type": "string"
+                        },
+                        "FormFields": {
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                              },
+                              {
+                                "$ref": "#/components/schemas/FormFldStaticTextComponent"
+                              },
+                              {
+                                "$ref": "#/components/schemas/FormShortTextInputComponent"
+                              },
+                              {
+                                "$ref": "#/components/schemas/FormChoiceComponent"
+                              },
+                              {
+                                "$ref": "#/components/schemas/FormBooleanChoiceComponent"
+                              },
+                              {
+                                "$ref": "#/components/schemas/FormEmailAdressComponent"
+                              },
+                              {
+                                "$ref": "#/components/schemas/FormNumberInputComponent"
+                              },
+                              {
+                                "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
+                              },
+                              {
+                                "$ref": "#/components/schemas/FormTextAreaComponent"
+                              },
+                              {
+                                "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
+                              },
+                              {
+                                "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                              }
+                            ]
+                          },
+                          "discriminator": {
+                            "propertyName": "__component",
+                            "mapping": {
+                              "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
+                              "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
+                              "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
+                              "form.choice": "#/components/schemas/FormChoiceComponent",
+                              "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
+                              "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
+                              "form.number-input": "#/components/schemas/FormNumberInputComponent",
+                              "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
+                              "form.text-area": "#/components/schemas/FormTextAreaComponent",
+                              "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
+                              "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                            }
                           }
-                        }
-                      },
-                      "InclPrivacyPolicy": {
-                        "type": "boolean"
-                      },
-                      "ThankYouMessage": {},
-                      "EventAdmin": {
-                        "type": "array",
-                        "items": {
+                        },
+                        "InclPrivacyPolicy": {
+                          "type": "boolean"
+                        },
+                        "ThankYouMessage": {},
+                        "event_admins": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "oneOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "number"
+                                  }
+                                ]
+                              },
+                              "documentId": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        },
+                        "SuccessUrl": {
+                          "type": "string"
+                        },
+                        "SuccessEMail": {
+                          "type": "string",
+                          "format": "email"
+                        },
+                        "SendConfirmationMail": {
+                          "type": "boolean"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "publishedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "createdBy": {
                           "type": "object",
                           "properties": {
                             "id": {
@@ -30143,72 +30204,8 @@
                               "type": "string"
                             }
                           }
-                        }
-                      },
-                      "SuccessUrl": {
-                        "type": "string"
-                      },
-                      "SuccessEMail": {
-                        "type": "string",
-                        "format": "email"
-                      },
-                      "SendConfirmationMail": {
-                        "type": "boolean"
-                      },
-                      "createdAt": {
-                        "type": "string",
-                        "format": "date-time"
-                      },
-                      "updatedAt": {
-                        "type": "string",
-                        "format": "date-time"
-                      },
-                      "publishedAt": {
-                        "type": "string",
-                        "format": "date-time"
-                      },
-                      "createdBy": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "oneOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "number"
-                              }
-                            ]
-                          },
-                          "documentId": {
-                            "type": "string"
-                          }
-                        }
-                      },
-                      "updatedBy": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "oneOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "number"
-                              }
-                            ]
-                          },
-                          "documentId": {
-                            "type": "string"
-                          }
-                        }
-                      },
-                      "locale": {
-                        "type": "string"
-                      },
-                      "localizations": {
-                        "type": "array",
-                        "items": {
+                        },
+                        "updatedBy": {
                           "type": "object",
                           "properties": {
                             "id": {
@@ -30223,6 +30220,30 @@
                             },
                             "documentId": {
                               "type": "string"
+                            }
+                          }
+                        },
+                        "locale": {
+                          "type": "string"
+                        },
+                        "localizations": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "oneOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "number"
+                                  }
+                                ]
+                              },
+                              "documentId": {
+                                "type": "string"
+                              }
                             }
                           }
                         }
@@ -31399,6 +31420,12 @@
                 "type": "integer"
               },
               "NonHzdOriginNote": {
+                "type": "string"
+              },
+              "isDirty": {
+                "type": "boolean"
+              },
+              "DogOwnersMessage": {
                 "type": "string"
               },
               "createdAt": {
@@ -33973,88 +34000,131 @@
               "DisplayName": {
                 "type": "string"
               },
-              "form": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "oneOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "number"
-                      }
-                    ]
-                  },
-                  "documentId": {
-                    "type": "string"
-                  },
-                  "Name": {
-                    "type": "string"
-                  },
-                  "FormFields": {
-                    "type": "array",
-                    "items": {
-                      "anyOf": [
+              "forms": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "oneOf": [
                         {
-                          "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                          "type": "string"
                         },
                         {
-                          "$ref": "#/components/schemas/FormFldStaticTextComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormShortTextInputComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormChoiceComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormBooleanChoiceComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormEmailAdressComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormNumberInputComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormTextAreaComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                          "type": "number"
                         }
                       ]
                     },
-                    "discriminator": {
-                      "propertyName": "__component",
-                      "mapping": {
-                        "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
-                        "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
-                        "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
-                        "form.choice": "#/components/schemas/FormChoiceComponent",
-                        "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
-                        "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
-                        "form.number-input": "#/components/schemas/FormNumberInputComponent",
-                        "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
-                        "form.text-area": "#/components/schemas/FormTextAreaComponent",
-                        "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
-                        "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                    "documentId": {
+                      "type": "string"
+                    },
+                    "Name": {
+                      "type": "string"
+                    },
+                    "FormFields": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormFldStaticTextComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormShortTextInputComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormChoiceComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormBooleanChoiceComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormEmailAdressComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormNumberInputComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormTextAreaComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                          }
+                        ]
+                      },
+                      "discriminator": {
+                        "propertyName": "__component",
+                        "mapping": {
+                          "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
+                          "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
+                          "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
+                          "form.choice": "#/components/schemas/FormChoiceComponent",
+                          "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
+                          "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
+                          "form.number-input": "#/components/schemas/FormNumberInputComponent",
+                          "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
+                          "form.text-area": "#/components/schemas/FormTextAreaComponent",
+                          "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
+                          "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                        }
                       }
-                    }
-                  },
-                  "InclPrivacyPolicy": {
-                    "type": "boolean"
-                  },
-                  "ThankYouMessage": {},
-                  "EventAdmin": {
-                    "type": "array",
-                    "items": {
+                    },
+                    "InclPrivacyPolicy": {
+                      "type": "boolean"
+                    },
+                    "ThankYouMessage": {},
+                    "event_admins": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "documentId": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "SuccessUrl": {
+                      "type": "string"
+                    },
+                    "SuccessEMail": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "SendConfirmationMail": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "publishedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdBy": {
                       "type": "object",
                       "properties": {
                         "id": {
@@ -34071,72 +34141,8 @@
                           "type": "string"
                         }
                       }
-                    }
-                  },
-                  "SuccessUrl": {
-                    "type": "string"
-                  },
-                  "SuccessEMail": {
-                    "type": "string",
-                    "format": "email"
-                  },
-                  "SendConfirmationMail": {
-                    "type": "boolean"
-                  },
-                  "createdAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "updatedAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "publishedAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "createdBy": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "oneOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "number"
-                          }
-                        ]
-                      },
-                      "documentId": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "updatedBy": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "oneOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "number"
-                          }
-                        ]
-                      },
-                      "documentId": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "locale": {
-                    "type": "string"
-                  },
-                  "localizations": {
-                    "type": "array",
-                    "items": {
+                    },
+                    "updatedBy": {
                       "type": "object",
                       "properties": {
                         "id": {
@@ -34151,6 +34157,30 @@
                         },
                         "documentId": {
                           "type": "string"
+                        }
+                      }
+                    },
+                    "locale": {
+                      "type": "string"
+                    },
+                    "localizations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "documentId": {
+                            "type": "string"
+                          }
                         }
                       }
                     }
@@ -34776,6 +34806,12 @@
                                 "type": "integer"
                               },
                               "NonHzdOriginNote": {
+                                "type": "string"
+                              },
+                              "isDirty": {
+                                "type": "boolean"
+                              },
+                              "DogOwnersMessage": {
                                 "type": "string"
                               },
                               "createdAt": {
@@ -38386,88 +38422,131 @@
                     "DisplayName": {
                       "type": "string"
                     },
-                    "form": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ]
-                        },
-                        "documentId": {
-                          "type": "string"
-                        },
-                        "Name": {
-                          "type": "string"
-                        },
-                        "FormFields": {
-                          "type": "array",
-                          "items": {
-                            "anyOf": [
+                    "forms": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
                               {
-                                "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                                "type": "string"
                               },
                               {
-                                "$ref": "#/components/schemas/FormFldStaticTextComponent"
-                              },
-                              {
-                                "$ref": "#/components/schemas/FormShortTextInputComponent"
-                              },
-                              {
-                                "$ref": "#/components/schemas/FormChoiceComponent"
-                              },
-                              {
-                                "$ref": "#/components/schemas/FormBooleanChoiceComponent"
-                              },
-                              {
-                                "$ref": "#/components/schemas/FormEmailAdressComponent"
-                              },
-                              {
-                                "$ref": "#/components/schemas/FormNumberInputComponent"
-                              },
-                              {
-                                "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
-                              },
-                              {
-                                "$ref": "#/components/schemas/FormTextAreaComponent"
-                              },
-                              {
-                                "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
-                              },
-                              {
-                                "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                                "type": "number"
                               }
                             ]
                           },
-                          "discriminator": {
-                            "propertyName": "__component",
-                            "mapping": {
-                              "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
-                              "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
-                              "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
-                              "form.choice": "#/components/schemas/FormChoiceComponent",
-                              "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
-                              "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
-                              "form.number-input": "#/components/schemas/FormNumberInputComponent",
-                              "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
-                              "form.text-area": "#/components/schemas/FormTextAreaComponent",
-                              "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
-                              "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                          "documentId": {
+                            "type": "string"
+                          },
+                          "Name": {
+                            "type": "string"
+                          },
+                          "FormFields": {
+                            "type": "array",
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/FormFldStaticTextComponent"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/FormShortTextInputComponent"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/FormChoiceComponent"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/FormBooleanChoiceComponent"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/FormEmailAdressComponent"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/FormNumberInputComponent"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/FormTextAreaComponent"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                                }
+                              ]
+                            },
+                            "discriminator": {
+                              "propertyName": "__component",
+                              "mapping": {
+                                "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
+                                "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
+                                "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
+                                "form.choice": "#/components/schemas/FormChoiceComponent",
+                                "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
+                                "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
+                                "form.number-input": "#/components/schemas/FormNumberInputComponent",
+                                "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
+                                "form.text-area": "#/components/schemas/FormTextAreaComponent",
+                                "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
+                                "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                              }
                             }
-                          }
-                        },
-                        "InclPrivacyPolicy": {
-                          "type": "boolean"
-                        },
-                        "ThankYouMessage": {},
-                        "EventAdmin": {
-                          "type": "array",
-                          "items": {
+                          },
+                          "InclPrivacyPolicy": {
+                            "type": "boolean"
+                          },
+                          "ThankYouMessage": {},
+                          "event_admins": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "oneOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                },
+                                "documentId": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          },
+                          "SuccessUrl": {
+                            "type": "string"
+                          },
+                          "SuccessEMail": {
+                            "type": "string",
+                            "format": "email"
+                          },
+                          "SendConfirmationMail": {
+                            "type": "boolean"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "publishedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "createdBy": {
                             "type": "object",
                             "properties": {
                               "id": {
@@ -38484,72 +38563,8 @@
                                 "type": "string"
                               }
                             }
-                          }
-                        },
-                        "SuccessUrl": {
-                          "type": "string"
-                        },
-                        "SuccessEMail": {
-                          "type": "string",
-                          "format": "email"
-                        },
-                        "SendConfirmationMail": {
-                          "type": "boolean"
-                        },
-                        "createdAt": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "updatedAt": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "publishedAt": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "createdBy": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "oneOf": [
-                                {
-                                  "type": "string"
-                                },
-                                {
-                                  "type": "number"
-                                }
-                              ]
-                            },
-                            "documentId": {
-                              "type": "string"
-                            }
-                          }
-                        },
-                        "updatedBy": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "oneOf": [
-                                {
-                                  "type": "string"
-                                },
-                                {
-                                  "type": "number"
-                                }
-                              ]
-                            },
-                            "documentId": {
-                              "type": "string"
-                            }
-                          }
-                        },
-                        "locale": {
-                          "type": "string"
-                        },
-                        "localizations": {
-                          "type": "array",
-                          "items": {
+                          },
+                          "updatedBy": {
                             "type": "object",
                             "properties": {
                               "id": {
@@ -38564,6 +38579,30 @@
                               },
                               "documentId": {
                                 "type": "string"
+                              }
+                            }
+                          },
+                          "locale": {
+                            "type": "string"
+                          },
+                          "localizations": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "oneOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                },
+                                "documentId": {
+                                  "type": "string"
+                                }
                               }
                             }
                           }
@@ -39189,6 +39228,12 @@
                                       "type": "integer"
                                     },
                                     "NonHzdOriginNote": {
+                                      "type": "string"
+                                    },
+                                    "isDirty": {
+                                      "type": "boolean"
+                                    },
+                                    "DogOwnersMessage": {
                                       "type": "string"
                                     },
                                     "createdAt": {
@@ -40855,7 +40900,7 @@
                 "type": "boolean"
               },
               "ThankYouMessage": {},
-              "EventAdmin": {
+              "event_admins": {
                 "type": "array",
                 "items": {
                   "oneOf": [
@@ -41017,7 +41062,7 @@
             "type": "boolean"
           },
           "ThankYouMessage": {},
-          "EventAdmin": {
+          "event_admins": {
             "type": "array",
             "items": {
               "type": "object",
@@ -42374,88 +42419,131 @@
                 "DisplayName": {
                   "type": "string"
                 },
-                "form": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "oneOf": [
-                        {
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ]
-                    },
-                    "documentId": {
-                      "type": "string"
-                    },
-                    "Name": {
-                      "type": "string"
-                    },
-                    "FormFields": {
-                      "type": "array",
-                      "items": {
-                        "anyOf": [
+                "forms": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "oneOf": [
                           {
-                            "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                            "type": "string"
                           },
                           {
-                            "$ref": "#/components/schemas/FormFldStaticTextComponent"
-                          },
-                          {
-                            "$ref": "#/components/schemas/FormShortTextInputComponent"
-                          },
-                          {
-                            "$ref": "#/components/schemas/FormChoiceComponent"
-                          },
-                          {
-                            "$ref": "#/components/schemas/FormBooleanChoiceComponent"
-                          },
-                          {
-                            "$ref": "#/components/schemas/FormEmailAdressComponent"
-                          },
-                          {
-                            "$ref": "#/components/schemas/FormNumberInputComponent"
-                          },
-                          {
-                            "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
-                          },
-                          {
-                            "$ref": "#/components/schemas/FormTextAreaComponent"
-                          },
-                          {
-                            "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
-                          },
-                          {
-                            "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                            "type": "number"
                           }
                         ]
                       },
-                      "discriminator": {
-                        "propertyName": "__component",
-                        "mapping": {
-                          "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
-                          "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
-                          "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
-                          "form.choice": "#/components/schemas/FormChoiceComponent",
-                          "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
-                          "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
-                          "form.number-input": "#/components/schemas/FormNumberInputComponent",
-                          "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
-                          "form.text-area": "#/components/schemas/FormTextAreaComponent",
-                          "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
-                          "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                      "documentId": {
+                        "type": "string"
+                      },
+                      "Name": {
+                        "type": "string"
+                      },
+                      "FormFields": {
+                        "type": "array",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                            },
+                            {
+                              "$ref": "#/components/schemas/FormFldStaticTextComponent"
+                            },
+                            {
+                              "$ref": "#/components/schemas/FormShortTextInputComponent"
+                            },
+                            {
+                              "$ref": "#/components/schemas/FormChoiceComponent"
+                            },
+                            {
+                              "$ref": "#/components/schemas/FormBooleanChoiceComponent"
+                            },
+                            {
+                              "$ref": "#/components/schemas/FormEmailAdressComponent"
+                            },
+                            {
+                              "$ref": "#/components/schemas/FormNumberInputComponent"
+                            },
+                            {
+                              "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
+                            },
+                            {
+                              "$ref": "#/components/schemas/FormTextAreaComponent"
+                            },
+                            {
+                              "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
+                            },
+                            {
+                              "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                            }
+                          ]
+                        },
+                        "discriminator": {
+                          "propertyName": "__component",
+                          "mapping": {
+                            "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
+                            "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
+                            "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
+                            "form.choice": "#/components/schemas/FormChoiceComponent",
+                            "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
+                            "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
+                            "form.number-input": "#/components/schemas/FormNumberInputComponent",
+                            "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
+                            "form.text-area": "#/components/schemas/FormTextAreaComponent",
+                            "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
+                            "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                          }
                         }
-                      }
-                    },
-                    "InclPrivacyPolicy": {
-                      "type": "boolean"
-                    },
-                    "ThankYouMessage": {},
-                    "EventAdmin": {
-                      "type": "array",
-                      "items": {
+                      },
+                      "InclPrivacyPolicy": {
+                        "type": "boolean"
+                      },
+                      "ThankYouMessage": {},
+                      "event_admins": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "oneOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "number"
+                                }
+                              ]
+                            },
+                            "documentId": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "SuccessUrl": {
+                        "type": "string"
+                      },
+                      "SuccessEMail": {
+                        "type": "string",
+                        "format": "email"
+                      },
+                      "SendConfirmationMail": {
+                        "type": "boolean"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "publishedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "createdBy": {
                         "type": "object",
                         "properties": {
                           "id": {
@@ -42472,72 +42560,8 @@
                             "type": "string"
                           }
                         }
-                      }
-                    },
-                    "SuccessUrl": {
-                      "type": "string"
-                    },
-                    "SuccessEMail": {
-                      "type": "string",
-                      "format": "email"
-                    },
-                    "SendConfirmationMail": {
-                      "type": "boolean"
-                    },
-                    "createdAt": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "updatedAt": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "publishedAt": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "createdBy": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ]
-                        },
-                        "documentId": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "updatedBy": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ]
-                        },
-                        "documentId": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "locale": {
-                      "type": "string"
-                    },
-                    "localizations": {
-                      "type": "array",
-                      "items": {
+                      },
+                      "updatedBy": {
                         "type": "object",
                         "properties": {
                           "id": {
@@ -42552,6 +42576,30 @@
                           },
                           "documentId": {
                             "type": "string"
+                          }
+                        }
+                      },
+                      "locale": {
+                        "type": "string"
+                      },
+                      "localizations": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "oneOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "number"
+                                }
+                              ]
+                            },
+                            "documentId": {
+                              "type": "string"
+                            }
                           }
                         }
                       }
@@ -43472,6 +43520,12 @@
                                   "type": "integer"
                                 },
                                 "NonHzdOriginNote": {
+                                  "type": "string"
+                                },
+                                "isDirty": {
+                                  "type": "boolean"
+                                },
+                                "DogOwnersMessage": {
                                   "type": "string"
                                 },
                                 "createdAt": {
@@ -44677,7 +44731,7 @@
                 "type": "boolean"
               },
               "ThankYouMessage": {},
-              "EventAdmin": {
+              "event_admins": {
                 "type": "array",
                 "items": {
                   "type": "object",
@@ -46034,21 +46088,24 @@
                     "DisplayName": {
                       "type": "string"
                     },
-                    "form": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ]
-                        },
-                        "documentId": {
-                          "type": "string"
+                    "forms": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "documentId": {
+                            "type": "string"
+                          }
                         }
                       }
                     },
@@ -46966,6 +47023,12 @@
                                       "type": "integer"
                                     },
                                     "NonHzdOriginNote": {
+                                      "type": "string"
+                                    },
+                                    "isDirty": {
+                                      "type": "boolean"
+                                    },
+                                    "DogOwnersMessage": {
                                       "type": "string"
                                     },
                                     "createdAt": {
@@ -48215,6 +48278,9 @@
               },
               "FeaturedImage": {
                 "type": "boolean"
+              },
+              "PhotographerName": {
+                "type": "string"
               },
               "locale": {
                 "type": "string"
@@ -50113,88 +50179,131 @@
               "DisplayName": {
                 "type": "string"
               },
-              "form": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "oneOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "number"
-                      }
-                    ]
-                  },
-                  "documentId": {
-                    "type": "string"
-                  },
-                  "Name": {
-                    "type": "string"
-                  },
-                  "FormFields": {
-                    "type": "array",
-                    "items": {
-                      "anyOf": [
+              "forms": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "oneOf": [
                         {
-                          "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                          "type": "string"
                         },
                         {
-                          "$ref": "#/components/schemas/FormFldStaticTextComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormShortTextInputComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormChoiceComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormBooleanChoiceComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormEmailAdressComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormNumberInputComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormTextAreaComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                          "type": "number"
                         }
                       ]
                     },
-                    "discriminator": {
-                      "propertyName": "__component",
-                      "mapping": {
-                        "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
-                        "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
-                        "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
-                        "form.choice": "#/components/schemas/FormChoiceComponent",
-                        "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
-                        "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
-                        "form.number-input": "#/components/schemas/FormNumberInputComponent",
-                        "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
-                        "form.text-area": "#/components/schemas/FormTextAreaComponent",
-                        "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
-                        "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                    "documentId": {
+                      "type": "string"
+                    },
+                    "Name": {
+                      "type": "string"
+                    },
+                    "FormFields": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormFldStaticTextComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormShortTextInputComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormChoiceComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormBooleanChoiceComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormEmailAdressComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormNumberInputComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormTextAreaComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                          }
+                        ]
+                      },
+                      "discriminator": {
+                        "propertyName": "__component",
+                        "mapping": {
+                          "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
+                          "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
+                          "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
+                          "form.choice": "#/components/schemas/FormChoiceComponent",
+                          "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
+                          "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
+                          "form.number-input": "#/components/schemas/FormNumberInputComponent",
+                          "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
+                          "form.text-area": "#/components/schemas/FormTextAreaComponent",
+                          "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
+                          "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                        }
                       }
-                    }
-                  },
-                  "InclPrivacyPolicy": {
-                    "type": "boolean"
-                  },
-                  "ThankYouMessage": {},
-                  "EventAdmin": {
-                    "type": "array",
-                    "items": {
+                    },
+                    "InclPrivacyPolicy": {
+                      "type": "boolean"
+                    },
+                    "ThankYouMessage": {},
+                    "event_admins": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "documentId": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "SuccessUrl": {
+                      "type": "string"
+                    },
+                    "SuccessEMail": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "SendConfirmationMail": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "publishedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdBy": {
                       "type": "object",
                       "properties": {
                         "id": {
@@ -50211,72 +50320,8 @@
                           "type": "string"
                         }
                       }
-                    }
-                  },
-                  "SuccessUrl": {
-                    "type": "string"
-                  },
-                  "SuccessEMail": {
-                    "type": "string",
-                    "format": "email"
-                  },
-                  "SendConfirmationMail": {
-                    "type": "boolean"
-                  },
-                  "createdAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "updatedAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "publishedAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "createdBy": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "oneOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "number"
-                          }
-                        ]
-                      },
-                      "documentId": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "updatedBy": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "oneOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "number"
-                          }
-                        ]
-                      },
-                      "documentId": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "locale": {
-                    "type": "string"
-                  },
-                  "localizations": {
-                    "type": "array",
-                    "items": {
+                    },
+                    "updatedBy": {
                       "type": "object",
                       "properties": {
                         "id": {
@@ -50291,6 +50336,30 @@
                         },
                         "documentId": {
                           "type": "string"
+                        }
+                      }
+                    },
+                    "locale": {
+                      "type": "string"
+                    },
+                    "localizations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "documentId": {
+                            "type": "string"
+                          }
                         }
                       }
                     }
@@ -50916,6 +50985,12 @@
                                 "type": "integer"
                               },
                               "NonHzdOriginNote": {
+                                "type": "string"
+                              },
+                              "isDirty": {
+                                "type": "boolean"
+                              },
+                              "DogOwnersMessage": {
                                 "type": "string"
                               },
                               "createdAt": {
@@ -51864,6 +51939,9 @@
           "FeaturedImage": {
             "type": "boolean"
           },
+          "PhotographerName": {
+            "type": "string"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -52136,6 +52214,9 @@
                 },
                 "FeaturedImage": {
                   "type": "boolean"
+                },
+                "PhotographerName": {
+                  "type": "string"
                 },
                 "createdAt": {
                   "type": "string",
@@ -59151,88 +59232,131 @@
                     "DisplayName": {
                       "type": "string"
                     },
-                    "form": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ]
-                        },
-                        "documentId": {
-                          "type": "string"
-                        },
-                        "Name": {
-                          "type": "string"
-                        },
-                        "FormFields": {
-                          "type": "array",
-                          "items": {
-                            "anyOf": [
+                    "forms": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
                               {
-                                "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                                "type": "string"
                               },
                               {
-                                "$ref": "#/components/schemas/FormFldStaticTextComponent"
-                              },
-                              {
-                                "$ref": "#/components/schemas/FormShortTextInputComponent"
-                              },
-                              {
-                                "$ref": "#/components/schemas/FormChoiceComponent"
-                              },
-                              {
-                                "$ref": "#/components/schemas/FormBooleanChoiceComponent"
-                              },
-                              {
-                                "$ref": "#/components/schemas/FormEmailAdressComponent"
-                              },
-                              {
-                                "$ref": "#/components/schemas/FormNumberInputComponent"
-                              },
-                              {
-                                "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
-                              },
-                              {
-                                "$ref": "#/components/schemas/FormTextAreaComponent"
-                              },
-                              {
-                                "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
-                              },
-                              {
-                                "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                                "type": "number"
                               }
                             ]
                           },
-                          "discriminator": {
-                            "propertyName": "__component",
-                            "mapping": {
-                              "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
-                              "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
-                              "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
-                              "form.choice": "#/components/schemas/FormChoiceComponent",
-                              "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
-                              "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
-                              "form.number-input": "#/components/schemas/FormNumberInputComponent",
-                              "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
-                              "form.text-area": "#/components/schemas/FormTextAreaComponent",
-                              "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
-                              "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                          "documentId": {
+                            "type": "string"
+                          },
+                          "Name": {
+                            "type": "string"
+                          },
+                          "FormFields": {
+                            "type": "array",
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/FormFldStaticTextComponent"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/FormShortTextInputComponent"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/FormChoiceComponent"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/FormBooleanChoiceComponent"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/FormEmailAdressComponent"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/FormNumberInputComponent"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/FormTextAreaComponent"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
+                                },
+                                {
+                                  "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                                }
+                              ]
+                            },
+                            "discriminator": {
+                              "propertyName": "__component",
+                              "mapping": {
+                                "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
+                                "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
+                                "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
+                                "form.choice": "#/components/schemas/FormChoiceComponent",
+                                "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
+                                "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
+                                "form.number-input": "#/components/schemas/FormNumberInputComponent",
+                                "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
+                                "form.text-area": "#/components/schemas/FormTextAreaComponent",
+                                "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
+                                "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                              }
                             }
-                          }
-                        },
-                        "InclPrivacyPolicy": {
-                          "type": "boolean"
-                        },
-                        "ThankYouMessage": {},
-                        "EventAdmin": {
-                          "type": "array",
-                          "items": {
+                          },
+                          "InclPrivacyPolicy": {
+                            "type": "boolean"
+                          },
+                          "ThankYouMessage": {},
+                          "event_admins": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "oneOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                },
+                                "documentId": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          },
+                          "SuccessUrl": {
+                            "type": "string"
+                          },
+                          "SuccessEMail": {
+                            "type": "string",
+                            "format": "email"
+                          },
+                          "SendConfirmationMail": {
+                            "type": "boolean"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "publishedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "createdBy": {
                             "type": "object",
                             "properties": {
                               "id": {
@@ -59249,72 +59373,8 @@
                                 "type": "string"
                               }
                             }
-                          }
-                        },
-                        "SuccessUrl": {
-                          "type": "string"
-                        },
-                        "SuccessEMail": {
-                          "type": "string",
-                          "format": "email"
-                        },
-                        "SendConfirmationMail": {
-                          "type": "boolean"
-                        },
-                        "createdAt": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "updatedAt": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "publishedAt": {
-                          "type": "string",
-                          "format": "date-time"
-                        },
-                        "createdBy": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "oneOf": [
-                                {
-                                  "type": "string"
-                                },
-                                {
-                                  "type": "number"
-                                }
-                              ]
-                            },
-                            "documentId": {
-                              "type": "string"
-                            }
-                          }
-                        },
-                        "updatedBy": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "oneOf": [
-                                {
-                                  "type": "string"
-                                },
-                                {
-                                  "type": "number"
-                                }
-                              ]
-                            },
-                            "documentId": {
-                              "type": "string"
-                            }
-                          }
-                        },
-                        "locale": {
-                          "type": "string"
-                        },
-                        "localizations": {
-                          "type": "array",
-                          "items": {
+                          },
+                          "updatedBy": {
                             "type": "object",
                             "properties": {
                               "id": {
@@ -59329,6 +59389,30 @@
                               },
                               "documentId": {
                                 "type": "string"
+                              }
+                            }
+                          },
+                          "locale": {
+                            "type": "string"
+                          },
+                          "localizations": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "oneOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                },
+                                "documentId": {
+                                  "type": "string"
+                                }
                               }
                             }
                           }
@@ -60249,6 +60333,12 @@
                                       "type": "integer"
                                     },
                                     "NonHzdOriginNote": {
+                                      "type": "string"
+                                    },
+                                    "isDirty": {
+                                      "type": "boolean"
+                                    },
+                                    "DogOwnersMessage": {
                                       "type": "string"
                                     },
                                     "createdAt": {
@@ -63072,88 +63162,131 @@
               "DisplayName": {
                 "type": "string"
               },
-              "form": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "oneOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "number"
-                      }
-                    ]
-                  },
-                  "documentId": {
-                    "type": "string"
-                  },
-                  "Name": {
-                    "type": "string"
-                  },
-                  "FormFields": {
-                    "type": "array",
-                    "items": {
-                      "anyOf": [
+              "forms": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "oneOf": [
                         {
-                          "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                          "type": "string"
                         },
                         {
-                          "$ref": "#/components/schemas/FormFldStaticTextComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormShortTextInputComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormChoiceComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormBooleanChoiceComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormEmailAdressComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormNumberInputComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormTextAreaComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                          "type": "number"
                         }
                       ]
                     },
-                    "discriminator": {
-                      "propertyName": "__component",
-                      "mapping": {
-                        "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
-                        "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
-                        "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
-                        "form.choice": "#/components/schemas/FormChoiceComponent",
-                        "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
-                        "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
-                        "form.number-input": "#/components/schemas/FormNumberInputComponent",
-                        "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
-                        "form.text-area": "#/components/schemas/FormTextAreaComponent",
-                        "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
-                        "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                    "documentId": {
+                      "type": "string"
+                    },
+                    "Name": {
+                      "type": "string"
+                    },
+                    "FormFields": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormFldStaticTextComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormShortTextInputComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormChoiceComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormBooleanChoiceComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormEmailAdressComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormNumberInputComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormTextAreaComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                          }
+                        ]
+                      },
+                      "discriminator": {
+                        "propertyName": "__component",
+                        "mapping": {
+                          "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
+                          "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
+                          "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
+                          "form.choice": "#/components/schemas/FormChoiceComponent",
+                          "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
+                          "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
+                          "form.number-input": "#/components/schemas/FormNumberInputComponent",
+                          "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
+                          "form.text-area": "#/components/schemas/FormTextAreaComponent",
+                          "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
+                          "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                        }
                       }
-                    }
-                  },
-                  "InclPrivacyPolicy": {
-                    "type": "boolean"
-                  },
-                  "ThankYouMessage": {},
-                  "EventAdmin": {
-                    "type": "array",
-                    "items": {
+                    },
+                    "InclPrivacyPolicy": {
+                      "type": "boolean"
+                    },
+                    "ThankYouMessage": {},
+                    "event_admins": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "documentId": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "SuccessUrl": {
+                      "type": "string"
+                    },
+                    "SuccessEMail": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "SendConfirmationMail": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "publishedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdBy": {
                       "type": "object",
                       "properties": {
                         "id": {
@@ -63170,72 +63303,8 @@
                           "type": "string"
                         }
                       }
-                    }
-                  },
-                  "SuccessUrl": {
-                    "type": "string"
-                  },
-                  "SuccessEMail": {
-                    "type": "string",
-                    "format": "email"
-                  },
-                  "SendConfirmationMail": {
-                    "type": "boolean"
-                  },
-                  "createdAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "updatedAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "publishedAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "createdBy": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "oneOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "number"
-                          }
-                        ]
-                      },
-                      "documentId": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "updatedBy": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "oneOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "number"
-                          }
-                        ]
-                      },
-                      "documentId": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "locale": {
-                    "type": "string"
-                  },
-                  "localizations": {
-                    "type": "array",
-                    "items": {
+                    },
+                    "updatedBy": {
                       "type": "object",
                       "properties": {
                         "id": {
@@ -63250,6 +63319,30 @@
                         },
                         "documentId": {
                           "type": "string"
+                        }
+                      }
+                    },
+                    "locale": {
+                      "type": "string"
+                    },
+                    "localizations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "documentId": {
+                            "type": "string"
+                          }
                         }
                       }
                     }
@@ -64170,6 +64263,12 @@
                                 "type": "integer"
                               },
                               "NonHzdOriginNote": {
+                                "type": "string"
+                              },
+                              "isDirty": {
+                                "type": "boolean"
+                              },
+                              "DogOwnersMessage": {
                                 "type": "string"
                               },
                               "createdAt": {
@@ -70062,88 +70161,131 @@
                         "DisplayName": {
                           "type": "string"
                         },
-                        "form": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "oneOf": [
-                                {
-                                  "type": "string"
-                                },
-                                {
-                                  "type": "number"
-                                }
-                              ]
-                            },
-                            "documentId": {
-                              "type": "string"
-                            },
-                            "Name": {
-                              "type": "string"
-                            },
-                            "FormFields": {
-                              "type": "array",
-                              "items": {
-                                "anyOf": [
+                        "forms": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "oneOf": [
                                   {
-                                    "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                                    "type": "string"
                                   },
                                   {
-                                    "$ref": "#/components/schemas/FormFldStaticTextComponent"
-                                  },
-                                  {
-                                    "$ref": "#/components/schemas/FormShortTextInputComponent"
-                                  },
-                                  {
-                                    "$ref": "#/components/schemas/FormChoiceComponent"
-                                  },
-                                  {
-                                    "$ref": "#/components/schemas/FormBooleanChoiceComponent"
-                                  },
-                                  {
-                                    "$ref": "#/components/schemas/FormEmailAdressComponent"
-                                  },
-                                  {
-                                    "$ref": "#/components/schemas/FormNumberInputComponent"
-                                  },
-                                  {
-                                    "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
-                                  },
-                                  {
-                                    "$ref": "#/components/schemas/FormTextAreaComponent"
-                                  },
-                                  {
-                                    "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
-                                  },
-                                  {
-                                    "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                                    "type": "number"
                                   }
                                 ]
                               },
-                              "discriminator": {
-                                "propertyName": "__component",
-                                "mapping": {
-                                  "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
-                                  "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
-                                  "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
-                                  "form.choice": "#/components/schemas/FormChoiceComponent",
-                                  "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
-                                  "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
-                                  "form.number-input": "#/components/schemas/FormNumberInputComponent",
-                                  "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
-                                  "form.text-area": "#/components/schemas/FormTextAreaComponent",
-                                  "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
-                                  "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                              "documentId": {
+                                "type": "string"
+                              },
+                              "Name": {
+                                "type": "string"
+                              },
+                              "FormFields": {
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                                    },
+                                    {
+                                      "$ref": "#/components/schemas/FormFldStaticTextComponent"
+                                    },
+                                    {
+                                      "$ref": "#/components/schemas/FormShortTextInputComponent"
+                                    },
+                                    {
+                                      "$ref": "#/components/schemas/FormChoiceComponent"
+                                    },
+                                    {
+                                      "$ref": "#/components/schemas/FormBooleanChoiceComponent"
+                                    },
+                                    {
+                                      "$ref": "#/components/schemas/FormEmailAdressComponent"
+                                    },
+                                    {
+                                      "$ref": "#/components/schemas/FormNumberInputComponent"
+                                    },
+                                    {
+                                      "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
+                                    },
+                                    {
+                                      "$ref": "#/components/schemas/FormTextAreaComponent"
+                                    },
+                                    {
+                                      "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
+                                    },
+                                    {
+                                      "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                                    }
+                                  ]
+                                },
+                                "discriminator": {
+                                  "propertyName": "__component",
+                                  "mapping": {
+                                    "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
+                                    "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
+                                    "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
+                                    "form.choice": "#/components/schemas/FormChoiceComponent",
+                                    "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
+                                    "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
+                                    "form.number-input": "#/components/schemas/FormNumberInputComponent",
+                                    "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
+                                    "form.text-area": "#/components/schemas/FormTextAreaComponent",
+                                    "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
+                                    "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                                  }
                                 }
-                              }
-                            },
-                            "InclPrivacyPolicy": {
-                              "type": "boolean"
-                            },
-                            "ThankYouMessage": {},
-                            "EventAdmin": {
-                              "type": "array",
-                              "items": {
+                              },
+                              "InclPrivacyPolicy": {
+                                "type": "boolean"
+                              },
+                              "ThankYouMessage": {},
+                              "event_admins": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "oneOf": [
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "number"
+                                        }
+                                      ]
+                                    },
+                                    "documentId": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              },
+                              "SuccessUrl": {
+                                "type": "string"
+                              },
+                              "SuccessEMail": {
+                                "type": "string",
+                                "format": "email"
+                              },
+                              "SendConfirmationMail": {
+                                "type": "boolean"
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "updatedAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "publishedAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "createdBy": {
                                 "type": "object",
                                 "properties": {
                                   "id": {
@@ -70160,72 +70302,8 @@
                                     "type": "string"
                                   }
                                 }
-                              }
-                            },
-                            "SuccessUrl": {
-                              "type": "string"
-                            },
-                            "SuccessEMail": {
-                              "type": "string",
-                              "format": "email"
-                            },
-                            "SendConfirmationMail": {
-                              "type": "boolean"
-                            },
-                            "createdAt": {
-                              "type": "string",
-                              "format": "date-time"
-                            },
-                            "updatedAt": {
-                              "type": "string",
-                              "format": "date-time"
-                            },
-                            "publishedAt": {
-                              "type": "string",
-                              "format": "date-time"
-                            },
-                            "createdBy": {
-                              "type": "object",
-                              "properties": {
-                                "id": {
-                                  "oneOf": [
-                                    {
-                                      "type": "string"
-                                    },
-                                    {
-                                      "type": "number"
-                                    }
-                                  ]
-                                },
-                                "documentId": {
-                                  "type": "string"
-                                }
-                              }
-                            },
-                            "updatedBy": {
-                              "type": "object",
-                              "properties": {
-                                "id": {
-                                  "oneOf": [
-                                    {
-                                      "type": "string"
-                                    },
-                                    {
-                                      "type": "number"
-                                    }
-                                  ]
-                                },
-                                "documentId": {
-                                  "type": "string"
-                                }
-                              }
-                            },
-                            "locale": {
-                              "type": "string"
-                            },
-                            "localizations": {
-                              "type": "array",
-                              "items": {
+                              },
+                              "updatedBy": {
                                 "type": "object",
                                 "properties": {
                                   "id": {
@@ -70240,6 +70318,30 @@
                                   },
                                   "documentId": {
                                     "type": "string"
+                                  }
+                                }
+                              },
+                              "locale": {
+                                "type": "string"
+                              },
+                              "localizations": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "oneOf": [
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "number"
+                                        }
+                                      ]
+                                    },
+                                    "documentId": {
+                                      "type": "string"
+                                    }
                                   }
                                 }
                               }
@@ -71160,6 +71262,12 @@
                                           "type": "integer"
                                         },
                                         "NonHzdOriginNote": {
+                                          "type": "string"
+                                        },
+                                        "isDirty": {
+                                          "type": "boolean"
+                                        },
+                                        "DogOwnersMessage": {
                                           "type": "string"
                                         },
                                         "createdAt": {
@@ -85949,88 +86057,131 @@
               "DisplayName": {
                 "type": "string"
               },
-              "form": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "oneOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "number"
-                      }
-                    ]
-                  },
-                  "documentId": {
-                    "type": "string"
-                  },
-                  "Name": {
-                    "type": "string"
-                  },
-                  "FormFields": {
-                    "type": "array",
-                    "items": {
-                      "anyOf": [
+              "forms": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "oneOf": [
                         {
-                          "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                          "type": "string"
                         },
                         {
-                          "$ref": "#/components/schemas/FormFldStaticTextComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormShortTextInputComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormChoiceComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormBooleanChoiceComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormEmailAdressComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormNumberInputComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormTextAreaComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                          "type": "number"
                         }
                       ]
                     },
-                    "discriminator": {
-                      "propertyName": "__component",
-                      "mapping": {
-                        "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
-                        "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
-                        "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
-                        "form.choice": "#/components/schemas/FormChoiceComponent",
-                        "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
-                        "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
-                        "form.number-input": "#/components/schemas/FormNumberInputComponent",
-                        "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
-                        "form.text-area": "#/components/schemas/FormTextAreaComponent",
-                        "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
-                        "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                    "documentId": {
+                      "type": "string"
+                    },
+                    "Name": {
+                      "type": "string"
+                    },
+                    "FormFields": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormFldStaticTextComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormShortTextInputComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormChoiceComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormBooleanChoiceComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormEmailAdressComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormNumberInputComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormTextAreaComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                          }
+                        ]
+                      },
+                      "discriminator": {
+                        "propertyName": "__component",
+                        "mapping": {
+                          "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
+                          "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
+                          "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
+                          "form.choice": "#/components/schemas/FormChoiceComponent",
+                          "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
+                          "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
+                          "form.number-input": "#/components/schemas/FormNumberInputComponent",
+                          "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
+                          "form.text-area": "#/components/schemas/FormTextAreaComponent",
+                          "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
+                          "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                        }
                       }
-                    }
-                  },
-                  "InclPrivacyPolicy": {
-                    "type": "boolean"
-                  },
-                  "ThankYouMessage": {},
-                  "EventAdmin": {
-                    "type": "array",
-                    "items": {
+                    },
+                    "InclPrivacyPolicy": {
+                      "type": "boolean"
+                    },
+                    "ThankYouMessage": {},
+                    "event_admins": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "documentId": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "SuccessUrl": {
+                      "type": "string"
+                    },
+                    "SuccessEMail": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "SendConfirmationMail": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "publishedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdBy": {
                       "type": "object",
                       "properties": {
                         "id": {
@@ -86047,72 +86198,8 @@
                           "type": "string"
                         }
                       }
-                    }
-                  },
-                  "SuccessUrl": {
-                    "type": "string"
-                  },
-                  "SuccessEMail": {
-                    "type": "string",
-                    "format": "email"
-                  },
-                  "SendConfirmationMail": {
-                    "type": "boolean"
-                  },
-                  "createdAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "updatedAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "publishedAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "createdBy": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "oneOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "number"
-                          }
-                        ]
-                      },
-                      "documentId": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "updatedBy": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "oneOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "number"
-                          }
-                        ]
-                      },
-                      "documentId": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "locale": {
-                    "type": "string"
-                  },
-                  "localizations": {
-                    "type": "array",
-                    "items": {
+                    },
+                    "updatedBy": {
                       "type": "object",
                       "properties": {
                         "id": {
@@ -86127,6 +86214,30 @@
                         },
                         "documentId": {
                           "type": "string"
+                        }
+                      }
+                    },
+                    "locale": {
+                      "type": "string"
+                    },
+                    "localizations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "documentId": {
+                            "type": "string"
+                          }
                         }
                       }
                     }
@@ -87047,6 +87158,12 @@
                                 "type": "integer"
                               },
                               "NonHzdOriginNote": {
+                                "type": "string"
+                              },
+                              "isDirty": {
+                                "type": "boolean"
+                              },
+                              "DogOwnersMessage": {
                                 "type": "string"
                               },
                               "createdAt": {
@@ -90147,88 +90264,131 @@
               "DisplayName": {
                 "type": "string"
               },
-              "form": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "oneOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "number"
-                      }
-                    ]
-                  },
-                  "documentId": {
-                    "type": "string"
-                  },
-                  "Name": {
-                    "type": "string"
-                  },
-                  "FormFields": {
-                    "type": "array",
-                    "items": {
-                      "anyOf": [
+              "forms": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "oneOf": [
                         {
-                          "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                          "type": "string"
                         },
                         {
-                          "$ref": "#/components/schemas/FormFldStaticTextComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormShortTextInputComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormChoiceComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormBooleanChoiceComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormEmailAdressComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormNumberInputComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormTextAreaComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
-                        },
-                        {
-                          "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                          "type": "number"
                         }
                       ]
                     },
-                    "discriminator": {
-                      "propertyName": "__component",
-                      "mapping": {
-                        "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
-                        "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
-                        "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
-                        "form.choice": "#/components/schemas/FormChoiceComponent",
-                        "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
-                        "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
-                        "form.number-input": "#/components/schemas/FormNumberInputComponent",
-                        "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
-                        "form.text-area": "#/components/schemas/FormTextAreaComponent",
-                        "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
-                        "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                    "documentId": {
+                      "type": "string"
+                    },
+                    "Name": {
+                      "type": "string"
+                    },
+                    "FormFields": {
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormFldStaticTextComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormShortTextInputComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormChoiceComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormBooleanChoiceComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormEmailAdressComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormNumberInputComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormTextAreaComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
+                          },
+                          {
+                            "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                          }
+                        ]
+                      },
+                      "discriminator": {
+                        "propertyName": "__component",
+                        "mapping": {
+                          "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
+                          "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
+                          "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
+                          "form.choice": "#/components/schemas/FormChoiceComponent",
+                          "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
+                          "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
+                          "form.number-input": "#/components/schemas/FormNumberInputComponent",
+                          "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
+                          "form.text-area": "#/components/schemas/FormTextAreaComponent",
+                          "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
+                          "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                        }
                       }
-                    }
-                  },
-                  "InclPrivacyPolicy": {
-                    "type": "boolean"
-                  },
-                  "ThankYouMessage": {},
-                  "EventAdmin": {
-                    "type": "array",
-                    "items": {
+                    },
+                    "InclPrivacyPolicy": {
+                      "type": "boolean"
+                    },
+                    "ThankYouMessage": {},
+                    "event_admins": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "documentId": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "SuccessUrl": {
+                      "type": "string"
+                    },
+                    "SuccessEMail": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "SendConfirmationMail": {
+                      "type": "boolean"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "publishedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdBy": {
                       "type": "object",
                       "properties": {
                         "id": {
@@ -90245,72 +90405,8 @@
                           "type": "string"
                         }
                       }
-                    }
-                  },
-                  "SuccessUrl": {
-                    "type": "string"
-                  },
-                  "SuccessEMail": {
-                    "type": "string",
-                    "format": "email"
-                  },
-                  "SendConfirmationMail": {
-                    "type": "boolean"
-                  },
-                  "createdAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "updatedAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "publishedAt": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "createdBy": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "oneOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "number"
-                          }
-                        ]
-                      },
-                      "documentId": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "updatedBy": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "oneOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "number"
-                          }
-                        ]
-                      },
-                      "documentId": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "locale": {
-                    "type": "string"
-                  },
-                  "localizations": {
-                    "type": "array",
-                    "items": {
+                    },
+                    "updatedBy": {
                       "type": "object",
                       "properties": {
                         "id": {
@@ -90325,6 +90421,30 @@
                         },
                         "documentId": {
                           "type": "string"
+                        }
+                      }
+                    },
+                    "locale": {
+                      "type": "string"
+                    },
+                    "localizations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "documentId": {
+                            "type": "string"
+                          }
                         }
                       }
                     }
@@ -91245,6 +91365,12 @@
                                 "type": "integer"
                               },
                               "NonHzdOriginNote": {
+                                "type": "string"
+                              },
+                              "isDirty": {
+                                "type": "boolean"
+                              },
+                              "DogOwnersMessage": {
                                 "type": "string"
                               },
                               "createdAt": {
@@ -93947,88 +94073,131 @@
                         "DisplayName": {
                           "type": "string"
                         },
-                        "form": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "oneOf": [
-                                {
-                                  "type": "string"
-                                },
-                                {
-                                  "type": "number"
-                                }
-                              ]
-                            },
-                            "documentId": {
-                              "type": "string"
-                            },
-                            "Name": {
-                              "type": "string"
-                            },
-                            "FormFields": {
-                              "type": "array",
-                              "items": {
-                                "anyOf": [
+                        "forms": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "oneOf": [
                                   {
-                                    "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                                    "type": "string"
                                   },
                                   {
-                                    "$ref": "#/components/schemas/FormFldStaticTextComponent"
-                                  },
-                                  {
-                                    "$ref": "#/components/schemas/FormShortTextInputComponent"
-                                  },
-                                  {
-                                    "$ref": "#/components/schemas/FormChoiceComponent"
-                                  },
-                                  {
-                                    "$ref": "#/components/schemas/FormBooleanChoiceComponent"
-                                  },
-                                  {
-                                    "$ref": "#/components/schemas/FormEmailAdressComponent"
-                                  },
-                                  {
-                                    "$ref": "#/components/schemas/FormNumberInputComponent"
-                                  },
-                                  {
-                                    "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
-                                  },
-                                  {
-                                    "$ref": "#/components/schemas/FormTextAreaComponent"
-                                  },
-                                  {
-                                    "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
-                                  },
-                                  {
-                                    "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                                    "type": "number"
                                   }
                                 ]
                               },
-                              "discriminator": {
-                                "propertyName": "__component",
-                                "mapping": {
-                                  "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
-                                  "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
-                                  "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
-                                  "form.choice": "#/components/schemas/FormChoiceComponent",
-                                  "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
-                                  "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
-                                  "form.number-input": "#/components/schemas/FormNumberInputComponent",
-                                  "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
-                                  "form.text-area": "#/components/schemas/FormTextAreaComponent",
-                                  "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
-                                  "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                              "documentId": {
+                                "type": "string"
+                              },
+                              "Name": {
+                                "type": "string"
+                              },
+                              "FormFields": {
+                                "type": "array",
+                                "items": {
+                                  "anyOf": [
+                                    {
+                                      "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                                    },
+                                    {
+                                      "$ref": "#/components/schemas/FormFldStaticTextComponent"
+                                    },
+                                    {
+                                      "$ref": "#/components/schemas/FormShortTextInputComponent"
+                                    },
+                                    {
+                                      "$ref": "#/components/schemas/FormChoiceComponent"
+                                    },
+                                    {
+                                      "$ref": "#/components/schemas/FormBooleanChoiceComponent"
+                                    },
+                                    {
+                                      "$ref": "#/components/schemas/FormEmailAdressComponent"
+                                    },
+                                    {
+                                      "$ref": "#/components/schemas/FormNumberInputComponent"
+                                    },
+                                    {
+                                      "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
+                                    },
+                                    {
+                                      "$ref": "#/components/schemas/FormTextAreaComponent"
+                                    },
+                                    {
+                                      "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
+                                    },
+                                    {
+                                      "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                                    }
+                                  ]
+                                },
+                                "discriminator": {
+                                  "propertyName": "__component",
+                                  "mapping": {
+                                    "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
+                                    "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
+                                    "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
+                                    "form.choice": "#/components/schemas/FormChoiceComponent",
+                                    "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
+                                    "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
+                                    "form.number-input": "#/components/schemas/FormNumberInputComponent",
+                                    "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
+                                    "form.text-area": "#/components/schemas/FormTextAreaComponent",
+                                    "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
+                                    "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                                  }
                                 }
-                              }
-                            },
-                            "InclPrivacyPolicy": {
-                              "type": "boolean"
-                            },
-                            "ThankYouMessage": {},
-                            "EventAdmin": {
-                              "type": "array",
-                              "items": {
+                              },
+                              "InclPrivacyPolicy": {
+                                "type": "boolean"
+                              },
+                              "ThankYouMessage": {},
+                              "event_admins": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "oneOf": [
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "number"
+                                        }
+                                      ]
+                                    },
+                                    "documentId": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              },
+                              "SuccessUrl": {
+                                "type": "string"
+                              },
+                              "SuccessEMail": {
+                                "type": "string",
+                                "format": "email"
+                              },
+                              "SendConfirmationMail": {
+                                "type": "boolean"
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "updatedAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "publishedAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "createdBy": {
                                 "type": "object",
                                 "properties": {
                                   "id": {
@@ -94045,72 +94214,8 @@
                                     "type": "string"
                                   }
                                 }
-                              }
-                            },
-                            "SuccessUrl": {
-                              "type": "string"
-                            },
-                            "SuccessEMail": {
-                              "type": "string",
-                              "format": "email"
-                            },
-                            "SendConfirmationMail": {
-                              "type": "boolean"
-                            },
-                            "createdAt": {
-                              "type": "string",
-                              "format": "date-time"
-                            },
-                            "updatedAt": {
-                              "type": "string",
-                              "format": "date-time"
-                            },
-                            "publishedAt": {
-                              "type": "string",
-                              "format": "date-time"
-                            },
-                            "createdBy": {
-                              "type": "object",
-                              "properties": {
-                                "id": {
-                                  "oneOf": [
-                                    {
-                                      "type": "string"
-                                    },
-                                    {
-                                      "type": "number"
-                                    }
-                                  ]
-                                },
-                                "documentId": {
-                                  "type": "string"
-                                }
-                              }
-                            },
-                            "updatedBy": {
-                              "type": "object",
-                              "properties": {
-                                "id": {
-                                  "oneOf": [
-                                    {
-                                      "type": "string"
-                                    },
-                                    {
-                                      "type": "number"
-                                    }
-                                  ]
-                                },
-                                "documentId": {
-                                  "type": "string"
-                                }
-                              }
-                            },
-                            "locale": {
-                              "type": "string"
-                            },
-                            "localizations": {
-                              "type": "array",
-                              "items": {
+                              },
+                              "updatedBy": {
                                 "type": "object",
                                 "properties": {
                                   "id": {
@@ -94125,6 +94230,30 @@
                                   },
                                   "documentId": {
                                     "type": "string"
+                                  }
+                                }
+                              },
+                              "locale": {
+                                "type": "string"
+                              },
+                              "localizations": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "oneOf": [
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "number"
+                                        }
+                                      ]
+                                    },
+                                    "documentId": {
+                                      "type": "string"
+                                    }
                                   }
                                 }
                               }
@@ -95045,6 +95174,12 @@
                                           "type": "integer"
                                         },
                                         "NonHzdOriginNote": {
+                                          "type": "string"
+                                        },
+                                        "isDirty": {
+                                          "type": "boolean"
+                                        },
+                                        "DogOwnersMessage": {
                                           "type": "string"
                                         },
                                         "createdAt": {
@@ -102053,88 +102188,131 @@
                 "DisplayName": {
                   "type": "string"
                 },
-                "form": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "oneOf": [
-                        {
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ]
-                    },
-                    "documentId": {
-                      "type": "string"
-                    },
-                    "Name": {
-                      "type": "string"
-                    },
-                    "FormFields": {
-                      "type": "array",
-                      "items": {
-                        "anyOf": [
+                "forms": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "oneOf": [
                           {
-                            "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                            "type": "string"
                           },
                           {
-                            "$ref": "#/components/schemas/FormFldStaticTextComponent"
-                          },
-                          {
-                            "$ref": "#/components/schemas/FormShortTextInputComponent"
-                          },
-                          {
-                            "$ref": "#/components/schemas/FormChoiceComponent"
-                          },
-                          {
-                            "$ref": "#/components/schemas/FormBooleanChoiceComponent"
-                          },
-                          {
-                            "$ref": "#/components/schemas/FormEmailAdressComponent"
-                          },
-                          {
-                            "$ref": "#/components/schemas/FormNumberInputComponent"
-                          },
-                          {
-                            "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
-                          },
-                          {
-                            "$ref": "#/components/schemas/FormTextAreaComponent"
-                          },
-                          {
-                            "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
-                          },
-                          {
-                            "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                            "type": "number"
                           }
                         ]
                       },
-                      "discriminator": {
-                        "propertyName": "__component",
-                        "mapping": {
-                          "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
-                          "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
-                          "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
-                          "form.choice": "#/components/schemas/FormChoiceComponent",
-                          "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
-                          "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
-                          "form.number-input": "#/components/schemas/FormNumberInputComponent",
-                          "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
-                          "form.text-area": "#/components/schemas/FormTextAreaComponent",
-                          "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
-                          "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                      "documentId": {
+                        "type": "string"
+                      },
+                      "Name": {
+                        "type": "string"
+                      },
+                      "FormFields": {
+                        "type": "array",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "$ref": "#/components/schemas/FormFldGroupSeparatorComponent"
+                            },
+                            {
+                              "$ref": "#/components/schemas/FormFldStaticTextComponent"
+                            },
+                            {
+                              "$ref": "#/components/schemas/FormShortTextInputComponent"
+                            },
+                            {
+                              "$ref": "#/components/schemas/FormChoiceComponent"
+                            },
+                            {
+                              "$ref": "#/components/schemas/FormBooleanChoiceComponent"
+                            },
+                            {
+                              "$ref": "#/components/schemas/FormEmailAdressComponent"
+                            },
+                            {
+                              "$ref": "#/components/schemas/FormNumberInputComponent"
+                            },
+                            {
+                              "$ref": "#/components/schemas/FormFormSubmitButtonComponent"
+                            },
+                            {
+                              "$ref": "#/components/schemas/FormTextAreaComponent"
+                            },
+                            {
+                              "$ref": "#/components/schemas/FormStandardIdentifiersComponent"
+                            },
+                            {
+                              "$ref": "#/components/schemas/FormDogStandardIdentifierComponent"
+                            }
+                          ]
+                        },
+                        "discriminator": {
+                          "propertyName": "__component",
+                          "mapping": {
+                            "form.fld-group-separator": "#/components/schemas/FormFldGroupSeparatorComponent",
+                            "form.fld-static-text": "#/components/schemas/FormFldStaticTextComponent",
+                            "form.short-text-input": "#/components/schemas/FormShortTextInputComponent",
+                            "form.choice": "#/components/schemas/FormChoiceComponent",
+                            "form.boolean-choice": "#/components/schemas/FormBooleanChoiceComponent",
+                            "form.email-adress": "#/components/schemas/FormEmailAdressComponent",
+                            "form.number-input": "#/components/schemas/FormNumberInputComponent",
+                            "form.form-submit-button": "#/components/schemas/FormFormSubmitButtonComponent",
+                            "form.text-area": "#/components/schemas/FormTextAreaComponent",
+                            "form.standard-identifiers": "#/components/schemas/FormStandardIdentifiersComponent",
+                            "form.dog-standard-identifier": "#/components/schemas/FormDogStandardIdentifierComponent"
+                          }
                         }
-                      }
-                    },
-                    "InclPrivacyPolicy": {
-                      "type": "boolean"
-                    },
-                    "ThankYouMessage": {},
-                    "EventAdmin": {
-                      "type": "array",
-                      "items": {
+                      },
+                      "InclPrivacyPolicy": {
+                        "type": "boolean"
+                      },
+                      "ThankYouMessage": {},
+                      "event_admins": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "oneOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "number"
+                                }
+                              ]
+                            },
+                            "documentId": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      "SuccessUrl": {
+                        "type": "string"
+                      },
+                      "SuccessEMail": {
+                        "type": "string",
+                        "format": "email"
+                      },
+                      "SendConfirmationMail": {
+                        "type": "boolean"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "publishedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "createdBy": {
                         "type": "object",
                         "properties": {
                           "id": {
@@ -102151,72 +102329,8 @@
                             "type": "string"
                           }
                         }
-                      }
-                    },
-                    "SuccessUrl": {
-                      "type": "string"
-                    },
-                    "SuccessEMail": {
-                      "type": "string",
-                      "format": "email"
-                    },
-                    "SendConfirmationMail": {
-                      "type": "boolean"
-                    },
-                    "createdAt": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "updatedAt": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "publishedAt": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "createdBy": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ]
-                        },
-                        "documentId": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "updatedBy": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ]
-                        },
-                        "documentId": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "locale": {
-                      "type": "string"
-                    },
-                    "localizations": {
-                      "type": "array",
-                      "items": {
+                      },
+                      "updatedBy": {
                         "type": "object",
                         "properties": {
                           "id": {
@@ -102231,6 +102345,30 @@
                           },
                           "documentId": {
                             "type": "string"
+                          }
+                        }
+                      },
+                      "locale": {
+                        "type": "string"
+                      },
+                      "localizations": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "oneOf": [
+                                {
+                                  "type": "string"
+                                },
+                                {
+                                  "type": "number"
+                                }
+                              ]
+                            },
+                            "documentId": {
+                              "type": "string"
+                            }
                           }
                         }
                       }
@@ -103151,6 +103289,12 @@
                                   "type": "integer"
                                 },
                                 "NonHzdOriginNote": {
+                                  "type": "string"
+                                },
+                                "isDirty": {
+                                  "type": "boolean"
+                                },
+                                "DogOwnersMessage": {
                                   "type": "string"
                                 },
                                 "createdAt": {

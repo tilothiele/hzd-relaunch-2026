@@ -86,6 +86,14 @@ const toFilterConditions = (query: LitterSearchQuery): Array<Record<string, unkn
     })
   }
 
+  // Öffentliche Suche (/litters): geschlossene Würfe nicht ausliefern.
+  // Eigene Würfe (breederDocumentId) bleiben vollständig sichtbar.
+  if (breederDocumentId.length === 0) {
+    conditions.push({
+      LitterStatus: { $ne: 'Closed' },
+    })
+  }
+
   if (orderLetter.length > 0) {
     conditions.push({
       OrderLetter: { $eq: orderLetter },

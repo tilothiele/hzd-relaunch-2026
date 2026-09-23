@@ -853,8 +853,8 @@ export interface ApiFormForm extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    EventAdmin: Schema.Attribute.Relation<
-      'oneToMany',
+    event_admins: Schema.Attribute.Relation<
+      'manyToMany',
       'plugin::users-permissions.user'
     >;
     FormFields: Schema.Attribute.DynamicZone<
@@ -922,6 +922,7 @@ export interface ApiGalleryImageGalleryImage
       'oneToOne',
       'plugin::users-permissions.user'
     >;
+    PhotographerName: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1733,7 +1734,7 @@ export interface ApiSupplementalDocumentSupplementalDocument
     Name: Schema.Attribute.String & Schema.Attribute.Required;
     publishedAt: Schema.Attribute.DateTime;
     ShortId: Schema.Attribute.String;
-    SortOrd: Schema.Attribute.Integer & Schema.Attribute.Unique;
+    SortOrd: Schema.Attribute.Integer;
     supplemental_document_groups: Schema.Attribute.Relation<
       'manyToMany',
       'api::supplemental-document-group.supplemental-document-group'
@@ -1980,6 +1981,7 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
     dateOfDeath: Schema.Attribute.Date;
     Disabled: Schema.Attribute.Boolean;
     DogDocument: Schema.Attribute.Component<'breeding.dog-document', true>;
+    DogOwnersMessage: Schema.Attribute.Text;
     Exhibitions: Schema.Attribute.Text;
     EyesCheck: Schema.Attribute.Boolean;
     father: Schema.Attribute.Relation<'oneToOne', 'plugin::hzd-plugin.dog'>;
@@ -1996,6 +1998,7 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
     HeartCheck: Schema.Attribute.Boolean;
     Height: Schema.Attribute.Integer;
     Images: Schema.Attribute.Media<'images', true>;
+    isDirty: Schema.Attribute.Boolean;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -2547,7 +2550,7 @@ export interface PluginUsersPermissionsUser
         minLength: 6;
       }>;
     firstName: Schema.Attribute.String;
-    form: Schema.Attribute.Relation<'manyToOne', 'api::form.form'>;
+    forms: Schema.Attribute.Relation<'manyToMany', 'api::form.form'>;
     lastName: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<

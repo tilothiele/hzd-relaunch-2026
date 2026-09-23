@@ -178,6 +178,12 @@
     },
     "NonHzdOriginNote": {
       "type": "string"
+    },
+    "isDirty": {
+      "type": "boolean"
+    },
+    "DogOwnersMessage": {
+      "type": "text"
     }
   }
 }

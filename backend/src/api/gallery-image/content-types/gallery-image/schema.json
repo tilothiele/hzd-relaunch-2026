@@ -38,6 +38,9 @@
     },
     "FeaturedImage": {
       "type": "boolean"
+    },
+    "PhotographerName": {
+      "type": "string"
     }
   }
 }

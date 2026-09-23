@@ -179,11 +179,11 @@
       "type": "string",
       "configurable": false
     },
-    "form": {
+    "forms": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::form.form",
-      "inversedBy": "EventAdmin"
+      "inversedBy": "event_admins"
     },
     "publishMyData": {
       "type": "boolean"

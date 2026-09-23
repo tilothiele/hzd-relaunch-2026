@@ -1,237 +1,325 @@
-
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import Image from 'next/image'
 import type { GalleryImage } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import CloseIcon from '@mui/icons-material/Close'
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
+import { resolveGalleryPhotographerName } from '@/components/image-gallery/gallery-photographer'
 
 interface MonthGroup {
-    monthKey: string
-    monthLabel: string
-    photographers: {
-        photographerName: string
-        images: GalleryImage[]
-    }[]
+	monthKey: string
+	monthLabel: string
+	photographers: {
+		photographerName: string
+		images: GalleryImage[]
+	}[]
 }
 
 interface ImageGalleryViewProps {
-    heroImage: GalleryImage
-    featuredImages: GalleryImage[]
-    monthGroups: MonthGroup[]
-    strapiUrl: string
+	heroImage: GalleryImage
+	featuredImages: GalleryImage[]
+	monthGroups: MonthGroup[]
+	strapiUrl: string
 }
 
-export function ImageGalleryView({ heroImage, featuredImages, monthGroups, strapiUrl }: ImageGalleryViewProps) {
-    const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
+export function ImageGalleryView({
+	heroImage,
+	featuredImages,
+	monthGroups,
+	strapiUrl,
+}: ImageGalleryViewProps) {
+	const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
 
-    // Handle ESC key to close lightbox
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') setSelectedImage(null)
-        }
-        window.addEventListener('keydown', handleKeyDown)
-        return () => window.removeEventListener('keydown', handleKeyDown)
-    }, [])
+	const allImages = useMemo(() => {
+		const seen = new Set<string>()
+		const result: GalleryImage[] = []
 
-    // Prevent scrolling when lightbox is open
-    useEffect(() => {
-        if (selectedImage) {
-            document.body.style.overflow = 'hidden'
-        } else {
-            document.body.style.overflow = ''
-        }
-    }, [selectedImage])
+		const push = (img: GalleryImage) => {
+			if (seen.has(img.documentId)) return
+			seen.add(img.documentId)
+			result.push(img)
+		}
 
-    const heroImageUrl = heroImage.GalleryImageMedia ? resolveMediaUrl(heroImage.GalleryImageMedia, strapiUrl) : null
+		featuredImages.forEach(push)
+		monthGroups.forEach((month) => {
+			month.photographers.forEach((group) => {
+				group.images.forEach(push)
+			})
+		})
 
-    const getPhotographerName = (img: GalleryImage) => {
-        const photographer = img.Photographer
-        return photographer
-            ? `${photographer.firstName || ''} ${photographer.lastName || ''}`.trim() || photographer.username || 'Unbekannt'
-            : 'Unbekannt'
-    }
+		if (!seen.has(heroImage.documentId)) {
+			result.unshift(heroImage)
+		}
 
-    return (
-        <>
-            {/* Hero Section */}
-            <section className="w-full bg-white">
-                <div className="relative h-[65vh] min-h-[450px] w-full overflow-hidden bg-gray-900 cursor-pointer" onClick={() => setSelectedImage(heroImage)}>
-                    {heroImageUrl && (
-                        <Image
-                            src={heroImageUrl as string}
-                            alt={heroImage.GalleryImageMedia?.alternativeText || 'Hero Image'}
-                            fill
-                            className="object-cover transition-transform duration-700 hover:scale-105"
-                            priority
-                            unoptimized
-                        />
-                    )}
-                    {/* Stronger Gradient Overlay with H1 */}
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent p-12 md:p-20 lg:p-32">
-                        <div className="max-w-6xl mx-auto">
-                            <h1 className="text-4xl  text-white font-bold md:text-6xl lg:text-8xl tracking-tight">Bildergalerie</h1>
-                        </div>
-                    </div>
-                </div>
-            </section>
+		return result
+	}, [featuredImages, monthGroups, heroImage])
 
-            {/* Featured Images Grid */}
-            {featuredImages.length > 0 && (
-                <SectionContainer backgroundColor="#f8fafc">
-                    <div className="py-16">
-                        <div className="mb-12 flex items-center gap-4">
-                            <div className="h-12 w-2 bg-primary rounded-full"></div>
-                            <h2 className="text-4xl font-bold text-gray-900">Highlights</h2>
-                        </div>
+	const selectedIndex = selectedImage
+		? allImages.findIndex((img) => img.documentId === selectedImage.documentId)
+		: -1
 
-                        <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
-                            {featuredImages.map((img) => (
-                                <div
-                                    key={img.documentId}
-                                    className="group flex flex-col bg-white rounded-2xl overflow-hidden shadow-lg transition-all hover:shadow-2xl cursor-pointer"
-                                    onClick={() => setSelectedImage(img)}
-                                >
-                                    <div className="relative aspect-[16/10] w-full overflow-hidden">
-                                        {img.GalleryImageMedia && (
-                                            <Image
-                                                src={resolveMediaUrl(img.GalleryImageMedia, strapiUrl) as string}
-                                                alt={img.GalleryImageMedia.alternativeText || 'Featured Image'}
-                                                fill
-                                                className="object-cover transition-transform duration-500 group-hover:scale-105"
-                                                unoptimized
-                                            />
-                                        )}
-                                        <div className="absolute top-4 right-4">
-                                            <span className="bg-primary/90 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest backdrop-blur-sm">
-                                                Featured
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="p-8">
-                                        <p className="text-sm font-semibold text-primary uppercase tracking-wider mb-2">
-                                            Eingereicht von {getPhotographerName(img)}
-                                        </p>
-                                        {img.ImageDescription ? (
-                                            <p className="text-xl text-gray-800 font-medium leading-relaxed">{img.ImageDescription}</p>
-                                        ) : (
-                                            <p className="text-xl italic text-gray-400">Keine Beschreibung</p>
-                                        )}
-                                        <p className="mt-4 text-xs text-gray-500">
-                                            Aufgenommen am {new Date(img.DateOfPicture).toLocaleDateString('de-DE')}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </SectionContainer>
-            )}
+	const showPreviousImage = useCallback(() => {
+		if (allImages.length === 0 || selectedIndex < 0) return
+		const previousIndex = (selectedIndex - 1 + allImages.length) % allImages.length
+		setSelectedImage(allImages[previousIndex])
+	}, [allImages, selectedIndex])
 
-            {/* Gallery Grid Sections (Standard) */}
-            <SectionContainer>
-                <div className="py-20">
-                    <div className="mb-16">
-                        <h2 className="text-3xl font-bold text-gray-800 mb-2">Archiv</h2>
-                        <p className="text-gray-500">Entdecken Sie alle Einsendungen sortiert nach Monaten.</p>
-                    </div>
+	const showNextImage = useCallback(() => {
+		if (allImages.length === 0 || selectedIndex < 0) return
+		const nextIndex = (selectedIndex + 1) % allImages.length
+		setSelectedImage(allImages[nextIndex])
+	}, [allImages, selectedIndex])
 
-                    {monthGroups.map((month) => (
-                        <div key={month.monthKey} className="mb-24 last:mb-0">
-                            <h3 className="mb-10 text-2xl font-bold text-gray-800 flex items-center gap-3">
-                                <span className="text-primary text-4xl">#</span> {month.monthLabel}
-                            </h3>
+	useEffect(() => {
+		if (!selectedImage) return
 
-                            {month.photographers.map((group, pIdx) => (
-                                <div key={`${month.monthKey}-${group.photographerName}-${pIdx}`} className="mb-12 last:mb-0">
-                                    <h4 className="mb-6 text-lg font-semibold text-gray-600 border-l-4 border-gray-200 pl-4">
-                                        Fotograf: {group.photographerName}
-                                    </h4>
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') {
+				setSelectedImage(null)
+				return
+			}
+			if (e.key === 'ArrowLeft') {
+				e.preventDefault()
+				showPreviousImage()
+				return
+			}
+			if (e.key === 'ArrowRight') {
+				e.preventDefault()
+				showNextImage()
+			}
+		}
 
-                                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                        {group.images.map((img) => (
-                                            <div
-                                                key={img.documentId}
-                                                className="group flex flex-col overflow-hidden rounded-xl bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-md cursor-pointer"
-                                                onClick={() => setSelectedImage(img)}
-                                            >
-                                                <div className="relative aspect-[4/3] w-full overflow-hidden">
-                                                    {img.GalleryImageMedia && (
-                                                        <Image
-                                                            src={resolveMediaUrl(img.GalleryImageMedia, strapiUrl) as string}
-                                                            alt={img.GalleryImageMedia.alternativeText || 'Gallery Image'}
-                                                            fill
-                                                            className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                                            unoptimized
-                                                        />
-                                                    )}
-                                                </div>
-                                                <div className="p-5">
-                                                    {img.ImageDescription ? (
-                                                        <p className="text-sm text-gray-800 line-clamp-2 leading-relaxed">{img.ImageDescription}</p>
-                                                    ) : (
-                                                        <p className="text-sm italic text-gray-400">Keine Beschreibung</p>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ))}
-                </div>
-            </SectionContainer>
+		window.addEventListener('keydown', handleKeyDown)
+		return () => window.removeEventListener('keydown', handleKeyDown)
+	}, [selectedImage, showPreviousImage, showNextImage])
 
-            {/* Lightbox Modal */}
-            {selectedImage && (
-                <div
-                    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/98 transition-opacity duration-300"
-                    onClick={() => setSelectedImage(null)}
-                >
-                    <button
-                        className="absolute right-8 top-8 z-[10000] rounded-full bg-white/10 p-3 text-white transition-all hover:bg-white/20 hover:scale-110"
-                        onClick={(e) => {
-                            e.stopPropagation()
-                            setSelectedImage(null)
-                        }}
-                    >
-                        <CloseIcon sx={{ fontSize: 32 }} />
-                    </button>
+	useEffect(() => {
+		if (selectedImage) {
+			document.body.style.overflow = 'hidden'
+		} else {
+			document.body.style.overflow = ''
+		}
+	}, [selectedImage])
 
-                    <div className="relative flex h-full w-full max-w-[95vw] items-center justify-center p-4">
-                        <div
-                            className="relative flex flex-col items-center w-full"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <div className="relative h-[80vh] w-full max-w-6xl overflow-hidden rounded-lg">
-                                {selectedImage.GalleryImageMedia && (
-                                    <Image
-                                        src={resolveMediaUrl(selectedImage.GalleryImageMedia, strapiUrl) as string}
-                                        alt={selectedImage.GalleryImageMedia.alternativeText || 'Lightbox Image'}
-                                        fill
-                                        className="object-contain"
-                                        unoptimized
-                                    />
-                                )}
-                            </div>
-                            <div className="mt-8 text-center text-white max-w-4xl px-4">
-                                <p className="text-2xl font-bold tracking-tight">
-                                    {getPhotographerName(selectedImage)}
-                                </p>
-                                {selectedImage.ImageDescription && (
-                                    <p className="mt-3 text-xl text-gray-300 font-light leading-relaxed">{selectedImage.ImageDescription}</p>
-                                )}
-                                <p className="mt-4 text-sm text-gray-500">
-                                    Aufgenommen im {new Date(selectedImage.DateOfPicture).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </>
-    )
+	const heroImageUrl = heroImage.GalleryImageMedia
+		? resolveMediaUrl(heroImage.GalleryImageMedia, strapiUrl)
+		: null
+
+	const canNavigate = allImages.length > 1
+
+	return (
+		<>
+			<section className='w-full bg-white'>
+				<div
+					className='relative h-[65vh] min-h-[450px] w-full cursor-pointer overflow-hidden bg-gray-900'
+					onClick={() => setSelectedImage(heroImage)}
+				>
+					{heroImageUrl && (
+						<Image
+							src={heroImageUrl as string}
+							alt={heroImage.GalleryImageMedia?.alternativeText || 'Hero Image'}
+							fill
+							className='object-cover transition-transform duration-700 hover:scale-105'
+							priority
+							unoptimized
+						/>
+					)}
+					<div className='absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-8 md:p-12'>
+						<div className='mx-auto max-w-6xl'>
+							<h1 className='text-3xl font-semibold tracking-tight text-white/90 md:text-5xl'>
+								Bildergalerie
+							</h1>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			{featuredImages.length > 0 && (
+				<SectionContainer backgroundColor='#f8fafc'>
+					<div className='py-12'>
+						<div className='mb-8 flex items-center gap-3'>
+							<div className='h-8 w-1.5 rounded-full bg-primary/70'></div>
+							<h2 className='text-2xl font-semibold text-gray-700'>Highlights</h2>
+						</div>
+
+						<div className='grid grid-cols-1 gap-8 md:grid-cols-2'>
+							{featuredImages.map((img) => (
+								<div
+									key={img.documentId}
+									className='group flex cursor-pointer flex-col overflow-hidden rounded-xl bg-white shadow-sm transition-all hover:shadow-md'
+									onClick={() => setSelectedImage(img)}
+								>
+									<div className='relative aspect-[16/10] w-full overflow-hidden'>
+										{img.GalleryImageMedia && (
+											<Image
+												src={resolveMediaUrl(img.GalleryImageMedia, strapiUrl) as string}
+												alt={img.GalleryImageMedia.alternativeText || 'Featured Image'}
+												fill
+												className='object-cover transition-transform duration-500 group-hover:scale-105'
+												unoptimized
+											/>
+										)}
+									</div>
+									<div className='space-y-1 px-4 py-3'>
+										<p className='text-xs text-gray-400'>
+											{new Date(img.DateOfPicture).toLocaleDateString('de-DE')}
+											{' · '}
+											{resolveGalleryPhotographerName(img)}
+										</p>
+										{img.ImageDescription && (
+											<p className='line-clamp-2 text-sm text-gray-500'>
+												{img.ImageDescription}
+											</p>
+										)}
+									</div>
+								</div>
+							))}
+						</div>
+					</div>
+				</SectionContainer>
+			)}
+
+			<SectionContainer>
+				<div className='py-14'>
+					<div className='mb-10'>
+						<h2 className='mb-1 text-2xl font-semibold text-gray-700'>Archiv</h2>
+						<p className='text-sm text-gray-400'>
+							Einsendungen sortiert nach Monaten.
+						</p>
+					</div>
+
+					{monthGroups.map((month) => (
+						<div key={month.monthKey} className='mb-16 last:mb-0'>
+							<h3 className='mb-6 text-lg font-medium text-gray-600'>
+								{month.monthLabel}
+							</h3>
+
+							{month.photographers.map((group, pIdx) => (
+								<div
+									key={`${month.monthKey}-${group.photographerName}-${pIdx}`}
+									className='mb-10 last:mb-0'
+								>
+									<h4 className='mb-4 text-sm font-medium text-gray-400'>
+										{group.photographerName}
+									</h4>
+
+									<div className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+										{group.images.map((img) => (
+											<div
+												key={img.documentId}
+												className='group flex cursor-pointer flex-col overflow-hidden rounded-lg bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md'
+												onClick={() => setSelectedImage(img)}
+											>
+												<div className='relative aspect-[4/3] w-full overflow-hidden'>
+													{img.GalleryImageMedia && (
+														<Image
+															src={resolveMediaUrl(img.GalleryImageMedia, strapiUrl) as string}
+															alt={img.GalleryImageMedia.alternativeText || 'Gallery Image'}
+															fill
+															className='object-cover transition-transform duration-500 group-hover:scale-105'
+															unoptimized
+														/>
+													)}
+												</div>
+												{img.ImageDescription && (
+													<div className='px-3 py-2'>
+														<p className='line-clamp-1 text-xs leading-relaxed text-gray-500'>
+															{img.ImageDescription}
+														</p>
+													</div>
+												)}
+											</div>
+										))}
+									</div>
+								</div>
+							))}
+						</div>
+					))}
+				</div>
+			</SectionContainer>
+
+			{selectedImage && (
+				<div
+					className='fixed inset-0 z-[9999] flex items-center justify-center bg-black/98 transition-opacity duration-300'
+					onClick={() => setSelectedImage(null)}
+				>
+					<button
+						className='absolute right-4 top-4 z-[10000] rounded-full bg-white/10 p-3 text-white transition-all hover:scale-110 hover:bg-white/20 md:right-8 md:top-8'
+						aria-label='Schließen'
+						onClick={(e) => {
+							e.stopPropagation()
+							setSelectedImage(null)
+						}}
+					>
+						<CloseIcon sx={{ fontSize: 32 }} />
+					</button>
+
+					{canNavigate && (
+						<>
+							<button
+								className='absolute left-2 top-1/2 z-[10000] -translate-y-1/2 rounded-full bg-white/15 p-2 text-white transition-all hover:scale-110 hover:bg-white/30 md:left-6 md:p-3'
+								aria-label='Vorheriges Bild'
+								onClick={(e) => {
+									e.stopPropagation()
+									showPreviousImage()
+								}}
+							>
+								<ChevronLeftIcon sx={{ fontSize: { xs: 36, md: 48 } }} />
+							</button>
+							<button
+								className='absolute right-2 top-1/2 z-[10000] -translate-y-1/2 rounded-full bg-white/15 p-2 text-white transition-all hover:scale-110 hover:bg-white/30 md:right-6 md:p-3'
+								aria-label='Nächstes Bild'
+								onClick={(e) => {
+									e.stopPropagation()
+									showNextImage()
+								}}
+							>
+								<ChevronRightIcon sx={{ fontSize: { xs: 36, md: 48 } }} />
+							</button>
+						</>
+					)}
+
+					<div className='relative flex h-full w-full max-w-[95vw] items-center justify-center p-4'>
+						<div
+							className='relative flex w-full flex-col items-center'
+							onClick={(e) => e.stopPropagation()}
+						>
+							<div className='relative h-[80vh] w-full max-w-6xl overflow-hidden rounded-lg'>
+								{selectedImage.GalleryImageMedia && (
+									<Image
+										src={resolveMediaUrl(selectedImage.GalleryImageMedia, strapiUrl) as string}
+										alt={selectedImage.GalleryImageMedia.alternativeText || 'Lightbox Image'}
+										fill
+										className='object-contain'
+										unoptimized
+									/>
+								)}
+							</div>
+							<div className='mt-5 max-w-3xl px-4 text-center'>
+								{canNavigate && selectedIndex >= 0 && (
+									<p className='mb-2 text-xs text-white/50'>
+										{selectedIndex + 1} / {allImages.length}
+									</p>
+								)}
+								<p className='text-base font-medium tracking-wide text-white'>
+									{new Date(selectedImage.DateOfPicture).toLocaleDateString('de-DE')}
+									{' · '}
+									{resolveGalleryPhotographerName(selectedImage)}
+								</p>
+								{selectedImage.ImageDescription && (
+									<p className='mt-2 text-base leading-relaxed text-gray-100'>
+										{selectedImage.ImageDescription}
+									</p>
+								)}
+							</div>
+						</div>
+					</div>
+				</div>
+			)}
+		</>
+	)
 }

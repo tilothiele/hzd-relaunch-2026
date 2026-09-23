@@ -31,21 +31,8 @@ export function IchAlsDeckruedenbesitzerTab({
     const [isDirty, setIsDirty] = useState(breeder.isDirty === true)
     const [breedersMessage, setBreedersMessage] = useState(breeder.BreedersMessage || '')
 
-    const [address, setAddress] = useState({
-        FullName: breeder.Address?.FullName || '',
-        Address1: breeder.Address?.Address1 || '',
-        Address2: breeder.Address?.Address2 || '',
-        CountryCode: breeder.Address?.CountryCode || 'DE',
-        Zip: breeder.Address?.Zip || '',
-        City: breeder.Address?.City || '',
-    })
-
     const [isSaving, setIsSaving] = useState(false)
     const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
-
-    const handleAddressChange = (field: keyof typeof address) => (event: React.ChangeEvent<HTMLInputElement>) => {
-        setAddress({ ...address, [field]: event.target.value })
-    }
 
     const handleSave = async () => {
         setIsSaving(true)
@@ -59,7 +46,6 @@ export function IchAlsDeckruedenbesitzerTab({
                     WebsiteUrlDraft: websiteUrlDraft,
                     BreedersIntroDraft: breederIntroDraft,
                     BreederEmail: breederEmail,
-                    Address: address,
                     isDirty,
                     BreedersMessage: breedersMessage,
                 },
@@ -127,7 +113,7 @@ export function IchAlsDeckruedenbesitzerTab({
             </Box>
 
             <Box sx={{ mb: 3 }}>
-                <Typography variant='subtitle2' color='text.secondary'>Email (Zwinger)</Typography>
+                <Typography variant='subtitle2' color='text.secondary'>Kontakt-Email</Typography>
                 <TextField
                     fullWidth
                     variant='outlined'
@@ -199,52 +185,27 @@ export function IchAlsDeckruedenbesitzerTab({
                 </Box>
 
                 <Box sx={{ flex: 1 }}>
-                    <Typography variant='h6' sx={{ mb: 2 }}>Zwingeradresse (Bearbeitbar)</Typography>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        <TextField
-                            label='Name (Adresszusatz)'
-                            value={address.FullName}
-                            onChange={handleAddressChange('FullName')}
-                            fullWidth
-                            size='small'
-                        />
-                        <TextField
-                            label='Straße'
-                            value={address.Address1}
-                            onChange={handleAddressChange('Address1')}
-                            fullWidth
-                            size='small'
-                        />
-                        <TextField
-                            label='Adresszusatz'
-                            value={address.Address2}
-                            onChange={handleAddressChange('Address2')}
-                            fullWidth
-                            size='small'
-                        />
-                        <Box sx={{ display: 'flex', gap: 2 }}>
-                            <TextField
-                                label='PLZ'
-                                value={address.Zip}
-                                onChange={handleAddressChange('Zip')}
-                                sx={{ width: '100px' }}
-                                size='small'
-                            />
-                            <TextField
-                                label='Ort'
-                                value={address.City}
-                                onChange={handleAddressChange('City')}
-                                fullWidth
-                                size='small'
-                            />
-                        </Box>
-                        <TextField
-                            label='Ländercode'
-                            value={address.CountryCode}
-                            onChange={handleAddressChange('CountryCode')}
-                            fullWidth
-                            size='small'
-                        />
+                    <Typography variant='h6' sx={{ mb: 1 }}>Zwingeradresse</Typography>
+                    <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+                        Bei Änderungsbedarf bitte das TIK kontaktieren.
+                    </Typography>
+                    <Box sx={{ p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
+                        <Typography variant='body2' color='text.secondary'>Name</Typography>
+                        <Typography variant='body1' gutterBottom>{breeder.Address?.FullName || '-'}</Typography>
+
+                        <Typography variant='body2' color='text.secondary'>Straße</Typography>
+                        <Typography variant='body1' gutterBottom>{breeder.Address?.Address1 || '-'}</Typography>
+
+                        <Typography variant='body2' color='text.secondary'>Adresszusatz</Typography>
+                        <Typography variant='body1' gutterBottom>{breeder.Address?.Address2 || '-'}</Typography>
+
+                        <Typography variant='body2' color='text.secondary'>Ort</Typography>
+                        <Typography variant='body1' gutterBottom>
+                            {[breeder.Address?.Zip, breeder.Address?.City].filter(Boolean).join(' ') || '-'}
+                        </Typography>
+
+                        <Typography variant='body2' color='text.secondary'>Ländercode</Typography>
+                        <Typography variant='body1'>{breeder.Address?.CountryCode || '-'}</Typography>
                     </Box>
                 </Box>
             </Box>

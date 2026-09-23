@@ -6,6 +6,7 @@ import { MainPageStructure } from '../main-page-structure'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { theme as globalTheme } from '@/themes'
 import { ImageGalleryView } from '@/components/image-gallery/image-gallery-view'
+import { resolveGalleryPhotographerName } from '@/components/image-gallery/gallery-photographer'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,8 +18,9 @@ export default async function ImageGalleryPage() {
     try {
         const query = buildStrapiQuery({
             sort: ['DateOfSubmission:desc'],
+            pagination: { pageSize: 200 },
             populate: {
-                'populate[GalleryImageMedia]': '*',
+                'populate[GalleryImageMedia]': 'true',
                 'populate[Photographer][fields][0]': 'firstName',
                 'populate[Photographer][fields][1]': 'lastName',
                 'populate[Photographer][fields][2]': 'username',
@@ -86,10 +88,7 @@ export default async function ImageGalleryPage() {
             monthGroups.push(monthGroup)
         }
 
-        const photographer = img.Photographer
-        const photographerName = photographer
-            ? `${photographer.firstName || ''} ${photographer.lastName || ''}`.trim() || photographer.username || 'Unbekannt'
-            : 'Unbekannt'
+        const photographerName = resolveGalleryPhotographerName(img)
 
         let photographerGroup = monthGroup.photographers.find(p => p.photographerName === photographerName)
         if (!photographerGroup) {

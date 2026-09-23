@@ -307,7 +307,6 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 							<MenuItem value='Planned'>Geplant</MenuItem>
 							<MenuItem value='Manted'>Gedeckt</MenuItem>
 							<MenuItem value='Littered'>Geworfen</MenuItem>
-							<MenuItem value='Closed'>Geschlossen</MenuItem>
 						</Select>
 					</FormControl>
 

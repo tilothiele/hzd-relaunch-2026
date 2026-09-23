@@ -606,7 +606,10 @@ export interface Dog {
 	withersHeight?: string | null
 	Disabled?: boolean | null
 	BreedersIntroduction?: string | null
+	MemosDraft?: string | null
 	MemosReleased?: string | null
+	DogOwnersMessage?: string | null
+	isDirty?: boolean | null
 	NonHzdOriginNote?: string | null
 	breeder?: {
 		kennelName?: string | null
@@ -1081,6 +1084,7 @@ export interface GalleryImage {
 	documentId: string
 	GalleryImageMedia?: Image | null
 	Photographer?: AuthUser | null
+	PhotographerName?: string | null
 	ImageDescription?: string | null
 	DateOfSubmission?: string | null
 	DateOfPicture: string

@@ -38,11 +38,11 @@
     "ThankYouMessage": {
       "type": "blocks"
     },
-    "EventAdmin": {
+    "event_admins": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToMany",
       "target": "plugin::users-permissions.user",
-      "mappedBy": "form"
+      "mappedBy": "forms"
     },
     "SuccessUrl": {
       "type": "string"
