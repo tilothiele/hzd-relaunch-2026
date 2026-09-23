@@ -93,9 +93,9 @@ export function DogDetailView({
                     <DogOwnerTab dog={dog} />
                 </section>
 
-                {/* 4. Persönliche Worte */}
+                {/* 4. Über den Hund */}
                 <section>
-                    <SectionHeader title="Persönliche Worte" />
+                    <SectionHeader title={`über ${dog.givenName || dog.fullKennelName || 'diesen Hund'}`} />
                     <DogPersonalWordsTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
                 </section>
 

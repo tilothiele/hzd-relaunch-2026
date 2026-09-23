@@ -7,13 +7,13 @@ interface DogPersonalWordsTabProps {
 	strapiBaseUrl: string | null | undefined
 }
 
-export function DogPersonalWordsTab({ dog, strapiBaseUrl }: DogPersonalWordsTabProps) {
-	const content = dog.MemosReleased || dog.breeder?.BreedersIntroduction
+export function DogPersonalWordsTab({ dog }: DogPersonalWordsTabProps) {
+	const content = dog.MemosReleased
 
 	if (!content) {
 		return (
 			<div className='rounded-lg bg-gray-50 p-8 text-center text-gray-500'>
-				<p>Keine persönlichen Worte verfügbar.</p>
+				<p>Keine Angaben verfügbar.</p>
 			</div>
 		)
 	}
@@ -25,7 +25,3 @@ export function DogPersonalWordsTab({ dog, strapiBaseUrl }: DogPersonalWordsTabP
 		/>
 	)
 }
-
-
-
-
