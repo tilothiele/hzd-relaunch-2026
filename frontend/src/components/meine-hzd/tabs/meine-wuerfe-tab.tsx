@@ -7,9 +7,12 @@ import type { Breeder, Litter, LitterSearchResult, Dog, DogSearchResult } from '
 import { searchDogsGeneric, searchLitters, createEntity, updateEntity } from '@/lib/strapi/api'
 import { formatDate } from '@/lib/utils'
 import { Add as AddIcon } from '@mui/icons-material'
+import { BreederMasterSelect } from '@/components/meine-hzd/breeder-master-select'
 
 interface MeineWuerfeTabProps {
-    breeder: Breeder
+    breeders: Breeder[]
+    breeder: Breeder | null
+    onSelectBreeder: (documentId: string) => void
     strapiBaseUrl?: string | null
 }
 
@@ -81,9 +84,14 @@ function PuppyAmountField({ label, value, onChange, disabled }: { label: string,
     )
 }
 
-export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) {
+export function MeineWuerfeTab({
+    breeders,
+    breeder,
+    onSelectBreeder,
+    strapiBaseUrl,
+}: MeineWuerfeTabProps) {
     const [litters, setLitters] = useState<Litter[]>([])
-    const [loading, setLoading] = useState(true)
+    const [loadedForId, setLoadedForId] = useState<string | null>(null)
     const [editingLitterId, setEditingLitterId] = useState<string | null>(null)
     const [editFormData, setEditFormData] = useState<LitterFormData | null>(null)
     const [isSaving, setIsSaving] = useState(false)
@@ -170,22 +178,39 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
     }, [fatherSearchInput, selectedFather, strapiBaseUrl])
 
     useEffect(() => {
+        let cancelled = false
+        const breederDocumentId = breeder?.documentId
+
         async function loadLitters() {
-            if (!breeder?.documentId) return
+            setEditingLitterId(null)
+            setEditFormData(null)
+            setLoadedForId(null)
+            setCreateError(null)
+            if (!breederDocumentId) {
+                setLitters([])
+                return
+            }
             try {
                 const data = await searchLitters({
-                    breederDocumentId: breeder.documentId,
+                    breederDocumentId,
                     sort: ['dateOfBirth:desc'],
                 }, {})
+                if (cancelled) return
                 setLitters(data.hzdPluginLitters_connection.nodes || [])
             } catch (error) {
                 console.error('Failed to load litters:', error)
+                if (!cancelled) setLitters([])
             } finally {
-                setLoading(false)
+                if (!cancelled && breederDocumentId) {
+                    setLoadedForId(breederDocumentId)
+                }
             }
         }
         loadLitters()
-    }, [breeder, strapiBaseUrl])
+        return () => {
+            cancelled = true
+        }
+    }, [breeder?.documentId, strapiBaseUrl])
 
     useEffect(() => {
         if (!editFormData) {
@@ -322,14 +347,29 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
         }
     }
 
-    if (loading) {
-        return <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><CircularProgress /></Box>
-    }
-
+    const isLoadingLitters = Boolean(breeder?.documentId)
+        && loadedForId !== breeder?.documentId
     const canEditPuppies = editFormData?.LitterStatus === 'Littered'
 
     return (
         <Box>
+            <BreederMasterSelect
+                breeders={breeders}
+                value={breeder?.documentId ?? ''}
+                onChange={onSelectBreeder}
+            />
+            {!breeder ? (
+                <Typography>
+                    {breeders.length === 0
+                        ? 'Ihnen ist kein Zwinger zugeordnet.'
+                        : 'Bitte zuerst einen Zwinger auswählen.'}
+                </Typography>
+            ) : isLoadingLitters ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+                    <CircularProgress />
+                </Box>
+            ) : (
+            <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant='h6'>Meine Würfe</Typography>
                 <Button
@@ -656,6 +696,8 @@ export function MeineWuerfeTab({ breeder, strapiBaseUrl }: MeineWuerfeTabProps) 
                     </Paper>
                 )
             })()}
+            </Box>
+            )}
         </Box>
     )
 }

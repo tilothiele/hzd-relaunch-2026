@@ -162,10 +162,21 @@ function getUserGroupNames(user: AuthUser | null): string[] {
 		.filter((name): name is string => Boolean(name))
 }
 
-function belongsToGroupId(user: AuthUser | null, groupId: number): boolean {
-	return getUserGroups(user).some(
-		(group) => String(group.id) === String(groupId),
-	)
+function belongsToGroup(
+	user: AuthUser | null,
+	groupId: number,
+	groupNames: string[],
+): boolean {
+	const expectedNames = new Set(groupNames.map((name) => name.toLowerCase()))
+
+	return getUserGroups(user).some((group) => {
+		if (String(group.id) === String(groupId)) {
+			return true
+		}
+
+		const name = group.Name?.trim().toLowerCase() ?? ''
+		return expectedNames.has(name)
+	})
 }
 
 export function isBreeder(user: AuthUser | null): boolean {
@@ -173,19 +184,23 @@ export function isBreeder(user: AuthUser | null): boolean {
 }
 
 export function isZuechter(user: AuthUser | null): boolean {
-	return belongsToGroupId(user, ZUECHTER_GROUP_ID)
+	return belongsToGroup(user, ZUECHTER_GROUP_ID, ['Züchter', 'Zuechter'])
 }
 
 export function isKoermeister(user: AuthUser | null): boolean {
-	return belongsToGroupId(user, KOERMEISTER_GROUP_ID)
+	return belongsToGroup(user, KOERMEISTER_GROUP_ID, ['Körmeister', 'Koermeister'])
 }
 
 export function isDeckruedenbesitzer(user: AuthUser | null): boolean {
-	return belongsToGroupId(user, DECKRUEDENBESITZER_GROUP_ID)
+	return belongsToGroup(
+		user,
+		DECKRUEDENBESITZER_GROUP_ID,
+		['Deckrüdenbesitzer', 'Deckruedenbesitzer'],
+	)
 }
 
 export function isSonderleiter(user: AuthUser | null): boolean {
-	return belongsToGroupId(user, SONDERLEITER_GROUP_ID)
+	return belongsToGroup(user, SONDERLEITER_GROUP_ID, ['Sonderleiter'])
 }
 
 export function hasUserGroup(user: AuthUser | null, groupName: string): boolean {

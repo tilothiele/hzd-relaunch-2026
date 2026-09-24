@@ -14,13 +14,23 @@ import {
 } from '@mui/material'
 import type { Breeder } from '@/types'
 import { updateEntity } from '@/lib/strapi/api'
+import { BreederMasterSelect } from '@/components/meine-hzd/breeder-master-select'
 
 interface MeinZwingerTabProps {
-    breeder: Breeder
+    breeders: Breeder[]
+    breeder: Breeder | null
+    onSelectBreeder: (documentId: string) => void
+    onBreederUpdated?: (breeder: Breeder) => void
     strapiBaseUrl?: string | null
 }
 
-export function MeinZwingerTab({ breeder, strapiBaseUrl }: MeinZwingerTabProps) {
+interface ZwingerEditorProps {
+    breeder: Breeder
+    strapiBaseUrl?: string | null
+    onBreederUpdated?: (breeder: Breeder) => void
+}
+
+function ZwingerEditor({ breeder, strapiBaseUrl, onBreederUpdated }: ZwingerEditorProps) {
     const [websiteUrlDraft, setWebsiteUrlDraft] = useState(breeder.WebsiteUrlDraft || '')
     // BreedersIntroDraft is now available in schema
     const [breederIntroDraft, setBreederIntroDraft] = useState(breeder.BreedersIntroDraft || '')
@@ -48,6 +58,14 @@ export function MeinZwingerTab({ breeder, strapiBaseUrl }: MeinZwingerTabProps) 
                 },
                 {},
             )
+            onBreederUpdated?.({
+                ...breeder,
+                WebsiteUrlDraft: websiteUrlDraft,
+                BreedersIntroDraft: breederIntroDraft,
+                BreederEmail: breederEmail,
+                isDirty,
+                BreedersMessage: breedersMessage,
+            })
             setSaveMessage({ type: 'success', text: 'Änderungen erfolgreich gespeichert.' })
         } catch (error) {
             console.error('Failed to save breeder data:', error)
@@ -247,6 +265,36 @@ export function MeinZwingerTab({ breeder, strapiBaseUrl }: MeinZwingerTabProps) 
                     </Typography>
                 )}
             </Box>
+        </Box>
+    )
+}
+
+export function MeinZwingerTab({
+    breeders,
+    breeder,
+    onSelectBreeder,
+    onBreederUpdated,
+    strapiBaseUrl,
+}: MeinZwingerTabProps) {
+    return (
+        <Box>
+            <BreederMasterSelect
+                breeders={breeders}
+                value={breeder?.documentId ?? ''}
+                onChange={onSelectBreeder}
+            />
+            {!breeder ? (
+                <Typography>
+                    Bitte zuerst einen Zwinger auswählen.
+                </Typography>
+            ) : (
+                <ZwingerEditor
+                    key={breeder.documentId}
+                    breeder={breeder}
+                    strapiBaseUrl={strapiBaseUrl}
+                    onBreederUpdated={onBreederUpdated}
+                />
+            )}
         </Box>
     )
 }

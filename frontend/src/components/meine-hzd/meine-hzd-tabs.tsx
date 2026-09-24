@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Tabs, Tab, Box } from '@mui/material'
+import { Tabs, Tab, Box, CircularProgress } from '@mui/material'
 import { fetchEntityByDocumentId, searchBreeders } from '@/lib/strapi/api'
 import { POPULATE_BREEDER_SEARCH } from '@/lib/strapi/populate'
 import { isDeckruedenbesitzer, isZuechter } from '@/lib/permissions'
@@ -19,7 +19,9 @@ interface MeineHzdTabsProps {
 
 export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 	const [activeTab, setActiveTab] = useState<TabId>(0)
-	const [breeder, setBreeder] = useState<Breeder | null>(null)
+	const [breeders, setBreeders] = useState<Breeder[]>([])
+	const [selectedBreederId, setSelectedBreederId] = useState<string | null>(null)
+	const [breedersLoading, setBreedersLoading] = useState(true)
 	const [deckruedenInfo, setDeckruedenInfo] = useState<Breeder | null>(null)
 	const canSeeZuechterTabs = isZuechter(user)
 	const canSeeDeckruedenTab = isDeckruedenbesitzer(user)
@@ -27,29 +29,45 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 	const deckruedenInfoDocumentId = user?.deckrueden_info?.documentId ?? null
 
 	useEffect(() => {
-		async function loadBreeder() {
+		async function loadBreeders() {
 			if (!canSeeZuechterTabs || !user?.documentId) {
-				setBreeder(null)
+				setBreeders([])
+				setSelectedBreederId(null)
+				setBreedersLoading(false)
 				return
 			}
 
+			setBreedersLoading(true)
 			try {
 				const data = await searchBreeders(
 					{
 						ownerMemberDocumentId: user.documentId,
-						pageSize: 10,
+						pageSize: 100,
+						sort: 'kennelName:asc',
 					},
 					{},
 				)
 				const nodes = data?.hzdPluginBreeders_connection?.nodes ?? []
-				setBreeder(nodes[0] ?? null)
+				setBreeders(nodes)
+				setSelectedBreederId((current) => {
+					if (nodes.length === 1) {
+						return nodes[0].documentId
+					}
+					if (current && nodes.some((node) => node.documentId === current)) {
+						return current
+					}
+					return null
+				})
 			} catch (error) {
 				console.error('Failed to load breeder data. Error details:', JSON.stringify(error, null, 2))
-				setBreeder(null)
+				setBreeders([])
+				setSelectedBreederId(null)
+			} finally {
+				setBreedersLoading(false)
 			}
 		}
 
-		loadBreeder()
+		loadBreeders()
 	}, [user, strapiBaseUrl, canSeeZuechterTabs])
 
 	useEffect(() => {
@@ -85,7 +103,7 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 			return
 		}
 
-		if (activeTab === 1 && !breeder) {
+		if (activeTab === 1 && !breedersLoading && breeders.length === 0) {
 			setActiveTab(0)
 			return
 		}
@@ -99,7 +117,8 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 			setActiveTab(0)
 		}
 	}, [
-		breeder,
+		breeders.length,
+		breedersLoading,
 		deckruedenInfo,
 		activeTab,
 		canSeeZuechterTabs,
@@ -107,8 +126,24 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 		canSeeDeckruedenTab,
 	])
 
+	const selectedBreeder = breeders.find(
+		(item) => item.documentId === selectedBreederId,
+	) ?? null
+
 	const handleTabChange = (_event: React.SyntheticEvent, newValue: TabId) => {
 		setActiveTab(newValue)
+	}
+
+	const handleSelectBreeder = (documentId: string) => {
+		setSelectedBreederId(documentId.length > 0 ? documentId : null)
+	}
+
+	const handleBreederUpdated = (updated: Breeder) => {
+		setBreeders((current) => current.map((item) => (
+			item.documentId === updated.documentId
+				? { ...item, ...updated }
+				: item
+		)))
 	}
 
 	if (!user) {
@@ -139,7 +174,7 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 					}}
 				>
 					<Tab label='Mein Profil' value={0} />
-					{canSeeZuechterTabs && breeder && (
+					{canSeeZuechterTabs && breeders.length > 0 && (
 						<Tab label='Mein Zwinger' value={1} />
 					)}
 					{canSeeZuechterTabs && <Tab label='Meine Würfe' value={2} />}
@@ -152,11 +187,28 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 
 			<Box sx={{ mt: 3, minHeight: '400px' }}>
 				{activeTab === 0 && <MeinProfilTab user={user} />}
-				{activeTab === 1 && canSeeZuechterTabs && breeder && (
-					<MeinZwingerTab breeder={breeder} strapiBaseUrl={strapiBaseUrl} />
+				{activeTab === 1 && canSeeZuechterTabs && breeders.length > 0 && (
+					<MeinZwingerTab
+						breeders={breeders}
+						breeder={selectedBreeder}
+						onSelectBreeder={handleSelectBreeder}
+						onBreederUpdated={handleBreederUpdated}
+						strapiBaseUrl={strapiBaseUrl}
+					/>
 				)}
-				{activeTab === 2 && canSeeZuechterTabs && breeder && (
-					<MeineWuerfeTab breeder={breeder} strapiBaseUrl={strapiBaseUrl} />
+				{activeTab === 2 && canSeeZuechterTabs && (
+					breedersLoading ? (
+						<Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+							<CircularProgress />
+						</Box>
+					) : (
+						<MeineWuerfeTab
+							breeders={breeders}
+							breeder={selectedBreeder}
+							onSelectBreeder={handleSelectBreeder}
+							strapiBaseUrl={strapiBaseUrl}
+						/>
+					)
 				)}
 				{activeTab === 3 && canSeeHunde && (
 					<MeineHundeTab user={user} strapiBaseUrl={strapiBaseUrl} />
