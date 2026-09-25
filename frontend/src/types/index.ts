@@ -437,6 +437,7 @@ export interface GlobalLayout {
 	announcements?: Announcement[] | null
 	CalendarHeader?: SimpleHeroSection | null
 	ResultsHeader?: SimpleHeroSection | null
+	GalleryDescription?: unknown[] | null
 }
 
 export interface ComponentLayoutSOS {
@@ -926,7 +927,7 @@ export type FormField = ShortTextInput | EmailAddress | TextArea | NumberInput |
 export interface Form {
 	documentId: string
 	Name?: string | null
-	EventAdmin?: {
+	event_admins?: {
 		documentId: string
 		firstName?: string | null
 		lastName?: string | null
@@ -1089,6 +1090,7 @@ export interface GalleryImage {
 	DateOfSubmission?: string | null
 	DateOfPicture: string
 	FeaturedImage?: boolean | null
+	fit?: 'cover' | 'fill' | null
 	createdAt?: string | null
 	updatedAt?: string | null
 	publishedAt?: string | null

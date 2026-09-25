@@ -908,6 +908,7 @@ export interface ApiGalleryImageGalleryImage
     DateOfPicture: Schema.Attribute.Date & Schema.Attribute.Required;
     DateOfSubmission: Schema.Attribute.Date;
     FeaturedImage: Schema.Attribute.Boolean;
+    fit: Schema.Attribute.Enumeration<['cover', 'fill']>;
     GalleryImageMedia: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios'
     >;
@@ -952,6 +953,7 @@ export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
       Schema.Attribute.Private;
     DrawerMenu: Schema.Attribute.JSON;
     Footer: Schema.Attribute.Component<'layout.footer', false>;
+    GalleryDescription: Schema.Attribute.Blocks;
     Impressum: Schema.Attribute.Relation<'oneToOne', 'api::page.page'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<

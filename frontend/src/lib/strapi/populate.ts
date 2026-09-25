@@ -157,9 +157,9 @@ export const POPULATE_PAGE_SECTIONS = buildPageSectionsPopulate()
 
 export const POPULATE_FORM = new URLSearchParams({
 	'populate[FormFields][populate]': '*',
-	'populate[EventAdmin][fields][0]': 'documentId',
-	'populate[EventAdmin][fields][1]': 'firstName',
-	'populate[EventAdmin][fields][2]': 'lastName',
+	'populate[event_admins][fields][0]': 'documentId',
+	'populate[event_admins][fields][1]': 'firstName',
+	'populate[event_admins][fields][2]': 'lastName',
 })
 
 export const POPULATE_CONTACT = new URLSearchParams({

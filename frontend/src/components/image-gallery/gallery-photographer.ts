@@ -11,5 +11,12 @@ export function resolveGalleryPhotographerName(img: GalleryImage): string {
 	const fallbackName = img.PhotographerName?.trim()
 	if (fallbackName) return fallbackName
 
-	return 'Unbekannt'
+	return ''
+}
+
+export function formatGalleryImageMeta(img: GalleryImage): string {
+	const date = new Date(img.DateOfPicture).toLocaleDateString('de-DE')
+	const photographer = resolveGalleryPhotographerName(img)
+	if (!photographer) return date
+	return `${date} · ${photographer}`
 }

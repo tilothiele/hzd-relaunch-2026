@@ -6,7 +6,6 @@ import { MainPageStructure } from '../main-page-structure'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { theme as globalTheme } from '@/themes'
 import { ImageGalleryView } from '@/components/image-gallery/image-gallery-view'
-import { resolveGalleryPhotographerName } from '@/components/image-gallery/gallery-photographer'
 
 export const dynamic = 'force-dynamic'
 
@@ -57,49 +56,36 @@ export default async function ImageGalleryPage() {
         )
     }
 
-    const featuredImages = images.filter(img => img.FeaturedImage === true)
+    const featuredImages = images
+        .filter(img => img.FeaturedImage === true)
+        .sort((a, b) => b.DateOfPicture.localeCompare(a.DateOfPicture))
     const nonFeaturedImages = images.filter(img => img.FeaturedImage !== true)
 
     const heroImage = featuredImages.length > 0
         ? featuredImages[0]
         : images[0]
 
-    type GroupedByPhotographer = {
-        photographerName: string
+    type GroupedByYear = {
+        yearKey: string
+        yearLabel: string
         images: GalleryImage[]
     }
 
-    type GroupedByMonth = {
-        monthKey: string
-        monthLabel: string
-        photographers: GroupedByPhotographer[]
-    }
-
-    const monthGroups: GroupedByMonth[] = []
+    const yearGroups: GroupedByYear[] = []
 
     nonFeaturedImages.forEach(img => {
-        const date = new Date(img.DateOfPicture)
-        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-        const monthLabel = date.toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })
+        const yearKey = img.DateOfPicture.slice(0, 4)
 
-        let monthGroup = monthGroups.find(g => g.monthKey === monthKey)
-        if (!monthGroup) {
-            monthGroup = { monthKey, monthLabel, photographers: [] }
-            monthGroups.push(monthGroup)
+        let yearGroup = yearGroups.find(g => g.yearKey === yearKey)
+        if (!yearGroup) {
+            yearGroup = { yearKey, yearLabel: yearKey, images: [] }
+            yearGroups.push(yearGroup)
         }
 
-        const photographerName = resolveGalleryPhotographerName(img)
-
-        let photographerGroup = monthGroup.photographers.find(p => p.photographerName === photographerName)
-        if (!photographerGroup) {
-            photographerGroup = { photographerName, images: [] }
-            monthGroup.photographers.push(photographerGroup)
-        }
-
-        photographerGroup.images.push(img)
+        yearGroup.images.push(img)
     })
 
-    monthGroups.sort((a, b) => b.monthKey.localeCompare(a.monthKey))
+    yearGroups.sort((a, b) => b.yearKey.localeCompare(a.yearKey))
 
     return (
         <MainPageStructure
@@ -111,8 +97,11 @@ export default async function ImageGalleryPage() {
             <ImageGalleryView
                 heroImage={heroImage}
                 featuredImages={featuredImages}
-                monthGroups={monthGroups}
+                yearGroups={yearGroups}
                 strapiUrl={strapiUrl}
+                headlineColor={theme.headlineColor}
+                textColor={theme.textColor}
+                galleryDescription={globalLayout?.GalleryDescription}
             />
         </MainPageStructure>
     )

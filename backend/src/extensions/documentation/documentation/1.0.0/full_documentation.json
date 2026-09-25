@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-09-24T17:29:58.322Z"
+    "x-generation-date": "2026-09-25T19:29:34.303Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -48282,6 +48282,13 @@
               "PhotographerName": {
                 "type": "string"
               },
+              "fit": {
+                "type": "string",
+                "enum": [
+                  "cover",
+                  "fill"
+                ]
+              },
               "locale": {
                 "type": "string"
               },
@@ -51942,6 +51949,13 @@
           "PhotographerName": {
             "type": "string"
           },
+          "fit": {
+            "type": "string",
+            "enum": [
+              "cover",
+              "fill"
+            ]
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -52218,6 +52232,13 @@
                 "PhotographerName": {
                   "type": "string"
                 },
+                "fit": {
+                  "type": "string",
+                  "enum": [
+                    "cover",
+                    "fill"
+                  ]
+                },
                 "createdAt": {
                   "type": "string",
                   "format": "date-time"
@@ -52409,6 +52430,7 @@
               "ResultsHeader": {
                 "$ref": "#/components/schemas/BlocksSimpleHeroSectionComponent"
               },
+              "GalleryDescription": {},
               "locale": {
                 "type": "string"
               },
@@ -54049,6 +54071,7 @@
           "ResultsHeader": {
             "$ref": "#/components/schemas/BlocksSimpleHeroSectionComponent"
           },
+          "GalleryDescription": {},
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -54552,6 +54575,7 @@
                 "ResultsHeader": {
                   "$ref": "#/components/schemas/BlocksSimpleHeroSectionComponent"
                 },
+                "GalleryDescription": {},
                 "createdAt": {
                   "type": "string",
                   "format": "date-time"

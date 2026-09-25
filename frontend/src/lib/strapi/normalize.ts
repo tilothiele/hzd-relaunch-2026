@@ -115,15 +115,44 @@ export function normalizeSections(
 	)) as unknown as StartpageSection[]
 }
 
+/** Choice.Options ist in Strapi ein Textfeld, eine Option pro Zeile. */
+function normalizeChoiceOptions(value: unknown): string[] {
+	if (Array.isArray(value)) {
+		return value.flatMap((entry) => (
+			typeof entry === 'string' ? normalizeChoiceOptions(entry) : []
+		))
+	}
+
+	if (typeof value !== 'string') {
+		return []
+	}
+
+	return value
+		.split(/\r?\n/)
+		.map((entry) => entry.trim())
+		.filter((entry) => entry.length > 0)
+}
+
 export function normalizeFormFields(fields: unknown): Array<Record<string, unknown>> {
 	if (!Array.isArray(fields)) {
 		return []
 	}
 
-	return fields.map((field) => normalizeDynamicZoneItem(
-		field as Record<string, unknown>,
-		formComponentToTypename,
-	))
+	return fields.map((field) => {
+		const normalized = normalizeDynamicZoneItem(
+			field as Record<string, unknown>,
+			formComponentToTypename,
+		)
+
+		if (normalized.__typename !== 'ComponentFormChoice') {
+			return normalized
+		}
+
+		return {
+			...normalized,
+			Options: normalizeChoiceOptions(normalized.Options),
+		}
+	})
 }
 
 export function normalizePage<T extends Record<string, unknown>>(page: T): T {

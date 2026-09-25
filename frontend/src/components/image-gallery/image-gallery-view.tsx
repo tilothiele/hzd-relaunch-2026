@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, type CSSProperties } from 'react'
 import Image from 'next/image'
 import type { GalleryImage } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
@@ -8,29 +8,112 @@ import { SectionContainer } from '@/components/sections/section-container/sectio
 import CloseIcon from '@mui/icons-material/Close'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
-import { resolveGalleryPhotographerName } from '@/components/image-gallery/gallery-photographer'
+import { formatGalleryImageMeta } from '@/components/image-gallery/gallery-photographer'
+import { GalleryFittedImage } from '@/components/image-gallery/gallery-fitted-image'
+import { BlocksRenderer, type BlocksContent } from '@strapi/blocks-react-renderer'
 
-interface MonthGroup {
-	monthKey: string
-	monthLabel: string
-	photographers: {
-		photographerName: string
-		images: GalleryImage[]
-	}[]
+interface YearGroup {
+	yearKey: string
+	yearLabel: string
+	images: GalleryImage[]
+}
+
+function hasGalleryDescription(content: unknown): content is BlocksContent {
+	return Array.isArray(content) && content.length > 0
+}
+
+function blockAlign(props: object): string | undefined {
+	if (!('align' in props)) return undefined
+	const align = props.align
+	return typeof align === 'string' ? align : undefined
+}
+
+function alignmentStyle(align?: string): CSSProperties | undefined {
+	if (
+		align === 'left'
+		|| align === 'center'
+		|| align === 'right'
+		|| align === 'justify'
+	) {
+		return { textAlign: align }
+	}
+
+	return undefined
+}
+
+function GalleryDescription({
+	content,
+	textColor,
+	headlineColor,
+}: {
+	content: unknown
+	textColor: string
+	headlineColor: string
+}) {
+	if (!hasGalleryDescription(content)) {
+		return null
+	}
+
+	return (
+		<div
+			className='prose mt-4 w-full max-w-none text-xl font-normal leading-relaxed md:text-2xl [&_p]:my-2'
+			style={{
+				color: textColor,
+				'--tw-prose-body': textColor,
+				'--tw-prose-headings': headlineColor,
+			} as CSSProperties}
+		>
+			<BlocksRenderer
+				content={content}
+				blocks={{
+					paragraph: ({ children, ...props }) => (
+						<p style={alignmentStyle(blockAlign(props))}>{children}</p>
+					),
+					heading: ({ children, level, ...props }) => {
+						const Tag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+						return (
+							<Tag style={alignmentStyle(blockAlign(props))}>
+								{children}
+							</Tag>
+						)
+					},
+					quote: ({ children, ...props }) => (
+						<blockquote style={alignmentStyle(blockAlign(props))}>
+							{children}
+						</blockquote>
+					),
+					list: ({ children, format, ...props }) => {
+						const Tag = format === 'ordered' ? 'ol' : 'ul'
+						return (
+							<Tag style={alignmentStyle(blockAlign(props))}>
+								{children}
+							</Tag>
+						)
+					},
+				}}
+			/>
+		</div>
+	)
 }
 
 interface ImageGalleryViewProps {
 	heroImage: GalleryImage
 	featuredImages: GalleryImage[]
-	monthGroups: MonthGroup[]
+	yearGroups: YearGroup[]
 	strapiUrl: string
+	headlineColor: string
+	textColor: string
+	galleryDescription?: unknown
 }
 
 export function ImageGalleryView({
 	heroImage,
 	featuredImages,
-	monthGroups,
+	yearGroups,
 	strapiUrl,
+	headlineColor,
+	textColor,
+	galleryDescription,
 }: ImageGalleryViewProps) {
 	const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null)
 
@@ -45,10 +128,8 @@ export function ImageGalleryView({
 		}
 
 		featuredImages.forEach(push)
-		monthGroups.forEach((month) => {
-			month.photographers.forEach((group) => {
-				group.images.forEach(push)
-			})
+		yearGroups.forEach((year) => {
+			year.images.forEach(push)
 		})
 
 		if (!seen.has(heroImage.documentId)) {
@@ -56,7 +137,7 @@ export function ImageGalleryView({
 		}
 
 		return result
-	}, [featuredImages, monthGroups, heroImage])
+	}, [featuredImages, yearGroups, heroImage])
 
 	const selectedIndex = selectedImage
 		? allImages.findIndex((img) => img.documentId === selectedImage.documentId)
@@ -105,10 +186,6 @@ export function ImageGalleryView({
 		}
 	}, [selectedImage])
 
-	const heroImageUrl = heroImage.GalleryImageMedia
-		? resolveMediaUrl(heroImage.GalleryImageMedia, strapiUrl)
-		: null
-
 	const canNavigate = allImages.length > 1
 
 	return (
@@ -118,25 +195,35 @@ export function ImageGalleryView({
 					className='relative h-[65vh] min-h-[450px] w-full cursor-pointer overflow-hidden bg-gray-900'
 					onClick={() => setSelectedImage(heroImage)}
 				>
-					{heroImageUrl && (
-						<Image
-							src={heroImageUrl as string}
-							alt={heroImage.GalleryImageMedia?.alternativeText || 'Hero Image'}
-							fill
-							className='object-cover transition-transform duration-700 hover:scale-105'
-							priority
-							unoptimized
-						/>
-					)}
-					<div className='absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-8 md:p-12'>
-						<div className='mx-auto max-w-6xl'>
-							<h1 className='text-3xl font-semibold tracking-tight text-white/90 md:text-5xl'>
-								Bildergalerie
-							</h1>
-						</div>
-					</div>
+					<GalleryFittedImage
+						image={heroImage}
+						strapiUrl={strapiUrl}
+						alt={heroImage.GalleryImageMedia?.alternativeText || 'Hero Image'}
+						priority
+						motionClassName='transition-transform duration-700 hover:scale-105'
+					/>
 				</div>
 			</section>
+
+			<SectionContainer
+				backgroundColor='#ffffff'
+				paddingTop='0'
+				paddingBottom='0'
+			>
+				<div className='flex flex-col py-10 md:py-14 lg:py-16'>
+					<h1
+						className='mb-0 w-full text-center text-4xl font-bold leading-tight md:text-5xl lg:text-6xl'
+						style={{ color: headlineColor }}
+					>
+						Bildergalerie
+					</h1>
+					<GalleryDescription
+						content={galleryDescription}
+						textColor={textColor}
+						headlineColor={headlineColor}
+					/>
+				</div>
+			</SectionContainer>
 
 			{featuredImages.length > 0 && (
 				<SectionContainer backgroundColor='#f8fafc'>
@@ -154,21 +241,16 @@ export function ImageGalleryView({
 									onClick={() => setSelectedImage(img)}
 								>
 									<div className='relative aspect-[16/10] w-full overflow-hidden'>
-										{img.GalleryImageMedia && (
-											<Image
-												src={resolveMediaUrl(img.GalleryImageMedia, strapiUrl) as string}
-												alt={img.GalleryImageMedia.alternativeText || 'Featured Image'}
-												fill
-												className='object-cover transition-transform duration-500 group-hover:scale-105'
-												unoptimized
-											/>
-										)}
+										<GalleryFittedImage
+											image={img}
+											strapiUrl={strapiUrl}
+											alt={img.GalleryImageMedia?.alternativeText || 'Featured Image'}
+											motionClassName='transition-transform duration-500 group-hover:scale-105'
+										/>
 									</div>
 									<div className='space-y-1 px-4 py-3'>
 										<p className='text-xs text-gray-400'>
-											{new Date(img.DateOfPicture).toLocaleDateString('de-DE')}
-											{' · '}
-											{resolveGalleryPhotographerName(img)}
+											{formatGalleryImageMeta(img)}
 										</p>
 										{img.ImageDescription && (
 											<p className='line-clamp-2 text-sm text-gray-500'>
@@ -188,55 +270,44 @@ export function ImageGalleryView({
 					<div className='mb-10'>
 						<h2 className='mb-1 text-2xl font-semibold text-gray-700'>Archiv</h2>
 						<p className='text-sm text-gray-400'>
-							Einsendungen sortiert nach Monaten.
+							Einsendungen sortiert nach Jahren.
 						</p>
 					</div>
 
-					{monthGroups.map((month) => (
-						<div key={month.monthKey} className='mb-16 last:mb-0'>
+					{yearGroups.map((year) => (
+						<div key={year.yearKey} className='mb-16 last:mb-0'>
 							<h3 className='mb-6 text-lg font-medium text-gray-600'>
-								{month.monthLabel}
+								{year.yearLabel}
 							</h3>
 
-							{month.photographers.map((group, pIdx) => (
-								<div
-									key={`${month.monthKey}-${group.photographerName}-${pIdx}`}
-									className='mb-10 last:mb-0'
-								>
-									<h4 className='mb-4 text-sm font-medium text-gray-400'>
-										{group.photographerName}
-									</h4>
-
-									<div className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
-										{group.images.map((img) => (
-											<div
-												key={img.documentId}
-												className='group flex cursor-pointer flex-col overflow-hidden rounded-lg bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md'
-												onClick={() => setSelectedImage(img)}
-											>
-												<div className='relative aspect-[4/3] w-full overflow-hidden'>
-													{img.GalleryImageMedia && (
-														<Image
-															src={resolveMediaUrl(img.GalleryImageMedia, strapiUrl) as string}
-															alt={img.GalleryImageMedia.alternativeText || 'Gallery Image'}
-															fill
-															className='object-cover transition-transform duration-500 group-hover:scale-105'
-															unoptimized
-														/>
-													)}
-												</div>
-												{img.ImageDescription && (
-													<div className='px-3 py-2'>
-														<p className='line-clamp-1 text-xs leading-relaxed text-gray-500'>
-															{img.ImageDescription}
-														</p>
-													</div>
-												)}
-											</div>
-										))}
+							<div className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+								{year.images.map((img) => (
+									<div
+										key={img.documentId}
+										className='group flex cursor-pointer flex-col overflow-hidden rounded-lg bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md'
+										onClick={() => setSelectedImage(img)}
+									>
+										<div className='relative aspect-[4/3] w-full overflow-hidden'>
+											<GalleryFittedImage
+												image={img}
+												strapiUrl={strapiUrl}
+												alt={img.GalleryImageMedia?.alternativeText || 'Gallery Image'}
+												motionClassName='transition-transform duration-500 group-hover:scale-105'
+											/>
+										</div>
+										<div className='space-y-1 px-3 py-2'>
+											<p className='text-xs text-gray-400'>
+												{formatGalleryImageMeta(img)}
+											</p>
+											{img.ImageDescription && (
+												<p className='line-clamp-1 text-xs leading-relaxed text-gray-500'>
+													{img.ImageDescription}
+												</p>
+											)}
+										</div>
 									</div>
-								</div>
-							))}
+								))}
+							</div>
 						</div>
 					))}
 				</div>
@@ -306,9 +377,7 @@ export function ImageGalleryView({
 									</p>
 								)}
 								<p className='text-base font-medium tracking-wide text-white'>
-									{new Date(selectedImage.DateOfPicture).toLocaleDateString('de-DE')}
-									{' · '}
-									{resolveGalleryPhotographerName(selectedImage)}
+									{formatGalleryImageMeta(selectedImage)}
 								</p>
 								{selectedImage.ImageDescription && (
 									<p className='mt-2 text-base leading-relaxed text-gray-100'>

@@ -91,6 +91,9 @@
       "type": "component",
       "component": "blocks.simple-hero-section",
       "repeatable": false
+    },
+    "GalleryDescription": {
+      "type": "blocks"
     }
   }
 }

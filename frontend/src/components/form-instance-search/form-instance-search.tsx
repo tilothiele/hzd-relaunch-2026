@@ -123,9 +123,9 @@ export function FormsInstanceSearch({ strapiBaseUrl, user, isAuthenticated }: Fo
 				})
 			}
 
-			// Filter nach EventAdmin (nur Formulare des aktuellen Users anzeigen)
+			// Nur Formulare, bei denen der aktuelle User Event-Admin ist
 			filterConditions.push({
-				EventAdmin: {
+				event_admins: {
 					documentId: {
 						eq: user.documentId
 					}

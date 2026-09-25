@@ -177,10 +177,15 @@ const userIsZuechter = (user: { user_groups?: unknown }): boolean => {
 
 const userOwnsBreeder = (
   user: { id?: number | string | null; documentId?: string | null },
-  breeder: { owner_members?: unknown; member?: unknown } | null,
+  breeder: unknown,
 ): boolean => {
-  if (!breeder) {
+  if (!breeder || typeof breeder !== 'object') {
     return false
+  }
+
+  const record = breeder as {
+    owner_members?: unknown
+    member?: unknown
   }
 
   const ids = new Set<string>()
@@ -192,8 +197,8 @@ const userOwnsBreeder = (
   }
 
   const members = [
-    ...(Array.isArray(breeder.owner_members) ? breeder.owner_members : []),
-    breeder.member,
+    ...(Array.isArray(record.owner_members) ? record.owner_members : []),
+    record.member,
   ]
 
   return members.some((member) => {

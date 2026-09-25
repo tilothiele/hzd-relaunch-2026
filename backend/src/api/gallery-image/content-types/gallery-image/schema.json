@@ -41,6 +41,13 @@
     },
     "PhotographerName": {
       "type": "string"
+    },
+    "fit": {
+      "type": "enumeration",
+      "enum": [
+        "cover",
+        "fill"
+      ]
     }
   }
 }
