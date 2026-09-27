@@ -28,6 +28,9 @@ public interface ImporterConfig {
 		String dogsPath();
 
 		Optional<String> uploadDirectory();
+
+		@WithDefault("100")
+		int plausibilityThreshold();
 	}
 
 	interface SchedulerConfig {

@@ -2,7 +2,6 @@ package de.hzd.importer.adapter.strapi;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -467,10 +466,11 @@ public class StrapiMemberAdapter {
 			Optional.of(member.cId())
 		);
 
-		Optional<String> existingBreederId = client.findDocumentIdByCId(
+		Optional<JsonNode> existingBreeder = client.findFirstByCId(
 			StrapiResources.BREEDERS,
 			member.cId()
 		);
+		Optional<String> existingBreederId = existingBreeder.flatMap(StrapiResponseReader::readResourceId);
 		Optional<String> kennelName = member.breedingStation();
 		Map<String, Object> payload = StrapiPayloadMapper.toBreederInput(
 			member.cId(),
@@ -487,12 +487,10 @@ public class StrapiMemberAdapter {
 				payload,
 				true
 			);
-			//LOG.infof("Updated breeder cId=%d documentId=%s", member.cId(), existingBreederId.get());
 			return false;
 		}
 
 		client.create(StrapiResources.BREEDERS, payload, true);
-		//LOG.infof("Created breeder cId=%d for member documentId=%s", member.cId(), memberDocumentId);
 		return true;
 	}
 

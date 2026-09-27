@@ -96,11 +96,19 @@ public class StrapiRestClient {
 	}
 
 	public Optional<String> findDocumentIdByCId(String resourcePath, int cId) {
+		return findFirstByCId(resourcePath, cId).flatMap(StrapiResponseReader::readResourceId);
+	}
+
+	public Optional<JsonNode> findFirstByCId(String resourcePath, int cId) {
 		JsonNode response = list(
 			resourcePath,
 			Map.of("filters[cId][$eq]", Integer.toString(cId))
 		);
-		return firstResourceId(response);
+		JsonNode items = StrapiResponseReader.readResultItems(response);
+		if (items == null || items.isEmpty()) {
+			return Optional.empty();
+		}
+		return Optional.of(items.get(0));
 	}
 
 	public Optional<String> findUserDocumentIdByEmail(String email) {
@@ -141,14 +149,6 @@ public class StrapiRestClient {
 			return Optional.empty();
 		}
 		return StrapiUserRef.fromJson(items.get(0));
-	}
-
-	private Optional<String> firstResourceId(JsonNode response) {
-		JsonNode items = StrapiResponseReader.readResultItems(response);
-		if (items == null || items.isEmpty()) {
-			return Optional.empty();
-		}
-		return StrapiResponseReader.readResourceId(items.get(0));
 	}
 
 	private JsonNode send(String method, String resourcePath, JsonNode body) {

@@ -1,0 +1,4 @@
+ALTER TABLE importjobs ADD COLUMN member_changed_count INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE importjobs ADD COLUMN member_new_count INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE importjobs ADD COLUMN dog_changed_count INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE importjobs ADD COLUMN dog_new_count INTEGER NOT NULL DEFAULT 0;

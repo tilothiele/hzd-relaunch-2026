@@ -21,6 +21,7 @@ public class StrapiDogAdapter {
 	StrapiMemberAdapter strapiMemberAdapter;
 
 	private final Map<Integer, String> documentIdsByCId = new HashMap<>();
+	private final Map<Integer, JsonNode> dogNodesByCId = new HashMap<>();
 
 	public enum UpsertResult {
 		CREATED,
@@ -29,14 +30,15 @@ public class StrapiDogAdapter {
 
 	public void clearCache() {
 		documentIdsByCId.clear();
+		dogNodesByCId.clear();
 	}
 
 	public boolean ensureStudBreeder(int breederCId, Optional<String> ownerMemberDocumentId) {
-		Optional<String> existingBreederId = client.findDocumentIdByCId(
+		Optional<JsonNode> existingBreeder = client.findFirstByCId(
 			StrapiResources.BREEDERS,
 			breederCId
 		);
-		if (existingBreederId.isPresent()) {
+		if (existingBreeder.flatMap(StrapiResponseReader::readResourceId).isPresent()) {
 			return false;
 		}
 
@@ -45,10 +47,11 @@ public class StrapiDogAdapter {
 			ownerMemberDocumentId.isPresent() ? Optional.of(breederCId) : Optional.empty()
 		);
 
+		Optional<String> kennelName = strapiMemberAdapter.resolveOwnerKennelName(breederCId);
 		Map<String, Object> payload = StrapiPayloadMapper.toStudBreederInput(
 			breederCId,
 			ownerMemberDocumentId,
-			strapiMemberAdapter.resolveOwnerKennelName(breederCId),
+			kennelName,
 			strapiMemberAdapter.resolveOwnerAddress(breederCId)
 		);
 		client.create(StrapiResources.BREEDERS, payload, true);
@@ -57,10 +60,11 @@ public class StrapiDogAdapter {
 	}
 
 	public boolean ensureBreeder(int breederCId, Optional<String> kennelName, Optional<Boolean> isActiveBreeder) {
-		Optional<String> existingBreederId = client.findDocumentIdByCId(
+		Optional<JsonNode> existingBreeder = client.findFirstByCId(
 			StrapiResources.BREEDERS,
 			breederCId
 		);
+		Optional<String> existingBreederId = existingBreeder.flatMap(StrapiResponseReader::readResourceId);
 
 		// Strapi beforeUpdate verknüpft per cId automatisch owner_members (linkBreederMemberFromCId).
 		strapiMemberAdapter.ensureOwnerMembersPublishMyDataBeforeBreederSave(
@@ -109,7 +113,8 @@ public class StrapiDogAdapter {
 				: findBreederDocumentId(breederId))
 			.isPresent();
 
-		Optional<String> existingId = findDogDocumentId(dog.cId());
+		Optional<JsonNode> existing = findDogNode(dog.cId());
+		Optional<String> existingId = existing.flatMap(StrapiResponseReader::readResourceId);
 		if (existingId.isPresent()) {
 			updateDog(dog.cId(), existingId.get(), payload, ownerResolvable, breederResolvable);
 			return UpsertResult.UPDATED;
@@ -133,7 +138,8 @@ public class StrapiDogAdapter {
 				throw exception;
 			}
 
-			Optional<String> resolvedId = findDogDocumentId(dog.cId());
+			Optional<JsonNode> resolved = findDogNode(dog.cId());
+			Optional<String> resolvedId = resolved.flatMap(StrapiResponseReader::readResourceId);
 			if (resolvedId.isEmpty()) {
 				throw exception;
 			}
@@ -148,15 +154,19 @@ public class StrapiDogAdapter {
 		}
 	}
 
-	private Optional<String> findDogDocumentId(int cId) {
-		String cachedDocumentId = documentIdsByCId.get(cId);
-		if (cachedDocumentId != null && !cachedDocumentId.isBlank()) {
-			return Optional.of(cachedDocumentId);
+	private Optional<JsonNode> findDogNode(int cId) {
+		if (dogNodesByCId.containsKey(cId)) {
+			return Optional.ofNullable(dogNodesByCId.get(cId));
 		}
 
-		Optional<String> found = client.findDocumentIdByCId(StrapiResources.DOGS, cId);
-		found.ifPresent(documentId -> documentIdsByCId.put(cId, documentId));
-		return found;
+		Optional<JsonNode> found = client.findFirstByCId(StrapiResources.DOGS, cId);
+		if (found.isEmpty()) {
+			return Optional.empty();
+		}
+		JsonNode node = found.get();
+		dogNodesByCId.put(cId, node);
+		StrapiResponseReader.readResourceId(node).ifPresent(documentId -> documentIdsByCId.put(cId, documentId));
+		return Optional.of(node);
 	}
 
 	private void updateDog(
