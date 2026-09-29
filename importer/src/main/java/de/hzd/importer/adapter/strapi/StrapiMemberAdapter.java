@@ -406,16 +406,12 @@ public class StrapiMemberAdapter {
 		Optional<StrapiMemberSnapshot> ucid = findExistingUserRefByCId(member.cId());
 		if(existingUser.isEmpty()) existingUser = ucid.isEmpty() ? Optional.empty() : Optional.of(ucid.get().toUserRef());
 		if(existingUser.isEmpty()) existingUser = findExistingStrapiByUsername(member);
-		boolean isCreate = existingUser.isEmpty();
-		Map<String, Object> payload = StrapiPayloadMapper.toUserInput(
-			member,
-			config,
-			isCreate,
-			authenticatedRoleId
-		);
-
 		if (existingUser.isPresent()) {
 			StrapiUserRef userRef = existingUser.get();
+			Map<String, Object> payload = StrapiPayloadMapper.toUserUpdateInput(
+				member,
+				authenticatedRoleId
+			);
 //			LOG.infof(
 //				"Update Strapi user cId=%d documentId=%s numericId=%d email=%s",
 //				member.cId(),
@@ -426,6 +422,12 @@ public class StrapiMemberAdapter {
 			client.updateUser(userRef.numericId(), payload);
 			return new UpsertResult(UpsertResult.UpsertAction.UPDATED, userRef.documentId());
 		}
+
+		Map<String, Object> payload = StrapiPayloadMapper.toUserInsertInput(
+			member,
+			config,
+			authenticatedRoleId
+		);
 
 //		LOG.infof(
 //			"Create Strapi user cId=%d username=%s email=%s",
@@ -472,25 +474,31 @@ public class StrapiMemberAdapter {
 		);
 		Optional<String> existingBreederId = existingBreeder.flatMap(StrapiResponseReader::readResourceId);
 		Optional<String> kennelName = member.breedingStation();
-		Map<String, Object> payload = StrapiPayloadMapper.toBreederInput(
-			member.cId(),
-			kennelName,
-			existingBreederId.isEmpty(),
-			member.isActiveBreeder(),
-			Optional.of(memberDocumentId)
-		);
-
 		if (existingBreederId.isPresent()) {
 			client.update(
 				StrapiResources.BREEDERS,
 				existingBreederId.get(),
-				payload,
+				StrapiPayloadMapper.toBreederUpdateInput(
+					member.cId(),
+					kennelName,
+					member.isActiveBreeder(),
+					Optional.of(memberDocumentId)
+				),
 				true
 			);
 			return false;
 		}
 
-		client.create(StrapiResources.BREEDERS, payload, true);
+		client.create(
+			StrapiResources.BREEDERS,
+			StrapiPayloadMapper.toBreederInsertInput(
+				member.cId(),
+				kennelName,
+				member.isActiveBreeder(),
+				Optional.of(memberDocumentId)
+			),
+			true
+		);
 		return true;
 	}
 

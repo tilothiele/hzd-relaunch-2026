@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
 import org.jboss.logging.Logger;
 
@@ -105,17 +106,20 @@ public class ImportHtmlReportWriter {
 			.append(result.newCount()).append(" neu, ")
 			.append(result.changedCount()).append(" mit Abweichungen, ")
 			.append(result.removedCount()).append(" entfernt.</p>\n");
-		if (result.rows().isEmpty()) {
-			html.append("<p>Keine Einträge.</p>\n");
+		List<Row> visibleRows = result.rows().stream()
+			.filter(row -> row.action() == Action.NEW || row.action() == Action.CHANGED)
+			.toList();
+		if (visibleRows.isEmpty()) {
+			html.append("<p>Keine neuen oder geänderten Einträge.</p>\n");
 			return;
 		}
 		html.append("<div class=\"wrap\"><table>\n<thead><tr>");
 		html.append("<th>cId</th><th>Bezeichnung</th><th>Aktion</th>");
-		for (Field field : result.rows().get(0).fields()) {
+		for (Field field : visibleRows.get(0).fields()) {
 			html.append("<th>").append(escape(field.name())).append("</th>");
 		}
 		html.append("</tr></thead>\n<tbody>\n");
-		for (Row row : result.rows()) {
+		for (Row row : visibleRows) {
 			html.append("<tr");
 			if (row.action() == Action.NEW) {
 				html.append(" class=\"inserted\"");

@@ -93,7 +93,7 @@ class StrapiPayloadMapperTest {
 			Member.UNDEFINED_ID
 		);
 
-		Map<String, Object> payload = StrapiPayloadMapper.toUserInput(member, config, true, 2);
+		Map<String, Object> payload = StrapiPayloadMapper.toUserInsertInput(member, config, 2);
 
 		assertEquals("152544", payload.get("username"));
 		assertEquals("c.10927@hovawarte.com", payload.get("email"));
@@ -111,7 +111,7 @@ class StrapiPayloadMapperTest {
 		mockStrapiConfig();
 		Member member = breederMember(Optional.empty());
 
-		Map<String, Object> payload = StrapiPayloadMapper.toUserInput(member, config, false, 2);
+		Map<String, Object> payload = StrapiPayloadMapper.toUserUpdateInput(member, 2);
 
 		assertEquals("c.10927", payload.get("username"));
 		assertEquals(true, payload.get("publishMyData"));
@@ -122,7 +122,7 @@ class StrapiPayloadMapperTest {
 		mockStrapiConfig();
 		Member member = breederMember(Optional.of(true));
 
-		Map<String, Object> payload = StrapiPayloadMapper.toUserInput(member, config, false, 2);
+		Map<String, Object> payload = StrapiPayloadMapper.toUserUpdateInput(member, 2);
 
 		assertEquals(true, payload.get("publishMyData"));
 	}
@@ -132,7 +132,7 @@ class StrapiPayloadMapperTest {
 		mockStrapiConfig();
 		Member member = breederMember(Optional.of(false));
 
-		Map<String, Object> payload = StrapiPayloadMapper.toUserInput(member, config, false, 2);
+		Map<String, Object> payload = StrapiPayloadMapper.toUserUpdateInput(member, 2);
 
 		assertEquals(true, payload.get("publishMyData"));
 	}
@@ -167,7 +167,7 @@ class StrapiPayloadMapperTest {
 			Member.UNDEFINED_ID
 		);
 
-		Map<String, Object> payload = StrapiPayloadMapper.toUserInput(member, config, false, 2);
+		Map<String, Object> payload = StrapiPayloadMapper.toUserUpdateInput(member, 2);
 
 		assertEquals(false, payload.get("publishMyData"));
 	}
@@ -246,29 +246,26 @@ class StrapiPayloadMapperTest {
 	void mapsBreederIsActiveFromMember() {
 		assertEquals(
 			false,
-			StrapiPayloadMapper.toBreederInput(
+			StrapiPayloadMapper.toBreederInsertInput(
 				10927,
 				Optional.of("Enormous"),
-				true,
 				Optional.of(false),
 				Optional.empty()
 			).get("IsActive")
 		);
 		assertEquals(
 			true,
-			StrapiPayloadMapper.toBreederInput(
+			StrapiPayloadMapper.toBreederInsertInput(
 				10927,
 				Optional.of("Enormous"),
-				true,
 				breederMember(Optional.empty(), Optional.of(true)).isActiveBreeder(),
 				Optional.empty()
 			).get("IsActive")
 		);
 		assertTrue(
-			!StrapiPayloadMapper.toBreederInput(
+			!StrapiPayloadMapper.toBreederInsertInput(
 				10927,
 				Optional.of("Enormous"),
-				true,
 				Optional.empty(),
 				Optional.empty()
 			).containsKey("IsActive")
@@ -382,7 +379,7 @@ class StrapiPayloadMapperTest {
 			Optional.of("Enormous")
 		);
 
-		Map<String, Object> payload = StrapiPayloadMapper.toDogInput(dog);
+		Map<String, Object> payload = StrapiPayloadMapper.toDogInsertInput(dog);
 
 		assertEquals(23824, payload.get("cId"));
 		assertEquals("Do It Again", payload.get("givenName"));
@@ -468,7 +465,7 @@ class StrapiPayloadMapperTest {
 			Member.UNDEFINED_ID
 		);
 
-		Map<String, Object> payload = StrapiPayloadMapper.toUserInput(member, config, true, 2);
+		Map<String, Object> payload = StrapiPayloadMapper.toUserInsertInput(member, config, 2);
 		assertEquals("c.42@hovawarte.com", payload.get("email"));
 		assertTrue(payload.containsKey("password"));
 	}

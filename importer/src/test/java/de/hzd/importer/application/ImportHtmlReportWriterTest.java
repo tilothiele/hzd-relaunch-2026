@@ -30,8 +30,14 @@ class ImportHtmlReportWriterTest {
 		Result members = new Result(List.of(
 			new Row(12, "Lena Beispiel", Action.CHANGED, List.of(
 				new Field("Ort", "Berlin", "Hamburg", true)
+			)),
+			new Row(13, "Unverändert", Action.UNCHANGED, List.of(
+				new Field("Ort", "Bonn", "Bonn", false)
+			)),
+			new Row(14, "Entfernt", Action.REMOVED, List.of(
+				new Field("Ort", "Köln", "", false)
 			))
-		), 1, 0, 0);
+		), 1, 0, 1);
 		Result dogs = new Result(List.of(
 			new Row(44, "Bo", Action.NEW, List.of(
 				new Field("Rufname", "", "Bo", false)
@@ -53,6 +59,8 @@ class ImportHtmlReportWriterTest {
 		assertTrue(html.contains("class=\"inserted\""));
 		assertTrue(html.contains("class=\"diff\">DB: Berlin<br>CSV: Hamburg"));
 		assertTrue(html.contains(">Neu<"));
+		assertFalse(html.contains("Unverändert"));
+		assertFalse(html.contains(">Entfernt<"));
 		assertFalse(html.contains("<script>"));
 
 		Path file = new ImportHtmlReportWriter().writeTo(tempDir, job.id(), job, members, dogs, 7);

@@ -72,25 +72,31 @@ public class StrapiDogAdapter {
 			Optional.of(breederCId)
 		);
 
-		Map<String, Object> payload = StrapiPayloadMapper.toBreederInput(
-			breederCId,
-			kennelName,
-			existingBreederId.isEmpty(),
-			isActiveBreeder,
-			Optional.empty()
-		);
-
 		if (existingBreederId.isPresent()) {
 			client.update(
 				StrapiResources.BREEDERS,
 				existingBreederId.get(),
-				payload,
+				StrapiPayloadMapper.toBreederUpdateInput(
+					breederCId,
+					kennelName,
+					isActiveBreeder,
+					Optional.empty()
+				),
 				true
 			);
 			return false;
 		}
 
-		client.create(StrapiResources.BREEDERS, payload, true);
+		client.create(
+			StrapiResources.BREEDERS,
+			StrapiPayloadMapper.toBreederInsertInput(
+				breederCId,
+				kennelName,
+				isActiveBreeder,
+				Optional.empty()
+			),
+			true
+		);
 		LOG.infof("Created breeder cId=%d from dog import", breederCId);
 		return true;
 	}
@@ -104,8 +110,6 @@ public class StrapiDogAdapter {
 	}
 
 	public UpsertResult upsert(Dog dog, Optional<String> breederDocumentId) {
-		Map<String, Object> payload = StrapiPayloadMapper.toDogInput(dog);
-
 		boolean ownerResolvable = dog.ownerId().flatMap(this::findOwnerDocumentId).isPresent();
 		boolean breederResolvable = dog.breederId()
 			.flatMap(breederId -> breederDocumentId.isPresent()
@@ -116,12 +120,22 @@ public class StrapiDogAdapter {
 		Optional<JsonNode> existing = findDogNode(dog.cId());
 		Optional<String> existingId = existing.flatMap(StrapiResponseReader::readResourceId);
 		if (existingId.isPresent()) {
-			updateDog(dog.cId(), existingId.get(), payload, ownerResolvable, breederResolvable);
+			updateDog(
+				dog.cId(),
+				existingId.get(),
+				StrapiPayloadMapper.toDogUpdateInput(dog),
+				ownerResolvable,
+				breederResolvable
+			);
 			return UpsertResult.UPDATED;
 		}
 
 		try {
-			JsonNode response = client.create(StrapiResources.DOGS, payload, true);
+			JsonNode response = client.create(
+				StrapiResources.DOGS,
+				StrapiPayloadMapper.toDogInsertInput(dog),
+				true
+			);
 			String documentId = client.readDocumentId(response)
 				.orElseThrow(() -> new StrapiClientException("Strapi dog create returned no documentId"));
 			documentIdsByCId.put(dog.cId(), documentId);
@@ -149,7 +163,13 @@ public class StrapiDogAdapter {
 				"Dog cId=%d already exists, retrying as update",
 				dog.cId()
 			);
-			updateDog(dog.cId(), resolvedId.get(), payload, ownerResolvable, breederResolvable);
+			updateDog(
+				dog.cId(),
+				resolvedId.get(),
+				StrapiPayloadMapper.toDogUpdateInput(dog),
+				ownerResolvable,
+				breederResolvable
+			);
 			return UpsertResult.UPDATED;
 		}
 	}
