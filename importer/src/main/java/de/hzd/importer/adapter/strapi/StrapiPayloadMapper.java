@@ -86,6 +86,15 @@ final class StrapiPayloadMapper {
 		return payload;
 	}
 
+	/** true, wenn der Update-Payload von {@code current} vom bisherigen Stand abweicht. */
+	static boolean requiresUserUpdate(Member previous, Member current, int authenticatedRoleId) {
+		if (previous == null || current == null) {
+			return true;
+		}
+		return !toUserUpdateInput(previous, authenticatedRoleId)
+			.equals(toUserUpdateInput(current, authenticatedRoleId));
+	}
+
 	static boolean shouldPublishMyData(Member member) {
 		if (member.isBreeder()) {
 			return true;
@@ -129,10 +138,13 @@ final class StrapiPayloadMapper {
 		return payload;
 	}
 
-	/** Deckrüden-Zwinger: Rolle S, member leer, owner_members = Besitzer des Hundes. */
+	/**
+	 * Deckrüdenbesitzer: User, dem ein zuchtfähiger Rüde gehört.
+	 * member und owner_members zeigen auf denselben User.
+	 */
 	static Map<String, Object> toStudBreederInput(
 		int breederCId,
-		Optional<String> ownerMemberDocumentId,
+		Optional<String> userDocumentId,
 		Optional<String> kennelName,
 		Optional<Map<String, Object>> address
 	) {
@@ -144,9 +156,10 @@ final class StrapiPayloadMapper {
 			.map(value -> truncate(value, 200))
 			.ifPresent(value -> payload.put("kennelName", "DRB " + value));
 		address.ifPresent(value -> payload.put("Address", value));
-		ownerMemberDocumentId.ifPresent(documentId ->
-			payload.put("owner_members", Map.of("connect", java.util.List.of(documentId)))
-		);
+		userDocumentId.ifPresent(documentId -> {
+			payload.put("member", Map.of("connect", java.util.List.of(documentId)));
+			payload.put("owner_members", Map.of("connect", java.util.List.of(documentId)));
+		});
 		return payload;
 	}
 
@@ -233,6 +246,14 @@ final class StrapiPayloadMapper {
 		dog.exhibitions().ifPresent(value -> payload.put("Exhibitions", value));
 		dog.breedSurvey().ifPresent(value -> payload.put("BreedSurvey", value));
 		return payload;
+	}
+
+	/** true, wenn der Update-Payload von {@code current} vom bisherigen Stand abweicht. */
+	static boolean requiresDogUpdate(Dog previous, Dog current) {
+		if (previous == null || current == null) {
+			return true;
+		}
+		return !toDogUpdateInput(previous).equals(toDogUpdateInput(current));
 	}
 
 	private static Optional<String> nonBlank(String value) {

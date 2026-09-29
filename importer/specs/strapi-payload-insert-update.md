@@ -82,6 +82,20 @@ Quelle: `toBreederInsertInput`, `toBreederUpdateInput`.
 | member | ja, wenn documentId da | ja, wenn documentId da |
 | owner_members | ja, wenn documentId da | ja, wenn documentId da |
 
-`member` und `owner_members` setzt nur der Mitgliederimport. Der Hundimport übergibt keine documentId, deshalb fehlen dort beide Relationen und auch `IsActive`.
+`member` und `owner_members` setzt der Mitgliederimport, wenn die documentId des Users bekannt ist. Der Hundimport für Züchter mit Rolle `B` übergibt keine documentId, deshalb fehlen dort beide Relationen und auch `IsActive`.
 
-Deckrüden-Zwinger werden nur angelegt (`toStudBreederInput`): `cId`, `IsActive` immer `true`, `BreederRole` `S`, `kennelName` mit Präfix `DRB`, optional `Address` und `owner_members`. Ein Update gibt es dafür nicht.
+## Deckrüdenbesitzer
+
+Ein Deckrüdenbesitzer ist ein User, dem ein zuchtfähiger Rüde gehört (`cFertile` und Geschlecht `M`). Dafür legt der Hundimport einen Breeder an (`toStudBreederInput`), sofern für diese `cId` noch keiner existiert. Ein bestehender Breeder, zum Beispiel Rolle `B`, wird nicht überschrieben.
+
+| Attribut | in insert? | in update? |
+|---|---|---|
+| cId | ja | — |
+| IsActive | ja (`true`) | — |
+| BreederRole | ja (`S`) | — |
+| kennelName | ja, wenn vorhanden (`DRB ` + Name) | — |
+| Address | ja, wenn vorhanden | — |
+| member | ja, wenn documentId da | — |
+| owner_members | ja, wenn documentId da | — |
+
+`kennelName` entsteht aus Vor- und Nachname des Users, `Address` aus dessen Adressfeldern. `member` und `owner_members` zeigen auf denselben User. Ein Update dieses Payloads gibt es nicht.

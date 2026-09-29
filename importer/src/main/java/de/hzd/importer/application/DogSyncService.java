@@ -37,6 +37,16 @@ public class DogSyncService implements DogSyncPort {
 	}
 
 	@Override
+	public void setPreviousDogs(List<Dog> dogs) {
+		strapiDogAdapter.setPreviousDogs(dogs);
+	}
+
+	@Override
+	public void clearPreviousDogs() {
+		strapiDogAdapter.clearPreviousDogs();
+	}
+
+	@Override
 	public DogSyncPort.BreederPreparationResult prepareBreeders(List<Dog> dogs) {
 		strapiDogAdapter.clearCache();
 		Map<Integer, Optional<String>> breederData = new HashMap<>();
@@ -124,8 +134,10 @@ public class DogSyncService implements DogSyncPort {
 
 		StrapiDogAdapter.UpsertResult result = strapiDogAdapter.upsert(dog, breederDocumentId);
 		strapiRestClient.delayBetweenRequests();
-		return result == StrapiDogAdapter.UpsertResult.CREATED
-			? SyncResult.CREATED
-			: SyncResult.UPDATED;
+		return switch (result) {
+			case CREATED -> SyncResult.CREATED;
+			case SKIPPED -> SyncResult.SKIPPED;
+			case UPDATED -> SyncResult.UPDATED;
+		};
 	}
 }

@@ -34,6 +34,7 @@ public class StrapiMemberAdapter {
 	private Map<Integer, StrapiMemberSnapshot> membersByCid = Map.of();
 	private Map<String, StrapiMemberSnapshot> membersByUsername = Map.of();
 	private Map<Integer, Member> csvMembersByCid = Map.of();
+	private Map<Integer, Member> previousMembersByCid = Map.of();
 	private int authenticatedRoleId = -1;
 
 	public StrapiMemberSnapshot cachedMemberByCid(int cId) {
@@ -121,7 +122,8 @@ public class StrapiMemberAdapter {
 	public record UpsertResult(UpsertAction action, String documentId) {
 		public enum UpsertAction {
 			CREATED,
-			UPDATED
+			UPDATED,
+			SKIPPED
 		}
 	}
 
@@ -174,6 +176,12 @@ public class StrapiMemberAdapter {
 
 	public void setCsvMembers(List<Member> members) {
 		this.csvMembersByCid = members != null
+			? members.stream().collect(Collectors.toMap(Member::cId, member -> member, (left, right) -> left))
+			: Map.of();
+	}
+
+	public void setPreviousMembers(List<Member> members) {
+		this.previousMembersByCid = members != null
 			? members.stream().collect(Collectors.toMap(Member::cId, member -> member, (left, right) -> left))
 			: Map.of();
 	}
@@ -390,7 +398,17 @@ public class StrapiMemberAdapter {
 		membersByCid = Map.of();
 		membersByUsername = Map.of();
 		csvMembersByCid = Map.of();
+		previousMembersByCid = Map.of();
 		authenticatedRoleId = -1;
+	}
+
+	private boolean userUpdateRequired(Member member) {
+		Member current = csvMembersByCid.getOrDefault(member.cId(), member);
+		return StrapiPayloadMapper.requiresUserUpdate(
+			previousMembersByCid.get(member.cId()),
+			current,
+			authenticatedRoleId
+		);
 	}
 
 	public UpsertResult upsert(Member member) {
@@ -408,6 +426,9 @@ public class StrapiMemberAdapter {
 		if(existingUser.isEmpty()) existingUser = findExistingStrapiByUsername(member);
 		if (existingUser.isPresent()) {
 			StrapiUserRef userRef = existingUser.get();
+			if (!userUpdateRequired(member)) {
+				return new UpsertResult(UpsertResult.UpsertAction.SKIPPED, userRef.documentId());
+			}
 			Map<String, Object> payload = StrapiPayloadMapper.toUserUpdateInput(
 				member,
 				authenticatedRoleId

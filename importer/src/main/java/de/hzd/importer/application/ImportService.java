@@ -222,7 +222,9 @@ public class ImportService {
 
 			strapiMemberAdapter.setImportCache(strapiMembers);
 			strapiMemberAdapter.setAuthenticatedRoleId(authenticatedRoleId);
-			
+			strapiMemberAdapter.setPreviousMembers(previousMembers);
+			dogSyncPort.setPreviousDogs(previousDogs);
+
 			try {
 				jobLog.info("start import Members");
 				statistics = importMembers(membersToSync, statistics);
@@ -231,6 +233,7 @@ public class ImportService {
 				statistics = importDogs(dogsToSync, statistics);
 			} finally {
 				strapiMemberAdapter.clearImportCache();
+				dogSyncPort.clearPreviousDogs();
 			}
 
 			csvSnapshotRepository.append(generation, members, dogs);
@@ -352,9 +355,11 @@ public class ImportService {
 			logTicker.tick(() -> jobLog.info(Ticker.formatProceedingMessage(t0, dogs.size(), j, "Dog")));
 			try {
 				DogSyncPort.SyncResult result = dogSyncPort.sync(dog);
-				statistics = result == DogSyncPort.SyncResult.CREATED
-					? statistics.withDogsCreated(1)
-					: statistics.withDogsUpdated(1);
+				statistics = switch (result) {
+					case CREATED -> statistics.withDogsCreated(1);
+					case UPDATED -> statistics.withDogsUpdated(1);
+					case SKIPPED -> statistics;
+				};
 			} catch (RuntimeException exception) {
 				jobLog.error("Failed to import dog cId=%d", exception, dog.cId());
 				statistics = statistics.withDogsFailed(1);

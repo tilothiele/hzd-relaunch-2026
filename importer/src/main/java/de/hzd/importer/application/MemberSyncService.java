@@ -22,9 +22,11 @@ public class MemberSyncService implements MemberSyncPort {
 			StrapiMemberAdapter.UpsertResult strapiResult = strapiMemberAdapter.upsert(member);
 			strapiMemberAdapter.upsertBreeder(member, strapiResult.documentId());
 
-			return strapiResult.action() == StrapiMemberAdapter.UpsertResult.UpsertAction.CREATED
-				? SyncResult.CREATED
-				: SyncResult.UPDATED;
+			return switch (strapiResult.action()) {
+				case CREATED -> SyncResult.CREATED;
+				case SKIPPED -> SyncResult.SKIPPED;
+				case UPDATED -> SyncResult.UPDATED;
+			};
 		} catch (RuntimeException exception) {
 			LOG.errorf(exception, "Failed to sync member cId=%d", member.cId());
 			throw exception;

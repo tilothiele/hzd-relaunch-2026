@@ -6,7 +6,8 @@ import java.util.List;
 public interface DogSyncPort {
 	enum SyncResult {
 		CREATED,
-		UPDATED
+		UPDATED,
+		SKIPPED
 	}
 
 	record BreederPreparationResult(int breedersCreated) {
@@ -16,6 +17,10 @@ public interface DogSyncPort {
 	}
 
 	BreederPreparationResult prepareBreeders(List<Dog> dogs);
+
+	void setPreviousDogs(List<Dog> dogs);
+
+	void clearPreviousDogs();
 
 	SyncResult sync(Dog dog);
 }

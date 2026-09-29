@@ -193,7 +193,10 @@ class StrapiPayloadMapperTest {
 		assertEquals("S", payload.get("BreederRole"));
 		assertEquals("DRB Max Mustermann", payload.get("kennelName"));
 		assertEquals(address, payload.get("Address"));
-		assertTrue(!payload.containsKey("member"));
+		assertEquals(
+			java.util.List.of("owner-doc-1"),
+			((Map<?, ?>) payload.get("member")).get("connect")
+		);
 		assertEquals(
 			java.util.List.of("owner-doc-1"),
 			((Map<?, ?>) payload.get("owner_members")).get("connect")
@@ -468,5 +471,93 @@ class StrapiPayloadMapperTest {
 		Map<String, Object> payload = StrapiPayloadMapper.toUserInsertInput(member, config, 2);
 		assertEquals("c.42@hovawarte.com", payload.get("email"));
 		assertTrue(payload.containsKey("password"));
+	}
+
+	@Test
+	void requiresUserUpdateOnlyWhenUpdatePayloadChanges() {
+		Member previous = breederMember(Optional.empty());
+		assertTrue(StrapiPayloadMapper.requiresUserUpdate(null, previous, 2));
+		assertTrue(!StrapiPayloadMapper.requiresUserUpdate(previous, previous, 2));
+		assertTrue(!StrapiPayloadMapper.requiresUserUpdate(
+			previous,
+			copyMember(previous, previous.lastName(), Optional.of("Neuer Zwinger")),
+			2
+		));
+		assertTrue(StrapiPayloadMapper.requiresUserUpdate(
+			previous,
+			copyMember(previous, Optional.of("Anders"), previous.breedingStation()),
+			2
+		));
+	}
+
+	@Test
+	void requiresDogUpdateOnlyWhenUpdatePayloadChanges() {
+		Dog previous = sampleDog(Optional.of("Do It Again"), Optional.of("Enormous"));
+		assertTrue(StrapiPayloadMapper.requiresDogUpdate(null, previous));
+		assertTrue(!StrapiPayloadMapper.requiresDogUpdate(previous, previous));
+		assertTrue(!StrapiPayloadMapper.requiresDogUpdate(
+			previous,
+			sampleDog(Optional.of("Do It Again"), Optional.of("Anderer Zwinger"))
+		));
+		assertTrue(StrapiPayloadMapper.requiresDogUpdate(
+			previous,
+			sampleDog(Optional.of("Neuer Rufname"), Optional.of("Enormous"))
+		));
+	}
+
+	private Member copyMember(Member member, Optional<String> lastName, Optional<String> breedingStation) {
+		return new Member(
+			member.cId(),
+			member.cFlagAccess(),
+			member.title(),
+			member.firstName(),
+			lastName,
+			member.address1(),
+			member.zip(),
+			member.city(),
+			member.region(),
+			member.countryCode(),
+			member.phone(),
+			member.email(),
+			member.sex(),
+			member.cFlagBreeder(),
+			member.membershipNumber(),
+			breedingStation,
+			member.dateOfBirth(),
+			member.dateOfDeath(),
+			member.memberSince(),
+			member.cancellationOn(),
+			member.isActiveBreeder(),
+			member.publishMyData(),
+			member.documentId(),
+			member.id()
+		);
+	}
+
+	private Dog sampleDog(Optional<String> givenName, Optional<String> breederKennelName) {
+		return new Dog(
+			23824,
+			givenName,
+			Optional.of("Enormous Do It Again"),
+			Optional.of(7402),
+			Optional.of(10745),
+			Optional.of("616093901903935"),
+			Optional.of(DogSex.F),
+			Optional.of(LocalDate.of(2022, 5, 24)),
+			Optional.empty(),
+			Optional.of(true),
+			Optional.of(DogHd.B1),
+			Optional.of(DogSod1.N_N),
+			Optional.of(true),
+			Optional.of(true),
+			Optional.of(true),
+			Optional.of(DogColor.B),
+			Optional.of("PKR.II-156446"),
+			Optional.of("CMKU/HW/7794/14"),
+			Optional.of("PKR. II-129361"),
+			Optional.of("Show notes"),
+			Optional.of("Verhalten III"),
+			breederKennelName
+		);
 	}
 }

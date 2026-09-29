@@ -5,6 +5,7 @@ import de.hzd.importer.domain.Dog;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.jboss.logging.Logger;
@@ -22,15 +23,33 @@ public class StrapiDogAdapter {
 
 	private final Map<Integer, String> documentIdsByCId = new HashMap<>();
 	private final Map<Integer, JsonNode> dogNodesByCId = new HashMap<>();
+	private Map<Integer, Dog> previousDogsByCId = Map.of();
 
 	public enum UpsertResult {
 		CREATED,
-		UPDATED
+		UPDATED,
+		SKIPPED
 	}
 
 	public void clearCache() {
 		documentIdsByCId.clear();
 		dogNodesByCId.clear();
+	}
+
+	public void setPreviousDogs(List<Dog> dogs) {
+		if (dogs == null) {
+			previousDogsByCId = Map.of();
+			return;
+		}
+		Map<Integer, Dog> indexed = new HashMap<>();
+		for (Dog dog : dogs) {
+			indexed.putIfAbsent(dog.cId(), dog);
+		}
+		previousDogsByCId = indexed;
+	}
+
+	public void clearPreviousDogs() {
+		previousDogsByCId = Map.of();
 	}
 
 	public boolean ensureStudBreeder(int breederCId, Optional<String> ownerMemberDocumentId) {
@@ -109,6 +128,10 @@ public class StrapiDogAdapter {
 		return client.findDocumentIdByCId(StrapiResources.USERS, ownerCId);
 	}
 
+	private boolean dogUpdateRequired(Dog dog) {
+		return StrapiPayloadMapper.requiresDogUpdate(previousDogsByCId.get(dog.cId()), dog);
+	}
+
 	public UpsertResult upsert(Dog dog, Optional<String> breederDocumentId) {
 		boolean ownerResolvable = dog.ownerId().flatMap(this::findOwnerDocumentId).isPresent();
 		boolean breederResolvable = dog.breederId()
@@ -120,6 +143,9 @@ public class StrapiDogAdapter {
 		Optional<JsonNode> existing = findDogNode(dog.cId());
 		Optional<String> existingId = existing.flatMap(StrapiResponseReader::readResourceId);
 		if (existingId.isPresent()) {
+			if (!dogUpdateRequired(dog)) {
+				return UpsertResult.SKIPPED;
+			}
 			updateDog(
 				dog.cId(),
 				existingId.get(),
@@ -163,6 +189,9 @@ public class StrapiDogAdapter {
 				"Dog cId=%d already exists, retrying as update",
 				dog.cId()
 			);
+			if (!dogUpdateRequired(dog)) {
+				return UpsertResult.SKIPPED;
+			}
 			updateDog(
 				dog.cId(),
 				resolvedId.get(),
