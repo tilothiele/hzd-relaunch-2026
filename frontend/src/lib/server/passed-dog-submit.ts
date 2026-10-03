@@ -41,6 +41,32 @@ function apiOptions() {
 	}
 }
 
+async function sendTotmeldungNotification(
+	passedDogId: string | number,
+): Promise<void> {
+	const response = await fetch(
+		`${getStrapiPublicBaseUrl()}/api/send-totmeldung`,
+		{
+			method: 'POST',
+			headers: {
+				Accept: 'application/json',
+				Authorization: `Bearer ${getStrapiApiToken()}`,
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				'passed-dog-id': passedDogId,
+			}),
+			cache: 'no-store',
+		},
+	)
+	if (!response.ok) {
+		const detail = await response.text()
+		throw new Error(
+			detail || `Totmeldung konnte nicht gesendet werden (${response.status}).`,
+		)
+	}
+}
+
 function asTrimmedString(value: FormDataEntryValue | null): string {
 	return typeof value === 'string' ? value.trim() : ''
 }
@@ -212,7 +238,21 @@ export async function createPassedDogFromForm(
 			data.Avatar = avatarId
 		}
 
-		await createEntity('passed-dogs', data, apiOptions())
+		const created = await createEntity<{
+			documentId?: string
+			id?: number
+		}>('passed-dogs', data, apiOptions())
+		const passedDogId = created?.documentId || created?.id
+		if (passedDogId) {
+			try {
+				await sendTotmeldungNotification(passedDogId)
+			} catch (mailError) {
+				console.error(
+					'PassedDog gespeichert, Totmeldung fehlgeschlagen:',
+					mailError,
+				)
+			}
+		}
 		return { ok: true }
 	} catch (err) {
 		return {

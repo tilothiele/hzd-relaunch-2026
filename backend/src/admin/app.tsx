@@ -38,6 +38,11 @@ export default {
       // 'zh-Hans',
       // 'zh',
     ],
+    translations: {
+      de: {
+        'content-manager.plugin.name': 'Content-Manager',
+      },
+    },
     auth: {
       logo: isTest ? TestLogo : Logo
     },
