@@ -100,6 +100,26 @@ const toTriStateBool = (value: unknown): boolean | null => {
 	return null
 }
 
+/**
+ * Ja: nur explizit true.
+ * Nein: false oder nicht gesetzt. Fehlende Untersuchungen liegen als null vor,
+ * nicht als false, und gehören zur Differenz gegenüber Ja.
+ */
+const pushTriStateCondition = (
+	conditions: Array<Record<string, unknown>>,
+	field: 'EyesCheck' | 'HeartCheck' | 'ColorCheck',
+	value: boolean | null,
+) => {
+	if (value === null) return
+	if (value) {
+		conditions.push({ [field]: { $eq: true } })
+		return
+	}
+	conditions.push({
+		$or: [{ [field]: { $eq: false } }, { [field]: { $null: true } }],
+	})
+}
+
 const PEDIGREE_SELECT = [
 	'id',
 	'documentId',
@@ -307,12 +327,9 @@ const toFilterConditions = async (
 		conditions.push({ SOD1: { $eq: sod1 as SOD1Value } })
 	}
 
-	const eyes = toTriStateBool(query.eyesCheck)
-	if (eyes !== null) conditions.push({ EyesCheck: { $eq: eyes } })
-	const heart = toTriStateBool(query.heartCheck)
-	if (heart !== null) conditions.push({ HeartCheck: { $eq: heart } })
-	const colorCheck = toTriStateBool(query.colorCheck)
-	if (colorCheck !== null) conditions.push({ ColorCheck: { $eq: colorCheck } })
+	pushTriStateCondition(conditions, 'EyesCheck', toTriStateBool(query.eyesCheck))
+	pushTriStateCondition(conditions, 'HeartCheck', toTriStateBool(query.heartCheck))
+	pushTriStateCondition(conditions, 'ColorCheck', toTriStateBool(query.colorCheck))
 
 	// Besitzer / Züchter
 	const ownerCIds = toStringArray(query.ownerCIds)

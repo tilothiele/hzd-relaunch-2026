@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
 import Image from 'next/image'
 import type { ImageGallerySection, Image as ImageType } from '@/types'
@@ -14,12 +15,48 @@ interface ImageGallerySectionComponentProps {
 	theme: ThemeDefinition
 }
 
+function renderGalleryImage(
+	image: ImageType,
+	index: number,
+	strapiBaseUrl: string,
+) {
+	const url = resolveMediaUrl(image, strapiBaseUrl)
+	if (!url) return null
+
+	return (
+		<div
+			key={image.url || index}
+			className='group overflow-hidden rounded-xl bg-white shadow-sm transition-all duration-300 hover:shadow-xl'
+		>
+			<Image
+				src={url}
+				alt={image.alternativeText ?? 'Gallerie Bild'}
+				width={image.width ?? 800}
+				height={image.height ?? 600}
+				className='h-auto w-full transition-transform duration-500 group-hover:scale-110'
+				unoptimized
+				sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+			/>
+			{image.caption ? (
+				<div className='absolute inset-x-0 bottom-0 translate-y-full bg-black/60 p-4 text-white transition-transform duration-300 group-hover:translate-y-0'>
+					<p className='text-sm'>{image.caption}</p>
+				</div>
+			) : null}
+		</div>
+	)
+}
+
 export function ImageGallerySectionComponent({
 	section,
 	strapiBaseUrl,
 	theme,
 }: ImageGallerySectionComponentProps) {
+	const [isMasonryMounted, setIsMasonryMounted] = useState(false)
 	const { elementRef, opacity } = useScrollLinkedFade(30)
+
+	useEffect(() => {
+		setIsMasonryMounted(true)
+	}, [])
 
 	const images = section.GalleryImages?.filter(
 		(image): image is ImageType => Boolean(image),
@@ -55,40 +92,27 @@ export function ImageGallerySectionComponent({
 					</h2>
 				) : null}
 
-				<div suppressHydrationWarning>
+				{isMasonryMounted ? (
 					<ResponsiveMasonry
 						columnsCountBreakPoints={{ 350: 1, 640: 2, 1024: 3 }}
 					>
 						<Masonry gutter='20px'>
-							{images.map((image, index) => {
-								const url = resolveMediaUrl(image, strapiBaseUrl)
-								if (!url) return null
-
-								return (
-									<div
-										key={image.url || index}
-										className='group overflow-hidden rounded-xl bg-white shadow-sm transition-all duration-300 hover:shadow-xl'
-									>
-										<Image
-											src={url}
-											alt={image.alternativeText ?? 'Gallerie Bild'}
-											width={image.width ?? 800}
-											height={image.height ?? 600}
-											className='h-auto w-full transition-transform duration-500 group-hover:scale-110'
-											unoptimized
-											sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
-										/>
-										{image.caption && (
-											<div className='absolute inset-x-0 bottom-0 translate-y-full bg-black/60 p-4 text-white transition-transform duration-300 group-hover:translate-y-0'>
-												<p className='text-sm'>{image.caption}</p>
-											</div>
-										)}
-									</div>
-								)
-							})}
+							{images.map((image, index) => renderGalleryImage(
+								image,
+								index,
+								strapiBaseUrl,
+							))}
 						</Masonry>
 					</ResponsiveMasonry>
-				</div>
+				) : (
+					<div className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3'>
+						{images.map((image, index) => renderGalleryImage(
+							image,
+							index,
+							strapiBaseUrl,
+						))}
+					</div>
+				)}
 			</div>
 		</SectionContainer>
 	)
