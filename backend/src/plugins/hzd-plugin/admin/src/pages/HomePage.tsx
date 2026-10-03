@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import { getTranslation } from '../utils/getTranslation';
+import { ChromosoftImportPanel } from './ChromosoftImportPanel';
 import { LitterReminderPanel } from './LitterReminderPanel';
 
 const HomePage = () => {
@@ -59,7 +60,7 @@ const HomePage = () => {
   return (
     <Main>
       <Box padding={10}>
-        <Flex direction="column" alignItems="flex-start" gap={6}>
+        <Flex direction="column" alignItems="stretch" gap={6}>
           <Box>
             <Typography tag="h1" variant="alpha">
               {formatMessage({
@@ -84,6 +85,7 @@ const HomePage = () => {
             hasRadius
             padding={6}
             shadow="tableShadow"
+            width="100%"
           >
             <Flex direction="column" alignItems="flex-start" gap={4}>
               <Box>
@@ -128,6 +130,7 @@ const HomePage = () => {
             hasRadius
             padding={6}
             shadow="tableShadow"
+            width="100%"
           >
             <Flex direction="column" alignItems="flex-start" gap={4}>
               <Box>
@@ -165,6 +168,8 @@ const HomePage = () => {
               </Button>
             </Flex>
           </Box>
+
+          <ChromosoftImportPanel />
 
           <LitterReminderPanel />
         </Flex>

@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-10-03T11:54:02.928Z"
+    "x-generation-date": "2026-10-03T21:11:34.759Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -4164,6 +4164,1038 @@
           }
         ],
         "operationId": "delete/contact-groups/{id}"
+      }
+    },
+    "/cs-dogs": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CsDogListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Cs-dog"
+        ],
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort by attributes ascending (asc) or descending (desc)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pagination[withCount]",
+            "in": "query",
+            "description": "Return page/pageSize (default: true)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "pagination[page]",
+            "in": "query",
+            "description": "Page number (default: 0)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pagination[pageSize]",
+            "in": "query",
+            "description": "Page size (default: 25)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pagination[start]",
+            "in": "query",
+            "description": "Offset value (default: 0)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pagination[limit]",
+            "in": "query",
+            "description": "Number of entities to return (default: 25)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Fields to return (ex: title,author)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "populate",
+            "in": "query",
+            "description": "Relations to return",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "description": "Filters to apply",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "style": "deepObject"
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "description": "Locale to apply",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "get/cs-dogs"
+      },
+      "post": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CsDogResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Cs-dog"
+        ],
+        "parameters": [],
+        "operationId": "post/cs-dogs",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CsDogRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cs-dogs/{id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CsDogResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Cs-dog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "deprecated": false,
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "get/cs-dogs/{id}"
+      },
+      "put": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CsDogResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Cs-dog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "deprecated": false,
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "put/cs-dogs/{id}",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CsDogRequest"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Cs-dog"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "deprecated": false,
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "delete/cs-dogs/{id}"
+      }
+    },
+    "/cs-members": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CsMemberListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Cs-member"
+        ],
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort by attributes ascending (asc) or descending (desc)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "pagination[withCount]",
+            "in": "query",
+            "description": "Return page/pageSize (default: true)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "pagination[page]",
+            "in": "query",
+            "description": "Page number (default: 0)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pagination[pageSize]",
+            "in": "query",
+            "description": "Page size (default: 25)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pagination[start]",
+            "in": "query",
+            "description": "Offset value (default: 0)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pagination[limit]",
+            "in": "query",
+            "description": "Number of entities to return (default: 25)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Fields to return (ex: title,author)",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "populate",
+            "in": "query",
+            "description": "Relations to return",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "description": "Filters to apply",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "style": "deepObject"
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "description": "Locale to apply",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "get/cs-members"
+      },
+      "post": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CsMemberResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Cs-member"
+        ],
+        "parameters": [],
+        "operationId": "post/cs-members",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CsMemberRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/cs-members/{id}": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CsMemberResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Cs-member"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "deprecated": false,
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "get/cs-members/{id}"
+      },
+      "put": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CsMemberResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Cs-member"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "deprecated": false,
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "put/cs-members/{id}",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CsMemberRequest"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int64"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Cs-member"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "",
+            "deprecated": false,
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "operationId": "delete/cs-members/{id}"
       }
     },
     "/forms": {
@@ -40825,6 +41857,4883 @@
           }
         }
       },
+      "CsDogRequest": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "required": [
+              "Generation"
+            ],
+            "type": "object",
+            "properties": {
+              "Generation": {
+                "type": "integer"
+              },
+              "IdAnimal": {
+                "type": "string"
+              },
+              "GivenName": {
+                "type": "string"
+              },
+              "NameOfBreedingStation": {
+                "type": "string"
+              },
+              "FullName": {
+                "type": "string"
+              },
+              "IdBreeder": {
+                "type": "string"
+              },
+              "IdOwner": {
+                "type": "string"
+              },
+              "FullnameSire": {
+                "type": "string"
+              },
+              "StudbookNumberSire": {
+                "type": "string"
+              },
+              "FullnameDam": {
+                "type": "string"
+              },
+              "StudbookNumberDam": {
+                "type": "string"
+              },
+              "Studbook": {
+                "type": "string"
+              },
+              "StudbookNumber": {
+                "type": "string"
+              },
+              "ChipNumber": {
+                "type": "string"
+              },
+              "Sex": {
+                "type": "string"
+              },
+              "DateOfBirth": {
+                "type": "string"
+              },
+              "DateOfDeath": {
+                "type": "string"
+              },
+              "Fertile": {
+                "type": "string"
+              },
+              "Color": {
+                "type": "string"
+              },
+              "HdG": {
+                "type": "string"
+              },
+              "HdGDate": {
+                "type": "string"
+              },
+              "HdGAge": {
+                "type": "string"
+              },
+              "Hd": {
+                "type": "string"
+              },
+              "HdDate": {
+                "type": "string"
+              },
+              "HdAge": {
+                "type": "string"
+              },
+              "Zaehne": {
+                "type": "string"
+              },
+              "ZaehneDate": {
+                "type": "string"
+              },
+              "ZaehneAge": {
+                "type": "string"
+              },
+              "Gebiss": {
+                "type": "string"
+              },
+              "GebissDate": {
+                "type": "string"
+              },
+              "GebissAge": {
+                "type": "string"
+              },
+              "Nabel": {
+                "type": "string"
+              },
+              "NabelDate": {
+                "type": "string"
+              },
+              "NabelAge": {
+                "type": "string"
+              },
+              "GentestSod1": {
+                "type": "string"
+              },
+              "GentestSod1Date": {
+                "type": "string"
+              },
+              "GentestSod1Age": {
+                "type": "string"
+              },
+              "Schilddruesentest": {
+                "type": "string"
+              },
+              "SchilddruesentestDate": {
+                "type": "string"
+              },
+              "SchilddruesentestAge": {
+                "type": "string"
+              },
+              "Herzuntersuchung": {
+                "type": "string"
+              },
+              "HerzuntersuchungDate": {
+                "type": "string"
+              },
+              "HerzuntersuchungAge": {
+                "type": "string"
+              },
+              "HerzuntersuchungKeinZertifizierterArztDesCc": {
+                "type": "string"
+              },
+              "HerzuntersuchungKeinZertifizierterArztDesCcDate": {
+                "type": "string"
+              },
+              "HerzuntersuchungKeinZertifizierterArztDesCcAge": {
+                "type": "string"
+              },
+              "Augenuntersuchung": {
+                "type": "string"
+              },
+              "AugenuntersuchungDate": {
+                "type": "string"
+              },
+              "AugenuntersuchungAge": {
+                "type": "string"
+              },
+              "Anaplasmose": {
+                "type": "string"
+              },
+              "AnaplasmoseDate": {
+                "type": "string"
+              },
+              "AnaplasmoseAge": {
+                "type": "string"
+              },
+              "Aortenstenose": {
+                "type": "string"
+              },
+              "AortenstenoseDate": {
+                "type": "string"
+              },
+              "AortenstenoseAge": {
+                "type": "string"
+              },
+              "Arthrose": {
+                "type": "string"
+              },
+              "ArthroseDate": {
+                "type": "string"
+              },
+              "ArthroseAge": {
+                "type": "string"
+              },
+              "Autoimmunerkrankung": {
+                "type": "string"
+              },
+              "AutoimmunerkrankungDate": {
+                "type": "string"
+              },
+              "AutoimmunerkrankungAge": {
+                "type": "string"
+              },
+              "Babesiose": {
+                "type": "string"
+              },
+              "BabesioseDate": {
+                "type": "string"
+              },
+              "BabesioseAge": {
+                "type": "string"
+              },
+              "Bandscheibenvorfall": {
+                "type": "string"
+              },
+              "BandscheibenvorfallDate": {
+                "type": "string"
+              },
+              "BandscheibenvorfallAge": {
+                "type": "string"
+              },
+              "Borreliose": {
+                "type": "string"
+              },
+              "BorrelioseDate": {
+                "type": "string"
+              },
+              "BorrelioseAge": {
+                "type": "string"
+              },
+              "CaudaEquina": {
+                "type": "string"
+              },
+              "CaudaEquinaDate": {
+                "type": "string"
+              },
+              "CaudaEquinaAge": {
+                "type": "string"
+              },
+              "Dermoid": {
+                "type": "string"
+              },
+              "DermoidDate": {
+                "type": "string"
+              },
+              "DermoidAge": {
+                "type": "string"
+              },
+              "DilativeKardiomyopathieDcm": {
+                "type": "string"
+              },
+              "DilativeKardiomyopathieDcmDate": {
+                "type": "string"
+              },
+              "DilativeKardiomyopathieDcmAge": {
+                "type": "string"
+              },
+              "Diabetes": {
+                "type": "string"
+              },
+              "DiabetesDate": {
+                "type": "string"
+              },
+              "DiabetesAge": {
+                "type": "string"
+              },
+              "DmGesichert": {
+                "type": "string"
+              },
+              "DmGesichertDate": {
+                "type": "string"
+              },
+              "DmGesichertAge": {
+                "type": "string"
+              },
+              "DmVerdacht": {
+                "type": "string"
+              },
+              "DmVerdachtDate": {
+                "type": "string"
+              },
+              "DmVerdachtAge": {
+                "type": "string"
+              },
+              "DiversitaetDla": {
+                "type": "string"
+              },
+              "DiversitaetDlaDate": {
+                "type": "string"
+              },
+              "DiversitaetDlaAge": {
+                "type": "string"
+              },
+              "DnaProfil": {
+                "type": "string"
+              },
+              "DnaProfilDate": {
+                "type": "string"
+              },
+              "DnaProfilAge": {
+                "type": "string"
+              },
+              "EllbogendysplasieEd": {
+                "type": "string"
+              },
+              "EllbogendysplasieEdDate": {
+                "type": "string"
+              },
+              "EllbogendysplasieEdAge": {
+                "type": "string"
+              },
+              "EllenbogendysplasieEd": {
+                "type": "string"
+              },
+              "EllenbogendysplasieEdDate": {
+                "type": "string"
+              },
+              "EllenbogendysplasieEdAge": {
+                "type": "string"
+              },
+              "Epilepsie": {
+                "type": "string"
+              },
+              "EpilepsieDate": {
+                "type": "string"
+              },
+              "EpilepsieAge": {
+                "type": "string"
+              },
+              "DLokus": {
+                "type": "string"
+              },
+              "DLokusDate": {
+                "type": "string"
+              },
+              "DLokusAge": {
+                "type": "string"
+              },
+              "Fellabweichung": {
+                "type": "string"
+              },
+              "FellabweichungDate": {
+                "type": "string"
+              },
+              "FellabweichungAge": {
+                "type": "string"
+              },
+              "Gallensaeuretest": {
+                "type": "string"
+              },
+              "GallensaeuretestDate": {
+                "type": "string"
+              },
+              "GallensaeuretestAge": {
+                "type": "string"
+              },
+              "Gaumenspalte": {
+                "type": "string"
+              },
+              "GaumenspalteDate": {
+                "type": "string"
+              },
+              "GaumenspalteAge": {
+                "type": "string"
+              },
+              "HereditaereKataraktHc": {
+                "type": "string"
+              },
+              "HereditaereKataraktHcDate": {
+                "type": "string"
+              },
+              "HereditaereKataraktHcAge": {
+                "type": "string"
+              },
+              "HinterhandschwaecheUnspez": {
+                "type": "string"
+              },
+              "HinterhandschwaecheUnspezDate": {
+                "type": "string"
+              },
+              "HinterhandschwaecheUnspezAge": {
+                "type": "string"
+              },
+              "Hydrocephalus": {
+                "type": "string"
+              },
+              "HydrocephalusDate": {
+                "type": "string"
+              },
+              "HydrocephalusAge": {
+                "type": "string"
+              },
+              "HypothyreoseGesichert": {
+                "type": "string"
+              },
+              "HypothyreoseGesichertDate": {
+                "type": "string"
+              },
+              "HypothyreoseGesichertAge": {
+                "type": "string"
+              },
+              "HypothyreoseVerdacht": {
+                "type": "string"
+              },
+              "HypothyreoseVerdachtDate": {
+                "type": "string"
+              },
+              "HypothyreoseVerdachtAge": {
+                "type": "string"
+              },
+              "Infarkt": {
+                "type": "string"
+              },
+              "InfarktDate": {
+                "type": "string"
+              },
+              "InfarktAge": {
+                "type": "string"
+              },
+              "Infektion": {
+                "type": "string"
+              },
+              "InfektionDate": {
+                "type": "string"
+              },
+              "InfektionAge": {
+                "type": "string"
+              },
+              "Kaiserschnitt": {
+                "type": "string"
+              },
+              "KaiserschnittDate": {
+                "type": "string"
+              },
+              "KaiserschnittAge": {
+                "type": "string"
+              },
+              "KardiologischeErkrankungen": {
+                "type": "string"
+              },
+              "KardiologischeErkrankungenDate": {
+                "type": "string"
+              },
+              "KardiologischeErkrankungenAge": {
+                "type": "string"
+              },
+              "Kehlkopflaehmung": {
+                "type": "string"
+              },
+              "KehlkopflaehmungDate": {
+                "type": "string"
+              },
+              "KehlkopflaehmungAge": {
+                "type": "string"
+              },
+              "Lebershunt": {
+                "type": "string"
+              },
+              "LebershuntDate": {
+                "type": "string"
+              },
+              "LebershuntAge": {
+                "type": "string"
+              },
+              "Leptospirose": {
+                "type": "string"
+              },
+              "LeptospiroseDate": {
+                "type": "string"
+              },
+              "LeptospiroseAge": {
+                "type": "string"
+              },
+              "Lungenerkrankung": {
+                "type": "string"
+              },
+              "LungenerkrankungDate": {
+                "type": "string"
+              },
+              "LungenerkrankungAge": {
+                "type": "string"
+              },
+              "Magendrehung": {
+                "type": "string"
+              },
+              "MagendrehungDate": {
+                "type": "string"
+              },
+              "MagendrehungAge": {
+                "type": "string"
+              },
+              "Milzdrehung": {
+                "type": "string"
+              },
+              "MilzdrehungDate": {
+                "type": "string"
+              },
+              "MilzdrehungAge": {
+                "type": "string"
+              },
+              "MorbusCushing": {
+                "type": "string"
+              },
+              "MorbusCushingDate": {
+                "type": "string"
+              },
+              "MorbusCushingAge": {
+                "type": "string"
+              },
+              "NeurologischeErkrankungen": {
+                "type": "string"
+              },
+              "NeurologischeErkrankungenDate": {
+                "type": "string"
+              },
+              "NeurologischeErkrankungenAge": {
+                "type": "string"
+              },
+              "NeurologischeErkrankung": {
+                "type": "string"
+              },
+              "NeurologischeErkrankungDate": {
+                "type": "string"
+              },
+              "NeurologischeErkrankungAge": {
+                "type": "string"
+              },
+              "Nierenerkrankung": {
+                "type": "string"
+              },
+              "NierenerkrankungDate": {
+                "type": "string"
+              },
+              "NierenerkrankungAge": {
+                "type": "string"
+              },
+              "Osteomyelitis": {
+                "type": "string"
+              },
+              "OsteomyelitisDate": {
+                "type": "string"
+              },
+              "OsteomyelitisAge": {
+                "type": "string"
+              },
+              "OsteochondrosisDissecansOcd": {
+                "type": "string"
+              },
+              "OsteochondrosisDissecansOcdDate": {
+                "type": "string"
+              },
+              "OsteochondrosisDissecansOcdAge": {
+                "type": "string"
+              },
+              "PersistPupillarmembranMpp": {
+                "type": "string"
+              },
+              "PersistPupillarmembranMppDate": {
+                "type": "string"
+              },
+              "PersistPupillarmembranMppAge": {
+                "type": "string"
+              },
+              "Pneumothorax": {
+                "type": "string"
+              },
+              "PneumothoraxDate": {
+                "type": "string"
+              },
+              "PneumothoraxAge": {
+                "type": "string"
+              },
+              "Pyometra": {
+                "type": "string"
+              },
+              "PyometraDate": {
+                "type": "string"
+              },
+              "PyometraAge": {
+                "type": "string"
+              },
+              "RuedeHatInDerHzdGedeckt": {
+                "type": "string"
+              },
+              "RuedeHatInDerHzdGedecktDate": {
+                "type": "string"
+              },
+              "RuedeHatInDerHzdGedecktAge": {
+                "type": "string"
+              },
+              "Rute": {
+                "type": "string"
+              },
+              "RuteDate": {
+                "type": "string"
+              },
+              "RuteAge": {
+                "type": "string"
+              },
+              "Rutenanomalie": {
+                "type": "string"
+              },
+              "RutenanomalieDate": {
+                "type": "string"
+              },
+              "RutenanomalieAge": {
+                "type": "string"
+              },
+              "VerdachtAufRutenanomalie": {
+                "type": "string"
+              },
+              "VerdachtAufRutenanomalieDate": {
+                "type": "string"
+              },
+              "VerdachtAufRutenanomalieAge": {
+                "type": "string"
+              },
+              "Sebadenitis": {
+                "type": "string"
+              },
+              "SebadenitisDate": {
+                "type": "string"
+              },
+              "SebadenitisAge": {
+                "type": "string"
+              },
+              "Sepsis": {
+                "type": "string"
+              },
+              "SepsisDate": {
+                "type": "string"
+              },
+              "SepsisAge": {
+                "type": "string"
+              },
+              "Spondylose": {
+                "type": "string"
+              },
+              "SpondyloseDate": {
+                "type": "string"
+              },
+              "SpondyloseAge": {
+                "type": "string"
+              },
+              "TumorDarm": {
+                "type": "string"
+              },
+              "TumorDarmDate": {
+                "type": "string"
+              },
+              "TumorDarmAge": {
+                "type": "string"
+              },
+              "TumorHirn": {
+                "type": "string"
+              },
+              "TumorHirnDate": {
+                "type": "string"
+              },
+              "TumorHirnAge": {
+                "type": "string"
+              },
+              "TumorKnochen": {
+                "type": "string"
+              },
+              "TumorKnochenDate": {
+                "type": "string"
+              },
+              "TumorKnochenAge": {
+                "type": "string"
+              },
+              "TumorLeber": {
+                "type": "string"
+              },
+              "TumorLeberDate": {
+                "type": "string"
+              },
+              "TumorLeberAge": {
+                "type": "string"
+              },
+              "TumorLunge": {
+                "type": "string"
+              },
+              "TumorLungeDate": {
+                "type": "string"
+              },
+              "TumorLungeAge": {
+                "type": "string"
+              },
+              "TumorMagen": {
+                "type": "string"
+              },
+              "TumorMagenDate": {
+                "type": "string"
+              },
+              "TumorMagenAge": {
+                "type": "string"
+              },
+              "TumorMamma": {
+                "type": "string"
+              },
+              "TumorMammaDate": {
+                "type": "string"
+              },
+              "TumorMammaAge": {
+                "type": "string"
+              },
+              "TumorMilz": {
+                "type": "string"
+              },
+              "TumorMilzDate": {
+                "type": "string"
+              },
+              "TumorMilzAge": {
+                "type": "string"
+              },
+              "TumorPankreas": {
+                "type": "string"
+              },
+              "TumorPankreasDate": {
+                "type": "string"
+              },
+              "TumorPankreasAge": {
+                "type": "string"
+              },
+              "TumorUnspezAndereKarzinogeneErkr": {
+                "type": "string"
+              },
+              "TumorUnspezAndereKarzinogeneErkrDate": {
+                "type": "string"
+              },
+              "TumorUnspezAndereKarzinogeneErkrAge": {
+                "type": "string"
+              },
+              "Wurfprotokolle": {
+                "type": "string"
+              },
+              "WurfprotokolleDate": {
+                "type": "string"
+              },
+              "WurfprotokolleAge": {
+                "type": "string"
+              },
+              "VerhaltenIi": {
+                "type": "string"
+              },
+              "VerhaltenIiDate": {
+                "type": "string"
+              },
+              "VerhaltenIiAge": {
+                "type": "string"
+              },
+              "VerhaltenIii": {
+                "type": "string"
+              },
+              "VerhaltenIiiDate": {
+                "type": "string"
+              },
+              "VerhaltenIiiAge": {
+                "type": "string"
+              },
+              "VerhaltenIiiE": {
+                "type": "string"
+              },
+              "VerhaltenIiiEDate": {
+                "type": "string"
+              },
+              "VerhaltenIiiEAge": {
+                "type": "string"
+              },
+              "VerhaltenIiiF": {
+                "type": "string"
+              },
+              "VerhaltenIiiFDate": {
+                "type": "string"
+              },
+              "VerhaltenIiiFAge": {
+                "type": "string"
+              },
+              "VerhaltenIiiZurueckgestellt": {
+                "type": "string"
+              },
+              "VerhaltenIiiZurueckgestelltDate": {
+                "type": "string"
+              },
+              "VerhaltenIiiZurueckgestelltAge": {
+                "type": "string"
+              },
+              "VerhaltenIiiNichtBestanden": {
+                "type": "string"
+              },
+              "VerhaltenIiiNichtBestandenDate": {
+                "type": "string"
+              },
+              "VerhaltenIiiNichtBestandenAge": {
+                "type": "string"
+              },
+              "VerhaltenIiiAbbruch": {
+                "type": "string"
+              },
+              "VerhaltenIiiAbbruchDate": {
+                "type": "string"
+              },
+              "VerhaltenIiiAbbruchAge": {
+                "type": "string"
+              },
+              "VerhaltenIv": {
+                "type": "string"
+              },
+              "VerhaltenIvDate": {
+                "type": "string"
+              },
+              "VerhaltenIvAge": {
+                "type": "string"
+              },
+              "VerhaltenVeteranen": {
+                "type": "string"
+              },
+              "VerhaltenVeteranenDate": {
+                "type": "string"
+              },
+              "VerhaltenVeteranenAge": {
+                "type": "string"
+              },
+              "KoerungHzd": {
+                "type": "string"
+              },
+              "KoerungHzdDate": {
+                "type": "string"
+              },
+              "KoerungHzdAge": {
+                "type": "string"
+              },
+              "KoerungHzdE": {
+                "type": "string"
+              },
+              "KoerungHzdEDate": {
+                "type": "string"
+              },
+              "KoerungHzdEAge": {
+                "type": "string"
+              },
+              "KoerungHzdNichtBestanden": {
+                "type": "string"
+              },
+              "KoerungHzdNichtBestandenDate": {
+                "type": "string"
+              },
+              "KoerungHzdNichtBestandenAge": {
+                "type": "string"
+              },
+              "JugendkoerungHzd": {
+                "type": "string"
+              },
+              "JugendkoerungHzdDate": {
+                "type": "string"
+              },
+              "JugendkoerungHzdAge": {
+                "type": "string"
+              },
+              "Richterbericht": {
+                "type": "string"
+              },
+              "RichterberichtDate": {
+                "type": "string"
+              },
+              "RichterberichtAge": {
+                "type": "string"
+              },
+              "UebernahmeInsHzdZuchtbuch": {
+                "type": "string"
+              },
+              "UebernahmeInsHzdZuchtbuchDate": {
+                "type": "string"
+              },
+              "UebernahmeInsHzdZuchtbuchAge": {
+                "type": "string"
+              },
+              "Zuchtzulassung": {
+                "type": "string"
+              },
+              "ZuchtzulassungDate": {
+                "type": "string"
+              },
+              "ZuchtzulassungAge": {
+                "type": "string"
+              },
+              "ZuchthuendinImZwinger": {
+                "type": "string"
+              },
+              "ZuchthuendinImZwingerDate": {
+                "type": "string"
+              },
+              "ZuchthuendinImZwingerAge": {
+                "type": "string"
+              },
+              "ZuchtzulassungMitAuflagen": {
+                "type": "string"
+              },
+              "ZuchtzulassungMitAuflagenDate": {
+                "type": "string"
+              },
+              "ZuchtzulassungMitAuflagenAge": {
+                "type": "string"
+              },
+              "AnmerkungenSonstBefundeNichtAuswertbar": {
+                "type": "string"
+              },
+              "AnmerkungenSonstBefundeNichtAuswertbarDate": {
+                "type": "string"
+              },
+              "AnmerkungenSonstBefundeNichtAuswertbarAge": {
+                "type": "string"
+              },
+              "Kryptorchide": {
+                "type": "string"
+              },
+              "KryptorchideDate": {
+                "type": "string"
+              },
+              "KryptorchideAge": {
+                "type": "string"
+              },
+              "Monorchide": {
+                "type": "string"
+              },
+              "MonorchideDate": {
+                "type": "string"
+              },
+              "MonorchideAge": {
+                "type": "string"
+              },
+              "TumorHoden": {
+                "type": "string"
+              },
+              "TumorHodenDate": {
+                "type": "string"
+              },
+              "TumorHodenAge": {
+                "type": "string"
+              },
+              "locale": {
+                "type": "string"
+              },
+              "localizations": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ],
+                  "example": "string or id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "CsDogListResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CsDog"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "pagination": {
+                "type": "object",
+                "properties": {
+                  "page": {
+                    "type": "integer"
+                  },
+                  "pageSize": {
+                    "type": "integer",
+                    "minimum": 25
+                  },
+                  "pageCount": {
+                    "type": "integer",
+                    "maximum": 1
+                  },
+                  "total": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "CsDog": {
+        "type": "object",
+        "required": [
+          "Generation"
+        ],
+        "properties": {
+          "id": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "documentId": {
+            "type": "string"
+          },
+          "Generation": {
+            "type": "integer"
+          },
+          "IdAnimal": {
+            "type": "string"
+          },
+          "GivenName": {
+            "type": "string"
+          },
+          "NameOfBreedingStation": {
+            "type": "string"
+          },
+          "FullName": {
+            "type": "string"
+          },
+          "IdBreeder": {
+            "type": "string"
+          },
+          "IdOwner": {
+            "type": "string"
+          },
+          "FullnameSire": {
+            "type": "string"
+          },
+          "StudbookNumberSire": {
+            "type": "string"
+          },
+          "FullnameDam": {
+            "type": "string"
+          },
+          "StudbookNumberDam": {
+            "type": "string"
+          },
+          "Studbook": {
+            "type": "string"
+          },
+          "StudbookNumber": {
+            "type": "string"
+          },
+          "ChipNumber": {
+            "type": "string"
+          },
+          "Sex": {
+            "type": "string"
+          },
+          "DateOfBirth": {
+            "type": "string"
+          },
+          "DateOfDeath": {
+            "type": "string"
+          },
+          "Fertile": {
+            "type": "string"
+          },
+          "Color": {
+            "type": "string"
+          },
+          "HdG": {
+            "type": "string"
+          },
+          "HdGDate": {
+            "type": "string"
+          },
+          "HdGAge": {
+            "type": "string"
+          },
+          "Hd": {
+            "type": "string"
+          },
+          "HdDate": {
+            "type": "string"
+          },
+          "HdAge": {
+            "type": "string"
+          },
+          "Zaehne": {
+            "type": "string"
+          },
+          "ZaehneDate": {
+            "type": "string"
+          },
+          "ZaehneAge": {
+            "type": "string"
+          },
+          "Gebiss": {
+            "type": "string"
+          },
+          "GebissDate": {
+            "type": "string"
+          },
+          "GebissAge": {
+            "type": "string"
+          },
+          "Nabel": {
+            "type": "string"
+          },
+          "NabelDate": {
+            "type": "string"
+          },
+          "NabelAge": {
+            "type": "string"
+          },
+          "GentestSod1": {
+            "type": "string"
+          },
+          "GentestSod1Date": {
+            "type": "string"
+          },
+          "GentestSod1Age": {
+            "type": "string"
+          },
+          "Schilddruesentest": {
+            "type": "string"
+          },
+          "SchilddruesentestDate": {
+            "type": "string"
+          },
+          "SchilddruesentestAge": {
+            "type": "string"
+          },
+          "Herzuntersuchung": {
+            "type": "string"
+          },
+          "HerzuntersuchungDate": {
+            "type": "string"
+          },
+          "HerzuntersuchungAge": {
+            "type": "string"
+          },
+          "HerzuntersuchungKeinZertifizierterArztDesCc": {
+            "type": "string"
+          },
+          "HerzuntersuchungKeinZertifizierterArztDesCcDate": {
+            "type": "string"
+          },
+          "HerzuntersuchungKeinZertifizierterArztDesCcAge": {
+            "type": "string"
+          },
+          "Augenuntersuchung": {
+            "type": "string"
+          },
+          "AugenuntersuchungDate": {
+            "type": "string"
+          },
+          "AugenuntersuchungAge": {
+            "type": "string"
+          },
+          "Anaplasmose": {
+            "type": "string"
+          },
+          "AnaplasmoseDate": {
+            "type": "string"
+          },
+          "AnaplasmoseAge": {
+            "type": "string"
+          },
+          "Aortenstenose": {
+            "type": "string"
+          },
+          "AortenstenoseDate": {
+            "type": "string"
+          },
+          "AortenstenoseAge": {
+            "type": "string"
+          },
+          "Arthrose": {
+            "type": "string"
+          },
+          "ArthroseDate": {
+            "type": "string"
+          },
+          "ArthroseAge": {
+            "type": "string"
+          },
+          "Autoimmunerkrankung": {
+            "type": "string"
+          },
+          "AutoimmunerkrankungDate": {
+            "type": "string"
+          },
+          "AutoimmunerkrankungAge": {
+            "type": "string"
+          },
+          "Babesiose": {
+            "type": "string"
+          },
+          "BabesioseDate": {
+            "type": "string"
+          },
+          "BabesioseAge": {
+            "type": "string"
+          },
+          "Bandscheibenvorfall": {
+            "type": "string"
+          },
+          "BandscheibenvorfallDate": {
+            "type": "string"
+          },
+          "BandscheibenvorfallAge": {
+            "type": "string"
+          },
+          "Borreliose": {
+            "type": "string"
+          },
+          "BorrelioseDate": {
+            "type": "string"
+          },
+          "BorrelioseAge": {
+            "type": "string"
+          },
+          "CaudaEquina": {
+            "type": "string"
+          },
+          "CaudaEquinaDate": {
+            "type": "string"
+          },
+          "CaudaEquinaAge": {
+            "type": "string"
+          },
+          "Dermoid": {
+            "type": "string"
+          },
+          "DermoidDate": {
+            "type": "string"
+          },
+          "DermoidAge": {
+            "type": "string"
+          },
+          "DilativeKardiomyopathieDcm": {
+            "type": "string"
+          },
+          "DilativeKardiomyopathieDcmDate": {
+            "type": "string"
+          },
+          "DilativeKardiomyopathieDcmAge": {
+            "type": "string"
+          },
+          "Diabetes": {
+            "type": "string"
+          },
+          "DiabetesDate": {
+            "type": "string"
+          },
+          "DiabetesAge": {
+            "type": "string"
+          },
+          "DmGesichert": {
+            "type": "string"
+          },
+          "DmGesichertDate": {
+            "type": "string"
+          },
+          "DmGesichertAge": {
+            "type": "string"
+          },
+          "DmVerdacht": {
+            "type": "string"
+          },
+          "DmVerdachtDate": {
+            "type": "string"
+          },
+          "DmVerdachtAge": {
+            "type": "string"
+          },
+          "DiversitaetDla": {
+            "type": "string"
+          },
+          "DiversitaetDlaDate": {
+            "type": "string"
+          },
+          "DiversitaetDlaAge": {
+            "type": "string"
+          },
+          "DnaProfil": {
+            "type": "string"
+          },
+          "DnaProfilDate": {
+            "type": "string"
+          },
+          "DnaProfilAge": {
+            "type": "string"
+          },
+          "EllbogendysplasieEd": {
+            "type": "string"
+          },
+          "EllbogendysplasieEdDate": {
+            "type": "string"
+          },
+          "EllbogendysplasieEdAge": {
+            "type": "string"
+          },
+          "EllenbogendysplasieEd": {
+            "type": "string"
+          },
+          "EllenbogendysplasieEdDate": {
+            "type": "string"
+          },
+          "EllenbogendysplasieEdAge": {
+            "type": "string"
+          },
+          "Epilepsie": {
+            "type": "string"
+          },
+          "EpilepsieDate": {
+            "type": "string"
+          },
+          "EpilepsieAge": {
+            "type": "string"
+          },
+          "DLokus": {
+            "type": "string"
+          },
+          "DLokusDate": {
+            "type": "string"
+          },
+          "DLokusAge": {
+            "type": "string"
+          },
+          "Fellabweichung": {
+            "type": "string"
+          },
+          "FellabweichungDate": {
+            "type": "string"
+          },
+          "FellabweichungAge": {
+            "type": "string"
+          },
+          "Gallensaeuretest": {
+            "type": "string"
+          },
+          "GallensaeuretestDate": {
+            "type": "string"
+          },
+          "GallensaeuretestAge": {
+            "type": "string"
+          },
+          "Gaumenspalte": {
+            "type": "string"
+          },
+          "GaumenspalteDate": {
+            "type": "string"
+          },
+          "GaumenspalteAge": {
+            "type": "string"
+          },
+          "HereditaereKataraktHc": {
+            "type": "string"
+          },
+          "HereditaereKataraktHcDate": {
+            "type": "string"
+          },
+          "HereditaereKataraktHcAge": {
+            "type": "string"
+          },
+          "HinterhandschwaecheUnspez": {
+            "type": "string"
+          },
+          "HinterhandschwaecheUnspezDate": {
+            "type": "string"
+          },
+          "HinterhandschwaecheUnspezAge": {
+            "type": "string"
+          },
+          "Hydrocephalus": {
+            "type": "string"
+          },
+          "HydrocephalusDate": {
+            "type": "string"
+          },
+          "HydrocephalusAge": {
+            "type": "string"
+          },
+          "HypothyreoseGesichert": {
+            "type": "string"
+          },
+          "HypothyreoseGesichertDate": {
+            "type": "string"
+          },
+          "HypothyreoseGesichertAge": {
+            "type": "string"
+          },
+          "HypothyreoseVerdacht": {
+            "type": "string"
+          },
+          "HypothyreoseVerdachtDate": {
+            "type": "string"
+          },
+          "HypothyreoseVerdachtAge": {
+            "type": "string"
+          },
+          "Infarkt": {
+            "type": "string"
+          },
+          "InfarktDate": {
+            "type": "string"
+          },
+          "InfarktAge": {
+            "type": "string"
+          },
+          "Infektion": {
+            "type": "string"
+          },
+          "InfektionDate": {
+            "type": "string"
+          },
+          "InfektionAge": {
+            "type": "string"
+          },
+          "Kaiserschnitt": {
+            "type": "string"
+          },
+          "KaiserschnittDate": {
+            "type": "string"
+          },
+          "KaiserschnittAge": {
+            "type": "string"
+          },
+          "KardiologischeErkrankungen": {
+            "type": "string"
+          },
+          "KardiologischeErkrankungenDate": {
+            "type": "string"
+          },
+          "KardiologischeErkrankungenAge": {
+            "type": "string"
+          },
+          "Kehlkopflaehmung": {
+            "type": "string"
+          },
+          "KehlkopflaehmungDate": {
+            "type": "string"
+          },
+          "KehlkopflaehmungAge": {
+            "type": "string"
+          },
+          "Lebershunt": {
+            "type": "string"
+          },
+          "LebershuntDate": {
+            "type": "string"
+          },
+          "LebershuntAge": {
+            "type": "string"
+          },
+          "Leptospirose": {
+            "type": "string"
+          },
+          "LeptospiroseDate": {
+            "type": "string"
+          },
+          "LeptospiroseAge": {
+            "type": "string"
+          },
+          "Lungenerkrankung": {
+            "type": "string"
+          },
+          "LungenerkrankungDate": {
+            "type": "string"
+          },
+          "LungenerkrankungAge": {
+            "type": "string"
+          },
+          "Magendrehung": {
+            "type": "string"
+          },
+          "MagendrehungDate": {
+            "type": "string"
+          },
+          "MagendrehungAge": {
+            "type": "string"
+          },
+          "Milzdrehung": {
+            "type": "string"
+          },
+          "MilzdrehungDate": {
+            "type": "string"
+          },
+          "MilzdrehungAge": {
+            "type": "string"
+          },
+          "MorbusCushing": {
+            "type": "string"
+          },
+          "MorbusCushingDate": {
+            "type": "string"
+          },
+          "MorbusCushingAge": {
+            "type": "string"
+          },
+          "NeurologischeErkrankungen": {
+            "type": "string"
+          },
+          "NeurologischeErkrankungenDate": {
+            "type": "string"
+          },
+          "NeurologischeErkrankungenAge": {
+            "type": "string"
+          },
+          "NeurologischeErkrankung": {
+            "type": "string"
+          },
+          "NeurologischeErkrankungDate": {
+            "type": "string"
+          },
+          "NeurologischeErkrankungAge": {
+            "type": "string"
+          },
+          "Nierenerkrankung": {
+            "type": "string"
+          },
+          "NierenerkrankungDate": {
+            "type": "string"
+          },
+          "NierenerkrankungAge": {
+            "type": "string"
+          },
+          "Osteomyelitis": {
+            "type": "string"
+          },
+          "OsteomyelitisDate": {
+            "type": "string"
+          },
+          "OsteomyelitisAge": {
+            "type": "string"
+          },
+          "OsteochondrosisDissecansOcd": {
+            "type": "string"
+          },
+          "OsteochondrosisDissecansOcdDate": {
+            "type": "string"
+          },
+          "OsteochondrosisDissecansOcdAge": {
+            "type": "string"
+          },
+          "PersistPupillarmembranMpp": {
+            "type": "string"
+          },
+          "PersistPupillarmembranMppDate": {
+            "type": "string"
+          },
+          "PersistPupillarmembranMppAge": {
+            "type": "string"
+          },
+          "Pneumothorax": {
+            "type": "string"
+          },
+          "PneumothoraxDate": {
+            "type": "string"
+          },
+          "PneumothoraxAge": {
+            "type": "string"
+          },
+          "Pyometra": {
+            "type": "string"
+          },
+          "PyometraDate": {
+            "type": "string"
+          },
+          "PyometraAge": {
+            "type": "string"
+          },
+          "RuedeHatInDerHzdGedeckt": {
+            "type": "string"
+          },
+          "RuedeHatInDerHzdGedecktDate": {
+            "type": "string"
+          },
+          "RuedeHatInDerHzdGedecktAge": {
+            "type": "string"
+          },
+          "Rute": {
+            "type": "string"
+          },
+          "RuteDate": {
+            "type": "string"
+          },
+          "RuteAge": {
+            "type": "string"
+          },
+          "Rutenanomalie": {
+            "type": "string"
+          },
+          "RutenanomalieDate": {
+            "type": "string"
+          },
+          "RutenanomalieAge": {
+            "type": "string"
+          },
+          "VerdachtAufRutenanomalie": {
+            "type": "string"
+          },
+          "VerdachtAufRutenanomalieDate": {
+            "type": "string"
+          },
+          "VerdachtAufRutenanomalieAge": {
+            "type": "string"
+          },
+          "Sebadenitis": {
+            "type": "string"
+          },
+          "SebadenitisDate": {
+            "type": "string"
+          },
+          "SebadenitisAge": {
+            "type": "string"
+          },
+          "Sepsis": {
+            "type": "string"
+          },
+          "SepsisDate": {
+            "type": "string"
+          },
+          "SepsisAge": {
+            "type": "string"
+          },
+          "Spondylose": {
+            "type": "string"
+          },
+          "SpondyloseDate": {
+            "type": "string"
+          },
+          "SpondyloseAge": {
+            "type": "string"
+          },
+          "TumorDarm": {
+            "type": "string"
+          },
+          "TumorDarmDate": {
+            "type": "string"
+          },
+          "TumorDarmAge": {
+            "type": "string"
+          },
+          "TumorHirn": {
+            "type": "string"
+          },
+          "TumorHirnDate": {
+            "type": "string"
+          },
+          "TumorHirnAge": {
+            "type": "string"
+          },
+          "TumorKnochen": {
+            "type": "string"
+          },
+          "TumorKnochenDate": {
+            "type": "string"
+          },
+          "TumorKnochenAge": {
+            "type": "string"
+          },
+          "TumorLeber": {
+            "type": "string"
+          },
+          "TumorLeberDate": {
+            "type": "string"
+          },
+          "TumorLeberAge": {
+            "type": "string"
+          },
+          "TumorLunge": {
+            "type": "string"
+          },
+          "TumorLungeDate": {
+            "type": "string"
+          },
+          "TumorLungeAge": {
+            "type": "string"
+          },
+          "TumorMagen": {
+            "type": "string"
+          },
+          "TumorMagenDate": {
+            "type": "string"
+          },
+          "TumorMagenAge": {
+            "type": "string"
+          },
+          "TumorMamma": {
+            "type": "string"
+          },
+          "TumorMammaDate": {
+            "type": "string"
+          },
+          "TumorMammaAge": {
+            "type": "string"
+          },
+          "TumorMilz": {
+            "type": "string"
+          },
+          "TumorMilzDate": {
+            "type": "string"
+          },
+          "TumorMilzAge": {
+            "type": "string"
+          },
+          "TumorPankreas": {
+            "type": "string"
+          },
+          "TumorPankreasDate": {
+            "type": "string"
+          },
+          "TumorPankreasAge": {
+            "type": "string"
+          },
+          "TumorUnspezAndereKarzinogeneErkr": {
+            "type": "string"
+          },
+          "TumorUnspezAndereKarzinogeneErkrDate": {
+            "type": "string"
+          },
+          "TumorUnspezAndereKarzinogeneErkrAge": {
+            "type": "string"
+          },
+          "Wurfprotokolle": {
+            "type": "string"
+          },
+          "WurfprotokolleDate": {
+            "type": "string"
+          },
+          "WurfprotokolleAge": {
+            "type": "string"
+          },
+          "VerhaltenIi": {
+            "type": "string"
+          },
+          "VerhaltenIiDate": {
+            "type": "string"
+          },
+          "VerhaltenIiAge": {
+            "type": "string"
+          },
+          "VerhaltenIii": {
+            "type": "string"
+          },
+          "VerhaltenIiiDate": {
+            "type": "string"
+          },
+          "VerhaltenIiiAge": {
+            "type": "string"
+          },
+          "VerhaltenIiiE": {
+            "type": "string"
+          },
+          "VerhaltenIiiEDate": {
+            "type": "string"
+          },
+          "VerhaltenIiiEAge": {
+            "type": "string"
+          },
+          "VerhaltenIiiF": {
+            "type": "string"
+          },
+          "VerhaltenIiiFDate": {
+            "type": "string"
+          },
+          "VerhaltenIiiFAge": {
+            "type": "string"
+          },
+          "VerhaltenIiiZurueckgestellt": {
+            "type": "string"
+          },
+          "VerhaltenIiiZurueckgestelltDate": {
+            "type": "string"
+          },
+          "VerhaltenIiiZurueckgestelltAge": {
+            "type": "string"
+          },
+          "VerhaltenIiiNichtBestanden": {
+            "type": "string"
+          },
+          "VerhaltenIiiNichtBestandenDate": {
+            "type": "string"
+          },
+          "VerhaltenIiiNichtBestandenAge": {
+            "type": "string"
+          },
+          "VerhaltenIiiAbbruch": {
+            "type": "string"
+          },
+          "VerhaltenIiiAbbruchDate": {
+            "type": "string"
+          },
+          "VerhaltenIiiAbbruchAge": {
+            "type": "string"
+          },
+          "VerhaltenIv": {
+            "type": "string"
+          },
+          "VerhaltenIvDate": {
+            "type": "string"
+          },
+          "VerhaltenIvAge": {
+            "type": "string"
+          },
+          "VerhaltenVeteranen": {
+            "type": "string"
+          },
+          "VerhaltenVeteranenDate": {
+            "type": "string"
+          },
+          "VerhaltenVeteranenAge": {
+            "type": "string"
+          },
+          "KoerungHzd": {
+            "type": "string"
+          },
+          "KoerungHzdDate": {
+            "type": "string"
+          },
+          "KoerungHzdAge": {
+            "type": "string"
+          },
+          "KoerungHzdE": {
+            "type": "string"
+          },
+          "KoerungHzdEDate": {
+            "type": "string"
+          },
+          "KoerungHzdEAge": {
+            "type": "string"
+          },
+          "KoerungHzdNichtBestanden": {
+            "type": "string"
+          },
+          "KoerungHzdNichtBestandenDate": {
+            "type": "string"
+          },
+          "KoerungHzdNichtBestandenAge": {
+            "type": "string"
+          },
+          "JugendkoerungHzd": {
+            "type": "string"
+          },
+          "JugendkoerungHzdDate": {
+            "type": "string"
+          },
+          "JugendkoerungHzdAge": {
+            "type": "string"
+          },
+          "Richterbericht": {
+            "type": "string"
+          },
+          "RichterberichtDate": {
+            "type": "string"
+          },
+          "RichterberichtAge": {
+            "type": "string"
+          },
+          "UebernahmeInsHzdZuchtbuch": {
+            "type": "string"
+          },
+          "UebernahmeInsHzdZuchtbuchDate": {
+            "type": "string"
+          },
+          "UebernahmeInsHzdZuchtbuchAge": {
+            "type": "string"
+          },
+          "Zuchtzulassung": {
+            "type": "string"
+          },
+          "ZuchtzulassungDate": {
+            "type": "string"
+          },
+          "ZuchtzulassungAge": {
+            "type": "string"
+          },
+          "ZuchthuendinImZwinger": {
+            "type": "string"
+          },
+          "ZuchthuendinImZwingerDate": {
+            "type": "string"
+          },
+          "ZuchthuendinImZwingerAge": {
+            "type": "string"
+          },
+          "ZuchtzulassungMitAuflagen": {
+            "type": "string"
+          },
+          "ZuchtzulassungMitAuflagenDate": {
+            "type": "string"
+          },
+          "ZuchtzulassungMitAuflagenAge": {
+            "type": "string"
+          },
+          "AnmerkungenSonstBefundeNichtAuswertbar": {
+            "type": "string"
+          },
+          "AnmerkungenSonstBefundeNichtAuswertbarDate": {
+            "type": "string"
+          },
+          "AnmerkungenSonstBefundeNichtAuswertbarAge": {
+            "type": "string"
+          },
+          "Kryptorchide": {
+            "type": "string"
+          },
+          "KryptorchideDate": {
+            "type": "string"
+          },
+          "KryptorchideAge": {
+            "type": "string"
+          },
+          "Monorchide": {
+            "type": "string"
+          },
+          "MonorchideDate": {
+            "type": "string"
+          },
+          "MonorchideAge": {
+            "type": "string"
+          },
+          "TumorHoden": {
+            "type": "string"
+          },
+          "TumorHodenDate": {
+            "type": "string"
+          },
+          "TumorHodenAge": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ]
+              },
+              "documentId": {
+                "type": "string"
+              },
+              "firstname": {
+                "type": "string"
+              },
+              "lastname": {
+                "type": "string"
+              },
+              "username": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "resetPasswordToken": {
+                "type": "string"
+              },
+              "resetPasswordTokenExpiresAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "registrationToken": {
+                "type": "string"
+              },
+              "isActive": {
+                "type": "boolean"
+              },
+              "roles": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ]
+                    },
+                    "documentId": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "documentId": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "documentId": {
+                            "type": "string"
+                          },
+                          "action": {
+                            "type": "string"
+                          },
+                          "actionParameters": {},
+                          "subject": {
+                            "type": "string"
+                          },
+                          "properties": {},
+                          "conditions": {},
+                          "role": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "oneOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "number"
+                                  }
+                                ]
+                              },
+                              "documentId": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "apiToken": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "oneOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "number"
+                                  }
+                                ]
+                              },
+                              "documentId": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "type": "string"
+                              },
+                              "kind": {
+                                "type": "string",
+                                "enum": [
+                                  "content-api",
+                                  "admin"
+                                ]
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "read-only",
+                                  "full-access",
+                                  "custom"
+                                ]
+                              },
+                              "accessKey": {
+                                "type": "string"
+                              },
+                              "encryptedKey": {
+                                "type": "string"
+                              },
+                              "lastUsedAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "permissions": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "oneOf": [
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "number"
+                                        }
+                                      ]
+                                    },
+                                    "documentId": {
+                                      "type": "string"
+                                    },
+                                    "action": {
+                                      "type": "string"
+                                    },
+                                    "token": {
+                                      "type": "object",
+                                      "properties": {
+                                        "id": {
+                                          "oneOf": [
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "number"
+                                            }
+                                          ]
+                                        },
+                                        "documentId": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "createdAt": {
+                                      "type": "string",
+                                      "format": "date-time"
+                                    },
+                                    "updatedAt": {
+                                      "type": "string",
+                                      "format": "date-time"
+                                    },
+                                    "publishedAt": {
+                                      "type": "string",
+                                      "format": "date-time"
+                                    },
+                                    "createdBy": {
+                                      "type": "object",
+                                      "properties": {
+                                        "id": {
+                                          "oneOf": [
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "number"
+                                            }
+                                          ]
+                                        },
+                                        "documentId": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "updatedBy": {
+                                      "type": "object",
+                                      "properties": {
+                                        "id": {
+                                          "oneOf": [
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "number"
+                                            }
+                                          ]
+                                        },
+                                        "documentId": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "locale": {
+                                      "type": "string"
+                                    },
+                                    "localizations": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "id": {
+                                            "oneOf": [
+                                              {
+                                                "type": "string"
+                                              },
+                                              {
+                                                "type": "number"
+                                              }
+                                            ]
+                                          },
+                                          "documentId": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "adminPermissions": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "oneOf": [
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "number"
+                                        }
+                                      ]
+                                    },
+                                    "documentId": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              },
+                              "adminUserOwner": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "oneOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      }
+                                    ]
+                                  },
+                                  "documentId": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "expiresAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "lifespan": {
+                                "type": "string",
+                                "pattern": "^\\d*$",
+                                "example": "123456789"
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "updatedAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "publishedAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "createdBy": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "oneOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      }
+                                    ]
+                                  },
+                                  "documentId": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "updatedBy": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "oneOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      }
+                                    ]
+                                  },
+                                  "documentId": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "locale": {
+                                "type": "string"
+                              },
+                              "localizations": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "oneOf": [
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "number"
+                                        }
+                                      ]
+                                    },
+                                    "documentId": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "publishedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "createdBy": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "oneOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "number"
+                                  }
+                                ]
+                              },
+                              "documentId": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "updatedBy": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "oneOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "number"
+                                  }
+                                ]
+                              },
+                              "documentId": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "locale": {
+                            "type": "string"
+                          },
+                          "localizations": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "oneOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                },
+                                "documentId": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "publishedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdBy": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ]
+                        },
+                        "documentId": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "updatedBy": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ]
+                        },
+                        "documentId": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "locale": {
+                      "type": "string"
+                    },
+                    "localizations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "documentId": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "apiTokens": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ]
+                    },
+                    "documentId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "blocked": {
+                "type": "boolean"
+              },
+              "preferedLanguage": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "publishedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "createdBy": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ]
+                  },
+                  "documentId": {
+                    "type": "string"
+                  }
+                }
+              },
+              "updatedBy": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ]
+                  },
+                  "documentId": {
+                    "type": "string"
+                  }
+                }
+              },
+              "locale": {
+                "type": "string"
+              },
+              "localizations": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ]
+                    },
+                    "documentId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "updatedBy": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ]
+              },
+              "documentId": {
+                "type": "string"
+              }
+            }
+          },
+          "locale": {
+            "type": "string"
+          },
+          "localizations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                },
+                "documentId": {
+                  "type": "string"
+                },
+                "Generation": {
+                  "type": "integer"
+                },
+                "IdAnimal": {
+                  "type": "string"
+                },
+                "GivenName": {
+                  "type": "string"
+                },
+                "NameOfBreedingStation": {
+                  "type": "string"
+                },
+                "FullName": {
+                  "type": "string"
+                },
+                "IdBreeder": {
+                  "type": "string"
+                },
+                "IdOwner": {
+                  "type": "string"
+                },
+                "FullnameSire": {
+                  "type": "string"
+                },
+                "StudbookNumberSire": {
+                  "type": "string"
+                },
+                "FullnameDam": {
+                  "type": "string"
+                },
+                "StudbookNumberDam": {
+                  "type": "string"
+                },
+                "Studbook": {
+                  "type": "string"
+                },
+                "StudbookNumber": {
+                  "type": "string"
+                },
+                "ChipNumber": {
+                  "type": "string"
+                },
+                "Sex": {
+                  "type": "string"
+                },
+                "DateOfBirth": {
+                  "type": "string"
+                },
+                "DateOfDeath": {
+                  "type": "string"
+                },
+                "Fertile": {
+                  "type": "string"
+                },
+                "Color": {
+                  "type": "string"
+                },
+                "HdG": {
+                  "type": "string"
+                },
+                "HdGDate": {
+                  "type": "string"
+                },
+                "HdGAge": {
+                  "type": "string"
+                },
+                "Hd": {
+                  "type": "string"
+                },
+                "HdDate": {
+                  "type": "string"
+                },
+                "HdAge": {
+                  "type": "string"
+                },
+                "Zaehne": {
+                  "type": "string"
+                },
+                "ZaehneDate": {
+                  "type": "string"
+                },
+                "ZaehneAge": {
+                  "type": "string"
+                },
+                "Gebiss": {
+                  "type": "string"
+                },
+                "GebissDate": {
+                  "type": "string"
+                },
+                "GebissAge": {
+                  "type": "string"
+                },
+                "Nabel": {
+                  "type": "string"
+                },
+                "NabelDate": {
+                  "type": "string"
+                },
+                "NabelAge": {
+                  "type": "string"
+                },
+                "GentestSod1": {
+                  "type": "string"
+                },
+                "GentestSod1Date": {
+                  "type": "string"
+                },
+                "GentestSod1Age": {
+                  "type": "string"
+                },
+                "Schilddruesentest": {
+                  "type": "string"
+                },
+                "SchilddruesentestDate": {
+                  "type": "string"
+                },
+                "SchilddruesentestAge": {
+                  "type": "string"
+                },
+                "Herzuntersuchung": {
+                  "type": "string"
+                },
+                "HerzuntersuchungDate": {
+                  "type": "string"
+                },
+                "HerzuntersuchungAge": {
+                  "type": "string"
+                },
+                "HerzuntersuchungKeinZertifizierterArztDesCc": {
+                  "type": "string"
+                },
+                "HerzuntersuchungKeinZertifizierterArztDesCcDate": {
+                  "type": "string"
+                },
+                "HerzuntersuchungKeinZertifizierterArztDesCcAge": {
+                  "type": "string"
+                },
+                "Augenuntersuchung": {
+                  "type": "string"
+                },
+                "AugenuntersuchungDate": {
+                  "type": "string"
+                },
+                "AugenuntersuchungAge": {
+                  "type": "string"
+                },
+                "Anaplasmose": {
+                  "type": "string"
+                },
+                "AnaplasmoseDate": {
+                  "type": "string"
+                },
+                "AnaplasmoseAge": {
+                  "type": "string"
+                },
+                "Aortenstenose": {
+                  "type": "string"
+                },
+                "AortenstenoseDate": {
+                  "type": "string"
+                },
+                "AortenstenoseAge": {
+                  "type": "string"
+                },
+                "Arthrose": {
+                  "type": "string"
+                },
+                "ArthroseDate": {
+                  "type": "string"
+                },
+                "ArthroseAge": {
+                  "type": "string"
+                },
+                "Autoimmunerkrankung": {
+                  "type": "string"
+                },
+                "AutoimmunerkrankungDate": {
+                  "type": "string"
+                },
+                "AutoimmunerkrankungAge": {
+                  "type": "string"
+                },
+                "Babesiose": {
+                  "type": "string"
+                },
+                "BabesioseDate": {
+                  "type": "string"
+                },
+                "BabesioseAge": {
+                  "type": "string"
+                },
+                "Bandscheibenvorfall": {
+                  "type": "string"
+                },
+                "BandscheibenvorfallDate": {
+                  "type": "string"
+                },
+                "BandscheibenvorfallAge": {
+                  "type": "string"
+                },
+                "Borreliose": {
+                  "type": "string"
+                },
+                "BorrelioseDate": {
+                  "type": "string"
+                },
+                "BorrelioseAge": {
+                  "type": "string"
+                },
+                "CaudaEquina": {
+                  "type": "string"
+                },
+                "CaudaEquinaDate": {
+                  "type": "string"
+                },
+                "CaudaEquinaAge": {
+                  "type": "string"
+                },
+                "Dermoid": {
+                  "type": "string"
+                },
+                "DermoidDate": {
+                  "type": "string"
+                },
+                "DermoidAge": {
+                  "type": "string"
+                },
+                "DilativeKardiomyopathieDcm": {
+                  "type": "string"
+                },
+                "DilativeKardiomyopathieDcmDate": {
+                  "type": "string"
+                },
+                "DilativeKardiomyopathieDcmAge": {
+                  "type": "string"
+                },
+                "Diabetes": {
+                  "type": "string"
+                },
+                "DiabetesDate": {
+                  "type": "string"
+                },
+                "DiabetesAge": {
+                  "type": "string"
+                },
+                "DmGesichert": {
+                  "type": "string"
+                },
+                "DmGesichertDate": {
+                  "type": "string"
+                },
+                "DmGesichertAge": {
+                  "type": "string"
+                },
+                "DmVerdacht": {
+                  "type": "string"
+                },
+                "DmVerdachtDate": {
+                  "type": "string"
+                },
+                "DmVerdachtAge": {
+                  "type": "string"
+                },
+                "DiversitaetDla": {
+                  "type": "string"
+                },
+                "DiversitaetDlaDate": {
+                  "type": "string"
+                },
+                "DiversitaetDlaAge": {
+                  "type": "string"
+                },
+                "DnaProfil": {
+                  "type": "string"
+                },
+                "DnaProfilDate": {
+                  "type": "string"
+                },
+                "DnaProfilAge": {
+                  "type": "string"
+                },
+                "EllbogendysplasieEd": {
+                  "type": "string"
+                },
+                "EllbogendysplasieEdDate": {
+                  "type": "string"
+                },
+                "EllbogendysplasieEdAge": {
+                  "type": "string"
+                },
+                "EllenbogendysplasieEd": {
+                  "type": "string"
+                },
+                "EllenbogendysplasieEdDate": {
+                  "type": "string"
+                },
+                "EllenbogendysplasieEdAge": {
+                  "type": "string"
+                },
+                "Epilepsie": {
+                  "type": "string"
+                },
+                "EpilepsieDate": {
+                  "type": "string"
+                },
+                "EpilepsieAge": {
+                  "type": "string"
+                },
+                "DLokus": {
+                  "type": "string"
+                },
+                "DLokusDate": {
+                  "type": "string"
+                },
+                "DLokusAge": {
+                  "type": "string"
+                },
+                "Fellabweichung": {
+                  "type": "string"
+                },
+                "FellabweichungDate": {
+                  "type": "string"
+                },
+                "FellabweichungAge": {
+                  "type": "string"
+                },
+                "Gallensaeuretest": {
+                  "type": "string"
+                },
+                "GallensaeuretestDate": {
+                  "type": "string"
+                },
+                "GallensaeuretestAge": {
+                  "type": "string"
+                },
+                "Gaumenspalte": {
+                  "type": "string"
+                },
+                "GaumenspalteDate": {
+                  "type": "string"
+                },
+                "GaumenspalteAge": {
+                  "type": "string"
+                },
+                "HereditaereKataraktHc": {
+                  "type": "string"
+                },
+                "HereditaereKataraktHcDate": {
+                  "type": "string"
+                },
+                "HereditaereKataraktHcAge": {
+                  "type": "string"
+                },
+                "HinterhandschwaecheUnspez": {
+                  "type": "string"
+                },
+                "HinterhandschwaecheUnspezDate": {
+                  "type": "string"
+                },
+                "HinterhandschwaecheUnspezAge": {
+                  "type": "string"
+                },
+                "Hydrocephalus": {
+                  "type": "string"
+                },
+                "HydrocephalusDate": {
+                  "type": "string"
+                },
+                "HydrocephalusAge": {
+                  "type": "string"
+                },
+                "HypothyreoseGesichert": {
+                  "type": "string"
+                },
+                "HypothyreoseGesichertDate": {
+                  "type": "string"
+                },
+                "HypothyreoseGesichertAge": {
+                  "type": "string"
+                },
+                "HypothyreoseVerdacht": {
+                  "type": "string"
+                },
+                "HypothyreoseVerdachtDate": {
+                  "type": "string"
+                },
+                "HypothyreoseVerdachtAge": {
+                  "type": "string"
+                },
+                "Infarkt": {
+                  "type": "string"
+                },
+                "InfarktDate": {
+                  "type": "string"
+                },
+                "InfarktAge": {
+                  "type": "string"
+                },
+                "Infektion": {
+                  "type": "string"
+                },
+                "InfektionDate": {
+                  "type": "string"
+                },
+                "InfektionAge": {
+                  "type": "string"
+                },
+                "Kaiserschnitt": {
+                  "type": "string"
+                },
+                "KaiserschnittDate": {
+                  "type": "string"
+                },
+                "KaiserschnittAge": {
+                  "type": "string"
+                },
+                "KardiologischeErkrankungen": {
+                  "type": "string"
+                },
+                "KardiologischeErkrankungenDate": {
+                  "type": "string"
+                },
+                "KardiologischeErkrankungenAge": {
+                  "type": "string"
+                },
+                "Kehlkopflaehmung": {
+                  "type": "string"
+                },
+                "KehlkopflaehmungDate": {
+                  "type": "string"
+                },
+                "KehlkopflaehmungAge": {
+                  "type": "string"
+                },
+                "Lebershunt": {
+                  "type": "string"
+                },
+                "LebershuntDate": {
+                  "type": "string"
+                },
+                "LebershuntAge": {
+                  "type": "string"
+                },
+                "Leptospirose": {
+                  "type": "string"
+                },
+                "LeptospiroseDate": {
+                  "type": "string"
+                },
+                "LeptospiroseAge": {
+                  "type": "string"
+                },
+                "Lungenerkrankung": {
+                  "type": "string"
+                },
+                "LungenerkrankungDate": {
+                  "type": "string"
+                },
+                "LungenerkrankungAge": {
+                  "type": "string"
+                },
+                "Magendrehung": {
+                  "type": "string"
+                },
+                "MagendrehungDate": {
+                  "type": "string"
+                },
+                "MagendrehungAge": {
+                  "type": "string"
+                },
+                "Milzdrehung": {
+                  "type": "string"
+                },
+                "MilzdrehungDate": {
+                  "type": "string"
+                },
+                "MilzdrehungAge": {
+                  "type": "string"
+                },
+                "MorbusCushing": {
+                  "type": "string"
+                },
+                "MorbusCushingDate": {
+                  "type": "string"
+                },
+                "MorbusCushingAge": {
+                  "type": "string"
+                },
+                "NeurologischeErkrankungen": {
+                  "type": "string"
+                },
+                "NeurologischeErkrankungenDate": {
+                  "type": "string"
+                },
+                "NeurologischeErkrankungenAge": {
+                  "type": "string"
+                },
+                "NeurologischeErkrankung": {
+                  "type": "string"
+                },
+                "NeurologischeErkrankungDate": {
+                  "type": "string"
+                },
+                "NeurologischeErkrankungAge": {
+                  "type": "string"
+                },
+                "Nierenerkrankung": {
+                  "type": "string"
+                },
+                "NierenerkrankungDate": {
+                  "type": "string"
+                },
+                "NierenerkrankungAge": {
+                  "type": "string"
+                },
+                "Osteomyelitis": {
+                  "type": "string"
+                },
+                "OsteomyelitisDate": {
+                  "type": "string"
+                },
+                "OsteomyelitisAge": {
+                  "type": "string"
+                },
+                "OsteochondrosisDissecansOcd": {
+                  "type": "string"
+                },
+                "OsteochondrosisDissecansOcdDate": {
+                  "type": "string"
+                },
+                "OsteochondrosisDissecansOcdAge": {
+                  "type": "string"
+                },
+                "PersistPupillarmembranMpp": {
+                  "type": "string"
+                },
+                "PersistPupillarmembranMppDate": {
+                  "type": "string"
+                },
+                "PersistPupillarmembranMppAge": {
+                  "type": "string"
+                },
+                "Pneumothorax": {
+                  "type": "string"
+                },
+                "PneumothoraxDate": {
+                  "type": "string"
+                },
+                "PneumothoraxAge": {
+                  "type": "string"
+                },
+                "Pyometra": {
+                  "type": "string"
+                },
+                "PyometraDate": {
+                  "type": "string"
+                },
+                "PyometraAge": {
+                  "type": "string"
+                },
+                "RuedeHatInDerHzdGedeckt": {
+                  "type": "string"
+                },
+                "RuedeHatInDerHzdGedecktDate": {
+                  "type": "string"
+                },
+                "RuedeHatInDerHzdGedecktAge": {
+                  "type": "string"
+                },
+                "Rute": {
+                  "type": "string"
+                },
+                "RuteDate": {
+                  "type": "string"
+                },
+                "RuteAge": {
+                  "type": "string"
+                },
+                "Rutenanomalie": {
+                  "type": "string"
+                },
+                "RutenanomalieDate": {
+                  "type": "string"
+                },
+                "RutenanomalieAge": {
+                  "type": "string"
+                },
+                "VerdachtAufRutenanomalie": {
+                  "type": "string"
+                },
+                "VerdachtAufRutenanomalieDate": {
+                  "type": "string"
+                },
+                "VerdachtAufRutenanomalieAge": {
+                  "type": "string"
+                },
+                "Sebadenitis": {
+                  "type": "string"
+                },
+                "SebadenitisDate": {
+                  "type": "string"
+                },
+                "SebadenitisAge": {
+                  "type": "string"
+                },
+                "Sepsis": {
+                  "type": "string"
+                },
+                "SepsisDate": {
+                  "type": "string"
+                },
+                "SepsisAge": {
+                  "type": "string"
+                },
+                "Spondylose": {
+                  "type": "string"
+                },
+                "SpondyloseDate": {
+                  "type": "string"
+                },
+                "SpondyloseAge": {
+                  "type": "string"
+                },
+                "TumorDarm": {
+                  "type": "string"
+                },
+                "TumorDarmDate": {
+                  "type": "string"
+                },
+                "TumorDarmAge": {
+                  "type": "string"
+                },
+                "TumorHirn": {
+                  "type": "string"
+                },
+                "TumorHirnDate": {
+                  "type": "string"
+                },
+                "TumorHirnAge": {
+                  "type": "string"
+                },
+                "TumorKnochen": {
+                  "type": "string"
+                },
+                "TumorKnochenDate": {
+                  "type": "string"
+                },
+                "TumorKnochenAge": {
+                  "type": "string"
+                },
+                "TumorLeber": {
+                  "type": "string"
+                },
+                "TumorLeberDate": {
+                  "type": "string"
+                },
+                "TumorLeberAge": {
+                  "type": "string"
+                },
+                "TumorLunge": {
+                  "type": "string"
+                },
+                "TumorLungeDate": {
+                  "type": "string"
+                },
+                "TumorLungeAge": {
+                  "type": "string"
+                },
+                "TumorMagen": {
+                  "type": "string"
+                },
+                "TumorMagenDate": {
+                  "type": "string"
+                },
+                "TumorMagenAge": {
+                  "type": "string"
+                },
+                "TumorMamma": {
+                  "type": "string"
+                },
+                "TumorMammaDate": {
+                  "type": "string"
+                },
+                "TumorMammaAge": {
+                  "type": "string"
+                },
+                "TumorMilz": {
+                  "type": "string"
+                },
+                "TumorMilzDate": {
+                  "type": "string"
+                },
+                "TumorMilzAge": {
+                  "type": "string"
+                },
+                "TumorPankreas": {
+                  "type": "string"
+                },
+                "TumorPankreasDate": {
+                  "type": "string"
+                },
+                "TumorPankreasAge": {
+                  "type": "string"
+                },
+                "TumorUnspezAndereKarzinogeneErkr": {
+                  "type": "string"
+                },
+                "TumorUnspezAndereKarzinogeneErkrDate": {
+                  "type": "string"
+                },
+                "TumorUnspezAndereKarzinogeneErkrAge": {
+                  "type": "string"
+                },
+                "Wurfprotokolle": {
+                  "type": "string"
+                },
+                "WurfprotokolleDate": {
+                  "type": "string"
+                },
+                "WurfprotokolleAge": {
+                  "type": "string"
+                },
+                "VerhaltenIi": {
+                  "type": "string"
+                },
+                "VerhaltenIiDate": {
+                  "type": "string"
+                },
+                "VerhaltenIiAge": {
+                  "type": "string"
+                },
+                "VerhaltenIii": {
+                  "type": "string"
+                },
+                "VerhaltenIiiDate": {
+                  "type": "string"
+                },
+                "VerhaltenIiiAge": {
+                  "type": "string"
+                },
+                "VerhaltenIiiE": {
+                  "type": "string"
+                },
+                "VerhaltenIiiEDate": {
+                  "type": "string"
+                },
+                "VerhaltenIiiEAge": {
+                  "type": "string"
+                },
+                "VerhaltenIiiF": {
+                  "type": "string"
+                },
+                "VerhaltenIiiFDate": {
+                  "type": "string"
+                },
+                "VerhaltenIiiFAge": {
+                  "type": "string"
+                },
+                "VerhaltenIiiZurueckgestellt": {
+                  "type": "string"
+                },
+                "VerhaltenIiiZurueckgestelltDate": {
+                  "type": "string"
+                },
+                "VerhaltenIiiZurueckgestelltAge": {
+                  "type": "string"
+                },
+                "VerhaltenIiiNichtBestanden": {
+                  "type": "string"
+                },
+                "VerhaltenIiiNichtBestandenDate": {
+                  "type": "string"
+                },
+                "VerhaltenIiiNichtBestandenAge": {
+                  "type": "string"
+                },
+                "VerhaltenIiiAbbruch": {
+                  "type": "string"
+                },
+                "VerhaltenIiiAbbruchDate": {
+                  "type": "string"
+                },
+                "VerhaltenIiiAbbruchAge": {
+                  "type": "string"
+                },
+                "VerhaltenIv": {
+                  "type": "string"
+                },
+                "VerhaltenIvDate": {
+                  "type": "string"
+                },
+                "VerhaltenIvAge": {
+                  "type": "string"
+                },
+                "VerhaltenVeteranen": {
+                  "type": "string"
+                },
+                "VerhaltenVeteranenDate": {
+                  "type": "string"
+                },
+                "VerhaltenVeteranenAge": {
+                  "type": "string"
+                },
+                "KoerungHzd": {
+                  "type": "string"
+                },
+                "KoerungHzdDate": {
+                  "type": "string"
+                },
+                "KoerungHzdAge": {
+                  "type": "string"
+                },
+                "KoerungHzdE": {
+                  "type": "string"
+                },
+                "KoerungHzdEDate": {
+                  "type": "string"
+                },
+                "KoerungHzdEAge": {
+                  "type": "string"
+                },
+                "KoerungHzdNichtBestanden": {
+                  "type": "string"
+                },
+                "KoerungHzdNichtBestandenDate": {
+                  "type": "string"
+                },
+                "KoerungHzdNichtBestandenAge": {
+                  "type": "string"
+                },
+                "JugendkoerungHzd": {
+                  "type": "string"
+                },
+                "JugendkoerungHzdDate": {
+                  "type": "string"
+                },
+                "JugendkoerungHzdAge": {
+                  "type": "string"
+                },
+                "Richterbericht": {
+                  "type": "string"
+                },
+                "RichterberichtDate": {
+                  "type": "string"
+                },
+                "RichterberichtAge": {
+                  "type": "string"
+                },
+                "UebernahmeInsHzdZuchtbuch": {
+                  "type": "string"
+                },
+                "UebernahmeInsHzdZuchtbuchDate": {
+                  "type": "string"
+                },
+                "UebernahmeInsHzdZuchtbuchAge": {
+                  "type": "string"
+                },
+                "Zuchtzulassung": {
+                  "type": "string"
+                },
+                "ZuchtzulassungDate": {
+                  "type": "string"
+                },
+                "ZuchtzulassungAge": {
+                  "type": "string"
+                },
+                "ZuchthuendinImZwinger": {
+                  "type": "string"
+                },
+                "ZuchthuendinImZwingerDate": {
+                  "type": "string"
+                },
+                "ZuchthuendinImZwingerAge": {
+                  "type": "string"
+                },
+                "ZuchtzulassungMitAuflagen": {
+                  "type": "string"
+                },
+                "ZuchtzulassungMitAuflagenDate": {
+                  "type": "string"
+                },
+                "ZuchtzulassungMitAuflagenAge": {
+                  "type": "string"
+                },
+                "AnmerkungenSonstBefundeNichtAuswertbar": {
+                  "type": "string"
+                },
+                "AnmerkungenSonstBefundeNichtAuswertbarDate": {
+                  "type": "string"
+                },
+                "AnmerkungenSonstBefundeNichtAuswertbarAge": {
+                  "type": "string"
+                },
+                "Kryptorchide": {
+                  "type": "string"
+                },
+                "KryptorchideDate": {
+                  "type": "string"
+                },
+                "KryptorchideAge": {
+                  "type": "string"
+                },
+                "Monorchide": {
+                  "type": "string"
+                },
+                "MonorchideDate": {
+                  "type": "string"
+                },
+                "MonorchideAge": {
+                  "type": "string"
+                },
+                "TumorHoden": {
+                  "type": "string"
+                },
+                "TumorHodenDate": {
+                  "type": "string"
+                },
+                "TumorHodenAge": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "publishedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "createdBy": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ]
+                    },
+                    "documentId": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "updatedBy": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ]
+                    },
+                    "documentId": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "locale": {
+                  "type": "string"
+                },
+                "localizations": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          }
+                        ]
+                      },
+                      "documentId": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "CsDogResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CsDog"
+          },
+          "meta": {
+            "type": "object"
+          }
+        }
+      },
+      "CsMemberRequest": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "data": {
+            "required": [
+              "Generation"
+            ],
+            "type": "object",
+            "properties": {
+              "Generation": {
+                "type": "integer"
+              },
+              "IdPerson": {
+                "type": "string"
+              },
+              "C01Access": {
+                "type": "string"
+              },
+              "Salutation": {
+                "type": "string"
+              },
+              "Title": {
+                "type": "string"
+              },
+              "Firstname": {
+                "type": "string"
+              },
+              "Lastname": {
+                "type": "string"
+              },
+              "Language": {
+                "type": "string"
+              },
+              "Street": {
+                "type": "string"
+              },
+              "Zipcode": {
+                "type": "string"
+              },
+              "City": {
+                "type": "string"
+              },
+              "Oblast": {
+                "type": "string"
+              },
+              "Country": {
+                "type": "string"
+              },
+              "Organization": {
+                "type": "string"
+              },
+              "Mobile": {
+                "type": "string"
+              },
+              "Phone": {
+                "type": "string"
+              },
+              "Email": {
+                "type": "string"
+              },
+              "Internet": {
+                "type": "string"
+              },
+              "TypeOfPerson": {
+                "type": "string"
+              },
+              "PersonIsABreeder": {
+                "type": "string"
+              },
+              "PersonIsAMember": {
+                "type": "string"
+              },
+              "PersonIsASubscriber": {
+                "type": "string"
+              },
+              "TypeOfSubscription": {
+                "type": "string"
+              },
+              "PersonIsAnActiveBreeder": {
+                "type": "string"
+              },
+              "BreedingStation": {
+                "type": "string"
+              },
+              "GivenNameFirst": {
+                "type": "string"
+              },
+              "MembershipNumber": {
+                "type": "string"
+              },
+              "MembershipStatus": {
+                "type": "string"
+              },
+              "RoleInAssociation": {
+                "type": "string"
+              },
+              "OtherRoles": {
+                "type": "string"
+              },
+              "DateOfBirth": {
+                "type": "string"
+              },
+              "DateOfDeath": {
+                "type": "string"
+              },
+              "DateOfJoining": {
+                "type": "string"
+              },
+              "DateOfLeaving": {
+                "type": "string"
+              },
+              "Iban": {
+                "type": "string"
+              },
+              "BankIdentifierCodeBic": {
+                "type": "string"
+              },
+              "locale": {
+                "type": "string"
+              },
+              "localizations": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ],
+                  "example": "string or id"
+                }
+              }
+            }
+          }
+        }
+      },
+      "CsMemberListResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CsMember"
+            }
+          },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "pagination": {
+                "type": "object",
+                "properties": {
+                  "page": {
+                    "type": "integer"
+                  },
+                  "pageSize": {
+                    "type": "integer",
+                    "minimum": 25
+                  },
+                  "pageCount": {
+                    "type": "integer",
+                    "maximum": 1
+                  },
+                  "total": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "CsMember": {
+        "type": "object",
+        "required": [
+          "Generation"
+        ],
+        "properties": {
+          "id": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "documentId": {
+            "type": "string"
+          },
+          "Generation": {
+            "type": "integer"
+          },
+          "IdPerson": {
+            "type": "string"
+          },
+          "C01Access": {
+            "type": "string"
+          },
+          "Salutation": {
+            "type": "string"
+          },
+          "Title": {
+            "type": "string"
+          },
+          "Firstname": {
+            "type": "string"
+          },
+          "Lastname": {
+            "type": "string"
+          },
+          "Language": {
+            "type": "string"
+          },
+          "Street": {
+            "type": "string"
+          },
+          "Zipcode": {
+            "type": "string"
+          },
+          "City": {
+            "type": "string"
+          },
+          "Oblast": {
+            "type": "string"
+          },
+          "Country": {
+            "type": "string"
+          },
+          "Organization": {
+            "type": "string"
+          },
+          "Mobile": {
+            "type": "string"
+          },
+          "Phone": {
+            "type": "string"
+          },
+          "Email": {
+            "type": "string"
+          },
+          "Internet": {
+            "type": "string"
+          },
+          "TypeOfPerson": {
+            "type": "string"
+          },
+          "PersonIsABreeder": {
+            "type": "string"
+          },
+          "PersonIsAMember": {
+            "type": "string"
+          },
+          "PersonIsASubscriber": {
+            "type": "string"
+          },
+          "TypeOfSubscription": {
+            "type": "string"
+          },
+          "PersonIsAnActiveBreeder": {
+            "type": "string"
+          },
+          "BreedingStation": {
+            "type": "string"
+          },
+          "GivenNameFirst": {
+            "type": "string"
+          },
+          "MembershipNumber": {
+            "type": "string"
+          },
+          "MembershipStatus": {
+            "type": "string"
+          },
+          "RoleInAssociation": {
+            "type": "string"
+          },
+          "OtherRoles": {
+            "type": "string"
+          },
+          "DateOfBirth": {
+            "type": "string"
+          },
+          "DateOfDeath": {
+            "type": "string"
+          },
+          "DateOfJoining": {
+            "type": "string"
+          },
+          "DateOfLeaving": {
+            "type": "string"
+          },
+          "Iban": {
+            "type": "string"
+          },
+          "BankIdentifierCodeBic": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ]
+              },
+              "documentId": {
+                "type": "string"
+              },
+              "firstname": {
+                "type": "string"
+              },
+              "lastname": {
+                "type": "string"
+              },
+              "username": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "resetPasswordToken": {
+                "type": "string"
+              },
+              "resetPasswordTokenExpiresAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "registrationToken": {
+                "type": "string"
+              },
+              "isActive": {
+                "type": "boolean"
+              },
+              "roles": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ]
+                    },
+                    "documentId": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "documentId": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "documentId": {
+                            "type": "string"
+                          },
+                          "action": {
+                            "type": "string"
+                          },
+                          "actionParameters": {},
+                          "subject": {
+                            "type": "string"
+                          },
+                          "properties": {},
+                          "conditions": {},
+                          "role": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "oneOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "number"
+                                  }
+                                ]
+                              },
+                              "documentId": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "apiToken": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "oneOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "number"
+                                  }
+                                ]
+                              },
+                              "documentId": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "type": "string"
+                              },
+                              "kind": {
+                                "type": "string",
+                                "enum": [
+                                  "content-api",
+                                  "admin"
+                                ]
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "read-only",
+                                  "full-access",
+                                  "custom"
+                                ]
+                              },
+                              "accessKey": {
+                                "type": "string"
+                              },
+                              "encryptedKey": {
+                                "type": "string"
+                              },
+                              "lastUsedAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "permissions": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "oneOf": [
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "number"
+                                        }
+                                      ]
+                                    },
+                                    "documentId": {
+                                      "type": "string"
+                                    },
+                                    "action": {
+                                      "type": "string"
+                                    },
+                                    "token": {
+                                      "type": "object",
+                                      "properties": {
+                                        "id": {
+                                          "oneOf": [
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "number"
+                                            }
+                                          ]
+                                        },
+                                        "documentId": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "createdAt": {
+                                      "type": "string",
+                                      "format": "date-time"
+                                    },
+                                    "updatedAt": {
+                                      "type": "string",
+                                      "format": "date-time"
+                                    },
+                                    "publishedAt": {
+                                      "type": "string",
+                                      "format": "date-time"
+                                    },
+                                    "createdBy": {
+                                      "type": "object",
+                                      "properties": {
+                                        "id": {
+                                          "oneOf": [
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "number"
+                                            }
+                                          ]
+                                        },
+                                        "documentId": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "updatedBy": {
+                                      "type": "object",
+                                      "properties": {
+                                        "id": {
+                                          "oneOf": [
+                                            {
+                                              "type": "string"
+                                            },
+                                            {
+                                              "type": "number"
+                                            }
+                                          ]
+                                        },
+                                        "documentId": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "locale": {
+                                      "type": "string"
+                                    },
+                                    "localizations": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "id": {
+                                            "oneOf": [
+                                              {
+                                                "type": "string"
+                                              },
+                                              {
+                                                "type": "number"
+                                              }
+                                            ]
+                                          },
+                                          "documentId": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "adminPermissions": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "oneOf": [
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "number"
+                                        }
+                                      ]
+                                    },
+                                    "documentId": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              },
+                              "adminUserOwner": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "oneOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      }
+                                    ]
+                                  },
+                                  "documentId": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "expiresAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "lifespan": {
+                                "type": "string",
+                                "pattern": "^\\d*$",
+                                "example": "123456789"
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "updatedAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "publishedAt": {
+                                "type": "string",
+                                "format": "date-time"
+                              },
+                              "createdBy": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "oneOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      }
+                                    ]
+                                  },
+                                  "documentId": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "updatedBy": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "oneOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "number"
+                                      }
+                                    ]
+                                  },
+                                  "documentId": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "locale": {
+                                "type": "string"
+                              },
+                              "localizations": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "oneOf": [
+                                        {
+                                          "type": "string"
+                                        },
+                                        {
+                                          "type": "number"
+                                        }
+                                      ]
+                                    },
+                                    "documentId": {
+                                      "type": "string"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "publishedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "createdBy": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "oneOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "number"
+                                  }
+                                ]
+                              },
+                              "documentId": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "updatedBy": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "oneOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "number"
+                                  }
+                                ]
+                              },
+                              "documentId": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "locale": {
+                            "type": "string"
+                          },
+                          "localizations": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "oneOf": [
+                                    {
+                                      "type": "string"
+                                    },
+                                    {
+                                      "type": "number"
+                                    }
+                                  ]
+                                },
+                                "documentId": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "publishedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "createdBy": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ]
+                        },
+                        "documentId": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "updatedBy": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "oneOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ]
+                        },
+                        "documentId": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "locale": {
+                      "type": "string"
+                    },
+                    "localizations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ]
+                          },
+                          "documentId": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "apiTokens": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ]
+                    },
+                    "documentId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "blocked": {
+                "type": "boolean"
+              },
+              "preferedLanguage": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "publishedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "createdBy": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ]
+                  },
+                  "documentId": {
+                    "type": "string"
+                  }
+                }
+              },
+              "updatedBy": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "number"
+                      }
+                    ]
+                  },
+                  "documentId": {
+                    "type": "string"
+                  }
+                }
+              },
+              "locale": {
+                "type": "string"
+              },
+              "localizations": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ]
+                    },
+                    "documentId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "updatedBy": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ]
+              },
+              "documentId": {
+                "type": "string"
+              }
+            }
+          },
+          "locale": {
+            "type": "string"
+          },
+          "localizations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                },
+                "documentId": {
+                  "type": "string"
+                },
+                "Generation": {
+                  "type": "integer"
+                },
+                "IdPerson": {
+                  "type": "string"
+                },
+                "C01Access": {
+                  "type": "string"
+                },
+                "Salutation": {
+                  "type": "string"
+                },
+                "Title": {
+                  "type": "string"
+                },
+                "Firstname": {
+                  "type": "string"
+                },
+                "Lastname": {
+                  "type": "string"
+                },
+                "Language": {
+                  "type": "string"
+                },
+                "Street": {
+                  "type": "string"
+                },
+                "Zipcode": {
+                  "type": "string"
+                },
+                "City": {
+                  "type": "string"
+                },
+                "Oblast": {
+                  "type": "string"
+                },
+                "Country": {
+                  "type": "string"
+                },
+                "Organization": {
+                  "type": "string"
+                },
+                "Mobile": {
+                  "type": "string"
+                },
+                "Phone": {
+                  "type": "string"
+                },
+                "Email": {
+                  "type": "string"
+                },
+                "Internet": {
+                  "type": "string"
+                },
+                "TypeOfPerson": {
+                  "type": "string"
+                },
+                "PersonIsABreeder": {
+                  "type": "string"
+                },
+                "PersonIsAMember": {
+                  "type": "string"
+                },
+                "PersonIsASubscriber": {
+                  "type": "string"
+                },
+                "TypeOfSubscription": {
+                  "type": "string"
+                },
+                "PersonIsAnActiveBreeder": {
+                  "type": "string"
+                },
+                "BreedingStation": {
+                  "type": "string"
+                },
+                "GivenNameFirst": {
+                  "type": "string"
+                },
+                "MembershipNumber": {
+                  "type": "string"
+                },
+                "MembershipStatus": {
+                  "type": "string"
+                },
+                "RoleInAssociation": {
+                  "type": "string"
+                },
+                "OtherRoles": {
+                  "type": "string"
+                },
+                "DateOfBirth": {
+                  "type": "string"
+                },
+                "DateOfDeath": {
+                  "type": "string"
+                },
+                "DateOfJoining": {
+                  "type": "string"
+                },
+                "DateOfLeaving": {
+                  "type": "string"
+                },
+                "Iban": {
+                  "type": "string"
+                },
+                "BankIdentifierCodeBic": {
+                  "type": "string"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "publishedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "createdBy": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ]
+                    },
+                    "documentId": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "updatedBy": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        }
+                      ]
+                    },
+                    "documentId": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "locale": {
+                  "type": "string"
+                },
+                "localizations": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          }
+                        ]
+                      },
+                      "documentId": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "CsMemberResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CsMember"
+          },
+          "meta": {
+            "type": "object"
+          }
+        }
+      },
       "FormRequest": {
         "type": "object",
         "required": [
@@ -65691,6 +71600,20 @@
               "TotmeldungTemplateId": {
                 "type": "integer"
               },
+              "ImportGenerationCSDogs": {
+                "type": "integer"
+              },
+              "ImportGenerationCSMembers": {
+                "type": "integer"
+              },
+              "ImportTimestampCSDogs": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "ImportTimestampCSMembers": {
+                "type": "string",
+                "format": "date-time"
+              },
               "locale": {
                 "type": "string"
               },
@@ -67751,6 +73674,20 @@
           "TotmeldungTemplateId": {
             "type": "integer"
           },
+          "ImportGenerationCSDogs": {
+            "type": "integer"
+          },
+          "ImportGenerationCSMembers": {
+            "type": "integer"
+          },
+          "ImportTimestampCSDogs": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ImportTimestampCSMembers": {
+            "type": "string",
+            "format": "date-time"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -68861,6 +74798,20 @@
                 },
                 "TotmeldungTemplateId": {
                   "type": "integer"
+                },
+                "ImportGenerationCSDogs": {
+                  "type": "integer"
+                },
+                "ImportGenerationCSMembers": {
+                  "type": "integer"
+                },
+                "ImportTimestampCSDogs": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "ImportTimestampCSMembers": {
+                  "type": "string",
+                  "format": "date-time"
                 },
                 "createdAt": {
                   "type": "string",

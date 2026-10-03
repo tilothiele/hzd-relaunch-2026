@@ -79,6 +79,18 @@
     },
     "TotmeldungTemplateId": {
       "type": "integer"
+    },
+    "ImportGenerationCSDogs": {
+      "type": "integer"
+    },
+    "ImportGenerationCSMembers": {
+      "type": "integer"
+    },
+    "ImportTimestampCSDogs": {
+      "type": "datetime"
+    },
+    "ImportTimestampCSMembers": {
+      "type": "datetime"
     }
   }
 }

@@ -1,0 +1,945 @@
+{
+  "kind": "collectionType",
+  "collectionName": "cs_dogs",
+  "info": {
+    "singularName": "cs-dog",
+    "pluralName": "cs-dogs",
+    "displayName": "CS_Dog"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "indexes": [
+    {
+      "name": "cs_dogs_generation_idx",
+      "columns": [
+        "generation"
+      ]
+    }
+  ],
+  "attributes": {
+    "Generation": {
+      "type": "integer",
+      "required": true
+    },
+    "IdAnimal": {
+      "type": "text"
+    },
+    "GivenName": {
+      "type": "text"
+    },
+    "NameOfBreedingStation": {
+      "type": "text"
+    },
+    "FullName": {
+      "type": "text"
+    },
+    "IdBreeder": {
+      "type": "text"
+    },
+    "IdOwner": {
+      "type": "text"
+    },
+    "FullnameSire": {
+      "type": "text"
+    },
+    "StudbookNumberSire": {
+      "type": "text"
+    },
+    "FullnameDam": {
+      "type": "text"
+    },
+    "StudbookNumberDam": {
+      "type": "text"
+    },
+    "Studbook": {
+      "type": "text"
+    },
+    "StudbookNumber": {
+      "type": "text"
+    },
+    "ChipNumber": {
+      "type": "text"
+    },
+    "Sex": {
+      "type": "text"
+    },
+    "DateOfBirth": {
+      "type": "text"
+    },
+    "DateOfDeath": {
+      "type": "text"
+    },
+    "Fertile": {
+      "type": "text"
+    },
+    "Color": {
+      "type": "text"
+    },
+    "HdG": {
+      "type": "text"
+    },
+    "HdGDate": {
+      "type": "text"
+    },
+    "HdGAge": {
+      "type": "text"
+    },
+    "Hd": {
+      "type": "text"
+    },
+    "HdDate": {
+      "type": "text"
+    },
+    "HdAge": {
+      "type": "text"
+    },
+    "Zaehne": {
+      "type": "text"
+    },
+    "ZaehneDate": {
+      "type": "text"
+    },
+    "ZaehneAge": {
+      "type": "text"
+    },
+    "Gebiss": {
+      "type": "text"
+    },
+    "GebissDate": {
+      "type": "text"
+    },
+    "GebissAge": {
+      "type": "text"
+    },
+    "Nabel": {
+      "type": "text"
+    },
+    "NabelDate": {
+      "type": "text"
+    },
+    "NabelAge": {
+      "type": "text"
+    },
+    "GentestSod1": {
+      "type": "text"
+    },
+    "GentestSod1Date": {
+      "type": "text"
+    },
+    "GentestSod1Age": {
+      "type": "text"
+    },
+    "Schilddruesentest": {
+      "type": "text"
+    },
+    "SchilddruesentestDate": {
+      "type": "text"
+    },
+    "SchilddruesentestAge": {
+      "type": "text"
+    },
+    "Herzuntersuchung": {
+      "type": "text"
+    },
+    "HerzuntersuchungDate": {
+      "type": "text"
+    },
+    "HerzuntersuchungAge": {
+      "type": "text"
+    },
+    "HerzuntersuchungKeinZertifizierterArztDesCc": {
+      "type": "text"
+    },
+    "HerzuntersuchungKeinZertifizierterArztDesCcDate": {
+      "type": "text"
+    },
+    "HerzuntersuchungKeinZertifizierterArztDesCcAge": {
+      "type": "text"
+    },
+    "Augenuntersuchung": {
+      "type": "text"
+    },
+    "AugenuntersuchungDate": {
+      "type": "text"
+    },
+    "AugenuntersuchungAge": {
+      "type": "text"
+    },
+    "Anaplasmose": {
+      "type": "text"
+    },
+    "AnaplasmoseDate": {
+      "type": "text"
+    },
+    "AnaplasmoseAge": {
+      "type": "text"
+    },
+    "Aortenstenose": {
+      "type": "text"
+    },
+    "AortenstenoseDate": {
+      "type": "text"
+    },
+    "AortenstenoseAge": {
+      "type": "text"
+    },
+    "Arthrose": {
+      "type": "text"
+    },
+    "ArthroseDate": {
+      "type": "text"
+    },
+    "ArthroseAge": {
+      "type": "text"
+    },
+    "Autoimmunerkrankung": {
+      "type": "text"
+    },
+    "AutoimmunerkrankungDate": {
+      "type": "text"
+    },
+    "AutoimmunerkrankungAge": {
+      "type": "text"
+    },
+    "Babesiose": {
+      "type": "text"
+    },
+    "BabesioseDate": {
+      "type": "text"
+    },
+    "BabesioseAge": {
+      "type": "text"
+    },
+    "Bandscheibenvorfall": {
+      "type": "text"
+    },
+    "BandscheibenvorfallDate": {
+      "type": "text"
+    },
+    "BandscheibenvorfallAge": {
+      "type": "text"
+    },
+    "Borreliose": {
+      "type": "text"
+    },
+    "BorrelioseDate": {
+      "type": "text"
+    },
+    "BorrelioseAge": {
+      "type": "text"
+    },
+    "CaudaEquina": {
+      "type": "text"
+    },
+    "CaudaEquinaDate": {
+      "type": "text"
+    },
+    "CaudaEquinaAge": {
+      "type": "text"
+    },
+    "Dermoid": {
+      "type": "text"
+    },
+    "DermoidDate": {
+      "type": "text"
+    },
+    "DermoidAge": {
+      "type": "text"
+    },
+    "DilativeKardiomyopathieDcm": {
+      "type": "text"
+    },
+    "DilativeKardiomyopathieDcmDate": {
+      "type": "text"
+    },
+    "DilativeKardiomyopathieDcmAge": {
+      "type": "text"
+    },
+    "Diabetes": {
+      "type": "text"
+    },
+    "DiabetesDate": {
+      "type": "text"
+    },
+    "DiabetesAge": {
+      "type": "text"
+    },
+    "DmGesichert": {
+      "type": "text"
+    },
+    "DmGesichertDate": {
+      "type": "text"
+    },
+    "DmGesichertAge": {
+      "type": "text"
+    },
+    "DmVerdacht": {
+      "type": "text"
+    },
+    "DmVerdachtDate": {
+      "type": "text"
+    },
+    "DmVerdachtAge": {
+      "type": "text"
+    },
+    "DiversitaetDla": {
+      "type": "text"
+    },
+    "DiversitaetDlaDate": {
+      "type": "text"
+    },
+    "DiversitaetDlaAge": {
+      "type": "text"
+    },
+    "DnaProfil": {
+      "type": "text"
+    },
+    "DnaProfilDate": {
+      "type": "text"
+    },
+    "DnaProfilAge": {
+      "type": "text"
+    },
+    "EllbogendysplasieEd": {
+      "type": "text"
+    },
+    "EllbogendysplasieEdDate": {
+      "type": "text"
+    },
+    "EllbogendysplasieEdAge": {
+      "type": "text"
+    },
+    "EllenbogendysplasieEd": {
+      "type": "text"
+    },
+    "EllenbogendysplasieEdDate": {
+      "type": "text"
+    },
+    "EllenbogendysplasieEdAge": {
+      "type": "text"
+    },
+    "Epilepsie": {
+      "type": "text"
+    },
+    "EpilepsieDate": {
+      "type": "text"
+    },
+    "EpilepsieAge": {
+      "type": "text"
+    },
+    "DLokus": {
+      "type": "text"
+    },
+    "DLokusDate": {
+      "type": "text"
+    },
+    "DLokusAge": {
+      "type": "text"
+    },
+    "Fellabweichung": {
+      "type": "text"
+    },
+    "FellabweichungDate": {
+      "type": "text"
+    },
+    "FellabweichungAge": {
+      "type": "text"
+    },
+    "Gallensaeuretest": {
+      "type": "text"
+    },
+    "GallensaeuretestDate": {
+      "type": "text"
+    },
+    "GallensaeuretestAge": {
+      "type": "text"
+    },
+    "Gaumenspalte": {
+      "type": "text"
+    },
+    "GaumenspalteDate": {
+      "type": "text"
+    },
+    "GaumenspalteAge": {
+      "type": "text"
+    },
+    "HereditaereKataraktHc": {
+      "type": "text"
+    },
+    "HereditaereKataraktHcDate": {
+      "type": "text"
+    },
+    "HereditaereKataraktHcAge": {
+      "type": "text"
+    },
+    "HinterhandschwaecheUnspez": {
+      "type": "text"
+    },
+    "HinterhandschwaecheUnspezDate": {
+      "type": "text"
+    },
+    "HinterhandschwaecheUnspezAge": {
+      "type": "text"
+    },
+    "Hydrocephalus": {
+      "type": "text"
+    },
+    "HydrocephalusDate": {
+      "type": "text"
+    },
+    "HydrocephalusAge": {
+      "type": "text"
+    },
+    "HypothyreoseGesichert": {
+      "type": "text"
+    },
+    "HypothyreoseGesichertDate": {
+      "type": "text"
+    },
+    "HypothyreoseGesichertAge": {
+      "type": "text"
+    },
+    "HypothyreoseVerdacht": {
+      "type": "text"
+    },
+    "HypothyreoseVerdachtDate": {
+      "type": "text"
+    },
+    "HypothyreoseVerdachtAge": {
+      "type": "text"
+    },
+    "Infarkt": {
+      "type": "text"
+    },
+    "InfarktDate": {
+      "type": "text"
+    },
+    "InfarktAge": {
+      "type": "text"
+    },
+    "Infektion": {
+      "type": "text"
+    },
+    "InfektionDate": {
+      "type": "text"
+    },
+    "InfektionAge": {
+      "type": "text"
+    },
+    "Kaiserschnitt": {
+      "type": "text"
+    },
+    "KaiserschnittDate": {
+      "type": "text"
+    },
+    "KaiserschnittAge": {
+      "type": "text"
+    },
+    "KardiologischeErkrankungen": {
+      "type": "text"
+    },
+    "KardiologischeErkrankungenDate": {
+      "type": "text"
+    },
+    "KardiologischeErkrankungenAge": {
+      "type": "text"
+    },
+    "Kehlkopflaehmung": {
+      "type": "text"
+    },
+    "KehlkopflaehmungDate": {
+      "type": "text"
+    },
+    "KehlkopflaehmungAge": {
+      "type": "text"
+    },
+    "Lebershunt": {
+      "type": "text"
+    },
+    "LebershuntDate": {
+      "type": "text"
+    },
+    "LebershuntAge": {
+      "type": "text"
+    },
+    "Leptospirose": {
+      "type": "text"
+    },
+    "LeptospiroseDate": {
+      "type": "text"
+    },
+    "LeptospiroseAge": {
+      "type": "text"
+    },
+    "Lungenerkrankung": {
+      "type": "text"
+    },
+    "LungenerkrankungDate": {
+      "type": "text"
+    },
+    "LungenerkrankungAge": {
+      "type": "text"
+    },
+    "Magendrehung": {
+      "type": "text"
+    },
+    "MagendrehungDate": {
+      "type": "text"
+    },
+    "MagendrehungAge": {
+      "type": "text"
+    },
+    "Milzdrehung": {
+      "type": "text"
+    },
+    "MilzdrehungDate": {
+      "type": "text"
+    },
+    "MilzdrehungAge": {
+      "type": "text"
+    },
+    "MorbusCushing": {
+      "type": "text"
+    },
+    "MorbusCushingDate": {
+      "type": "text"
+    },
+    "MorbusCushingAge": {
+      "type": "text"
+    },
+    "NeurologischeErkrankungen": {
+      "type": "text"
+    },
+    "NeurologischeErkrankungenDate": {
+      "type": "text"
+    },
+    "NeurologischeErkrankungenAge": {
+      "type": "text"
+    },
+    "NeurologischeErkrankung": {
+      "type": "text"
+    },
+    "NeurologischeErkrankungDate": {
+      "type": "text"
+    },
+    "NeurologischeErkrankungAge": {
+      "type": "text"
+    },
+    "Nierenerkrankung": {
+      "type": "text"
+    },
+    "NierenerkrankungDate": {
+      "type": "text"
+    },
+    "NierenerkrankungAge": {
+      "type": "text"
+    },
+    "Osteomyelitis": {
+      "type": "text"
+    },
+    "OsteomyelitisDate": {
+      "type": "text"
+    },
+    "OsteomyelitisAge": {
+      "type": "text"
+    },
+    "OsteochondrosisDissecansOcd": {
+      "type": "text"
+    },
+    "OsteochondrosisDissecansOcdDate": {
+      "type": "text"
+    },
+    "OsteochondrosisDissecansOcdAge": {
+      "type": "text"
+    },
+    "PersistPupillarmembranMpp": {
+      "type": "text"
+    },
+    "PersistPupillarmembranMppDate": {
+      "type": "text"
+    },
+    "PersistPupillarmembranMppAge": {
+      "type": "text"
+    },
+    "Pneumothorax": {
+      "type": "text"
+    },
+    "PneumothoraxDate": {
+      "type": "text"
+    },
+    "PneumothoraxAge": {
+      "type": "text"
+    },
+    "Pyometra": {
+      "type": "text"
+    },
+    "PyometraDate": {
+      "type": "text"
+    },
+    "PyometraAge": {
+      "type": "text"
+    },
+    "RuedeHatInDerHzdGedeckt": {
+      "type": "text"
+    },
+    "RuedeHatInDerHzdGedecktDate": {
+      "type": "text"
+    },
+    "RuedeHatInDerHzdGedecktAge": {
+      "type": "text"
+    },
+    "Rute": {
+      "type": "text"
+    },
+    "RuteDate": {
+      "type": "text"
+    },
+    "RuteAge": {
+      "type": "text"
+    },
+    "Rutenanomalie": {
+      "type": "text"
+    },
+    "RutenanomalieDate": {
+      "type": "text"
+    },
+    "RutenanomalieAge": {
+      "type": "text"
+    },
+    "VerdachtAufRutenanomalie": {
+      "type": "text"
+    },
+    "VerdachtAufRutenanomalieDate": {
+      "type": "text"
+    },
+    "VerdachtAufRutenanomalieAge": {
+      "type": "text"
+    },
+    "Sebadenitis": {
+      "type": "text"
+    },
+    "SebadenitisDate": {
+      "type": "text"
+    },
+    "SebadenitisAge": {
+      "type": "text"
+    },
+    "Sepsis": {
+      "type": "text"
+    },
+    "SepsisDate": {
+      "type": "text"
+    },
+    "SepsisAge": {
+      "type": "text"
+    },
+    "Spondylose": {
+      "type": "text"
+    },
+    "SpondyloseDate": {
+      "type": "text"
+    },
+    "SpondyloseAge": {
+      "type": "text"
+    },
+    "TumorDarm": {
+      "type": "text"
+    },
+    "TumorDarmDate": {
+      "type": "text"
+    },
+    "TumorDarmAge": {
+      "type": "text"
+    },
+    "TumorHirn": {
+      "type": "text"
+    },
+    "TumorHirnDate": {
+      "type": "text"
+    },
+    "TumorHirnAge": {
+      "type": "text"
+    },
+    "TumorKnochen": {
+      "type": "text"
+    },
+    "TumorKnochenDate": {
+      "type": "text"
+    },
+    "TumorKnochenAge": {
+      "type": "text"
+    },
+    "TumorLeber": {
+      "type": "text"
+    },
+    "TumorLeberDate": {
+      "type": "text"
+    },
+    "TumorLeberAge": {
+      "type": "text"
+    },
+    "TumorLunge": {
+      "type": "text"
+    },
+    "TumorLungeDate": {
+      "type": "text"
+    },
+    "TumorLungeAge": {
+      "type": "text"
+    },
+    "TumorMagen": {
+      "type": "text"
+    },
+    "TumorMagenDate": {
+      "type": "text"
+    },
+    "TumorMagenAge": {
+      "type": "text"
+    },
+    "TumorMamma": {
+      "type": "text"
+    },
+    "TumorMammaDate": {
+      "type": "text"
+    },
+    "TumorMammaAge": {
+      "type": "text"
+    },
+    "TumorMilz": {
+      "type": "text"
+    },
+    "TumorMilzDate": {
+      "type": "text"
+    },
+    "TumorMilzAge": {
+      "type": "text"
+    },
+    "TumorPankreas": {
+      "type": "text"
+    },
+    "TumorPankreasDate": {
+      "type": "text"
+    },
+    "TumorPankreasAge": {
+      "type": "text"
+    },
+    "TumorUnspezAndereKarzinogeneErkr": {
+      "type": "text"
+    },
+    "TumorUnspezAndereKarzinogeneErkrDate": {
+      "type": "text"
+    },
+    "TumorUnspezAndereKarzinogeneErkrAge": {
+      "type": "text"
+    },
+    "Wurfprotokolle": {
+      "type": "text"
+    },
+    "WurfprotokolleDate": {
+      "type": "text"
+    },
+    "WurfprotokolleAge": {
+      "type": "text"
+    },
+    "VerhaltenIi": {
+      "type": "text"
+    },
+    "VerhaltenIiDate": {
+      "type": "text"
+    },
+    "VerhaltenIiAge": {
+      "type": "text"
+    },
+    "VerhaltenIii": {
+      "type": "text"
+    },
+    "VerhaltenIiiDate": {
+      "type": "text"
+    },
+    "VerhaltenIiiAge": {
+      "type": "text"
+    },
+    "VerhaltenIiiE": {
+      "type": "text"
+    },
+    "VerhaltenIiiEDate": {
+      "type": "text"
+    },
+    "VerhaltenIiiEAge": {
+      "type": "text"
+    },
+    "VerhaltenIiiF": {
+      "type": "text"
+    },
+    "VerhaltenIiiFDate": {
+      "type": "text"
+    },
+    "VerhaltenIiiFAge": {
+      "type": "text"
+    },
+    "VerhaltenIiiZurueckgestellt": {
+      "type": "text"
+    },
+    "VerhaltenIiiZurueckgestelltDate": {
+      "type": "text"
+    },
+    "VerhaltenIiiZurueckgestelltAge": {
+      "type": "text"
+    },
+    "VerhaltenIiiNichtBestanden": {
+      "type": "text"
+    },
+    "VerhaltenIiiNichtBestandenDate": {
+      "type": "text"
+    },
+    "VerhaltenIiiNichtBestandenAge": {
+      "type": "text"
+    },
+    "VerhaltenIiiAbbruch": {
+      "type": "text"
+    },
+    "VerhaltenIiiAbbruchDate": {
+      "type": "text"
+    },
+    "VerhaltenIiiAbbruchAge": {
+      "type": "text"
+    },
+    "VerhaltenIv": {
+      "type": "text"
+    },
+    "VerhaltenIvDate": {
+      "type": "text"
+    },
+    "VerhaltenIvAge": {
+      "type": "text"
+    },
+    "VerhaltenVeteranen": {
+      "type": "text"
+    },
+    "VerhaltenVeteranenDate": {
+      "type": "text"
+    },
+    "VerhaltenVeteranenAge": {
+      "type": "text"
+    },
+    "KoerungHzd": {
+      "type": "text"
+    },
+    "KoerungHzdDate": {
+      "type": "text"
+    },
+    "KoerungHzdAge": {
+      "type": "text"
+    },
+    "KoerungHzdE": {
+      "type": "text"
+    },
+    "KoerungHzdEDate": {
+      "type": "text"
+    },
+    "KoerungHzdEAge": {
+      "type": "text"
+    },
+    "KoerungHzdNichtBestanden": {
+      "type": "text"
+    },
+    "KoerungHzdNichtBestandenDate": {
+      "type": "text"
+    },
+    "KoerungHzdNichtBestandenAge": {
+      "type": "text"
+    },
+    "JugendkoerungHzd": {
+      "type": "text"
+    },
+    "JugendkoerungHzdDate": {
+      "type": "text"
+    },
+    "JugendkoerungHzdAge": {
+      "type": "text"
+    },
+    "Richterbericht": {
+      "type": "text"
+    },
+    "RichterberichtDate": {
+      "type": "text"
+    },
+    "RichterberichtAge": {
+      "type": "text"
+    },
+    "UebernahmeInsHzdZuchtbuch": {
+      "type": "text"
+    },
+    "UebernahmeInsHzdZuchtbuchDate": {
+      "type": "text"
+    },
+    "UebernahmeInsHzdZuchtbuchAge": {
+      "type": "text"
+    },
+    "Zuchtzulassung": {
+      "type": "text"
+    },
+    "ZuchtzulassungDate": {
+      "type": "text"
+    },
+    "ZuchtzulassungAge": {
+      "type": "text"
+    },
+    "ZuchthuendinImZwinger": {
+      "type": "text"
+    },
+    "ZuchthuendinImZwingerDate": {
+      "type": "text"
+    },
+    "ZuchthuendinImZwingerAge": {
+      "type": "text"
+    },
+    "ZuchtzulassungMitAuflagen": {
+      "type": "text"
+    },
+    "ZuchtzulassungMitAuflagenDate": {
+      "type": "text"
+    },
+    "ZuchtzulassungMitAuflagenAge": {
+      "type": "text"
+    },
+    "AnmerkungenSonstBefundeNichtAuswertbar": {
+      "type": "text"
+    },
+    "AnmerkungenSonstBefundeNichtAuswertbarDate": {
+      "type": "text"
+    },
+    "AnmerkungenSonstBefundeNichtAuswertbarAge": {
+      "type": "text"
+    },
+    "Kryptorchide": {
+      "type": "text"
+    },
+    "KryptorchideDate": {
+      "type": "text"
+    },
+    "KryptorchideAge": {
+      "type": "text"
+    },
+    "Monorchide": {
+      "type": "text"
+    },
+    "MonorchideDate": {
+      "type": "text"
+    },
+    "MonorchideAge": {
+      "type": "text"
+    },
+    "TumorHoden": {
+      "type": "text"
+    },
+    "TumorHodenDate": {
+      "type": "text"
+    },
+    "TumorHodenAge": {
+      "type": "text"
+    }
+  }
+}

@@ -6,6 +6,7 @@ import geolocationController from './geolocation';
 import geolocationSync from './geolocation-sync';
 import userImport from './user-import';
 import litterReminder from './litter-reminder';
+import importStrapiDaten from './import-strapi-daten';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const controllers: Record<string, any> = {
@@ -17,6 +18,7 @@ const controllers: Record<string, any> = {
   'geolocation-sync': geolocationSync,
   'user-import': userImport,
   'litter-reminder': litterReminder,
+  'import-strapi-daten': importStrapiDaten,
 }
 
 export default controllers
