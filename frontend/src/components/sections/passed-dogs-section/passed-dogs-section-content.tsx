@@ -53,7 +53,7 @@ export function PassedDogsSectionContent({
 	const observer = useRef<IntersectionObserver | null>(null)
 
 	const publicCards = useMemo(
-		() => nodes.filter((d) => d.Consent === true),
+		() => nodes.filter((d) => d.Consent === true && d.Approved === true),
 		[nodes],
 	)
 
