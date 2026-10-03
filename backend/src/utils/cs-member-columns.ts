@@ -1,0 +1,42 @@
+export interface CsCsvColumn {
+	header: string
+	attribute: string
+}
+
+export const CS_MEMBER_COLUMNS: CsCsvColumn[] = [
+	{ header: "ID Person", attribute: 'IdPerson' },
+	{ header: "0/1 access", attribute: 'C01Access' },
+	{ header: "salutation", attribute: 'Salutation' },
+	{ header: "title", attribute: 'Title' },
+	{ header: "firstname", attribute: 'Firstname' },
+	{ header: "lastname", attribute: 'Lastname' },
+	{ header: "language", attribute: 'Language' },
+	{ header: "street", attribute: 'Street' },
+	{ header: "zipcode", attribute: 'Zipcode' },
+	{ header: "city", attribute: 'City' },
+	{ header: "oblast", attribute: 'Oblast' },
+	{ header: "country", attribute: 'Country' },
+	{ header: "organization", attribute: 'Organization' },
+	{ header: "mobile", attribute: 'Mobile' },
+	{ header: "phone", attribute: 'Phone' },
+	{ header: "email", attribute: 'Email' },
+	{ header: "internet", attribute: 'Internet' },
+	{ header: "type of person", attribute: 'TypeOfPerson' },
+	{ header: "person is a breeder", attribute: 'PersonIsABreeder' },
+	{ header: "person is a member", attribute: 'PersonIsAMember' },
+	{ header: "person is a subscriber", attribute: 'PersonIsASubscriber' },
+	{ header: "type of subscription", attribute: 'TypeOfSubscription' },
+	{ header: "person is an active breeder", attribute: 'PersonIsAnActiveBreeder' },
+	{ header: "breeding station", attribute: 'BreedingStation' },
+	{ header: "given name first", attribute: 'GivenNameFirst' },
+	{ header: "membership number", attribute: 'MembershipNumber' },
+	{ header: "membership status", attribute: 'MembershipStatus' },
+	{ header: "role in association", attribute: 'RoleInAssociation' },
+	{ header: "other roles", attribute: 'OtherRoles' },
+	{ header: "date of birth", attribute: 'DateOfBirth' },
+	{ header: "date of death", attribute: 'DateOfDeath' },
+	{ header: "date of joining", attribute: 'DateOfJoining' },
+	{ header: "date of leaving", attribute: 'DateOfLeaving' },
+	{ header: "IBAN", attribute: 'Iban' },
+	{ header: "Bank Identifier Code (BIC)", attribute: 'BankIdentifierCodeBic' },
+]

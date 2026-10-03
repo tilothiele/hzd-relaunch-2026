@@ -47,4 +47,28 @@ export default [
       policies: [],
     },
   },
+  {
+    method: "POST",
+    path: "/chromosoft/import-strapi-daten",
+    handler: "import-strapi-daten.import_strapi_daten",
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: "GET",
+    path: "/chromosoft/import-strapi-daten/status",
+    handler: "import-strapi-daten.status",
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: "GET",
+    path: "/chromosoft/import-strapi-daten/log",
+    handler: "import-strapi-daten.downloadLog",
+    config: {
+      policies: [],
+    },
+  },
 ];

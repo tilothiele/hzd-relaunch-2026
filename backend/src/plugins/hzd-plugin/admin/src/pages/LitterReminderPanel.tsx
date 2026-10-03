@@ -80,6 +80,7 @@ const LitterReminderPanel = () => {
       hasRadius
       padding={6}
       shadow="tableShadow"
+      width="100%"
     >
       <Flex direction="column" alignItems="flex-start" gap={4}>
         <Box>

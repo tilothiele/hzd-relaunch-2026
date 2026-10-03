@@ -1,0 +1,132 @@
+{
+  "kind": "collectionType",
+  "collectionName": "cs_members",
+  "info": {
+    "singularName": "cs-member",
+    "pluralName": "cs-members",
+    "displayName": "CS_Member"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "indexes": [
+    {
+      "name": "cs_members_generation_idx",
+      "columns": [
+        "generation"
+      ]
+    }
+  ],
+  "attributes": {
+    "Generation": {
+      "type": "integer",
+      "required": true
+    },
+    "IdPerson": {
+      "type": "text"
+    },
+    "C01Access": {
+      "type": "text"
+    },
+    "Salutation": {
+      "type": "text"
+    },
+    "Title": {
+      "type": "text"
+    },
+    "Firstname": {
+      "type": "text"
+    },
+    "Lastname": {
+      "type": "text"
+    },
+    "Language": {
+      "type": "text"
+    },
+    "Street": {
+      "type": "text"
+    },
+    "Zipcode": {
+      "type": "text"
+    },
+    "City": {
+      "type": "text"
+    },
+    "Oblast": {
+      "type": "text"
+    },
+    "Country": {
+      "type": "text"
+    },
+    "Organization": {
+      "type": "text"
+    },
+    "Mobile": {
+      "type": "text"
+    },
+    "Phone": {
+      "type": "text"
+    },
+    "Email": {
+      "type": "text"
+    },
+    "Internet": {
+      "type": "text"
+    },
+    "TypeOfPerson": {
+      "type": "text"
+    },
+    "PersonIsABreeder": {
+      "type": "text"
+    },
+    "PersonIsAMember": {
+      "type": "text"
+    },
+    "PersonIsASubscriber": {
+      "type": "text"
+    },
+    "TypeOfSubscription": {
+      "type": "text"
+    },
+    "PersonIsAnActiveBreeder": {
+      "type": "text"
+    },
+    "BreedingStation": {
+      "type": "text"
+    },
+    "GivenNameFirst": {
+      "type": "text"
+    },
+    "MembershipNumber": {
+      "type": "text"
+    },
+    "MembershipStatus": {
+      "type": "text"
+    },
+    "RoleInAssociation": {
+      "type": "text"
+    },
+    "OtherRoles": {
+      "type": "text"
+    },
+    "DateOfBirth": {
+      "type": "text"
+    },
+    "DateOfDeath": {
+      "type": "text"
+    },
+    "DateOfJoining": {
+      "type": "text"
+    },
+    "DateOfLeaving": {
+      "type": "text"
+    },
+    "Iban": {
+      "type": "text"
+    },
+    "BankIdentifierCodeBic": {
+      "type": "text"
+    }
+  }
+}
