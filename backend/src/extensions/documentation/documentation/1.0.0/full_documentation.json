@@ -65681,6 +65681,16 @@
                 ],
                 "example": "string or id"
               },
+              "TotmeldungEmail": {
+                "type": "string",
+                "format": "email"
+              },
+              "LitterReminderTemplateId": {
+                "type": "integer"
+              },
+              "TotmeldungTemplateId": {
+                "type": "integer"
+              },
               "locale": {
                 "type": "string"
               },
@@ -67731,6 +67741,16 @@
               }
             }
           },
+          "TotmeldungEmail": {
+            "type": "string",
+            "format": "email"
+          },
+          "LitterReminderTemplateId": {
+            "type": "integer"
+          },
+          "TotmeldungTemplateId": {
+            "type": "integer"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -68831,6 +68851,16 @@
                       }
                     }
                   }
+                },
+                "TotmeldungEmail": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "LitterReminderTemplateId": {
+                  "type": "integer"
+                },
+                "TotmeldungTemplateId": {
+                  "type": "integer"
                 },
                 "createdAt": {
                   "type": "string",

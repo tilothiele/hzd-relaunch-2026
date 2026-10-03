@@ -799,6 +799,7 @@ export async function fetchApprovedPassedDogsPage(
 		filters: {
 			and: [
 				{ Consent: { eq: true } },
+				{ Approved: { eq: true } },
 			],
 		},
 		pagination: { page, pageSize },
