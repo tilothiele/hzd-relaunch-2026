@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useIntl } from 'react-intl';
 
 import { getTranslation } from '../utils/getTranslation';
+import { LitterReminderPanel } from './LitterReminderPanel';
 
 const HomePage = () => {
   const { formatMessage } = useIntl();
@@ -164,6 +165,8 @@ const HomePage = () => {
               </Button>
             </Flex>
           </Box>
+
+          <LitterReminderPanel />
         </Flex>
       </Box>
     </Main>

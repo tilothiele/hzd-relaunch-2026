@@ -70,6 +70,15 @@
         "videos",
         "audios"
       ]
+    },
+    "TotmeldungEmail": {
+      "type": "email"
+    },
+    "LitterReminderTemplateId": {
+      "type": "integer"
+    },
+    "TotmeldungTemplateId": {
+      "type": "integer"
     }
   }
 }

@@ -1,11 +1,29 @@
 import { MainPageStructure } from '../main-page-structure'
 import { DogSearch } from '@/components/dog-search/dog-search'
+import type { SexFilter } from '@/hooks/use-dogs'
 import { theme as globalTheme } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 
 export const dynamic = 'force-dynamic'
 
-export default async function DogsPage() {
+function parseDogSexQuery(value: string | string[] | undefined): SexFilter {
+	const raw = Array.isArray(value) ? value[0] : value
+	const normalized = raw?.trim().toUpperCase()
+	if (normalized === 'H') {
+		return 'F'
+	}
+	if (normalized === 'R') {
+		return 'M'
+	}
+	return ''
+}
+
+interface DogsPageProps {
+	searchParams: Promise<{ geschlecht?: string | string[] }>
+}
+
+export default async function DogsPage({ searchParams }: DogsPageProps) {
+	const { geschlecht } = await searchParams
 	const { globalLayout, baseUrl, error } = await fetchGlobalLayout()
 	const theme = globalTheme
 
@@ -29,6 +47,7 @@ export default async function DogsPage() {
 			<DogSearch
 				strapiBaseUrl={baseUrl}
 				hzdSetting={globalLayout?.HzdSetting}
+				initialSex={parseDogSexQuery(geschlecht)}
 			/>
 		</MainPageStructure>
 	)

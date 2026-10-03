@@ -9,5 +9,13 @@
   "hzd-plugin.reports.breeders.title": "Breeder Report",
   "hzd-plugin.reports.breeders.description": "Checks active, non-disabled breeders for missing owner members.",
   "hzd-plugin.reports.breeders.button": "Generate Breeder Report",
-  "hzd-plugin.reports.breeders.error": "The breeder report could not be generated."
+  "hzd-plugin.reports.breeders.error": "The breeder report could not be generated.",
+  "hzd-plugin.litterReminder.title": "Litter reminder",
+  "hzd-plugin.litterReminder.description": "Sends an email to the breeder of every litter in status Littered whose date of birth is more than the selected number of weeks ago.",
+  "hzd-plugin.litterReminder.weeks": "Minimum age in weeks",
+  "hzd-plugin.litterReminder.button": "Send reminders",
+  "hzd-plugin.litterReminder.error": "The litter reminders could not be sent.",
+  "hzd-plugin.litterReminder.sentHeading": "Sent ({count}), birth before {cutoff}",
+  "hzd-plugin.litterReminder.sentEmpty": "No email sent.",
+  "hzd-plugin.litterReminder.skippedHeading": "Not sent"
 }

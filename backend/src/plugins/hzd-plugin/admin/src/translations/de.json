@@ -9,5 +9,13 @@
   "hzd-plugin.reports.breeders.title": "Breeder-Report",
   "hzd-plugin.reports.breeders.description": "Prueft aktive, nicht deaktivierte Breeder auf fehlende Owner-Members.",
   "hzd-plugin.reports.breeders.button": "Generiere Breeder-Report",
-  "hzd-plugin.reports.breeders.error": "Der Breeder-Report konnte nicht generiert werden."
+  "hzd-plugin.reports.breeders.error": "Der Breeder-Report konnte nicht generiert werden.",
+  "hzd-plugin.litterReminder.title": "Wurf-Erinnerung",
+  "hzd-plugin.litterReminder.description": "Sendet eine Mail an den Züchter jedes Wurfs im Status Littered, dessen Geburtsdatum länger als die gewählte Wochenzahl zurückliegt.",
+  "hzd-plugin.litterReminder.weeks": "Mindestalter in Wochen",
+  "hzd-plugin.litterReminder.button": "Erinnerungen senden",
+  "hzd-plugin.litterReminder.error": "Die Wurf-Erinnerungen konnten nicht gesendet werden.",
+  "hzd-plugin.litterReminder.sentHeading": "Gesendet ({count}), Geburt vor {cutoff}",
+  "hzd-plugin.litterReminder.sentEmpty": "Keine Mail versendet.",
+  "hzd-plugin.litterReminder.skippedHeading": "Nicht gesendet"
 }

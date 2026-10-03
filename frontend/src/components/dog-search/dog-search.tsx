@@ -32,16 +32,31 @@ function getColorLabel(color: string | null | undefined): string {
 	}
 }
 
+function getDogCountLabel(sex: SexFilter): string {
+	if (sex === 'F') {
+		return 'Hündinnen'
+	}
+	if (sex === 'M') {
+		return 'Deckrüden'
+	}
+	return 'Hunden'
+}
+
 
 interface DogSearchProps {
 	strapiBaseUrl?: string | null
 	hzdSetting?: HzdSetting | null
+	initialSex?: SexFilter
 }
 
-export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
+export function DogSearch({
+	strapiBaseUrl,
+	hzdSetting,
+	initialSex = '',
+}: DogSearchProps) {
 	const [nameFilter, setNameFilter] = useState('')
 	const [nameInput, setNameInput] = useState('')
-	const [sexFilter, setSexFilter] = useState<SexFilter>('')
+	const [sexFilter, setSexFilter] = useState<SexFilter>(initialSex)
 	const [colorFilter, setColorFilter] = useState<ColorFilter>('')
 	const [zipCode, setZipCode] = useState('')
 	const [zipLocation, setZipLocation] = useState<{ lat: number; lng: number } | null>(null)
@@ -55,7 +70,7 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 	const [colorcheckFilter, setColorcheckFilter] = useState<TriStateFilter>('')
 	const [showMap, setShowMap] = useState(false)
 	const [selectedDog, setSelectedDog] = useState<Dog | null>(null)
-	const [hasSearched, setHasSearched] = useState(false)
+	const [hasSearched, setHasSearched] = useState(initialSex !== '')
 	const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
 
 	const userLocation = zipLocation || null
@@ -375,7 +390,7 @@ export function DogSearch({ strapiBaseUrl, hzdSetting }: DogSearchProps) {
 						{totalDogs > 0 ? (
 							<>
 								Zeige {((currentPage - 1) * pageSize) + 1} bis{' '}
-								{Math.min(currentPage * pageSize, totalDogs)} von {totalDogs} Hunden
+								{Math.min(currentPage * pageSize, totalDogs)} von {totalDogs} {getDogCountLabel(sexFilter)}
 							</>
 						) : (
 							'Keine Hunde gefunden'

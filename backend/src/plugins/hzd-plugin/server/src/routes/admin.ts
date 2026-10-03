@@ -39,4 +39,12 @@ export default [
       policies: [],
     },
   },
+  {
+    method: "POST",
+    path: "/litters/send-reminder",
+    handler: "litter-reminder.send",
+    config: {
+      policies: [],
+    },
+  },
 ];
