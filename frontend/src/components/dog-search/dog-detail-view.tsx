@@ -24,6 +24,34 @@ interface DogDetailViewProps {
     backButtonLabel?: string
 }
 
+function hasPersonalWords(dog: Dog): boolean {
+    const html = dog.MemosReleased?.trim()
+    if (!html) {
+        return false
+    }
+    const text = html
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/&nbsp;|&#160;/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+    if (text.length > 0) {
+        return true
+    }
+    return /<img\b/i.test(html)
+}
+
+function hasDogImages(dog: Dog): boolean {
+    return (dog.Images ?? []).some((image) => Boolean(image?.url))
+}
+
+function hasDogDocuments(dog: Dog): boolean {
+    return (dog.DogDocument ?? []).some((doc) => {
+        const hasDescription = Boolean(doc.Description?.trim())
+        const hasFile = (doc.MediaFile ?? []).some((file) => Boolean(file?.url))
+        return hasDescription || hasFile
+    })
+}
+
 export function DogDetailView({
     dog,
     strapiBaseUrl,
@@ -93,17 +121,19 @@ export function DogDetailView({
                     <DogOwnerTab dog={dog} />
                 </section>
 
-                {/* 4. Über den Hund */}
-                <section>
-                    <SectionHeader title={`über ${dog.givenName || dog.fullKennelName || 'diesen Hund'}`} />
-                    <DogPersonalWordsTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
-                </section>
+                {hasPersonalWords(dog) ? (
+                    <section>
+                        <SectionHeader title={`über ${dog.givenName || dog.fullKennelName || 'diesen Hund'}`} />
+                        <DogPersonalWordsTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
+                    </section>
+                ) : null}
 
-                {/* 5. Bilder */}
-                <section>
-                    <SectionHeader title="Bilder" />
-                    <DogImagesTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
-                </section>
+                {hasDogImages(dog) ? (
+                    <section>
+                        <SectionHeader title="Bilder" />
+                        <DogImagesTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
+                    </section>
+                ) : null}
 
                 {/* 6. Leistungen */}
                 <section>
@@ -117,11 +147,12 @@ export function DogDetailView({
                     <DogHealthTab dog={dog} />
                 </section>
  
-                {/* 7. Dokumente */}
-                <section>
-                    <SectionHeader title="Dokumente" />
-                    <DogDocumentsTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
-                </section>
+                {hasDogDocuments(dog) ? (
+                    <section>
+                        <SectionHeader title="Dokumente" />
+                        <DogDocumentsTab dog={dog} strapiBaseUrl={strapiBaseUrl} />
+                    </section>
+                ) : null}
 
                 <section>
                     <SectionHeader title="Abstammung" />
