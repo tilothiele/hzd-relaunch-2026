@@ -385,6 +385,27 @@ h5 {
 	vertical-align: top;
 }
 
+/* Leaflet-Marker: Tailwind setzt img { height: auto } und Leaflet width: auto.
+   Auf Retina-Displays lädt danach das 2x-PNG in Originalgröße und die Pins
+   rutschen nach oben. Größe und Anker bleiben an den 25×41-Icon gebunden. */
+.leaflet-container .leaflet-marker-pane img.leaflet-marker-icon {
+	width: 25px !important;
+	height: 41px !important;
+	margin-left: -12px !important;
+	margin-top: -41px !important;
+	max-width: none !important;
+	max-height: none !important;
+}
+
+.leaflet-container .leaflet-shadow-pane img.leaflet-marker-shadow {
+	width: 41px !important;
+	height: 41px !important;
+	margin-left: -12px !important;
+	margin-top: -41px !important;
+	max-width: none !important;
+	max-height: none !important;
+}
+
 /* Mobile Logo Fix - Ensure logo displays correctly on small screens */
 @media (max-width: 375px) {
 	.header-logo-link {

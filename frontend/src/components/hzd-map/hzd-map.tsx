@@ -77,20 +77,34 @@ function MapReady({ onReady }: { onReady: () => void }) {
     return null
 }
 
-// Komponente zum Aktualisieren der Kartengröße bei Höhenänderung
+// Komponente zum Aktualisieren der Kartengröße bei Höhenänderung.
+// pan: false, damit eine nachträgliche Größenkorrektur die Marker nicht verschiebt.
 function ResizeTrigger({ height }: { height: number }) {
     const map = useMap()
     useEffect(() => {
         if (map) {
-            map.invalidateSize()
+            map.invalidateSize({ pan: false })
         }
     }, [height, map])
     return null
 }
 
+const MARKER_ICON_OPTIONS = {
+    iconUrl: '/static-images/map/marker-icon.png',
+    iconRetinaUrl: '/static-images/map/marker-icon-2x.png',
+    shadowUrl: '/static-images/map/marker-shadow.png',
+    iconSize: [25, 41] as [number, number],
+    iconAnchor: [12, 41] as [number, number],
+    popupAnchor: [1, -34] as [number, number],
+    tooltipAnchor: [16, -28] as [number, number],
+    shadowSize: [41, 41] as [number, number],
+    shadowAnchor: [12, 41] as [number, number],
+}
+
 export function HzdMap({ isVisible, items, userLocation, height = '400px' }: HzdMapProps) {
     const [isMounted, setIsMounted] = useState(false)
     const [isMapReady, setIsMapReady] = useState(false)
+    const [markerIcon, setMarkerIcon] = useState<LeafletIcon | null>(null)
     const [userIcon, setUserIcon] = useState<LeafletIcon | null>(null)
     const [mapHeight, setMapHeight] = useState<number>(
         typeof height === 'string' ? parseInt(height) : height
@@ -144,34 +158,37 @@ export function HzdMap({ isVisible, items, userLocation, height = '400px' }: Hzd
     useEffect(() => {
         if (!isAccepted || typeof window === 'undefined') return
 
+        let cancelled = false
+
         const fixLeafletIcons = async () => {
             const LModule = await import('leaflet')
             const L = LModule.default
 
-            // Fix für Default-Icons
+            // Default-Icon vor dem ersten Marker festnageln. In Produktion zeigt
+            // der automatische Bildpfad auf ein gehashtes Asset; das 2x-PNG lädt
+            // danach in voller Größe und die Pins rutschen nach oben.
             delete (L.Icon.Default.prototype as { _getIconUrl?: unknown })._getIconUrl
-            L.Icon.Default.mergeOptions({
-                iconUrl: '/static-images/map/marker-icon.png',
-                iconRetinaUrl: '/static-images/map/marker-icon-2x.png',
-                shadowUrl: '/static-images/map/marker-shadow.png',
-            })
+            L.Icon.Default.mergeOptions(MARKER_ICON_OPTIONS)
 
-            // Rotes Icon für User-Location laden
-            if (userLocation) {
-                const icon = L.icon({
+            const icon = L.icon(MARKER_ICON_OPTIONS)
+            if (!cancelled) {
+                setMarkerIcon(icon)
+            }
+
+            if (userLocation && !cancelled) {
+                setUserIcon(L.icon({
+                    ...MARKER_ICON_OPTIONS,
                     iconUrl: '/static-images/map/marker-icon-red.png',
                     iconRetinaUrl: '/static-images/map/marker-icon-2x-red.png',
-                    shadowUrl: '/static-images/map/marker-shadow.png',
-                    iconSize: [25, 41],
-                    iconAnchor: [12, 41],
-                    popupAnchor: [1, -34],
-                    shadowSize: [41, 41],
-                })
-                setUserIcon(icon)
+                }))
             }
         }
 
         void fixLeafletIcons()
+
+        return () => {
+            cancelled = true
+        }
     }, [isAccepted, userLocation])
 
     if (!isVisible || !isMounted) {
@@ -260,8 +277,8 @@ export function HzdMap({ isVisible, items, userLocation, height = '400px' }: Hzd
                 {userPosition && isMapReady && userIcon && (
                     <UserLocationMarker position={userPosition} icon={userIcon} />
                 )}
-                {items.map((item) => (
-                    <Marker key={item.id} position={item.position}>
+                {markerIcon && items.map((item) => (
+                    <Marker key={item.id} position={item.position} icon={markerIcon}>
                         <Tooltip permanent={false}>
                             {item.title}
                         </Tooltip>
