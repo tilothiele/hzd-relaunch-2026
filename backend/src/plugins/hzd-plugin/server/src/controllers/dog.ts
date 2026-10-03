@@ -396,7 +396,16 @@ const coreControllerFactory = factories.createCoreController(
 				const filterConditions = await toFilterConditions(strapi, rawQuery)
 				const { page, pageSize } = parsePagination(rawQuery)
 				const sort = toSortArray(rawQuery.sort)
-				const hasGeo = rawQuery.lat != null && rawQuery.lng != null
+				const searchLat = toNumber(rawQuery.lat, NaN)
+				const searchLng = toNumber(rawQuery.lng, NaN)
+				// Ohne gewählte Entfernung nicht auf 100 km filtern. Die Karte sendet
+				// die IP-Position nur für den eigenen Marker, nicht als Suchradius.
+				const maxDist = toNumber(rawQuery.maxDistance, NaN)
+				const hasGeo =
+					Number.isFinite(searchLat) &&
+					Number.isFinite(searchLng) &&
+					Number.isFinite(maxDist) &&
+					maxDist > 0
 
 				const dogPopulate = {
 					owner: {
@@ -488,31 +497,26 @@ const coreControllerFactory = factories.createCoreController(
 				// Distanz-Filterung im Backend (Haversine auf owner.locationLat/Lng)
 				let total = results.length
 				if (hasGeo) {
-					const searchLat = toNumber(rawQuery.lat, NaN)
-					const searchLng = toNumber(rawQuery.lng, NaN)
-					const maxDist = toNumber(rawQuery.maxDistance, 100)
-					if (Number.isFinite(searchLat) && Number.isFinite(searchLng)) {
-						results = results
-							.map((dog) => {
-								const owner = dog.owner
-								const lat = owner ? Number.parseFloat(String(owner.locationLat)) : NaN
-								const lng = owner ? Number.parseFloat(String(owner.locationLng)) : NaN
-								if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-									return { dog, distance: null }
-								}
-								const distance = calculateDistance(searchLat, searchLng, lat, lng)
-								return { dog, distance }
-							})
-							.filter(({ distance }) => distance !== null && distance <= maxDist)
-							.sort((a, b) => (a.distance ?? 0) - (b.distance ?? 0))
-							.map(({ dog, distance }) => {
-								if (distance != null) {
-									dog.distance = Math.round(distance * 100) / 100
-								}
-								return dog
-							})
-						total = results.length
-					}
+					results = results
+						.map((dog) => {
+							const owner = dog.owner
+							const lat = owner ? Number.parseFloat(String(owner.locationLat)) : NaN
+							const lng = owner ? Number.parseFloat(String(owner.locationLng)) : NaN
+							if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+								return { dog, distance: null }
+							}
+							const distance = calculateDistance(searchLat, searchLng, lat, lng)
+							return { dog, distance }
+						})
+						.filter(({ distance }) => distance !== null && distance <= maxDist)
+						.sort((a, b) => (a.distance ?? 0) - (b.distance ?? 0))
+						.map(({ dog, distance }) => {
+							if (distance != null) {
+								dog.distance = Math.round(distance * 100) / 100
+							}
+							return dog
+						})
+					total = results.length
 				}
 
 				let paginatedResults = results
