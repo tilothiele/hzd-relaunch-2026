@@ -21,6 +21,8 @@
   "hzd-plugin.chromosoft.import.title": "Chromosoftdaten verarbeiten",
   "hzd-plugin.chromosoft.import.description": "Verarbeitet CS_Member und CS_Dog und aktualisiert danach Züchter und Deckrüden.",
   "hzd-plugin.chromosoft.import.button": "Chromosoft-Daten importieren",
+  "hzd-plugin.chromosoft.import.abort": "Abbruch",
+  "hzd-plugin.chromosoft.import.abortError": "Der Import konnte nicht abgebrochen werden.",
   "hzd-plugin.chromosoft.import.onlyChanged": "Nur geänderte Datensätze importieren",
   "hzd-plugin.chromosoft.import.skipped": "{count} übersprungen",
   "hzd-plugin.chromosoft.import.members": "Verarbeite CS_Member",

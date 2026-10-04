@@ -21,6 +21,8 @@
   "hzd-plugin.chromosoft.import.title": "Process Chromosoft data",
   "hzd-plugin.chromosoft.import.description": "Processes CS_Member and CS_Dog, then updates breeders and stud dogs.",
   "hzd-plugin.chromosoft.import.button": "Import Chromosoft data",
+  "hzd-plugin.chromosoft.import.abort": "Cancel",
+  "hzd-plugin.chromosoft.import.abortError": "The import could not be cancelled.",
   "hzd-plugin.chromosoft.import.onlyChanged": "Import only changed records",
   "hzd-plugin.chromosoft.import.skipped": "{count} skipped",
   "hzd-plugin.chromosoft.import.members": "Process CS_Member",

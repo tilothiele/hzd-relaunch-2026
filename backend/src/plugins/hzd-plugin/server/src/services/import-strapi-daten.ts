@@ -114,8 +114,26 @@ function idleJob(): JobState {
 	}
 }
 
+class ImportCancelled extends Error {
+	constructor() {
+		super('Import abgebrochen.')
+		this.name = 'ImportCancelled'
+	}
+}
+
 let job: JobState = idleJob()
 let running = false
+let cancelRequested = false
+
+function throwIfCancelled() {
+	if (cancelRequested) {
+		throw new ImportCancelled()
+	}
+}
+
+function isImportCancelled(error: unknown): boolean {
+	return error instanceof ImportCancelled
+}
 
 function snapshot(): ImportStrapiDatenStatus {
 	const finished = job.phase === 'done' || job.phase === 'error'
@@ -362,8 +380,10 @@ async function loadGenerationById(
 	}
 	let page = 1
 	while (true) {
+		throwIfCancelled()
 		const result = await loadGenerationPage(strapi, uid, generation, page)
 		for (const entry of result.results) {
+			throwIfCancelled()
 			const recordId = readRecordId(entry[idAttribute])
 			if (recordId) {
 				byId.set(recordId, entry)
@@ -390,8 +410,10 @@ async function iterateGeneration(
 	let seen = 0
 
 	while (true) {
+		throwIfCancelled()
 		const result = await loadGenerationPage(strapi, uid, generation, page)
 		for (const entry of result.results) {
+			throwIfCancelled()
 			seen += 1
 			await onItem(entry, seen)
 			await yieldToEventLoop()
@@ -487,6 +509,9 @@ async function importCollection(
 			try {
 				await apply(entry)
 			} catch (error) {
+				if (isImportCancelled(error)) {
+					throw error
+				}
 				failed += 1
 				const message = describeError(error)
 				const line = `${label}${idLabel} fehlgeschlagen: ${message}`
@@ -536,12 +561,14 @@ async function runEntityStep(
 	let failed = 0
 	let page = 1
 	while (true) {
+		throwIfCancelled()
 		const result = await findDocumentsPage<Record<string, unknown>>(strapi, uid, {
 			filters,
 			page,
 			pageSize: PAGE_SIZE,
 		})
 		for (const entry of result.results) {
+			throwIfCancelled()
 			imported += 1
 			counts.processed = imported
 			const recordId = readRecordId(entry[idAttribute])
@@ -550,6 +577,9 @@ async function runEntityStep(
 			try {
 				await apply(entry)
 			} catch (error) {
+				if (isImportCancelled(error)) {
+					throw error
+				}
 				failed += 1
 				const message = describeError(error)
 				const line = `${label}${idLabel} fehlgeschlagen: ${message}`
@@ -579,6 +609,7 @@ async function loadBreedingStations(
 	}
 	let page = 1
 	while (true) {
+		throwIfCancelled()
 		const result = await loadGenerationPage(strapi, CS_MEMBER_UID, generation, page)
 		for (const entry of result.results) {
 			const personId = readRecordId(entry.IdPerson)
@@ -637,6 +668,7 @@ async function import_strapi_daten(
 		let failed = 0
 		const { steps } = options
 
+		throwIfCancelled()
 		if (steps.members) {
 			job.phase = 'members'
 			const memberGeneration = await loadCurrentGeneration(
@@ -667,6 +699,7 @@ async function import_strapi_daten(
 			log('Verarbeite CS_Member übersprungen')
 		}
 
+		throwIfCancelled()
 		if (steps.dogs) {
 			job.phase = 'dogs'
 			const dogGeneration = await loadCurrentGeneration(
@@ -692,6 +725,7 @@ async function import_strapi_daten(
 			log('Verarbeite CS_Dog übersprungen')
 		}
 
+		throwIfCancelled()
 		if (steps.breeders) {
 			job.phase = 'breeders'
 			const memberGeneration = await loadCurrentGeneration(
@@ -723,6 +757,7 @@ async function import_strapi_daten(
 			log('Aktualisiere Züchterdaten übersprungen')
 		}
 
+		throwIfCancelled()
 		if (steps.studDogs) {
 			job.phase = 'studDogs'
 			failed += await runEntityStep(strapi, {
@@ -753,17 +788,23 @@ async function import_strapi_daten(
 			`import_strapi_daten: ${job.members.processed} CS_Member, ${job.dogs.processed} CS_Dog, ${job.breeders.processed} Züchter, ${job.studDogs.processed} Deckrüden, fehlgeschlagen=${failed}, log=${job.logFileName}`,
 		)
 	} catch (error) {
-		const message = describeError(error)
+		const cancelled = isImportCancelled(error)
+		const message = cancelled ? 'Import abgebrochen.' : describeError(error)
 		job.phase = 'error'
 		job.error = message
 		if (stream) {
-			writeLog(stream, `Import fehlgeschlagen: ${message}`)
+			writeLog(stream, cancelled ? message : `Import fehlgeschlagen: ${message}`)
 		}
-		strapi.log.error(`import_strapi_daten fehlgeschlagen: ${message}`)
+		if (cancelled) {
+			strapi.log.info(`import_strapi_daten abgebrochen, log=${job.logFileName}`)
+		} else {
+			strapi.log.error(`import_strapi_daten fehlgeschlagen: ${message}`)
+		}
 	} finally {
 		if (stream) {
 			await closeLog(stream).catch(() => undefined)
 		}
+		cancelRequested = false
 		running = false
 	}
 
@@ -779,6 +820,7 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
 		if (!firstEnabledStep(steps)) {
 			return { started: false, reason: 'no-steps' as const, status: snapshot() }
 		}
+		cancelRequested = false
 		running = true
 		const onlyChanged = options?.onlyChanged === true
 		const phase = firstEnabledStep(steps) ?? 'members'
@@ -789,6 +831,18 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
 		}
 		void import_strapi_daten(strapi, { onlyChanged, steps })
 		return { started: true, reason: null, status: snapshot() }
+	},
+
+	abortImport() {
+		const activePhase = job.phase === 'members'
+			|| job.phase === 'dogs'
+			|| job.phase === 'breeders'
+			|| job.phase === 'studDogs'
+		if (!running && !activePhase) {
+			return { aborted: false, status: snapshot() }
+		}
+		cancelRequested = true
+		return { aborted: true, status: snapshot() }
 	},
 
 	getStatus() {
@@ -812,6 +866,7 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
 		if (running) {
 			return Promise.reject(new Error('Import läuft bereits.'))
 		}
+		cancelRequested = false
 		running = true
 		const steps = defaultSteps()
 		job = {

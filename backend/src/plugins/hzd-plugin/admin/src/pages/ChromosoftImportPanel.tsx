@@ -244,6 +244,7 @@ const ChromosoftImportPanel = () => {
   const { toggleNotification } = useNotification();
   const [status, setStatus] = useState<ImportStatus>(IDLE_STATUS);
   const [starting, setStarting] = useState(false);
+  const [aborting, setAborting] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [onlyChanged, setOnlyChanged] = useState(false);
   const [steps, setSteps] = useState<ImportSteps>(DEFAULT_STEPS);
@@ -251,6 +252,12 @@ const ChromosoftImportPanel = () => {
 
   const isRunning = isRunningPhase(status.phase);
   const hasSelectedStep = STEP_ORDER.some((step) => steps[step]);
+
+  useEffect(() => {
+    if (!isRunning) {
+      setAborting(false);
+    }
+  }, [isRunning]);
 
   useEffect(() => {
     let cancelled = false;
@@ -389,6 +396,24 @@ const ChromosoftImportPanel = () => {
     }
   };
 
+  const handleAbort = async () => {
+    try {
+      setAborting(true);
+      await post('/hzd-plugin/chromosoft/import-strapi-daten/abort', {});
+    } catch (error) {
+      setAborting(false);
+      toggleNotification({
+        type: 'danger',
+        message:
+          readErrorMessage(error) ||
+          formatMessage({
+            id: getTranslation('chromosoft.import.abortError'),
+            defaultMessage: 'Der Import konnte nicht abgebrochen werden.',
+          }),
+      });
+    }
+  };
+
   const handleDownloadLog = async () => {
     try {
       setDownloading(true);
@@ -502,17 +527,31 @@ const ChromosoftImportPanel = () => {
           </Typography>
         </Flex>
 
-        <Button
-          type="button"
-          loading={starting || isRunning}
-          disabled={isRunning || !hasSelectedStep}
-          onClick={handleImport}
-        >
-          {formatMessage({
-            id: getTranslation('chromosoft.import.button'),
-            defaultMessage: 'Chromosoft-Daten importieren',
-          })}
-        </Button>
+        <Flex gap={2}>
+          <Button
+            type="button"
+            loading={starting || (isRunning && !aborting)}
+            disabled={isRunning || !hasSelectedStep}
+            onClick={handleImport}
+          >
+            {formatMessage({
+              id: getTranslation('chromosoft.import.button'),
+              defaultMessage: 'Chromosoft-Daten importieren',
+            })}
+          </Button>
+          <Button
+            type="button"
+            variant="danger"
+            loading={aborting}
+            disabled={!isRunning}
+            onClick={handleAbort}
+          >
+            {formatMessage({
+              id: getTranslation('chromosoft.import.abort'),
+              defaultMessage: 'Abbruch',
+            })}
+          </Button>
+        </Flex>
 
         <Flex direction="column" alignItems="stretch" gap={4} width="100%">
           {STEP_ORDER.map((step) => (
