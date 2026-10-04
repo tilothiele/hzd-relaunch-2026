@@ -210,17 +210,38 @@ function comparableAttributes(strapi: Core.Strapi, uid: string): string[] {
 	)
 }
 
-function hasFieldChanges(
+interface FieldChange {
+	name: string
+	previous: string
+	current: string
+}
+
+function listFieldChanges(
 	current: Record<string, unknown>,
 	previous: Record<string, unknown>,
 	attributes: string[],
-): boolean {
+): FieldChange[] {
 	const names = attributes.length > 0
 		? attributes
 		: Object.keys(current).filter((name) => !IGNORED_FIELDS.has(name))
-	return names.some(
-		(name) => normalizeField(current[name]) !== normalizeField(previous[name]),
-	)
+	const changes: FieldChange[] = []
+	for (const name of names) {
+		const previousValue = normalizeField(previous[name])
+		const currentValue = normalizeField(current[name])
+		if (previousValue === currentValue) {
+			continue
+		}
+		changes.push({
+			name,
+			previous: previousValue,
+			current: currentValue,
+		})
+	}
+	return changes
+}
+
+function formatLogValue(value: string): string {
+	return JSON.stringify(value)
 }
 
 async function loadGenerationById(
@@ -300,19 +321,23 @@ async function importCollection(
 	}
 
 	const attributes = comparableAttributes(strapi, uid)
-	const previousById = onlyChanged
-		? await loadGenerationById(strapi, uid, generation - 1, idAttribute)
-		: null
+	const previousById = await loadGenerationById(
+		strapi,
+		uid,
+		generation - 1,
+		idAttribute,
+	)
 
 	let imported = 0
 	let skipped = 0
 	await iterateGeneration(strapi, uid, generation, (entry, index) => {
 		const recordId = readRecordId(entry[idAttribute])
 		const idLabel = recordId ? ` ${idAttribute}=${recordId}` : ''
-		const previous = previousById && recordId
-			? previousById.get(recordId)
-			: undefined
-		if (previous && !hasFieldChanges(entry, previous, attributes)) {
+		const previous = recordId ? previousById.get(recordId) : undefined
+		const changes = previous
+			? listFieldChanges(entry, previous, attributes)
+			: null
+		if (onlyChanged && previous && changes && changes.length === 0) {
 			skipped += 1
 			counts.skipped = skipped
 			counts.processed = imported
@@ -323,9 +348,22 @@ async function importCollection(
 		counts.processed = imported
 		counts.skipped = skipped
 		const documentId = typeof entry.documentId === 'string' ? entry.documentId : ''
+		const changeNote = !previous
+			? ' neu'
+			: changes && changes.length > 0
+				? ` geändert (${changes.length})`
+				: ''
 		log(
-			`${label} ${index}/${total}${idLabel}${documentId ? ` documentId=${documentId}` : ''}`,
+			`${label} ${index}/${total}${idLabel}${documentId ? ` documentId=${documentId}` : ''}${changeNote}`,
 		)
+		if (!changes) {
+			return
+		}
+		for (const change of changes) {
+			log(
+				`${label}${idLabel} ${change.name}: ${formatLogValue(change.previous)} -> ${formatLogValue(change.current)}`,
+			)
+		}
 	})
 	counts.processed = imported
 	counts.skipped = skipped
