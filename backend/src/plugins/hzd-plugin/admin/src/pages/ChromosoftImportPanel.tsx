@@ -6,7 +6,16 @@ import styled, { keyframes } from 'styled-components';
 
 import { getTranslation } from '../utils/getTranslation';
 
-type ImportPhase = 'idle' | 'members' | 'dogs' | 'done' | 'error';
+type ImportPhase =
+  | 'idle'
+  | 'members'
+  | 'dogs'
+  | 'breeders'
+  | 'studDogs'
+  | 'done'
+  | 'error';
+
+type ImportStepKey = 'members' | 'dogs' | 'breeders' | 'studDogs';
 
 interface ImportCounts {
   processed: number;
@@ -14,18 +23,56 @@ interface ImportCounts {
   skipped?: number;
 }
 
+interface ImportSteps {
+  members: boolean;
+  dogs: boolean;
+  breeders: boolean;
+  studDogs: boolean;
+}
+
 interface ImportStatus {
   phase: ImportPhase;
+  steps: ImportSteps;
   members: ImportCounts;
   dogs: ImportCounts;
+  breeders: ImportCounts;
+  studDogs: ImportCounts;
   logFileName: string | null;
   error: string | null;
 }
 
+const STEP_ORDER: ImportStepKey[] = [
+  'members',
+  'dogs',
+  'breeders',
+  'studDogs',
+];
+
+const DEFAULT_STEPS: ImportSteps = {
+  members: true,
+  dogs: true,
+  breeders: true,
+  studDogs: true,
+};
+
+const RUNNING_PHASES: ImportPhase[] = [
+  'members',
+  'dogs',
+  'breeders',
+  'studDogs',
+];
+
+function emptyCounts(): ImportCounts {
+  return { processed: 0, total: 0, skipped: 0 };
+}
+
 const IDLE_STATUS: ImportStatus = {
   phase: 'idle',
-  members: { processed: 0, total: 0 },
-  dogs: { processed: 0, total: 0 },
+  steps: DEFAULT_STEPS,
+  members: emptyCounts(),
+  dogs: emptyCounts(),
+  breeders: emptyCounts(),
+  studDogs: emptyCounts(),
   logFileName: null,
   error: null,
 };
@@ -68,16 +115,52 @@ const BarFill = styled.div<{ $percent: number; $active: boolean; $indeterminate:
   }} 1.1s linear infinite;
 `;
 
-function isImportStatus(value: unknown): value is ImportStatus {
+function asCounts(value: unknown): ImportCounts {
   if (!value || typeof value !== 'object') {
-    return false;
+    return emptyCounts();
+  }
+  const counts = value as Partial<ImportCounts>;
+  return {
+    processed: typeof counts.processed === 'number' ? counts.processed : 0,
+    total: typeof counts.total === 'number' ? counts.total : 0,
+    skipped: typeof counts.skipped === 'number' ? counts.skipped : 0,
+  };
+}
+
+function asSteps(value: unknown): ImportSteps {
+  const source = value && typeof value === 'object'
+    ? value as Partial<ImportSteps>
+    : {};
+  return {
+    members: source.members !== false,
+    dogs: source.dogs !== false,
+    breeders: source.breeders !== false,
+    studDogs: source.studDogs !== false,
+  };
+}
+
+function normalizeStatus(value: unknown): ImportStatus | null {
+  if (!value || typeof value !== 'object') {
+    return null;
   }
   const status = value as Partial<ImportStatus>;
-  return (
-    typeof status.phase === 'string' &&
-    !!status.members &&
-    !!status.dogs
-  );
+  if (typeof status.phase !== 'string') {
+    return null;
+  }
+  return {
+    phase: status.phase as ImportPhase,
+    steps: asSteps(status.steps),
+    members: asCounts(status.members),
+    dogs: asCounts(status.dogs),
+    breeders: asCounts(status.breeders),
+    studDogs: asCounts(status.studDogs),
+    logFileName: typeof status.logFileName === 'string' ? status.logFileName : null,
+    error: typeof status.error === 'string' ? status.error : null,
+  };
+}
+
+function isRunningPhase(phase: ImportPhase) {
+  return RUNNING_PHASES.includes(phase);
 }
 
 function readErrorMessage(error: unknown): string {
@@ -163,18 +246,24 @@ const ChromosoftImportPanel = () => {
   const [starting, setStarting] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [onlyChanged, setOnlyChanged] = useState(false);
+  const [steps, setSteps] = useState<ImportSteps>(DEFAULT_STEPS);
   const phaseRef = useRef<ImportPhase>('idle');
 
-  const isRunning = status.phase === 'members' || status.phase === 'dogs';
+  const isRunning = isRunningPhase(status.phase);
+  const hasSelectedStep = STEP_ORDER.some((step) => steps[step]);
 
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
       try {
         const response = await get('/hzd-plugin/chromosoft/import-strapi-daten/status');
-        if (!cancelled && isImportStatus(response.data)) {
-          setStatus(response.data);
-          phaseRef.current = response.data.phase;
+        const nextStatus = normalizeStatus(response.data);
+        if (!cancelled && nextStatus) {
+          setStatus(nextStatus);
+          phaseRef.current = nextStatus.phase;
+          if (isRunningPhase(nextStatus.phase)) {
+            setSteps(nextStatus.steps);
+          }
         }
       } catch {
         // Status ist optional, solange noch kein Lauf existiert.
@@ -193,8 +282,9 @@ const ChromosoftImportPanel = () => {
     const timer = window.setInterval(async () => {
       try {
         const response = await get('/hzd-plugin/chromosoft/import-strapi-daten/status');
-        if (isImportStatus(response.data)) {
-          setStatus(response.data);
+        const nextStatus = normalizeStatus(response.data);
+        if (nextStatus) {
+          setStatus(nextStatus);
         }
       } catch {
         // Der nächste Poll versucht es erneut.
@@ -206,7 +296,7 @@ const ChromosoftImportPanel = () => {
   useEffect(() => {
     const previous = phaseRef.current;
     phaseRef.current = status.phase;
-    const wasRunning = previous === 'members' || previous === 'dogs';
+    const wasRunning = isRunningPhase(previous);
     if (!wasRunning) {
       return;
     }
@@ -218,29 +308,33 @@ const ChromosoftImportPanel = () => {
           {
             id: getTranslation('chromosoft.import.successSkipped'),
             defaultMessage:
-              'Chromosoft-Daten verarbeitet: {members} Mitglieder ({memberSkipped} unverändert), {dogs} Hunde ({dogSkipped} unverändert).',
+              'Chromosoft-Daten verarbeitet: {members} Mitglieder ({memberSkipped} unverändert), {dogs} Hunde ({dogSkipped} unverändert), {breeders} Züchter, {studDogs} Deckrüden.',
           },
           {
             members: status.members.processed,
             dogs: status.dogs.processed,
             memberSkipped,
             dogSkipped,
+            breeders: status.breeders.processed,
+            studDogs: status.studDogs.processed,
           },
         )
         : formatMessage(
           {
             id: getTranslation('chromosoft.import.success'),
             defaultMessage:
-              'Chromosoft-Daten verarbeitet: {members} Mitglieder, {dogs} Hunde.',
+              'Chromosoft-Daten verarbeitet: {members} Mitglieder, {dogs} Hunde, {breeders} Züchter, {studDogs} Deckrüden.',
           },
           {
             members: status.members.processed,
             dogs: status.dogs.processed,
+            breeders: status.breeders.processed,
+            studDogs: status.studDogs.processed,
           },
         );
       toggleNotification({
-        type: 'success',
-        message,
+        type: status.error ? 'warning' : 'success',
+        message: status.error ? `${message} ${status.error}` : message,
       });
     }
     if (status.phase === 'error') {
@@ -259,23 +353,25 @@ const ChromosoftImportPanel = () => {
   const handleImport = async () => {
     try {
       setStarting(true);
+      const firstStep = STEP_ORDER.find((step) => steps[step]) ?? 'members';
       setStatus({
-        phase: 'members',
-        members: { processed: 0, total: 0 },
-        dogs: { processed: 0, total: 0 },
-        logFileName: null,
-        error: null,
+        ...IDLE_STATUS,
+        phase: firstStep,
+        steps,
       });
       const response = await post('/hzd-plugin/chromosoft/import-strapi-daten', {
         onlyChanged,
+        steps,
       });
-      if (isImportStatus(response.data)) {
-        setStatus(response.data);
+      const nextStatus = normalizeStatus(response.data);
+      if (nextStatus) {
+        setStatus(nextStatus);
       }
     } catch (error) {
       const responseData = (error as { response?: { data?: unknown } }).response?.data;
-      if (isImportStatus(responseData)) {
-        setStatus(responseData);
+      const nextStatus = normalizeStatus(responseData);
+      if (nextStatus) {
+        setStatus(nextStatus);
         return;
       }
       setStatus(IDLE_STATUS);
@@ -327,10 +423,36 @@ const ChromosoftImportPanel = () => {
     }
   };
 
-  const showProgress = status.phase !== 'idle';
-  const membersFinished =
-    status.phase === 'dogs' || status.phase === 'done' || status.phase === 'error';
-  const dogsFinished = status.phase === 'done' || status.phase === 'error';
+  const stepLabels: Record<ImportStepKey, string> = {
+    members: formatMessage({
+      id: getTranslation('chromosoft.import.members'),
+      defaultMessage: 'Verarbeite CS_Member',
+    }),
+    dogs: formatMessage({
+      id: getTranslation('chromosoft.import.dogs'),
+      defaultMessage: 'Verarbeite CS_Dog',
+    }),
+    breeders: formatMessage({
+      id: getTranslation('chromosoft.import.breeders'),
+      defaultMessage: 'Aktualisiere Züchterdaten',
+    }),
+    studDogs: formatMessage({
+      id: getTranslation('chromosoft.import.studDogs'),
+      defaultMessage: 'Aktualisiere Deckrüden',
+    }),
+  };
+
+  const runSteps = status.phase === 'idle' ? steps : status.steps;
+
+  const stepFinished = (step: ImportStepKey) => {
+    if (!runSteps[step] || status.phase === 'error' || status.phase === 'idle') {
+      return false;
+    }
+    if (status.phase === 'done') {
+      return true;
+    }
+    return STEP_ORDER.indexOf(status.phase) > STEP_ORDER.indexOf(step);
+  };
 
   return (
     <Box
@@ -354,7 +476,7 @@ const ChromosoftImportPanel = () => {
               {formatMessage({
                 id: getTranslation('chromosoft.import.description'),
                 defaultMessage:
-                  'Übernimmt die CS_Member und CS_Dog der aktuellen Import-Generation.',
+                  'Verarbeitet CS_Member und CS_Dog und aktualisiert danach Züchter und Deckrüden.',
               })}
             </Typography>
           </Box>
@@ -383,7 +505,7 @@ const ChromosoftImportPanel = () => {
         <Button
           type="button"
           loading={starting || isRunning}
-          disabled={isRunning}
+          disabled={isRunning || !hasSelectedStep}
           onClick={handleImport}
         >
           {formatMessage({
@@ -392,42 +514,40 @@ const ChromosoftImportPanel = () => {
           })}
         </Button>
 
-        {showProgress && (
-          <Flex direction="column" alignItems="stretch" gap={4} width="100%">
-            <ImportProgressBar
-              label={formatMessage({
-                id: getTranslation('chromosoft.import.members'),
-                defaultMessage: 'CS_Member',
-              })}
-              counts={status.members}
-              active={status.phase === 'members'}
-              finished={membersFinished && status.phase !== 'error'}
-              skippedText={formatMessage(
-                {
-                  id: getTranslation('chromosoft.import.skipped'),
-                  defaultMessage: '{count} übersprungen',
-                },
-                { count: status.members.skipped ?? 0 },
-              )}
-            />
-            <ImportProgressBar
-              label={formatMessage({
-                id: getTranslation('chromosoft.import.dogs'),
-                defaultMessage: 'CS_Dog',
-              })}
-              counts={status.dogs}
-              active={status.phase === 'dogs'}
-              finished={dogsFinished && status.phase !== 'error'}
-              skippedText={formatMessage(
-                {
-                  id: getTranslation('chromosoft.import.skipped'),
-                  defaultMessage: '{count} übersprungen',
-                },
-                { count: status.dogs.skipped ?? 0 },
-              )}
-            />
-          </Flex>
-        )}
+        <Flex direction="column" alignItems="stretch" gap={4} width="100%">
+          {STEP_ORDER.map((step) => (
+            <Flex key={step} gap={3} alignItems="flex-start" width="100%">
+              <Box paddingTop={1}>
+                <Checkbox
+                  id={`chromosoft-step-${step}`}
+                  checked={steps[step]}
+                  disabled={isRunning}
+                  onCheckedChange={(value: boolean | 'indeterminate') => {
+                    setSteps((current) => ({
+                      ...current,
+                      [step]: value === true,
+                    }));
+                  }}
+                />
+              </Box>
+              <Box style={{ flex: 1, opacity: runSteps[step] ? 1 : 0.45 }}>
+                <ImportProgressBar
+                  label={stepLabels[step]}
+                  counts={status[step]}
+                  active={status.phase === step}
+                  finished={stepFinished(step)}
+                  skippedText={formatMessage(
+                    {
+                      id: getTranslation('chromosoft.import.skipped'),
+                      defaultMessage: '{count} übersprungen',
+                    },
+                    { count: status[step].skipped ?? 0 },
+                  )}
+                />
+              </Box>
+            </Flex>
+          ))}
+        </Flex>
 
         {status.logFileName && (
           <Button

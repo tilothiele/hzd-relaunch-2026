@@ -1,7 +1,9 @@
 import type { Core } from '@strapi/strapi'
 
 const USER_UID = 'plugin::users-permissions.user'
+const MIN_USERNAME_LENGTH = 3
 const DOG_UID = 'plugin::hzd-plugin.dog'
+const BREEDER_UID = 'plugin::hzd-plugin.breeder'
 
 const REGION_MAP: Record<string, string> = {
 	nord: 'Nord',
@@ -214,9 +216,12 @@ function mapMemberToUser(
 	const isBreeder = parseBoolean(member.PersonIsABreeder) === true
 	const membershipNumber = parseInteger(member.MembershipNumber)
 	const phone = cell(member.Mobile) ?? cell(member.Phone)
-	const username = isBreeder || membershipNumber === null
-		? `c.${cId}`
+	const membershipLabel = membershipNumber === null
+		? ''
 		: String(membershipNumber)
+	const username = isBreeder || membershipLabel.length < MIN_USERNAME_LENGTH
+		? `c.${cId}`
+		: membershipLabel
 
 	const data: TargetData = {
 		username,
@@ -337,6 +342,40 @@ async function saveDocument(
 	return created?.documentId ?? ''
 }
 
+async function omitTakenMembershipNumber(
+	strapi: Core.Strapi,
+	data: TargetData,
+	existing: { id?: number; documentId?: string } | null,
+	cId: number,
+	log: (line: string) => void,
+) {
+	const membershipNumber = data.membershipNumber
+	if (typeof membershipNumber !== 'number') {
+		return
+	}
+
+	const where: Record<string, unknown> = { membershipNumber }
+	if (typeof existing?.id === 'number') {
+		where.id = { $ne: existing.id }
+	}
+	const taken = await strapi.db.query(USER_UID).findOne({
+		where,
+		select: ['id', 'cId'],
+	}) as { id?: number; cId?: number } | null
+	if (!taken) {
+		return
+	}
+
+	if (data.username === String(membershipNumber)) {
+		data.username = `c.${cId}`
+	}
+	delete data.membershipNumber
+	const owner = typeof taken.cId === 'number' ? `cId=${taken.cId}` : `id=${taken.id}`
+	log(
+		`CS_Member cId=${cId}: membershipNumber ${membershipNumber} ist bereits bei ${owner} vergeben, Feld bleibt unverändert`,
+	)
+}
+
 export async function loadAuthenticatedRoleId(strapi: Core.Strapi): Promise<number> {
 	const role = await strapi.db.query('plugin::users-permissions.role').findOne({
 		where: { type: 'authenticated' },
@@ -362,6 +401,7 @@ export async function updateUser(
 
 	const data = mapMemberToUser(member, cId, authenticatedRoleId)
 	const existing = await findByCId(strapi, USER_UID, cId)
+	await omitTakenMembershipNumber(strapi, data, existing, cId, log)
 	if (!existing) {
 		data.password = await hashPassword(strapi, `Import-${cId}-ChangeMe!`)
 	}
@@ -370,6 +410,187 @@ export async function updateUser(
 		existing
 			? `User aktualisiert cId=${cId} documentId=${savedId}`
 			: `User erstellt cId=${cId} documentId=${savedId}`,
+	)
+}
+
+async function ensurePublishMyData(strapi: Core.Strapi, userId: number) {
+	const user = await strapi.db.query(USER_UID).findOne({
+		where: { id: userId },
+		select: ['id', 'publishMyData'],
+	}) as { publishMyData?: boolean } | null
+	if (user?.publishMyData === true) {
+		return
+	}
+	await strapi.db.query(USER_UID).update({
+		where: { id: userId },
+		data: { publishMyData: true },
+	})
+}
+
+function addressFromUser(user: Record<string, unknown>): TargetData | null {
+	const address1 = truncateOrNull(cell(user.address1), 255)
+	const zip = truncateOrNull(cell(user.zip), 5)
+	const city = cell(user.city)
+	const firstName = cell(user.firstName) ?? ''
+	const lastName = cell(user.lastName) ?? ''
+	const fullName = truncateOrNull(`${firstName} ${lastName}`.trim(), 255)
+	if (!address1 && !zip && !city && !fullName) {
+		return null
+	}
+	const country = cell(user.countryCode)
+	const address: TargetData = {
+		CountryCode: country && country.length === 2 ? country : 'DE',
+	}
+	assign(address, 'FullName', fullName)
+	assign(address, 'Address1', address1)
+	assign(address, 'Zip', zip)
+	assign(address, 'City', city)
+	return address
+}
+
+async function findBreederByRole(
+	strapi: Core.Strapi,
+	cId: number,
+	role: 'B' | 'S',
+) {
+	const found = await strapi.db.query(BREEDER_UID).findOne({
+		where: { cId, BreederRole: role },
+		select: ['id', 'documentId'],
+	})
+	return found ?? null
+}
+
+export async function updateBreederFromUser(
+	strapi: Core.Strapi,
+	user: Record<string, unknown>,
+	breedingStation: string | null,
+	log: (line: string) => void,
+) {
+	const cId = parseInteger(user.cId)
+	if (cId === null) {
+		log('Züchter ohne cId, Update übersprungen')
+		return
+	}
+	const storedUser = typeof user.id === 'number'
+		? { id: user.id }
+		: await findByCId(strapi, USER_UID, cId)
+	const userId = typeof storedUser?.id === 'number' ? storedUser.id : null
+	if (userId === null) {
+		log(`Züchter cId=${cId} ohne User-ID, Update übersprungen`)
+		return
+	}
+
+	const data: TargetData = {
+		cId,
+		member: userId,
+	}
+	const kennelName = truncateOrNull(breedingStation, 200)
+	assign(data, 'kennelName', kennelName)
+	assign(data, 'BreederEmail', parseEmail(user.cEmail))
+	const address = addressFromUser(user)
+	if (address) {
+		data.Address = address
+	}
+
+	const existing = await findBreederByRole(strapi, cId, 'B')
+	if (!existing) {
+		const other = await strapi.db.query(BREEDER_UID).findOne({
+			where: { cId },
+			select: ['id', 'BreederRole'],
+		}) as { BreederRole?: string } | null
+		if (other) {
+			log(
+				`Züchter cId=${cId} existiert bereits als Rolle ${other.BreederRole ?? '?'}, nicht angelegt`,
+			)
+			return
+		}
+		data.BreederRole = 'B'
+	}
+
+	await ensurePublishMyData(strapi, userId)
+	const savedId = await saveDocument(strapi, BREEDER_UID, existing, data)
+	log(
+		existing
+			? `Züchter aktualisiert cId=${cId} documentId=${savedId}`
+			: `Züchter erstellt cId=${cId} documentId=${savedId}`,
+	)
+}
+
+export async function updateStudDog(
+	strapi: Core.Strapi,
+	dog: Record<string, unknown>,
+	log: (line: string) => void,
+) {
+	const dogId = parseInteger(dog.cId)
+	const ownerCId = parseInteger(dog.cOwnerId)
+	const dogLabel = dogId === null ? '' : ` cId=${dogId}`
+	if (ownerCId === null) {
+		log(`Deckrüde${dogLabel} ohne Besitzer, Update übersprungen`)
+		return
+	}
+
+	const owner = await strapi.db.query(USER_UID).findOne({
+		where: { cId: ownerCId },
+		select: [
+			'id',
+			'cId',
+			'firstName',
+			'lastName',
+			'address1',
+			'zip',
+			'city',
+			'countryCode',
+			'cEmail',
+		],
+	}) as Record<string, unknown> | null
+	const ownerId = typeof owner?.id === 'number' ? owner.id : null
+	if (!owner || ownerId === null) {
+		log(`Deckrüde${dogLabel}: Besitzer cId=${ownerCId} nicht gefunden`)
+		return
+	}
+
+	const data: TargetData = {
+		cId: ownerCId,
+		member: ownerId,
+	}
+	assign(data, 'BreederEmail', parseEmail(owner.cEmail))
+	const address = addressFromUser(owner)
+	if (address) {
+		data.Address = address
+	}
+
+	const existing = await findBreederByRole(strapi, ownerCId, 'S')
+	if (!existing) {
+		const other = await strapi.db.query(BREEDER_UID).findOne({
+			where: { cId: ownerCId },
+			select: ['id', 'BreederRole'],
+		}) as { BreederRole?: string } | null
+		if (other) {
+			log(
+				`Deckrüde${dogLabel}: Besitzer cId=${ownerCId} hat bereits Rolle ${other.BreederRole ?? '?'}, Profil nicht angelegt`,
+			)
+			return
+		}
+		const firstName = cell(owner.firstName) ?? ''
+		const lastName = cell(owner.lastName) ?? ''
+		const kennelName = truncateOrNull(`DRB ${firstName} ${lastName}`.trim(), 200)
+		assign(data, 'kennelName', kennelName)
+		data.BreederRole = 'S'
+	}
+
+	await ensurePublishMyData(strapi, ownerId)
+	const savedId = await saveDocument(strapi, BREEDER_UID, existing, data)
+	const linked = await findBreederByRole(strapi, ownerCId, 'S')
+	if (typeof linked?.id === 'number') {
+		await strapi.db.query(USER_UID).update({
+			where: { id: ownerId },
+			data: { deckrueden_info: linked.id },
+		})
+	}
+	log(
+		existing
+			? `Deckrüde${dogLabel} aktualisiert, Besitzer cId=${ownerCId} documentId=${savedId}`
+			: `Deckrüde${dogLabel} erstellt, Besitzer cId=${ownerCId} documentId=${savedId}`,
 	)
 }
 

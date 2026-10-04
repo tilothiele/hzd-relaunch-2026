@@ -1,9 +1,17 @@
 import { createReadStream, promises as fs } from 'fs'
 import type { Core } from '@strapi/strapi'
 
+interface ImportSteps {
+	members?: boolean
+	dogs?: boolean
+	breeders?: boolean
+	studDogs?: boolean
+}
+
 interface ImportService {
-	startImport: (options?: { onlyChanged?: boolean }) => {
+	startImport: (options?: { onlyChanged?: boolean; steps?: ImportSteps }) => {
 		started: boolean
+		reason?: 'running' | 'no-steps' | null
 		status: {
 			phase: string
 			logFileName: string | null
@@ -12,6 +20,21 @@ interface ImportService {
 	}
 	getStatus: () => unknown
 	getDownloadableLog: () => { filePath: string; fileName: string } | null
+}
+
+function readSteps(value: unknown): ImportSteps {
+	const steps: ImportSteps = {}
+	if (!value || typeof value !== 'object' || Array.isArray(value)) {
+		return steps
+	}
+	const source = value as Record<string, unknown>
+	const keys = ['members', 'dogs', 'breeders', 'studDogs'] as const
+	for (const key of keys) {
+		if (typeof source[key] === 'boolean') {
+			steps[key] = source[key]
+		}
+	}
+	return steps
 }
 
 function getService(strapi: Core.Strapi): ImportService {
@@ -25,12 +48,23 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 		request: { body?: unknown }
 	}) {
 		const body = ctx.request.body
-		const onlyChanged = !!body
-			&& typeof body === 'object'
-			&& !Array.isArray(body)
-			&& (body as { onlyChanged?: unknown }).onlyChanged === true
-		const result = getService(strapi).startImport({ onlyChanged })
-		ctx.status = result.started ? 202 : 409
+		const payload = body && typeof body === 'object' && !Array.isArray(body)
+			? body as { onlyChanged?: unknown; steps?: unknown }
+			: {}
+		const onlyChanged = payload.onlyChanged === true
+		const steps = readSteps(payload.steps)
+		const result = getService(strapi).startImport({ onlyChanged, steps })
+		if (result.started) {
+			ctx.status = 202
+		} else if (result.reason === 'no-steps') {
+			ctx.status = 400
+			ctx.body = {
+				error: { message: 'Mindestens ein Schritt muss ausgewählt sein.' },
+			}
+			return
+		} else {
+			ctx.status = 409
+		}
 		ctx.body = result.status
 	},
 

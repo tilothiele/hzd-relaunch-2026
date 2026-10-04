@@ -130,7 +130,7 @@ async function syncDogLocationFromOwner(
 
 const dogLifecycles = {
 	async beforeCreate(event) {
-		console.log('HZD-PLUGIN: dog.beforeCreate triggered', event.params)
+		//console.log('HZD-PLUGIN: dog.beforeCreate triggered', event.params)
 		const { data } = event.params
 
 		await syncDogRelationsFromCIds(data)
@@ -138,7 +138,7 @@ const dogLifecycles = {
 	},
 	async beforeUpdate(event) {
 		const { data, where } = event.params
-		console.log('HZD-PLUGIN: dog.beforeUpdate triggered', event.params, data)
+		//console.log('HZD-PLUGIN: dog.beforeUpdate triggered', event.params, data)
 
 		const existingDog = await strapi.entityService.findOne(
 			'plugin::hzd-plugin.dog',
