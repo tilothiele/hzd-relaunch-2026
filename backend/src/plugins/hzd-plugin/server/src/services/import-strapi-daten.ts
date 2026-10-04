@@ -4,6 +4,11 @@ import path from 'path'
 import type { WriteStream } from 'fs'
 import type { Core } from '@strapi/strapi'
 import { findDocumentsPage } from '../utils/document-pagination'
+import {
+	loadAuthenticatedRoleId,
+	updateDog,
+	updateUser,
+} from './cs-target-sync'
 
 const HZD_SETTING_UID = 'api::hzd-setting.hzd-setting'
 const CS_MEMBER_UID = 'api::cs-member.cs-member'
@@ -275,7 +280,10 @@ async function iterateGeneration(
 	strapi: Core.Strapi,
 	uid: string,
 	generation: number,
-	onItem: (entry: Record<string, unknown>, index: number) => void,
+	onItem: (
+		entry: Record<string, unknown>,
+		index: number,
+	) => void | Promise<void>,
 ): Promise<number> {
 	let page = 1
 	let seen = 0
@@ -284,7 +292,7 @@ async function iterateGeneration(
 		const result = await loadGenerationPage(strapi, uid, generation, page)
 		for (const entry of result.results) {
 			seen += 1
-			onItem(entry, seen)
+			await onItem(entry, seen)
 			await yieldToEventLoop()
 		}
 		if (page >= result.pagination.pageCount || result.results.length === 0) {
@@ -306,9 +314,19 @@ async function importCollection(
 		counts: Counts
 		onlyChanged: boolean
 		log: (line: string) => void
+		apply?: (entry: Record<string, unknown>) => Promise<void>
 	},
 ) {
-	const { label, uid, generation, idAttribute, counts, onlyChanged, log } = options
+	const {
+		label,
+		uid,
+		generation,
+		idAttribute,
+		counts,
+		onlyChanged,
+		log,
+		apply,
+	} = options
 	const total = await countGeneration(strapi, uid, generation)
 	counts.processed = 0
 	counts.total = total
@@ -330,7 +348,7 @@ async function importCollection(
 
 	let imported = 0
 	let skipped = 0
-	await iterateGeneration(strapi, uid, generation, (entry, index) => {
+	await iterateGeneration(strapi, uid, generation, async (entry, index) => {
 		const recordId = readRecordId(entry[idAttribute])
 		const idLabel = recordId ? ` ${idAttribute}=${recordId}` : ''
 		const previous = recordId ? previousById.get(recordId) : undefined
@@ -356,13 +374,15 @@ async function importCollection(
 		log(
 			`${label} ${index}/${total}${idLabel}${documentId ? ` documentId=${documentId}` : ''}${changeNote}`,
 		)
-		if (!changes) {
-			return
+		if (changes) {
+			for (const change of changes) {
+				log(
+					`${label}${idLabel} ${change.name}: ${formatLogValue(change.previous)} -> ${formatLogValue(change.current)}`,
+				)
+			}
 		}
-		for (const change of changes) {
-			log(
-				`${label}${idLabel} ${change.name}: ${formatLogValue(change.previous)} -> ${formatLogValue(change.current)}`,
-			)
+		if (apply) {
+			await apply(entry)
 		}
 	})
 	counts.processed = imported
@@ -390,6 +410,7 @@ async function import_strapi_daten(
 				? 'Import gestartet (nur geänderte Datensätze)'
 				: 'Import gestartet',
 		)
+		const authenticatedRoleId = await loadAuthenticatedRoleId(strapi)
 		const memberGeneration = await loadCurrentGeneration(
 			strapi,
 			'ImportGenerationCSMembers',
@@ -407,6 +428,12 @@ async function import_strapi_daten(
 				counts: job.members,
 				onlyChanged: options.onlyChanged,
 				log,
+				apply: (entry) => updateUser(
+					strapi,
+					entry,
+					authenticatedRoleId,
+					log,
+				),
 			})
 		}
 
@@ -427,6 +454,7 @@ async function import_strapi_daten(
 				counts: job.dogs,
 				onlyChanged: options.onlyChanged,
 				log,
+				apply: (entry) => updateDog(strapi, entry, log),
 			})
 		}
 
