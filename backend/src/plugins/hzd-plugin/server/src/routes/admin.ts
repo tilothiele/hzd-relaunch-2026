@@ -56,6 +56,14 @@ export default [
     },
   },
   {
+    method: "POST",
+    path: "/chromosoft/import-strapi-daten/abort",
+    handler: "import-strapi-daten.abort",
+    config: {
+      policies: [],
+    },
+  },
+  {
     method: "GET",
     path: "/chromosoft/import-strapi-daten/status",
     handler: "import-strapi-daten.status",
