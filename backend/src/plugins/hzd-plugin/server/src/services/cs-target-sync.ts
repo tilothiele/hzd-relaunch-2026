@@ -427,6 +427,63 @@ async function ensurePublishMyData(strapi: Core.Strapi, userId: number) {
 	})
 }
 
+interface OwnerMemberUser {
+	id: number
+	cId?: number | null
+	publishMyData?: boolean | null
+	firstName?: string | null
+	lastName?: string | null
+}
+
+async function ensureOwnerMembersPublishMyData(
+	strapi: Core.Strapi,
+	breederId: number | null,
+	userId: number,
+	log: (line: string) => void,
+) {
+	const users: OwnerMemberUser[] = []
+	if (breederId !== null) {
+		const breeder = await strapi.db.query(BREEDER_UID).findOne({
+			where: { id: breederId },
+			populate: {
+				owner_members: {
+					select: ['id', 'cId', 'publishMyData', 'firstName', 'lastName'],
+				},
+			},
+		}) as { owner_members?: OwnerMemberUser[] } | null
+		if (Array.isArray(breeder?.owner_members)) {
+			users.push(...breeder.owner_members)
+		}
+	}
+
+	if (!users.some((entry) => entry.id === userId)) {
+		const user = await strapi.db.query(USER_UID).findOne({
+			where: { id: userId },
+			select: ['id', 'cId', 'publishMyData', 'firstName', 'lastName'],
+		}) as OwnerMemberUser | null
+		if (user) {
+			users.push(user)
+		}
+	}
+
+	for (const user of users) {
+		if (user.publishMyData === true) {
+			continue
+		}
+		await strapi.db.query(USER_UID).update({
+			where: { id: user.id },
+			data: { publishMyData: true },
+		})
+		const name = [user.firstName, user.lastName]
+			.filter((part) => typeof part === 'string' && part.trim() !== '')
+			.join(' ')
+			.trim()
+		const label = name || `id=${user.id}`
+		const cIdLabel = typeof user.cId === 'number' ? ` cId=${user.cId}` : ''
+		log(`publishMyData für Owner-Member ${label}${cIdLabel} auf true gesetzt`)
+	}
+}
+
 function addressFromUser(user: Record<string, unknown>): TargetData | null {
 	const address1 = truncateOrNull(cell(user.address1), 255)
 	const zip = truncateOrNull(cell(user.zip), 5)
@@ -507,7 +564,12 @@ export async function updateBreederFromUser(
 		data.BreederRole = 'B'
 	}
 
-	await ensurePublishMyData(strapi, userId)
+	await ensureOwnerMembersPublishMyData(
+		strapi,
+		typeof existing?.id === 'number' ? existing.id : null,
+		userId,
+		log,
+	)
 	const savedId = await saveDocument(strapi, BREEDER_UID, existing, data)
 	log(
 		existing
