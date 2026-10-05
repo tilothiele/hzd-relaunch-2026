@@ -431,57 +431,113 @@ interface OwnerMemberUser {
 	id: number
 	cId?: number | null
 	publishMyData?: boolean | null
+	cFlagBreeder?: boolean | null
 	firstName?: string | null
 	lastName?: string | null
 }
 
-async function ensureOwnerMembersPublishMyData(
+function ownerMemberLabel(user: OwnerMemberUser): string {
+	const name = [user.firstName, user.lastName]
+		.filter((part) => typeof part === 'string' && part.trim() !== '')
+		.join(' ')
+		.trim()
+	const label = name || `id=${user.id}`
+	const cIdLabel = typeof user.cId === 'number' ? ` cId=${user.cId}` : ''
+	return `${label}${cIdLabel}`
+}
+
+async function loadOwnerMembers(
+	strapi: Core.Strapi,
+	breederId: number,
+): Promise<OwnerMemberUser[]> {
+	const breeder = await strapi.db.query(BREEDER_UID).findOne({
+		where: { id: breederId },
+		populate: {
+			owner_members: {
+				select: [
+					'id',
+					'cId',
+					'publishMyData',
+					'cFlagBreeder',
+					'firstName',
+					'lastName',
+				],
+			},
+		},
+	}) as { owner_members?: OwnerMemberUser[] } | null
+	return Array.isArray(breeder?.owner_members) ? breeder.owner_members : []
+}
+
+async function prepareOwnerMembers(
 	strapi: Core.Strapi,
 	breederId: number | null,
 	userId: number,
 	log: (line: string) => void,
-) {
-	const users: OwnerMemberUser[] = []
-	if (breederId !== null) {
-		const breeder = await strapi.db.query(BREEDER_UID).findOne({
-			where: { id: breederId },
-			populate: {
-				owner_members: {
-					select: ['id', 'cId', 'publishMyData', 'firstName', 'lastName'],
-				},
-			},
-		}) as { owner_members?: OwnerMemberUser[] } | null
-		if (Array.isArray(breeder?.owner_members)) {
-			users.push(...breeder.owner_members)
+): Promise<Record<string, number[]> | null> {
+	const linked = breederId === null
+		? []
+		: await loadOwnerMembers(strapi, breederId)
+	const disconnect: number[] = []
+	const keep: OwnerMemberUser[] = []
+
+	for (const member of linked) {
+		if (member.cFlagBreeder === true) {
+			disconnect.push(member.id)
+			log(
+				`Owner-Member ${ownerMemberLabel(member)} aus der Relation entfernt, weil cFlagBreeder=true`,
+			)
+			continue
 		}
+		keep.push(member)
 	}
 
-	if (!users.some((entry) => entry.id === userId)) {
-		const user = await strapi.db.query(USER_UID).findOne({
-			where: { id: userId },
-			select: ['id', 'cId', 'publishMyData', 'firstName', 'lastName'],
-		}) as OwnerMemberUser | null
-		if (user) {
-			users.push(user)
-		}
+	const current = await strapi.db.query(USER_UID).findOne({
+		where: { id: userId },
+		select: [
+			'id',
+			'cId',
+			'publishMyData',
+			'cFlagBreeder',
+			'firstName',
+			'lastName',
+		],
+	}) as OwnerMemberUser | null
+	const currentIsFlagged = current?.cFlagBreeder === true
+	const currentIsKept = linked.some(
+		(entry) => entry.id === userId && entry.cFlagBreeder !== true,
+	)
+	if (current && !currentIsFlagged && !currentIsKept) {
+		keep.push(current)
 	}
 
-	for (const user of users) {
-		if (user.publishMyData === true) {
+	for (const member of keep) {
+		if (member.publishMyData === true) {
 			continue
 		}
 		await strapi.db.query(USER_UID).update({
-			where: { id: user.id },
+			where: { id: member.id },
 			data: { publishMyData: true },
 		})
-		const name = [user.firstName, user.lastName]
-			.filter((part) => typeof part === 'string' && part.trim() !== '')
-			.join(' ')
-			.trim()
-		const label = name || `id=${user.id}`
-		const cIdLabel = typeof user.cId === 'number' ? ` cId=${user.cId}` : ''
-		log(`publishMyData für Owner-Member ${label}${cIdLabel} auf true gesetzt`)
+		log(
+			`publishMyData für Owner-Member ${ownerMemberLabel(member)} auf true gesetzt`,
+		)
 	}
+
+	const connect: number[] = []
+	if (disconnect.length > 0 && current && !currentIsFlagged && !currentIsKept) {
+		connect.push(userId)
+	}
+	if (disconnect.length === 0 && connect.length === 0) {
+		return currentIsFlagged ? {} : null
+	}
+	const relation: Record<string, number[]> = {}
+	if (disconnect.length > 0) {
+		relation.disconnect = disconnect
+	}
+	if (connect.length > 0) {
+		relation.connect = connect
+	}
+	return relation
 }
 
 function addressFromUser(user: Record<string, unknown>): TargetData | null {
@@ -564,12 +620,15 @@ export async function updateBreederFromUser(
 		data.BreederRole = 'B'
 	}
 
-	await ensureOwnerMembersPublishMyData(
+	const ownerMembers = await prepareOwnerMembers(
 		strapi,
 		typeof existing?.id === 'number' ? existing.id : null,
 		userId,
 		log,
 	)
+	if (ownerMembers) {
+		data.owner_members = ownerMembers
+	}
 	const savedId = await saveDocument(strapi, BREEDER_UID, existing, data)
 	log(
 		existing
