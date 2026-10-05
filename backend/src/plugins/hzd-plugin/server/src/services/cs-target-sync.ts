@@ -25,6 +25,12 @@ const COUNTRY_CODE_MAP: Record<string, string> = {
 	switzerland: 'CH',
 }
 
+const ACTIVE_MEMBERSHIP_STATUSES = new Set([
+	'mitglied',
+	'familienmitglied',
+	'schüler'
+])
+
 const USER_SEX_MAP: Record<string, 'M' | 'F'> = {
 	herr: 'M',
 	mr: 'M',
@@ -111,6 +117,14 @@ function parseInteger(value: unknown): number | null {
 	}
 	const parsed = Number.parseInt(digits, 10)
 	return Number.isNaN(parsed) ? null : parsed
+}
+
+function isActiveMembership(value: unknown): boolean {
+	const cleaned = cell(value)
+	if (!cleaned) {
+		return false
+	}
+	return ACTIVE_MEMBERSHIP_STATUSES.has(cleaned.toLowerCase())
 }
 
 function parseBoolean(value: unknown): boolean | null {
@@ -228,7 +242,7 @@ function mapMemberToUser(
 		email: `c.${cId}@hovawarte.com`,
 		provider: 'local',
 		confirmed: true,
-		blocked: false,
+		blocked: !isActiveMembership(member.MembershipStatus) || isBreeder,
 		role: authenticatedRoleId,
 		cId,
 		publishMyData: isBreeder,
@@ -342,6 +356,83 @@ async function saveDocument(
 	return created?.documentId ?? ''
 }
 
+async function findOtherUserByEmail(
+	strapi: Core.Strapi,
+	email: string,
+	existing: { id?: number } | null,
+): Promise<{ id?: number; cId?: number } | null> {
+	const where: Record<string, unknown> = {
+		email: { $eqi: email },
+	}
+	if (typeof existing?.id === 'number') {
+		where.id = { $ne: existing.id }
+	}
+	const taken = await strapi.db.query(USER_UID).findOne({
+		where,
+		select: ['id', 'cId'],
+	}) as { id?: number; cId?: number } | null
+	return taken ?? null
+}
+
+function otherUserLabel(user: { id?: number; cId?: number }): string {
+	return typeof user.cId === 'number' ? `cId=${user.cId}` : `id=${user.id}`
+}
+
+async function applyUniqueMemberEmail(
+	strapi: Core.Strapi,
+	data: TargetData,
+	existing: { id?: number; documentId?: string } | null,
+	cId: number,
+	log: (line: string) => void,
+) {
+	const memberEmail = typeof data.cEmail === 'string' ? data.cEmail : null
+	const placeholder = typeof data.email === 'string'
+		? data.email
+		: `c.${cId}@hovawarte.com`
+
+	if (memberEmail) {
+		const taken = await findOtherUserByEmail(strapi, memberEmail, existing)
+		if (!taken) {
+			data.email = memberEmail
+			log(`CS_Member cId=${cId}: user.email übernommen (${memberEmail})`)
+			return
+		}
+		log(
+			`CS_Member cId=${cId}: Email ${memberEmail} ist bereits bei ${otherUserLabel(taken)} vergeben, user.email wird nicht übernommen`,
+		)
+		if (existing) {
+			delete data.email
+			return
+		}
+	}
+
+	const placeholderTaken = await findOtherUserByEmail(
+		strapi,
+		placeholder,
+		existing,
+	)
+	if (!placeholderTaken) {
+		data.email = placeholder
+		return
+	}
+	if (existing) {
+		delete data.email
+		log(
+			`CS_Member cId=${cId}: user.email bleibt unverändert, ${placeholder} ist bereits bei ${otherUserLabel(placeholderTaken)} vergeben`,
+		)
+		return
+	}
+
+	const fallback = `c.${cId}.import@hovawarte.com`
+	const fallbackTaken = await findOtherUserByEmail(strapi, fallback, null)
+	data.email = fallbackTaken
+		? `c.${cId}.${Date.now()}@hovawarte.com`
+		: fallback
+	log(
+		`CS_Member cId=${cId}: Platzhalter ${placeholder} ist vergeben, user.email=${data.email}`,
+	)
+}
+
 async function omitTakenMembershipNumber(
 	strapi: Core.Strapi,
 	data: TargetData,
@@ -392,6 +483,7 @@ export async function updateUser(
 	member: Record<string, unknown>,
 	authenticatedRoleId: number,
 	log: (line: string) => void,
+	options?: { copyMemberEmails?: boolean },
 ) {
 	const cId = parseInteger(member.IdPerson)
 	if (cId === null) {
@@ -402,6 +494,9 @@ export async function updateUser(
 	const data = mapMemberToUser(member, cId, authenticatedRoleId)
 	const existing = await findByCId(strapi, USER_UID, cId)
 	await omitTakenMembershipNumber(strapi, data, existing, cId, log)
+	if (options?.copyMemberEmails) {
+		await applyUniqueMemberEmail(strapi, data, existing, cId, log)
+	}
 	if (!existing) {
 		data.password = await hashPassword(strapi, `Import-${cId}-ChangeMe!`)
 	}

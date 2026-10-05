@@ -9,7 +9,11 @@ interface ImportSteps {
 }
 
 interface ImportService {
-	startImport: (options?: { onlyChanged?: boolean; steps?: ImportSteps }) => {
+	startImport: (options?: {
+		onlyChanged?: boolean
+		copyMemberEmails?: boolean
+		steps?: ImportSteps
+	}) => {
 		started: boolean
 		reason?: 'running' | 'no-steps' | null
 		status: {
@@ -50,11 +54,20 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 	}) {
 		const body = ctx.request.body
 		const payload = body && typeof body === 'object' && !Array.isArray(body)
-			? body as { onlyChanged?: unknown; steps?: unknown }
+			? body as {
+				onlyChanged?: unknown
+				copyMemberEmails?: unknown
+				steps?: unknown
+			}
 			: {}
 		const onlyChanged = payload.onlyChanged === true
+		const copyMemberEmails = payload.copyMemberEmails === true
 		const steps = readSteps(payload.steps)
-		const result = getService(strapi).startImport({ onlyChanged, steps })
+		const result = getService(strapi).startImport({
+			onlyChanged,
+			copyMemberEmails,
+			steps,
+		})
 		if (result.started) {
 			ctx.status = 202
 		} else if (result.reason === 'no-steps') {

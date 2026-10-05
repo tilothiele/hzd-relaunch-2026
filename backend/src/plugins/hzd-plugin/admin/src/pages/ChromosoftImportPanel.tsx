@@ -247,6 +247,7 @@ const ChromosoftImportPanel = () => {
   const [aborting, setAborting] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [onlyChanged, setOnlyChanged] = useState(false);
+  const [copyMemberEmails, setCopyMemberEmails] = useState(false);
   const [steps, setSteps] = useState<ImportSteps>(DEFAULT_STEPS);
   const phaseRef = useRef<ImportPhase>('idle');
 
@@ -368,6 +369,7 @@ const ChromosoftImportPanel = () => {
       });
       const response = await post('/hzd-plugin/chromosoft/import-strapi-daten', {
         onlyChanged,
+        copyMemberEmails,
         steps,
       });
       const nextStatus = normalizeStatus(response.data);
@@ -507,24 +509,45 @@ const ChromosoftImportPanel = () => {
           </Box>
         </Box>
 
-        <Flex gap={2} alignItems="center">
-          <Checkbox
-            id="chromosoft-only-changed"
-            checked={onlyChanged}
-            disabled={isRunning}
-            onCheckedChange={(value: boolean | 'indeterminate') => {
-              setOnlyChanged(value === true);
-            }}
-          />
-          <Typography
-            tag="label"
-            htmlFor="chromosoft-only-changed"
-          >
-            {formatMessage({
-              id: getTranslation('chromosoft.import.onlyChanged'),
-              defaultMessage: 'Nur geänderte Datensätze importieren',
-            })}
-          </Typography>
+        <Flex direction="column" alignItems="flex-start" gap={2}>
+          <Flex gap={2} alignItems="center">
+            <Checkbox
+              id="chromosoft-only-changed"
+              checked={onlyChanged}
+              disabled={isRunning}
+              onCheckedChange={(value: boolean | 'indeterminate') => {
+                setOnlyChanged(value === true);
+              }}
+            />
+            <Typography
+              tag="label"
+              htmlFor="chromosoft-only-changed"
+            >
+              {formatMessage({
+                id: getTranslation('chromosoft.import.onlyChanged'),
+                defaultMessage: 'Nur geänderte Datensätze importieren',
+              })}
+            </Typography>
+          </Flex>
+          <Flex gap={2} alignItems="center">
+            <Checkbox
+              id="chromosoft-copy-member-emails"
+              checked={copyMemberEmails}
+              disabled={isRunning}
+              onCheckedChange={(value: boolean | 'indeterminate') => {
+                setCopyMemberEmails(value === true);
+              }}
+            />
+            <Typography
+              tag="label"
+              htmlFor="chromosoft-copy-member-emails"
+            >
+              {formatMessage({
+                id: getTranslation('chromosoft.import.copyMemberEmails'),
+                defaultMessage: 'Alle Member Emails übernehmen',
+              })}
+            </Typography>
+          </Flex>
         </Flex>
 
         <Flex gap={2}>

@@ -69,6 +69,7 @@ export interface ImportStrapiDatenStatus {
 
 interface ImportOptions {
 	onlyChanged: boolean
+	copyMemberEmails: boolean
 	steps: ImportSteps
 }
 
@@ -659,9 +660,15 @@ async function import_strapi_daten(
 		job.logFileName = opened.fileName
 		job.logFilePath = opened.filePath
 		const log = (line: string) => writeLog(opened.stream, line)
+		const startNotes = [
+			options.onlyChanged ? 'nur geänderte Datensätze' : null,
+			options.copyMemberEmails
+				? 'Member-Emails in user.email übernehmen'
+				: null,
+		].filter((note): note is string => note !== null)
 		log(
-			options.onlyChanged
-				? 'Import gestartet (nur geänderte Datensätze)'
+			startNotes.length > 0
+				? `Import gestartet (${startNotes.join(', ')})`
 				: 'Import gestartet',
 		)
 		const authenticatedRoleId = await loadAuthenticatedRoleId(strapi)
@@ -692,6 +699,7 @@ async function import_strapi_daten(
 						entry,
 						authenticatedRoleId,
 						log,
+						{ copyMemberEmails: options.copyMemberEmails },
 					),
 				})
 			}
@@ -823,13 +831,18 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
 		cancelRequested = false
 		running = true
 		const onlyChanged = options?.onlyChanged === true
+		const copyMemberEmails = options?.copyMemberEmails === true
 		const phase = firstEnabledStep(steps) ?? 'members'
 		job = {
 			...idleJob(),
 			phase,
 			steps,
 		}
-		void import_strapi_daten(strapi, { onlyChanged, steps })
+		void import_strapi_daten(strapi, {
+			onlyChanged,
+			copyMemberEmails,
+			steps,
+		})
 		return { started: true, reason: null, status: snapshot() }
 	},
 
@@ -874,7 +887,11 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
 			phase: 'members',
 			steps,
 		}
-		return import_strapi_daten(strapi, { onlyChanged: false, steps })
+		return import_strapi_daten(strapi, {
+			onlyChanged: false,
+			copyMemberEmails: false,
+			steps,
+		})
 	},
 })
 

@@ -24,6 +24,7 @@
   "hzd-plugin.chromosoft.import.abort": "Abbruch",
   "hzd-plugin.chromosoft.import.abortError": "Der Import konnte nicht abgebrochen werden.",
   "hzd-plugin.chromosoft.import.onlyChanged": "Nur geänderte Datensätze importieren",
+  "hzd-plugin.chromosoft.import.copyMemberEmails": "Alle Member Emails übernehmen",
   "hzd-plugin.chromosoft.import.skipped": "{count} übersprungen",
   "hzd-plugin.chromosoft.import.members": "Verarbeite CS_Member",
   "hzd-plugin.chromosoft.import.dogs": "Verarbeite CS_Dog",

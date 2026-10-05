@@ -24,6 +24,7 @@
   "hzd-plugin.chromosoft.import.abort": "Cancel",
   "hzd-plugin.chromosoft.import.abortError": "The import could not be cancelled.",
   "hzd-plugin.chromosoft.import.onlyChanged": "Import only changed records",
+  "hzd-plugin.chromosoft.import.copyMemberEmails": "Copy all member emails",
   "hzd-plugin.chromosoft.import.skipped": "{count} skipped",
   "hzd-plugin.chromosoft.import.members": "Process CS_Member",
   "hzd-plugin.chromosoft.import.dogs": "Process CS_Dog",
