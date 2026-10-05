@@ -25,12 +25,6 @@ const COUNTRY_CODE_MAP: Record<string, string> = {
 	switzerland: 'CH',
 }
 
-const ACTIVE_MEMBERSHIP_STATUSES = new Set([
-	'mitglied',
-	'familienmitglied',
-	'schüler'
-])
-
 const USER_SEX_MAP: Record<string, 'M' | 'F'> = {
 	herr: 'M',
 	mr: 'M',
@@ -119,14 +113,6 @@ function parseInteger(value: unknown): number | null {
 	return Number.isNaN(parsed) ? null : parsed
 }
 
-function isActiveMembership(value: unknown): boolean {
-	const cleaned = cell(value)
-	if (!cleaned) {
-		return false
-	}
-	return ACTIVE_MEMBERSHIP_STATUSES.has(cleaned.toLowerCase())
-}
-
 function parseBoolean(value: unknown): boolean | null {
 	const cleaned = cell(value)
 	if (!cleaned) {
@@ -157,6 +143,81 @@ function parseDate(value: unknown): string | null {
 	const day = match[1].padStart(2, '0')
 	const month = match[2].padStart(2, '0')
 	return `${match[3]}-${month}-${day}`
+}
+
+interface CalendarDate {
+	year: number
+	month: number
+	day: number
+}
+
+function toCalendarDate(value: unknown): CalendarDate | null {
+	const iso = parseDate(value)
+	if (!iso) {
+		return null
+	}
+	const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso)
+	if (!match) {
+		return null
+	}
+	const year = Number(match[1])
+	const month = Number(match[2])
+	const day = Number(match[3])
+	const probe = new Date(Date.UTC(year, month - 1, day))
+	if (
+		probe.getUTCFullYear() !== year
+		|| probe.getUTCMonth() !== month - 1
+		|| probe.getUTCDate() !== day
+	) {
+		return null
+	}
+	return { year, month, day }
+}
+
+function shiftCalendarMonths(date: CalendarDate, months: number): CalendarDate {
+	const monthIndex = date.month - 1 + months
+	const year = date.year + Math.floor(monthIndex / 12)
+	const month = ((monthIndex % 12) + 12) % 12
+	const lastDay = new Date(Date.UTC(year, month + 1, 0)).getUTCDate()
+	return {
+		year,
+		month: month + 1,
+		day: Math.min(date.day, lastDay),
+	}
+}
+
+function compareCalendarDate(left: CalendarDate, right: CalendarDate): number {
+	if (left.year !== right.year) {
+		return left.year - right.year
+	}
+	if (left.month !== right.month) {
+		return left.month - right.month
+	}
+	return left.day - right.day
+}
+
+function isMoreThanOneMonthAgo(value: unknown, today = new Date()): boolean {
+	const date = toCalendarDate(value)
+	if (!date) {
+		return false
+	}
+	const current: CalendarDate = {
+		year: today.getFullYear(),
+		month: today.getMonth() + 1,
+		day: today.getDate(),
+	}
+	const threshold = shiftCalendarMonths(current, -1)
+	return compareCalendarDate(date, threshold) < 0
+}
+
+function isMemberBlocked(
+	member: Record<string, unknown>,
+	isBreeder: boolean,
+): boolean {
+	if(isBreeder) return true
+	const joinedLongAgo = isMoreThanOneMonthAgo(member.DateOfJoining)
+	const leavingUnset = toCalendarDate(member.DateOfLeaving) === null
+	return ! (joinedLongAgo && leavingUnset)
 }
 
 function parseEmail(value: unknown): string | null {
@@ -242,7 +303,7 @@ function mapMemberToUser(
 		email: `c.${cId}@hovawarte.com`,
 		provider: 'local',
 		confirmed: true,
-		blocked: !isActiveMembership(member.MembershipStatus) || isBreeder,
+		blocked: isMemberBlocked(member, isBreeder),
 		role: authenticatedRoleId,
 		cId,
 		publishMyData: isBreeder,
@@ -386,9 +447,7 @@ async function applyUniqueMemberEmail(
 	log: (line: string) => void,
 ) {
 	const memberEmail = typeof data.cEmail === 'string' ? data.cEmail : null
-	const placeholder = typeof data.email === 'string'
-		? data.email
-		: `c.${cId}@hovawarte.com`
+	const placeholder = `c.${cId}@hovawarte.com`
 
 	if (memberEmail) {
 		const taken = await findOtherUserByEmail(strapi, memberEmail, existing)
@@ -400,26 +459,20 @@ async function applyUniqueMemberEmail(
 		log(
 			`CS_Member cId=${cId}: Email ${memberEmail} ist bereits bei ${otherUserLabel(taken)} vergeben, user.email wird nicht übernommen`,
 		)
-		if (existing) {
-			delete data.email
-			return
-		}
+	}
+
+	if (existing) {
+		delete data.email
+		return
 	}
 
 	const placeholderTaken = await findOtherUserByEmail(
 		strapi,
 		placeholder,
-		existing,
+		null,
 	)
 	if (!placeholderTaken) {
 		data.email = placeholder
-		return
-	}
-	if (existing) {
-		delete data.email
-		log(
-			`CS_Member cId=${cId}: user.email bleibt unverändert, ${placeholder} ist bereits bei ${otherUserLabel(placeholderTaken)} vergeben`,
-		)
 		return
 	}
 
@@ -496,6 +549,8 @@ export async function updateUser(
 	await omitTakenMembershipNumber(strapi, data, existing, cId, log)
 	if (options?.copyMemberEmails) {
 		await applyUniqueMemberEmail(strapi, data, existing, cId, log)
+	} else if (existing) {
+		delete data.email
 	}
 	if (!existing) {
 		data.password = await hashPassword(strapi, `Import-${cId}-ChangeMe!`)
