@@ -1,12 +1,37 @@
 import type { Core } from '@strapi/strapi'
 
+function readCoordinate(value: unknown): number | null {
+	if (typeof value === 'number' && Number.isFinite(value)) {
+		return value
+	}
+	if (typeof value === 'string' && value.trim() !== '') {
+		const parsed = Number(value)
+		if (Number.isFinite(parsed)) {
+			return parsed
+		}
+	}
+	return null
+}
+
+function publicLocation(user: any): { locationLat?: number; locationLng?: number } {
+	const locationLat = readCoordinate(user?.locationLat)
+	const locationLng = readCoordinate(user?.locationLng)
+	if (locationLat === null || locationLng === null) {
+		return {}
+	}
+	return { locationLat, locationLng }
+}
+
 function sanitizeUser(user: any): any {
 	if (user == null) {
 		return user
 	}
 
 	if (user.publishMyData === true) {
-		return user
+		return {
+			...user,
+			...publicLocation(user),
+		}
 	}
 
 	return {
@@ -15,6 +40,7 @@ function sanitizeUser(user: any): any {
 		cId: user.cId ?? null,
 		username: `user-${user.id}`,
 		email: `user-${user.id}@hovawarte.com`,
+		...publicLocation(user),
 	}
 }
 

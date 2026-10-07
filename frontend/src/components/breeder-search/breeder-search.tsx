@@ -19,7 +19,7 @@ import { BreederSearchForm } from './breeder-search-form'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { theme } from '@/themes'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
-import { calculateDistance } from '@/lib/geo-utils'
+import { calculateDistance, readPosition } from '@/lib/geo-utils'
 import { ViewToggle } from '@/components/common/view-toggle'
 
 interface BreederSearchProps {
@@ -150,16 +150,17 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 	const mapItems = useMemo<MapItem[]>(() => {
 		return breeders
 			.map((breeder): MapItem | null => {
-				const lat = breeder.member?.locationLat
-				const lng = breeder.member?.locationLng
-
-				if (typeof lat !== 'number' || typeof lng !== 'number') {
+				const position = readPosition(
+					breeder.member?.locationLat,
+					breeder.member?.locationLng,
+				)
+				if (!position) {
 					return null
 				}
 
 				return {
 					id: breeder.documentId,
-					position: [lat, lng] as [number, number],
+					position: [position.lat, position.lng] as [number, number],
 					title: breeder.kennelName || 'Unbekannt',
 					popupContent: (
 						<div>
@@ -387,12 +388,16 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 										{breeders.map((breeder) => {
 											const memberName = ((breeder.member?.firstName || '') + ' ' + (breeder.member?.lastName || '')).trim()
 											let distance: number | null = null
-											if (userLocation && typeof breeder.member?.locationLat === 'number' && typeof breeder.member?.locationLng === 'number') {
+											const breederPosition = readPosition(
+												breeder.member?.locationLat,
+												breeder.member?.locationLng,
+											)
+											if (userLocation && breederPosition) {
 												distance = calculateDistance(
 													userLocation.lat,
 													userLocation.lng,
-													breeder.member.locationLat,
-													breeder.member.locationLng
+													breederPosition.lat,
+													breederPosition.lng,
 												)
 											}
 

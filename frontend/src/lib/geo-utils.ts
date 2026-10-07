@@ -1,3 +1,28 @@
+export function readCoordinate(value: unknown): number | null {
+	if (typeof value === 'number' && Number.isFinite(value)) {
+		return value
+	}
+	if (typeof value === 'string' && value.trim() !== '') {
+		const parsed = Number(value)
+		if (Number.isFinite(parsed)) {
+			return parsed
+		}
+	}
+	return null
+}
+
+export function readPosition(
+	lat: unknown,
+	lng: unknown,
+): { lat: number; lng: number } | null {
+	const latitude = readCoordinate(lat)
+	const longitude = readCoordinate(lng)
+	if (latitude === null || longitude === null) {
+		return null
+	}
+	return { lat: latitude, lng: longitude }
+}
+
 /**
  * Berechnet die Entfernung zwischen zwei Koordinaten in Kilometern (Haversine-Formel)
  */

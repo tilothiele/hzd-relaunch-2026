@@ -1,3 +1,4 @@
+import { readPosition } from '@/lib/geo-utils'
 import type { Address, Breeder } from '@/types'
 
 type BreederMember = NonNullable<Breeder['member']>
@@ -109,6 +110,7 @@ export function resolveBreederContact(breeder: Breeder): BreederContactInfo {
 	const member = isContactUser(breeder.member) ? breeder.member : null
 	const primaryUser = resolvePrimaryUser(breeder)
 	const { displayName, names } = resolveBreederPersonDisplayName(breeder)
+	const memberPosition = readPosition(member?.locationLat, member?.locationLng)
 
 	return {
 		ownerDisplayName: displayName,
@@ -161,16 +163,8 @@ export function resolveBreederContact(breeder: Breeder): BreederContactInfo {
 			primaryUser?.address2,
 			address?.Address2,
 		),
-		locationLat: typeof primaryUser?.locationLat === 'number'
-			? primaryUser.locationLat
-			: typeof member?.locationLat === 'number'
-				? member.locationLat
-				: null,
-		locationLng: typeof primaryUser?.locationLng === 'number'
-			? primaryUser.locationLng
-			: typeof member?.locationLng === 'number'
-				? member.locationLng
-				: null,
+		locationLat: memberPosition?.lat ?? null,
+		locationLng: memberPosition?.lng ?? null,
 	}
 }
 

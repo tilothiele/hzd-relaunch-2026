@@ -1,4 +1,5 @@
 import { fetchStrapiServer } from '@/lib/server/strapi-client'
+import { readPosition } from '@/lib/geo-utils'
 import type { AuthUser } from '@/types'
 
 const USER_CONTACT_FIELDS = [
@@ -24,8 +25,13 @@ function sanitizePublicUser(user: Record<string, unknown> | null | undefined): A
 		return null
 	}
 
+	const position = readPosition(user.locationLat, user.locationLng)
+
 	if (user.publishMyData === true) {
-		return user as unknown as AuthUser
+		return {
+			...(user as unknown as AuthUser),
+			...(position ?? {}),
+		}
 	}
 
 	return {
@@ -34,6 +40,7 @@ function sanitizePublicUser(user: Record<string, unknown> | null | undefined): A
 		cId: typeof user.cId === 'number' ? user.cId : null,
 		username: `user-${user.id}`,
 		email: `user-${user.id}@hovawarte.com`,
+		...(position ?? {}),
 	}
 }
 
