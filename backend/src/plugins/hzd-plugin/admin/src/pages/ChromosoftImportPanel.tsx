@@ -30,6 +30,13 @@ interface ImportSteps {
   studDogs: boolean;
 }
 
+interface ImportTimestamps {
+  importDogs: string | null;
+  importMembers: string | null;
+  processedDogs: string | null;
+  processedMembers: string | null;
+}
+
 interface ImportStatus {
   phase: ImportPhase;
   steps: ImportSteps;
@@ -39,6 +46,7 @@ interface ImportStatus {
   studDogs: ImportCounts;
   logFileName: string | null;
   error: string | null;
+  timestamps: ImportTimestamps;
 }
 
 const STEP_ORDER: ImportStepKey[] = [
@@ -66,6 +74,15 @@ function emptyCounts(): ImportCounts {
   return { processed: 0, total: 0, skipped: 0 };
 }
 
+function emptyTimestamps(): ImportTimestamps {
+  return {
+    importDogs: null,
+    importMembers: null,
+    processedDogs: null,
+    processedMembers: null,
+  };
+}
+
 const IDLE_STATUS: ImportStatus = {
   phase: 'idle',
   steps: DEFAULT_STEPS,
@@ -75,6 +92,7 @@ const IDLE_STATUS: ImportStatus = {
   studDogs: emptyCounts(),
   logFileName: null,
   error: null,
+  timestamps: emptyTimestamps(),
 };
 
 const shimmer = keyframes`
@@ -127,6 +145,37 @@ function asCounts(value: unknown): ImportCounts {
   };
 }
 
+function asTimestamp(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value : null;
+}
+
+function asTimestamps(value: unknown): ImportTimestamps {
+  if (!value || typeof value !== 'object') {
+    return emptyTimestamps();
+  }
+  const source = value as Partial<ImportTimestamps>;
+  return {
+    importDogs: asTimestamp(source.importDogs),
+    importMembers: asTimestamp(source.importMembers),
+    processedDogs: asTimestamp(source.processedDogs),
+    processedMembers: asTimestamp(source.processedMembers),
+  };
+}
+
+function formatAdminTimestamp(value: string | null): string {
+  if (!value) {
+    return '–';
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return '–';
+  }
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()} ${hours}:${minutes}:${seconds}`;
+}
+
 function asSteps(value: unknown): ImportSteps {
   const source = value && typeof value === 'object'
     ? value as Partial<ImportSteps>
@@ -156,6 +205,9 @@ function normalizeStatus(value: unknown): ImportStatus | null {
     studDogs: asCounts(status.studDogs),
     logFileName: typeof status.logFileName === 'string' ? status.logFileName : null,
     error: typeof status.error === 'string' ? status.error : null,
+    timestamps: asTimestamps(
+      (status as { timestamps?: unknown }).timestamps,
+    ),
   };
 }
 
@@ -362,11 +414,12 @@ const ChromosoftImportPanel = () => {
     try {
       setStarting(true);
       const firstStep = STEP_ORDER.find((step) => steps[step]) ?? 'members';
-      setStatus({
+      setStatus((current) => ({
         ...IDLE_STATUS,
         phase: firstStep,
         steps,
-      });
+        timestamps: current.timestamps,
+      }));
       const response = await post('/hzd-plugin/chromosoft/import-strapi-daten', {
         onlyChanged,
         copyMemberEmails,
@@ -383,7 +436,10 @@ const ChromosoftImportPanel = () => {
         setStatus(nextStatus);
         return;
       }
-      setStatus(IDLE_STATUS);
+      setStatus((current) => ({
+        ...IDLE_STATUS,
+        timestamps: current.timestamps,
+      }));
       toggleNotification({
         type: 'danger',
         message:
@@ -606,6 +662,52 @@ const ChromosoftImportPanel = () => {
                     { count: status[step].skipped ?? 0 },
                   )}
                 />
+                {step === 'members' || step === 'dogs' ? (
+                  <Box paddingTop={2}>
+                    <Flex direction="column" alignItems="flex-start" gap={1}>
+                      <Typography textColor="neutral600">
+                        {formatMessage(
+                          {
+                            id: getTranslation(
+                              step === 'members'
+                                ? 'chromosoft.import.membersUploaded'
+                                : 'chromosoft.import.dogsUploaded',
+                            ),
+                            defaultMessage: step === 'members'
+                              ? 'members.csv hochgeladen: {time}'
+                              : 'dogs.csv hochgeladen: {time}',
+                          },
+                          {
+                            time: formatAdminTimestamp(
+                              step === 'members'
+                                ? status.timestamps.importMembers
+                                : status.timestamps.importDogs,
+                            ),
+                          },
+                        )}
+                      </Typography>
+                      <Typography textColor="neutral600">
+                        {formatMessage(
+                          {
+                            id: getTranslation(
+                              step === 'members'
+                                ? 'chromosoft.import.membersProcessed'
+                                : 'chromosoft.import.dogsProcessed',
+                            ),
+                            defaultMessage: 'Verarbeitet: {time}',
+                          },
+                          {
+                            time: formatAdminTimestamp(
+                              step === 'members'
+                                ? status.timestamps.processedMembers
+                                : status.timestamps.processedDogs,
+                            ),
+                          },
+                        )}
+                      </Typography>
+                    </Flex>
+                  </Box>
+                ) : null}
               </Box>
             </Flex>
           ))}

@@ -91,6 +91,12 @@
     },
     "ImportTimestampCSMembers": {
       "type": "datetime"
+    },
+    "ProcessedTimestampCSDogs": {
+      "type": "datetime"
+    },
+    "ProcessedTimestampCSMembers": {
+      "type": "datetime"
     }
   }
 }

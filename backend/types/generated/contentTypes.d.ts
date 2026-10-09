@@ -1309,6 +1309,8 @@ export interface ApiHzdSettingHzdSetting extends Struct.SingleTypeSchema {
       'api::hzd-setting.hzd-setting'
     > &
       Schema.Attribute.Private;
+    ProcessedTimestampCSDogs: Schema.Attribute.DateTime;
+    ProcessedTimestampCSMembers: Schema.Attribute.DateTime;
     publishedAt: Schema.Attribute.DateTime;
     TotmeldungEmail: Schema.Attribute.Email;
     TotmeldungTemplateId: Schema.Attribute.Integer;
