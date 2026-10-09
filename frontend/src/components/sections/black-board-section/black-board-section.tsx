@@ -24,6 +24,7 @@ import type { ThemeDefinition } from '@/themes'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { formatDate } from '@/lib/date-utils'
 import { useScrollAnimation } from '@/hooks/use-scroll-animation'
+import { trackUmamiEvent } from '@/components/analytics/track-umami-event'
 
 interface BlackBoardSectionViewProps {
 	board: BlackBoard | null | undefined
@@ -140,6 +141,25 @@ function resolveFileUrl(file: StrapiFile, strapiBaseUrl: string): string {
 	}
 
 	return `${strapiBaseUrl}${file.url}`
+}
+
+function resolveDownloadFileName(file: StrapiFile): string {
+	const name = file.name?.trim()
+	if (name) {
+		return name
+	}
+
+	const path = file.url.split('?')[0] ?? ''
+	const base = path.split('/').pop() ?? ''
+	if (!base) {
+		return ''
+	}
+
+	try {
+		return decodeURIComponent(base)
+	} catch {
+		return base
+	}
 }
 
 function formatFileSize(bytes: number | null | undefined): string {
@@ -319,6 +339,7 @@ function BlackBoardEntryAccordion({
 						{documents.map((document, index) => {
 							const file = document.file
 							const fileUrl = resolveFileUrl(file, strapiBaseUrl)
+							const fileName = resolveDownloadFileName(file)
 							const label = document.Description || file.name || 'Download'
 							const metaParts = [
 								file.ext?.replace('.', '').toUpperCase(),
@@ -363,6 +384,11 @@ function BlackBoardEntryAccordion({
 										size="small"
 										startIcon={<DownloadIcon />}
 										sx={{ textTransform: 'none' }}
+										onClick={() => {
+											trackUmamiEvent('black-board-document-download', {
+												Dateiname: fileName,
+											})
+										}}
 									>
 										Download
 									</Button>

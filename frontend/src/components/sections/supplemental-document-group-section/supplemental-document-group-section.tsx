@@ -1,6 +1,6 @@
-import { Box, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip } from '@mui/material'
-import DownloadIcon from '@mui/icons-material/Download'
-import type { SupplementalDocumentGroupSection, SupplementalDocument } from '@/types'
+import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip } from '@mui/material'
+import type { SupplementalDocumentGroupSection, SupplementalDocument, File } from '@/types'
+import { SupplementalDocumentDownloadLink } from './supplemental-document-download-link'
 import type { ThemeDefinition } from '@/themes'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { renderStrapiBlocks } from '@/lib/strapi-blocks'
@@ -43,6 +43,25 @@ function isDocumentVisible(document: SupplementalDocument | null | undefined): b
 	}
 
 	return true
+}
+
+function resolveDownloadFileName(file: File): string {
+	const name = file.name?.trim()
+	if (name) {
+		return name
+	}
+
+	const path = file.url.split('?')[0] ?? ''
+	const base = path.split('/').pop() ?? ''
+	if (!base) {
+		return ''
+	}
+
+	try {
+		return decodeURIComponent(base)
+	} catch {
+		return base
+	}
 }
 
 function formatFileSize(bytes: number | null | undefined): string {
@@ -237,42 +256,18 @@ export function SupplementalDocumentGroupSectionComponent({
 														const fileUrl = file.url.startsWith('http')
 															? file.url
 															: `${strapiBaseUrl}${file.url}`
+														const fileName = resolveDownloadFileName(file)
 
 														return (
-															<Box key={fileIndex} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-																<Button
-																	component='a'
-																	href={fileUrl}
-																	download
-																	variant='contained'
-																	size='small'
-																	startIcon={<DownloadIcon />}
-																	sx={{
-																		backgroundColor: theme.buttonColor ?? 'var(--color-main-base)',
-																		color: theme.buttonTextColor ?? 'var(--color-main-contrast-text)',
-																		fontWeight: 600,
-																		'&:hover': {
-																			backgroundColor: theme.buttonHoverColor ?? 'var(--color-main-hover)',
-																		},
-																	}}
-																>
-																	Download
-																</Button>
-																{(file.name || file.size) && (
-																	<Typography
-																		variant='caption'
-																		sx={{
-																			mt: 0.5,
-																			color: 'text.secondary',
-																			fontSize: '0.75rem',
-																		}}
-																	>
-																		{file.name && file.name}
-																		{file.name && file.size && ' • '}
-																		{file.size && formatFileSize(file.size)}
-																	</Typography>
-																)}
-															</Box>
+															<SupplementalDocumentDownloadLink
+																key={fileIndex}
+																href={fileUrl}
+																fileName={fileName}
+																fileSizeLabel={file.size ? formatFileSize(file.size) : undefined}
+																buttonColor={theme.buttonColor}
+																buttonTextColor={theme.buttonTextColor}
+																buttonHoverColor={theme.buttonHoverColor}
+															/>
 														)
 													})
 												) : (

@@ -20,6 +20,38 @@ interface TrackUmamiEventProps {
 	eventData: Record<string, string | number>
 }
 
+export function trackUmamiEvent (
+	eventName: string,
+	eventData: Record<string, string | number>,
+) {
+	const send = () => {
+		if (typeof window.umami?.track !== 'function') {
+			return false
+		}
+		window.umami.track(eventName, eventData)
+		return true
+	}
+
+	if (send()) {
+		return () => undefined
+	}
+
+	const intervalId = window.setInterval(() => {
+		if (send()) {
+			window.clearInterval(intervalId)
+		}
+	}, 250)
+
+	const timeoutId = window.setTimeout(() => {
+		window.clearInterval(intervalId)
+	}, 4000)
+
+	return () => {
+		window.clearInterval(intervalId)
+		window.clearTimeout(timeoutId)
+	}
+}
+
 export function TrackUmamiEvent ({
 	eventName,
 	eventData,
@@ -34,32 +66,7 @@ export function TrackUmamiEvent ({
 			return
 		}
 
-		const send = () => {
-			if (typeof window.umami?.track !== 'function') {
-				return false
-			}
-			window.umami.track(eventName, payload)
-			return true
-		}
-
-		if (send()) {
-			return
-		}
-
-		const intervalId = window.setInterval(() => {
-			if (send()) {
-				window.clearInterval(intervalId)
-			}
-		}, 250)
-
-		const timeoutId = window.setTimeout(() => {
-			window.clearInterval(intervalId)
-		}, 4000)
-
-		return () => {
-			window.clearInterval(intervalId)
-			window.clearTimeout(timeoutId)
-		}
+		return trackUmamiEvent(eventName, payload)
 	}, [eventName, eventDataKey])
 
 	return null
