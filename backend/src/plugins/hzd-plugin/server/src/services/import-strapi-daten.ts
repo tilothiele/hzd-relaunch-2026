@@ -21,6 +21,21 @@ const PAGE_SIZE = 100
 const LOG_DIR = path.join(tmpdir(), 'hzd-plugin-import-logs')
 
 type GenerationField = 'ImportGenerationCSMembers' | 'ImportGenerationCSDogs'
+type SettingsTimestampField =
+	| 'ImportTimestampCSDogs'
+	| 'ImportTimestampCSMembers'
+	| 'ProcessedTimestampCSDogs'
+	| 'ProcessedTimestampCSMembers'
+type ProcessedTimestampField =
+	| 'ProcessedTimestampCSMembers'
+	| 'ProcessedTimestampCSDogs'
+
+const TIMESTAMP_FIELDS: SettingsTimestampField[] = [
+	'ImportTimestampCSDogs',
+	'ImportTimestampCSMembers',
+	'ProcessedTimestampCSDogs',
+	'ProcessedTimestampCSMembers',
+]
 type ImportPhase =
 	| 'idle'
 	| 'members'
@@ -56,6 +71,13 @@ interface JobState {
 	error: string | null
 }
 
+export interface ImportTimestamps {
+	importDogs: string | null
+	importMembers: string | null
+	processedDogs: string | null
+	processedMembers: string | null
+}
+
 export interface ImportStrapiDatenStatus {
 	phase: ImportPhase
 	steps: ImportSteps
@@ -65,6 +87,7 @@ export interface ImportStrapiDatenStatus {
 	studDogs: Counts
 	logFileName: string | null
 	error: string | null
+	timestamps: ImportTimestamps
 }
 
 interface ImportOptions {
@@ -136,7 +159,29 @@ function isImportCancelled(error: unknown): boolean {
 	return error instanceof ImportCancelled
 }
 
-function snapshot(): ImportStrapiDatenStatus {
+function emptyImportTimestamps(): ImportTimestamps {
+	return {
+		importDogs: null,
+		importMembers: null,
+		processedDogs: null,
+		processedMembers: null,
+	}
+}
+
+function toIsoTimestamp(value: unknown): string | null {
+	if (value instanceof Date && !Number.isNaN(value.getTime())) {
+		return value.toISOString()
+	}
+	if (typeof value === 'string' && value.trim()) {
+		const parsed = new Date(value)
+		if (!Number.isNaN(parsed.getTime())) {
+			return parsed.toISOString()
+		}
+	}
+	return null
+}
+
+function snapshot(): Omit<ImportStrapiDatenStatus, 'timestamps'> {
 	const finished = job.phase === 'done' || job.phase === 'error'
 	return {
 		phase: job.phase,
@@ -191,6 +236,72 @@ async function loadCurrentGeneration(
 	}
 
 	return (await read('published')) ?? (await read('draft'))
+}
+
+async function loadImportTimestamps(
+	strapi: Core.Strapi,
+): Promise<ImportTimestamps> {
+	try {
+		const read = async (status: 'published' | 'draft') => {
+			return strapi.documents(HZD_SETTING_UID).findFirst({
+				status,
+				fields: TIMESTAMP_FIELDS,
+			})
+		}
+		const published = await read('published')
+		const draft = await read('draft')
+		const pick = (field: SettingsTimestampField) => {
+			return toIsoTimestamp(published?.[field])
+				?? toIsoTimestamp(draft?.[field])
+		}
+		return {
+			importDogs: pick('ImportTimestampCSDogs'),
+			importMembers: pick('ImportTimestampCSMembers'),
+			processedDogs: pick('ProcessedTimestampCSDogs'),
+			processedMembers: pick('ProcessedTimestampCSMembers'),
+		}
+	} catch (error) {
+		strapi.log.warn(
+			`HZD-Settings Zeitstempel konnten nicht gelesen werden: ${describeError(error)}`,
+		)
+		return emptyImportTimestamps()
+	}
+}
+
+async function storeProcessedTimestamp(
+	strapi: Core.Strapi,
+	field: ProcessedTimestampField,
+): Promise<void> {
+	const processedAt = new Date().toISOString()
+	try {
+		const published = await strapi.documents(HZD_SETTING_UID).findFirst({
+			status: 'published',
+		})
+		const draft = await strapi.documents(HZD_SETTING_UID).findFirst({
+			status: 'draft',
+		})
+		const documentId = published?.documentId ?? draft?.documentId
+		if (!documentId) {
+			strapi.log.warn(
+				`HZD Settings fehlen, ${field} wurde nicht gesetzt.`,
+			)
+			return
+		}
+		await strapi.documents(HZD_SETTING_UID).update({
+			documentId,
+			data: {
+				[field]: processedAt,
+			},
+		})
+		if (published) {
+			await strapi.documents(HZD_SETTING_UID).publish({ documentId })
+		}
+		strapi.log.info(`${field}=${processedAt}`)
+	} catch (error) {
+		strapi.log.error(
+			`${field} konnte nicht gespeichert werden: ${describeError(error)}`,
+		)
+	}
 }
 
 async function countGeneration(
@@ -702,6 +813,11 @@ async function import_strapi_daten(
 						{ copyMemberEmails: options.copyMemberEmails },
 					),
 				})
+				await storeProcessedTimestamp(
+					strapi,
+					'ProcessedTimestampCSMembers',
+				)
+				log('Verarbeite CS_Member: ProcessedTimestampCSMembers gesetzt')
 			}
 		} else {
 			log('Verarbeite CS_Member übersprungen')
@@ -728,6 +844,11 @@ async function import_strapi_daten(
 					log,
 					apply: (entry) => updateDog(strapi, entry, log),
 				})
+				await storeProcessedTimestamp(
+					strapi,
+					'ProcessedTimestampCSDogs',
+				)
+				log('Verarbeite CS_Dog: ProcessedTimestampCSDogs gesetzt')
 			}
 		} else {
 			log('Verarbeite CS_Dog übersprungen')
@@ -858,8 +979,11 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
 		return { aborted: true, status: snapshot() }
 	},
 
-	getStatus() {
-		return snapshot()
+	async getStatus(): Promise<ImportStrapiDatenStatus> {
+		return {
+			...snapshot(),
+			timestamps: await loadImportTimestamps(strapi),
+		}
 	},
 
 	getDownloadableLog() {

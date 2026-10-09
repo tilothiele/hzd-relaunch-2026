@@ -296,6 +296,9 @@ async function storeImportResult(
 	if (published) {
 		await strapi.documents(HZD_SETTING_UID).publish({ documentId })
 	}
+	strapi.log.info(
+		`CSV-Import: ${timestampField}=${importedAt}, ${field}=${generation}`,
+	)
 }
 
 async function deleteGeneration(

@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-10-09T07:37:29.439Z"
+    "x-generation-date": "2026-10-09T09:43:21.122Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -69832,6 +69832,14 @@
                 "type": "string",
                 "format": "date-time"
               },
+              "ProcessedTimestampCSDogs": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "ProcessedTimestampCSMembers": {
+                "type": "string",
+                "format": "date-time"
+              },
               "locale": {
                 "type": "string"
               },
@@ -71906,6 +71914,14 @@
             "type": "string",
             "format": "date-time"
           },
+          "ProcessedTimestampCSDogs": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ProcessedTimestampCSMembers": {
+            "type": "string",
+            "format": "date-time"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -73028,6 +73044,14 @@
                   "format": "date-time"
                 },
                 "ImportTimestampCSMembers": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "ProcessedTimestampCSDogs": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "ProcessedTimestampCSMembers": {
                   "type": "string",
                   "format": "date-time"
                 },

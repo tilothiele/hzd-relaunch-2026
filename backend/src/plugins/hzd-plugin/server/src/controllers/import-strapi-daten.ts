@@ -23,7 +23,7 @@ interface ImportService {
 		}
 	}
 	abortImport: () => { aborted: boolean; status: unknown }
-	getStatus: () => unknown
+	getStatus: () => Promise<unknown>
 	getDownloadableLog: () => { filePath: string; fileName: string } | null
 }
 
@@ -79,7 +79,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 		} else {
 			ctx.status = 409
 		}
-		ctx.body = result.status
+		ctx.body = await getService(strapi).getStatus()
 	},
 
 	async abort(ctx: { status: number; body: unknown }) {
@@ -92,7 +92,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 	},
 
 	async status(ctx: { body: unknown }) {
-		ctx.body = getService(strapi).getStatus()
+		ctx.body = await getService(strapi).getStatus()
 	},
 
 	async downloadLog(ctx: {
