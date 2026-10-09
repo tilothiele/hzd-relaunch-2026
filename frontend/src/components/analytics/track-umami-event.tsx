@@ -3,10 +3,10 @@
 import { useEffect } from 'react'
 
 interface UmamiTracker {
-	track: (
-		eventName: string,
-		eventData?: Record<string, string | number>,
-	) => void
+	track: {
+		(eventName: string, eventData?: Record<string, string | number>): void
+		(): void
+	}
 }
 
 declare global {
