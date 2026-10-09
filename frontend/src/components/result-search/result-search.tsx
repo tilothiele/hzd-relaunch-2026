@@ -323,9 +323,9 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 	return (
 		<>
 			{/* Jahr-Auswahl in der obersten Zeile */}
-			<div className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em', backgroundColor }}>
-				<div className='w-full max-w-7xl'>
-					<Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+			<div className='flex w-full min-w-0 justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em', backgroundColor }}>
+				<div className='w-full min-w-0 max-w-7xl'>
+					<Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', minWidth: 0 }}>
 						{availableYears.map((year) => {
 							const isSelected = selectedYear === year
 							const primaryColor = theme?.buttonColor ?? '#64574E'
@@ -362,15 +362,15 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 			</div>
 
 			{/* Multiselect im Kopfbereich */}
-			<div className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em', backgroundColor }}>
-				<div className='w-full max-w-7xl'>
+			<div className='flex w-full min-w-0 justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em', backgroundColor }}>
+				<div className='w-full min-w-0 max-w-7xl'>
 					{isLoading && calendars.length === 0 ? (
 						<Typography variant='body2' color='text.secondary'>
 							Lade Kalender...
 						</Typography>
 					) : calendars.length > 0 ? (
-						<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
-							<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+						<Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2, minWidth: 0, maxWidth: '100%' }}>
+							<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, minWidth: 0, maxWidth: '100%' }}>
 								{calendars.map((calendar) => {
 									const colors = getCalendarColors(calendar)
 									const isSelected = selectedCalendarIds.has(calendar.documentId)
@@ -380,7 +380,10 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 											variant={isSelected ? 'contained' : 'outlined'}
 											onClick={() => handleCalendarToggle(calendar.documentId)}
 											sx={{
-												minWidth: 'auto',
+												minWidth: 0,
+												maxWidth: '100%',
+												whiteSpace: 'normal',
+												textAlign: 'left',
 												backgroundColor: isSelected ? colors.backgroundColor : 'transparent',
 												color: isSelected ? colors.textColor : colors.backgroundColor,
 												borderColor: colors.backgroundColor,
@@ -405,7 +408,7 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 							</Box>
 
 							{/* Region Dropdown */}
-							<FormControl size='small' sx={{ minWidth: 200 }}>
+							<FormControl size='small' sx={{ minWidth: { xs: 0, sm: 200 }, width: { xs: '100%', sm: 'auto' }, maxWidth: '100%' }}>
 								<InputLabel id='region-select-label'>Region</InputLabel>
 								<Select
 									labelId='region-select-label'
@@ -453,7 +456,7 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 						</Typography>
 					</Box>
 				) : sortedItems.length > 0 ? (
-					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0, maxWidth: '100%' }}>
 						{sortedItems.map((item, index) => {
 							const calendarColors = item.calendar ? getCalendarColors(item.calendar) : null
 							const isEven = index % 2 === 0
@@ -464,8 +467,10 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 									key={item.documentId}
 									elevation={2}
 									sx={{
-										paddingX: 3,
+										paddingX: { xs: 2, md: 3 },
 										paddingY: 1,
+										maxWidth: '100%',
+										overflow: 'hidden',
 										backgroundColor: isEven ? '#ffffff' : '#f9fafb',
 										borderLeft: calendarColors
 											? `8px solid ${calendarColors.backgroundColor}`
@@ -475,18 +480,22 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 									<Box
 										sx={{
 											display: 'flex',
-											alignItems: 'center',
+											alignItems: 'flex-start',
 											gap: 2,
 											flexWrap: { xs: 'wrap', md: 'nowrap' },
+											minWidth: 0,
+											maxWidth: '100%',
 										}}
 									>
 										<Box
 											sx={{
 												display: 'flex',
-												alignItems: 'center',
-												gap: 2,
-												flexWrap: { xs: 'wrap', md: 'nowrap' },
+												flexDirection: { xs: 'column', md: 'row' },
+												alignItems: { xs: 'flex-start', md: 'center' },
+												gap: { xs: 0.5, md: 2 },
 												flex: { xs: '1 1 100%', md: '1 1 auto' },
+												minWidth: 0,
+												maxWidth: '100%',
 											}}
 										>
 											<Typography
@@ -503,11 +512,12 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 											<Box
 												sx={{
 													display: 'flex',
-													alignItems: 'center',
+													alignItems: 'baseline',
 													gap: 1,
 													flex: 1,
 													minWidth: 0,
-													flexWrap: 'nowrap',
+													maxWidth: '100%',
+													flexWrap: { xs: 'wrap', md: 'nowrap' },
 													overflow: 'hidden',
 												}}
 											>
@@ -517,7 +527,10 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 														sx={{
 															fontWeight: 500,
 															color: 'text.primary',
-															whiteSpace: 'nowrap',
+															minWidth: 0,
+															maxWidth: '100%',
+															whiteSpace: { xs: 'normal', md: 'nowrap' },
+															overflowWrap: 'anywhere',
 															overflow: 'hidden',
 															textOverflow: 'ellipsis',
 														}}
@@ -530,7 +543,7 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 														variant='body1'
 														sx={{
 															color: 'text.secondary',
-															whiteSpace: 'nowrap',
+															flexShrink: 0,
 														}}
 													>
 														-
@@ -541,7 +554,10 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 														variant='body1'
 														sx={{
 															color: 'text.secondary',
-															whiteSpace: 'nowrap',
+															minWidth: 0,
+															maxWidth: '100%',
+															whiteSpace: { xs: 'normal', md: 'nowrap' },
+															overflowWrap: 'anywhere',
 															overflow: 'hidden',
 															textOverflow: 'ellipsis',
 														}}
@@ -594,13 +610,37 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 									</Box>
 
 									{item.ErgebnisText && isExpanded ? (
-										<Box sx={{ mt: 1 }}>
+										<Box
+											sx={{
+												mt: 1,
+												width: '100%',
+												maxWidth: '100%',
+												minWidth: 0,
+												overflowX: 'auto',
+												WebkitOverflowScrolling: 'touch',
+												scrollbarWidth: 'thin',
+												scrollbarColor: '#64574E #e5e7eb',
+												'&::-webkit-scrollbar': {
+													height: 10,
+												},
+												'&::-webkit-scrollbar-track': {
+													backgroundColor: '#e5e7eb',
+												},
+												'&::-webkit-scrollbar-thumb': {
+													backgroundColor: '#64574E',
+													borderRadius: 999,
+												},
+												'& img': { maxWidth: '100%', height: 'auto' },
+												'& table, & figure': {
+													width: 'max-content',
+													maxWidth: 'none',
+												},
+											}}
+										>
 											<Typography
+												component='div'
 												variant='body2'
-												sx={{
-													color: 'text.secondary',
-													whiteSpace: 'pre-wrap',
-												}}
+												sx={{ color: 'text.secondary' }}
 												dangerouslySetInnerHTML={{ __html: renderResultText(item.ErgebnisText) }}
 											/>
 										</Box>
