@@ -14,6 +14,7 @@ import { theme } from '@/themes'
 import { ViewToggle } from '@/components/common/view-toggle'
 import { LitterCard } from '@/components/litter-search/litter-card'
 import { LitterDetailView } from '@/components/litter-search/litter-detail-view'
+import { TrackUmamiEvent } from '@/components/analytics/track-umami-event'
 import { calculateDistance } from '@/lib/geo-utils'
 import { useLitters, type LitterStatus, type PageSize } from '@/hooks/use-litters'
 import { SubmitButton } from '@/components/ui/submit-button'
@@ -220,14 +221,23 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 		})() : null
 
 		return (
-			<LitterDetailView
-				litter={selectedLitter}
-				strapiBaseUrl={strapiBaseUrl}
-				hzdSetting={hzdSetting}
-				distance={distance}
-				onBack={() => setSelectedLitter(null)}
-				formatDate={formatDate}
-			/>
+			<>
+				<TrackUmamiEvent
+					eventName='litter-detail-view'
+					eventData={{
+						Wurfnummer: selectedLitter.OrderLetter?.trim() || '',
+						KennelName: selectedLitter.breeder?.kennelName?.trim() || '',
+					}}
+				/>
+				<LitterDetailView
+					litter={selectedLitter}
+					strapiBaseUrl={strapiBaseUrl}
+					hzdSetting={hzdSetting}
+					distance={distance}
+					onBack={() => setSelectedLitter(null)}
+					formatDate={formatDate}
+				/>
+			</>
 		)
 	}
 

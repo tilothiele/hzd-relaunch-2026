@@ -15,6 +15,7 @@ import { enrichBreedersWithMembers } from '@/lib/breeder-member-enrich'
 import type { Breeder, HzdSetting } from '@/types'
 import { BreederCard } from './breeder-card'
 import { BreederDetailView } from './breeder-detail-view'
+import { TrackUmamiEvent } from '@/components/analytics/track-umami-event'
 import { BreederSearchForm } from './breeder-search-form'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { theme } from '@/themes'
@@ -180,12 +181,20 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 
 	if (selectedBreeder) {
 		return (
-			<BreederDetailView
-				breeder={selectedBreeder}
-				strapiBaseUrl={strapiBaseUrl}
-				hzdSetting={hzdSetting}
-				onBack={handleBackToSearch}
-			/>
+			<>
+				<TrackUmamiEvent
+					eventName='breeder-detail-view'
+					eventData={{
+						KennelName: selectedBreeder.kennelName?.trim() || '',
+					}}
+				/>
+				<BreederDetailView
+					breeder={selectedBreeder}
+					strapiBaseUrl={strapiBaseUrl}
+					hzdSetting={hzdSetting}
+					onBack={handleBackToSearch}
+				/>
+			</>
 		)
 	}
 

@@ -13,6 +13,8 @@ import { theme } from '@/themes'
 import { DogCard } from './dog-card'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { DogDetailView } from './dog-detail-view'
+import { TrackUmamiEvent } from '@/components/analytics/track-umami-event'
+import { getSexLabel } from '@/lib/dog-utils'
 import type { Dog, GeoLocation, HzdSetting } from '@/types'
 import { SubmitButton } from '@/components/ui/submit-button'
 
@@ -181,12 +183,21 @@ export function DogSearch({
 
 	if (selectedDog) {
 		return (
-			<DogDetailView
-				dog={selectedDog}
-				strapiBaseUrl={strapiBaseUrl}
-				hzdSetting={hzdSetting}
-				onBack={handleBackToSearch}
-			/>
+			<>
+				<TrackUmamiEvent
+					eventName='dog-detail-view'
+					eventData={{
+						FullKennelName: selectedDog.fullKennelName?.trim() || '',
+						geschlecht: getSexLabel(selectedDog.sex),
+					}}
+				/>
+				<DogDetailView
+					dog={selectedDog}
+					strapiBaseUrl={strapiBaseUrl}
+					hzdSetting={hzdSetting}
+					onBack={handleBackToSearch}
+				/>
+			</>
 		)
 	}
 

@@ -8,6 +8,7 @@ import { renderServerSections } from '@/components/sections/server-section-facto
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import NotFoundSection from '@/components/sections/not-found-section/not-found-section'
 import { MarkAsRead } from '@/components/news/mark-as-read'
+import { TrackNewsArticleView } from '@/components/news/track-news-article-view'
 import { formattedDate } from '@/lib/article-utils'
 import { resolveTagColors } from '@/lib/color-utils'
 
@@ -197,6 +198,7 @@ export default async function ArticlePage({ params }: PageProps) {
             pageTitle={pageTitle}
         >
             <MarkAsRead documentId={article.documentId} />
+            <TrackNewsArticleView slug={article.Slug || slug} />
             <SectionContainer
                 variant='max-width'
                 backgroundColor={theme.evenBgColor}
