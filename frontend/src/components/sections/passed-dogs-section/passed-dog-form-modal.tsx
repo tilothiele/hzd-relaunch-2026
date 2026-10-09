@@ -23,6 +23,7 @@ import {
 	submitPassedDog,
 	submitPassedDogUpdate,
 } from '@/lib/server/passed-dog-actions'
+import { AltchaField } from '@/components/altcha/altcha-field'
 import { useAuth } from '@/hooks/use-auth'
 
 function sessionUserName(user: {
@@ -85,6 +86,8 @@ export function PassedDogFormModal({
 	const [filePreviewUrl, setFilePreviewUrl] = useState<string | null>(null)
 	const [submitting, setSubmitting] = useState(false)
 	const [formError, setFormError] = useState<string | null>(null)
+	const [altchaVerified, setAltchaVerified] = useState(false)
+	const [altchaReset, setAltchaReset] = useState(0)
 
 	useEffect(() => {
 		if (!file) {
@@ -129,6 +132,8 @@ export function PassedDogFormModal({
 			return
 		}
 		resetFromInitial()
+		setAltchaVerified(false)
+		setAltchaReset((current) => current + 1)
 	}, [open, resetFromInitial])
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -150,6 +155,10 @@ export function PassedDogFormModal({
 		}
 		if (!datePassed) {
 			setFormError('Bitte wählen Sie das Sterbedatum.')
+			return
+		}
+		if (!altchaVerified) {
+			setFormError('Bitte bestätigen Sie, dass Sie kein automatisiertes Programm sind.')
 			return
 		}
 
@@ -184,6 +193,7 @@ export function PassedDogFormModal({
 			)
 		} finally {
 			setSubmitting(false)
+			setAltchaReset((current) => current + 1)
 		}
 	}
 
@@ -332,6 +342,10 @@ export function PassedDogFormModal({
 							</div>
 						) : null}
 					</div>
+					<AltchaField
+						onVerifiedChange={setAltchaVerified}
+						resetSignal={altchaReset}
+					/>
 				</DialogContent>
 				<DialogActions sx={{ px: 3, py: 2 }}>
 					<Button onClick={onClose} disabled={submitting} color="inherit">
@@ -340,7 +354,7 @@ export function PassedDogFormModal({
 					<Button
 						type="submit"
 						variant="contained"
-						disabled={submitting}
+						disabled={submitting || !altchaVerified}
 						sx={{
 							bgcolor: theme.buttonColor,
 							'&:hover': { bgcolor: theme.buttonColor },

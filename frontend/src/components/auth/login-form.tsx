@@ -11,6 +11,7 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material'
+import { AltchaField } from '@/components/altcha/altcha-field'
 import { AuthFormCard } from '@/components/auth/auth-form-card'
 import { useAuth } from '@/hooks/use-auth'
 import { sanitizeCallbackUrl } from '@/lib/auth-login'
@@ -26,6 +27,8 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
 	const [password, setPassword] = useState('')
 	const [error, setError] = useState<string | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [altchaVerified, setAltchaVerified] = useState(false)
+	const [altchaReset, setAltchaReset] = useState(0)
 	const redirectTo = sanitizeCallbackUrl(callbackUrl)
 
 	useEffect(() => {
@@ -37,6 +40,10 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault()
 		setError(null)
+		if (!altchaVerified) {
+			setError('Bitte bestätigen Sie, dass Sie kein automatisiertes Programm sind.')
+			return
+		}
 		setIsSubmitting(true)
 
 		try {
@@ -51,6 +58,7 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
 			)
 		} finally {
 			setIsSubmitting(false)
+			setAltchaReset((current) => current + 1)
 		}
 	}
 
@@ -91,10 +99,14 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
 					value={password}
 					onChange={(event) => setPassword(event.target.value)}
 				/>
+				<AltchaField
+					onVerifiedChange={setAltchaVerified}
+					resetSignal={altchaReset}
+				/>
 				<Button
 					type='submit'
 					variant='contained'
-					disabled={isSubmitting}
+					disabled={isSubmitting || !altchaVerified}
 					sx={{ mt: 1 }}
 				>
 					{isSubmitting ? <CircularProgress size={24} /> : 'Anmelden'}

@@ -20,6 +20,7 @@ import type { Form, FormSubmitButton, Image, StandardIdentifier } from '@/types'
 import { renderFormField } from './form-field-renderer'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { renderStrapiBlocks } from '@/lib/strapi-blocks'
+import { AltchaField } from '@/components/altcha/altcha-field'
 import { useAuth } from '@/hooks/use-auth'
 import { theme } from '@/themes'
 
@@ -84,6 +85,9 @@ export function FormComponent({
 	const { isAuthenticated, authState } = useAuth()
 	const [values, setValues] = useState<Record<string, unknown>>({})
 	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [submitError, setSubmitError] = useState<string | null>(null)
+	const [altchaVerified, setAltchaVerified] = useState(false)
+	const [altchaReset, setAltchaReset] = useState(0)
 	const [showThankYouModal, setShowThankYouModal] = useState(false)
 	const [isHovered, setIsHovered] = useState(false)
 	const privacyPolicyUrl = resolveMediaUrl(privacyPolicy, strapiBaseUrl)
@@ -173,6 +177,11 @@ export function FormComponent({
 	const handleSubmit = useCallback(
 		async (e: React.FormEvent<HTMLFormElement>) => {
 			e.preventDefault()
+			setSubmitError(null)
+			if (!altchaVerified) {
+				setSubmitError('Bitte bestätigen Sie, dass Sie kein automatisiertes Programm sind.')
+				return
+			}
 			setIsSubmitting(true)
 
 			try {
@@ -214,12 +223,17 @@ export function FormComponent({
 				setShowThankYouModal(true)
 			} catch (error) {
 				console.error('Fehler beim Absenden des Formulars:', error)
-				// TODO: Fehler-Meldung anzeigen
+				setSubmitError(
+					error instanceof Error
+						? error.message
+						: 'Formular konnte nicht abgesendet werden.',
+				)
 			} finally {
 				setIsSubmitting(false)
+				setAltchaReset((current) => current + 1)
 			}
 		},
-		[values, form],
+		[altchaVerified, values, form],
 	)
 
 	const submitButton = form.FormFields?.find(
@@ -228,7 +242,7 @@ export function FormComponent({
 
 	const isPrivacyPolicyRequired = form.InclPrivacyPolicy && privacyPolicyUrl
 	const isPrivacyPolicyAccepted = (values['privacyPolicyAccepted'] as boolean) ?? false
-	const canSubmit = !isPrivacyPolicyRequired || isPrivacyPolicyAccepted
+	const canSubmit = (!isPrivacyPolicyRequired || isPrivacyPolicyAccepted) && altchaVerified
 
 	return (
 		<Box component='form' onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -261,6 +275,17 @@ export function FormComponent({
 					}
 					sx={{ mt: 1 }}
 				/>
+			) : null}
+
+			<AltchaField
+				onVerifiedChange={setAltchaVerified}
+				resetSignal={altchaReset}
+			/>
+
+			{submitError ? (
+				<Typography color='error' variant='body2'>
+					{submitError}
+				</Typography>
 			) : null}
 
 			{submitButton ? (

@@ -16,7 +16,7 @@ def runExport(page, rexp, filename):
     page.locator("span").filter(has_text=rexp).click()
     page.locator(".ch_fld_cont_hldr > img").click()
     page.locator("input[name=\"chk_all_sel_reslts\"]").check()
-    with page.expect_download(timeout=200000) as download_info:
+    with page.expect_download(timeout=600000) as download_info:
         page.get_by_role("img", name="speichere ausgewählte als").nth(1).click()
     download = download_info.value
     download.save_as(filename)

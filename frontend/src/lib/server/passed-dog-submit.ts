@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers'
 import { STRAPI_JWT_COOKIE } from '@/lib/auth-cookie'
+import { consumeAltchaFromCookies } from '@/lib/server/altcha'
 import { getRequestClientIp } from '@/lib/server/request-ip'
 import {
 	createEntity,
@@ -207,6 +208,11 @@ export async function createPassedDogFromForm(
 			return { ok: false, error: validationError }
 		}
 
+		const altchaError = await consumeAltchaFromCookies()
+		if (altchaError) {
+			return { ok: false, error: altchaError }
+		}
+
 		const pendingCount = await countPendingByEmail(email)
 		if (pendingCount >= MAX_PENDING_PASSED_DOGS) {
 			return {
@@ -328,6 +334,11 @@ export async function updatePassedDogFromForm(
 		})
 		if (validationError) {
 			return { ok: false, error: validationError }
+		}
+
+		const altchaError = await consumeAltchaFromCookies()
+		if (altchaError) {
+			return { ok: false, error: altchaError }
 		}
 
 		const token = getStrapiApiToken()

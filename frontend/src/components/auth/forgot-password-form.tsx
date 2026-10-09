@@ -10,6 +10,7 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material'
+import { AltchaField } from '@/components/altcha/altcha-field'
 import { AuthFormCard } from '@/components/auth/auth-form-card'
 import { requestPasswordReset } from '@/lib/auth-api'
 
@@ -18,10 +19,16 @@ export function ForgotPasswordForm() {
 	const [error, setError] = useState<string | null>(null)
 	const [isSubmitted, setIsSubmitted] = useState(false)
 	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [altchaVerified, setAltchaVerified] = useState(false)
+	const [altchaReset, setAltchaReset] = useState(0)
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault()
 		setError(null)
+		if (!altchaVerified) {
+			setError('Bitte bestätigen Sie, dass Sie kein automatisiertes Programm sind.')
+			return
+		}
 		setIsSubmitting(true)
 
 		try {
@@ -35,6 +42,7 @@ export function ForgotPasswordForm() {
 			)
 		} finally {
 			setIsSubmitting(false)
+			setAltchaReset((current) => current + 1)
 		}
 	}
 
@@ -73,10 +81,14 @@ export function ForgotPasswordForm() {
 						value={email}
 						onChange={(event) => setEmail(event.target.value)}
 					/>
+					<AltchaField
+						onVerifiedChange={setAltchaVerified}
+						resetSignal={altchaReset}
+					/>
 					<Button
 						type='submit'
 						variant='contained'
-						disabled={isSubmitting}
+						disabled={isSubmitting || !altchaVerified}
 						sx={{ mt: 1 }}
 					>
 						{isSubmitting

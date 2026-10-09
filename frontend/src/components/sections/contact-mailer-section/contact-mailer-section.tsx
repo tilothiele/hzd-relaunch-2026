@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { TextField, Button, MenuItem, Select, FormControl, InputLabel, Box, Alert, CircularProgress, Typography, Checkbox, FormControlLabel } from '@mui/material'
 import type { ContactMailerSection } from '@/types'
 import type { ThemeDefinition } from '@/themes'
+import { AltchaField } from '@/components/altcha/altcha-field'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { useAuth } from '@/hooks/use-auth'
 import { SubmitButton } from '@/components/ui/submit-button'
@@ -31,6 +32,8 @@ export function ContactMailerSectionComponent({
     const messageLimit = parseInt(process.env.NEXT_PUBLIC_CONTACT_FORM_MESSAGE_MAX_LENGTH || '2000')
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
     const [errorMessage, setErrorMessage] = useState('')
+    const [altchaVerified, setAltchaVerified] = useState(false)
+    const [altchaReset, setAltchaReset] = useState(0)
 
     // Recipient options from dynamic zone section
     const recipients = section.ReceipientOptions || []
@@ -79,8 +82,13 @@ export function ContactMailerSectionComponent({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setStatus('loading')
         setErrorMessage('')
+        if (!altchaVerified) {
+            setStatus('error')
+            setErrorMessage('Bitte bestätigen Sie, dass Sie kein automatisiertes Programm sind.')
+            return
+        }
+        setStatus('loading')
 
         try {
             const response = await fetch('/api/contact/send', {
@@ -102,6 +110,8 @@ export function ContactMailerSectionComponent({
         } catch (error: any) {
             setStatus('error')
             setErrorMessage(error.message || 'Ein unerwarteter Fehler ist aufgetreten.')
+        } finally {
+            setAltchaReset((current) => current + 1)
         }
     }
 
@@ -248,10 +258,18 @@ export function ContactMailerSectionComponent({
                                 />
                             </Box>
 
+                            <Box sx={{ gridColumn: { md: 'span 2' } }}>
+                                <AltchaField
+                                    onVerifiedChange={setAltchaVerified}
+                                    resetSignal={altchaReset}
+                                />
+                            </Box>
+
                             <Box sx={{ gridColumn: { md: 'span 2' }, display: 'flex', justifyContent: 'center', mt: 2 }}>
                                 <SubmitButton
                                     type="submit"
                                     label="Nachricht senden"
+                                    disabled={!altchaVerified}
                                     loadingLabel={
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <CircularProgress size={20} color="inherit" />

@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server'
+import { withAltcha } from '@/lib/server/altcha'
 import { getStrapiPublicBaseUrl } from '@/lib/server/strapi-client'
 
 export async function POST(request: Request) {
+    return withAltcha(request, () => sendContactMail(request))
+}
+
+async function sendContactMail(request: Request) {
     try {
         const body = await request.json()
         const { from, to, subject, message, sendCopy } = body

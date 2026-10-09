@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { withAltcha } from '@/lib/server/altcha'
 import { createFormInstance } from '@/lib/strapi/api'
 import { getRequestClientIp } from '@/lib/server/request-ip'
 
@@ -8,6 +9,10 @@ import { getRequestClientIp } from '@/lib/server/request-ip'
  * Speichert die Daten als form-instance im Backend
  */
 export async function POST(request: NextRequest) {
+	return withAltcha(request, () => submitForm(request))
+}
+
+async function submitForm(request: NextRequest) {
 	try {
 		const body = await request.json()
 		const { documentId, formData } = body

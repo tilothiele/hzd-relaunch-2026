@@ -11,6 +11,7 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material'
+import { AltchaField } from '@/components/altcha/altcha-field'
 import { AuthFormCard } from '@/components/auth/auth-form-card'
 import { useAuth } from '@/hooks/use-auth'
 import { resetPasswordWithCode } from '@/lib/auth-api'
@@ -27,6 +28,8 @@ export function ResetPasswordForm({ code }: ResetPasswordFormProps) {
 	const [passwordConfirmation, setPasswordConfirmation] = useState('')
 	const [error, setError] = useState<string | null>(null)
 	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [altchaVerified, setAltchaVerified] = useState(false)
+	const [altchaReset, setAltchaReset] = useState(0)
 
 	useEffect(() => {
 		if (!code) {
@@ -45,6 +48,11 @@ export function ResetPasswordForm({ code }: ResetPasswordFormProps) {
 
 		if (password !== passwordConfirmation) {
 			setError('Die Passwörter stimmen nicht überein.')
+			return
+		}
+
+		if (!altchaVerified) {
+			setError('Bitte bestätigen Sie, dass Sie kein automatisiertes Programm sind.')
 			return
 		}
 
@@ -76,6 +84,7 @@ export function ResetPasswordForm({ code }: ResetPasswordFormProps) {
 			)
 		} finally {
 			setIsSubmitting(false)
+			setAltchaReset((current) => current + 1)
 		}
 	}
 
@@ -118,10 +127,14 @@ export function ResetPasswordForm({ code }: ResetPasswordFormProps) {
 					onChange={(event) => setPasswordConfirmation(event.target.value)}
 					disabled={!code}
 				/>
+				<AltchaField
+					onVerifiedChange={setAltchaVerified}
+					resetSignal={altchaReset}
+				/>
 				<Button
 					type='submit'
 					variant='contained'
-					disabled={isSubmitting || !code}
+					disabled={isSubmitting || !code || !altchaVerified}
 					sx={{ mt: 1 }}
 				>
 					{isSubmitting

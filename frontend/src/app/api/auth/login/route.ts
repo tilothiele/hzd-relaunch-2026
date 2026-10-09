@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { withAltcha } from '@/lib/server/altcha'
 import { applyStrapiJwtCookie } from '@/lib/auth-cookie'
 import { mapStrapiAuthError } from '@/lib/auth-errors'
 import {
@@ -9,6 +10,10 @@ import {
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
+	return withAltcha(request, () => login(request))
+}
+
+async function login(request: NextRequest) {
 	let identifier = ''
 	let password = ''
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { withAltcha } from '@/lib/server/altcha'
 import { mapStrapiAuthError } from '@/lib/auth-errors'
 import {
 	forgotPasswordWithStrapi,
@@ -8,6 +9,10 @@ import {
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
+	return withAltcha(request, () => forgotPassword(request))
+}
+
+async function forgotPassword(request: NextRequest) {
 	let email = ''
 
 	try {
