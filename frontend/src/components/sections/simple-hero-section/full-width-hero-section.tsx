@@ -8,6 +8,7 @@ import { ActionButton } from '@/components/ui/action-button'
 import { SectionContainer } from '../section-container/section-container'
 import { useScrollAnimation } from '@/hooks/use-scroll-animation'
 import { useState } from 'react'
+import { heroHeightClass } from './hero-height'
 
 interface FullWidthHeroSectionComponentProps {
     section: SimpleHeroSection
@@ -37,12 +38,7 @@ export function FullWidthHeroSectionComponent({
         return null
     }
 
-    const height = section.Height ?? 'tall'
-    const heightClass = {
-        small: 'h-[300px] md:h-[350px] lg:h-[400px]',
-        medium: 'h-[450px] md:h-[525px] lg:h-[600px]',
-        tall: 'h-[600px] md:h-[700px] lg:h-[800px]',
-    }[height]
+    const heightClass = heroHeightClass(section.Height)
 
     return (
         <SectionContainer

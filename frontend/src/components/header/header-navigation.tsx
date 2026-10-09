@@ -178,7 +178,7 @@ export function HeaderNavigation({
 
                 <Link
                     href='/calendar'
-                    title='Veranstaltungskalender'
+                    title='Veranstaltungen'
                     className='flex items-center justify-center transition-transform hover:scale-110'
                 >
                     <FontAwesomeIcon

@@ -10,6 +10,7 @@ import { useScrollAnimation } from '@/hooks/use-scroll-animation'
 import { useState } from 'react'
 
 import { FullWidthHeroSectionComponent } from './full-width-hero-section'
+import { heroHeightClass, heroMinHeightClass } from './hero-height'
 
 type NormalizedHeroLayout =
     | 'image-left'
@@ -77,12 +78,7 @@ export function SimpleHeroSectionComponent({
     }
 
     if (layout === 'full-text-below') {
-        const height = section.Height ?? 'tall'
-        const heightClass = {
-            small: 'h-[300px] md:h-[350px] lg:h-[400px]',
-            medium: 'h-[450px] md:h-[525px] lg:h-[600px]',
-            tall: 'h-[600px] md:h-[700px] lg:h-[800px]',
-        }[height]
+        const heightClass = heroHeightClass(section.Height)
         const teaserHtml = teaserText ? removeParagraphTags(teaserText) : null
 
         if (!headline && !teaserHtml && !imageUrl) {
@@ -163,12 +159,7 @@ export function SimpleHeroSectionComponent({
     const isImageLeft = layout === 'image-left'
     const isFullWidth = section.FullWidth ?? false
 
-    const height = section.Height ?? 'tall'
-    const minHeightClass = {
-        small: 'min-h-[300px] md:min-h-[350px] lg:min-h-[400px]',
-        medium: 'min-h-[450px] md:min-h-[525px] lg:min-h-[600px]',
-        tall: 'min-h-[600px] md:min-h-[700px] lg:min-h-[800px]',
-    }[height]
+    const minHeightClass = heroMinHeightClass(section.Height)
 
     return (
         <SectionContainer
@@ -238,7 +229,7 @@ export function SimpleHeroSectionComponent({
 
                 {/* Image Side - On mobile: always top (order-1). On desktop: positioned based on layout */}
                 {imageUrl ? (
-                    <div className={`relative h-64 md:h-auto md:w-1/2 w-full order-1 md:order-1 ${isImageLeft ? 'md:order-1' : 'md:order-2'}`}>
+                    <div className={`relative h-[clamp(12rem,56vw,16rem)] w-full order-1 md:order-1 md:h-auto md:w-1/2 ${isImageLeft ? 'md:order-1' : 'md:order-2'}`}>
                         <Image
                             src={imageUrl}
                             alt={imageAlt}

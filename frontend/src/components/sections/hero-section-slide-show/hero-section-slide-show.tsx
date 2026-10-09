@@ -57,7 +57,7 @@ export function HeroSectionSlideShowComponent({
 
 					return (
 						<SwiperSlide key={slide?.id ?? index}>
-							<div className='relative flex min-h-[32rem] items-end justify-center sm:min-h-[40rem] md:min-h-[48rem]'>
+							<div className='relative flex min-h-[clamp(16rem,70vw,32rem)] items-end justify-center md:min-h-[48rem]'>
 								{imageUrl ? (
 									<span
 										className='absolute inset-0 block bg-black'
