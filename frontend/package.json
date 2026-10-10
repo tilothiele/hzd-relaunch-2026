@@ -3,7 +3,15 @@
   "version": "1.0.2",
   "private": true,
   "browserslist": [
-    "baseline widely available"
+    "chrome >= 123",
+    "edge >= 123",
+    "firefox >= 124",
+    "safari >= 17.4",
+    "ios_saf >= 17.4",
+    "and_chr >= 123",
+    "and_ff >= 124",
+    "samsung >= 27",
+    "opera >= 109"
   ],
   "scripts": {
     "dev": "next dev",
