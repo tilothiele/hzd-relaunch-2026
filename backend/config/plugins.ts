@@ -31,6 +31,7 @@ export default ({ env }) => ({
         port: env.int('SMTP_PORT', 587),
         secure: env.bool('SMTP_SECURE', false),
         ignoreTLS: env.bool('SMTP_IGNORE_TLS', false),
+        requireTLS: env.bool('SMTP_REQUIRE_TLS', false),
         ...(env('SMTP_USERNAME')
           ? {
               auth: {
