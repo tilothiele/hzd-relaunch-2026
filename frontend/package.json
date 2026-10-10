@@ -2,6 +2,9 @@
   "name": "frontend",
   "version": "1.0.2",
   "private": true,
+  "browserslist": [
+    "baseline widely available"
+  ],
   "scripts": {
     "dev": "next dev",
     "dev:pwa": "npm run build && cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/ && PORT=3000 node .next/standalone/server.js",
@@ -55,7 +58,8 @@
     "@types/react-dom": "^18",
     "@types/react-responsive-masonry": "^2.7.0",
     "@types/web-push": "^3.6.4",
-    "baseline-browser-mapping": "^2.10.0",
+    "baseline-browser-mapping": "^2.11.28",
+    "caniuse-lite": "^1.0.30001815",
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
     "husky": "^9.1.7",
