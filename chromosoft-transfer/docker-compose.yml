@@ -1,0 +1,12 @@
+services:
+  chromosoft-transfer:
+    build: .
+    container_name: hzd-chromosoft-transfer
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8090}:8080"
+    environment:
+      PORT: "8080"
+      JOB_CRON: "${JOB_CRON:-0 3 * * *}"
+      JOB_CRON_ENABLED: "${JOB_CRON_ENABLED:-true}"
+      JOB_TIMEZONE: "${JOB_TIMEZONE:-Europe/Berlin}"
