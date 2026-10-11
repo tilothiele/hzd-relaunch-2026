@@ -2,7 +2,7 @@ import { randomBytes } from 'crypto'
 import { readFile } from 'fs/promises'
 import type { Core } from '@strapi/strapi'
 import type { CsCsvColumn } from './cs-member-columns'
-import { sendCsImportReport } from './cs-import-report'
+import { assessCsImport } from './cs-import-report'
 
 const HZD_SETTING_UID = 'api::hzd-setting.hzd-setting' as const
 const INSERT_PARAMETER_BUDGET = 50000
@@ -25,6 +25,7 @@ export interface CsCsvUploadResult {
 	generation: number
 	imported: number
 	skipped: number
+	discarded: boolean
 }
 
 function normalizeHeader(value: string): string {
@@ -374,6 +375,7 @@ export async function importCsCsv(
 		Math.min(200, Math.floor(INSERT_PARAMETER_BUDGET / (options.columns.length + 5))),
 	)
 
+	let assessment: Awaited<ReturnType<typeof assessCsImport>>
 	try {
 		await deleteGeneration(strapi, options.uid, generation)
 		for (let index = 0; index < rows.length; index += batchSize) {
@@ -381,32 +383,7 @@ export async function importCsCsv(
 				data: rows.slice(index, index + batchSize),
 			})
 		}
-		await storeImportResult(
-			strapi,
-			options.generationField,
-			generation,
-			new Date().toISOString(),
-		)
-	} catch (error) {
-		await deleteGeneration(strapi, options.uid, generation).catch((cleanupError) => {
-			strapi.log.error(cleanupError)
-		})
-		throw error
-	}
-
-	await deleteOlderGenerations(strapi, options.uid, generation)
-
-	if (skipped > 0) {
-		strapi.log.warn(
-			`CSV ${options.fieldName}: ${skipped} Zeilen übersprungen, Generation ${generation}.`,
-		)
-	}
-	strapi.log.info(
-		`CSV ${options.fieldName}: ${rows.length} Datensätze in Generation ${generation} übernommen.`,
-	)
-
-	try {
-		await sendCsImportReport(strapi, {
+		assessment = await assessCsImport(strapi, {
 			uid: options.uid,
 			columns: options.columns,
 			identityAttribute: options.identityAttribute,
@@ -416,6 +393,48 @@ export async function importCsCsv(
 			skipped,
 		})
 	} catch (error) {
+		await deleteGeneration(strapi, options.uid, generation).catch((cleanupError) => {
+			strapi.log.error(cleanupError)
+		})
+		throw error
+	}
+
+	const discarded = assessment.totalChanges === 0 && generation > 1
+	if (discarded) {
+		await deleteGeneration(strapi, options.uid, generation)
+		strapi.log.info(
+			`CSV ${options.fieldName}: keine Änderungen, Generation ${generation} verworfen. Generation ${generation - 1} bleibt gespeichert.`,
+		)
+	} else {
+		try {
+			await storeImportResult(
+				strapi,
+				options.generationField,
+				generation,
+				new Date().toISOString(),
+			)
+		} catch (error) {
+			await deleteGeneration(strapi, options.uid, generation).catch((cleanupError) => {
+				strapi.log.error(cleanupError)
+			})
+			throw error
+		}
+
+		await deleteOlderGenerations(strapi, options.uid, generation)
+
+		if (skipped > 0) {
+			strapi.log.warn(
+				`CSV ${options.fieldName}: ${skipped} Zeilen übersprungen, Generation ${generation}.`,
+			)
+		}
+		strapi.log.info(
+			`CSV ${options.fieldName}: ${rows.length} Datensätze in Generation ${generation} übernommen.`,
+		)
+	}
+
+	try {
+		await assessment.send(discarded)
+	} catch (error) {
 		const message = error instanceof Error ? error.message : 'unbekannter Fehler'
 		strapi.log.error(
 			`CSV ${options.fieldName}: Importbericht konnte nicht gesendet werden: ${message}`,
@@ -423,8 +442,9 @@ export async function importCsCsv(
 	}
 
 	return {
-		generation,
+		generation: discarded ? generation - 1 : generation,
 		imported: rows.length,
 		skipped,
+		discarded,
 	}
 }

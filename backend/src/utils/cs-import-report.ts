@@ -260,6 +260,7 @@ function buildText(options: {
 	counts: Record<ChangeKind, number>
 	omitted: number
 	details: RecordDiff[]
+	discarded: boolean
 }): string {
 	const lines = [
 		`Chromosoft-Import ${options.subjectName}`,
@@ -280,6 +281,11 @@ function buildText(options: {
 		+ options.counts.deleted
 	if (totalChanges === 0) {
 		lines.push('Gegenüber der Vorgängergeneration hat sich nichts geändert.')
+		if (options.discarded) {
+			lines.push(
+				`Der Upload wurde verworfen. Die neue Generation ${options.generation} wurde gelöscht. Gespeichert bleibt Generation ${options.previousGeneration}.`,
+			)
+		}
 		return lines.join('\n')
 	}
 
@@ -331,8 +337,11 @@ function buildHtml(textOptions: Parameters<typeof buildText>[0]): string {
 	const totalChanges = textOptions.counts.new
 		+ textOptions.counts.changed
 		+ textOptions.counts.deleted
+	const discardedNotice = textOptions.discarded
+		? `<p>Der Upload wurde verworfen. Die neue Generation ${textOptions.generation} wurde gelöscht. Gespeichert bleibt Generation ${textOptions.previousGeneration}.</p>`
+		: ''
 	const notice = totalChanges === 0
-		? '<p>Gegenüber der Vorgängergeneration hat sich nichts geändert.</p>'
+		? `<p>Gegenüber der Vorgängergeneration hat sich nichts geändert.</p>${discardedNotice}`
 		: textOptions.omitted > 0
 			? `<p>${textOptions.details.length} von ${totalChanges} betroffenen Datensätzen im Detail. Weitere ${textOptions.omitted} sind nicht einzeln aufgeführt.</p>`
 			: ''
@@ -375,7 +384,7 @@ ${blocks}
 </html>`
 }
 
-export async function sendCsImportReport(
+export async function assessCsImport(
 	strapi: Core.Strapi,
 	options: {
 		uid: string
@@ -386,15 +395,7 @@ export async function sendCsImportReport(
 		imported: number
 		skipped: number
 	},
-): Promise<void> {
-	const recipient = await readReportEmail(strapi)
-	if (!recipient) {
-		strapi.log.info(
-			`CSV-Import Generation ${options.generation}: keine ReportEmail, Bericht wird nicht gesendet.`,
-		)
-		return
-	}
-
+): Promise<{ totalChanges: number; send: (discarded: boolean) => Promise<void> }> {
 	const kind: ReportKind = options.generationField === 'ImportGenerationCSDogs'
 		? 'dogs'
 		: 'members'
@@ -415,30 +416,46 @@ export async function sendCsImportReport(
 		previous,
 		current,
 	)
-
-	const report = {
-		subjectName: profile.subjectName,
-		generation: options.generation,
-		previousGeneration,
-		imported: options.imported,
-		skipped: options.skipped,
-		unchanged,
-		counts,
-		omitted,
-		details,
-	}
 	const totalChanges = counts.new + counts.changed + counts.deleted
-	const subject = totalChanges === 0
-		? `Chromosoft-Import ${profile.subjectName}: keine Änderungen (Generation ${options.generation})`
-		: `Chromosoft-Import ${profile.subjectName}: ${counts.new} neu, ${counts.changed} geändert, ${counts.deleted} gelöscht (Generation ${options.generation})`
 
-	await strapi.plugin('email').service('email').send({
-		to: recipient,
-		subject,
-		text: buildText(report),
-		html: buildHtml(report),
-	})
-	strapi.log.info(
-		`CSV-Import Generation ${options.generation}: Bericht an ${recipient} gesendet (${totalChanges} Änderungen).`,
-	)
+	return {
+		totalChanges,
+		send: async (discarded: boolean) => {
+			const recipient = await readReportEmail(strapi)
+			if (!recipient) {
+				strapi.log.info(
+					`CSV-Import Generation ${options.generation}: keine ReportEmail, Bericht wird nicht gesendet.`,
+				)
+				return
+			}
+
+			const report = {
+				subjectName: profile.subjectName,
+				generation: options.generation,
+				previousGeneration,
+				imported: options.imported,
+				skipped: options.skipped,
+				unchanged,
+				counts,
+				omitted,
+				details,
+				discarded,
+			}
+			const subject = discarded
+				? `Chromosoft-Import ${profile.subjectName}: keine Änderungen, Upload verworfen (Generation ${previousGeneration} bleibt)`
+				: totalChanges === 0
+					? `Chromosoft-Import ${profile.subjectName}: keine Änderungen (Generation ${options.generation})`
+					: `Chromosoft-Import ${profile.subjectName}: ${counts.new} neu, ${counts.changed} geändert, ${counts.deleted} gelöscht (Generation ${options.generation})`
+
+			await strapi.plugin('email').service('email').send({
+				to: recipient,
+				subject,
+				text: buildText(report),
+				html: buildHtml(report),
+			})
+			strapi.log.info(
+				`CSV-Import Generation ${options.generation}: Bericht an ${recipient} gesendet (${totalChanges} Änderungen${discarded ? ', verworfen' : ''}).`,
+			)
+		},
+	}
 }
