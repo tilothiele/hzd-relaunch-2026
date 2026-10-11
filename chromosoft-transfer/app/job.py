@@ -17,16 +17,16 @@ UPLOAD_TIMEOUT_SECONDS = 1800
 
 FETCHES = (
 	(
-		"fetch-all-dogs-from-chromosoft.py",
-		"alle_hzd_hunde.csv",
-		"/api/upload-cs-dogs",
-		"dogs.csv",
-	),
-	(
 		"fetch-all-members-from-chromosoft.py",
 		"alle_hzd_mitglieder.csv",
 		"/api/upload-cs-member",
 		"members.csv",
+	),
+	(
+		"fetch-all-dogs-from-chromosoft.py",
+		"alle_hzd_hunde.csv",
+		"/api/upload-cs-dogs",
+		"dogs.csv",
 	),
 )
 
@@ -41,6 +41,7 @@ def run() -> None:
 	try:
 		produced: list[tuple[Path, str, str]] = []
 		for script_name, filename, upload_path, field in FETCHES:
+			logger.info("fetching %s", filename)
 			_run_script(script_name, workdir)
 			csv_path = workdir / filename
 			if not csv_path.is_file() or csv_path.stat().st_size == 0:
