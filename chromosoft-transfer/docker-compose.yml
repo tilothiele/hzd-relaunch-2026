@@ -10,3 +10,9 @@ services:
       JOB_CRON: "${JOB_CRON:-0 3 * * *}"
       JOB_CRON_ENABLED: "${JOB_CRON_ENABLED:-true}"
       JOB_TIMEZONE: "${JOB_TIMEZONE:-Europe/Berlin}"
+      CHROMOSOFT_USERNAME: ${CHROMOSOFT_USERNAME:-}
+      CHROMOSOFT_PASSWORD: ${CHROMOSOFT_PASSWORD:-}
+      API_URL: ${API_URL:-http://localhost:1337}
+      API_TOKEN: ${API_TOKEN:-}
+    shm_size: "1gb"
+    init: true
