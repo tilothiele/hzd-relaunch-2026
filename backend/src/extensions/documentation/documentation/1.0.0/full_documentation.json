@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-10-10T08:29:59.045Z"
+    "x-generation-date": "2026-10-11T11:09:32.161Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -69840,6 +69840,10 @@
                 "type": "string",
                 "format": "date-time"
               },
+              "ReportEmail": {
+                "type": "string",
+                "format": "email"
+              },
               "locale": {
                 "type": "string"
               },
@@ -71922,6 +71926,10 @@
             "type": "string",
             "format": "date-time"
           },
+          "ReportEmail": {
+            "type": "string",
+            "format": "email"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -73054,6 +73062,10 @@
                 "ProcessedTimestampCSMembers": {
                   "type": "string",
                   "format": "date-time"
+                },
+                "ReportEmail": {
+                  "type": "string",
+                  "format": "email"
                 },
                 "createdAt": {
                   "type": "string",

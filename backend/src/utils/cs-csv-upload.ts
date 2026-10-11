@@ -2,6 +2,7 @@ import { randomBytes } from 'crypto'
 import { readFile } from 'fs/promises'
 import type { Core } from '@strapi/strapi'
 import type { CsCsvColumn } from './cs-member-columns'
+import { sendCsImportReport } from './cs-import-report'
 
 const HZD_SETTING_UID = 'api::hzd-setting.hzd-setting' as const
 const INSERT_PARAMETER_BUDGET = 50000
@@ -403,6 +404,23 @@ export async function importCsCsv(
 	strapi.log.info(
 		`CSV ${options.fieldName}: ${rows.length} Datensätze in Generation ${generation} übernommen.`,
 	)
+
+	try {
+		await sendCsImportReport(strapi, {
+			uid: options.uid,
+			columns: options.columns,
+			identityAttribute: options.identityAttribute,
+			generationField: options.generationField,
+			generation,
+			imported: rows.length,
+			skipped,
+		})
+	} catch (error) {
+		const message = error instanceof Error ? error.message : 'unbekannter Fehler'
+		strapi.log.error(
+			`CSV ${options.fieldName}: Importbericht konnte nicht gesendet werden: ${message}`,
+		)
+	}
 
 	return {
 		generation,
