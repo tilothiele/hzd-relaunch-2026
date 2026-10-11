@@ -23,6 +23,8 @@ import {
     faLockOpen,
     faUser,
     faVenusMars,
+    faMars,
+    faVenus,
     faBullhorn,
     faPoll,
     faAward,
@@ -86,6 +88,8 @@ const iconMap: Record<string, any> = {
     'fa-calendar': faCalendar,
     'fa-paw': faPaw, // "Welpen/Würfe" -> Paw
     'fa-venus-mars': faVenusMars,
+    'fa-mars': faMars,
+    'fa-venus': faVenus,
     'fa-speaker': faBullhorn,
     'fa-result': faPoll,
     'fa-letter': faEnvelope,
