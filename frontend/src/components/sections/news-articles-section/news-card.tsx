@@ -31,7 +31,7 @@ export function NewsCard({ article, strapiBaseUrl, theme, isUnread }: NewsCardPr
         })
         : null
 
-    const articleLink = `/article/${article.Slug}`
+    const articleLink = `/article${article.Slug}`
 
     return (
         <Card
