@@ -6,6 +6,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import Image from 'next/image'
 import type { Litter, HzdSetting } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
+import { formatDayMonthYear } from '@/lib/date-utils'
 import { theme } from '@/themes'
 import { BackButton } from '@/components/ui/back-button'
 import { useState } from 'react'
@@ -107,7 +108,7 @@ export function LitterDetailView({
                 >
                     <Image
                         src={url}
-                        alt="Mutter"
+                        alt="Zuchthündin"
                         fill
                         className='object-cover transition-transform duration-300 group-hover/img:scale-105'
                         unoptimized
@@ -118,7 +119,7 @@ export function LitterDetailView({
                         </div>
                     </div>
                 </div>
-                <span className="font-semibold text-gray-700 text-sm md:text-base">Mutter: {motherName}</span>
+                <span className="font-semibold text-gray-700 text-sm md:text-base">Zuchthündin: {motherName}</span>
             </div>
         )
     }
@@ -226,9 +227,14 @@ export function LitterDetailView({
                                 value={new Date(litter.plannedDateOfBirth).toLocaleDateString('de-DE', { month: '2-digit', year: 'numeric' })}
                             />
                         )}
-                        {litter.LitterStatus !== 'Littered' && litter.expectedDateOfBirth && (
+                        {litter.LitterStatus === 'Manted' ? (
+                            <DetailRow
+                                label="Vorauss. Wurfdatum"
+                                value={formatDayMonthYear(litter.expectedDateOfBirth)}
+                            />
+                        ) : litter.LitterStatus !== 'Littered' && litter.expectedDateOfBirth ? (
                             <DetailRow label="Erw. Wurfdatum" value={formatDate(litter.expectedDateOfBirth)} />
-                        )}
+                        ) : null}
                         {litter.dateOfBirth && (
                             <DetailRow label="Wurfdatum" value={formatDate(litter.dateOfBirth)} />
                         )}

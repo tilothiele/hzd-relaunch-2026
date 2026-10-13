@@ -44,6 +44,28 @@ export function calculateAge(dateOfBirth: string | null | undefined): string | n
     }
 }
 
+/** Datum als d.M.yyyy, zum Beispiel 5.3.2026. */
+export function formatDayMonthYear(dateString: string | null | undefined): string {
+    if (!dateString) {
+        return '-'
+    }
+
+    try {
+        const date = new Date(dateString)
+        if (Number.isNaN(date.getTime())) {
+            return dateString
+        }
+
+        return date.toLocaleDateString('de-DE', {
+            day: 'numeric',
+            month: 'numeric',
+            year: 'numeric',
+        })
+    } catch {
+        return dateString
+    }
+}
+
 export function formatDate(dateString: string | null | undefined): string {
     if (!dateString) {
         return '-'

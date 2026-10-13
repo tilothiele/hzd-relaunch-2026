@@ -465,36 +465,52 @@ const coreControllerFactory = factories.createCoreController(
         }
       }
 
-      const [litteredResult, otherResult] = await Promise.all([
-        findDocumentsPage(
-          strapi,
-          'plugin::hzd-plugin.litter',
-          {
-            populate: LITTERED_FIRST_POPULATE,
-            sort: ['dateOfBirth:asc', 'expectedDateOfBirth:asc'],
-            page: 1,
-            pageSize: 10000,
-            filters: filterConditions.length > 0
-              ? { $and: [...filterConditions, { LitterStatus: { $eq: 'Littered' } }] }
-              : { LitterStatus: { $eq: 'Littered' } },
-          },
+      const withStatus = (statusCondition: Record<string, unknown>) =>
+        filterConditions.length > 0
+          ? { $and: [...filterConditions, statusCondition] }
+          : statusCondition
+
+      const fetchStatusGroup = (
+        statusCondition: Record<string, unknown>,
+        sort: string[],
+      ) => findDocumentsPage(
+        strapi,
+        'plugin::hzd-plugin.litter',
+        {
+          populate: LITTERED_FIRST_POPULATE,
+          sort,
+          page: 1,
+          pageSize: 10000,
+          filters: withStatus(statusCondition),
+        },
+      )
+
+      const dateSort = ['expectedDateOfBirth:asc', 'plannedDateOfBirth:asc']
+      const [litteredResult, mantedResult, plannedResult, otherResult] = await Promise.all([
+        fetchStatusGroup(
+          { LitterStatus: { $eq: 'Littered' } },
+          ['dateOfBirth:asc', 'expectedDateOfBirth:asc'],
         ),
-        findDocumentsPage(
-          strapi,
-          'plugin::hzd-plugin.litter',
-          {
-            populate: LITTERED_FIRST_POPULATE,
-            sort: ['expectedDateOfBirth:asc', 'plannedDateOfBirth:asc'],
-            page: 1,
-            pageSize: 10000,
-            filters: filterConditions.length > 0
-              ? { $and: [...filterConditions, { LitterStatus: { $ne: 'Littered' } }] }
-              : { LitterStatus: { $ne: 'Littered' } },
-          },
+        fetchStatusGroup(
+          { LitterStatus: { $eq: 'Manted' } },
+          dateSort,
+        ),
+        fetchStatusGroup(
+          { LitterStatus: { $eq: 'Planned' } },
+          dateSort,
+        ),
+        fetchStatusGroup(
+          { LitterStatus: { $eq: 'Closed' } },
+          dateSort,
         ),
       ])
 
-      const merged = [...litteredResult.results, ...otherResult.results]
+      const merged = [
+        ...litteredResult.results,
+        ...mantedResult.results,
+        ...plannedResult.results,
+        ...otherResult.results,
+      ]
 
       const total = merged.length
       const start = (page - 1) * pageSize

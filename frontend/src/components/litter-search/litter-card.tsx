@@ -3,6 +3,7 @@
 import React from 'react'
 import Image from 'next/image'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
+import { formatDayMonthYear } from '@/lib/date-utils'
 import type { Litter, HzdSetting } from '@/types'
 
 interface LitterCardProps {
@@ -83,7 +84,7 @@ export function LitterCard({ litter, strapiBaseUrl, hzdSetting, distance, format
                                     hzdSetting?.DefaultAvatarS),
                             strapiBaseUrl
                         ) || ''}
-                        alt="Mutter"
+                        alt="Zuchthündin"
                         fill
                         className='object-cover'
                         unoptimized
@@ -139,7 +140,7 @@ export function LitterCard({ litter, strapiBaseUrl, hzdSetting, distance, format
                             <td className="py-2 align-top">{breederMember}</td>
                         </tr>
                         <tr className="border-b border-gray-100 last:border-0">
-                            <td className="py-2 font-bold align-top">Mutter:</td>
+                            <td className="py-2 font-bold align-top">Zuchthündin:</td>
                             <td className="py-2 align-top">{motherName}</td>
                         </tr>
                         {stuntDogName && (
@@ -156,12 +157,17 @@ export function LitterCard({ litter, strapiBaseUrl, hzdSetting, distance, format
                                 </td>
                             </tr>
                         )}
-                        {litter.LitterStatus !== 'Littered' && litter.expectedDateOfBirth && (
+                        {litter.LitterStatus === 'Manted' ? (
+                            <tr className="border-b border-gray-100 last:border-0">
+                                <td className="py-2 font-bold align-top">Vorauss. Wurfdatum:</td>
+                                <td className="py-2 align-top">{formatDayMonthYear(litter.expectedDateOfBirth)}</td>
+                            </tr>
+                        ) : litter.LitterStatus !== 'Littered' && litter.expectedDateOfBirth ? (
                             <tr className="border-b border-gray-100 last:border-0">
                                 <td className="py-2 font-bold align-top">Erw. Wurfdatum:</td>
                                 <td className="py-2 align-top">{formatDate(litter.expectedDateOfBirth)}</td>
                             </tr>
-                        )}
+                        ) : null}
                         {litter.dateOfBirth && (
                             <tr className="border-b border-gray-100 last:border-0">
                                 <td className="py-2 font-bold align-top">Wurfdatum:</td>

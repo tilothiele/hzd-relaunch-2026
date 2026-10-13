@@ -2,8 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, ToggleButtonGroup, ToggleButton, Tooltip, FormControlLabel } from '@mui/material'
-import GridViewIcon from '@mui/icons-material/GridView'
-import TableRowsIcon from '@mui/icons-material/TableRows'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import MaleIcon from '@mui/icons-material/Male'
 import FemaleIcon from '@mui/icons-material/Female'
 
@@ -15,6 +14,7 @@ import { ViewToggle } from '@/components/common/view-toggle'
 import { LitterCard } from '@/components/litter-search/litter-card'
 import { LitterDetailView } from '@/components/litter-search/litter-detail-view'
 import { TrackUmamiEvent } from '@/components/analytics/track-umami-event'
+import { formatDayMonthYear } from '@/lib/date-utils'
 import { calculateDistance } from '@/lib/geo-utils'
 import { useLitters, type LitterStatus, type PageSize } from '@/hooks/use-litters'
 import { SubmitButton } from '@/components/ui/submit-button'
@@ -88,6 +88,7 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 	const [showMap, setShowMap] = useState(false)
 	const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
 	const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
+	const [isSearchCriteriaOpen, setIsSearchCriteriaOpen] = useState(false)
 
 	const filters = useMemo(() => ({
 		breederFilter,
@@ -191,6 +192,8 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 							<strong>{title}</strong>
 							{litter.dateOfBirth ? (
 								<div>Geboren: {formatDate(litter.dateOfBirth)}</div>
+							) : litter.LitterStatus === 'Manted' ? (
+								<div>Vorauss. Wurfdatum: {formatDayMonthYear(litter.expectedDateOfBirth)}</div>
 							) : litter.expectedDateOfBirth ? (
 								<div>Erwartet: {formatDate(litter.expectedDateOfBirth)}</div>
 							) : null}
@@ -276,6 +279,35 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 					</Box>
 				)}
 
+				<div className='mb-4 flex items-center gap-2 min-[641px]:hidden'>
+					<button
+						type='button'
+						className='flex min-w-0 flex-1 items-center justify-between rounded border border-gray-200 bg-gray-50 px-4 py-3 text-left text-sm font-medium text-gray-800'
+						aria-expanded={isSearchCriteriaOpen}
+						aria-controls='litter-search-criteria'
+						onClick={() => setIsSearchCriteriaOpen((open) => !open)}
+					>
+						suche nach...
+						<ExpandMoreIcon
+							sx={{
+								transform: isSearchCriteriaOpen ? 'rotate(180deg)' : 'none',
+								transition: 'transform 150ms ease',
+							}}
+						/>
+					</button>
+					<SubmitButton
+						label='Suchen'
+						loadingLabel='Suche...'
+						onClick={handleSearch}
+						isLoading={isLoading}
+						sx={{ flexShrink: 0, whiteSpace: 'nowrap' }}
+					/>
+				</div>
+
+				<Box
+					id='litter-search-criteria'
+					className={isSearchCriteriaOpen ? undefined : 'hidden min-[641px]:block'}
+				>
 				<Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(4, 1fr)' }, gap: 2 }}>
 
 					<TextField
@@ -293,7 +325,7 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 					/>
 
 					<TextField
-						label='Mutter'
+						label='Zuchthündin'
 						value={motherInput}
 						onChange={(e) => setMotherInput(e.target.value)}
 						onKeyDown={(e) => {
@@ -301,7 +333,7 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 								handleSearch()
 							}
 						}}
-						placeholder='Name der Mutter'
+						placeholder='Name der Zuchthündin'
 						fullWidth
 						size='small'
 					/>
@@ -418,12 +450,15 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 						</Box>
 					</Box>
 
-					<SubmitButton
-						label="Suchen"
-						loadingLabel="Suche..."
-						onClick={handleSearch}
-						isLoading={isLoading}
-					/>
+					<Box className='max-[640px]:hidden'>
+						<SubmitButton
+							label='Suchen'
+							loadingLabel='Suche...'
+							onClick={handleSearch}
+							isLoading={isLoading}
+						/>
+					</Box>
+				</Box>
 				</Box>
 			</Box>
 
@@ -516,7 +551,7 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 										<TableCell sx={{ fontWeight: 'bold' }}>Wurf-Nr.</TableCell>
 										<TableCell sx={{ fontWeight: 'bold' }}>Zwinger</TableCell>
 										<TableCell sx={{ fontWeight: 'bold' }}>Entfernung</TableCell>
-										<TableCell sx={{ fontWeight: 'bold' }}>Mutter</TableCell>
+										<TableCell sx={{ fontWeight: 'bold' }}>Zuchthündin</TableCell>
 										<TableCell sx={{ fontWeight: 'bold' }}>Deckrüde</TableCell>
 										<TableCell sx={{ fontWeight: 'bold' }}>Erw. Geb. Datum</TableCell>
 										<TableCell sx={{ fontWeight: 'bold' }}>Geburtsdatum</TableCell>
@@ -566,7 +601,11 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 												</TableCell>
 												<TableCell>{motherName}</TableCell>
 												<TableCell>{stuntDogName}</TableCell>
-												<TableCell>{formatDate(litter.expectedDateOfBirth)}</TableCell>
+												<TableCell>
+													{litter.LitterStatus === 'Manted'
+														? formatDayMonthYear(litter.expectedDateOfBirth)
+														: formatDate(litter.expectedDateOfBirth)}
+												</TableCell>
 												<TableCell>{formatDate(litter.dateOfBirth)}</TableCell>
 												<TableCell align="center">
 													<div className="flex justify-center gap-2 text-xs">
