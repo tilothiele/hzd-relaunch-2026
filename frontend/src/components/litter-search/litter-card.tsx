@@ -151,7 +151,7 @@ export function LitterCard({ litter, strapiBaseUrl, hzdSetting, distance, format
                         )}
                         {litter.LitterStatus === 'Planned' && litter.plannedDateOfBirth && (
                             <tr className="border-b border-gray-100 last:border-0">
-                                <td className="py-2 font-bold align-top">Gep. Wurfdatum:</td>
+                                <td className="py-2 font-bold align-top">Wurf geplant:</td>
                                 <td className="py-2 align-top">
                                     {new Date(litter.plannedDateOfBirth).toLocaleDateString('de-DE', { month: '2-digit', year: 'numeric' })}
                                 </td>

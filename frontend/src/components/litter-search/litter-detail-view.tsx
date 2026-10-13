@@ -223,7 +223,7 @@ export function LitterDetailView({
                     <div className="rounded-lg bg-gray-50 px-6 py-2">
                         {litter.LitterStatus === 'Planned' && litter.plannedDateOfBirth && (
                             <DetailRow
-                                label="Gep. Wurfdatum"
+                                label="Wurf geplant"
                                 value={new Date(litter.plannedDateOfBirth).toLocaleDateString('de-DE', { month: '2-digit', year: 'numeric' })}
                             />
                         )}
