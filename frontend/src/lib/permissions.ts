@@ -1,7 +1,7 @@
 import type { AuthUser, ComponentPermissionRestriction, UserGroup } from '@/types'
 
 const SONDERLEITER_GROUP_ID = 1
-const KOERMEISTER_GROUP_ID = 2
+const ADMINISTRATIR_GROUP_ID = 2
 const DECKRUEDENBESITZER_GROUP_ID = 3
 const ZUECHTER_GROUP_ID = 4
 
@@ -187,8 +187,10 @@ export function isZuechter(user: AuthUser | null): boolean {
 	return belongsToGroup(user, ZUECHTER_GROUP_ID, ['Züchter', 'Zuechter'])
 }
 
-export function isKoermeister(user: AuthUser | null): boolean {
-	return belongsToGroup(user, KOERMEISTER_GROUP_ID, ['Körmeister', 'Koermeister'])
+export function isAdministrator(user: AuthUser | null): boolean {
+	return belongsToGroup(user, ADMINISTRATIR_GROUP_ID, [
+		'Administrator',
+	])
 }
 
 export function isDeckruedenbesitzer(user: AuthUser | null): boolean {
@@ -266,7 +268,7 @@ export const hasRequiredUserGroups = hasRequiredGroups
 
 const permissions = {
 	isBreeder,
-	isKoermeister,
+	isAdministrator,
 	isSonderleiter,
 	hasUserGroup,
 	hasAnyUserGroup,

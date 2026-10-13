@@ -22,6 +22,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import Link from 'next/link'
 import type { MenuItem as MenuItemType } from '@/types'
+import { getMenuItemLabel } from '@/lib/menu-helper'
 
 interface NavigationMenuProps {
 	menuItems: MenuItemType[]
@@ -77,7 +78,7 @@ function DesktopMenuItem({
 								},
 							}}
 						>
-							{item.name}
+							{getMenuItemLabel(item)}
 						</Button>
 					) : (
 						<Typography
@@ -89,13 +90,13 @@ function DesktopMenuItem({
 								paddingLeft: '16px',
 							}}
 						>
-							{item.name}
+							{getMenuItemLabel(item)}
 						</Typography>
 					)}
 					<IconButton
 						onClick={handleClick}
 						size='small'
-						aria-label={`${item.name} Untermenü ${open ? 'schließen' : 'öffnen'}`}
+						aria-label={`${getMenuItemLabel(item)} Untermenü ${open ? 'schließen' : 'öffnen'}`}
 						sx={{
 							color: theme.headerFooterTextColor,
 							padding: '4px',
@@ -305,7 +306,7 @@ function DesktopMenuItem({
 					},
 				}}
 			>
-				{item.name}
+				{getMenuItemLabel(item)}
 			</Button>
 		)
 	}
@@ -320,7 +321,7 @@ function DesktopMenuItem({
 				padding: '6px 16px',
 			}}
 		>
-			{item.name}
+			{getMenuItemLabel(item)}
 		</Typography>
 	)
 }
@@ -392,7 +393,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 													secondaryAction={
 														<IconButton
 															edge='end'
-															aria-label={`${item.name} Untermenü ${isSubmenuOpen ? 'schließen' : 'öffnen'}`}
+															aria-label={`${getMenuItemLabel(item)} Untermenü ${isSubmenuOpen ? 'schließen' : 'öffnen'}`}
 															onClick={(event) => handleSubmenuToggle(itemKey, event)}
 															sx={{
 																color: 'var(--color-text)',
@@ -425,7 +426,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 																			fontWeight: 500,
 																		}}
 																	>
-																		{item.name}
+																		{getMenuItemLabel(item)}
 																	</Typography>
 																}
 															/>
@@ -450,7 +451,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 																			fontWeight: 500,
 																		}}
 																	>
-																		{item.name}
+																		{getMenuItemLabel(item)}
 																	</Typography>
 																}
 															/>
@@ -691,7 +692,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 																	fontWeight: 500,
 																}}
 															>
-																{item.name}
+																{getMenuItemLabel(item)}
 															</Typography>
 														}
 													/>
@@ -709,7 +710,7 @@ export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 																color: 'var(--color-text)',
 															}}
 														>
-															{item.name}
+															{getMenuItemLabel(item)}
 														</Typography>
 													}
 												/>

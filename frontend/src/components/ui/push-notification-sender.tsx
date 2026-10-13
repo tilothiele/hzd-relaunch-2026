@@ -3,8 +3,11 @@
 import { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane, faMessage, faSliders, faCheck } from '@fortawesome/free-solid-svg-icons'
+import { useAuth } from '@/hooks/use-auth'
+import { isAdministrator } from '@/lib/permissions'
 
 export function PushNotificationSender() {
+    const { user, isInitialized } = useAuth()
     const [message, setMessage] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [status, setStatus] = useState<{ type: 'success' | 'error', text: string } | null>(null)
@@ -75,6 +78,10 @@ export function PushNotificationSender() {
 
     const toggleChannel = (key: string) => {
         setChannels(prev => ({ ...prev, [key]: !prev[key] }))
+    }
+
+    if (!isInitialized || !isAdministrator(user)) {
+        return null
     }
 
     return (

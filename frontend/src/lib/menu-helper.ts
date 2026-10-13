@@ -1,12 +1,20 @@
 import type { MenuItem, AuthUser } from '@/types'
-import { isBreeder, isDeckruedenbesitzer, isKoermeister, isSonderleiter } from './permissions'
+import { isAdministrator, isBreeder, isDeckruedenbesitzer, isSonderleiter } from './permissions'
 
 export function getMenuItemUrl(menuItem: MenuItem): string {
     return menuItem.url ?? ''
 }
 
 export function getMenuItemLabel(menuItem: MenuItem): string {
-    return menuItem.name ?? ''
+    const name = menuItem.name ?? ''
+    if (
+        menuItem.id === 'koermeister'
+        || name === 'Körmeister'
+        || name === 'Koermeister'
+    ) {
+        return 'Administrator'
+    }
+    return name
 }
 
 export function getMenuItemIcon(menuItem: MenuItem, _user: AuthUser | null): string {
@@ -21,7 +29,7 @@ export function getMenuItemEnabled(menuItem: MenuItem, _user: AuthUser | null): 
         return _user != null
     }
     if (menuItem.id == 'koermeister') {
-        return isKoermeister(_user)
+        return isAdministrator(_user)
     }
     if (menuItem.id == 'sonderleiter' || menuItem.id == 'anmeldungen') {
         return isSonderleiter(_user)

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import webpush from 'web-push'
 import { buildStrapiQuery } from '@/lib/strapi/filters'
 import { fetchEntityList } from '@/lib/strapi/api'
+import { isAdministrator } from '@/lib/permissions'
+import { getSessionUser } from '@/lib/server/passed-dog-submit'
 
 const strapiToken = process.env.STRAPI_API_TOKEN
 
@@ -24,6 +26,11 @@ export async function POST(request: NextRequest) {
 	}
 
 	try {
+		const user = await getSessionUser()
+		if (!isAdministrator(user)) {
+			return NextResponse.json({ error: 'Nicht berechtigt' }, { status: 403 })
+		}
+
 		const { message, channels } = await request.json()
 
 		if (!message) {
