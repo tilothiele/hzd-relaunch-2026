@@ -311,7 +311,7 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 				<Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(4, 1fr)' }, gap: 2 }}>
 
 					<TextField
-						label='Züchter'
+						label='Züchter/Zwinger'
 						value={breederInput}
 						onChange={(e) => setBreederInput(e.target.value)}
 						onKeyDown={(e) => {
