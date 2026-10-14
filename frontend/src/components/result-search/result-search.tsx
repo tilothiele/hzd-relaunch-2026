@@ -27,7 +27,7 @@ interface CalendarColors {
  * Mappt ColorSchema Enumeration-Werte (vom GraphQL Backend) auf konkrete Farben
  * Enumeration-Werte: Gelb, Gruen, Pink, Rot, Violet
  */
-import { getCalendarColors, formatDate } from '@/lib/calendar-utils'
+import { getCalendarColors, formatDate, withVisibleCalendarDocuments } from '@/lib/calendar-utils'
 
 export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 	const [calendars, setCalendars] = useState<Calendar[]>([])
@@ -164,7 +164,9 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				{},
 			)
 			const nowTs = Date.now()
-			const visibleItems = itemsArray.filter((item) => isPastEntry(item, nowTs) && isWithinVisibility(item, nowTs))
+			const visibleItems = itemsArray
+				.filter((item) => isPastEntry(item, nowTs) && isWithinVisibility(item, nowTs))
+				.map((item) => withVisibleCalendarDocuments(item, nowTs))
 			setAllCalendarItems(visibleItems)
 		} catch (err) {
 			// Fehler beim Laden aller Items ignorieren
@@ -243,7 +245,9 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				{},
 			)
 			const nowTs = Date.now()
-			const visibleItems = itemsArray.filter((item) => isPastEntry(item, nowTs) && isWithinVisibility(item, nowTs))
+			const visibleItems = itemsArray
+				.filter((item) => isPastEntry(item, nowTs) && isWithinVisibility(item, nowTs))
+				.map((item) => withVisibleCalendarDocuments(item, nowTs))
 			setCalendarItems(visibleItems)
 		} catch (err) {
 			const fetchError = err instanceof Error

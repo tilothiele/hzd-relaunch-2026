@@ -790,6 +790,18 @@ export interface Calendar {
 	Ord?: number | null
 }
 
+export interface CalendarDocument {
+	Description?: string | null
+	MediaFile?: {
+		url: string
+		name?: string | null
+		ext?: string | null
+		alternativeText?: string | null
+	} | null
+	VisibleFrom?: string | null
+	VisibleTo?: string | null
+}
+
 export interface CalendarItem {
 	documentId: string
 	Headline: string
@@ -805,14 +817,7 @@ export interface CalendarItem {
 	form?: {
 		documentId: string
 	} | null
-	CalendarDocument?: {
-		MediaFile?: {
-			url: string
-			name?: string | null
-			ext?: string | null
-			alternativeText?: string | null
-		} | null
-	}[] | null
+	CalendarDocument?: CalendarDocument[] | null
 	calendar?: Calendar | null
 	VisibleFrom?: string | null
 	VisibleTo?: string | null

@@ -1,4 +1,4 @@
-import type { Calendar } from '@/types'
+import type { Calendar, CalendarDocument, CalendarItem } from '@/types'
 
 /**
  * Mappt ColorSchema Enumeration-Werte (vom GraphQL Backend) auf konkrete Farben
@@ -142,4 +142,55 @@ export function formatDateRange(
         result = `${result} – ${endDate}`
     }
     return result
+}
+
+function readTimestamp(value: string | null | undefined): number | null {
+    if (value == null || value.trim() === '') {
+        return null
+    }
+
+    const time = new Date(value).getTime()
+    return Number.isNaN(time) ? Number.NaN : time
+}
+
+/**
+ * Sichtbar, wenn VisibleFrom leer oder in der Vergangenheit liegt
+ * und VisibleTo leer oder in der Zukunft liegt.
+ */
+export function isCalendarDocumentVisible(
+    document: CalendarDocument | null | undefined,
+    now = Date.now(),
+): boolean {
+    if (!document) {
+        return false
+    }
+
+    const visibleFrom = readTimestamp(document.VisibleFrom)
+    const visibleTo = readTimestamp(document.VisibleTo)
+    const fromOk = visibleFrom === null || visibleFrom <= now
+    const toOk = visibleTo === null || visibleTo >= now
+    return fromOk && toOk
+}
+
+export function getVisibleCalendarDocuments(
+    documents: CalendarDocument[] | null | undefined,
+    now = Date.now(),
+): CalendarDocument[] {
+    return (documents ?? []).filter((document) => (
+        isCalendarDocumentVisible(document, now)
+    ))
+}
+
+export function withVisibleCalendarDocuments(
+    item: CalendarItem,
+    now = Date.now(),
+): CalendarItem {
+    if (!item.CalendarDocument) {
+        return item
+    }
+
+    return {
+        ...item,
+        CalendarDocument: getVisibleCalendarDocuments(item.CalendarDocument, now),
+    }
 }

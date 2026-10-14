@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Paper, Box, Typography, Button } from '@mui/material'
 import type { CalendarItem } from '@/types'
-import { getCalendarColors, formatDateRange } from '@/lib/calendar-utils'
+import { getCalendarColors, formatDateRange, getVisibleCalendarDocuments } from '@/lib/calendar-utils'
 import { ExternalRegistrationLink, InternalRegistrationLink, ResultLink } from '@/components/calendar/registration-links'
 import { CalendarDetailsModal } from './calendar-details-modal'
 import { BlocksRenderer } from '@strapi/blocks-react-renderer'
@@ -19,7 +19,8 @@ export function CalendarItemCard({ item, index, registrationOpen, strapiBaseUrl 
     const isEven = index % 2 === 0
     const now = Date.now()
 
-    const hasExtraDetails = !!(item.LongDescription || (item.CalendarDocument && item.CalendarDocument.some(doc => doc.MediaFile?.url)))
+    const visibleDocuments = getVisibleCalendarDocuments(item.CalendarDocument)
+    const hasExtraDetails = !!(item.LongDescription || visibleDocuments.some(doc => doc.MediaFile?.url))
 
     // Logic for AnmeldeLink visibility
     const isAnmeldeLinkVisible = () => {

@@ -10,7 +10,7 @@ import type { ThemeDefinition } from '@/themes'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { ExternalRegistrationLink, InternalRegistrationLink } from '@/components/calendar/registration-links'
 
-import { getCalendarColors } from '@/lib/calendar-utils'
+import { getCalendarColors, withVisibleCalendarDocuments } from '@/lib/calendar-utils'
 import { CalendarItemCard } from './calendar-item-card'
 
 /** Kalendertag in lokaler Zeitzone (yyyy-mm-dd), nicht UTC */
@@ -256,12 +256,14 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				{},
 			)
 			const nowTs = Date.now()
-			const visibleItems = itemsArray.filter(
-				(item) =>
-					isFlagHideVisible(item)
-					&& isWithinVisibility(item, nowTs)
-					&& isTodayOrFuture(item),
-			)
+			const visibleItems = itemsArray
+				.filter(
+					(item) =>
+						isFlagHideVisible(item)
+						&& isWithinVisibility(item, nowTs)
+						&& isTodayOrFuture(item),
+				)
+				.map((item) => withVisibleCalendarDocuments(item, nowTs))
 			setAllCalendarItems(visibleItems)
 		} catch (err) {
 			// Fehler beim Laden aller Items ignorieren
@@ -339,12 +341,14 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 				{},
 			)
 			const nowTs = Date.now()
-			const visibleItems = itemsArray.filter(
-				(item) =>
-					isFlagHideVisible(item)
-					&& isWithinVisibility(item, nowTs)
-					&& isTodayOrFuture(item),
-			)
+			const visibleItems = itemsArray
+				.filter(
+					(item) =>
+						isFlagHideVisible(item)
+						&& isWithinVisibility(item, nowTs)
+						&& isTodayOrFuture(item),
+				)
+				.map((item) => withVisibleCalendarDocuments(item, nowTs))
 			setCalendarItems(visibleItems)
 		} catch (err) {
 			const fetchError = err instanceof Error
