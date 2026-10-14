@@ -4,8 +4,8 @@ import Link from 'next/link'
 import type { GlobalLayout } from '@/types'
 import Image from 'next/image'
 import type { ThemeDefinition } from '@/themes'
-import { SocialLinks } from '../header/social-links'
 import { resolveMediaUrl } from '../header/logo-utils'
+import { SocialLinks } from '../header/social-links'
 
 interface FooterProps {
 	globalLayout?: GlobalLayout | null
@@ -20,12 +20,11 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 
 	const logoSrc = resolveMediaUrl(logoImage, strapiBaseUrl) ?? ''
 	const logoAlt = logoImage?.alternativeText ?? 'Hovawart logo'
-	const logoWidth = 120
-	const logoHeight = 120
+	const logoWidth = 156
+	const logoHeight = 156
 
 	const partnerLinks = globalLayout?.PartnerLink ?? []
-	const firstPartnerLink = partnerLinks[0]
-	const remainingPartnerLinks = partnerLinks.slice(1, 4) // Nimm die nächsten 3 Partner-Links
+	const footerContacts = (globalLayout?.Footer?.contacts ?? []).slice(0, 3)
 
 	return (
 		<footer
@@ -36,36 +35,56 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 			className='w-full pt-1'
 		>
 			<div className='mx-auto w-full max-w-screen-xl px-4 py-8'>
-				<div className='mb-8 grid gap-4 md:grid-cols-[1.5fr_2fr_1fr_1fr]'>
-					<div>
-						{logoSrc ? (
-							<Image
-								src={logoSrc}
-								alt={logoAlt}
-								width={logoWidth}
-								height={logoHeight}
-								className='object-contain'
-								unoptimized
-								priority
+				<div className='mb-8 grid gap-4 md:grid-cols-[minmax(7rem,0.8fr)_minmax(0,2.6fr)_minmax(8rem,1fr)]'>
+					<div className='flex justify-center md:justify-start'>
+						<div className='flex flex-col items-center gap-3'>
+							{logoSrc ? (
+								<Image
+									src={logoSrc}
+									alt={logoAlt}
+									width={logoWidth}
+									height={logoHeight}
+									className='object-contain'
+									unoptimized
+									priority
+								/>
+							) : (
+								<span className='text-lg font-semibold tracking-wide'>
+									HZD
+								</span>
+							)}
+							<SocialLinks
+								socialLinkFB={globalLayout?.SocialLinkFB}
+								socialLinkYT={globalLayout?.SocialLinkYT}
+								socialLinkIG={globalLayout?.SocialLinkIG}
+								theme={theme}
 							/>
-						) : (
-							<span className='text-lg font-semibold tracking-wide'>
-								HZD
-							</span>
-						)}
+						</div>
 					</div>
 					<div>
 						<div>
-							<div className='grid grid-cols-2 gap-2 px-2'>
-								<div>
-									<p className='font-bold' style={{ color: theme.headerFooterIcons }}>Präsidium</p>
-									<div className='text-sm'>{globalLayout?.Footer?.PraesidiumName}</div>
-									<div className='text-sm'>{globalLayout?.Footer?.PraesidiumOrt}</div>
-									<div className='text-sm'>{globalLayout?.Footer?.PraesidiumTelefon}</div>
-								</div>
-								<div className='flex'>
-									<SocialLinks socialLinkFB={globalLayout?.SocialLinkFB} theme={theme} />
-								</div>
+							<div className='grid grid-cols-1 gap-4 px-2 sm:grid-cols-3'>
+								{footerContacts.map((contact) => (
+									<div key={contact.documentId} className='text-center sm:text-left'>
+										{contact.Headline ? (
+											<p className='font-bold' style={{ color: theme.headerFooterIcons }}>
+												{contact.Headline}
+											</p>
+										) : null}
+										{contact.Name ? (
+											<div className='text-sm'>{contact.Name}</div>
+										) : null}
+										{contact.Street ? (
+											<div className='text-sm'>{contact.Street}</div>
+										) : null}
+										{contact.ZipCity ? (
+											<div className='text-sm'>{contact.ZipCity}</div>
+										) : null}
+										{contact.Phone ? (
+											<div className='text-sm'>{contact.Phone}</div>
+										) : null}
+									</div>
+								))}
 							</div>
 							<hr
 								style={{
@@ -77,7 +96,7 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 							<div className='mt-4 grid grid-cols-2 gap-2 px-2'>
 								<div>
 									<p className='text-sm'>TIK/IT-Support</p>
-									<div className='text-sm'>tik@hovawarte.com</div>
+									<div className='text-sm'>{globalLayout?.Footer?.SupportEmail}</div>
 								</div>
 								<div>
 									<div><Link href='/impressum' className='text-sm transition-colors hover:text-yellow-400 underline'>
@@ -94,68 +113,27 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 						</div>
 					</div>
 					<div>
-						{firstPartnerLink?.Logo ? (
-							firstPartnerLink.PartnerLinkUrl ? (
-								<Link
-									href={firstPartnerLink.PartnerLinkUrl}
-									rel='noopener noreferrer'
-									style={{
-										display: 'block',
-										margin: 'auto',
-									}}
-								>
-									<Image
-										src={resolveMediaUrl(firstPartnerLink.Logo, strapiBaseUrl) ?? ''}
-										alt={firstPartnerLink.Logo.alternativeText ?? firstPartnerLink.AltText ?? 'Partner Logo'}
-										width={200}
-										height={300}
-										className='object-contain'
-										unoptimized
-										priority
-										style={{
-											margin: 'auto',
-										}}
-									/>
-								</Link>
-							) : (
-								<Image
-									src={resolveMediaUrl(firstPartnerLink.Logo, strapiBaseUrl) ?? ''}
-									alt={firstPartnerLink.Logo.alternativeText ?? firstPartnerLink.AltText ?? 'Partner Logo'}
-									width={200}
-									height={300}
-									className='object-contain'
-									unoptimized
-									priority
-									style={{
-										margin: 'auto',
-									}}
-								/>
-							)
-						) : null}
-					</div>
-					<div>
 						<p className='text-center font-semibold' style={{ color: theme.headerFooterIcons }}>
 							Unsere Partner
 						</p>
 						<div className='flex flex-col items-center' style={{ gap: '1rem' }}>
-							{remainingPartnerLinks.map((partnerLink, index) => {
-								if (!partnerLink.Logo) return null
-
-								const logoUrl = resolveMediaUrl(partnerLink.Logo, strapiBaseUrl) ?? ''
-								const logoAlt = partnerLink.Logo.alternativeText ?? partnerLink.AltText ?? 'Partner Logo'
+							{partnerLinks.map((partnerLink, index) => {
+								const logoUrl = resolveMediaUrl(partnerLink.Logo, strapiBaseUrl)
+								const logoAlt = partnerLink.Logo?.alternativeText ?? partnerLink.AltText ?? 'Partner Logo'
 								const isFirst = index === 0
-								const isLast = index === remainingPartnerLinks.length - 1
+								const isLast = index === partnerLinks.length - 1
 
-								const imageElement = (
+								const imageElement = logoUrl ? (
 									<Image
 										src={logoUrl}
 										alt={logoAlt}
-										width={100}
-										height={100}
-										className='object-contain'
+										width={98}
+										height={56}
+										className='h-auto w-full max-w-[98px] object-contain'
 										unoptimized
-										priority
 									/>
+								) : (
+									<span className='text-sm'>{logoAlt}</span>
 								)
 
 								return (

@@ -5,23 +5,13 @@
   },
   "options": {},
   "attributes": {
-    "PraesidiumName": {
+    "SupportEmail": {
       "type": "string"
     },
-    "PraesidiumOrt": {
-      "type": "string"
-    },
-    "PraesidiumTelefon": {
-      "type": "string"
-    },
-    "ItProjektleitungName": {
-      "type": "string"
-    },
-    "ItProjektleitungOrt": {
-      "type": "string"
-    },
-    "ItProjektleitungTelefon": {
-      "type": "string"
+    "contacts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::contact.contact"
     }
   },
   "config": {}

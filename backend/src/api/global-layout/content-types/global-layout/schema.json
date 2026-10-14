@@ -94,6 +94,9 @@
     },
     "GalleryDescription": {
       "type": "blocks"
+    },
+    "SocialLinkIG": {
+      "type": "string"
     }
   }
 }

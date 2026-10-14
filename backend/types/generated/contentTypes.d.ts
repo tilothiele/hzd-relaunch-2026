@@ -1176,6 +1176,7 @@ export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
       false
     >;
     SocialLinkFB: Schema.Attribute.String;
+    SocialLinkIG: Schema.Attribute.String;
     SocialLinkYT: Schema.Attribute.String;
     SOS: Schema.Attribute.Component<'layout.sos', false>;
     updatedAt: Schema.Attribute.DateTime;

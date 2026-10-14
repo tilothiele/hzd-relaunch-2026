@@ -18,9 +18,17 @@ export function buildGlobalLayoutPopulate(): Record<string, unknown> {
 	return {
 		populate: {
 			Logo: true,
-			Footer: true,
+			Footer: {
+				populate: {
+					contacts: true,
+				},
+			},
 			SOS: true,
-			PartnerLink: true,
+			PartnerLink: {
+				populate: {
+					Logo: true,
+				},
+			},
 			Impressum: true,
 			PrivacyPolicy: true,
 			CalendarHeader: {

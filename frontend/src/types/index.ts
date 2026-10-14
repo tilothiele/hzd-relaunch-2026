@@ -394,12 +394,8 @@ export interface Page {
 }
 
 export interface Footer {
-	ItProjektleitungName?: string | null
-	ItProjektleitungOrt?: string | null
-	ItProjektleitungTelefon?: string | null
-	PraesidiumName?: string | null
-	PraesidiumOrt?: string | null
-	PraesidiumTelefon?: string | null
+	SupportEmail?: string | null
+	contacts?: Contact[] | null
 }
 
 export interface PartnerLink {
@@ -427,6 +423,7 @@ export interface GlobalLayout {
 	Copyright?: string | null
 	SocialLinkFB?: string | null
 	SocialLinkYT?: string | null
+	SocialLinkIG?: string | null
 	HzdSetting?: HzdSetting | null
 	SOS?: ComponentLayoutSOS | null
 	Sections?: StartpageSection[] | null

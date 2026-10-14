@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-10-14T08:33:01.887Z"
+    "x-generation-date": "2026-10-14T21:20:19.238Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -56558,6 +56558,9 @@
                 "$ref": "#/components/schemas/BlocksSimpleHeroSectionComponent"
               },
               "GalleryDescription": {},
+              "SocialLinkIG": {
+                "type": "string"
+              },
               "locale": {
                 "type": "string"
               },
@@ -58199,6 +58202,9 @@
             "$ref": "#/components/schemas/BlocksSimpleHeroSectionComponent"
           },
           "GalleryDescription": {},
+          "SocialLinkIG": {
+            "type": "string"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -58703,6 +58709,9 @@
                   "$ref": "#/components/schemas/BlocksSimpleHeroSectionComponent"
                 },
                 "GalleryDescription": {},
+                "SocialLinkIG": {
+                  "type": "string"
+                },
                 "createdAt": {
                   "type": "string",
                   "format": "date-time"
@@ -58804,23 +58813,29 @@
               }
             ]
           },
-          "PraesidiumName": {
+          "SupportEmail": {
             "type": "string"
           },
-          "PraesidiumOrt": {
-            "type": "string"
-          },
-          "PraesidiumTelefon": {
-            "type": "string"
-          },
-          "ItProjektleitungName": {
-            "type": "string"
-          },
-          "ItProjektleitungOrt": {
-            "type": "string"
-          },
-          "ItProjektleitungTelefon": {
-            "type": "string"
+          "contacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                },
+                "documentId": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       },

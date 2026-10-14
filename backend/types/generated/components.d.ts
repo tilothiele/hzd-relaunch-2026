@@ -727,12 +727,8 @@ export interface LayoutFooter extends Struct.ComponentSchema {
     displayName: 'Footer';
   };
   attributes: {
-    ItProjektleitungName: Schema.Attribute.String;
-    ItProjektleitungOrt: Schema.Attribute.String;
-    ItProjektleitungTelefon: Schema.Attribute.String;
-    PraesidiumName: Schema.Attribute.String;
-    PraesidiumOrt: Schema.Attribute.String;
-    PraesidiumTelefon: Schema.Attribute.String;
+    contacts: Schema.Attribute.Relation<'oneToMany', 'api::contact.contact'>;
+    SupportEmail: Schema.Attribute.String;
   };
 }
 
