@@ -298,8 +298,8 @@ export function renderFormField(
 			const dogIdentifier = field as DogStandardIdentifier
 
 			const inputs = {
-				dogGivenName: { label: 'Name des Hundes', required: dogIdentifier.GivenName },
-				dogKennelName: { label: 'Zwingername', required: dogIdentifier.KennelName },
+				dogGivenName: { label: 'Name des Hundes mit Zwingername', required: dogIdentifier.GivenName },
+				dogKennelName: { label: 'im Zwinger', required: dogIdentifier.KennelName },
 				dogChipNo: { label: 'Chipnummer', required: dogIdentifier.ChipNo },
 				dogZuchtbuchnummer: { label: 'Zuchtbuchnummer', required: dogIdentifier.Zuchtbuchnummer },
 				dogDateOfBirth: { label: 'Geburtsdatum', required: dogIdentifier.DateOfBirth },
