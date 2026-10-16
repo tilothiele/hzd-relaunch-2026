@@ -547,10 +547,19 @@ export async function updateUser(
 	const data = mapMemberToUser(member, cId, authenticatedRoleId)
 	const existing = await findByCId(strapi, USER_UID, cId)
 	await omitTakenMembershipNumber(strapi, data, existing, cId, log)
-	if (options?.copyMemberEmails) {
+	const skipMemberEmailReasons = [
+		data.cFlagBreeder === true ? 'cFlagBreeder=true' : null,
+		data.blocked === true ? 'blocked=true' : null,
+	].filter((reason): reason is string => reason !== null)
+	if (options?.copyMemberEmails && skipMemberEmailReasons.length === 0) {
 		await applyUniqueMemberEmail(strapi, data, existing, cId, log)
 	} else if (existing) {
 		delete data.email
+	}
+	if (options?.copyMemberEmails && skipMemberEmailReasons.length > 0) {
+		log(
+			`CS_Member cId=${cId}: ${skipMemberEmailReasons.join(', ')}, user.email wird nicht übernommen`,
+		)
 	}
 	if (!existing) {
 		data.password = await hashPassword(strapi, `Import-${cId}-ChangeMe!`)

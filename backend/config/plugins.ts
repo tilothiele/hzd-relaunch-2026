@@ -23,6 +23,9 @@ export default ({ env }) => ({
     enabled: true,
     resolve: './src/plugins/hzd-plugin'
   },
+  'csv-exporter': {
+    enabled: true,
+  },
   email: {
     config: {
       provider: 'nodemailer',
