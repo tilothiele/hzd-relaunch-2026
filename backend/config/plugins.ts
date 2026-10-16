@@ -9,6 +9,9 @@ export default ({ env }) => ({
       },
     },
   },
+  'strapi-identity': {
+    enabled: true,
+  },
   'webp-converter': {
     enabled: true,
     config: {
