@@ -6,6 +6,7 @@ import type { Core } from '@strapi/strapi'
 import { findDocumentsPage } from '../utils/document-pagination'
 import {
 	loadAuthenticatedRoleId,
+	ensureBreederForCsMember,
 	updateBreederFromUser,
 	updateDog,
 	updateStudDog,
@@ -564,6 +565,7 @@ async function importCollection(
 		counts: Counts
 		onlyChanged: boolean
 		log: (line: string) => void
+		visit?: (entry: Record<string, unknown>) => Promise<void>
 		apply?: (entry: Record<string, unknown>) => Promise<void>
 	},
 ) {
@@ -575,6 +577,7 @@ async function importCollection(
 		counts,
 		onlyChanged,
 		log,
+		visit,
 		apply,
 	} = options
 	const total = await countGeneration(strapi, uid, generation)
@@ -606,6 +609,20 @@ async function importCollection(
 		const changes = previous
 			? listFieldChanges(entry, previous, attributes)
 			: null
+		if (visit) {
+			try {
+				await visit(entry)
+			} catch (error) {
+				if (isImportCancelled(error)) {
+					throw error
+				}
+				failed += 1
+				const message = describeError(error)
+				const line = `${label}${idLabel} fehlgeschlagen: ${message}`
+				log(line)
+				strapi.log.error(`import_strapi_daten ${line}`)
+			}
+		}
 		if (onlyChanged && previous && changes && changes.length === 0) {
 			skipped += 1
 			counts.skipped = skipped
@@ -1071,6 +1088,7 @@ async function import_strapi_daten(
 					counts: job.members,
 					onlyChanged: options.onlyChanged,
 					log,
+					visit: (entry) => ensureBreederForCsMember(strapi, entry, log),
 					apply: (entry) => updateUser(
 						strapi,
 						entry,

@@ -636,6 +636,46 @@ export async function updateUser(
 	)
 }
 
+export async function ensureBreederForCsMember(
+	strapi: Core.Strapi,
+	member: Record<string, unknown>,
+	log: (line: string) => void,
+) {
+	if (parseBoolean(member.PersonIsABreeder) !== true) {
+		return
+	}
+	const cId = parseInteger(member.IdPerson)
+	if (cId === null) {
+		log('CS_Member ohne IdPerson, Breeder-Anlage übersprungen')
+		return
+	}
+	const existing = await findByCId(strapi, BREEDER_UID, cId)
+	if (existing) {
+		return
+	}
+	const data: TargetData = {
+		cId,
+		BreederRole: 'B',
+	}
+	const kennelName = truncateOrNull(cell(member.BreedingStation), 200)
+	assign(data, 'kennelName', kennelName)
+	assign(data, 'IsActive', parseBoolean(member.PersonIsAnActiveBreeder))
+	const rawEmail = cell(member.Email)
+	const emailReason = emailRejectionReason(member.Email)
+	if (rawEmail && emailReason) {
+		log(
+			`CS_Member cId=${cId}: ${emailReason}, BreederEmail wird nicht übernommen`,
+		)
+	}
+	assign(data, 'BreederEmail', parseEmail(member.Email))
+	const address = addressFromCsMember(member)
+	if (address) {
+		data.Address = address
+	}
+	const savedId = await saveDocument(strapi, BREEDER_UID, null, data)
+	log(`Breeder erstellt cId=${cId} documentId=${savedId}`)
+}
+
 async function ensurePublishMyData(strapi: Core.Strapi, userId: number) {
 	const user = await strapi.db.query(USER_UID).findOne({
 		where: { id: userId },
@@ -729,6 +769,27 @@ async function prepareOwnerMembers(
 	}
 
 	return null
+}
+
+function addressFromCsMember(member: Record<string, unknown>): TargetData | null {
+	const address1 = truncateOrNull(cell(member.Street), 255)
+	const zip = truncateOrNull(cell(member.Zipcode), 5)
+	const city = cell(member.City)
+	const firstName = cell(member.Firstname) ?? ''
+	const lastName = cell(member.Lastname) ?? ''
+	const fullName = truncateOrNull(`${firstName} ${lastName}`.trim(), 255)
+	if (!address1 && !zip && !city && !fullName) {
+		return null
+	}
+	const country = parseCountryCode(member.Country)
+	const address: TargetData = {
+		CountryCode: country && country.length === 2 ? country : 'DE',
+	}
+	assign(address, 'FullName', fullName)
+	assign(address, 'Address1', address1)
+	assign(address, 'Zip', zip)
+	assign(address, 'City', city)
+	return address
 }
 
 function addressFromUser(user: Record<string, unknown>): TargetData | null {

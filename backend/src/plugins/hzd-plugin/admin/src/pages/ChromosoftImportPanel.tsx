@@ -578,7 +578,7 @@ const ChromosoftImportPanel = () => {
     members: formatMessage({
       id: getTranslation('chromosoft.import.membersHint'),
       defaultMessage:
-        'Schreibt die aktuelle CS_Member-Generation in Benutzer. Züchter werden übersprungen.',
+        'Schreibt die aktuelle CS_Member-Generation in Benutzer. Züchter werden nicht als Benutzer angelegt. Fehlt ein Breeder mit derselben cId, wird er angelegt.',
     }),
     dogs: formatMessage({
       id: getTranslation('chromosoft.import.dogsHint'),

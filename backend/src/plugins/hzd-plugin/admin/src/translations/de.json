@@ -30,7 +30,7 @@
   "hzd-plugin.chromosoft.import.fixedUsers": "Fixe Benutzerdaten",
   "hzd-plugin.chromosoft.import.skipped": "{count} übersprungen",
   "hzd-plugin.chromosoft.import.members": "Verarbeite CS_Member",
-  "hzd-plugin.chromosoft.import.membersHint": "Schreibt die aktuelle CS_Member-Generation in Benutzer. Züchter werden übersprungen.",
+  "hzd-plugin.chromosoft.import.membersHint": "Schreibt die aktuelle CS_Member-Generation in Benutzer. Züchter werden nicht als Benutzer angelegt. Fehlt ein Breeder mit derselben cId, wird er angelegt.",
   "hzd-plugin.chromosoft.import.dogs": "Verarbeite CS_Dog",
   "hzd-plugin.chromosoft.import.dogsHint": "Schreibt die aktuelle CS_Dog-Generation in Hunde.",
   "hzd-plugin.chromosoft.import.membersUploaded": "members.csv hochgeladen: {time}",
