@@ -12,10 +12,11 @@ type ImportPhase =
   | 'dogs'
   | 'breeders'
   | 'studDogs'
+  | 'fixedUsers'
   | 'done'
   | 'error';
 
-type ImportStepKey = 'members' | 'dogs' | 'breeders' | 'studDogs';
+type ImportStepKey = 'members' | 'dogs' | 'breeders' | 'studDogs' | 'fixedUsers';
 
 interface ImportCounts {
   processed: number;
@@ -28,6 +29,7 @@ interface ImportSteps {
   dogs: boolean;
   breeders: boolean;
   studDogs: boolean;
+  fixedUsers: boolean;
 }
 
 interface ImportTimestamps {
@@ -44,6 +46,7 @@ interface ImportStatus {
   dogs: ImportCounts;
   breeders: ImportCounts;
   studDogs: ImportCounts;
+  fixedUsers: ImportCounts;
   logFileName: string | null;
   error: string | null;
   timestamps: ImportTimestamps;
@@ -54,6 +57,7 @@ const STEP_ORDER: ImportStepKey[] = [
   'dogs',
   'breeders',
   'studDogs',
+  'fixedUsers',
 ];
 
 const DEFAULT_STEPS: ImportSteps = {
@@ -61,6 +65,7 @@ const DEFAULT_STEPS: ImportSteps = {
   dogs: true,
   breeders: true,
   studDogs: true,
+  fixedUsers: true,
 };
 
 const RUNNING_PHASES: ImportPhase[] = [
@@ -68,6 +73,7 @@ const RUNNING_PHASES: ImportPhase[] = [
   'dogs',
   'breeders',
   'studDogs',
+  'fixedUsers',
 ];
 
 function emptyCounts(): ImportCounts {
@@ -90,6 +96,7 @@ const IDLE_STATUS: ImportStatus = {
   dogs: emptyCounts(),
   breeders: emptyCounts(),
   studDogs: emptyCounts(),
+  fixedUsers: emptyCounts(),
   logFileName: null,
   error: null,
   timestamps: emptyTimestamps(),
@@ -185,6 +192,7 @@ function asSteps(value: unknown): ImportSteps {
     dogs: source.dogs !== false,
     breeders: source.breeders !== false,
     studDogs: source.studDogs !== false,
+    fixedUsers: source.fixedUsers !== false,
   };
 }
 
@@ -203,6 +211,7 @@ function normalizeStatus(value: unknown): ImportStatus | null {
     dogs: asCounts(status.dogs),
     breeders: asCounts(status.breeders),
     studDogs: asCounts(status.studDogs),
+    fixedUsers: asCounts(status.fixedUsers),
     logFileName: typeof status.logFileName === 'string' ? status.logFileName : null,
     error: typeof status.error === 'string' ? status.error : null,
     timestamps: asTimestamps(
@@ -298,6 +307,7 @@ const ChromosoftImportPanel = () => {
   const [starting, setStarting] = useState(false);
   const [aborting, setAborting] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [fixGroups, setFixGroups] = useState(false);
   const [onlyChanged, setOnlyChanged] = useState(false);
   const [copyMemberEmails, setCopyMemberEmails] = useState(false);
   const [steps, setSteps] = useState<ImportSteps>(DEFAULT_STEPS);
@@ -368,7 +378,7 @@ const ChromosoftImportPanel = () => {
           {
             id: getTranslation('chromosoft.import.successSkipped'),
             defaultMessage:
-              'Chromosoft-Daten verarbeitet: {members} Mitglieder ({memberSkipped} unverändert), {dogs} Hunde ({dogSkipped} unverändert), {breeders} Züchter, {studDogs} Deckrüden.',
+              'Chromosoft-Daten verarbeitet: {members} Mitglieder ({memberSkipped} unverändert), {dogs} Hunde ({dogSkipped} unverändert), {breeders} Züchter, {studDogs} Deckrüden, {fixedUsers} Benutzer geprüft.',
           },
           {
             members: status.members.processed,
@@ -377,19 +387,21 @@ const ChromosoftImportPanel = () => {
             dogSkipped,
             breeders: status.breeders.processed,
             studDogs: status.studDogs.processed,
+            fixedUsers: status.fixedUsers.processed,
           },
         )
         : formatMessage(
           {
             id: getTranslation('chromosoft.import.success'),
             defaultMessage:
-              'Chromosoft-Daten verarbeitet: {members} Mitglieder, {dogs} Hunde, {breeders} Züchter, {studDogs} Deckrüden.',
+              'Chromosoft-Daten verarbeitet: {members} Mitglieder, {dogs} Hunde, {breeders} Züchter, {studDogs} Deckrüden, {fixedUsers} Benutzer geprüft.',
           },
           {
             members: status.members.processed,
             dogs: status.dogs.processed,
             breeders: status.breeders.processed,
             studDogs: status.studDogs.processed,
+            fixedUsers: status.fixedUsers.processed,
           },
         );
       toggleNotification({
@@ -423,6 +435,7 @@ const ChromosoftImportPanel = () => {
       const response = await post('/hzd-plugin/chromosoft/import-strapi-daten', {
         onlyChanged,
         copyMemberEmails,
+        fixGroups,
         steps,
       });
       const nextStatus = normalizeStatus(response.data);
@@ -523,6 +536,10 @@ const ChromosoftImportPanel = () => {
       id: getTranslation('chromosoft.import.studDogs'),
       defaultMessage: 'Aktualisiere Deckrüden',
     }),
+    fixedUsers: formatMessage({
+      id: getTranslation('chromosoft.import.fixedUsers'),
+      defaultMessage: 'Fixe Benutzerdaten',
+    }),
   };
 
   const runSteps = status.phase === 'idle' ? steps : status.steps;
@@ -566,6 +583,25 @@ const ChromosoftImportPanel = () => {
         </Box>
 
         <Flex direction="column" alignItems="flex-start" gap={2}>
+          <Flex gap={2} alignItems="center">
+            <Checkbox
+              id="chromosoft-fix-groups"
+              checked={fixGroups}
+              disabled={isRunning}
+              onCheckedChange={(value: boolean | 'indeterminate') => {
+                setFixGroups(value === true);
+              }}
+            />
+            <Typography
+              tag="label"
+              htmlFor="chromosoft-fix-groups"
+            >
+              {formatMessage({
+                id: getTranslation('chromosoft.import.fixGroups'),
+                defaultMessage: 'Fixe Gruppen',
+              })}
+            </Typography>
+          </Flex>
           <Flex gap={2} alignItems="center">
             <Checkbox
               id="chromosoft-only-changed"

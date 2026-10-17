@@ -128,7 +128,7 @@ const toFilterConditions = (query: LitterSearchQuery): Array<Record<string, unkn
   return conditions
 }
 
-const ZUECHTER_GROUP_ID = '4'
+const ZUECHTER_GROUP_KEY = 'zuechter'
 const ORDER_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 const emptyPuppyAmount = () => ({ Total: 0, Available: 0 })
@@ -163,15 +163,8 @@ const userIsZuechter = (user: { user_groups?: unknown }): boolean => {
     }
 
     const record = group as Record<string, unknown>
-    if (String(record.id ?? '') === ZUECHTER_GROUP_ID) {
-      return true
-    }
-
-    const name = typeof record.Name === 'string'
-      ? record.Name.trim().toLowerCase()
-      : ''
-
-    return name === 'züchter' || name === 'zuechter'
+    return typeof record.key === 'string'
+      && record.key.trim().toLowerCase() === ZUECHTER_GROUP_KEY
   })
 }
 

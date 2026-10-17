@@ -25,6 +25,8 @@
   "hzd-plugin.chromosoft.import.abortError": "The import could not be cancelled.",
   "hzd-plugin.chromosoft.import.onlyChanged": "Import only changed records",
   "hzd-plugin.chromosoft.import.copyMemberEmails": "Copy all member emails",
+  "hzd-plugin.chromosoft.import.fixGroups": "Fix groups",
+  "hzd-plugin.chromosoft.import.fixedUsers": "Fix user data",
   "hzd-plugin.chromosoft.import.skipped": "{count} skipped",
   "hzd-plugin.chromosoft.import.members": "Process CS_Member",
   "hzd-plugin.chromosoft.import.dogs": "Process CS_Dog",
@@ -35,8 +37,8 @@
   "hzd-plugin.chromosoft.import.breeders": "Update breeder data",
   "hzd-plugin.chromosoft.import.studDogs": "Update stud dogs",
   "hzd-plugin.chromosoft.import.download": "Download log file",
-  "hzd-plugin.chromosoft.import.success": "Chromosoft data processed: {members} members, {dogs} dogs, {breeders} breeders, {studDogs} stud dogs.",
-  "hzd-plugin.chromosoft.import.successSkipped": "Chromosoft data processed: {members} members ({memberSkipped} unchanged), {dogs} dogs ({dogSkipped} unchanged), {breeders} breeders, {studDogs} stud dogs.",
+  "hzd-plugin.chromosoft.import.success": "Chromosoft data processed: {members} members, {dogs} dogs, {breeders} breeders, {studDogs} stud dogs, {fixedUsers} users checked.",
+  "hzd-plugin.chromosoft.import.successSkipped": "Chromosoft data processed: {members} members ({memberSkipped} unchanged), {dogs} dogs ({dogSkipped} unchanged), {breeders} breeders, {studDogs} stud dogs, {fixedUsers} users checked.",
   "hzd-plugin.chromosoft.import.error": "The Chromosoft data could not be imported.",
   "hzd-plugin.chromosoft.import.logError": "The log file could not be downloaded."
 }

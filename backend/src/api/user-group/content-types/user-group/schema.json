@@ -19,6 +19,10 @@
       "relation": "manyToMany",
       "target": "plugin::users-permissions.user",
       "mappedBy": "user_groups"
+    },
+    "key": {
+      "type": "string",
+      "unique": true
     }
   }
 }

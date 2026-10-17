@@ -1,9 +1,9 @@
 import type { AuthUser, ComponentPermissionRestriction, UserGroup } from '@/types'
 
-const SONDERLEITER_GROUP_ID = 1
-const ADMINISTRATIR_GROUP_ID = 2
-const DECKRUEDENBESITZER_GROUP_ID = 3
-const ZUECHTER_GROUP_ID = 4
+const SONDERLEITER_GROUP_KEY = 'sonderleiter'
+const ADMINISTRATIR_GROUP_KEY = 'admins'
+const DECKRUEDENBESITZER_GROUP_KEY = 'dr-besitzer'
+const ZUECHTER_GROUP_KEY = 'zuechter'
 
 type RestrictionLike = {
 	user_groups?: unknown
@@ -49,6 +49,7 @@ function unwrapCollection(value: unknown): unknown[] {
 		|| 'documentId' in record
 		|| 'Name' in record
 		|| 'name' in record
+		|| 'key' in record
 		|| 'attributes' in record
 	) {
 		return [record]
@@ -101,6 +102,7 @@ function normalizeUserGroups(value: unknown): UserGroup[] {
 				: typeof item.name === 'string'
 					? item.name
 					: null
+			const key = typeof item.key === 'string' ? item.key : null
 
 			return {
 				id: (item.id as number | string | null | undefined) ?? null,
@@ -108,6 +110,7 @@ function normalizeUserGroups(value: unknown): UserGroup[] {
 					? item.documentId
 					: null,
 				Name: name,
+				key,
 			}
 		})
 }
@@ -149,6 +152,11 @@ function getUserGroupKeys(group: UserGroup | null | undefined): string[] {
 		keys.push(`name:${name}`)
 	}
 
+	const key = group.key?.trim().toLowerCase()
+	if (key) {
+		keys.push(`key:${key}`)
+	}
+
 	return keys
 }
 
@@ -164,18 +172,15 @@ function getUserGroupNames(user: AuthUser | null): string[] {
 
 function belongsToGroup(
 	user: AuthUser | null,
-	groupId: number,
-	groupNames: string[],
+	groupKey: string,
 ): boolean {
-	const expectedNames = new Set(groupNames.map((name) => name.toLowerCase()))
+	const expected = groupKey.trim().toLowerCase()
+	if (!expected) {
+		return false
+	}
 
 	return getUserGroups(user).some((group) => {
-		if (String(group.id) === String(groupId)) {
-			return true
-		}
-
-		const name = group.Name?.trim().toLowerCase() ?? ''
-		return expectedNames.has(name)
+		return group.key?.trim().toLowerCase() === expected
 	})
 }
 
@@ -184,25 +189,19 @@ export function isBreeder(user: AuthUser | null): boolean {
 }
 
 export function isZuechter(user: AuthUser | null): boolean {
-	return belongsToGroup(user, ZUECHTER_GROUP_ID, ['Züchter', 'Zuechter'])
+	return belongsToGroup(user, ZUECHTER_GROUP_KEY)
 }
 
 export function isAdministrator(user: AuthUser | null): boolean {
-	return belongsToGroup(user, ADMINISTRATIR_GROUP_ID, [
-		'Administrator',
-	])
+	return belongsToGroup(user, ADMINISTRATIR_GROUP_KEY)
 }
 
 export function isDeckruedenbesitzer(user: AuthUser | null): boolean {
-	return belongsToGroup(
-		user,
-		DECKRUEDENBESITZER_GROUP_ID,
-		['Deckrüdenbesitzer', 'Deckruedenbesitzer'],
-	)
+	return belongsToGroup(user, DECKRUEDENBESITZER_GROUP_KEY)
 }
 
 export function isSonderleiter(user: AuthUser | null): boolean {
-	return belongsToGroup(user, SONDERLEITER_GROUP_ID, ['Sonderleiter'])
+	return belongsToGroup(user, SONDERLEITER_GROUP_KEY)
 }
 
 export function hasUserGroup(user: AuthUser | null, groupName: string): boolean {

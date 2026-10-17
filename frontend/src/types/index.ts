@@ -520,6 +520,7 @@ export interface UserGroup {
 	id?: number | string | null
 	documentId?: string | null
 	Name?: string | null
+	key?: string | null
 }
 
 export interface AuthUser {

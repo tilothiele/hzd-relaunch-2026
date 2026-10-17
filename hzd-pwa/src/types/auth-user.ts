@@ -9,5 +9,6 @@ export interface AuthUser {
 		id?: number | string | null
 		documentId?: string | null
 		Name?: string | null
+		key?: string | null
 	}> | null
 }

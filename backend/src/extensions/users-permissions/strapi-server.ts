@@ -38,6 +38,7 @@ function serializeUserGroups(groups: unknown): Array<{
 	id: number | string | null
 	documentId: string | null
 	Name: string | null
+	key: string | null
 }> {
 	if (!Array.isArray(groups)) {
 		return []
@@ -49,6 +50,7 @@ function serializeUserGroups(groups: unknown): Array<{
 			id: group.id ?? null,
 			documentId: group.documentId ?? null,
 			Name: typeof group.Name === 'string' ? group.Name : null,
+			key: typeof group.key === 'string' ? group.key : null,
 		}))
 }
 

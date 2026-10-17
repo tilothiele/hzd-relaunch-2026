@@ -42,9 +42,10 @@ type ImportPhase =
 	| 'dogs'
 	| 'breeders'
 	| 'studDogs'
+	| 'fixedUsers'
 	| 'done'
 	| 'error'
-type ImportStep = 'members' | 'dogs' | 'breeders' | 'studDogs'
+type ImportStep = 'members' | 'dogs' | 'breeders' | 'studDogs' | 'fixedUsers'
 
 interface Counts {
 	processed: number
@@ -57,6 +58,7 @@ export interface ImportSteps {
 	dogs: boolean
 	breeders: boolean
 	studDogs: boolean
+	fixedUsers: boolean
 }
 
 interface JobState {
@@ -66,6 +68,7 @@ interface JobState {
 	dogs: Counts
 	breeders: Counts
 	studDogs: Counts
+	fixedUsers: Counts
 	logFileName: string | null
 	logFilePath: string | null
 	error: string | null
@@ -85,6 +88,7 @@ export interface ImportStrapiDatenStatus {
 	dogs: Counts
 	breeders: Counts
 	studDogs: Counts
+	fixedUsers: Counts
 	logFileName: string | null
 	error: string | null
 	timestamps: ImportTimestamps
@@ -93,10 +97,19 @@ export interface ImportStrapiDatenStatus {
 interface ImportOptions {
 	onlyChanged: boolean
 	copyMemberEmails: boolean
+	fixGroups: boolean
 	steps: ImportSteps
 }
 
-const STEP_ORDER: ImportStep[] = ['members', 'dogs', 'breeders', 'studDogs']
+const USER_GROUP_UID = 'api::user-group.user-group'
+const ZUECHTER_GROUP_KEY = 'zuechter'
+const STEP_ORDER: ImportStep[] = [
+	'members',
+	'dogs',
+	'breeders',
+	'studDogs',
+	'fixedUsers',
+]
 
 function defaultSteps(): ImportSteps {
 	return {
@@ -104,6 +117,7 @@ function defaultSteps(): ImportSteps {
 		dogs: true,
 		breeders: true,
 		studDogs: true,
+		fixedUsers: true,
 	}
 }
 
@@ -132,6 +146,7 @@ function idleJob(): JobState {
 		dogs: emptyCounts(),
 		breeders: emptyCounts(),
 		studDogs: emptyCounts(),
+		fixedUsers: emptyCounts(),
 		logFileName: null,
 		logFilePath: null,
 		error: null,
@@ -190,6 +205,7 @@ function snapshot(): Omit<ImportStrapiDatenStatus, 'timestamps'> {
 		dogs: { ...job.dogs },
 		breeders: { ...job.breeders },
 		studDogs: { ...job.studDogs },
+		fixedUsers: { ...job.fixedUsers },
 		logFileName: finished ? job.logFileName : null,
 		error: job.error,
 	}
@@ -711,6 +727,184 @@ async function runEntityStep(
 	return failed
 }
 
+function relationEntries(value: unknown): Record<string, unknown>[] {
+	if (!Array.isArray(value)) {
+		return []
+	}
+	return value.filter((entry): entry is Record<string, unknown> => {
+		return Boolean(entry) && typeof entry === 'object'
+	})
+}
+
+function benutzerName(user: Record<string, unknown>): string {
+	const firstName = typeof user.firstName === 'string' ? user.firstName.trim() : ''
+	const lastName = typeof user.lastName === 'string' ? user.lastName.trim() : ''
+	const name = `${firstName} ${lastName}`.trim()
+	const cId = typeof user.cId === 'number' ? `cId=${user.cId}` : ''
+	if (name && cId) {
+		return `${name} (${cId})`
+	}
+	if (name) {
+		return name
+	}
+	if (typeof user.email === 'string' && user.email.trim()) {
+		return user.email.trim()
+	}
+	if (cId) {
+		return cId
+	}
+	return `id=${String(user.id ?? '')}`
+}
+
+function isOwnerMember(user: Record<string, unknown>): boolean {
+	return relationEntries(user.breeders).length > 0
+}
+
+function hasZuechterGroup(user: Record<string, unknown>): boolean {
+	return relationEntries(user.user_groups).some((group) => {
+		return group.key === ZUECHTER_GROUP_KEY
+	})
+}
+
+async function loadZuechterGroup(
+	strapi: Core.Strapi,
+): Promise<{ id: number; documentId?: string } | null> {
+	const found = await strapi.db.query(USER_GROUP_UID).findOne({
+		where: { key: ZUECHTER_GROUP_KEY },
+		select: ['id', 'documentId'],
+	}) as { id?: number; documentId?: string } | null
+	if (typeof found?.id !== 'number') {
+		return null
+	}
+	return {
+		id: found.id,
+		documentId: found.documentId,
+	}
+}
+
+async function connectZuechterGroup(
+	strapi: Core.Strapi,
+	user: Record<string, unknown>,
+	group: { id: number; documentId?: string },
+) {
+	const documentId = typeof user.documentId === 'string' ? user.documentId : ''
+	if (documentId) {
+		await strapi.documents(USER_UID as never).update({
+			documentId,
+			data: {
+				user_groups: { connect: [group.id] },
+			} as never,
+		})
+		return
+	}
+	if (typeof user.id !== 'number') {
+		throw new Error('Benutzer ohne id')
+	}
+	await strapi.db.query(USER_UID).update({
+		where: { id: user.id },
+		data: {
+			user_groups: { connect: [group.id] },
+		},
+	})
+}
+
+async function fixUserData(
+	strapi: Core.Strapi,
+	options: {
+		fixGroups: boolean
+		counts: Counts
+		log: (line: string) => void
+	},
+): Promise<number> {
+	const { fixGroups, counts, log } = options
+	const label = 'Fixe Benutzerdaten'
+	const total = await countFiltered(strapi, USER_UID, {})
+	counts.processed = 0
+	counts.total = total
+	counts.skipped = 0
+	log(`${label}: ${total} Benutzer`)
+	if (fixGroups) {
+		log(`${label}: Fixe Gruppen ist aktiv`)
+	}
+
+	const group = fixGroups ? await loadZuechterGroup(strapi) : null
+	if (fixGroups && !group) {
+		log(
+			`${label}: UserGroup key=${ZUECHTER_GROUP_KEY} nicht gefunden, Relationen werden nicht angelegt`,
+		)
+	}
+
+	let imported = 0
+	let failed = 0
+	let page = 1
+	while (true) {
+		throwIfCancelled()
+		const result = await findDocumentsPage<Record<string, unknown>>(
+			strapi,
+			USER_UID,
+			{
+				populate: {
+					breeders: true,
+					user_groups: true,
+				},
+				page,
+				pageSize: PAGE_SIZE,
+			},
+		)
+		for (const user of result.results) {
+			throwIfCancelled()
+			imported += 1
+			counts.processed = imported
+			try {
+				if (!isOwnerMember(user)) {
+					continue
+				}
+				const name = benutzerName(user)
+				if (user.cFlagBreeder === true) {
+					log(
+						`${label}: Benutzer ${name} hat cFlagBreeder=true, übersprungen`,
+					)
+					continue
+				}
+				if (user.blocked === true) {
+					continue
+				}
+				if (hasZuechterGroup(user)) {
+					continue
+				}
+				log(
+					`${label}: Benutzer ${name} ist in Breeder.owner_members, aber nicht in der Gruppe Züchter`,
+				)
+				if (!fixGroups || !group) {
+					continue
+				}
+				await connectZuechterGroup(strapi, user, group)
+				log(`Benutzer ${name} in die Gruppe Züchter aufgenommen`)
+			} catch (error) {
+				if (isImportCancelled(error)) {
+					throw error
+				}
+				failed += 1
+				const recordId = readRecordId(user.cId)
+				const idLabel = recordId ? ` cId=${recordId}` : ''
+				const message = describeError(error)
+				const line = `${label}${idLabel} fehlgeschlagen: ${message}`
+				log(line)
+				strapi.log.error(`import_strapi_daten ${line}`)
+			}
+			await yieldToEventLoop()
+		}
+		if (page >= result.pagination.pageCount || result.results.length === 0) {
+			break
+		}
+		page += 1
+	}
+
+	counts.processed = imported
+	log(`${label} abgeschlossen: ${imported}/${total}, fehlgeschlagen ${failed}`)
+	return failed
+}
+
 async function loadBreedingStations(
 	strapi: Core.Strapi,
 	generation: number | null,
@@ -776,6 +970,7 @@ async function import_strapi_daten(
 			options.copyMemberEmails
 				? 'Member-Emails in user.email übernehmen'
 				: null,
+			options.fixGroups ? 'Fixe Gruppen' : null,
 		].filter((note): note is string => note !== null)
 		log(
 			startNotes.length > 0
@@ -905,9 +1100,21 @@ async function import_strapi_daten(
 			log('Aktualisiere Deckrüden übersprungen')
 		}
 
+		throwIfCancelled()
+		if (steps.fixedUsers) {
+			job.phase = 'fixedUsers'
+			failed += await fixUserData(strapi, {
+				fixGroups: options.fixGroups,
+				counts: job.fixedUsers,
+				log,
+			})
+		} else {
+			log('Fixe Benutzerdaten übersprungen')
+		}
+
 		const duration = Date.now() - startedAt
 		log(
-			`Import abgeschlossen in ${duration}ms. CS_Member=${job.members.processed} (${job.members.skipped} übersprungen), CS_Dog=${job.dogs.processed} (${job.dogs.skipped} übersprungen), Züchter=${job.breeders.processed}, Deckrüden=${job.studDogs.processed}, fehlgeschlagen=${failed}`,
+			`Import abgeschlossen in ${duration}ms. CS_Member=${job.members.processed} (${job.members.skipped} übersprungen), CS_Dog=${job.dogs.processed} (${job.dogs.skipped} übersprungen), Züchter=${job.breeders.processed}, Deckrüden=${job.studDogs.processed}, Fixe Benutzerdaten=${job.fixedUsers.processed}, fehlgeschlagen=${failed}`,
 		)
 		job.phase = 'done'
 		job.error = failed > 0
@@ -953,6 +1160,7 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
 		running = true
 		const onlyChanged = options?.onlyChanged === true
 		const copyMemberEmails = options?.copyMemberEmails === true
+		const fixGroups = options?.fixGroups === true
 		const phase = firstEnabledStep(steps) ?? 'members'
 		job = {
 			...idleJob(),
@@ -962,6 +1170,7 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
 		void import_strapi_daten(strapi, {
 			onlyChanged,
 			copyMemberEmails,
+			fixGroups,
 			steps,
 		})
 		return { started: true, reason: null, status: snapshot() }
@@ -972,6 +1181,7 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
 			|| job.phase === 'dogs'
 			|| job.phase === 'breeders'
 			|| job.phase === 'studDogs'
+			|| job.phase === 'fixedUsers'
 		if (!running && !activePhase) {
 			return { aborted: false, status: snapshot() }
 		}
@@ -1014,6 +1224,7 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
 		return import_strapi_daten(strapi, {
 			onlyChanged: false,
 			copyMemberEmails: false,
+			fixGroups: false,
 			steps,
 		})
 	},

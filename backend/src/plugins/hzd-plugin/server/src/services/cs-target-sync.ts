@@ -220,16 +220,33 @@ function isMemberBlocked(
 	return ! (joinedLongAgo && leavingUnset)
 }
 
+function emailRejectionReason(value: unknown): string | null {
+	const cleaned = cell(value)
+	if (!cleaned) {
+		return 'Email ist leer'
+	}
+	const email = cleaned.toLowerCase()
+	if (!email.includes('@')) {
+		return `Email "${cleaned}" hat eine falsche Schreibweise (enthält kein @)`
+	}
+	if (email.includes(' ')) {
+		return `Email "${cleaned}" hat eine falsche Schreibweise (enthält ein Leerzeichen)`
+	}
+	if (email.endsWith('.')) {
+		return `Email "${cleaned}" hat eine falsche Schreibweise (endet auf einen Punkt)`
+	}
+	return null
+}
+
 function parseEmail(value: unknown): string | null {
+	if (emailRejectionReason(value)) {
+		return null
+	}
 	const cleaned = cell(value)
 	if (!cleaned) {
 		return null
 	}
-	const email = cleaned.toLowerCase()
-	if (!email.includes('@') || email.includes(' ') || email.endsWith('.')) {
-		return null
-	}
-	return truncate(email, 255)
+	return truncate(cleaned.toLowerCase(), 255)
 }
 
 function parseRegion(value: unknown): string | null {
@@ -551,14 +568,25 @@ export async function updateUser(
 		data.cFlagBreeder === true ? 'cFlagBreeder=true' : null,
 		data.blocked === true ? 'blocked=true' : null,
 	].filter((reason): reason is string => reason !== null)
+	const emailFormatReason = options?.copyMemberEmails
+		? emailRejectionReason(member.Email)
+		: null
 	if (options?.copyMemberEmails && skipMemberEmailReasons.length === 0) {
+		if (emailFormatReason) {
+			log(
+				`CS_Member cId=${cId}: ${emailFormatReason}, user.email wird nicht übernommen`,
+			)
+		}
 		await applyUniqueMemberEmail(strapi, data, existing, cId, log)
 	} else if (existing) {
 		delete data.email
 	}
 	if (options?.copyMemberEmails && skipMemberEmailReasons.length > 0) {
+		const reasons = emailFormatReason
+			? [...skipMemberEmailReasons, emailFormatReason]
+			: skipMemberEmailReasons
 		log(
-			`CS_Member cId=${cId}: ${skipMemberEmailReasons.join(', ')}, user.email wird nicht übernommen`,
+			`CS_Member cId=${cId}: ${reasons.join(', ')}, user.email wird nicht übernommen`,
 		)
 	}
 	if (!existing) {

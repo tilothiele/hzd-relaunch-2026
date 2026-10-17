@@ -6,12 +6,14 @@ interface ImportSteps {
 	dogs?: boolean
 	breeders?: boolean
 	studDogs?: boolean
+	fixedUsers?: boolean
 }
 
 interface ImportService {
 	startImport: (options?: {
 		onlyChanged?: boolean
 		copyMemberEmails?: boolean
+		fixGroups?: boolean
 		steps?: ImportSteps
 	}) => {
 		started: boolean
@@ -33,7 +35,7 @@ function readSteps(value: unknown): ImportSteps {
 		return steps
 	}
 	const source = value as Record<string, unknown>
-	const keys = ['members', 'dogs', 'breeders', 'studDogs'] as const
+	const keys = ['members', 'dogs', 'breeders', 'studDogs', 'fixedUsers'] as const
 	for (const key of keys) {
 		if (typeof source[key] === 'boolean') {
 			steps[key] = source[key]
@@ -57,15 +59,18 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 			? body as {
 				onlyChanged?: unknown
 				copyMemberEmails?: unknown
+				fixGroups?: unknown
 				steps?: unknown
 			}
 			: {}
 		const onlyChanged = payload.onlyChanged === true
 		const copyMemberEmails = payload.copyMemberEmails === true
+		const fixGroups = payload.fixGroups === true
 		const steps = readSteps(payload.steps)
 		const result = getService(strapi).startImport({
 			onlyChanged,
 			copyMemberEmails,
+			fixGroups,
 			steps,
 		})
 		if (result.started) {

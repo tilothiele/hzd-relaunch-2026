@@ -149,6 +149,7 @@ function buildPageSectionsPopulate(): URLSearchParams {
 	const params = new URLSearchParams()
 	appendSectionsDeepPopulate(params, 'populate[Sections]')
 	params.set('populate[Restriction][populate][user_groups][fields][0]', 'Name')
+	params.set('populate[Restriction][populate][user_groups][fields][1]', 'key')
 	params.set('populate[ColorTheme]', '*')
 	return params
 }
