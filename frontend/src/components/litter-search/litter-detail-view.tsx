@@ -68,7 +68,7 @@ export function LitterDetailView({
     const handleZoomClose = () => setZoomImage(null)
     const orderLetter = litter.OrderLetter ?? ''
     const kennelName = litter.breeder?.kennelName ?? 'Kein Zwingername bekannt'
-    const breederMember = ((litter.breeder?.member?.firstName || '') + ' ' + (litter.breeder?.member?.lastName || '')).trim()
+    const breederMember = litter.breeder?.Address?.FullName?.trim() ?? ''
     const motherName = litter.mother?.fullKennelName ?? litter.mother?.givenName ?? 'Unbekannt'
     const stuntDogName = litter.stuntDog?.fullKennelName ?? litter.stuntDog?.givenName
     const stuntDogNonHzdOriginNote = litter.stuntDog?.NonHzdOriginNote?.trim()
@@ -271,8 +271,8 @@ export function LitterDetailView({
                         {breederMember && (
                             <DetailRow label="Name" value={breederMember} />
                         )}
-                        {litter.breeder?.member?.zip && litter.breeder?.member?.city && (
-                            <DetailRow label="Ort" value={`${litter.breeder.member.zip} ${litter.breeder.member.city}`} />
+                        {litter.breeder?.Address?.Zip && litter.breeder?.Address?.City && (
+                            <DetailRow label="Ort" value={`${litter.breeder.Address.Zip} ${litter.breeder.Address.City}`} />
                         )}
                     </div>
                 </section>

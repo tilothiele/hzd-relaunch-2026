@@ -5,7 +5,7 @@ import { Card, CardContent, CardMedia, Table, TableBody, TableCell, TableRow, Bo
 import PersonIcon from '@mui/icons-material/Person'
 import PhoneIcon from '@mui/icons-material/Phone'
 import type { Breeder, HzdSetting } from '@/types'
-import { resolveBreederContact, formatBreederLocation } from '@/lib/breeder-display-utils'
+import { findMaleOwnerDogAvatar, resolveBreederContact, formatBreederLocation } from '@/lib/breeder-display-utils'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { calculateDistance } from '@/lib/geo-utils'
 
@@ -30,19 +30,9 @@ export function StudDogCard({
 	const locationLabel = formatBreederLocation(contact)
 	const displayName = contact.ownerDisplayName
 
-	// Avatar-Fallback für breederRole=S: wenn kein breeder.avatar gesetzt ist,
-	// nimm das avatar des ersten Hundes mit owner=breeder.member, sex=M
-	const fallbackDogAvatar = (() => {
-		if (breederRole !== 'S' || breeder.avatar) return null
-		const dogs = breeder.dogs
-		console.log('[DEBUG] StudDogCard breeder.dogs:', JSON.stringify(dogs))
-		console.log('[DEBUG] StudDogCard breeder.member:', JSON.stringify(breeder.member))
-		if (!Array.isArray(dogs) || dogs.length === 0) return null
-		// Finde ersten Hund mit sex=M und avatar
-		const match = dogs.find((d) => d.avatar && d.sex === 'M')
-		console.log('[DEBUG] StudDogCard fallbackDogAvatar match:', JSON.stringify(match?.avatar))
-		return match?.avatar ?? null
-	})()
+	const fallbackDogAvatar = breederRole === 'S' && !breeder.avatar
+		? findMaleOwnerDogAvatar(breeder)
+		: null
 
 	let distance: number | null = null
 

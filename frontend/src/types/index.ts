@@ -612,11 +612,10 @@ export interface Dog {
 	NonHzdOriginNote?: string | null
 	breeder?: {
 		kennelName?: string | null
-		member?: {
-			documentId?: string
-			firstName?: string | null
-			lastName?: string | null
-			city?: string | null
+		Address?: {
+			FullName?: string | null
+			Zip?: string | null
+			City?: string | null
 		} | null
 		BreedersIntroduction?: string | null
 		HasNoDogsAvailabe?: boolean | null
@@ -652,6 +651,8 @@ export interface Address {
 	CountryCode?: string | null
 	Zip?: string | null
 	City?: string | null
+	locationLat?: number | null
+	locationLng?: number | null
 }
 
 export interface Breeder {
@@ -659,26 +660,6 @@ export interface Breeder {
 	cId?: number | null
 	kennelName?: string | null
 	breedingLicenseSince?: string | null
-	member?: {
-		id?: string | number
-		documentId: string
-		cId?: number | null
-		firstName?: string | null
-		lastName?: string | null
-		DisplayName?: string | null
-		region?: string | null
-		phone?: string | null
-		email?: string | null
-		cEmail?: string | null
-		city?: string | null
-		address1?: string | null
-		address2?: string | null
-		zip?: string | null
-		countryCode?: string | null
-
-		locationLat?: number | null
-		locationLng?: number | null
-	} | null
 	IsActive?: boolean | null
 	HasNoDogsAvailabe?: boolean | null
 	Disable?: boolean | null

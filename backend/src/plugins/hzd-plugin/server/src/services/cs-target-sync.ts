@@ -583,6 +583,12 @@ export async function updateUser(
 		log('CS_Member ohne IdPerson, User-Update übersprungen')
 		return
 	}
+	if (parseBoolean(member.PersonIsABreeder) === true) {
+		log(
+			`CS_Member cId=${cId}: PersonIsABreeder=true, User wird nicht angelegt oder aktualisiert`,
+		)
+		return
+	}
 
 	const data = mapMemberToUser(member, cId, authenticatedRoleId)
 	const existing = await findByCId(strapi, USER_UID, cId)
@@ -592,7 +598,6 @@ export async function updateUser(
 		: null
 	const mayOverwriteEmail = !existing || canOverwriteUserEmail(storedEmail)
 	const skipMemberEmailReasons = [
-		data.cFlagBreeder === true ? 'cFlagBreeder=true' : null,
 		data.blocked === true ? 'blocked=true' : null,
 	].filter((reason): reason is string => reason !== null)
 	const emailFormatReason = mayOverwriteEmail
@@ -649,7 +654,6 @@ interface OwnerMemberUser {
 	id: number
 	cId?: number | null
 	publishMyData?: boolean | null
-	cFlagBreeder?: boolean | null
 	firstName?: string | null
 	lastName?: string | null
 }
@@ -676,7 +680,6 @@ async function loadOwnerMembers(
 					'id',
 					'cId',
 					'publishMyData',
-					'cFlagBreeder',
 					'firstName',
 					'lastName',
 				],
@@ -695,19 +698,7 @@ async function prepareOwnerMembers(
 	const linked = breederId === null
 		? []
 		: await loadOwnerMembers(strapi, breederId)
-	const disconnect: number[] = []
-	const keep: OwnerMemberUser[] = []
-
-	for (const member of linked) {
-		if (member.cFlagBreeder === true) {
-			disconnect.push(member.id)
-			log(
-				`Owner-Member ${ownerMemberLabel(member)} aus der Relation entfernt, weil cFlagBreeder=true`,
-			)
-			continue
-		}
-		keep.push(member)
-	}
+	const keep = [...linked]
 
 	const current = await strapi.db.query(USER_UID).findOne({
 		where: { id: userId },
@@ -715,16 +706,12 @@ async function prepareOwnerMembers(
 			'id',
 			'cId',
 			'publishMyData',
-			'cFlagBreeder',
 			'firstName',
 			'lastName',
 		],
 	}) as OwnerMemberUser | null
-	const currentIsFlagged = current?.cFlagBreeder === true
-	const currentIsKept = linked.some(
-		(entry) => entry.id === userId && entry.cFlagBreeder !== true,
-	)
-	if (current && !currentIsFlagged && !currentIsKept) {
+	const currentIsKept = linked.some((entry) => entry.id === userId)
+	if (current && !currentIsKept) {
 		keep.push(current)
 	}
 
@@ -741,21 +728,7 @@ async function prepareOwnerMembers(
 		)
 	}
 
-	const connect: number[] = []
-	if (disconnect.length > 0 && current && !currentIsFlagged && !currentIsKept) {
-		connect.push(userId)
-	}
-	if (disconnect.length === 0 && connect.length === 0) {
-		return currentIsFlagged ? {} : null
-	}
-	const relation: Record<string, number[]> = {}
-	if (disconnect.length > 0) {
-		relation.disconnect = disconnect
-	}
-	if (connect.length > 0) {
-		relation.connect = connect
-	}
-	return relation
+	return null
 }
 
 function addressFromUser(user: Record<string, unknown>): TargetData | null {

@@ -158,10 +158,10 @@ export function ChampionsList({
                                             </td>
                                             <td className="p-2 align-top" style={{ color: theme.textColor }}>
                                                 {champion.hzd_plugin_dog?.breeder?.kennelName || '-'}
-                                                {champion.hzd_plugin_dog?.breeder?.member && (
+                                                {champion.hzd_plugin_dog?.breeder?.Address?.FullName && (
                                                     <div className="text-[0.85rem] opacity-80">
-                                                        {`${champion.hzd_plugin_dog.breeder.member.firstName || ''} ${champion.hzd_plugin_dog.breeder.member.lastName || ''}`}
-                                                        {champion.hzd_plugin_dog.breeder.member.city && `, ${champion.hzd_plugin_dog.breeder.member.city}`}
+                                                        {champion.hzd_plugin_dog.breeder.Address.FullName}
+                                                        {champion.hzd_plugin_dog.breeder.Address?.City && `, ${champion.hzd_plugin_dog.breeder.Address.City}`}
                                                     </div>
                                                 )}
                                             </td>

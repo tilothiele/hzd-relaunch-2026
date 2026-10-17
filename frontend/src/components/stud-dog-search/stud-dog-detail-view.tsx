@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { Box, Typography } from '@mui/material'
 import type { Breeder, Dog, HzdSetting } from '@/types'
-import { resolveBreederContact } from '@/lib/breeder-display-utils'
+import { findMaleOwnerDogAvatar, resolveBreederContact } from '@/lib/breeder-display-utils'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { BackButton } from '@/components/ui/back-button'
 import { theme } from '@/themes'
@@ -36,16 +36,9 @@ export function StudDogDetailView({
 	const [selectedDog, setSelectedDog] = useState<Dog | null>(null)
 	const contact = resolveBreederContact(breeder)
 
-	// Avatar-Fallback für breederRole=S: wenn kein breeder.avatar gesetzt ist,
-	// nimm das avatar des ersten Hundes mit owner=breeder.member, sex=M
-	const fallbackDogAvatar = (() => {
-		if (breederRole !== 'S' || breeder.avatar) return null
-		const dogs = breeder.dogs
-		if (!Array.isArray(dogs) || dogs.length === 0) return null
-		// Finde ersten Hund mit sex=M und avatar
-		const match = dogs.find((d) => d.avatar && d.sex === 'M')
-		return match?.avatar ?? null
-	})()
+	const fallbackDogAvatar = breederRole === 'S' && !breeder.avatar
+		? findMaleOwnerDogAvatar(breeder)
+		: null
 
 	const avatarUrl = resolveMediaUrl(
 		breeder.avatar || fallbackDogAvatar || hzdSetting?.DefaultBreederAvatar,

@@ -341,6 +341,41 @@ const controller = () => ({
 		for (const cu of chromosoftUsers) {
 			log(`Starte Verarbeitung für cId=${cu.cId}, email=${cu.email ?? 'null'}`)
 
+			if (cu.personIsBreeder) {
+				log(`Breeder-Flag aktiv für cId=${cu.cId}, User-Upsert übersprungen`)
+				const existingBreeder = await strapi.db
+					.query('plugin::hzd-plugin.breeder')
+					.findOne({
+						where: { cId: cu.cId },
+						select: ['id'],
+					})
+
+				const breederData = {
+					cId: cu.cId,
+					kennelName: cu.breedingStation,
+				}
+				log(`Breeder upsert payload cId=${cu.cId}: ${JSON.stringify(breederData)}`)
+
+				if (existingBreeder) {
+					await strapi.db.query('plugin::hzd-plugin.breeder').update({
+						where: { id: existingBreeder.id },
+						data: breederData,
+					})
+					log(`Breeder aktualisiert: id=${existingBreeder.id}, cId=${cu.cId}`)
+				} else {
+					await strapi.db.query('plugin::hzd-plugin.breeder').create({
+						data: {
+							...breederData,
+							BreederRole: 'B',
+						},
+					})
+					log(`Breeder erstellt: cId=${cu.cId}`)
+				}
+
+				stats.breedersUpserted += 1
+				continue
+			}
+
 			const wu1 = await strapi.db
 				.query('plugin::users-permissions.user')
 				.findOne({
@@ -430,39 +465,7 @@ const controller = () => ({
 				stats.usersCreated += 1
 			}
 
-			if (cu.personIsBreeder) {
-				log(`Breeder-Flag aktiv für cId=${cu.cId} -> Upsert breeder`)
-				const existingBreeder = await strapi.db
-					.query('plugin::hzd-plugin.breeder')
-					.findOne({
-						where: { cId: cu.cId },
-						select: ['id'],
-					})
-
-				const breederData = {
-					cId: cu.cId,
-					kennelName: cu.breedingStation,
-					member: persistedUser?.id ?? wu1?.id,
-				}
-				log(`Breeder upsert payload cId=${cu.cId}: ${JSON.stringify(breederData)}`)
-
-				if (existingBreeder) {
-					await strapi.db.query('plugin::hzd-plugin.breeder').update({
-						where: { id: existingBreeder.id },
-						data: breederData,
-					})
-					log(`Breeder aktualisiert: id=${existingBreeder.id}, cId=${cu.cId}`)
-				} else {
-					await strapi.db.query('plugin::hzd-plugin.breeder').create({
-						data: breederData,
-					})
-					log(`Breeder erstellt: cId=${cu.cId}`)
-				}
-
-				stats.breedersUpserted += 1
-			} else {
-				log(`Breeder-Flag nicht aktiv für cId=${cu.cId}`)
-			}
+			log(`Breeder-Flag nicht aktiv für cId=${cu.cId}`)
 		}
 
 		const finishedAt = new Date()

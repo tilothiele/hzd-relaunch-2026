@@ -54,7 +54,7 @@ const renderStatusBadge = (status: Litter['LitterStatus'], small = false) => {
 export function LitterCard({ litter, strapiBaseUrl, hzdSetting, distance, formatDate, onClick }: LitterCardProps) {
     const orderLetter = litter.OrderLetter ?? ''
     const kennelName = litter.breeder?.kennelName ?? 'Kein Zwingername bekannt'
-    const breederMember = ((litter.breeder?.member?.firstName || '') + ' ' + (litter.breeder?.member?.lastName || '')).trim()
+    const breederMember = litter.breeder?.Address?.FullName?.trim() ?? ''
     const motherName = litter.mother?.fullKennelName ?? litter.mother?.givenName ?? 'Unbekannt'
     const stuntDogName = litter.stuntDog?.fullKennelName ?? litter.stuntDog?.givenName
 

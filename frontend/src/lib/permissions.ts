@@ -185,7 +185,7 @@ function belongsToGroup(
 }
 
 export function isBreeder(user: AuthUser | null): boolean {
-	return user?.cFlagBreeder === true
+	return belongsToGroup(user, ZUECHTER_GROUP_KEY)
 }
 
 export function isZuechter(user: AuthUser | null): boolean {

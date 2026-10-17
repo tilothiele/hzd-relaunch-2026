@@ -2,9 +2,9 @@
  * Geolocation Sync Service
  *
  * Cronjob service that:
- * 1. Finds breeders with ZIP but no GeoLocation and sets it
+ * 1. Finds breeders with Address.Zip but no Address coordinates and sets them
  * 2. Finds users with ZIP but no GeoLocation and sets it
- * 3. Finds dogs without Location and sets it from their breeder's GeoLocation
+ * 3. Finds dogs without Location and sets it from their breeder's Address
  *
  * The job is idempotent and uses a lock to prevent concurrent execution.
  */
@@ -78,6 +78,80 @@ async function syncUserGeolocations(strapi: Core.Strapi): Promise<void> {
 	strapi.log.info(`[Geolocation Sync] Processed ${usersProcessed} users successfully, ${usersFailed} failed`)
 }
 
+function breederCountryCode(countryCode: unknown): string {
+	if (typeof countryCode !== 'string' || countryCode.trim() === '' || countryCode === 'D') {
+		return 'DE'
+	}
+	return countryCode
+}
+
+/**
+ * Sync geolocation for breeders with Address.Zip but no Address coordinates
+ */
+async function syncBreederAddressGeolocations(strapi: Core.Strapi): Promise<void> {
+	const breeders = await strapi.query('plugin::hzd-plugin.breeder').findMany({
+		populate: {
+			Address: true,
+		},
+	})
+
+	const breedersToProcess = breeders.filter((breeder) => {
+		const zip = typeof breeder.Address?.Zip === 'string' ? breeder.Address.Zip.trim() : ''
+		const hasNoGeo = !breeder.Address?.locationLat || !breeder.Address?.locationLng
+		return zip.length > 0 && hasNoGeo
+	})
+
+	strapi.log.info(`[Geolocation Sync] Found ${breedersToProcess.length} breeders with ZIP but no Address coordinates`)
+
+	const geolocationService = strapi.plugin('hzd-plugin')?.service('geolocation')
+	if (!geolocationService) {
+		strapi.log.error('[Geolocation Sync] Geolocation service not available, skipping breeder processing')
+		return
+	}
+
+	let breedersProcessed = 0
+	let breedersFailed = 0
+
+	for (const breeder of breedersToProcess) {
+		const address = breeder.Address
+		const zip = address.Zip.trim()
+		strapi.log.info(`[Geolocation Sync] Processing breeder ${breeder.id} with ZIP: ${zip}`)
+
+		const geoResult = await geolocationService.getGeoLocationByZip(
+			zip,
+			breederCountryCode(address.CountryCode),
+		)
+
+		if (geoResult) {
+			await strapi.documents('plugin::hzd-plugin.breeder').update({
+				documentId: breeder.documentId,
+				data: {
+					Address: {
+						FullName: address.FullName,
+						Address1: address.Address1,
+						Address2: address.Address2,
+						CountryCode: address.CountryCode,
+						Zip: address.Zip,
+						City: address.City,
+						locationLat: geoResult.lat,
+						locationLng: geoResult.lng,
+					},
+				} as any,
+			})
+
+			strapi.log.info(`[Geolocation Sync] ✓ Set Address coordinates for breeder ${breeder.id}: lat=${geoResult.lat}, lng=${geoResult.lng}`)
+			breedersProcessed++
+		} else {
+			strapi.log.warn(`[Geolocation Sync] ✗ Could not fetch geolocation for ZIP: ${zip} (breeder ${breeder.id})`)
+			breedersFailed++
+		}
+
+		await new Promise((resolve) => setTimeout(resolve, 100))
+	}
+
+	strapi.log.info(`[Geolocation Sync] Processed ${breedersProcessed} breeders successfully, ${breedersFailed} failed`)
+}
+
 /**
  * Main sync job function
  */
@@ -95,84 +169,7 @@ async function syncGeolocations(strapi: Core.Strapi): Promise<void> {
 	try {
 		strapi.log.info('[Geolocation Sync] Starting geolocation sync job')
 
-		// Step 1-3: Process breeders with ZIP but no GeoLocation
-		let breedersProcessed = 0
-		let maxIterations = 1000 // Safety limit to prevent infinite loops
-		let iteration = 0
-
-		while (iteration < maxIterations) {
-			iteration++
-
-			// Find breeders with Address populated
-			// We'll filter for those without GeoLocation and with ZIP in the code
-			const breeders = await strapi.query('plugin::hzd-plugin.breeder').findMany({
-				populate: {
-					Address: true,
-					GeoLocation: true,
-				},
-				limit: 100, // Get a batch to filter
-			})
-
-			// Filter breeders that have ZIP but no GeoLocation
-			const breederWithZip = breeders.find((b) => {
-				const address = b.Address
-				const hasZip = address && address.Zip && address.Zip.trim().length > 0
-				const hasNoGeo = !b.GeoLocation || !b.GeoLocation.lat || !b.GeoLocation.lng
-				return hasZip && hasNoGeo
-			})
-
-			if (!breederWithZip) {
-				strapi.log.info('[Geolocation Sync] No more breeders with ZIP but no GeoLocation found')
-				break
-			}
-
-			const zip = breederWithZip.Address.Zip.trim()
-			strapi.log.info(`[Geolocation Sync] Processing breeder ${breederWithZip.id} with ZIP: ${zip}`)
-
-			// Get geolocation service
-			const geolocationService = strapi.plugin('hzd-plugin')?.service('geolocation')
-			if (!geolocationService) {
-				strapi.log.error('[Geolocation Sync] Geolocation service not available')
-				break
-			}
-
-			// Fetch geolocation
-			let countryCode = breederWithZip.Address.CountryCode
-			if (!countryCode || countryCode === 'D') {
-				countryCode = 'DE'
-			}
-			const geoResult = await geolocationService.getGeoLocationByZip(zip, countryCode)
-
-			if (geoResult) {
-				// Update breeder with GeoLocation
-				await strapi.documents('plugin::hzd-plugin.breeder').update({
-					documentId: breederWithZip.documentId,
-					data: {
-						GeoLocation: {
-							lat: geoResult.lat,
-							lng: geoResult.lng,
-						},
-					} as any,
-				})
-
-				strapi.log.info(`[Geolocation Sync] ✓ Set GeoLocation for breeder ${breederWithZip.id}: lat=${geoResult.lat}, lng=${geoResult.lng}`)
-				breedersProcessed++
-			} else {
-				strapi.log.warn(`[Geolocation Sync] ✗ Could not fetch geolocation for ZIP: ${zip} (breeder ${breederWithZip.id})`)
-				// Continue with next breeder even if this one failed
-			}
-
-			// Small delay to be nice to the API
-			await new Promise((resolve) => setTimeout(resolve, 100))
-		}
-
-		if (iteration >= maxIterations) {
-			strapi.log.warn(`[Geolocation Sync] Reached max iterations (${maxIterations}), stopping breeder processing`)
-		}
-
-		strapi.log.info(`[Geolocation Sync] Processed ${breedersProcessed} breeders`)
-
-		// Step 3.5: Process users with ZIP but no GeoLocation
+		await syncBreederAddressGeolocations(strapi)
 		await syncUserGeolocations(strapi)
 
 		// Step 4-5: Process dogs without Location
@@ -181,7 +178,7 @@ async function syncGeolocations(strapi: Core.Strapi): Promise<void> {
 			populate: {
 				breeder: {
 					populate: {
-						GeoLocation: true,
+						Address: true,
 					},
 				},
 				Location: true,
@@ -198,20 +195,18 @@ async function syncGeolocations(strapi: Core.Strapi): Promise<void> {
 
 		let dogsProcessed = 0
 		for (const dog of dogs) {
-			if (!dog.breeder || !dog.breeder.GeoLocation) {
-				strapi.log.debug(`[Geolocation Sync] Dog ${dog.id} has no breeder or breeder has no GeoLocation, skipping`)
+			const address = dog.breeder?.Address
+			if (!address?.locationLat || !address?.locationLng) {
+				strapi.log.debug(`[Geolocation Sync] Dog ${dog.id} has no breeder address coordinates, skipping`)
 				continue
 			}
 
-			const geoLocation = dog.breeder.GeoLocation
-
-			// Update dog with Location from breeder
 			await strapi.documents('plugin::hzd-plugin.dog').update({
 				documentId: dog.documentId,
 				data: {
 					Location: {
-						lat: geoLocation.lat,
-						lng: geoLocation.lng,
+						lat: address.locationLat,
+						lng: address.locationLng,
 					},
 				} as any,
 			})

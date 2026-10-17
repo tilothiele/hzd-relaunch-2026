@@ -57,11 +57,6 @@
       "type": "integer",
       "unique": true
     },
-    "member": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "plugin::users-permissions.user"
-    },
     "avatar": {
       "type": "media",
       "multiple": false,

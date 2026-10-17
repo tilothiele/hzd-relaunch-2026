@@ -1,4 +1,5 @@
-import { Box, Button, Checkbox, Flex, Typography } from '@strapi/design-system';
+import { Box, Button, Checkbox, Flex, Tooltip, Typography } from '@strapi/design-system';
+import { Information } from '@strapi/icons';
 import { useFetchClient, useNotification } from '@strapi/strapi/admin';
 import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -105,6 +106,24 @@ const IDLE_STATUS: ImportStatus = {
 const shimmer = keyframes`
   0% { background-position: -40% 0; }
   100% { background-position: 140% 0; }
+`;
+
+const InfoButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #666687;
+  cursor: help;
+  line-height: 0;
+
+  &:hover,
+  &:focus-visible {
+    color: #4945ff;
+  }
 `;
 
 const BarTrack = styled.div`
@@ -255,14 +274,26 @@ function progressLabel(
   return `${detail} (${percent}%)`;
 }
 
+function StepInfo({ hint }: { hint: string }) {
+  return (
+    <Tooltip label={hint}>
+      <InfoButton type="button" aria-label={hint}>
+        <Information width="14" height="14" aria-hidden />
+      </InfoButton>
+    </Tooltip>
+  );
+}
+
 function ImportProgressBar({
   label,
+  hint,
   counts,
   active,
   finished,
   skippedText,
 }: {
   label: string;
+  hint: string;
   counts: ImportCounts;
   active: boolean;
   finished: boolean;
@@ -274,7 +305,10 @@ function ImportProgressBar({
   return (
     <Box width="100%">
       <Flex justifyContent="space-between">
-        <Typography fontWeight="bold">{label}</Typography>
+        <Flex gap={1} alignItems="center">
+          <Typography fontWeight="bold">{label}</Typography>
+          <StepInfo hint={hint} />
+        </Flex>
         <Typography textColor="neutral600">
           {indeterminate
             ? '…'
@@ -540,6 +574,34 @@ const ChromosoftImportPanel = () => {
     }),
   };
 
+  const stepHints: Record<ImportStepKey, string> = {
+    members: formatMessage({
+      id: getTranslation('chromosoft.import.membersHint'),
+      defaultMessage:
+        'Schreibt die aktuelle CS_Member-Generation in Benutzer. Züchter werden übersprungen.',
+    }),
+    dogs: formatMessage({
+      id: getTranslation('chromosoft.import.dogsHint'),
+      defaultMessage:
+        'Schreibt die aktuelle CS_Dog-Generation in Hunde.',
+    }),
+    breeders: formatMessage({
+      id: getTranslation('chromosoft.import.breedersHint'),
+      defaultMessage:
+        'Aktualisiert Züchterprofile für Benutzer mit cFlagBreeder.',
+    }),
+    studDogs: formatMessage({
+      id: getTranslation('chromosoft.import.studDogsHint'),
+      defaultMessage:
+        'Aktualisiert Deckrüden-Profile fruchtbarer Rüden anhand des Besitzers.',
+    }),
+    fixedUsers: formatMessage({
+      id: getTranslation('chromosoft.import.fixedUsersHint'),
+      defaultMessage:
+        'Setzt publishMyData für alle Owner-Members. Nimmt sie bei „Fixe Gruppen“ in die Gruppe Züchter auf, außer CS_Member.PersonIsABreeder ist true.',
+    }),
+  };
+
   const runSteps = status.phase === 'idle' ? steps : status.steps;
 
   const stepFinished = (step: ImportStepKey) => {
@@ -666,6 +728,7 @@ const ChromosoftImportPanel = () => {
               <Box style={{ flex: 1, opacity: runSteps[step] ? 1 : 0.45 }}>
                 <ImportProgressBar
                   label={stepLabels[step]}
+                  hint={stepHints[step]}
                   counts={status[step]}
                   active={status.phase === step}
                   finished={stepFinished(step)}

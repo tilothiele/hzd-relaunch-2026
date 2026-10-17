@@ -68,7 +68,6 @@ export default (): CSVExporterPlugin => ({
 				'provider',
 				'confirmed',
 				'blocked',
-				'cFlagBreeder',
 				'cFlagAccess',
 				'publishMyData',
 				'title',

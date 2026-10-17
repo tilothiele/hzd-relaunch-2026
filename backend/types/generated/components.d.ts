@@ -841,6 +841,8 @@ export interface PersonalAddress extends Struct.ComponentSchema {
       }> &
       Schema.Attribute.DefaultTo<'D'>;
     FullName: Schema.Attribute.String;
+    locationLat: Schema.Attribute.Float;
+    locationLng: Schema.Attribute.Float;
     Zip: Schema.Attribute.String &
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 5;

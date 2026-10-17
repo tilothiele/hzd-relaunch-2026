@@ -15,6 +15,7 @@ import { LitterCard } from '@/components/litter-search/litter-card'
 import { LitterDetailView } from '@/components/litter-search/litter-detail-view'
 import { TrackUmamiEvent } from '@/components/analytics/track-umami-event'
 import { formatDayMonthYear } from '@/lib/date-utils'
+import { resolveBreederContact } from '@/lib/breeder-display-utils'
 import { calculateDistance } from '@/lib/geo-utils'
 import { useLitters, type LitterStatus, type PageSize } from '@/hooks/use-litters'
 import { SubmitButton } from '@/components/ui/submit-button'
@@ -30,9 +31,15 @@ interface LitterSearchProps {
  * Ermittelt die Position eines Wurfs (real oder fake)
  */
 function getLitterLocation(litter: Litter): { lat: number; lng: number } | null {
-	const member = litter.breeder?.member
-	if (typeof member?.locationLat === 'number' && typeof member?.locationLng === 'number') {
-		return { lat: member.locationLat, lng: member.locationLng }
+	if (!litter.breeder) {
+		return null
+	}
+	const contact = resolveBreederContact(litter.breeder)
+	if (
+		typeof contact.locationLat === 'number'
+		&& typeof contact.locationLng === 'number'
+	) {
+		return { lat: contact.locationLat, lng: contact.locationLng }
 	}
 	return null
 }
@@ -182,6 +189,7 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 				const orderLetter = litter.OrderLetter ?? ''
 				const kennelName = breeder?.kennelName ?? 'Unbekannt'
 				const title = `${orderLetter}-Wurf: ${kennelName}`
+				const zip = breeder ? resolveBreederContact(breeder).zip : null
 
 				return {
 					id: litter.documentId,
@@ -198,8 +206,8 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 								<div>Erwartet: {formatDate(litter.expectedDateOfBirth)}</div>
 							) : null}
 							<div>Status: {getStatusLabel(litter.LitterStatus)}</div>
-							{breeder?.member?.zip && (
-								<div>PLZ: {breeder.member.zip}</div>
+							{zip && (
+								<div>PLZ: {zip}</div>
 							)}
 						</div>
 					)
@@ -564,7 +572,7 @@ export function LitterSearch({ strapiBaseUrl, hzdSetting }: LitterSearchProps) {
 									{litters.map((litter) => {
 										const orderLetter = litter.OrderLetter ?? ''
 										const kennelName = litter.breeder?.kennelName ?? 'Kein Zwingername bekannt'
-										const breederMember = (litter.breeder?.member?.firstName || '') + ' ' + (litter.breeder?.member?.lastName || '')
+										const breederMember = litter.breeder?.Address?.FullName?.trim() ?? ''
 										const motherName = litter.mother?.fullKennelName ?? litter.mother?.givenName ?? 'Unbekannt'
 										const stuntDogName = litter.stuntDog?.fullKennelName ?? litter.stuntDog?.givenName ?? '-'
 

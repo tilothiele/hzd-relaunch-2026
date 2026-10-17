@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-10-17T12:23:52.945Z"
+    "x-generation-date": "2026-10-17T20:23:17.313Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -22325,24 +22325,6 @@
                     "cId": {
                       "type": "integer"
                     },
-                    "member": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ]
-                        },
-                        "documentId": {
-                          "type": "string"
-                        }
-                      }
-                    },
                     "avatar": {
                       "type": "object",
                       "properties": {
@@ -24304,6 +24286,14 @@
           },
           "City": {
             "type": "string"
+          },
+          "locationLat": {
+            "type": "number",
+            "format": "float"
+          },
+          "locationLng": {
+            "type": "number",
+            "format": "float"
           }
         }
       },
@@ -27927,24 +27917,6 @@
                           },
                           "cId": {
                             "type": "integer"
-                          },
-                          "member": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "oneOf": [
-                                  {
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "number"
-                                  }
-                                ]
-                              },
-                              "documentId": {
-                                "type": "string"
-                              }
-                            }
                           },
                           "avatar": {
                             "type": "object",
@@ -31710,24 +31682,6 @@
                         },
                         "cId": {
                           "type": "integer"
-                        },
-                        "member": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "oneOf": [
-                                {
-                                  "type": "string"
-                                },
-                                {
-                                  "type": "number"
-                                }
-                              ]
-                            },
-                            "documentId": {
-                              "type": "string"
-                            }
-                          }
                         },
                         "avatar": {
                           "type": "object",
@@ -36267,24 +36221,6 @@
                     "cId": {
                       "type": "integer"
                     },
-                    "member": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ]
-                        },
-                        "documentId": {
-                          "type": "string"
-                        }
-                      }
-                    },
                     "avatar": {
                       "type": "object",
                       "properties": {
@@ -40691,24 +40627,6 @@
                           },
                           "cId": {
                             "type": "integer"
-                          },
-                          "member": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "oneOf": [
-                                  {
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "number"
-                                  }
-                                ]
-                              },
-                              "documentId": {
-                                "type": "string"
-                              }
-                            }
                           },
                           "avatar": {
                             "type": "object",
@@ -48082,24 +48000,6 @@
                       "cId": {
                         "type": "integer"
                       },
-                      "member": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "oneOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "number"
-                              }
-                            ]
-                          },
-                          "documentId": {
-                            "type": "string"
-                          }
-                        }
-                      },
                       "avatar": {
                         "type": "object",
                         "properties": {
@@ -51587,24 +51487,6 @@
                           },
                           "cId": {
                             "type": "integer"
-                          },
-                          "member": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "oneOf": [
-                                  {
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "number"
-                                  }
-                                ]
-                              },
-                              "documentId": {
-                                "type": "string"
-                              }
-                            }
                           },
                           "avatar": {
                             "type": "object",
@@ -55559,24 +55441,6 @@
                     },
                     "cId": {
                       "type": "integer"
-                    },
-                    "member": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ]
-                        },
-                        "documentId": {
-                          "type": "string"
-                        }
-                      }
                     },
                     "avatar": {
                       "type": "object",
@@ -64943,24 +64807,6 @@
                           "cId": {
                             "type": "integer"
                           },
-                          "member": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "oneOf": [
-                                  {
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "number"
-                                  }
-                                ]
-                              },
-                              "documentId": {
-                                "type": "string"
-                              }
-                            }
-                          },
                           "avatar": {
                             "type": "object",
                             "properties": {
@@ -68875,24 +68721,6 @@
                     },
                     "cId": {
                       "type": "integer"
-                    },
-                    "member": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ]
-                        },
-                        "documentId": {
-                          "type": "string"
-                        }
-                      }
                     },
                     "avatar": {
                       "type": "object",
@@ -75985,24 +75813,6 @@
                               },
                               "cId": {
                                 "type": "integer"
-                              },
-                              "member": {
-                                "type": "object",
-                                "properties": {
-                                  "id": {
-                                    "oneOf": [
-                                      {
-                                        "type": "string"
-                                      },
-                                      {
-                                        "type": "number"
-                                      }
-                                    ]
-                                  },
-                                  "documentId": {
-                                    "type": "string"
-                                  }
-                                }
                               },
                               "avatar": {
                                 "type": "object",
@@ -91885,24 +91695,6 @@
                     "cId": {
                       "type": "integer"
                     },
-                    "member": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ]
-                        },
-                        "documentId": {
-                          "type": "string"
-                        }
-                      }
-                    },
                     "avatar": {
                       "type": "object",
                       "properties": {
@@ -96095,24 +95887,6 @@
                     "cId": {
                       "type": "integer"
                     },
-                    "member": {
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            }
-                          ]
-                        },
-                        "documentId": {
-                          "type": "string"
-                        }
-                      }
-                    },
                     "avatar": {
                       "type": "object",
                       "properties": {
@@ -99906,24 +99680,6 @@
                               },
                               "cId": {
                                 "type": "integer"
-                              },
-                              "member": {
-                                "type": "object",
-                                "properties": {
-                                  "id": {
-                                    "oneOf": [
-                                      {
-                                        "type": "string"
-                                      },
-                                      {
-                                        "type": "number"
-                                      }
-                                    ]
-                                  },
-                                  "documentId": {
-                                    "type": "string"
-                                  }
-                                }
                               },
                               "avatar": {
                                 "type": "object",
@@ -108027,24 +107783,6 @@
                       },
                       "cId": {
                         "type": "integer"
-                      },
-                      "member": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "oneOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "number"
-                              }
-                            ]
-                          },
-                          "documentId": {
-                            "type": "string"
-                          }
-                        }
                       },
                       "avatar": {
                         "type": "object",

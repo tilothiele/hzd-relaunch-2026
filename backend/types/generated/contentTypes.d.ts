@@ -2240,10 +2240,6 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
       'plugin::hzd-plugin.breeder'
     > &
       Schema.Attribute.Private;
-    member: Schema.Attribute.Relation<
-      'oneToOne',
-      'plugin::users-permissions.user'
-    >;
     owner_members: Schema.Attribute.Relation<
       'manyToMany',
       'plugin::users-permissions.user'
