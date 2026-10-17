@@ -7,6 +7,43 @@ import { getTranslation } from '../utils/getTranslation';
 import { ChromosoftImportPanel } from './ChromosoftImportPanel';
 import { LitterReminderPanel } from './LitterReminderPanel';
 
+function escapeHtml(value: string) {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
+}
+
+function renderReportDocument(
+  reportWindow: Window,
+  title: string,
+  body: string,
+) {
+  reportWindow.document.open();
+  reportWindow.document.write(`<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>${escapeHtml(title)}</title>
+<style>
+  body {
+    margin: 24px;
+    color: #212134;
+    background: #ffffff;
+    font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+</style>
+</head>
+<body><pre>${escapeHtml(body)}</pre></body>
+</html>`);
+  reportWindow.document.close();
+}
+
 const HomePage = () => {
   const { formatMessage } = useIntl();
   const { get } = useFetchClient();
@@ -16,11 +53,34 @@ const HomePage = () => {
   const handleGenerateReport = async ({
     endpoint,
     errorMessageId,
+    title,
   }: {
     endpoint: string;
     errorMessageId: string;
+    title: string;
   }) => {
-    const reportWindow = window.open('', '_blank', 'noopener,noreferrer');
+    const reportWindow = window.open('', '_blank');
+
+    if (!reportWindow) {
+      toggleNotification({
+        type: 'warning',
+        message: formatMessage({
+          id: getTranslation('reports.popupBlocked'),
+          defaultMessage:
+            'Das Report-Fenster wurde vom Browser blockiert.',
+        }),
+      });
+      return;
+    }
+
+    renderReportDocument(
+      reportWindow,
+      title,
+      formatMessage({
+        id: getTranslation('reports.loading'),
+        defaultMessage: 'Report wird generiert …',
+      }),
+    );
 
     try {
       setGeneratingReport(endpoint);
@@ -31,20 +91,15 @@ const HomePage = () => {
         typeof response.data === 'string'
           ? response.data
           : JSON.stringify(response.data, null, 2);
-      const blob = new Blob([reportData], {
-        type: 'text/plain;charset=utf-8',
-      });
-      const reportUrl = URL.createObjectURL(blob);
 
-      if (reportWindow) {
-        reportWindow.location.href = reportUrl;
-      } else {
-        window.open(reportUrl, '_blank', 'noopener,noreferrer');
+      if (!reportWindow.closed) {
+        renderReportDocument(reportWindow, title, reportData);
+        reportWindow.focus();
       }
-
-      window.setTimeout(() => URL.revokeObjectURL(reportUrl), 60_000);
     } catch (error) {
-      reportWindow?.close();
+      if (!reportWindow.closed) {
+        reportWindow.close();
+      }
       toggleNotification({
         type: 'danger',
         message: formatMessage({
@@ -113,6 +168,10 @@ const HomePage = () => {
                   handleGenerateReport({
                     endpoint: '/hzd-plugin/reports/users',
                     errorMessageId: 'reports.users.error',
+                    title: formatMessage({
+                      id: getTranslation('reports.users.title'),
+                      defaultMessage: 'Benutzer-Report',
+                    }),
                   })
                 }
               >
@@ -158,6 +217,10 @@ const HomePage = () => {
                   handleGenerateReport({
                     endpoint: '/hzd-plugin/reports/breeders',
                     errorMessageId: 'reports.breeders.error',
+                    title: formatMessage({
+                      id: getTranslation('reports.breeders.title'),
+                      defaultMessage: 'Breeder-Report',
+                    }),
                   })
                 }
               >

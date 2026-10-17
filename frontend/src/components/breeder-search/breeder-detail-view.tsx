@@ -5,7 +5,7 @@ import { Box, Typography, Divider } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import Image from 'next/image'
 import type { Breeder, Dog, HzdSetting } from '@/types'
-import { resolveBreederContact } from '@/lib/breeder-display-utils'
+import { findMaleOwnerDogAvatar, resolveBreederContact } from '@/lib/breeder-display-utils'
 import { getBreederByDocumentId } from '@/lib/strapi/api'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { theme } from '@/themes'
@@ -77,20 +77,9 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack, 
         }
     }, [breeder.documentId])
 
-    // Avatar-Fallback für breederRole=S: wenn kein breeder.avatar gesetzt ist,
-    // nimm das avatar des ersten Hundes mit owner=breeder.member, sex=M
-    const fallbackDogAvatar = (() => {
-        if (breederRole !== 'S' || breeder.avatar) return null
-        const dogs = breeder.dogs
-        if (!Array.isArray(dogs)) return null
-        const match = dogs.find(
-            (d) =>
-                d.avatar &&
-                (d.owner?.id === breeder.member?.id || d.owner?.documentId === breeder.member?.documentId) &&
-                d.sex === 'M',
-        )
-        return match?.avatar ?? null
-    })()
+    const fallbackDogAvatar = breederRole === 'S' && !breeder.avatar
+        ? findMaleOwnerDogAvatar(breeder)
+        : null
 
     const avatarUrl = resolveMediaUrl(
         breederDetails.avatar || fallbackDogAvatar || hzdSetting?.DefaultBreederAvatar,

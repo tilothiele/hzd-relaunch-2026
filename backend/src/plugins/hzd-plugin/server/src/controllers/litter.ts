@@ -235,7 +235,6 @@ async function findOwnedBreeder(
     documentId: breederDocumentId,
     populate: {
       owner_members: true,
-      member: true,
     },
   })
 }
@@ -266,9 +265,7 @@ const LITTERED_FIRST_POPULATE = {
   breeder: {
     fields: ['documentId', 'kennelName', 'WebsiteUrl'],
     populate: {
-      member: {
-        fields: ['documentId', 'firstName', 'lastName', 'zip', 'city', 'locationLat', 'locationLng'],
-      },
+      Address: true,
     },
   },
   mother: {
@@ -362,7 +359,6 @@ const coreControllerFactory = factories.createCoreController(
             breeder: {
               populate: {
                 owner_members: true,
-                member: true,
               },
             },
           },

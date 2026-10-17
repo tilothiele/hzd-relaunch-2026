@@ -25,6 +25,7 @@ import type { Breeder, HzdSetting } from '@/types'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
 import { ViewToggle } from '@/components/common/view-toggle'
+import { resolveBreederContact } from '@/lib/breeder-display-utils'
 import { calculateDistance } from '@/lib/geo-utils'
 import { theme } from '@/themes'
 import { StudDogCard } from './stud-dog-card'
@@ -61,7 +62,7 @@ export function StudDogSearch({
 		lat: number
 		lng: number
 	} | null>(null)
-	const [sortField, setSortField] = useState<SortField>('member.lastName')
+	const [sortField, setSortField] = useState<SortField>('fullName')
 	const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
 
 	const userLocation = zipLocation || null
@@ -155,27 +156,24 @@ export function StudDogSearch({
 	const mapItems = useMemo<MapItem[]>(() => {
 		return breeders
 			.map((breeder): MapItem | null => {
-				const lat = breeder.member?.locationLat
-				const lng = breeder.member?.locationLng
-
-				if (typeof lat !== 'number' || typeof lng !== 'number') {
+				const contact = resolveBreederContact(breeder)
+				if (
+					typeof contact.locationLat !== 'number'
+					|| typeof contact.locationLng !== 'number'
+				) {
 					return null
 				}
 
+				const title = contact.ownerDisplayName || 'Unbekannt'
+
 				return {
 					id: breeder.documentId,
-					position: [lat, lng] as [number, number],
-					title: [breeder.member?.firstName, breeder.member?.lastName]
-						.filter(Boolean)
-						.join(' ') || 'Unbekannt',
+					position: [contact.locationLat, contact.locationLng] as [number, number],
+					title,
 					popupContent: (
 						<div>
-							<strong>
-								{[breeder.member?.firstName, breeder.member?.lastName]
-									.filter(Boolean)
-									.join(' ') || 'Unbekannt'}
-							</strong>
-							{breeder.member?.firstName && breeder.member?.lastName && (
+							<strong>{title}</strong>
+							{contact.ownerDisplayName && (
 								<div>
 									Deckrüdenbesitzer
 								</div>
@@ -348,39 +346,39 @@ export function StudDogSearch({
 									<TableRow>
 										<TableCell sx={{ fontWeight: 'bold' }}>
 											<TableSortLabel
-												active={sortField === 'member.lastName'}
+												active={sortField === 'fullName'}
 												direction={
-													sortField === 'member.lastName'
+													sortField === 'fullName'
 														? sortDirection
 														: 'asc'
 												}
-												onClick={() => handleSort('member.lastName')}
+												onClick={() => handleSort('fullName')}
 											>
 												Deckrüdenbesitzer
 											</TableSortLabel>
 										</TableCell>
 										<TableCell sx={{ fontWeight: 'bold' }}>
 											<TableSortLabel
-												active={sortField === 'member.zip'}
+												active={sortField === 'zip'}
 												direction={
-													sortField === 'member.zip'
+													sortField === 'zip'
 														? sortDirection
 														: 'asc'
 												}
-												onClick={() => handleSort('member.zip')}
+												onClick={() => handleSort('zip')}
 											>
 												PLZ
 											</TableSortLabel>
 										</TableCell>
 										<TableCell sx={{ fontWeight: 'bold' }}>
 											<TableSortLabel
-												active={sortField === 'member.city'}
+												active={sortField === 'city'}
 												direction={
-													sortField === 'member.city'
+													sortField === 'city'
 														? sortDirection
 														: 'asc'
 												}
-												onClick={() => handleSort('member.city')}
+												onClick={() => handleSort('city')}
 											>
 												Ort
 											</TableSortLabel>
@@ -398,22 +396,19 @@ export function StudDogSearch({
 								</TableHead>
 								<TableBody>
 									{breeders.map((breeder) => {
-										const memberName = [
-											breeder.member?.firstName,
-											breeder.member?.lastName,
-										].filter(Boolean).join(' ')
+										const contact = resolveBreederContact(breeder)
 										let distance: number | null = null
 
 										if (
-											userLocation &&
-											typeof breeder.member?.locationLat === 'number' &&
-											typeof breeder.member?.locationLng === 'number'
+											userLocation
+											&& typeof contact.locationLat === 'number'
+											&& typeof contact.locationLng === 'number'
 										) {
 											distance = calculateDistance(
 												userLocation.lat,
 												userLocation.lng,
-												breeder.member.locationLat,
-												breeder.member.locationLng,
+												contact.locationLat,
+												contact.locationLng,
 											)
 										}
 
@@ -424,11 +419,11 @@ export function StudDogSearch({
 												onClick={() => handleBreederClick(breeder)}
 												sx={{ cursor: 'pointer' }}
 											>
-												<TableCell>{memberName || '-'}</TableCell>
-												<TableCell>{breeder.member?.zip || '-'}</TableCell>
-												<TableCell>{breeder.member?.city || '-'}</TableCell>
-												<TableCell>{breeder.member?.phone || '-'}</TableCell>
-												<TableCell>{breeder.member?.cEmail || '-'}</TableCell>
+												<TableCell>{contact.ownerDisplayName || '-'}</TableCell>
+												<TableCell>{contact.zip || '-'}</TableCell>
+												<TableCell>{contact.city || '-'}</TableCell>
+												<TableCell>{contact.phone || '-'}</TableCell>
+												<TableCell>{contact.email || '-'}</TableCell>
 												<TableCell>
 													{distance !== null
 														? `~${Math.round(distance)} km`

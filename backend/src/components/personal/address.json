@@ -26,6 +26,12 @@
     },
     "City": {
       "type": "string"
+    },
+    "locationLat": {
+      "type": "float"
+    },
+    "locationLng": {
+      "type": "float"
     }
   },
   "config": {}

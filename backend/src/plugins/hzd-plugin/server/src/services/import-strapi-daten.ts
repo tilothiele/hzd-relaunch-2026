@@ -755,6 +755,15 @@ function benutzerName(user: Record<string, unknown>): string {
 	return `id=${String(user.id ?? '')}`
 }
 
+function csMemberIsBreeder(value: unknown): boolean {
+	const text = typeof value === 'number'
+		? String(value)
+		: typeof value === 'string'
+			? value.trim().toLowerCase()
+			: ''
+	return text === '1' || text === 'true'
+}
+
 function isOwnerMember(user: Record<string, unknown>): boolean {
 	return relationEntries(user.breeders).length > 0
 }
@@ -762,6 +771,12 @@ function isOwnerMember(user: Record<string, unknown>): boolean {
 function hasZuechterGroup(user: Record<string, unknown>): boolean {
 	return relationEntries(user.user_groups).some((group) => {
 		return group.key === ZUECHTER_GROUP_KEY
+	})
+}
+
+function hasBreederRoleB(user: Record<string, unknown>): boolean {
+	return relationEntries(user.breeders).some((breeder) => {
+		return breeder.BreederRole === 'B'
 	})
 }
 
@@ -807,6 +822,33 @@ async function connectZuechterGroup(
 	})
 }
 
+async function setOwnerMemberPublishMyData(
+	strapi: Core.Strapi,
+	user: Record<string, unknown>,
+	log: (line: string) => void,
+) {
+	if (user.publishMyData === true) {
+		return
+	}
+	const documentId = typeof user.documentId === 'string' ? user.documentId : ''
+	if (documentId) {
+		await strapi.documents(USER_UID as never).update({
+			documentId,
+			data: { publishMyData: true } as never,
+		})
+	} else if (typeof user.id === 'number') {
+		await strapi.db.query(USER_UID).update({
+			where: { id: user.id },
+			data: { publishMyData: true },
+		})
+	} else {
+		throw new Error('Benutzer ohne id')
+	}
+	log(
+		`publishMyData für Benutzer ${benutzerName(user)} auf true gesetzt`,
+	)
+}
+
 async function fixUserData(
 	strapi: Core.Strapi,
 	options: {
@@ -826,6 +868,24 @@ async function fixUserData(
 		log(`${label}: Fixe Gruppen ist aktiv`)
 	}
 
+	const memberGeneration = await loadCurrentGeneration(
+		strapi,
+		'ImportGenerationCSMembers',
+	)
+	const membersByPerson = memberGeneration
+		? await loadGenerationById(
+			strapi,
+			CS_MEMBER_UID,
+			memberGeneration,
+			'IdPerson',
+		)
+		: new Map<string, Record<string, unknown>>()
+	if (!memberGeneration) {
+		log(
+			`${label}: keine ImportGenerationCSMembers, PersonIsABreeder wird nicht geprüft`,
+		)
+	}
+
 	const group = fixGroups ? await loadZuechterGroup(strapi) : null
 	if (fixGroups && !group) {
 		log(
@@ -842,6 +902,15 @@ async function fixUserData(
 			strapi,
 			USER_UID,
 			{
+				fields: [
+					'documentId',
+					'firstName',
+					'lastName',
+					'email',
+					'cId',
+					'publishMyData',
+					'blocked',
+				],
 				populate: {
 					breeders: true,
 					user_groups: true,
@@ -859,9 +928,12 @@ async function fixUserData(
 					continue
 				}
 				const name = benutzerName(user)
-				if (user.cFlagBreeder === true) {
+				await setOwnerMemberPublishMyData(strapi, user, log)
+				const personId = readRecordId(user.cId)
+				const member = personId ? membersByPerson.get(personId) : undefined
+				if (csMemberIsBreeder(member?.PersonIsABreeder)) {
 					log(
-						`${label}: Benutzer ${name} hat cFlagBreeder=true, übersprungen`,
+						`${label}: Benutzer ${name} hat CS_Member.PersonIsABreeder=true, übersprungen`,
 					)
 					continue
 				}
@@ -869,6 +941,9 @@ async function fixUserData(
 					continue
 				}
 				if (hasZuechterGroup(user)) {
+					continue
+				}
+				if (!hasBreederRoleB(user)) {
 					continue
 				}
 				log(

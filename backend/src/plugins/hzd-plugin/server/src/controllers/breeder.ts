@@ -38,9 +38,6 @@ const MEMBER_CONTACT_FIELDS = [
 ] as const
 
 const BREEDER_SEARCH_POPULATE = {
-	member: {
-		fields: ['id', ...MEMBER_CONTACT_FIELDS],
-	},
 	avatar: true,
 	Address: true,
 	owner_members: {
@@ -113,10 +110,10 @@ const toFilterConditions = (query: BreederSearchQuery): Array<Record<string, unk
 		conditions.push({
 			$or: [
 				{ kennelName: { $containsi: name } },
-				{ member: { lastName: { $containsi: name } } },
-				{ member: { firstName: { $containsi: name } } },
-				{ member: { DisplayName: { $containsi: name } } },
-				{ member: { username: { $containsi: name } } },
+				{ Address: { FullName: { $containsi: name } } },
+				{ owner_members: { lastName: { $containsi: name } } },
+				{ owner_members: { firstName: { $containsi: name } } },
+				{ owner_members: { DisplayName: { $containsi: name } } },
 			],
 		})
 	}
@@ -146,7 +143,6 @@ const coreControllerFactory = factories.createCoreController(
 				.findOne({
 					where: { documentId },
 					populate: {
-						member: { fields: ['id', ...MEMBER_CONTACT_FIELDS] },
 						avatar: true,
 						Address: true,
 						owner_members: { fields: ['id', ...MEMBER_CONTACT_FIELDS] },

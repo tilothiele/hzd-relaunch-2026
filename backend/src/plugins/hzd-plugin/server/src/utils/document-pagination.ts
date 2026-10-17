@@ -10,6 +10,7 @@ export interface DocumentPaginationMeta {
 export interface FindDocumentsPageOptions {
 	filters?: Record<string, unknown>
 	populate?: Record<string, unknown>
+	fields?: string[]
 	sort?: string | string[]
 	page: number
 	pageSize: number
@@ -26,12 +27,13 @@ export async function findDocumentsPage<T = Record<string, unknown>>(
 	uid: string,
 	options: FindDocumentsPageOptions,
 ): Promise<FindDocumentsPageResult<T>> {
-	const { page, pageSize, filters, populate, sort, status } = options
+	const { page, pageSize, filters, populate, fields, sort, status } = options
 	const start = (page - 1) * pageSize
 
 	const baseQuery: Record<string, unknown> = {}
 	if (filters) baseQuery.filters = filters
 	if (populate) baseQuery.populate = populate
+	if (fields) baseQuery.fields = fields
 	if (sort) baseQuery.sort = sort
 	if (status) baseQuery.status = status
 
@@ -45,8 +47,9 @@ export async function findDocumentsPage<T = Record<string, unknown>>(
 			limit: pageSize,
 		}) as Promise<T[]>,
 		docService.count({
-			...baseQuery,
-		}) as Promise<number>,
+			filters,
+			status,
+		} as never) as Promise<number>,
 	])
 
 	const safeTotal = typeof total === 'number' ? total : results.length

@@ -10,7 +10,7 @@ function createUserReportHeader(): string[] {
     'Benutzer-Report',
     `Generiert am: ${new Date().toISOString()}`,
     '',
-    'Pruefung: User mit publishMyData=true muessen mindestens einem Breeder als Owner-Member zugeordnet sein.',
+    'Pruefung: Jeder User, der als Breeder.owner_members referenziert ist, muss publishMyData=true haben.',
     '',
   ];
 }
@@ -35,46 +35,63 @@ const controller = ({ strapi }: { strapi: Core.Strapi }): Record<string, any> =>
   },
 
   async userReport(ctx: any) {
-    const users = await strapi.db.query('plugin::users-permissions.user').findMany({
-      where: {
-        publishMyData: true,
-      },
+    const breeders = await strapi.db.query('plugin::hzd-plugin.breeder').findMany({
       populate: {
-        breeders: {
-          select: ['id', 'documentId', 'kennelName'],
+        owner_members: {
+          select: ['id', 'documentId', 'firstName', 'lastName', 'email', 'publishMyData'],
         },
       },
-      select: ['id', 'documentId', 'firstName', 'lastName', 'email', 'publishMyData', 'cFlagBreeder'],
-      orderBy: [{ lastName: 'asc' }, { firstName: 'asc' }, { email: 'asc' }],
+      select: ['id', 'documentId', 'kennelName'],
+      orderBy: { kennelName: 'asc' },
     });
 
-    const lines = createUserReportHeader();
-    let findings = 0;
+    const findingsByUserId = new Map<string, { user: any; kennelNames: string[] }>();
 
-    for (const user of users) {
-      if (user.cFlagBreeder) {
-        continue;
+    for (const breeder of breeders) {
+      const kennelName = breeder.kennelName || breeder.documentId || `Breeder ${breeder.id}`;
+
+      for (const user of breeder.owner_members ?? []) {
+        if (user.publishMyData === true) {
+          continue;
+        }
+
+        const userKey = String(user.id ?? user.documentId);
+        const existing = findingsByUserId.get(userKey);
+
+        if (existing) {
+          existing.kennelNames.push(kennelName);
+          continue;
+        }
+
+        findingsByUserId.set(userKey, {
+          user,
+          kennelNames: [kennelName],
+        });
       }
-      const breeders = user.breeders ?? [];
-
-      if (breeders.length > 0) {
-        continue;
-      }
-
-      findings += 1;
-      lines.push(
-        [
-          `WARNUNG ${findings}:`,
-          `User "${createUserLabel(user)}"`,
-          'hat publishMyData, ist aber keinem Breeder Objekt zugeordnet.',
-        ].join(' '),
-      );
     }
 
-    if (findings === 0) {
+    const findings = [...findingsByUserId.values()].sort((left, right) =>
+      createUserLabel(left.user).localeCompare(createUserLabel(right.user), 'de'),
+    );
+    const findingCount = findings.length;
+    const lines = createUserReportHeader();
+
+    findings.forEach((finding, index) => {
+      const kennelNames = finding.kennelNames.filter(Boolean).join(', ');
+      lines.push(
+        [
+          `WARNUNG ${index + 1}:`,
+          `User "${createUserLabel(finding.user)}"`,
+          `ist Owner-Member von "${kennelNames}",`,
+          'hat aber publishMyData nicht aktiviert.',
+        ].join(' '),
+      );
+    });
+
+    if (findingCount === 0) {
       lines.push('Keine Auffaelligkeiten gefunden.');
     } else {
-      lines.push('', `Summe Auffaelligkeiten: ${findings}`);
+      lines.push('', `Summe Auffaelligkeiten: ${findingCount}`);
     }
 
     ctx.type = 'text/plain; charset=utf-8';

@@ -189,13 +189,13 @@ function ZwingerEditor({ breeder, strapiBaseUrl, onBreederUpdated }: ZwingerEdit
                         )}
 
                         <Typography variant='body2' color='text.secondary'>Name</Typography>
-                        <Typography variant='body1' gutterBottom>{breeder.member?.firstName} {breeder.member?.lastName}</Typography>
+                        <Typography variant='body1' gutterBottom>{breeder.Address?.FullName || '-'}</Typography>
 
                         <Typography variant='body2' color='text.secondary'>Straße</Typography>
-                        <Typography variant='body1' gutterBottom>{breeder.member?.address1 || '-'}</Typography>
+                        <Typography variant='body1' gutterBottom>{breeder.Address?.Address1 || '-'}</Typography>
 
                         <Typography variant='body2' color='text.secondary'>Ort</Typography>
-                        <Typography variant='body1'>{breeder.member?.zip} {breeder.member?.city}</Typography>
+                        <Typography variant='body1'>{[breeder.Address?.Zip, breeder.Address?.City].filter(Boolean).join(' ') || '-'}</Typography>
                     </Box>
                 </Box>
 

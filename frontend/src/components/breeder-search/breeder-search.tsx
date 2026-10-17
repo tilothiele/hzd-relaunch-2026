@@ -20,7 +20,8 @@ import { BreederSearchForm } from './breeder-search-form'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { theme } from '@/themes'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
-import { calculateDistance, readPosition } from '@/lib/geo-utils'
+import { resolveBreederContact } from '@/lib/breeder-display-utils'
+import { calculateDistance } from '@/lib/geo-utils'
 import { ViewToggle } from '@/components/common/view-toggle'
 
 interface BreederSearchProps {
@@ -151,23 +152,23 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 	const mapItems = useMemo<MapItem[]>(() => {
 		return breeders
 			.map((breeder): MapItem | null => {
-				const position = readPosition(
-					breeder.member?.locationLat,
-					breeder.member?.locationLng,
-				)
-				if (!position) {
+				const contact = resolveBreederContact(breeder)
+				if (
+					typeof contact.locationLat !== 'number'
+					|| typeof contact.locationLng !== 'number'
+				) {
 					return null
 				}
 
 				return {
 					id: breeder.documentId,
-					position: [position.lat, position.lng] as [number, number],
+					position: [contact.locationLat, contact.locationLng] as [number, number],
 					title: breeder.kennelName || 'Unbekannt',
 					popupContent: (
 						<div>
 							<strong>{breeder.kennelName}</strong>
-							{breeder.member?.firstName && breeder.member?.lastName && (
-								<div>{breeder.member.firstName} {breeder.member.lastName}</div>
+							{contact.ownerDisplayName && (
+								<div>{contact.ownerDisplayName}</div>
 							)}
 						</div>
 					),
@@ -345,45 +346,45 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 											</TableCell>
 											<TableCell sx={{ fontWeight: 'bold' }}>
 												<TableSortLabel
-													active={sortField === 'member.lastName'}
-													direction={sortField === 'member.lastName' ? sortDirection : 'asc'}
-													onClick={() => handleSort('member.lastName')}
+													active={sortField === 'fullName'}
+													direction={sortField === 'fullName' ? sortDirection : 'asc'}
+													onClick={() => handleSort('fullName')}
 												>
 													Züchter
 												</TableSortLabel>
 											</TableCell>
 											<TableCell sx={{ fontWeight: 'bold' }}>
 												<TableSortLabel
-													active={sortField === 'member.zip'}
-													direction={sortField === 'member.zip' ? sortDirection : 'asc'}
-													onClick={() => handleSort('member.zip')}
+													active={sortField === 'zip'}
+													direction={sortField === 'zip' ? sortDirection : 'asc'}
+													onClick={() => handleSort('zip')}
 												>
 													PLZ
 												</TableSortLabel>
 											</TableCell>
 											<TableCell sx={{ fontWeight: 'bold' }}>
 												<TableSortLabel
-													active={sortField === 'member.city'}
-													direction={sortField === 'member.city' ? sortDirection : 'asc'}
-													onClick={() => handleSort('member.city')}
+													active={sortField === 'city'}
+													direction={sortField === 'city' ? sortDirection : 'asc'}
+													onClick={() => handleSort('city')}
 												>
 													Ort
 												</TableSortLabel>
 											</TableCell>
 											<TableCell sx={{ fontWeight: 'bold' }}>
 												<TableSortLabel
-													active={sortField === 'member.phone'}
-													direction={sortField === 'member.phone' ? sortDirection : 'asc'}
-													onClick={() => handleSort('member.phone')}
+													active={sortField === 'phone'}
+													direction={sortField === 'phone' ? sortDirection : 'asc'}
+													onClick={() => handleSort('phone')}
 												>
 													Telefon
 												</TableSortLabel>
 											</TableCell>
 											<TableCell sx={{ fontWeight: 'bold' }}>
 												<TableSortLabel
-													active={sortField === 'member.cEmail'}
-													direction={sortField === 'member.cEmail' ? sortDirection : 'asc'}
-													onClick={() => handleSort('member.cEmail')}
+													active={sortField === 'cEmail'}
+													direction={sortField === 'cEmail' ? sortDirection : 'asc'}
+													onClick={() => handleSort('cEmail')}
 												>
 													E-Mail
 												</TableSortLabel>
@@ -395,18 +396,18 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 									</TableHead>
 									<TableBody>
 										{breeders.map((breeder) => {
-											const memberName = ((breeder.member?.firstName || '') + ' ' + (breeder.member?.lastName || '')).trim()
+											const contact = resolveBreederContact(breeder)
 											let distance: number | null = null
-											const breederPosition = readPosition(
-												breeder.member?.locationLat,
-												breeder.member?.locationLng,
-											)
-											if (userLocation && breederPosition) {
+											if (
+												userLocation
+												&& typeof contact.locationLat === 'number'
+												&& typeof contact.locationLng === 'number'
+											) {
 												distance = calculateDistance(
 													userLocation.lat,
 													userLocation.lng,
-													breederPosition.lat,
-													breederPosition.lng,
+													contact.locationLat,
+													contact.locationLng,
 												)
 											}
 
@@ -434,11 +435,11 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 															breeder.kennelName || '-'
 														)}
 													</TableCell>
-													<TableCell>{memberName || '-'}</TableCell>
-													<TableCell>{breeder.member?.zip || '-'}</TableCell>
-													<TableCell>{breeder.member?.city || '-'}</TableCell>
-													<TableCell>{breeder.member?.phone || '-'}</TableCell>
-													<TableCell>{breeder.member?.cEmail || '-'}</TableCell>
+													<TableCell>{contact.ownerDisplayName || '-'}</TableCell>
+													<TableCell>{contact.zip || '-'}</TableCell>
+													<TableCell>{contact.city || '-'}</TableCell>
+													<TableCell>{contact.phone || '-'}</TableCell>
+													<TableCell>{contact.email || '-'}</TableCell>
 													<TableCell>{distance !== null ? `~${Math.round(distance)} km` : '-'}</TableCell>
 												</TableRow>
 											)

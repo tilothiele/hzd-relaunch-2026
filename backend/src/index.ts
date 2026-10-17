@@ -164,6 +164,31 @@ export default {
 				}
 			}
 
+			if (
+				context.uid === 'plugin::hzd-plugin.breeder'
+				&& (context.action === 'create' || context.action === 'update')
+			) {
+				const data = (context.params as any).data;
+				const address = data?.Address;
+				if (address && typeof address === 'object' && !Array.isArray(address)) {
+					const zip = typeof address.Zip === 'string' ? address.Zip.trim() : '';
+					if (zip) {
+						const geo = strapi.plugin('hzd-plugin')?.service('geolocation');
+						if (geo) {
+							const rawCountry = typeof address.CountryCode === 'string'
+								? address.CountryCode
+								: '';
+							const countryCode = !rawCountry || rawCountry === 'D' ? 'DE' : rawCountry;
+							const result = await geo.getGeoLocationByZip(zip, countryCode);
+							if (result) {
+								address.locationLat = result.lat;
+								address.locationLng = result.lng;
+							}
+						}
+					}
+				}
+			}
+
 			return next();
 		});
 		strapi.log.info('[Document Middleware] Registered User data manipulation middleware');

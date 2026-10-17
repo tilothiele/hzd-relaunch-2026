@@ -170,23 +170,8 @@ export const POPULATE_CONTACT = new URLSearchParams({
 	'populate[member][fields][2]': 'lastName',
 })
 
-/** member/owner_members sind users-permissions.user — `=*` triggert Invalid key role */
+/** owner_members sind users-permissions.user — `=*` triggert Invalid key role */
 export const POPULATE_BREEDER_SEARCH = new URLSearchParams({
-	'populate[member][fields][0]': 'documentId',
-	'populate[member][fields][1]': 'cId',
-	'populate[member][fields][2]': 'firstName',
-	'populate[member][fields][3]': 'lastName',
-	'populate[member][fields][4]': 'region',
-	'populate[member][fields][5]': 'phone',
-	'populate[member][fields][6]': 'cEmail',
-	'populate[member][fields][7]': 'city',
-	'populate[member][fields][8]': 'address1',
-	'populate[member][fields][9]': 'address2',
-	'populate[member][fields][10]': 'zip',
-	'populate[member][fields][11]': 'countryCode',
-	'populate[member][fields][12]': 'locationLat',
-	'populate[member][fields][13]': 'locationLng',
-	'populate[member][fields][14]': 'username',
 	'populate[avatar]': 'true',
 	'populate[Address]': 'true',
 	'populate[owner_members][fields][0]': 'documentId',

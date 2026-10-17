@@ -1,14 +1,25 @@
 import { readPosition } from '@/lib/geo-utils'
-import type { Address, Breeder } from '@/types'
+import type { Address, AuthUser, Breeder, Image } from '@/types'
 
-type BreederMember = NonNullable<Breeder['member']>
-
-type ContactUser = BreederMember & {
-	cId?: number | null
-}
+type ContactUser = Pick<
+	AuthUser,
+	| 'id'
+	| 'documentId'
+	| 'cId'
+	| 'firstName'
+	| 'lastName'
+	| 'region'
+	| 'phone'
+	| 'cEmail'
+	| 'city'
+	| 'address1'
+	| 'address2'
+	| 'zip'
+	| 'countryCode'
+>
 
 export interface BreederContactInfo {
-	/** Vor-/Nachname von member, sonst kommaseparierte owner_members */
+	/** Address.FullName, sonst kommaseparierte owner_members */
 	ownerDisplayName: string
 	names: string[]
 	ownerDocumentIds: string[]
@@ -53,16 +64,7 @@ function resolveOwnerMembers(breeder: Breeder): ContactUser[] {
 }
 
 function resolvePrimaryUser(breeder: Breeder): ContactUser | null {
-	const ownerMembers = resolveOwnerMembers(breeder)
-	if (ownerMembers.length > 0) {
-		return ownerMembers[0]
-	}
-
-	if (isContactUser(breeder.member)) {
-		return breeder.member
-	}
-
-	return null
+	return resolveOwnerMembers(breeder)[0] ?? null
 }
 
 export function resolveOwnerMemberDisplayNames(breeder: Breeder): string[] {
@@ -75,13 +77,11 @@ function resolveBreederPersonDisplayName(breeder: Breeder): {
 	displayName: string
 	names: string[]
 } {
-	const member = isContactUser(breeder.member) ? breeder.member : null
-	const memberName = member ? resolveOwnerMemberDisplayName(member) : null
-
-	if (memberName) {
+	const fullName = breeder.Address?.FullName?.trim()
+	if (fullName) {
 		return {
-			displayName: memberName,
-			names: [memberName],
+			displayName: fullName,
+			names: [fullName],
 		}
 	}
 
@@ -107,10 +107,9 @@ export function resolveOwnerMemberCIds(breeder: Breeder): number[] {
 export function resolveBreederContact(breeder: Breeder): BreederContactInfo {
 	const address = resolveAddress(breeder)
 	const ownerMembers = resolveOwnerMembers(breeder)
-	const member = isContactUser(breeder.member) ? breeder.member : null
 	const primaryUser = resolvePrimaryUser(breeder)
 	const { displayName, names } = resolveBreederPersonDisplayName(breeder)
-	const memberPosition = readPosition(member?.locationLat, member?.locationLng)
+	const position = readPosition(address?.locationLat, address?.locationLng)
 
 	return {
 		ownerDisplayName: displayName,
@@ -119,53 +118,72 @@ export function resolveBreederContact(breeder: Breeder): BreederContactInfo {
 		ownerCIds: resolveOwnerMemberCIds(breeder),
 		zip: pickFirstString(
 			...ownerMembers.map((user) => user.zip),
-			member?.zip,
 			primaryUser?.zip,
 			address?.Zip,
 		),
 		city: pickFirstString(
 			...ownerMembers.map((user) => user.city),
-			member?.city,
 			primaryUser?.city,
 			address?.City,
 		),
 		countryCode: pickFirstString(
 			...ownerMembers.map((user) => user.countryCode),
-			member?.countryCode,
 			primaryUser?.countryCode,
 			address?.CountryCode,
 		),
 		phone: pickFirstString(
 			...ownerMembers.map((user) => user.phone),
-			member?.phone,
 			primaryUser?.phone,
 		),
 		email: pickFirstString(
 			...ownerMembers.map((user) => user.cEmail),
-			member?.cEmail,
 			primaryUser?.cEmail,
 			breeder.BreederEmail,
 		),
 		region: pickFirstString(
 			...ownerMembers.map((user) => user.region),
-			member?.region,
 			primaryUser?.region,
 		),
 		address1: pickFirstString(
 			...ownerMembers.map((user) => user.address1),
-			member?.address1,
 			primaryUser?.address1,
 			address?.Address1,
 		),
 		address2: pickFirstString(
 			...ownerMembers.map((user) => user.address2),
-			member?.address2,
 			primaryUser?.address2,
 			address?.Address2,
 		),
-		locationLat: memberPosition?.lat ?? null,
-		locationLng: memberPosition?.lng ?? null,
+		locationLat: position?.lat ?? null,
+		locationLng: position?.lng ?? null,
 	}
+}
+
+export function findMaleOwnerDogAvatar(breeder: Breeder): Image | null {
+	const ownerIds = new Set<string>()
+	for (const user of resolveOwnerMembers(breeder)) {
+		if (user.id != null) {
+			ownerIds.add(String(user.id))
+		}
+		if (user.documentId) {
+			ownerIds.add(user.documentId)
+		}
+	}
+
+	const dogs = breeder.dogs
+	if (!Array.isArray(dogs) || ownerIds.size === 0) {
+		return null
+	}
+
+	const match = dogs.find((dog) => {
+		if (!dog.avatar || dog.sex !== 'M' || !dog.owner) {
+			return false
+		}
+		const ownerId = dog.owner.id != null ? String(dog.owner.id) : ''
+		return ownerIds.has(ownerId) || ownerIds.has(dog.owner.documentId)
+	})
+
+	return match?.avatar ?? null
 }
 
 export function formatBreederLocation(contact: BreederContactInfo): string | null {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { fetchStrapiServer } from '@/lib/server/strapi-client'
-import type { Breeder } from '@/types'
+import type { AuthUser } from '@/types'
 
 function sanitizePublicUser(user: Record<string, unknown> | null | undefined) {
 	if (!user) {
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
 				? (response as { data: Record<string, unknown>[] }).data
 				: []
 
-		const membersByCId: Record<number, NonNullable<Breeder['member']>> = {}
+		const membersByCId: Record<number, Partial<AuthUser>> = {}
 
 		for (const user of users) {
 			const cId = typeof user.cId === 'number' ? user.cId : null
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
 			if (user.publishMyData === true) {
 				const sanitized = sanitizePublicUser(user)
 				if (sanitized) {
-					membersByCId[cId] = sanitized as NonNullable<Breeder['member']>
+					membersByCId[cId] = sanitized as Partial<AuthUser>
 				}
 				continue
 			}

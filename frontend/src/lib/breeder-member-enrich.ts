@@ -11,7 +11,6 @@ function mergeOwnerMembers(
 	return {
 		...breeder,
 		owner_members: ownerMembers,
-		member: breeder.member ?? ownerMembers[0],
 	}
 }
 
