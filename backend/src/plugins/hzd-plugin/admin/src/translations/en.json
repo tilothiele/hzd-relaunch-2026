@@ -30,7 +30,7 @@
   "hzd-plugin.chromosoft.import.fixedUsers": "Fix user data",
   "hzd-plugin.chromosoft.import.skipped": "{count} skipped",
   "hzd-plugin.chromosoft.import.members": "Process CS_Member",
-  "hzd-plugin.chromosoft.import.membersHint": "Writes the current CS_Member generation into users. Breeders are skipped.",
+  "hzd-plugin.chromosoft.import.membersHint": "Writes the current CS_Member generation into users. Breeders are not created as users. A missing breeder with the same cId is created.",
   "hzd-plugin.chromosoft.import.dogs": "Process CS_Dog",
   "hzd-plugin.chromosoft.import.dogsHint": "Writes the current CS_Dog generation into dogs.",
   "hzd-plugin.chromosoft.import.membersUploaded": "members.csv uploaded: {time}",
