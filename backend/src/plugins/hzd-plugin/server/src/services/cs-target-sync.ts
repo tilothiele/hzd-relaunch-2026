@@ -456,6 +456,30 @@ function otherUserLabel(user: { id?: number; cId?: number }): string {
 	return typeof user.cId === 'number' ? `cId=${user.cId}` : `id=${user.id}`
 }
 
+const PLACEHOLDER_USER_EMAIL = /^c\.[0-9]*@hovawarte\.com$/i
+
+function canOverwriteUserEmail(email: string | null | undefined): boolean {
+	if (email == null) {
+		return true
+	}
+	const trimmed = email.trim()
+	if (!trimmed) {
+		return true
+	}
+	return PLACEHOLDER_USER_EMAIL.test(trimmed)
+}
+
+async function loadStoredUserEmail(
+	strapi: Core.Strapi,
+	userId: number,
+): Promise<string | null> {
+	const user = await strapi.db.query(USER_UID).findOne({
+		where: { id: userId },
+		select: ['email'],
+	}) as { email?: string | null } | null
+	return typeof user?.email === 'string' ? user.email : null
+}
+
 async function applyUniqueMemberEmail(
 	strapi: Core.Strapi,
 	data: TargetData,
@@ -553,7 +577,6 @@ export async function updateUser(
 	member: Record<string, unknown>,
 	authenticatedRoleId: number,
 	log: (line: string) => void,
-	options?: { copyMemberEmails?: boolean },
 ) {
 	const cId = parseInteger(member.IdPerson)
 	if (cId === null) {
@@ -564,14 +587,18 @@ export async function updateUser(
 	const data = mapMemberToUser(member, cId, authenticatedRoleId)
 	const existing = await findByCId(strapi, USER_UID, cId)
 	await omitTakenMembershipNumber(strapi, data, existing, cId, log)
+	const storedEmail = typeof existing?.id === 'number'
+		? await loadStoredUserEmail(strapi, existing.id)
+		: null
+	const mayOverwriteEmail = !existing || canOverwriteUserEmail(storedEmail)
 	const skipMemberEmailReasons = [
 		data.cFlagBreeder === true ? 'cFlagBreeder=true' : null,
 		data.blocked === true ? 'blocked=true' : null,
 	].filter((reason): reason is string => reason !== null)
-	const emailFormatReason = options?.copyMemberEmails
+	const emailFormatReason = mayOverwriteEmail
 		? emailRejectionReason(member.Email)
 		: null
-	if (options?.copyMemberEmails && skipMemberEmailReasons.length === 0) {
+	if (mayOverwriteEmail && skipMemberEmailReasons.length === 0) {
 		if (emailFormatReason) {
 			log(
 				`CS_Member cId=${cId}: ${emailFormatReason}, user.email wird nicht übernommen`,
@@ -581,12 +608,16 @@ export async function updateUser(
 	} else if (existing) {
 		delete data.email
 	}
-	if (options?.copyMemberEmails && skipMemberEmailReasons.length > 0) {
+	if (skipMemberEmailReasons.length > 0 && mayOverwriteEmail) {
 		const reasons = emailFormatReason
 			? [...skipMemberEmailReasons, emailFormatReason]
 			: skipMemberEmailReasons
 		log(
 			`CS_Member cId=${cId}: ${reasons.join(', ')}, user.email wird nicht übernommen`,
+		)
+	} else if (existing && !mayOverwriteEmail) {
+		log(
+			`CS_Member cId=${cId}: user.email "${storedEmail}" wird nicht überschrieben`,
 		)
 	}
 	if (!existing) {

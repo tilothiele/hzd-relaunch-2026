@@ -1,12 +1,12 @@
 /**
  * Geolocation service
  * Provides geocoding functionality using OpenStreetMap Nominatim API
- * 
+ *
  * This service queries OpenStreetMap's Nominatim API to get latitude and longitude
  * coordinates for German postal codes (PLZ).
- * 
+ *
  * It caches results in the `plugin::hzd-plugin.geo-location` collection to persist data.
- * 
+ *
  * @see docs/NOMINATIM.md for configuration and environment variables documentation
  * @see https://nominatim.org/release-docs/latest/api/Usage-Policy/ for usage policy
  */
@@ -40,7 +40,7 @@ const limiter = new Bottleneck({
 /**
  * Get geolocation by ZIP code using OpenStreetMap Nominatim API
  * Results are cached in the database
- * 
+ *
  * @param zip - Postal code
  * @param countryCode - ISO 3166-1 alpha-2 country code (e.g. 'DE', 'AT', 'CH')
  * @returns Promise with lat/lng coordinates or null if not found
@@ -64,11 +64,11 @@ async function getGeoLocationByZip(zip: string, countryCode: string): Promise<Ge
 
 		if (cachedEntries && cachedEntries.length > 0) {
 			const cached = cachedEntries[0];
-			console.log(`[Geolocation Service] DB Cache hit for: ${zipKey}`);
+			//console.log(`[Geolocation Service] DB Cache hit for: ${zipKey}`);
 
 			// Check for negative cache (null coordinates)
 			if (cached.lat === null || cached.lng === null) {
-				console.log(`[Geolocation Service] Negative cache hit for: ${zipKey}`);
+				//console.log(`[Geolocation Service] Negative cache hit for: ${zipKey}`);
 				return null;
 			}
 

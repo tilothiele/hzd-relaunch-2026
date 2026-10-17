@@ -309,7 +309,6 @@ const ChromosoftImportPanel = () => {
   const [downloading, setDownloading] = useState(false);
   const [fixGroups, setFixGroups] = useState(false);
   const [onlyChanged, setOnlyChanged] = useState(false);
-  const [copyMemberEmails, setCopyMemberEmails] = useState(false);
   const [steps, setSteps] = useState<ImportSteps>(DEFAULT_STEPS);
   const phaseRef = useRef<ImportPhase>('idle');
 
@@ -434,7 +433,6 @@ const ChromosoftImportPanel = () => {
       }));
       const response = await post('/hzd-plugin/chromosoft/import-strapi-daten', {
         onlyChanged,
-        copyMemberEmails,
         fixGroups,
         steps,
       });
@@ -618,25 +616,6 @@ const ChromosoftImportPanel = () => {
               {formatMessage({
                 id: getTranslation('chromosoft.import.onlyChanged'),
                 defaultMessage: 'Nur geänderte Datensätze importieren',
-              })}
-            </Typography>
-          </Flex>
-          <Flex gap={2} alignItems="center">
-            <Checkbox
-              id="chromosoft-copy-member-emails"
-              checked={copyMemberEmails}
-              disabled={isRunning}
-              onCheckedChange={(value: boolean | 'indeterminate') => {
-                setCopyMemberEmails(value === true);
-              }}
-            />
-            <Typography
-              tag="label"
-              htmlFor="chromosoft-copy-member-emails"
-            >
-              {formatMessage({
-                id: getTranslation('chromosoft.import.copyMemberEmails'),
-                defaultMessage: 'Alle Member Emails übernehmen',
               })}
             </Typography>
           </Flex>

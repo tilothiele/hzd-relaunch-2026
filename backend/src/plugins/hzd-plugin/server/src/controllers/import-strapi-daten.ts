@@ -12,7 +12,6 @@ interface ImportSteps {
 interface ImportService {
 	startImport: (options?: {
 		onlyChanged?: boolean
-		copyMemberEmails?: boolean
 		fixGroups?: boolean
 		steps?: ImportSteps
 	}) => {
@@ -58,18 +57,15 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 		const payload = body && typeof body === 'object' && !Array.isArray(body)
 			? body as {
 				onlyChanged?: unknown
-				copyMemberEmails?: unknown
 				fixGroups?: unknown
 				steps?: unknown
 			}
 			: {}
 		const onlyChanged = payload.onlyChanged === true
-		const copyMemberEmails = payload.copyMemberEmails === true
 		const fixGroups = payload.fixGroups === true
 		const steps = readSteps(payload.steps)
 		const result = getService(strapi).startImport({
 			onlyChanged,
-			copyMemberEmails,
 			fixGroups,
 			steps,
 		})

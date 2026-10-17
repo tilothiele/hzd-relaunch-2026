@@ -96,7 +96,6 @@ export interface ImportStrapiDatenStatus {
 
 interface ImportOptions {
 	onlyChanged: boolean
-	copyMemberEmails: boolean
 	fixGroups: boolean
 	steps: ImportSteps
 }
@@ -967,9 +966,6 @@ async function import_strapi_daten(
 		const log = (line: string) => writeLog(opened.stream, line)
 		const startNotes = [
 			options.onlyChanged ? 'nur geänderte Datensätze' : null,
-			options.copyMemberEmails
-				? 'Member-Emails in user.email übernehmen'
-				: null,
 			options.fixGroups ? 'Fixe Gruppen' : null,
 		].filter((note): note is string => note !== null)
 		log(
@@ -1005,7 +1001,6 @@ async function import_strapi_daten(
 						entry,
 						authenticatedRoleId,
 						log,
-						{ copyMemberEmails: options.copyMemberEmails },
 					),
 				})
 				await storeProcessedTimestamp(
@@ -1159,7 +1154,6 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
 		cancelRequested = false
 		running = true
 		const onlyChanged = options?.onlyChanged === true
-		const copyMemberEmails = options?.copyMemberEmails === true
 		const fixGroups = options?.fixGroups === true
 		const phase = firstEnabledStep(steps) ?? 'members'
 		job = {
@@ -1169,7 +1163,6 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
 		}
 		void import_strapi_daten(strapi, {
 			onlyChanged,
-			copyMemberEmails,
 			fixGroups,
 			steps,
 		})
@@ -1223,7 +1216,6 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
 		}
 		return import_strapi_daten(strapi, {
 			onlyChanged: false,
-			copyMemberEmails: false,
 			fixGroups: false,
 			steps,
 		})
