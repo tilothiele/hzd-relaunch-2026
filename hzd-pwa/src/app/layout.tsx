@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
+import { AppShell } from '@/components/AppShell'
 import { Providers } from './providers'
 import './globals.css'
 import './variables.css'
@@ -34,7 +35,9 @@ export default function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
-				<Providers>{children}</Providers>
+				<Providers>
+					<AppShell>{children}</AppShell>
+				</Providers>
 			</body>
 		</html>
 	)

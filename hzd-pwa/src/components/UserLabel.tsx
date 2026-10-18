@@ -1,17 +1,18 @@
 'use client'
 
 import { useAuth } from '@/hooks/use-auth'
+import { formatAuthDisplayName } from '@/lib/strapi-api'
 
 export function UserLabel() {
-	const { user, isInitialized } = useAuth()
+	const { isAuthenticated, isInitialized, user } = useAuth()
 
-	if (!isInitialized || !user?.firstName || !user?.lastName) {
+	if (!isInitialized || !isAuthenticated || !user) {
 		return null
 	}
 
 	return (
-		<span className="text-sm font-medium hidden md:block">
-			{user.firstName} {user.lastName}
+		<span className="max-w-[9rem] truncate text-sm font-medium sm:max-w-xs">
+			{formatAuthDisplayName(user)}
 		</span>
 	)
 }

@@ -5,7 +5,7 @@ export default function LoginPage() {
 	return (
 		<Suspense
 			fallback={(
-				<div className="flex min-h-screen items-center justify-center bg-[var(--color-goldbeige)] text-sm text-gray-600">
+				<div className="flex flex-1 items-center justify-center text-sm text-gray-600">
 					Anmeldung wird geladen…
 				</div>
 			)}

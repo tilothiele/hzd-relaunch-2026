@@ -21,6 +21,7 @@ export function proxy(request: NextRequest) {
 	const hasValidToken = hasToken && !isStrapiJwtExpired(token)
 
 	const isPublicPath = pathname === '/login'
+		|| pathname === '/mitgliedsantrag'
 		|| pathname.startsWith('/_next')
 		|| pathname.startsWith('/static')
 		|| pathname.includes('.')

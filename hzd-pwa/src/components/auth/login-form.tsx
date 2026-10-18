@@ -57,7 +57,7 @@ export function LoginForm() {
 	const isBusy = isSubmitting || isAuthenticating || !isInitialized
 
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-center p-4 bg-[var(--color-goldbeige)]">
+		<div className="flex flex-1 flex-col items-center justify-center">
 			<div className="w-full max-w-md space-y-8 rounded-lg bg-white p-6 shadow-md dark:bg-gray-800 sm:p-8">
 				<div className="flex flex-col items-center">
 					<Image
