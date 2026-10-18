@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import {
 	BesonderheitInput,
 	Card,
@@ -13,6 +14,7 @@ import {
 } from './FormControls'
 import {
 	createWelpenRow,
+	createWelpenkaeufer,
 	MAX_WELPEN_ROWS,
 	MIN_WELPEN_ROWS,
 	WELPEN_FARBE_OPTIONS,
@@ -21,7 +23,9 @@ import {
 	type StammblattData,
 	type WelpenFarbe,
 	type WelpenGeschlecht,
+	type WelpenkaeuferData,
 	type WelpenRowData,
+	type WurfabnahmeFormData,
 } from '@/types/wurfabnahme-form'
 
 interface SignatureProps {
@@ -32,8 +36,10 @@ interface SignatureProps {
 
 interface StammblattPageProps extends SignatureProps {
 	data: StammblattData
+	formData: WurfabnahmeFormData
 	welpen: WelpenRowData[]
 	onWelpenChange: (welpen: WelpenRowData[]) => void
+	onWelpenkaeuferChange: (rows: WelpenkaeuferData[]) => void
 	onChange: (data: StammblattData) => void
 	deletedIds?: Set<string>
 	onMarkDelete?: (id: string) => void
@@ -219,10 +225,270 @@ function WelpenTable({
 	)
 }
 
+function puppyChoices(
+	welpen: WelpenRowData[],
+	deletedIds: Set<string>,
+) {
+	return welpen.flatMap((welpe, index) => {
+		if (welpe.deletedAt || deletedIds.has(welpe.id)) {
+			return []
+		}
+
+		return [{
+			id: welpe.id,
+			nummer: index + 1,
+			name: welpe.name.trim() || 'ohne Name',
+		}]
+	})
+}
+
+function WelpenkaeuferSection({
+	rows,
+	welpen,
+	deletedIds,
+	readOnly,
+	onChange,
+}: {
+	rows: WelpenkaeuferData[]
+	welpen: WelpenRowData[]
+	deletedIds: Set<string>
+	readOnly?: boolean
+	onChange: (rows: WelpenkaeuferData[]) => void
+}) {
+	const [openIds, setOpenIds] = useState<string[]>([])
+	const choices = puppyChoices(welpen, deletedIds)
+
+	const toggleOpen = (id: string) => {
+		setOpenIds((current) => (
+			current.includes(id)
+				? current.filter((entry) => entry !== id)
+				: [...current, id]
+		))
+	}
+
+	const updateRow = (
+		id: string,
+		patch: Partial<WelpenkaeuferData>,
+	) => {
+		onChange(rows.map((row) => (
+			row.id === id ? { ...row, ...patch } : row
+		)))
+	}
+
+	const toggleWelpe = (row: WelpenkaeuferData, welpeId: string) => {
+		const selected = row.welpenIds.includes(welpeId)
+		updateRow(row.id, {
+			welpenIds: selected
+				? row.welpenIds.filter((entry) => entry !== welpeId)
+				: [...row.welpenIds, welpeId],
+		})
+	}
+
+	const addRow = () => {
+		const row = createWelpenkaeufer()
+		onChange([...rows, row])
+		setOpenIds((current) => [...current, row.id])
+	}
+
+	const removeRow = (id: string) => {
+		onChange(rows.filter((row) => row.id !== id))
+		setOpenIds((current) => current.filter((entry) => entry !== id))
+	}
+
+	return (
+		<Card title="Welpenkäufer">
+			<div className="wa-welpen-actions">
+				<p className="wa-welpen-count">
+					Anzahl Welpenkäufer: <strong>{rows.length}</strong>
+				</p>
+				<div className="wa-btn-row-action">
+					<button
+						type="button"
+						className="wa-btn-secondary wa-btn-add-row"
+						onClick={addRow}
+						disabled={readOnly}
+					>
+						+ Welpenkäufer
+					</button>
+				</div>
+			</div>
+			{rows.length === 0 ? (
+				<p className="wa-kaeufer-empty">Keine Welpenkäufer erfasst.</p>
+			) : null}
+			{rows.map((row) => {
+				const isOpen = openIds.includes(row.id)
+				const selected = choices
+					.filter((choice) => row.welpenIds.includes(choice.id))
+					.map((choice) => `${choice.nummer} ${choice.name}`)
+					.join(', ')
+
+				return (
+					<div key={row.id} className="wa-kaeufer-row">
+						<div className="wa-kaeufer-summary">
+							<span
+								role="button"
+								tabIndex={0}
+								className="wa-kaeufer-toggle"
+								aria-expanded={isOpen}
+								onClick={() => toggleOpen(row.id)}
+								onKeyDown={(event) => {
+									if (event.key === 'Enter' || event.key === ' ') {
+										event.preventDefault()
+										toggleOpen(row.id)
+									}
+								}}
+							>
+								<span aria-hidden="true">{isOpen ? '▾' : '▸'}</span>
+								<span className={row.vorname ? '' : 'wa-kaeufer-placeholder'}>
+									{row.vorname || 'Vorname'}
+								</span>
+								<span className={row.name ? '' : 'wa-kaeufer-placeholder'}>
+									{row.name || 'Name'}
+								</span>
+								<span className={row.ort ? '' : 'wa-kaeufer-placeholder'}>
+									{row.ort || 'Ort'}
+								</span>
+								<span className={selected ? '' : 'wa-kaeufer-placeholder'}>
+									{selected || 'keine Welpen'}
+								</span>
+							</span>
+							<button
+								type="button"
+								className="wa-btn-icon"
+								onClick={() => removeRow(row.id)}
+								disabled={readOnly}
+								title="Welpenkäufer entfernen"
+								aria-label="Welpenkäufer entfernen"
+							>
+								×
+							</button>
+						</div>
+						{isOpen ? (
+							<div className="wa-kaeufer-body">
+								<FieldRow cols={2}>
+									<Field label="Vorname">
+										<input
+											type="text"
+											value={row.vorname}
+											onChange={(event) => updateRow(row.id, {
+												vorname: event.target.value,
+											})}
+											disabled={readOnly}
+										/>
+									</Field>
+									<Field label="Name">
+										<input
+											type="text"
+											value={row.name}
+											onChange={(event) => updateRow(row.id, {
+												name: event.target.value,
+											})}
+											disabled={readOnly}
+										/>
+									</Field>
+								</FieldRow>
+								<FieldRow cols={2}>
+									<Field label="Geburtsdatum">
+										<input
+											type="date"
+											value={row.geburtsdatum}
+											onChange={(event) => updateRow(row.id, {
+												geburtsdatum: event.target.value,
+											})}
+											disabled={readOnly}
+										/>
+									</Field>
+									<Field label="Telefon">
+										<input
+											type="text"
+											value={row.telefon}
+											onChange={(event) => updateRow(row.id, {
+												telefon: event.target.value,
+											})}
+											disabled={readOnly}
+										/>
+									</Field>
+								</FieldRow>
+								<FieldRow>
+									<Field label="Straße und Hausnummer">
+										<input
+											type="text"
+											value={row.strasse}
+											onChange={(event) => updateRow(row.id, {
+												strasse: event.target.value,
+											})}
+											disabled={readOnly}
+										/>
+									</Field>
+								</FieldRow>
+								<FieldRow cols={3}>
+									<Field label="Land">
+										<input
+											type="text"
+											value={row.land}
+											onChange={(event) => updateRow(row.id, {
+												land: event.target.value,
+											})}
+											disabled={readOnly}
+										/>
+									</Field>
+									<Field label="PLZ">
+										<input
+											type="text"
+											value={row.plz}
+											onChange={(event) => updateRow(row.id, {
+												plz: event.target.value,
+											})}
+											disabled={readOnly}
+										/>
+									</Field>
+									<Field label="Ort">
+										<input
+											type="text"
+											value={row.ort}
+											onChange={(event) => updateRow(row.id, {
+												ort: event.target.value,
+											})}
+											disabled={readOnly}
+										/>
+									</Field>
+								</FieldRow>
+								<div className="wa-field">
+									<label>Welpen</label>
+									<div className="wa-check-group">
+										{choices.length === 0 ? (
+											<span className="wa-kaeufer-placeholder">
+												Noch keine Welpen erfasst.
+											</span>
+										) : choices.map((choice) => (
+											<label key={choice.id} className="wa-cb-item">
+												<input
+													type="checkbox"
+													checked={row.welpenIds.includes(choice.id)}
+													onChange={() => toggleWelpe(row, choice.id)}
+													disabled={readOnly}
+												/>
+												<span className="wa-cb-box" />
+												<span>{choice.nummer} {choice.name}</span>
+											</label>
+										))}
+									</div>
+								</div>
+							</div>
+						) : null}
+					</div>
+				)
+			})}
+		</Card>
+	)
+}
+
 export function StammblattPage({
 	data,
+	formData,
 	welpen,
 	onWelpenChange,
+	onWelpenkaeuferChange,
 	onChange,
 	signatures,
 	onSignatureChange,
@@ -427,6 +693,14 @@ export function StammblattPage({
 				/>
 			</Card>
 
+			<WelpenkaeuferSection
+				rows={formData.welpenkaeufer ?? []}
+				welpen={welpen}
+				deletedIds={deletedIds}
+				readOnly={readOnly}
+				onChange={onWelpenkaeuferChange}
+			/>
+
 			<Card title="Beurteilung">
 				<FieldRow>
 					<Field label="Gesamteindruck">
@@ -518,12 +792,14 @@ export function StammblattPage({
 				</FieldRow>
 			</Card>
 
-			<PdfAnleitung />
+			<PdfAnleitung formData={formData} deletedIds={deletedIds} />
 		</div>
 	)
 }
 
 interface WelpePageProps extends SignatureProps {
+	formData: WurfabnahmeFormData
+	deletedIds?: Set<string>
 	welpe: WelpenRowData | null
 	onChange?: (data: WelpenRowData) => void
 }
@@ -542,6 +818,8 @@ export function WelpePage({
 	signatures,
 	onSignatureChange,
 	readOnly,
+	formData,
+	deletedIds,
 }: WelpePageProps) {
 	if (!welpe || !onChange) {
 		return (
@@ -1060,153 +1338,7 @@ export function WelpePage({
 				</FieldRow>
 			</Card>
 
-			<PdfAnleitung />
-		</div>
-	)
-}
-
-export function DatenschutzPage({
-	signatures,
-	onSignatureChange,
-	readOnly,
-}: SignatureProps) {
-	return (
-		<div className="wa-page active" id="page-datenschutz1">
-			<div className="wa-badge">Welpe 1</div>
-			<div className="wa-page-title">Einwilligung zum Datenschutz</div>
-			<div className="wa-page-subtitle">Welpenkäufer</div>
-
-			<Card title="Welpenkäufer">
-				<FieldRow cols={2}>
-					<Field label="Name, Vorname">
-						<input type="text" name="ds1-name" />
-					</Field>
-					<Field label="Geburtsdatum">
-						<input type="date" name="ds1-geburt" />
-					</Field>
-				</FieldRow>
-				<FieldRow cols={2}>
-					<Field label="PLZ / Ort">
-						<input type="text" name="ds1-plz" />
-					</Field>
-					<Field label="Straße / Nr.">
-						<input type="text" name="ds1-strasse" />
-					</Field>
-				</FieldRow>
-				<FieldRow cols={2}>
-					<Field label="E-Mail">
-						<input type="email" name="ds1-email" />
-					</Field>
-					<Field label="Telefon">
-						<input type="text" name="ds1-telefon" />
-					</Field>
-				</FieldRow>
-			</Card>
-
-			<Card title="Hundedaten">
-				<FieldRow cols={3}>
-					<Field label="Welpe (Name)">
-						<input type="text" name="ds1-welpe" />
-					</Field>
-					<Field label="Zwinger">
-						<input type="text" name="ds1-zwinger" />
-					</Field>
-					<Field label="Züchter">
-						<input type="text" name="ds1-zuechter" />
-					</Field>
-				</FieldRow>
-				<div className="wa-info-box" style={{ marginTop: 8 }}>
-					Mit dem Erwerb des Welpen der Rasse Hovawart wurde mir erläutert und
-					ist mir bekannt, dass die Daten des Hundes – bestehend aus
-					Zwingernamen, Rufnamen, Geburtsdatum, Geschlecht, Farbe und
-					Chipnummer – zu züchterischen Zwecken in der Datenbank der HZD
-					aufgenommen und gespeichert werden.
-				</div>
-			</Card>
-
-			<Card title="Wurfabnahmeprotokoll">
-				<CheckboxGroup
-					vertical
-					name="ds1-protokoll"
-					options={[
-						'Das Wurfabnahmeprotokoll wurde mit mir besprochen.',
-						'Auf besondere Feststellungen wurde ich hingewiesen.',
-						'Das Protokoll wurde mir ausgehändigt.',
-					]}
-				/>
-			</Card>
-
-			<Card title="Deckgenehmigung">
-				<label className="wa-cb-item">
-					<input type="checkbox" name="ds1-deckgenehmigung" />
-					<span className="wa-cb-box" />
-					<span>
-						Der Hinweis aus der Deckgenehmigung, sofern vorhanden, wurde mir
-						erläutert.
-					</span>
-				</label>
-			</Card>
-
-			<Card title="Einwilligung zur Verarbeitung personenbezogener Daten">
-				<div className="wa-consent-text">Datenweitergabe an die HZD e.V.</div>
-				<div className="wa-check-group vertical" style={{ marginBottom: 16 }}>
-					<label className="wa-rb-item">
-						<input type="radio" name="ds1-datenweitergabe" value="ja" />
-						<span className="wa-rb-dot" />
-						<span>
-							Ich willige ein, dass meine personenbezogenen Daten (Name,
-							Vorname, Geburtsdatum, Anschrift, Telefonnummer, E-Mail-Adresse)
-							von der HZD e.V. zur Speicherung und weiteren Verarbeitung im
-							Rahmen der Zuchtbetreuung verwendet werden dürfen (Art. 6 DSGVO).
-						</span>
-					</label>
-					<label className="wa-rb-item">
-						<input type="radio" name="ds1-datenweitergabe" value="nein" />
-						<span className="wa-rb-dot" />
-						<span>Ich willige nicht ein.</span>
-					</label>
-				</div>
-
-				<div className="wa-consent-text">
-					Informationen zum Verein / Veranstaltungen
-				</div>
-				<div className="wa-check-group vertical">
-					<label className="wa-rb-item">
-						<input type="radio" name="ds1-info" value="ja" />
-						<span className="wa-rb-dot" />
-						<span>
-							Ich willige ein, dass die HZD e.V. mir Informationen zum Verein
-							oder zu Veranstaltungen per Post oder E-Mail zusendet (Art. 6
-							DSGVO).
-						</span>
-					</label>
-					<label className="wa-rb-item">
-						<input type="radio" name="ds1-info" value="nein" />
-						<span className="wa-rb-dot" />
-						<span>Ich willige nicht ein.</span>
-					</label>
-				</div>
-			</Card>
-
-			<Card title="Unterschrift Welpenkäufer">
-				<FieldRow cols={2} style={{ marginBottom: 12 }}>
-					<Field label="Ort / Datum">
-						<input type="text" name="ds1-ort-datum" />
-					</Field>
-				</FieldRow>
-				<div style={{ maxWidth: 400 }}>
-					<SignatureGrid
-						signatures={[
-							{ id: 'sig-ds1', label: 'Unterschrift Welpenkäufer' },
-						]}
-						values={signatures}
-						onChange={onSignatureChange}
-						readOnly={readOnly}
-					/>
-				</div>
-			</Card>
-
-			<PdfAnleitung />
+			<PdfAnleitung formData={formData} deletedIds={deletedIds} />
 		</div>
 	)
 }

@@ -3,7 +3,6 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import {
-	DatenschutzPage,
 	StammblattPage,
 	WelpePage,
 } from './WurfabnahmePages'
@@ -131,6 +130,17 @@ function WurfabnahmeAppInner({
 		[formData, onFormDataChange, readOnly],
 	)
 
+	const handleWelpenkaeuferChange = useCallback(
+		(welpenkaeufer: WurfabnahmeFormData['welpenkaeufer']) => {
+			if (readOnly) return
+			onFormDataChange({
+				...formData,
+				welpenkaeufer,
+			})
+		},
+		[formData, onFormDataChange, readOnly],
+	)
+
 	const signatureProps = {
 		signatures: formData.signatures,
 		onSignatureChange: handleSignatureChange,
@@ -139,7 +149,6 @@ function WurfabnahmeAppInner({
 
 	const showPage = (tab: string) => {
 		if (tab === 'stammblatt') return activeTab === 'stammblatt'
-		if (tab === 'datenschutz1') return activeTab === 'datenschutz1'
 		return activeTab.startsWith('welpe-')
 	}
 
@@ -185,8 +194,10 @@ function WurfabnahmeAppInner({
 				{showPage('stammblatt') && (
 					<StammblattPage
 						data={formData.stammblatt}
+						formData={formData}
 						welpen={formData.welpen}
 						onWelpenChange={handleWelpenChange}
+						onWelpenkaeuferChange={handleWelpenkaeuferChange}
 						onChange={handleStammblattChange}
 						deletedIds={deletedWelpenIds}
 						onMarkDelete={onMarkWelpeDelete}
@@ -200,14 +211,13 @@ function WurfabnahmeAppInner({
 				{showPage('welpe1') && (
 					<WelpePage
 						welpe={activeWelpe}
+						formData={formData}
+						deletedIds={deletedWelpenIds}
 						onChange={activeWelpe ? (data) => handleWelpeChange(activeWelpeIdx, data) : undefined}
 						{...signatureProps}
 					/>
 				)}
 
-				{showPage('datenschutz1') && (
-					<DatenschutzPage {...signatureProps} />
-				)}
 			</div>
 		</fieldset>
 	)

@@ -1,4 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react'
+import { downloadWurfabnahmePdf } from '@/lib/wurfabnahme-pdf'
+import type { WurfabnahmeFormData } from '@/types/wurfabnahme-form'
 import { SignatureCanvas } from './SignatureCanvas'
 
 export function Card({
@@ -150,29 +152,32 @@ export function BesonderheitInput({
 	)
 }
 
-export function PdfAnleitung() {
+export function PdfAnleitung({
+	formData,
+	deletedIds,
+}: {
+	formData: WurfabnahmeFormData
+	deletedIds?: Set<string>
+}) {
+	const handleCreate = () => {
+		downloadWurfabnahmePdf(formData, deletedIds).catch(() => {
+			window.alert('Das PDF konnte nicht erstellt werden.')
+		})
+	}
+
 	return (
 		<div className="wa-pdf-anleitung">
-			<strong>📄 Als PDF speichern – Android Tablet</strong>
-			<ol>
-				<li>
-					Auf <b>„PDF erstellen“</b> tippen
-				</li>
-				<li>Es öffnet sich der Druckdialog</li>
-				<li>
-					Oben bei <b>„Drucker auswählen“</b> tippen →{' '}
-					<b>„Als PDF speichern“</b> wählen
-				</li>
-				<li>
-					Oben rechts auf das <b>PDF-Symbol</b> tippen → Speichern
-				</li>
-			</ol>
+			<strong>PDF mit je einer DIN-A4-Seite</strong>
+			<p>
+				Stammblatt, jeder Welpe und jeder Welpenkäufer werden als eigene
+				Seiten geschrieben.
+			</p>
 			<button
 				type="button"
 				className="wa-pdf-btn"
-				onClick={() => window.print()}
+				onClick={handleCreate}
 			>
-				📄 PDF erstellen / Drucken
+				PDF erstellen
 			</button>
 		</div>
 	)

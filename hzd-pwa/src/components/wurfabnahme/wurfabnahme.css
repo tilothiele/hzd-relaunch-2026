@@ -536,6 +536,47 @@
 	font-size: 14px;
 }
 
+.wurfabnahme-app .wa-pdf-anleitung p {
+	margin: 0;
+}
+
+.wurfabnahme-app .wa-kaeufer-empty {
+	margin: 0 0 8px;
+	color: var(--wa-text-muted);
+}
+
+.wurfabnahme-app .wa-kaeufer-row {
+	border: 1px solid var(--wa-border-light);
+	border-radius: 4px;
+	margin-bottom: 8px;
+	background: #fff;
+}
+
+.wurfabnahme-app .wa-kaeufer-summary {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 10px;
+}
+
+.wurfabnahme-app .wa-kaeufer-toggle {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	gap: 12px;
+	min-width: 0;
+	cursor: pointer;
+}
+
+.wurfabnahme-app .wa-kaeufer-placeholder {
+	color: var(--wa-text-muted);
+}
+
+.wurfabnahme-app .wa-kaeufer-body {
+	padding: 4px 10px 10px;
+	border-top: 1px solid var(--wa-border-light);
+}
+
 .wurfabnahme-app .wa-pdf-anleitung ol {
 	padding-left: 18px;
 }

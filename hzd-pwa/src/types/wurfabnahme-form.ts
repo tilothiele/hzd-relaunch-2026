@@ -68,6 +68,37 @@ export interface WelpenRowData {
 	datum: string
 }
 
+export const DS_HUND_HINWEIS =
+	'Mit dem Erwerb des Welpen der Rasse Hovawart wurde mir erläutert und ist mir bekannt, dass die Daten des Hundes – bestehend aus Zwingernamen, Rufnamen, Geburtsdatum, Geschlecht, Farbe und Chipnummer – zu züchterischen Zwecken in der Datenbank der HZD aufgenommen und gespeichert werden.'
+
+export const DS_PROTOKOLL_OPTIONS = [
+	'Das Wurfabnahmeprotokoll wurde mit mir besprochen.',
+	'Auf besondere Feststellungen wurde ich hingewiesen.',
+	'Das Protokoll wurde mir ausgehändigt.',
+] as const
+
+export const DS_DECK_HINWEIS =
+	'Der Hinweis aus der Deckgenehmigung, sofern vorhanden, wurde mir erläutert.'
+
+export const DS_WEITERGABE_TEXT =
+	'Ich willige ein, dass meine personenbezogenen Daten (Name, Vorname, Geburtsdatum, Anschrift, Telefonnummer, E-Mail-Adresse) von der HZD e.V. zur Speicherung und weiteren Verarbeitung im Rahmen der Zuchtbetreuung verwendet werden dürfen (Art. 6 DSGVO).'
+
+export const DS_INFO_TEXT =
+	'Ich willige ein, dass die HZD e.V. mir Informationen zum Verein oder zu Veranstaltungen per Post oder E-Mail zusendet (Art. 6 DSGVO).'
+
+export interface WelpenkaeuferData {
+	id: string
+	vorname: string
+	name: string
+	geburtsdatum: string
+	strasse: string
+	land: string
+	plz: string
+	ort: string
+	telefon: string
+	welpenIds: string[]
+}
+
 export interface StammblattData {
 	zuechterName: string
 	datum: string
@@ -93,6 +124,7 @@ export interface StammblattData {
 export interface WurfabnahmeFormData {
 	stammblatt: StammblattData
 	welpen: WelpenRowData[]
+	welpenkaeufer: WelpenkaeuferData[]
 	signatures: Record<string, string>
 }
 
@@ -175,11 +207,49 @@ export function normalizeWelpenRow(row: Partial<WelpenRowData>): WelpenRowData {
 	}
 }
 
+export function createWelpenkaeufer(): WelpenkaeuferData {
+	return {
+		id: crypto.randomUUID(),
+		vorname: '',
+		name: '',
+		geburtsdatum: '',
+		strasse: '',
+		land: '',
+		plz: '',
+		ort: '',
+		telefon: '',
+		welpenIds: [],
+	}
+}
+
+export function normalizeWelpenkaeufer(
+	row: Partial<WelpenkaeuferData>,
+): WelpenkaeuferData {
+	return {
+		...createWelpenkaeufer(),
+		...row,
+		id: row.id || crypto.randomUUID(),
+		vorname: row.vorname ?? '',
+		name: row.name ?? '',
+		geburtsdatum: row.geburtsdatum ?? '',
+		strasse: row.strasse ?? '',
+		land: row.land ?? '',
+		plz: row.plz ?? '',
+		ort: row.ort ?? '',
+		telefon: row.telefon ?? '',
+		welpenIds: row.welpenIds ?? [],
+	}
+}
+
 export function normalizeFormData(data: WurfabnahmeFormData): WurfabnahmeFormData {
+	const stored = data as WurfabnahmeFormData & {
+		welpenkaeufer?: Partial<WelpenkaeuferData>[]
+	}
 	return {
 		...data,
 		signatures: data.signatures ?? {},
 		welpen: (data.welpen ?? []).map(normalizeWelpenRow),
+		welpenkaeufer: (stored.welpenkaeufer ?? []).map(normalizeWelpenkaeufer),
 		stammblatt: {
 			...data.stammblatt,
 			zuchthuendin: data.stammblatt.zuchthuendin ?? '',
@@ -200,6 +270,10 @@ export function cloneFormDataForEdit(
 			...normalized.stammblatt,
 		},
 		welpen: normalized.welpen.map((row) => ({ ...row })),
+		welpenkaeufer: normalized.welpenkaeufer.map((row) => ({
+			...row,
+			welpenIds: [...row.welpenIds],
+		})),
 		signatures: {},
 	}
 }
@@ -299,6 +373,7 @@ export function createEmptyFormData(): WurfabnahmeFormData {
 	return {
 		stammblatt: createEmptyStammblatt(),
 		welpen: [],
+		welpenkaeufer: [],
 		signatures: {},
 	}
 }

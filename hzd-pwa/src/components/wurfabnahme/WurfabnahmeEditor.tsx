@@ -199,7 +199,6 @@ export function WurfabnahmeEditor({
 				id: `welpe-${welpe.id}`,
 				label: `Welpe ${index + 1}`,
 			})),
-		{ id: 'datenschutz1', label: 'Datenschutz' },
 	]
 
 	const handleTabKeyDown = (
@@ -224,7 +223,7 @@ export function WurfabnahmeEditor({
 	}
 
 	useEffect(() => {
-		if (activeTab === 'stammblatt' || activeTab === 'datenschutz1') {
+		if (activeTab === 'stammblatt') {
 			return
 		}
 

@@ -1,9 +1,8 @@
-export type WurfabnahmePageId = 'stammblatt' | 'welpe1' | 'datenschutz1'
+export type WurfabnahmePageId = 'stammblatt' | 'welpe1'
 
 export const WURFABNAHME_TABS: { id: WurfabnahmePageId; label: string }[] = [
 	{ id: 'stammblatt', label: 'Stammblatt' },
 	{ id: 'welpe1', label: 'Welpe 1' },
-	{ id: 'datenschutz1', label: 'Datenschutz' },
 ]
 
 export function getWurfabnahmeHref(
@@ -16,7 +15,7 @@ export function getWurfabnahmeHref(
 export function parseWurfabnahmePage(
 	seite: string | null,
 ): WurfabnahmePageId {
-	if (seite === 'welpe1' || seite === 'datenschutz1') {
+	if (seite === 'welpe1') {
 		return seite
 	}
 
