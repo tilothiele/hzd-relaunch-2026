@@ -16,13 +16,13 @@
 	color: var(--wa-text);
 	font-size: 14px;
 	line-height: 1.5;
-	margin: -1rem -1rem 0;
+	margin: 0 -1rem 0;
 	padding-bottom: 2rem;
 }
 
 @media (min-width: 640px) {
 	.wurfabnahme-app {
-		margin: -2rem -2rem 0;
+		margin: 0 -2rem 0;
 	}
 }
 

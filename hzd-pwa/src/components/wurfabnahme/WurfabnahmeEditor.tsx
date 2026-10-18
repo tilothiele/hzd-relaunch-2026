@@ -1,6 +1,12 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import {
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+	type KeyboardEvent,
+} from 'react'
 import { useRouter } from 'next/navigation'
 import WurfabnahmeApp from '@/components/wurfabnahme/WurfabnahmeApp'
 import { getWurfabnahme, saveWurfabnahme } from '@/services/wurfabnahme-db'
@@ -17,8 +23,6 @@ import {
 	type Wurfabnahme,
 	type WurfabnahmeFormData,
 } from '@/types/wurfabnahme-form'
-import { parseWurfabnahmePage } from './constants'
-
 const CURRENT_DRAFT_VALUE = 'draft'
 
 interface WurfabnahmeEditorProps {
@@ -187,6 +191,54 @@ export function WurfabnahmeEditor({
 		router,
 	])
 
+	const wurfTabs = [
+		{ id: 'stammblatt', label: 'Stammblatt' },
+		...formData.welpen
+			.filter((welpe) => !welpe.deletedAt)
+			.map((welpe, index) => ({
+				id: `welpe-${welpe.id}`,
+				label: `Welpe ${index + 1}`,
+			})),
+		{ id: 'datenschutz1', label: 'Datenschutz' },
+	]
+
+	const handleTabKeyDown = (
+		event: KeyboardEvent<HTMLButtonElement>,
+		index: number,
+	) => {
+		const direction = event.key === 'ArrowRight'
+			? 1
+			: event.key === 'ArrowLeft'
+				? -1
+				: 0
+		if (direction === 0) {
+			return
+		}
+
+		event.preventDefault()
+		const nextIndex = (index + direction + wurfTabs.length) % wurfTabs.length
+		setActiveTab(wurfTabs[nextIndex].id)
+		const tabs = event.currentTarget.parentElement
+			?.querySelectorAll<HTMLButtonElement>('[role="tab"]')
+		tabs?.[nextIndex]?.focus()
+	}
+
+	useEffect(() => {
+		if (activeTab === 'stammblatt' || activeTab === 'datenschutz1') {
+			return
+		}
+
+		const welpeId = activeTab.startsWith('welpe-')
+			? activeTab.slice('welpe-'.length)
+			: ''
+		const stillThere = formData.welpen.some(
+			(welpe) => welpe.id === welpeId && !welpe.deletedAt,
+		)
+		if (!stillThere) {
+			setActiveTab('stammblatt')
+		}
+	}, [activeTab, formData.welpen])
+
 	if (isLoading) {
 		return <p>Lade Wurfabnahme…</p>
 	}
@@ -241,33 +293,48 @@ export function WurfabnahmeEditor({
 				</div>
 			) : null}
 
-			<div className="wa-nav-tabs" style={{ marginBottom: '12px' }}>
-				<button
-					type="button"
-					className={`wa-nav-tab ${activeTab === 'stammblatt' ? 'active' : ''}`}
-					onClick={() => setActiveTab('stammblatt')}
+			<div className="-mx-4 overflow-x-auto sm:-mx-8">
+				<nav
+					className="flex w-max min-w-full justify-center"
+					role="tablist"
+					aria-label="Wurfabnahme"
 				>
-					Stammblatt
-				</button>
-				{formData.welpen.filter(w => !w.deletedAt).map((welpe, idx) => (
-					<button
-						key={welpe.id}
-						type="button"
-						className={`wa-nav-tab ${activeTab === `welpe-${welpe.id}` ? 'active' : ''}`}
-						onClick={() => setActiveTab(`welpe-${welpe.id}`)}
-					>
-						Welpe {idx + 1}
-					</button>
-				))}
-				<button
-					type="button"
-					className={`wa-nav-tab ${activeTab === 'datenschutz1' ? 'active' : ''}`}
-					onClick={() => setActiveTab('datenschutz1')}
-				>
-					Datenschutz
-				</button>
+					{wurfTabs.map((tab, index) => {
+						const isSelected = activeTab === tab.id
+
+						return (
+							<button
+								key={tab.id}
+								type="button"
+								role="tab"
+								id={`wurf-tab-${tab.id}`}
+								aria-selected={isSelected}
+								aria-controls="wurfabnahme-panel"
+								tabIndex={isSelected ? 0 : -1}
+								onClick={() => setActiveTab(tab.id)}
+								onKeyDown={(event) =>
+									handleTabKeyDown(event, index)
+								}
+								className={`inline-flex items-center whitespace-nowrap border-x border-t border-gray-300 px-4 py-3 text-sm leading-5 dark:border-gray-600 ${
+									index > 0 ? '-ml-px' : ''
+								} ${
+									isSelected
+										? 'bg-[#e8eef8] font-semibold text-[var(--color-kapitaensblau)] dark:bg-gray-700 dark:text-white'
+										: 'bg-white font-medium text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+								}`}
+							>
+								{tab.label}
+							</button>
+						)
+					})}
+				</nav>
 			</div>
 
+			<div
+				id="wurfabnahme-panel"
+				role="tabpanel"
+				aria-labelledby={`wurf-tab-${activeTab}`}
+			>
 			<WurfabnahmeApp
 				key={`${selectedHistoryValue}-${isReadOnly ? 'ro' : 'ed'}`}
 				basePath={basePath}
@@ -301,6 +368,7 @@ export function WurfabnahmeEditor({
 				>
 					Abbrechen
 				</button>
+			</div>
 			</div>
 		</div>
 	)
