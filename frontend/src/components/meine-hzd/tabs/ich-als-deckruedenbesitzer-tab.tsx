@@ -75,9 +75,6 @@ export function IchAlsDeckruedenbesitzerTab({
                     {breeder.kennelName?.substring(0, 2).toUpperCase()}
                 </Avatar>
                 <Box>
-                    <Typography variant='h5' gutterBottom>
-                        {breeder.kennelName}
-                    </Typography>
                     <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                         <Chip
                             label={isActive ? 'Aktiv' : 'Inaktiv'}

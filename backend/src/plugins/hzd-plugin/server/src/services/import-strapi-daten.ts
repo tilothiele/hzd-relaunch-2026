@@ -1034,8 +1034,13 @@ async function updateBreederOwnerGroups(
 	strapi: Core.Strapi,
 	counts: Counts,
 	log: (line: string) => void,
+	fixGroups: boolean,
 ): Promise<number> {
 	const label = 'Aktualisiere Züchter'
+	if (!fixGroups) {
+		log(`${label}: Gruppenzuordnung übersprungen, Fixe Gruppen ist nicht aktiv`)
+		return 0
+	}
 	const groups = new Map<string, { id: number; documentId?: string } | null>()
 	for (const key of [ZUECHTER_GROUP_KEY, STUD_DOG_OWNER_GROUP_KEY]) {
 		const group = await loadUserGroup(strapi, key)
@@ -1233,7 +1238,9 @@ async function import_strapi_daten(
 				idAttribute: 'cId',
 				counts: job.studDogs,
 				log,
-				apply: (entry) => updateStudDog(strapi, entry, log),
+				apply: (entry) => updateStudDog(strapi, entry, log, {
+					fixGroups: options.fixGroups,
+				}),
 			})
 		} else {
 			log('Aktualisiere Deckrüden übersprungen')
@@ -1242,7 +1249,12 @@ async function import_strapi_daten(
 		throwIfCancelled()
 		if (steps.breeders) {
 			job.phase = 'breeders'
-			failed += await updateBreederOwnerGroups(strapi, job.breeders, log)
+			failed += await updateBreederOwnerGroups(
+				strapi,
+				job.breeders,
+				log,
+				options.fixGroups,
+			)
 		} else {
 			log('Aktualisiere Züchter übersprungen')
 		}

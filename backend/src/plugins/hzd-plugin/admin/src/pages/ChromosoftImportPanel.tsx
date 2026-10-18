@@ -588,12 +588,12 @@ const ChromosoftImportPanel = () => {
     studDogs: formatMessage({
       id: getTranslation('chromosoft.import.studDogsHint'),
       defaultMessage:
-        'Aktualisiert Deckrüden-Profile fruchtbarer Rüden anhand des Besitzers und nimmt ihn in die Gruppe dr-besitzer auf.',
+        'Aktualisiert Deckrüden-Profile fruchtbarer Rüden anhand des Besitzers. Bei „Fixe Gruppen“ kommt der Besitzer in die Gruppe dr-besitzer.',
     }),
     breeders: formatMessage({
       id: getTranslation('chromosoft.import.breedersHint'),
       defaultMessage:
-        'Nimmt Owner-Members von Züchtern (Rolle B) in die Gruppe zuechter und Owner-Members von Deckrüden (Rolle S) in die Gruppe dr-besitzer auf.',
+        'Bei „Fixe Gruppen“ kommen Owner-Members von Züchtern (Rolle B) in die Gruppe zuechter und Owner-Members von Deckrüden (Rolle S) in die Gruppe dr-besitzer.',
     }),
     fixedUsers: formatMessage({
       id: getTranslation('chromosoft.import.fixedUsersHint'),
@@ -683,32 +683,6 @@ const ChromosoftImportPanel = () => {
           </Flex>
         </Flex>
 
-        <Flex gap={2}>
-          <Button
-            type="button"
-            loading={starting || (isRunning && !aborting)}
-            disabled={isRunning || !hasSelectedStep}
-            onClick={handleImport}
-          >
-            {formatMessage({
-              id: getTranslation('chromosoft.import.button'),
-              defaultMessage: 'Chromosoft-Daten importieren',
-            })}
-          </Button>
-          <Button
-            type="button"
-            variant="danger"
-            loading={aborting}
-            disabled={!isRunning}
-            onClick={handleAbort}
-          >
-            {formatMessage({
-              id: getTranslation('chromosoft.import.abort'),
-              defaultMessage: 'Abbruch',
-            })}
-          </Button>
-        </Flex>
-
         <Flex direction="column" alignItems="stretch" gap={4} width="100%">
           {STEP_ORDER.map((step) => (
             <Flex key={step} gap={3} alignItems="flex-start" width="100%">
@@ -789,6 +763,32 @@ const ChromosoftImportPanel = () => {
               </Box>
             </Flex>
           ))}
+        </Flex>
+
+        <Flex gap={2}>
+          <Button
+            type="button"
+            loading={starting || (isRunning && !aborting)}
+            disabled={isRunning || !hasSelectedStep}
+            onClick={handleImport}
+          >
+            {formatMessage({
+              id: getTranslation('chromosoft.import.button'),
+              defaultMessage: 'Chromosoft-Daten importieren',
+            })}
+          </Button>
+          <Button
+            type="button"
+            variant="danger"
+            loading={aborting}
+            disabled={!isRunning}
+            onClick={handleAbort}
+          >
+            {formatMessage({
+              id: getTranslation('chromosoft.import.abort'),
+              defaultMessage: 'Abbruch',
+            })}
+          </Button>
         </Flex>
 
         {status.logFileName && (

@@ -175,12 +175,12 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 				>
 					<Tab label='Mein Profil' value={0} />
 					{canSeeZuechterTabs && breeders.length > 0 && (
-						<Tab label='Mein Zwinger' value={1} />
+						<Tab label='Unser Zwinger' value={1} />
 					)}
 					{canSeeZuechterTabs && <Tab label='Meine Würfe' value={2} />}
 					{canSeeHunde && <Tab label='Meine Zuchthunde' value={3} />}
 					{canSeeDeckruedenTab && deckruedenInfo && (
-						<Tab label='Deckrüdenbesitzer-Infos' value={4} />
+						<Tab label='Deckrüdenbesitzer' value={4} />
 					)}
 				</Tabs>
 			</Box>

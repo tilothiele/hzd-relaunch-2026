@@ -808,6 +808,7 @@ export async function updateStudDog(
 	strapi: Core.Strapi,
 	dog: Record<string, unknown>,
 	log: (line: string) => void,
+	options?: { fixGroups?: boolean },
 ) {
 	const dogId = parseInteger(dog.cId)
 	const ownerCId = parseInteger(dog.cOwnerId)
@@ -843,7 +844,9 @@ export async function updateStudDog(
 		return
 	}
 
-	await ensureStudDogOwnerGroup(strapi, owner, log)
+	if (options?.fixGroups === true) {
+		await ensureStudDogOwnerGroup(strapi, owner, log)
+	}
 
 	const data: TargetData = {
 		cId: ownerCId,
