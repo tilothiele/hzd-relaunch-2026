@@ -10,11 +10,15 @@ import {
 import { useRouter } from 'next/navigation'
 import WurfabnahmeApp from '@/components/wurfabnahme/WurfabnahmeApp'
 import {
+	beginWurfabnahmeAutosave,
 	clearWurfabnahmeDraft,
+	endWurfabnahmeAutosave,
 	getWurfabnahme,
 	getWurfabnahmeDraft,
+	isWurfabnahmeAutosaveActive,
 	saveWurfabnahme,
 	saveWurfabnahmeDraft,
+	suspendWurfabnahmeAutosave,
 } from '@/services/wurfabnahme-db'
 import {
 	appendWurfabnahmeRecord,
@@ -63,9 +67,6 @@ export function WurfabnahmeEditor({
 	)
 	const [activeTab, setActiveTab] = useState<string>('stammblatt')
 	const [autosaveReady, setAutosaveReady] = useState(false)
-	const skipAutosaveRef = useRef(false)
-	const autosaveReadyRef = useRef(false)
-	const autosaveGenerationRef = useRef(0)
 	const snapshotRef = useRef({
 		recordId: recordId ?? null,
 		formData: draftFormData,
@@ -117,7 +118,6 @@ export function WurfabnahmeEditor({
 					}
 				}
 				setIsLoading(false)
-				autosaveReadyRef.current = true
 				setAutosaveReady(true)
 				return
 			}
@@ -149,7 +149,6 @@ export function WurfabnahmeEditor({
 				}
 			}
 			setIsLoading(false)
-			autosaveReadyRef.current = true
 			setAutosaveReady(true)
 		}
 
@@ -157,7 +156,6 @@ export function WurfabnahmeEditor({
 
 		return () => {
 			cancelled = true
-			autosaveReadyRef.current = false
 		}
 	}, [recordId])
 
@@ -191,14 +189,9 @@ export function WurfabnahmeEditor({
 	)
 
 	const discardTemporaryDraft = useCallback(async () => {
-		skipAutosaveRef.current = true
-		autosaveGenerationRef.current += 1
-		const existing = await getWurfabnahmeDraft()
-		const currentId = recordId ?? null
-		if (!existing || existing.recordId === currentId) {
-			await clearWurfabnahmeDraft()
-		}
-	}, [recordId])
+		suspendWurfabnahmeAutosave()
+		await clearWurfabnahmeDraft()
+	}, [])
 
 	const handleCancel = useCallback(() => {
 		void discardTemporaryDraft().finally(() => {
@@ -262,52 +255,36 @@ export function WurfabnahmeEditor({
 		discardTemporaryDraft,
 	])
 
-	const persistDraft = useCallback(async () => {
-		if (skipAutosaveRef.current || !autosaveReadyRef.current) return
+	const persistDraft = useCallback(async (session: number) => {
+		if (!isWurfabnahmeAutosaveActive(session)) return
 
-		const generation = autosaveGenerationRef.current
 		const snapshot = snapshotRef.current
-		const existing = await getWurfabnahmeDraft()
-		if (
-			skipAutosaveRef.current
-			|| generation !== autosaveGenerationRef.current
-		) {
-			return
-		}
-		if (existing && existing.recordId !== snapshot.recordId) return
-
-		await saveWurfabnahmeDraft({
+		await saveWurfabnahmeDraft(session, {
 			recordId: snapshot.recordId,
 			formData: snapshot.formData,
 			deletedWelpenIds: snapshot.deletedWelpenIds,
 			activeTab: snapshot.activeTab,
 		})
-
-		if (
-			skipAutosaveRef.current
-			|| generation !== autosaveGenerationRef.current
-		) {
-			await clearWurfabnahmeDraft()
-		}
 	}, [])
 
 	useEffect(() => {
 		if (!autosaveReady) return
 
+		const session = beginWurfabnahmeAutosave()
 		const timer = window.setInterval(() => {
-			void persistDraft()
+			void persistDraft(session)
 		}, AUTOSAVE_INTERVAL_MS)
 
 		const handlePageHide = () => {
-			void persistDraft()
+			void persistDraft(session)
 		}
 
 		window.addEventListener('pagehide', handlePageHide)
 
 		return () => {
+			endWurfabnahmeAutosave(session)
 			window.clearInterval(timer)
 			window.removeEventListener('pagehide', handlePageHide)
-			void persistDraft()
 		}
 	}, [autosaveReady, persistDraft])
 

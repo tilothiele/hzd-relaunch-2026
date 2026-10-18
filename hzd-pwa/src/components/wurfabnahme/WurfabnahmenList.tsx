@@ -3,7 +3,10 @@
 import { useRouter } from 'next/navigation'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db'
-import { clearWurfabnahmeDraft } from '@/services/wurfabnahme-db'
+import {
+	clearWurfabnahmeDraft,
+	suspendWurfabnahmeAutosave,
+} from '@/services/wurfabnahme-db'
 import { getWurfabnahmeListLabel } from '@/types/wurfabnahme-form'
 
 function formatDateTime(iso: string): string {
@@ -31,6 +34,7 @@ export function WurfabnahmenList() {
 	}
 
 	const handleDiscardDraft = () => {
+		suspendWurfabnahmeAutosave()
 		void clearWurfabnahmeDraft()
 	}
 
