@@ -770,10 +770,7 @@ function stampFooters(doc: PDFDocument, font: PDFFont) {
 	})
 }
 
-export async function buildWurfabnahmePdf(
-	formData: WurfabnahmeFormData,
-	deletedIds?: ReadonlySet<string>,
-): Promise<Uint8Array> {
+async function openDocument(stamm: StammblattData): Promise<Pen> {
 	const doc = await PDFDocument.create()
 	const font = await doc.embedFont(StandardFonts.Helvetica)
 	const bold = await doc.embedFont(StandardFonts.HelveticaBold)
@@ -785,10 +782,28 @@ export async function buildWurfabnahmePdf(
 		y: PAGE_H,
 		images: new Map(),
 		logo: await loadLogo(doc),
-		wurfLabel: litterLabel(formData.stammblatt),
+		wurfLabel: litterLabel(stamm),
 	}
 	doc.removePage(0)
+	return pen
+}
 
+async function saveDocument(pen: Pen, title: string): Promise<Uint8Array> {
+	const form = pen.doc.getForm()
+	if (form.getFields().length > 0) {
+		form.updateFieldAppearances(pen.font)
+	}
+	stampFooters(pen.doc, pen.font)
+	pen.doc.setTitle(title)
+	pen.doc.setAuthor('HZD e.V.')
+	return pen.doc.save()
+}
+
+export async function buildWurfabnahmePdf(
+	formData: WurfabnahmeFormData,
+	deletedIds?: ReadonlySet<string>,
+): Promise<Uint8Array> {
+	const pen = await openDocument(formData.stammblatt)
 	const welpen = activeWelpen(formData, deletedIds)
 	const stamm = formData.stammblatt
 	beginPage(pen, 'Stammblatt', 'Stammblatt')
@@ -834,25 +849,30 @@ export async function buildWurfabnahmePdf(
 		)
 	}
 
+	return saveDocument(pen, 'Wurfabnahmeprotokoll')
+}
+
+export async function buildWelpenkaeuferPdf(
+	formData: WurfabnahmeFormData,
+	buyerId: string,
+	deletedIds?: ReadonlySet<string>,
+): Promise<Uint8Array> {
 	const buyers = formData.welpenkaeufer ?? []
-	for (let index = 0; index < buyers.length; index += 1) {
-		await drawDatenschutz(
-			pen,
-			buyers[index],
-			index + 1,
-			stamm,
-			welpen,
-		)
+	const buyerIndex = buyers.findIndex((buyer) => buyer.id === buyerId)
+	if (buyerIndex < 0) {
+		throw new Error('Welpenkäufer nicht gefunden.')
 	}
 
-	if ((formData.welpenkaeufer ?? []).length > 0) {
-		doc.getForm().updateFieldAppearances(font)
-	}
-	stampFooters(doc, font)
-	doc.setTitle('Wurfabnahmeprotokoll')
-	doc.setAuthor('HZD e.V.')
-
-	return doc.save()
+	const pen = await openDocument(formData.stammblatt)
+	await drawDatenschutz(
+		pen,
+		buyers[buyerIndex],
+		buyerIndex + 1,
+		formData.stammblatt,
+		activeWelpen(formData, deletedIds),
+	)
+	const title = buyerName(buyers[buyerIndex]) || `Welpenkäufer ${buyerIndex + 1}`
+	return saveDocument(pen, title)
 }
 
 function drawWelpenTable(
@@ -931,18 +951,39 @@ function drawWelpenTable(
 	pen.y -= 6
 }
 
+function triggerPdfDownload(bytes: Uint8Array, filename: string) {
+	const blob = new Blob([Uint8Array.from(bytes)], { type: 'application/pdf' })
+	const url = URL.createObjectURL(blob)
+	const link = document.createElement('a')
+	link.href = url
+	link.download = filename.replace(/[\\/:*?"<>|]+/g, '-')
+	link.click()
+	URL.revokeObjectURL(url)
+}
+
 export async function downloadWurfabnahmePdf(
 	formData: WurfabnahmeFormData,
 	deletedIds?: ReadonlySet<string>,
 ): Promise<void> {
 	const bytes = await buildWurfabnahmePdf(formData, deletedIds)
-	const blob = new Blob([Uint8Array.from(bytes)], { type: 'application/pdf' })
-	const url = URL.createObjectURL(blob)
-	const link = document.createElement('a')
 	const zwinger = formData.stammblatt.zwingername.trim() || 'Wurfabnahme'
 	const datum = formatDateDe(formData.stammblatt.datum) || 'Protokoll'
-	link.href = url
-	link.download = `${zwinger} ${datum}.pdf`.replace(/[\\/:*?"<>|]+/g, '-')
-	link.click()
-	URL.revokeObjectURL(url)
+	triggerPdfDownload(bytes, `Wurfabnahmeprotokoll ${zwinger} ${datum}.pdf`)
+}
+
+export async function downloadWelpenkaeuferPdf(
+	formData: WurfabnahmeFormData,
+	buyerId: string,
+	deletedIds?: ReadonlySet<string>,
+): Promise<void> {
+	const buyers = formData.welpenkaeufer ?? []
+	const buyerIndex = buyers.findIndex((buyer) => buyer.id === buyerId)
+	const buyer = buyers[buyerIndex]
+	const bytes = await buildWelpenkaeuferPdf(formData, buyerId, deletedIds)
+	const name = buyer
+		? buyerName(buyer) || `Welpenkäufer ${buyerIndex + 1}`
+		: 'Welpenkäufer'
+	const zwinger = formData.stammblatt.zwingername.trim()
+	const filename = [name, zwinger, 'Welpenkäufer'].filter(Boolean).join(' ')
+	triggerPdfDownload(bytes, `${filename}.pdf`)
 }

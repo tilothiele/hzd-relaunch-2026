@@ -31,7 +31,7 @@ import {
 } from '@/types/wurfabnahme-form'
 
 const CURRENT_DRAFT_VALUE = 'draft'
-const AUTOSAVE_INTERVAL_MS = 30_000
+const AUTOSAVE_INTERVAL_MS = 10_000
 
 interface WurfabnahmeEditorProps {
 	basePath: string

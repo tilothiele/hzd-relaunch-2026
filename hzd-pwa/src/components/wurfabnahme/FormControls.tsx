@@ -1,6 +1,12 @@
 import type { CSSProperties, ReactNode } from 'react'
-import { downloadWurfabnahmePdf } from '@/lib/wurfabnahme-pdf'
-import type { WurfabnahmeFormData } from '@/types/wurfabnahme-form'
+import {
+	downloadWelpenkaeuferPdf,
+	downloadWurfabnahmePdf,
+} from '@/lib/wurfabnahme-pdf'
+import type {
+	WelpenkaeuferData,
+	WurfabnahmeFormData,
+} from '@/types/wurfabnahme-form'
 import { SignatureCanvas } from './SignatureCanvas'
 
 export function Card({
@@ -152,6 +158,15 @@ export function BesonderheitInput({
 	)
 }
 
+function buyerPdfLabel(buyer: WelpenkaeuferData, index: number): string {
+	const name = [buyer.name.trim(), buyer.vorname.trim()]
+		.filter(Boolean)
+		.join(', ')
+	return name
+		? `Welpenkäufer-PDF: ${name}`
+		: `Welpenkäufer-PDF ${index + 1}`
+}
+
 export function PdfAnleitung({
 	formData,
 	deletedIds,
@@ -159,8 +174,16 @@ export function PdfAnleitung({
 	formData: WurfabnahmeFormData
 	deletedIds?: Set<string>
 }) {
-	const handleCreate = () => {
+	const buyers = formData.welpenkaeufer ?? []
+
+	const handleCreateProtocol = () => {
 		downloadWurfabnahmePdf(formData, deletedIds).catch(() => {
+			window.alert('Das PDF konnte nicht erstellt werden.')
+		})
+	}
+
+	const handleCreateBuyer = (buyerId: string) => {
+		downloadWelpenkaeuferPdf(formData, buyerId, deletedIds).catch(() => {
 			window.alert('Das PDF konnte nicht erstellt werden.')
 		})
 	}
@@ -169,16 +192,28 @@ export function PdfAnleitung({
 		<div className="wa-pdf-anleitung">
 			<strong>PDF mit je einer DIN-A4-Seite</strong>
 			<p>
-				Stammblatt, jeder Welpe und jeder Welpenkäufer werden als eigene
-				Seiten geschrieben.
+				Das Wurfabnahmeprotokoll enthält das Stammblatt und jedes
+				Welpenblatt. Für jeden Welpenkäufer wird ein eigenes PDF erzeugt.
 			</p>
-			<button
-				type="button"
-				className="wa-pdf-btn"
-				onClick={handleCreate}
-			>
-				PDF erstellen
-			</button>
+			<div className="wa-pdf-actions">
+				<button
+					type="button"
+					className="wa-pdf-btn"
+					onClick={handleCreateProtocol}
+				>
+					Wurfabnahmeprotokoll-PDF erstellen
+				</button>
+				{buyers.map((buyer, index) => (
+					<button
+						key={buyer.id}
+						type="button"
+						className="wa-pdf-btn"
+						onClick={() => handleCreateBuyer(buyer.id)}
+					>
+						{buyerPdfLabel(buyer, index)}
+					</button>
+				))}
+			</div>
 		</div>
 	)
 }

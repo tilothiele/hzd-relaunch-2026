@@ -585,6 +585,13 @@
 	margin-bottom: 5px;
 }
 
+.wurfabnahme-app .wa-pdf-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 10px;
+}
+
 .wurfabnahme-app .wa-pdf-btn {
 	background: #1a6a9a;
 	color: white;
@@ -595,8 +602,7 @@
 	font-size: 14px;
 	font-weight: bold;
 	cursor: pointer;
-	width: 100%;
-	margin-top: 10px;
+	width: auto;
 }
 
 .wurfabnahme-app .wa-pdf-btn:active {
