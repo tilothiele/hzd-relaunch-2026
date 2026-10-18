@@ -8,10 +8,13 @@ import {
 	useState,
 	type ReactNode,
 } from 'react'
-import { signIn, signOut, useSession } from 'next-auth/react'
-import { performFederatedLogout } from '@/lib/federated-logout'
-import { getLoginCallbackUrl } from '@/lib/auth-login'
-import { createFallbackUser, fetchMe } from '@/lib/strapi-api'
+import { useRouter } from 'next/navigation'
+import {
+	fetchAuthSession,
+	loginWithPassword,
+	logoutFromBackend,
+} from '@/lib/auth-api'
+import { getLoginPageHref } from '@/lib/auth-login'
 import type { AuthUser } from '@/types/auth-user'
 
 interface AuthState {
@@ -27,135 +30,156 @@ interface AuthContextValue {
 	isAuthenticating: boolean
 	handleLogin: () => Promise<void>
 	handleLogout: () => Promise<void>
+	login: (identifier: string, password: string) => Promise<void>
 	isInitialized: boolean
 }
 
-export const AuthContext = createContext<AuthContextValue | undefined>(undefined)
+export const AuthContext = createContext<AuthContextValue | undefined>(
+	undefined,
+)
 
 interface AuthProviderProps {
 	children: ReactNode
 }
 
+const SESSION_EXPIRED_MESSAGE =
+	'Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.'
+
 export function AuthProvider({ children }: AuthProviderProps) {
-	const { data: session, status } = useSession()
-	const [authState, setAuthState] = useState<AuthState>({ token: null, user: null })
+	const router = useRouter()
+	const [authState, setAuthState] = useState<AuthState>({
+		token: null,
+		user: null,
+	})
 	const [authError, setAuthError] = useState<string | null>(null)
-	const [isAuthenticating, setIsAuthenticating] = useState(false)
-	const [hasMounted, setHasMounted] = useState(false)
+	const [isAuthenticating, setIsAuthenticating] = useState(true)
+	const [isInitialized, setIsInitialized] = useState(false)
 
-	const invalidateSession = useCallback(async () => {
+	const clearAuthSession = useCallback(() => {
 		setAuthState({ token: null, user: null })
-		setAuthError('Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.')
-		await signOut({ callbackUrl: '/login' })
-	}, [])
-
-	useEffect(() => {
-		setHasMounted(true)
 	}, [])
 
 	useEffect(() => {
 		let isActive = true
-		const strapiToken = session?.idToken ?? session?.accessToken ?? null
 
-		async function syncSessionUser() {
-			if (!hasMounted || status === 'loading') {
-				return
-			}
-
-			if (session?.error) {
-				await invalidateSession()
-				return
-			}
-
-			if (!strapiToken) {
-				setAuthState({ token: null, user: null })
-				setAuthError(null)
-				return
-			}
-
-			setAuthError(null)
+		async function loadSession() {
+			setIsAuthenticating(true)
 
 			try {
-				const me = await fetchMe(strapiToken)
+				const session = await fetchAuthSession()
 
 				if (!isActive) {
 					return
 				}
 
+				if (session.expired) {
+					clearAuthSession()
+					setAuthError(SESSION_EXPIRED_MESSAGE)
+					router.replace('/login?error=SessionExpired')
+					return
+				}
+
+				if (!session.jwt) {
+					clearAuthSession()
+					setAuthError(null)
+					return
+				}
+
 				setAuthState({
-					token: strapiToken,
-					user: me ?? createFallbackUser(session?.user),
+					token: session.jwt,
+					user: session.user ?? null,
 				})
+				setAuthError(null)
 			} catch (error) {
 				if (!isActive) {
 					return
 				}
 
-				console.error('[Auth] Fehler beim Laden des User-Profils:', error)
-				setAuthState({
-					token: strapiToken,
-					user: createFallbackUser(session?.user),
-				})
+				console.error('[Auth] Session konnte nicht geladen werden:', error)
+				clearAuthSession()
+			} finally {
+				if (isActive) {
+					setIsAuthenticating(false)
+					setIsInitialized(true)
+				}
 			}
 		}
 
-		void syncSessionUser()
+		void loadSession()
 
 		return () => {
 			isActive = false
 		}
-	}, [hasMounted, invalidateSession, session, status])
+	}, [clearAuthSession, router])
 
-	const handleLogin = useCallback(async () => {
+	const login = useCallback(async (
+		identifier: string,
+		password: string,
+	) => {
 		setIsAuthenticating(true)
 		setAuthError(null)
 
 		try {
-			await signIn('authentik', {
-				callbackUrl: getLoginCallbackUrl(),
-				redirect: true,
+			const result = await loginWithPassword(identifier, password)
+			setAuthState({
+				token: result.jwt,
+				user: result.user,
 			})
+		} catch (error) {
+			const message = error instanceof Error
+				? error.message
+				: 'Anmeldung fehlgeschlagen.'
+			setAuthError(message)
+			throw error instanceof Error ? error : new Error(message)
 		} finally {
 			setIsAuthenticating(false)
 		}
 	}, [])
+
+	const handleLogin = useCallback(async () => {
+		router.push(getLoginPageHref())
+	}, [router])
 
 	const handleLogout = useCallback(async () => {
 		setIsAuthenticating(true)
 		setAuthError(null)
-		setAuthState({ token: null, user: null })
+		clearAuthSession()
 
 		try {
-			await performFederatedLogout(`${window.location.origin}/login`)
+			await logoutFromBackend()
+		} catch (error) {
+			console.error('[Auth] Logout fehlgeschlagen:', error)
 		} finally {
 			setIsAuthenticating(false)
+			router.push('/login')
+			router.refresh()
 		}
-	}, [])
+	}, [clearAuthSession, router])
 
-	const isInitialized = hasMounted && status !== 'loading'
-	const isAuthenticated = hasMounted
-		&& status === 'authenticated'
-		&& Boolean(authState.token)
+	const isAuthenticated = Boolean(authState.token)
 
 	const value = useMemo<AuthContextValue>(() => ({
-		authState: hasMounted ? authState : { token: null, user: null },
+		authState,
 		isAuthenticated,
-		user: hasMounted ? authState.user : null,
+		user: authState.user,
 		authError,
-		isAuthenticating: hasMounted && (isAuthenticating || status === 'loading'),
+		isAuthenticating: isAuthenticating || !isInitialized,
 		handleLogin,
 		handleLogout,
+		login,
 		isInitialized,
 	}), [
 		authState,
 		authError,
-		hasMounted,
 		handleLogin,
 		handleLogout,
 		isAuthenticated,
 		isAuthenticating,
 		isInitialized,
+		login,
 	])
 
-	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+	return (
+		<AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+	)
 }

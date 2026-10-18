@@ -17,11 +17,13 @@ export function searchDogs(
 	return dogs
 		.filter((dog) => {
 			const name = (dog.fullkennelname || '').toLowerCase()
+			const givenName = (dog.givenName || '').toLowerCase()
 			const chip = (dog.microchipNo || '').toLowerCase()
 			const studBook = (dog.cStudBookNumber || '').toLowerCase()
 
 			return (
 				name.includes(normalizedQuery)
+				|| givenName.includes(normalizedQuery)
 				|| chip.includes(normalizedQuery)
 				|| studBook.includes(normalizedQuery)
 			)

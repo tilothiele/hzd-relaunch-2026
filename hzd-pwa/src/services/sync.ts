@@ -1,3 +1,4 @@
+import { mapStrapiDog } from '@/lib/map-strapi-dog';
 import { db } from './db';
 
 interface SyncResult {
@@ -18,8 +19,16 @@ export async function syncDogs(onProgress?: (current: number, total: number) => 
         const seenIds = new Set<string>();
 
         do {
-            // Manually construct query string to avoid encoding brackets if that's the issue
-            const queryString = `pagination[page]=${page}&pagination[pageSize]=${pageSize}`;
+            // Klammern nicht encoden, sonst ignoriert Strapi die Parameter.
+            const queryString = [
+                `pagination[page]=${page}`,
+                `pagination[pageSize]=${pageSize}`,
+                'populate[owner][fields][0]=firstName',
+                'populate[owner][fields][1]=lastName',
+                'populate[owner][fields][2]=DisplayName',
+                'populate[owner][fields][3]=membershipNumber',
+                'populate[owner][fields][4]=username',
+            ].join('&');
             const url = `/api/proxy/hzd-plugin/dogs?${queryString}`;
 
             const response = await fetch(url, {
@@ -92,24 +101,9 @@ export async function syncDogs(onProgress?: (current: number, total: number) => 
             page++;
         } while (page <= pageCount);
 
-        // 2. Transform data
-        const dogs = allDogs.map((item: any) => ({
-            documentId: item.documentId,
-            fullkennelname: item.fullKennelName || item.FullKennelName || item.fullkennelname || '',
-            dateofbirth: item.dateOfBirth || item.DateOfBirth || item.dateofbirth || '',
-            dateofdeath: item.dateOfDeath || item.DateOfDeath || item.dateofdeath || null,
-            microchipNo: item.microchipNo || item.MicrochipNo || '',
-            sex: item.sex || item.Sex || '',
-            color: item.color || item.Color || '',
-            ownerName: item.owner?.name || item.owner?.Name || item.owner?.username || '',
-            ownerMembershipNumber: String(
-                item.owner?.membershipNumber
-                ?? item.owner?.MembershipNumber
-                ?? '',
-            ),
-            cStudBookNumber: item.cStudBookNumber || item.CStudBookNumber || '',
-            cFertile: item.cFertile === true ? 'Ja' : (item.cFertile === false ? 'Nein' : (item.cFertile || item.CFertile || '')),
-        }));
+        const dogs = allDogs
+            .map((item: unknown) => mapStrapiDog(item))
+            .filter((dog): dog is NonNullable<typeof dog> => dog !== null);
 
         // 3. Clear and Bulk Put to Dexie
         const uniqueDogs = Array.from(new Map(dogs.map(item => [item.documentId, item])).values());

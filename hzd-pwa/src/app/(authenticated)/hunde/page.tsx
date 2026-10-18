@@ -105,7 +105,8 @@ export default function HundePage() {
             // Search Query
             if (searchQuery) {
                 const query = searchQuery.toLowerCase();
-                const matchesName = (dog.fullkennelname || '').toLowerCase().includes(query);
+                const matchesName = (dog.fullkennelname || '').toLowerCase().includes(query)
+                    || (dog.givenName || '').toLowerCase().includes(query);
                 const matchesChip = (dog.microchipNo || '').toLowerCase().includes(query);
                 const matchesStud = (dog.cStudBookNumber || '').toLowerCase().includes(query);
                 if (!matchesName && !matchesChip && !matchesStud) return false;
@@ -342,7 +343,14 @@ export default function HundePage() {
                             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                 {paginatedDogs.map((dog) => (
                                     <tr key={dog.documentId} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                        <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">{dog.fullkennelname}</td>
+                                        <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">
+                                            {dog.fullkennelname}
+                                            {dog.givenName && dog.givenName !== dog.fullkennelname ? (
+                                                <div className="text-xs font-normal text-gray-500 dark:text-gray-400">
+                                                    {dog.givenName}
+                                                </div>
+                                            ) : null}
+                                        </td>
                                         <td className="px-4 py-3">{formatDateAndAge(dog.dateofbirth)}</td>
                                         <td className="px-4 py-3 font-mono">{dog.microchipNo}</td>
                                         <td className="px-4 py-3">

@@ -5,12 +5,13 @@ import type { Wurfabnahme } from '@/types/wurfabnahme-form';
 interface Dog {
     documentId: string;
     fullkennelname: string;
+    givenName?: string;
     dateofbirth: string;
     dateofdeath: string | null;
     microchipNo: string;
     sex: string;
     color: string;
-    ownerName: string; // Flattened from owner.name
+    ownerName: string;
     ownerMembershipNumber: string;
     cStudBookNumber: string;
     cFertile: string;

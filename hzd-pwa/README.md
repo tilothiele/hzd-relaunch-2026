@@ -13,13 +13,9 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Authentifizierung
 
-Die Anmeldung läuft über **Authentik (OIDC)** via NextAuth — analog zum `frontend`-Projekt.
+Die Anmeldung läuft über **Strapi** (`POST /api/auth/local`) mit E-Mail oder Benutzername und Passwort. Das JWT liegt in einem httpOnly-Cookie; API-Aufrufe gehen per REST über `/api/proxy` an Strapi.
 
-1. `.env` aus `.env.example` anlegen und Werte setzen
-2. In Authentik eine eigene OAuth-Application für die PWA anlegen
-3. Redirect-URI: `{NEXTAUTH_URL}/api/auth/callback/authentik`
-
-Wichtige Variablen: `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `AUTHENTIK_ISSUER`, `AUTHENTIK_CLIENT_ID`, `STRAPI_BASE_URL`.
+Wichtige Variable: `STRAPI_BASE_URL` (Standard `http://localhost:1337`).
 
 ## Learn More
 

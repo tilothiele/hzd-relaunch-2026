@@ -55,7 +55,7 @@ export function mapDogToKoerungHundFields(
 	| 'mitgliedsnummer'
 > {
 	return {
-		vollerZwingername: dog.fullkennelname ?? '',
+		vollerZwingername: dog.fullkennelname || dog.givenName || '',
 		zuchtbuchnummer: dog.cStudBookNumber ?? '',
 		geschlecht: mapSexToKoerungGeschlecht(dog.sex),
 		wurftag: normalizeDateForInput(dog.dateofbirth),

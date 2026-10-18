@@ -8,6 +8,7 @@ const pwaConfig = withPWA({
 
 const nextConfig: NextConfig = {
 	output: 'standalone',
+	agentRules: false,
 	async rewrites() {
 		return [
 			{

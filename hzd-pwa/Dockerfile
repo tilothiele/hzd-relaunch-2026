@@ -16,7 +16,7 @@ RUN corepack prepare pnpm@11.1.2 --activate \
 FROM base AS builder
 WORKDIR /app
 
-# Nur öffentliche Build-Config – Secrets (NEXTAUTH_SECRET etc.) nur zur Laufzeit setzen
+# Nur öffentliche Build-Config – keine Secrets ins Image backen
 ARG STRAPI_BASE_URL=http://localhost:1337
 ENV STRAPI_BASE_URL=${STRAPI_BASE_URL}
 

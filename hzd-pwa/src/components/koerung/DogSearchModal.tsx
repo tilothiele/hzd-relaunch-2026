@@ -118,7 +118,7 @@ export function DogSearchModal({
 								>
 									<div className="min-w-0 flex-1">
 										<p className="truncate font-medium">
-											{dog.fullkennelname || '–'}
+											{dog.fullkennelname || dog.givenName || '–'}
 										</p>
 										<p className="text-xs text-gray-500 dark:text-gray-400">
 											Zuchtbuch: {dog.cStudBookNumber || '–'}

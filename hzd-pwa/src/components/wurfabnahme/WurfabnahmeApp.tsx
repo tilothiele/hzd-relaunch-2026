@@ -47,7 +47,7 @@ function WurfabnahmeAppInner({
 				...formData,
 				stammblatt: {
 					...formData.stammblatt,
-					zuchthuendin: dog.fullkennelname ?? '',
+					zuchthuendin: dog.fullkennelname || dog.givenName || '',
 					zuchtbuchNrHuendin: dog.cStudBookNumber ?? '',
 				},
 			})

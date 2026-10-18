@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getToken } from 'next-auth/jwt'
+import { getStrapiJwtFromRequest } from '@/lib/auth-cookie'
+import { getStrapiBaseUrl } from '@/lib/strapi-api'
 
 export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
-
-function getStrapiBaseUrl(): string {
-	return (process.env.STRAPI_BASE_URL ?? 'http://localhost:1337').replace(/\/$/, '')
-}
 
 async function forwardToStrapi(
 	request: NextRequest,
@@ -19,11 +16,6 @@ async function forwardToStrapi(
 	const targetUrl = forwardParams.toString()
 		? `${strapiBaseUrl}/api/${apiPath}?${forwardParams.toString()}`
 		: `${strapiBaseUrl}/api/${apiPath}`
-
-	const sessionToken = await getToken({
-		req: request,
-		secret: process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET,
-	})
 
 	const headerAuth = request.headers.get('authorization')
 	const headerToken = headerAuth?.startsWith('Bearer ')
@@ -40,9 +32,7 @@ async function forwardToStrapi(
 		}
 	}
 
-	const effectiveToken = headerToken
-		?? sessionToken?.idToken
-		?? sessionToken?.accessToken
+	const effectiveToken = headerToken ?? getStrapiJwtFromRequest(request)
 
 	const headers: Record<string, string> = {
 		Accept: 'application/json',
