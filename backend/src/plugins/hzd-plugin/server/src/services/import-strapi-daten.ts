@@ -7,7 +7,6 @@ import { findDocumentsPage } from '../utils/document-pagination'
 import {
 	loadAuthenticatedRoleId,
 	ensureBreederForCsMember,
-	updateBreederFromUser,
 	updateDog,
 	updateStudDog,
 	updateUser,
@@ -41,12 +40,12 @@ type ImportPhase =
 	| 'idle'
 	| 'members'
 	| 'dogs'
-	| 'breeders'
 	| 'studDogs'
+	| 'breeders'
 	| 'fixedUsers'
 	| 'done'
 	| 'error'
-type ImportStep = 'members' | 'dogs' | 'breeders' | 'studDogs' | 'fixedUsers'
+type ImportStep = 'members' | 'dogs' | 'studDogs' | 'breeders' | 'fixedUsers'
 
 interface Counts {
 	processed: number
@@ -57,8 +56,8 @@ interface Counts {
 export interface ImportSteps {
 	members: boolean
 	dogs: boolean
-	breeders: boolean
 	studDogs: boolean
+	breeders: boolean
 	fixedUsers: boolean
 }
 
@@ -67,8 +66,8 @@ interface JobState {
 	steps: ImportSteps
 	members: Counts
 	dogs: Counts
-	breeders: Counts
 	studDogs: Counts
+	breeders: Counts
 	fixedUsers: Counts
 	logFileName: string | null
 	logFilePath: string | null
@@ -87,8 +86,8 @@ export interface ImportStrapiDatenStatus {
 	steps: ImportSteps
 	members: Counts
 	dogs: Counts
-	breeders: Counts
 	studDogs: Counts
+	breeders: Counts
 	fixedUsers: Counts
 	logFileName: string | null
 	error: string | null
@@ -102,12 +101,14 @@ interface ImportOptions {
 }
 
 const USER_GROUP_UID = 'api::user-group.user-group'
+const BREEDER_UID = 'plugin::hzd-plugin.breeder'
 const ZUECHTER_GROUP_KEY = 'zuechter'
+const STUD_DOG_OWNER_GROUP_KEY = 'dr-besitzer'
 const STEP_ORDER: ImportStep[] = [
 	'members',
 	'dogs',
-	'breeders',
 	'studDogs',
+	'breeders',
 	'fixedUsers',
 ]
 
@@ -115,8 +116,8 @@ function defaultSteps(): ImportSteps {
 	return {
 		members: true,
 		dogs: true,
-		breeders: true,
 		studDogs: true,
+		breeders: true,
 		fixedUsers: true,
 	}
 }
@@ -144,8 +145,8 @@ function idleJob(): JobState {
 		steps: defaultSteps(),
 		members: emptyCounts(),
 		dogs: emptyCounts(),
-		breeders: emptyCounts(),
 		studDogs: emptyCounts(),
+		breeders: emptyCounts(),
 		fixedUsers: emptyCounts(),
 		logFileName: null,
 		logFilePath: null,
@@ -203,8 +204,8 @@ function snapshot(): Omit<ImportStrapiDatenStatus, 'timestamps'> {
 		steps: { ...job.steps },
 		members: { ...job.members },
 		dogs: { ...job.dogs },
-		breeders: { ...job.breeders },
 		studDogs: { ...job.studDogs },
+		breeders: { ...job.breeders },
 		fixedUsers: { ...job.fixedUsers },
 		logFileName: finished ? job.logFileName : null,
 		error: job.error,
@@ -797,11 +798,12 @@ function hasBreederRoleB(user: Record<string, unknown>): boolean {
 	})
 }
 
-async function loadZuechterGroup(
+async function loadUserGroup(
 	strapi: Core.Strapi,
+	key: string,
 ): Promise<{ id: number; documentId?: string } | null> {
 	const found = await strapi.db.query(USER_GROUP_UID).findOne({
-		where: { key: ZUECHTER_GROUP_KEY },
+		where: { key },
 		select: ['id', 'documentId'],
 	}) as { id?: number; documentId?: string } | null
 	if (typeof found?.id !== 'number') {
@@ -811,6 +813,16 @@ async function loadZuechterGroup(
 		id: found.id,
 		documentId: found.documentId,
 	}
+}
+
+async function loadZuechterGroup(
+	strapi: Core.Strapi,
+): Promise<{ id: number; documentId?: string } | null> {
+	return loadUserGroup(strapi, ZUECHTER_GROUP_KEY)
+}
+
+function hasUserGroup(user: Record<string, unknown>, key: string): boolean {
+	return relationEntries(user.user_groups).some((group) => group.key === key)
 }
 
 async function connectZuechterGroup(
@@ -996,36 +1008,6 @@ async function fixUserData(
 	return failed
 }
 
-async function loadBreedingStations(
-	strapi: Core.Strapi,
-	generation: number | null,
-): Promise<Map<string, string>> {
-	const byPerson = new Map<string, string>()
-	if (!generation) {
-		return byPerson
-	}
-	let page = 1
-	while (true) {
-		throwIfCancelled()
-		const result = await loadGenerationPage(strapi, CS_MEMBER_UID, generation, page)
-		for (const entry of result.results) {
-			const personId = readRecordId(entry.IdPerson)
-			const station = typeof entry.BreedingStation === 'string'
-				? entry.BreedingStation.trim()
-				: ''
-			if (!personId || !station || station === '-') {
-				continue
-			}
-			byPerson.set(personId, station.slice(0, 200))
-		}
-		if (page >= result.pagination.pageCount || result.results.length === 0) {
-			break
-		}
-		page += 1
-	}
-	return byPerson
-}
-
 function firstEnabledStep(steps: ImportSteps): ImportStep | null {
 	return STEP_ORDER.find((step) => steps[step]) ?? null
 }
@@ -1041,6 +1023,107 @@ function normalizeSteps(value: Partial<ImportSteps> | undefined): ImportSteps {
 		}
 	}
 	return steps
+}
+
+const OWNER_GROUP_BY_ROLE: Record<string, string> = {
+	B: ZUECHTER_GROUP_KEY,
+	S: STUD_DOG_OWNER_GROUP_KEY,
+}
+
+async function updateBreederOwnerGroups(
+	strapi: Core.Strapi,
+	counts: Counts,
+	log: (line: string) => void,
+): Promise<number> {
+	const label = 'Aktualisiere Züchter'
+	const groups = new Map<string, { id: number; documentId?: string } | null>()
+	for (const key of [ZUECHTER_GROUP_KEY, STUD_DOG_OWNER_GROUP_KEY]) {
+		const group = await loadUserGroup(strapi, key)
+		groups.set(key, group)
+		if (!group) {
+			log(`${label}: UserGroup key=${key} nicht gefunden`)
+		}
+	}
+
+	const total = await countFiltered(strapi, BREEDER_UID, {})
+	counts.processed = 0
+	counts.total = total
+	counts.skipped = 0
+	log(`${label}: ${total} Breeder`)
+
+	const assigned = new Set<string>()
+	let imported = 0
+	let failed = 0
+	let page = 1
+	while (true) {
+		throwIfCancelled()
+		const result = await findDocumentsPage<Record<string, unknown>>(
+			strapi,
+			BREEDER_UID,
+			{
+				fields: ['documentId', 'cId', 'kennelName', 'BreederRole'],
+				populate: {
+					owner_members: {
+						populate: {
+							user_groups: true,
+						},
+					},
+				},
+				page,
+				pageSize: PAGE_SIZE,
+			},
+		)
+		for (const breeder of result.results) {
+			throwIfCancelled()
+			imported += 1
+			counts.processed = imported
+			const role = typeof breeder.BreederRole === 'string' ? breeder.BreederRole : ''
+			const groupKey = OWNER_GROUP_BY_ROLE[role]
+			if (!groupKey) {
+				continue
+			}
+			const group = groups.get(groupKey) ?? null
+			if (!group) {
+				continue
+			}
+			const kennel = typeof breeder.kennelName === 'string' && breeder.kennelName.trim()
+				? breeder.kennelName.trim()
+				: `cId=${String(breeder.cId ?? breeder.id ?? '')}`
+			for (const member of relationEntries(breeder.owner_members)) {
+				throwIfCancelled()
+				const memberId = typeof member.id === 'number' ? String(member.id) : ''
+				const assignmentKey = `${memberId || member.documentId}:${groupKey}`
+				if (assigned.has(assignmentKey) || hasUserGroup(member, groupKey)) {
+					continue
+				}
+				try {
+					await connectZuechterGroup(strapi, member, group)
+					assigned.add(assignmentKey)
+					log(
+						`${label}: Benutzer ${benutzerName(member)} von "${kennel}" in die Gruppe ${groupKey} aufgenommen`,
+					)
+				} catch (error) {
+					if (isImportCancelled(error)) {
+						throw error
+					}
+					failed += 1
+					const message = describeError(error)
+					const line = `${label}: Benutzer ${benutzerName(member)} fehlgeschlagen: ${message}`
+					log(line)
+					strapi.log.error(`import_strapi_daten ${line}`)
+				}
+			}
+			await yieldToEventLoop()
+		}
+		if (page >= result.pagination.pageCount || result.results.length === 0) {
+			break
+		}
+		page += 1
+	}
+
+	counts.processed = imported
+	log(`${label} abgeschlossen: ${imported}/${total}, fehlgeschlagen ${failed}`)
+	return failed
 }
 
 async function import_strapi_daten(
@@ -1138,38 +1221,6 @@ async function import_strapi_daten(
 		}
 
 		throwIfCancelled()
-		if (steps.breeders) {
-			job.phase = 'breeders'
-			const memberGeneration = await loadCurrentGeneration(
-				strapi,
-				'ImportGenerationCSMembers',
-			)
-			const breedingStations = await loadBreedingStations(
-				strapi,
-				memberGeneration,
-			)
-			failed += await runEntityStep(strapi, {
-				label: 'Aktualisiere Züchterdaten',
-				uid: USER_UID,
-				filters: { cFlagBreeder: { $eq: true } },
-				idAttribute: 'cId',
-				counts: job.breeders,
-				log,
-				apply: (entry) => {
-					const personId = readRecordId(entry.cId)
-					return updateBreederFromUser(
-						strapi,
-						entry,
-						personId ? breedingStations.get(personId) ?? null : null,
-						log,
-					)
-				},
-			})
-		} else {
-			log('Aktualisiere Züchterdaten übersprungen')
-		}
-
-		throwIfCancelled()
 		if (steps.studDogs) {
 			job.phase = 'studDogs'
 			failed += await runEntityStep(strapi, {
@@ -1189,6 +1240,14 @@ async function import_strapi_daten(
 		}
 
 		throwIfCancelled()
+		if (steps.breeders) {
+			job.phase = 'breeders'
+			failed += await updateBreederOwnerGroups(strapi, job.breeders, log)
+		} else {
+			log('Aktualisiere Züchter übersprungen')
+		}
+
+		throwIfCancelled()
 		if (steps.fixedUsers) {
 			job.phase = 'fixedUsers'
 			failed += await fixUserData(strapi, {
@@ -1202,14 +1261,14 @@ async function import_strapi_daten(
 
 		const duration = Date.now() - startedAt
 		log(
-			`Import abgeschlossen in ${duration}ms. CS_Member=${job.members.processed} (${job.members.skipped} übersprungen), CS_Dog=${job.dogs.processed} (${job.dogs.skipped} übersprungen), Züchter=${job.breeders.processed}, Deckrüden=${job.studDogs.processed}, Fixe Benutzerdaten=${job.fixedUsers.processed}, fehlgeschlagen=${failed}`,
+			`Import abgeschlossen in ${duration}ms. CS_Member=${job.members.processed} (${job.members.skipped} übersprungen), CS_Dog=${job.dogs.processed} (${job.dogs.skipped} übersprungen), Deckrüden=${job.studDogs.processed}, Züchter=${job.breeders.processed}, Fixe Benutzerdaten=${job.fixedUsers.processed}, fehlgeschlagen=${failed}`,
 		)
 		job.phase = 'done'
 		job.error = failed > 0
 			? `${failed} Datensätze fehlgeschlagen, Details im Import-Log`
 			: null
 		strapi.log.info(
-			`import_strapi_daten: ${job.members.processed} CS_Member, ${job.dogs.processed} CS_Dog, ${job.breeders.processed} Züchter, ${job.studDogs.processed} Deckrüden, fehlgeschlagen=${failed}, log=${job.logFileName}`,
+			`import_strapi_daten: ${job.members.processed} CS_Member, ${job.dogs.processed} CS_Dog, ${job.studDogs.processed} Deckrüden, ${job.breeders.processed} Züchter, fehlgeschlagen=${failed}, log=${job.logFileName}`,
 		)
 	} catch (error) {
 		const cancelled = isImportCancelled(error)
@@ -1265,8 +1324,8 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
 	abortImport() {
 		const activePhase = job.phase === 'members'
 			|| job.phase === 'dogs'
-			|| job.phase === 'breeders'
 			|| job.phase === 'studDogs'
+			|| job.phase === 'breeders'
 			|| job.phase === 'fixedUsers'
 		if (!running && !activePhase) {
 			return { aborted: false, status: snapshot() }

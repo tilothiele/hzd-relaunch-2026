@@ -11,13 +11,13 @@ type ImportPhase =
   | 'idle'
   | 'members'
   | 'dogs'
-  | 'breeders'
   | 'studDogs'
+  | 'breeders'
   | 'fixedUsers'
   | 'done'
   | 'error';
 
-type ImportStepKey = 'members' | 'dogs' | 'breeders' | 'studDogs' | 'fixedUsers';
+type ImportStepKey = 'members' | 'dogs' | 'studDogs' | 'breeders' | 'fixedUsers';
 
 interface ImportCounts {
   processed: number;
@@ -28,8 +28,8 @@ interface ImportCounts {
 interface ImportSteps {
   members: boolean;
   dogs: boolean;
-  breeders: boolean;
   studDogs: boolean;
+  breeders: boolean;
   fixedUsers: boolean;
 }
 
@@ -45,8 +45,8 @@ interface ImportStatus {
   steps: ImportSteps;
   members: ImportCounts;
   dogs: ImportCounts;
-  breeders: ImportCounts;
   studDogs: ImportCounts;
+  breeders: ImportCounts;
   fixedUsers: ImportCounts;
   logFileName: string | null;
   error: string | null;
@@ -56,24 +56,24 @@ interface ImportStatus {
 const STEP_ORDER: ImportStepKey[] = [
   'members',
   'dogs',
-  'breeders',
   'studDogs',
+  'breeders',
   'fixedUsers',
 ];
 
 const DEFAULT_STEPS: ImportSteps = {
   members: true,
   dogs: true,
-  breeders: true,
   studDogs: true,
+  breeders: true,
   fixedUsers: true,
 };
 
 const RUNNING_PHASES: ImportPhase[] = [
   'members',
   'dogs',
-  'breeders',
   'studDogs',
+  'breeders',
   'fixedUsers',
 ];
 
@@ -95,8 +95,8 @@ const IDLE_STATUS: ImportStatus = {
   steps: DEFAULT_STEPS,
   members: emptyCounts(),
   dogs: emptyCounts(),
-  breeders: emptyCounts(),
   studDogs: emptyCounts(),
+  breeders: emptyCounts(),
   fixedUsers: emptyCounts(),
   logFileName: null,
   error: null,
@@ -209,8 +209,8 @@ function asSteps(value: unknown): ImportSteps {
   return {
     members: source.members !== false,
     dogs: source.dogs !== false,
-    breeders: source.breeders !== false,
     studDogs: source.studDogs !== false,
+    breeders: source.breeders !== false,
     fixedUsers: source.fixedUsers !== false,
   };
 }
@@ -228,8 +228,8 @@ function normalizeStatus(value: unknown): ImportStatus | null {
     steps: asSteps(status.steps),
     members: asCounts(status.members),
     dogs: asCounts(status.dogs),
-    breeders: asCounts(status.breeders),
     studDogs: asCounts(status.studDogs),
+    breeders: asCounts(status.breeders),
     fixedUsers: asCounts(status.fixedUsers),
     logFileName: typeof status.logFileName === 'string' ? status.logFileName : null,
     error: typeof status.error === 'string' ? status.error : null,
@@ -411,15 +411,15 @@ const ChromosoftImportPanel = () => {
           {
             id: getTranslation('chromosoft.import.successSkipped'),
             defaultMessage:
-              'Chromosoft-Daten verarbeitet: {members} Mitglieder ({memberSkipped} unverändert), {dogs} Hunde ({dogSkipped} unverändert), {breeders} Züchter, {studDogs} Deckrüden, {fixedUsers} Benutzer geprüft.',
+              'Chromosoft-Daten verarbeitet: {members} Mitglieder ({memberSkipped} unverändert), {dogs} Hunde ({dogSkipped} unverändert), {studDogs} Deckrüden, {breeders} Züchter, {fixedUsers} Benutzer geprüft.',
           },
           {
             members: status.members.processed,
             dogs: status.dogs.processed,
             memberSkipped,
             dogSkipped,
-            breeders: status.breeders.processed,
             studDogs: status.studDogs.processed,
+            breeders: status.breeders.processed,
             fixedUsers: status.fixedUsers.processed,
           },
         )
@@ -427,13 +427,13 @@ const ChromosoftImportPanel = () => {
           {
             id: getTranslation('chromosoft.import.success'),
             defaultMessage:
-              'Chromosoft-Daten verarbeitet: {members} Mitglieder, {dogs} Hunde, {breeders} Züchter, {studDogs} Deckrüden, {fixedUsers} Benutzer geprüft.',
+              'Chromosoft-Daten verarbeitet: {members} Mitglieder, {dogs} Hunde, {studDogs} Deckrüden, {breeders} Züchter, {fixedUsers} Benutzer geprüft.',
           },
           {
             members: status.members.processed,
             dogs: status.dogs.processed,
-            breeders: status.breeders.processed,
             studDogs: status.studDogs.processed,
+            breeders: status.breeders.processed,
             fixedUsers: status.fixedUsers.processed,
           },
         );
@@ -560,13 +560,13 @@ const ChromosoftImportPanel = () => {
       id: getTranslation('chromosoft.import.dogs'),
       defaultMessage: 'Verarbeite CS_Dog',
     }),
-    breeders: formatMessage({
-      id: getTranslation('chromosoft.import.breeders'),
-      defaultMessage: 'Aktualisiere Züchterdaten',
-    }),
     studDogs: formatMessage({
       id: getTranslation('chromosoft.import.studDogs'),
       defaultMessage: 'Aktualisiere Deckrüden',
+    }),
+    breeders: formatMessage({
+      id: getTranslation('chromosoft.import.breeders'),
+      defaultMessage: 'Aktualisiere Züchter',
     }),
     fixedUsers: formatMessage({
       id: getTranslation('chromosoft.import.fixedUsers'),
@@ -585,15 +585,15 @@ const ChromosoftImportPanel = () => {
       defaultMessage:
         'Schreibt die aktuelle CS_Dog-Generation in Hunde.',
     }),
-    breeders: formatMessage({
-      id: getTranslation('chromosoft.import.breedersHint'),
-      defaultMessage:
-        'Aktualisiert Züchterprofile für Benutzer mit cFlagBreeder.',
-    }),
     studDogs: formatMessage({
       id: getTranslation('chromosoft.import.studDogsHint'),
       defaultMessage:
-        'Aktualisiert Deckrüden-Profile fruchtbarer Rüden anhand des Besitzers.',
+        'Aktualisiert Deckrüden-Profile fruchtbarer Rüden anhand des Besitzers und nimmt ihn in die Gruppe dr-besitzer auf.',
+    }),
+    breeders: formatMessage({
+      id: getTranslation('chromosoft.import.breedersHint'),
+      defaultMessage:
+        'Nimmt Owner-Members von Züchtern (Rolle B) in die Gruppe zuechter und Owner-Members von Deckrüden (Rolle S) in die Gruppe dr-besitzer auf.',
     }),
     fixedUsers: formatMessage({
       id: getTranslation('chromosoft.import.fixedUsersHint'),
@@ -636,7 +636,7 @@ const ChromosoftImportPanel = () => {
               {formatMessage({
                 id: getTranslation('chromosoft.import.description'),
                 defaultMessage:
-                  'Verarbeitet CS_Member und CS_Dog und aktualisiert danach Züchter und Deckrüden.',
+                  'Verarbeitet CS_Member und CS_Dog, aktualisiert danach Deckrüden und ordnet Züchtergruppen zu.',
               })}
             </Typography>
           </Box>

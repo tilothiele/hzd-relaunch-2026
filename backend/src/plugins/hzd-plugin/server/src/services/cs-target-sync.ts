@@ -1,6 +1,8 @@
 import type { Core } from '@strapi/strapi'
 
 const USER_UID = 'plugin::users-permissions.user'
+const USER_GROUP_UID = 'api::user-group.user-group'
+const STUD_DOG_OWNER_GROUP_KEY = 'dr-besitzer'
 const MIN_USERNAME_LENGTH = 3
 const DOG_UID = 'plugin::hzd-plugin.dog'
 const BREEDER_UID = 'plugin::hzd-plugin.breeder'
@@ -690,87 +692,6 @@ async function ensurePublishMyData(strapi: Core.Strapi, userId: number) {
 	})
 }
 
-interface OwnerMemberUser {
-	id: number
-	cId?: number | null
-	publishMyData?: boolean | null
-	firstName?: string | null
-	lastName?: string | null
-}
-
-function ownerMemberLabel(user: OwnerMemberUser): string {
-	const name = [user.firstName, user.lastName]
-		.filter((part) => typeof part === 'string' && part.trim() !== '')
-		.join(' ')
-		.trim()
-	const label = name || `id=${user.id}`
-	const cIdLabel = typeof user.cId === 'number' ? ` cId=${user.cId}` : ''
-	return `${label}${cIdLabel}`
-}
-
-async function loadOwnerMembers(
-	strapi: Core.Strapi,
-	breederId: number,
-): Promise<OwnerMemberUser[]> {
-	const breeder = await strapi.db.query(BREEDER_UID).findOne({
-		where: { id: breederId },
-		populate: {
-			owner_members: {
-				select: [
-					'id',
-					'cId',
-					'publishMyData',
-					'firstName',
-					'lastName',
-				],
-			},
-		},
-	}) as { owner_members?: OwnerMemberUser[] } | null
-	return Array.isArray(breeder?.owner_members) ? breeder.owner_members : []
-}
-
-async function prepareOwnerMembers(
-	strapi: Core.Strapi,
-	breederId: number | null,
-	userId: number,
-	log: (line: string) => void,
-): Promise<Record<string, number[]> | null> {
-	const linked = breederId === null
-		? []
-		: await loadOwnerMembers(strapi, breederId)
-	const keep = [...linked]
-
-	const current = await strapi.db.query(USER_UID).findOne({
-		where: { id: userId },
-		select: [
-			'id',
-			'cId',
-			'publishMyData',
-			'firstName',
-			'lastName',
-		],
-	}) as OwnerMemberUser | null
-	const currentIsKept = linked.some((entry) => entry.id === userId)
-	if (current && !currentIsKept) {
-		keep.push(current)
-	}
-
-	for (const member of keep) {
-		if (member.publishMyData === true) {
-			continue
-		}
-		await strapi.db.query(USER_UID).update({
-			where: { id: member.id },
-			data: { publishMyData: true },
-		})
-		log(
-			`publishMyData für Owner-Member ${ownerMemberLabel(member)} auf true gesetzt`,
-		)
-	}
-
-	return null
-}
-
 function addressFromCsMember(member: Record<string, unknown>): TargetData | null {
 	const address1 = truncateOrNull(cell(member.Street), 255)
 	const zip = truncateOrNull(cell(member.Zipcode), 5)
@@ -825,68 +746,62 @@ async function findBreederByRole(
 	return found ?? null
 }
 
-export async function updateBreederFromUser(
+function relationKeys(value: unknown): string[] {
+	if (!Array.isArray(value)) {
+		return []
+	}
+	return value.flatMap((entry) => {
+		if (!entry || typeof entry !== 'object' || !('key' in entry)) {
+			return []
+		}
+		const key = (entry as { key?: unknown }).key
+		return typeof key === 'string' ? [key] : []
+	})
+}
+
+let studDogOwnerGroupMissingLogged = false
+
+async function ensureStudDogOwnerGroup(
 	strapi: Core.Strapi,
-	user: Record<string, unknown>,
-	breedingStation: string | null,
+	owner: Record<string, unknown>,
 	log: (line: string) => void,
 ) {
-	const cId = parseInteger(user.cId)
-	if (cId === null) {
-		log('Züchter ohne cId, Update übersprungen')
+	if (relationKeys(owner.user_groups).includes(STUD_DOG_OWNER_GROUP_KEY)) {
 		return
 	}
-	const storedUser = typeof user.id === 'number'
-		? { id: user.id }
-		: await findByCId(strapi, USER_UID, cId)
-	const userId = typeof storedUser?.id === 'number' ? storedUser.id : null
-	if (userId === null) {
-		log(`Züchter cId=${cId} ohne User-ID, Update übersprungen`)
-		return
-	}
-
-	const data: TargetData = {
-		cId,
-		member: userId,
-	}
-	const kennelName = truncateOrNull(breedingStation, 200)
-	assign(data, 'kennelName', kennelName)
-	assign(data, 'BreederEmail', parseEmail(user.cEmail))
-	const address = addressFromUser(user)
-	if (address) {
-		data.Address = address
-	}
-
-	const existing = await findBreederByRole(strapi, cId, 'B')
-	if (!existing) {
-		const other = await strapi.db.query(BREEDER_UID).findOne({
-			where: { cId },
-			select: ['id', 'BreederRole'],
-		}) as { BreederRole?: string } | null
-		if (other) {
+	const group = await strapi.db.query(USER_GROUP_UID).findOne({
+		where: { key: STUD_DOG_OWNER_GROUP_KEY },
+		select: ['id', 'documentId'],
+	}) as { id?: number; documentId?: string } | null
+	if (typeof group?.id !== 'number') {
+		if (!studDogOwnerGroupMissingLogged) {
+			studDogOwnerGroupMissingLogged = true
 			log(
-				`Züchter cId=${cId} existiert bereits als Rolle ${other.BreederRole ?? '?'}, nicht angelegt`,
+				`UserGroup key=${STUD_DOG_OWNER_GROUP_KEY} nicht gefunden, Besitzer werden nicht zugeordnet`,
 			)
-			return
 		}
-		data.BreederRole = 'B'
+		return
 	}
-
-	const ownerMembers = await prepareOwnerMembers(
-		strapi,
-		typeof existing?.id === 'number' ? existing.id : null,
-		userId,
-		log,
-	)
-	if (ownerMembers) {
-		data.owner_members = ownerMembers
+	const documentId = typeof owner.documentId === 'string' ? owner.documentId : ''
+	if (documentId) {
+		await strapi.documents(USER_UID as never).update({
+			documentId,
+			data: {
+				user_groups: { connect: [group.id] },
+			} as never,
+		})
+	} else if (typeof owner.id === 'number') {
+		await strapi.db.query(USER_UID).update({
+			where: { id: owner.id },
+			data: {
+				user_groups: { connect: [group.id] },
+			},
+		})
+	} else {
+		throw new Error('Besitzer ohne id')
 	}
-	const savedId = await saveDocument(strapi, BREEDER_UID, existing, data)
-	log(
-		existing
-			? `Züchter aktualisiert cId=${cId} documentId=${savedId}`
-			: `Züchter erstellt cId=${cId} documentId=${savedId}`,
-	)
+	const cId = typeof owner.cId === 'number' ? ` cId=${owner.cId}` : ''
+	log(`Besitzer${cId} in die Gruppe ${STUD_DOG_OWNER_GROUP_KEY} aufgenommen`)
 }
 
 export async function updateStudDog(
@@ -906,6 +821,7 @@ export async function updateStudDog(
 		where: { cId: ownerCId },
 		select: [
 			'id',
+			'documentId',
 			'cId',
 			'firstName',
 			'lastName',
@@ -915,12 +831,19 @@ export async function updateStudDog(
 			'countryCode',
 			'cEmail',
 		],
+		populate: {
+			user_groups: {
+				select: ['key'],
+			},
+		},
 	}) as Record<string, unknown> | null
 	const ownerId = typeof owner?.id === 'number' ? owner.id : null
 	if (!owner || ownerId === null) {
 		log(`Deckrüde${dogLabel}: Besitzer cId=${ownerCId} nicht gefunden`)
 		return
 	}
+
+	await ensureStudDogOwnerGroup(strapi, owner, log)
 
 	const data: TargetData = {
 		cId: ownerCId,

@@ -4,8 +4,8 @@ import type { Core } from '@strapi/strapi'
 interface ImportSteps {
 	members?: boolean
 	dogs?: boolean
-	breeders?: boolean
 	studDogs?: boolean
+	breeders?: boolean
 	fixedUsers?: boolean
 }
 
@@ -34,7 +34,7 @@ function readSteps(value: unknown): ImportSteps {
 		return steps
 	}
 	const source = value as Record<string, unknown>
-	const keys = ['members', 'dogs', 'breeders', 'studDogs', 'fixedUsers'] as const
+	const keys = ['members', 'dogs', 'studDogs', 'breeders', 'fixedUsers'] as const
 	for (const key of keys) {
 		if (typeof source[key] === 'boolean') {
 			steps[key] = source[key]
