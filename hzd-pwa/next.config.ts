@@ -9,6 +9,13 @@ const pwaConfig = withPWA({
 const nextConfig: NextConfig = {
 	output: 'standalone',
 	agentRules: false,
+	serverExternalPackages: [
+		'@prisma/client',
+		'prisma',
+		'jspdf',
+		'nodemailer',
+		'altcha-lib',
+	],
 	async rewrites() {
 		return [
 			{

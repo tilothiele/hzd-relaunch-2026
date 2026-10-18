@@ -1,0 +1,23 @@
+Bestätigung Ihrer Anmeldung - HZD OG Hamburg u.U.
+
+Sehr geehrte Damen und Herren,
+
+es wurde bereits eine Anmeldung mit dieser E-Mail-Adresse bei uns eingereicht.
+
+Falls Sie erneut eine Anmeldung einreichen möchten oder Ihre bisherige Anmeldung 
+überprüfen möchten, klicken Sie bitte auf den folgenden Link:
+
+{{VERIFICATION_LINK}}
+
+Dieser Link ist nur 30 Minuten gültig.
+
+Falls Sie diese E-Mail nicht angefordert haben, können Sie sie einfach ignorieren.
+
+---
+HZD OG Hamburg u.U.
+Tilo Thiele
+Anne-Becker-Ring 8
+21031 Hamburg
+geschaeftsstelle@hzd-og-hamburg.de
+
+

@@ -1,0 +1,30 @@
+Antrag erfolgreich eingegangen - HZD OG Hamburg u.U.
+
+Sehr geehrte(r) {{VORNAME}} {{NAME}},
+
+vielen Dank für Ihre Anmeldung! Ihr Antrag ist bei uns eingegangen und wird bearbeitet.
+
+Wie geht es weiter?
+
+1. Der Papierausdruck Ihres Antrags muss noch unterschrieben werden
+2. Nach Eingang der unterschriebenen Unterlagen erfolgt eine endgültige Bestätigung
+3. Sie erhalten dann alle weiteren Informationen zur Mitgliedschaft
+
+Ihre Anmeldungsdaten:
+E-Mail: {{EMAIL}}
+Name: {{VORNAME}} {{NAME}}
+Mitgliedschaft: {{MITGLIEDSCHAFT}}
+
+Diese E-Mail wurde automatisch generiert. Bitte antworten Sie nicht direkt auf diese E-Mail.
+
+Bei Fragen oder Unklarheiten können Sie sich jederzeit an uns wenden.
+
+---
+Kontakt:
+HZD OG Hamburg u.U.
+Tilo Thiele
+Anne-Becker-Ring 8
+21031 Hamburg
+geschaeftsstelle@hzd-og-hamburg.de
+
+

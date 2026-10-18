@@ -1,0 +1,22 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Application {
+  id                   Int       @id @default(autoincrement())
+  creationDate         DateTime  @default(now())
+  email                String    @map("email")
+  uuid                 String?   @map("uuid")
+  payload              String?   @map("payload")
+  verificationSentAt   DateTime? @map("verification_sent_at")
+
+  @@map("applications")
+}

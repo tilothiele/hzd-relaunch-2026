@@ -19,6 +19,7 @@ WORKDIR /app
 # Nur öffentliche Build-Config – keine Secrets ins Image backen
 ARG STRAPI_BASE_URL=http://localhost:1337
 ENV STRAPI_BASE_URL=${STRAPI_BASE_URL}
+ENV DATABASE_URL=file:./data/applications.db
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -35,9 +36,12 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV DATABASE_URL=file:/app/data/applications.db
 
 RUN addgroup --system --gid 1001 nodejs \
-	&& adduser --system --uid 1001 nextjs
+	&& adduser --system --uid 1001 nextjs \
+	&& mkdir -p /app/data \
+	&& chown nextjs:nodejs /app/data
 
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./

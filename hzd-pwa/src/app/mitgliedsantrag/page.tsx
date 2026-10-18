@@ -1,5 +1,5 @@
+import AntragForm from '@/components/mitgliedsantrag/antrag-form'
+
 export default function MitgliedsantragPage() {
-	return (
-		<h1 className="sr-only">Mitgliedsantrag</h1>
-	)
+	return <AntragForm />
 }

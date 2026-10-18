@@ -22,6 +22,8 @@ export function proxy(request: NextRequest) {
 
 	const isPublicPath = pathname === '/login'
 		|| pathname === '/mitgliedsantrag'
+		|| pathname === '/antrag-bestaetigung'
+		|| pathname === '/verify-email'
 		|| pathname.startsWith('/_next')
 		|| pathname.startsWith('/static')
 		|| pathname.includes('.')
