@@ -10,6 +10,10 @@ import {
 import { parseWurfabnahmePage } from './constants'
 import type { WurfabnahmeFormData } from '@/types/wurfabnahme-form'
 import { DogSearchModal } from '@/components/koerung/DogSearchModal'
+import { BreederSearchModal } from '@/components/zuechter/BreederSearchModal'
+import { isEligibleZuchthuendin } from '@/lib/dog-search'
+import { formatPlzOrt } from '@/lib/map-strapi-breeder'
+import type { Breeder } from '@/services/db'
 import type { Dog } from '@/services/db'
 import './wurfabnahme.css'
 
@@ -40,6 +44,7 @@ function WurfabnahmeAppInner({
 	const searchParams = useSearchParams()
 	const fieldsAppliedRef = useRef<string>('')
 	const [searchHundinId, setSearchHundinId] = useState<string | null>(null)
+	const [isZuechterSearchOpen, setIsZuechterSearchOpen] = useState(false)
 
 	const handleApplyHundin = useCallback(
 		(dog: Dog) => {
@@ -52,6 +57,25 @@ function WurfabnahmeAppInner({
 				},
 			})
 			setSearchHundinId(null)
+		},
+		[formData, onFormDataChange],
+	)
+
+	const handleApplyZuechter = useCallback(
+		(breeder: Breeder) => {
+			onFormDataChange({
+				...formData,
+				stammblatt: {
+					...formData.stammblatt,
+					zuechterName: breeder.name,
+					zwingername: breeder.kennelName,
+					strasse: breeder.street,
+					plzOrt: formatPlzOrt(breeder.zip, breeder.city),
+					telefon: breeder.phone,
+					email: breeder.email,
+				},
+			})
+			setIsZuechterSearchOpen(false)
 		},
 		[formData, onFormDataChange],
 	)
@@ -148,6 +172,13 @@ function WurfabnahmeAppInner({
 				isOpen={searchHundinId !== null}
 				onClose={() => setSearchHundinId(null)}
 				onSelect={handleApplyHundin}
+				filter={isEligibleZuchthuendin}
+				hint="Nur zuchtfähige Hündinnen unter 10 Jahren."
+			/>
+			<BreederSearchModal
+				isOpen={isZuechterSearchOpen}
+				onClose={() => setIsZuechterSearchOpen(false)}
+				onSelect={handleApplyZuechter}
 			/>
 
 			<div className="wurfabnahme-app" ref={formRef}>
@@ -161,6 +192,7 @@ function WurfabnahmeAppInner({
 						onMarkDelete={onMarkWelpeDelete}
 						onUndoDelete={onUndoWelpeDelete}
 						onOpenHundinSearch={() => setSearchHundinId('search')}
+						onOpenZuechterSearch={() => setIsZuechterSearchOpen(true)}
 						{...signatureProps}
 					/>
 				)}

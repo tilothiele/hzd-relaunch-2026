@@ -263,10 +263,18 @@ export function createInitialWelpenRows(): WelpenRowData[] {
 	return Array.from({ length: DEFAULT_WELPEN_ROWS }, createWelpenRow)
 }
 
+function todayLocalIsoDate(): string {
+	const now = new Date()
+	const year = now.getFullYear()
+	const month = String(now.getMonth() + 1).padStart(2, '0')
+	const day = String(now.getDate()).padStart(2, '0')
+	return `${year}-${month}-${day}`
+}
+
 export function createEmptyStammblatt(): StammblattData {
 	return {
 		zuechterName: '',
-		datum: '',
+		datum: todayLocalIsoDate(),
 		zwingername: '',
 		wurfNr: '',
 		strasse: '',

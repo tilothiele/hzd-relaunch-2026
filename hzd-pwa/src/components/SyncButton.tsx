@@ -4,7 +4,15 @@ import { useState } from 'react'
 import { useOnlineStatus } from '@/hooks/use-online-status'
 import { syncDogs } from '@/services/sync'
 
-export default function SyncButton() {
+interface SyncButtonProps {
+	sync?: typeof syncDogs
+	idleLabel?: string
+}
+
+export default function SyncButton({
+	sync = syncDogs,
+	idleLabel = 'Hunde synchronisieren',
+}: SyncButtonProps) {
 	const { isOnline, isReady } = useOnlineStatus()
 	const [loading, setLoading] = useState(false)
 	const [message, setMessage] = useState('')
@@ -17,7 +25,7 @@ export default function SyncButton() {
 		setMessage('Initialisiere...')
 		setProgress(0)
 
-		const result = await syncDogs((current, total) => {
+		const result = await sync((current, total) => {
 			const percentage = total > 0 ? Math.round((current / total) * 100) : 0
 			setProgress(percentage)
 			setMessage(`Synchronisiere... ${current} / ${total || '?'}`)
@@ -40,7 +48,7 @@ export default function SyncButton() {
 						? 'Offline – Sync nicht verfügbar'
 						: loading
 							? 'Synchronisiere...'
-							: 'Hunde synchronisieren'}
+							: idleLabel}
 			</button>
 
 			{loading && (

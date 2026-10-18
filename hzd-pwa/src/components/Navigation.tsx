@@ -2,16 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+const stammItems = [
+    { name: "HZD-Hunde", href: "/hunde" },
+    { name: "HZD-Züchter", href: "/zuechter" },
+];
 
 export default function Navigation() {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
+    const [isStammOpen, setIsStammOpen] = useState(false);
+    const stammRef = useRef<HTMLDivElement>(null);
 
     const navItems = [
         { name: "Körung", href: "/koerungen" },
         { name: "Zucht", href: "/wurfabnahmen" },
-        { name: "HZD-Hunde-Stammdaten", href: "/hunde" },
     ];
 
     const isActive = (href: string) => {
@@ -23,8 +29,30 @@ export default function Navigation() {
             return pathname.startsWith("/koerungen");
         }
 
-        return pathname === href;
+        return pathname === href || pathname.startsWith(`${href}/`);
     };
+
+    const isStammActive = stammItems.some((item) => isActive(item.href));
+
+    useEffect(() => {
+        setIsStammOpen(false);
+        setIsOpen(false);
+    }, [pathname]);
+
+    useEffect(() => {
+        if (!isStammOpen) {
+            return;
+        }
+
+        const handlePointerDown = (event: MouseEvent) => {
+            if (!stammRef.current?.contains(event.target as Node)) {
+                setIsStammOpen(false);
+            }
+        };
+
+        window.addEventListener("mousedown", handlePointerDown);
+        return () => window.removeEventListener("mousedown", handlePointerDown);
+    }, [isStammOpen]);
 
     return (
         <>
@@ -43,6 +71,42 @@ export default function Navigation() {
                             {item.name}
                         </Link>
                     ))}
+                    <div className="relative" ref={stammRef}>
+                        <button
+                            type="button"
+                            aria-expanded={isStammOpen}
+                            aria-haspopup="menu"
+                            onClick={() => setIsStammOpen((open) => !open)}
+                            className={`inline-flex items-center gap-1 border-b-2 px-1 pt-1 text-base font-medium ${isStammActive
+                                ? "border-indigo-500 text-gray-900 dark:text-white"
+                                : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
+                                }`}
+                        >
+                            Stammdaten
+                            <span aria-hidden="true">{isStammOpen ? "▴" : "▾"}</span>
+                        </button>
+                        {isStammOpen && (
+                            <div
+                                role="menu"
+                                className="absolute left-0 top-full z-30 mt-1 min-w-44 rounded-md bg-white py-1 shadow-lg dark:bg-gray-800"
+                            >
+                                {stammItems.map((item) => (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        role="menuitem"
+                                        className={`block px-4 py-2 text-sm ${isActive(item.href)
+                                            ? "bg-indigo-50 text-indigo-700 dark:bg-gray-700 dark:text-white"
+                                            : "text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-700"
+                                            }`}
+                                        onClick={() => setIsStammOpen(false)}
+                                    >
+                                        {item.name}
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -94,6 +158,22 @@ export default function Navigation() {
                 <div className="absolute top-16 left-0 w-full bg-white shadow-lg dark:bg-gray-800 sm:hidden z-20" id="mobile-menu">
                     <div className="space-y-1 pb-3 pt-2 px-4 shadow-sm border-t dark:border-gray-700">
                         {navItems.map((item) => (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={`block border-l-4 py-2 pl-3 pr-4 text-lg font-medium ${isActive(item.href)
+                                    ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-gray-700 dark:text-white"
+                                    : "border-transparent text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
+                                    }`}
+                                onClick={() => setIsOpen(false)}
+                            >
+                                {item.name}
+                            </Link>
+                        ))}
+                        <p className="px-3 pt-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                            Stammdaten
+                        </p>
+                        {stammItems.map((item) => (
                             <Link
                                 key={item.href}
                                 href={item.href}

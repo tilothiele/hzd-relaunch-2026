@@ -9,6 +9,8 @@ interface DogSearchModalProps {
 	isOpen: boolean
 	onClose: () => void
 	onSelect: (dog: Dog) => void
+	filter?: (dog: Dog) => boolean
+	hint?: string
 }
 
 const inputClassName =
@@ -18,6 +20,8 @@ export function DogSearchModal({
 	isOpen,
 	onClose,
 	onSelect,
+	filter,
+	hint,
 }: DogSearchModalProps) {
 	const [query, setQuery] = useState('')
 	const dogs = useLiveQuery(() => db.dogs.toArray(), [])
@@ -27,8 +31,8 @@ export function DogSearchModal({
 			return []
 		}
 
-		return searchDogs(dogs, query, DOG_SEARCH_MAX_RESULTS)
-	}, [dogs, query])
+		return searchDogs(dogs, query, DOG_SEARCH_MAX_RESULTS, filter)
+	}, [dogs, filter, query])
 
 	useEffect(() => {
 		if (!isOpen) {
@@ -90,6 +94,11 @@ export function DogSearchModal({
 						className={inputClassName}
 						autoFocus
 					/>
+					{hint ? (
+						<p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+							{hint}
+						</p>
+					) : null}
 				</div>
 
 				<div className="overflow-y-auto px-4 py-3">

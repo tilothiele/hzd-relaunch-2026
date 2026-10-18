@@ -17,6 +17,20 @@ interface Dog {
     cFertile: string;
 }
 
+interface Breeder {
+    documentId: string;
+    kennelName: string;
+    name: string;
+    street: string;
+    zip: string;
+    city: string;
+    phone: string;
+    email: string;
+    role: string;
+    isActive: boolean;
+    disabled: boolean;
+}
+
 const db = new Dexie('HzdDatabase') as Dexie & {
     dogs: EntityTable<
         Dog,
@@ -29,6 +43,10 @@ const db = new Dexie('HzdDatabase') as Dexie & {
     koerungVeranstaltungen: EntityTable<
         KoerungVeranstaltung,
         'id'
+    >;
+    breeders: EntityTable<
+        Breeder,
+        'documentId'
     >;
 };
 
@@ -76,5 +94,12 @@ db.version(4).stores({
     koerungVeranstaltungen: 'id, updatedAt, datum, name',
 })
 
-export type { Dog };
+db.version(5).stores({
+    dogs: 'documentId, fullkennelname, microchipNo, cStudBookNumber',
+    wurfabnahmen: 'id, updatedAt, zwingername, datum',
+    koerungVeranstaltungen: 'id, updatedAt, datum, name',
+    breeders: 'documentId, kennelName, name, email',
+})
+
+export type { Dog, Breeder };
 export { db };

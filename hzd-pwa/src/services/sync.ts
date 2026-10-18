@@ -1,3 +1,4 @@
+import { mapStrapiBreeder } from '@/lib/map-strapi-breeder';
 import { mapStrapiDog } from '@/lib/map-strapi-dog';
 import { db } from './db';
 
@@ -117,6 +118,127 @@ export async function syncDogs(onProgress?: (current: number, total: number) => 
 
     } catch (error) {
         console.error('Sync error:', error);
+        return { success: false, message: error instanceof Error ? error.message : 'Unknown error during sync' };
+    }
+}
+
+const OWNER_MEMBER_FIELDS = [
+    'firstName',
+    'lastName',
+    'DisplayName',
+    'username',
+    'phone',
+    'cEmail',
+    'address1',
+    'address2',
+    'zip',
+    'city',
+];
+
+export async function syncBreeders(onProgress?: (current: number, total: number) => void): Promise<SyncResult> {
+    try {
+        let allBreeders: unknown[] = [];
+        let page = 1;
+        const pageSize = 100;
+        let pageCount = 1;
+        let total = 0;
+        const seenIds = new Set<string>();
+
+        do {
+            const ownerFields = OWNER_MEMBER_FIELDS
+                .map((field, index) => `populate[owner_members][fields][${index}]=${field}`)
+                .join('&');
+            const queryString = [
+                `pagination[page]=${page}`,
+                `pagination[pageSize]=${pageSize}`,
+                'populate[Address]=true',
+                ownerFields,
+            ].join('&');
+            const url = `/api/proxy/hzd-plugin/breeders?${queryString}`;
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                return { success: false, message: `Page ${page} failed: ${response.status} ${response.statusText} - ${errorText}` };
+            }
+
+            const json = await response.json();
+            let data = json.data;
+            if (json.results) {
+                data = json.results;
+            } else if (Array.isArray(json)) {
+                data = json;
+            }
+
+            if (!Array.isArray(data)) {
+                if (page === 1) {
+                    const preview = JSON.stringify(json).substring(0, 100);
+                    return { success: false, message: `Invalid data format. Keys: ${Object.keys(json).join(', ')}. Preview: ${preview}` };
+                }
+                console.warn(`Page ${page} returned invalid format. Stopping breeder sync.`);
+                break;
+            }
+
+            const newIds = data.map((entry: { documentId?: string, id?: string | number }) =>
+                String(entry.documentId || entry.id || ''));
+            const hasNewData = newIds.some((id: string) => id && !seenIds.has(id));
+
+            if (!hasNewData && newIds.length > 0 && page > 1) {
+                console.warn('Breeder page returned only known records. Stopping to avoid duplicates.');
+                break;
+            }
+
+            newIds.forEach((id: string) => {
+                if (id) seenIds.add(id);
+            });
+            allBreeders = allBreeders.concat(data);
+
+            if (json.pagination) {
+                pageCount = json.pagination.pageCount || 1;
+                total = json.pagination.total || 0;
+            } else if (json.meta && json.meta.pagination) {
+                pageCount = json.meta.pagination.pageCount || 1;
+                total = json.meta.pagination.total || 0;
+            } else if (data.length < pageSize) {
+                pageCount = page;
+            } else {
+                pageCount = page + 1;
+            }
+
+            if (onProgress) {
+                const estimatedTotal = total || (allBreeders.length + (data.length === pageSize ? pageSize : 0));
+                onProgress(allBreeders.length, estimatedTotal);
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 0));
+            page++;
+        } while (page <= pageCount);
+
+        const breeders = allBreeders
+            .map((item) => mapStrapiBreeder(item))
+            .filter((breeder): breeder is NonNullable<typeof breeder> => breeder !== null);
+        const uniqueBreeders = Array.from(
+            new Map(breeders.map((item) => [item.documentId, item])).values(),
+        );
+
+        await db.transaction('rw', db.breeders, async () => {
+            await db.breeders.clear();
+            await db.breeders.bulkPut(uniqueBreeders);
+        });
+
+        return {
+            success: true,
+            message: `Synchronisation erfolgreich. ${uniqueBreeders.length} Züchter geladen.`,
+            count: uniqueBreeders.length,
+        };
+    } catch (error) {
+        console.error('Breeder sync error:', error);
         return { success: false, message: error instanceof Error ? error.message : 'Unknown error during sync' };
     }
 }

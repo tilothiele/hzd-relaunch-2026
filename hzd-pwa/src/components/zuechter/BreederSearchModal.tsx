@@ -1,0 +1,176 @@
+'use client'
+
+import { useEffect, useMemo, useState } from 'react'
+import { useLiveQuery } from 'dexie-react-hooks'
+import {
+	BREEDER_SEARCH_MAX_RESULTS,
+	isEligibleZuechter,
+	searchBreeders,
+} from '@/lib/breeder-search'
+import { formatPlzOrt } from '@/lib/map-strapi-breeder'
+import { db, type Breeder } from '@/services/db'
+
+interface BreederSearchModalProps {
+	isOpen: boolean
+	onClose: () => void
+	onSelect: (breeder: Breeder) => void
+}
+
+const inputClassName =
+	'w-full rounded border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500'
+
+export function BreederSearchModal({
+	isOpen,
+	onClose,
+	onSelect,
+}: BreederSearchModalProps) {
+	const [query, setQuery] = useState('')
+	const breeders = useLiveQuery(() => db.breeders.toArray(), [])
+	const eligibleBreeders = useMemo(
+		() => (breeders ?? []).filter(isEligibleZuechter),
+		[breeders],
+	)
+
+	const results = useMemo(() => {
+		if (!breeders) {
+			return []
+		}
+
+		return searchBreeders(
+			breeders,
+			query,
+			BREEDER_SEARCH_MAX_RESULTS,
+			isEligibleZuechter,
+		)
+	}, [breeders, query])
+
+	useEffect(() => {
+		if (!isOpen) {
+			setQuery('')
+		}
+	}, [isOpen])
+
+	useEffect(() => {
+		if (!isOpen) {
+			return
+		}
+
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				onClose()
+			}
+		}
+
+		window.addEventListener('keydown', handleKeyDown)
+		return () => window.removeEventListener('keydown', handleKeyDown)
+	}, [isOpen, onClose])
+
+	if (!isOpen) {
+		return null
+	}
+
+	return (
+		<div
+			className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+			onClick={onClose}
+			role="presentation"
+		>
+			<div
+				className="flex max-h-[85vh] w-full max-w-2xl flex-col rounded-lg bg-white shadow-xl dark:bg-gray-800"
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby="breeder-search-modal-title"
+				onClick={(event) => event.stopPropagation()}
+			>
+				<div className="border-b border-gray-200 px-4 py-3 dark:border-gray-700">
+					<h3
+						id="breeder-search-modal-title"
+						className="text-lg font-semibold"
+					>
+						Züchter aus Datenbank übernehmen
+					</h3>
+				</div>
+
+				<div className="border-b border-gray-200 px-4 py-3 dark:border-gray-700">
+					<label htmlFor="breeder-search-query" className="sr-only">
+						Züchter suchen
+					</label>
+					<input
+						id="breeder-search-query"
+						type="text"
+						value={query}
+						onChange={(event) => setQuery(event.target.value)}
+						placeholder="Name, Zwinger, Ort, Telefon, E-Mail …"
+						className={inputClassName}
+						autoFocus
+					/>
+					<p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+						Nur aktive Züchter.
+					</p>
+				</div>
+
+				<div className="overflow-y-auto px-4 py-3">
+					{breeders === undefined ? (
+						<p className="text-sm text-gray-500 dark:text-gray-400">
+							Lade Züchter…
+						</p>
+					) : breeders.length === 0 ? (
+						<p className="text-sm text-gray-500 dark:text-gray-400">
+							Keine synchronisierten Züchter vorhanden.
+						</p>
+					) : eligibleBreeders.length === 0 ? (
+						<p className="text-sm text-gray-500 dark:text-gray-400">
+							Keine aktiven Züchter vorhanden.
+						</p>
+					) : !query.trim() ? (
+						<p className="text-sm text-gray-500 dark:text-gray-400">
+							Suchbegriff eingeben, um Vorschläge anzuzeigen.
+						</p>
+					) : results.length === 0 ? (
+						<p className="text-sm text-gray-500 dark:text-gray-400">
+							Keine Züchter gefunden.
+						</p>
+					) : (
+						<ul className="divide-y divide-gray-200 dark:divide-gray-700">
+							{results.map((breeder) => (
+								<li
+									key={breeder.documentId}
+									className="flex flex-wrap items-center justify-between gap-3 py-3"
+								>
+									<div className="min-w-0 flex-1">
+										<p className="truncate font-medium">
+											{breeder.kennelName || breeder.name || '–'}
+										</p>
+										<p className="text-xs text-gray-500 dark:text-gray-400">
+											{breeder.name || '–'}
+											{' · '}
+											{formatPlzOrt(breeder.zip, breeder.city) || '–'}
+											{breeder.email ? ` · ${breeder.email}` : ''}
+										</p>
+									</div>
+									<button
+										type="button"
+										onClick={() => onSelect(breeder)}
+										className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
+									>
+										Übernehmen
+									</button>
+								</li>
+							))}
+						</ul>
+					)}
+				</div>
+
+				<div className="border-t border-gray-200 px-4 py-3 dark:border-gray-700">
+					<button
+						type="button"
+						onClick={onClose}
+						className="rounded border border-gray-300 px-4 py-2 text-sm font-medium hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700"
+					>
+						Schließen
+					</button>
+				</div>
+			</div>
+		</div>
+	)
+}
