@@ -3007,7 +3007,6 @@ export interface PluginUsersPermissionsUser
         maxLength: 255;
       }>;
     cFlagAccess: Schema.Attribute.Boolean;
-    cFlagBreeder: Schema.Attribute.Boolean;
     cId: Schema.Attribute.Integer & Schema.Attribute.Unique;
     city: Schema.Attribute.String;
     confirmationToken: Schema.Attribute.String & Schema.Attribute.Private;

@@ -1311,7 +1311,6 @@ input UsersPermissionsUserFiltersInput {
   dateOfBirth: DateFilterInput
   dateOfDeath: DateFilterInput
   cId: IntFilterInput
-  cFlagBreeder: BooleanFilterInput
   cEmail: StringFilterInput
   cFlagAccess: BooleanFilterInput
   memberSince: DateFilterInput
@@ -1353,7 +1352,6 @@ input UsersPermissionsUserInput {
   dateOfBirth: Date
   dateOfDeath: Date
   cId: Int
-  cFlagBreeder: Boolean
   cEmail: String
   cFlagAccess: Boolean
   memberSince: Date
@@ -1392,7 +1390,6 @@ type UsersPermissionsUser {
   dateOfBirth: Date
   dateOfDeath: Date
   cId: Int
-  cFlagBreeder: Boolean
   cEmail: String
   cFlagAccess: Boolean
   memberSince: Date

@@ -255,7 +255,6 @@ class UsersPermissionsUserInput(TypedDict, total=False):
 	dateOfBirth: DateString
 	dateOfDeath: DateString
 	cId: int
-	cFlagBreeder: bool
 	cEmail: str
 	cFlagAccess: bool
 	memberSince: DateString

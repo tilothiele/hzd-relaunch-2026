@@ -47,7 +47,8 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 					},
 					{},
 				)
-				const nodes = data?.hzdPluginBreeders_connection?.nodes ?? []
+				const nodes = (data?.hzdPluginBreeders_connection?.nodes ?? [])
+					.filter((node) => node.BreederRole === 'B')
 				setBreeders(nodes)
 				setSelectedBreederId((current) => {
 					if (nodes.length === 1) {
@@ -177,7 +178,7 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 					{canSeeZuechterTabs && breeders.length > 0 && (
 						<Tab label='Unser Zwinger' value={1} />
 					)}
-					{canSeeZuechterTabs && <Tab label='Meine Würfe' value={2} />}
+					{canSeeZuechterTabs && <Tab label='Unsere Würfe' value={2} />}
 					{canSeeHunde && <Tab label='Meine Zuchthunde' value={3} />}
 					{canSeeDeckruedenTab && deckruedenInfo && (
 						<Tab label='Deckrüdenbesitzer' value={4} />

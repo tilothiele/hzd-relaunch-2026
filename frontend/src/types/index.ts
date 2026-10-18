@@ -527,7 +527,6 @@ export interface AuthUser {
 	id: string
 	documentId: string
 	cId?: number | null
-	cFlagBreeder?: boolean | null
 	username: string
 	email?: string | null
 	cEmail?: string | null
@@ -658,6 +657,7 @@ export interface Address {
 export interface Breeder {
 	documentId: string
 	cId?: number | null
+	BreederRole?: 'B' | 'S' | null
 	kennelName?: string | null
 	breedingLicenseSince?: string | null
 	IsActive?: boolean | null

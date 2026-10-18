@@ -73,7 +73,6 @@ def has_changes(new_member: ChromosoftMember, existing_user: Any) -> bool:
         # Phone: website might store it differently? Assuming string identity.
         ('phone', new_member.phone, get_strapi_attr(existing_user, 'phone')),
 
-        ('cFlagBreeder', new_member.cFlagBreeder, get_strapi_attr(existing_user, 'cFlagBreeder')),
         ('IsActiveBreeder', new_member.IsActiveBreeder, get_strapi_attr(existing_user, 'IsActiveBreeder')),
         ('blocked', new_member.blocked, get_strapi_attr(existing_user, 'blocked')),
         ('cEmail', new_member.cEmail, get_strapi_attr(existing_user, 'cEmail')),
@@ -240,6 +239,7 @@ def import_member_process(client: WebsiteClient, member: ChromosoftMember,
 
     # 5. Prepare Update Data
     user_data = member.to_dict()
+    user_data.pop('cFlagBreeder', None)
     user_data['email'] = auth_email
 
     # Remove fields that are not part of User Input type (but part of Breeder)

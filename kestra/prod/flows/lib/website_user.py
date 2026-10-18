@@ -179,7 +179,6 @@ class WebsiteClient:
                             'breederId': breeder.get('documentId'),
                             'IsActive': breeder.get('IsActive', False),
                             'kennelName': breeder.get('kennelName'),
-                            'cFlagBreeder': True
                         }
                 print(f"  Fetched {len(breeders_data)} breeders")
                 if len(breeders_data) < page_size:

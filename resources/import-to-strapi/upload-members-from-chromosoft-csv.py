@@ -234,11 +234,6 @@ def map_csv_to_member(row: dict[str, str]) -> UsersPermissionsUserInput:
     if phone:
         member_data['phone'] = phone
 
-    # cFlagBreeder - person is a breeder
-    breeder_flag = parse_boolean(row.get('person is a breeder', ''))
-    if breeder_flag is not None:
-        member_data['cFlagBreeder'] = breeder_flag
-
     # membershipNo
     membership_no = parse_integer(row.get('membership number', ''))
 #    if(not membership_no):

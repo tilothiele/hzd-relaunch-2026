@@ -339,7 +339,6 @@ function mapMemberToUser(
 	assign(data, 'countryCode', parseCountryCode(member.Country))
 	assign(data, 'phone', truncateOrNull(phone, 50))
 	assign(data, 'sex', lookup(member.Salutation, USER_SEX_MAP))
-	assign(data, 'cFlagBreeder', parseBoolean(member.PersonIsABreeder))
 	assign(data, 'membershipNumber', membershipNumber)
 	assign(data, 'dateOfBirth', parseDate(member.DateOfBirth))
 	assign(data, 'dateOfDeath', parseDate(member.DateOfDeath))

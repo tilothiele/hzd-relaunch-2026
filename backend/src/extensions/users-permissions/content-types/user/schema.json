@@ -125,10 +125,6 @@
       "unique": true,
       "configurable": false
     },
-    "cFlagBreeder": {
-      "type": "boolean",
-      "configurable": false
-    },
     "cEmail": {
       "type": "string",
       "maxLength": 255,

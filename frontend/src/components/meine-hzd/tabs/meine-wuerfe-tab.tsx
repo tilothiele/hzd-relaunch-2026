@@ -371,7 +371,7 @@ export function MeineWuerfeTab({
             ) : (
             <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant='h6'>Meine Würfe</Typography>
+                <Typography variant='h6'>Unsere Würfe</Typography>
                 <Button
                     variant="contained"
                     startIcon={<AddIcon />}

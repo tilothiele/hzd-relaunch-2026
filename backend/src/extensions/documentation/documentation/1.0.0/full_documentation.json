@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-10-18T07:50:46.680Z"
+    "x-generation-date": "2026-10-18T07:55:20.862Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -21054,9 +21054,6 @@
               "cId": {
                 "type": "integer"
               },
-              "cFlagBreeder": {
-                "type": "boolean"
-              },
               "cEmail": {
                 "type": "string"
               },
@@ -26813,9 +26810,6 @@
                     "cId": {
                       "type": "integer"
                     },
-                    "cFlagBreeder": {
-                      "type": "boolean"
-                    },
                     "cEmail": {
                       "type": "string"
                     },
@@ -31028,9 +31022,6 @@
                   "cId": {
                     "type": "integer"
                   },
-                  "cFlagBreeder": {
-                    "type": "boolean"
-                  },
                   "cEmail": {
                     "type": "string"
                   },
@@ -34949,9 +34940,6 @@
               },
               "cId": {
                 "type": "integer"
-              },
-              "cFlagBreeder": {
-                "type": "boolean"
               },
               "cEmail": {
                 "type": "string"
@@ -39356,9 +39344,6 @@
                     },
                     "cId": {
                       "type": "integer"
-                    },
-                    "cFlagBreeder": {
-                      "type": "boolean"
                     },
                     "cEmail": {
                       "type": "string"
@@ -46434,9 +46419,6 @@
                 "cId": {
                   "type": "integer"
                 },
-                "cFlagBreeder": {
-                  "type": "boolean"
-                },
                 "cEmail": {
                   "type": "string"
                 },
@@ -50087,9 +50069,6 @@
                     },
                     "cId": {
                       "type": "integer"
-                    },
-                    "cFlagBreeder": {
-                      "type": "boolean"
                     },
                     "cEmail": {
                       "type": "string"
@@ -54170,9 +54149,6 @@
               },
               "cId": {
                 "type": "integer"
-              },
-              "cFlagBreeder": {
-                "type": "boolean"
               },
               "cEmail": {
                 "type": "string"
@@ -63241,9 +63217,6 @@
                     "cId": {
                       "type": "integer"
                     },
-                    "cFlagBreeder": {
-                      "type": "boolean"
-                    },
                     "cEmail": {
                       "type": "string"
                     },
@@ -67155,9 +67128,6 @@
               },
               "cId": {
                 "type": "integer"
-              },
-              "cFlagBreeder": {
-                "type": "boolean"
               },
               "cEmail": {
                 "type": "string"
@@ -74247,9 +74217,6 @@
                         },
                         "cId": {
                           "type": "integer"
-                        },
-                        "cFlagBreeder": {
-                          "type": "boolean"
                         },
                         "cEmail": {
                           "type": "string"
@@ -90129,9 +90096,6 @@
               "cId": {
                 "type": "integer"
               },
-              "cFlagBreeder": {
-                "type": "boolean"
-              },
               "cEmail": {
                 "type": "string"
               },
@@ -94321,9 +94285,6 @@
               "cId": {
                 "type": "integer"
               },
-              "cFlagBreeder": {
-                "type": "boolean"
-              },
               "cEmail": {
                 "type": "string"
               },
@@ -98114,9 +98075,6 @@
                         },
                         "cId": {
                           "type": "integer"
-                        },
-                        "cFlagBreeder": {
-                          "type": "boolean"
                         },
                         "cEmail": {
                           "type": "string"
@@ -106217,9 +106175,6 @@
                 },
                 "cId": {
                   "type": "integer"
-                },
-                "cFlagBreeder": {
-                  "type": "boolean"
                 },
                 "cEmail": {
                   "type": "string"

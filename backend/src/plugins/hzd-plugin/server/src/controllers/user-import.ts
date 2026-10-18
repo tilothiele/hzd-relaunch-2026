@@ -434,7 +434,6 @@ const controller = () => ({
 				city: cu.city,
 				phone: cu.mobile ?? cu.phone,
 				cId: cu.cId,
-				cFlagBreeder: cu.personIsBreeder,
 				cFlagAccess: cu.cFlagAccess,
 				memberSince: cu.memberSince,
 				cancellationOn: cu.cancellationOn,
