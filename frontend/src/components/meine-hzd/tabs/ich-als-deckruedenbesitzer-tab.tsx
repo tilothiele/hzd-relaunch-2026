@@ -93,7 +93,7 @@ export function IchAlsDeckruedenbesitzerTab({
                 </Box>
             </Box>
 
-            <Typography variant='h6' sx={{ mb: 2, mt: 4 }}>Allgemeine Informationen</Typography>
+            <Typography variant='h6' sx={{ mb: 2, mt: 4 }}>Allgemeine Deckrüdenbesitzer-Informationen</Typography>
 
             <Box sx={{ mb: 3 }}>
                 <Typography variant='subtitle2' color='text.secondary'>Webseite (Veröffentlicht)</Typography>
