@@ -112,7 +112,7 @@ export function mapStrapiBreeder(payload: unknown): Breeder | null {
 		phone: readString(owner, 'phone'),
 		email: readString(owner, 'cEmail') || readString(item, 'BreederEmail'),
 		role: readString(item, 'BreederRole'),
-		isActive: item.IsActive !== false,
+		isActive: item.IsActive === true,
 		disabled: item.Disable === true,
 	}
 }

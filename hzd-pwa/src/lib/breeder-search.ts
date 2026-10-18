@@ -4,15 +4,7 @@ import { formatPlzOrt } from '@/lib/map-strapi-breeder'
 export const BREEDER_SEARCH_MAX_RESULTS = 100
 
 export function isEligibleZuechter(breeder: Breeder): boolean {
-	if (breeder.role && breeder.role !== 'B') {
-		return false
-	}
-
-	if (breeder.disabled || !breeder.isActive) {
-		return false
-	}
-
-	return true
+	return breeder.role === 'B' && breeder.isActive && !breeder.disabled
 }
 
 export function searchBreeders(
@@ -27,7 +19,9 @@ export function searchBreeders(
 	}
 
 	const normalizedQuery = trimmed.toLowerCase()
-	const pool = predicate ? breeders.filter(predicate) : breeders
+	const pool = predicate
+		? breeders.filter((breeder) => predicate(breeder))
+		: breeders
 
 	return pool
 		.filter((breeder) => {

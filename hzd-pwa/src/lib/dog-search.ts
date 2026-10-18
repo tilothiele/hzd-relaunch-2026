@@ -74,7 +74,7 @@ export function searchDogs(
 	}
 
 	const normalizedQuery = trimmed.toLowerCase()
-	const pool = predicate ? dogs.filter(predicate) : dogs
+	const pool = predicate ? dogs.filter((dog) => predicate(dog)) : dogs
 
 	return pool
 		.filter((dog) => {
