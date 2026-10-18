@@ -4,6 +4,7 @@ import { AccountMenu } from '@/components/AccountMenu'
 import Footer from '@/components/Footer'
 import Navigation from '@/components/Navigation'
 import { OnlineIndicator } from '@/components/OnlineIndicator'
+import { WurfabnahmeAutosaveGuard } from '@/components/wurfabnahme/WurfabnahmeAutosaveGuard'
 
 export function AppShell({
 	children,
@@ -12,6 +13,7 @@ export function AppShell({
 }) {
 	return (
 		<div className="flex min-h-screen flex-col font-[family-name:var(--font-geist-sans)] text-[var(--color-kapitaensblau)]">
+			<WurfabnahmeAutosaveGuard />
 			<header className="app-shell-header flex w-full items-center justify-between gap-3 p-4 shadow-sm z-10 relative bg-[var(--color-goldbeige)] text-[var(--color-kapitaensblau)]">
 				<div className="flex items-center gap-3">
 					<Link href="/" className="flex items-center gap-4 hover:opacity-80 transition-opacity">

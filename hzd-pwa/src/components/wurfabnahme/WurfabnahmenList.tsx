@@ -1,11 +1,12 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db'
 import {
-	clearWurfabnahmeDraft,
-	suspendWurfabnahmeAutosave,
+	discardWurfabnahmeAutosave,
+	pauseWurfabnahmeAutosave,
 } from '@/services/wurfabnahme-db'
 import { getWurfabnahmeListLabel } from '@/types/wurfabnahme-form'
 
@@ -25,6 +26,10 @@ export function WurfabnahmenList() {
 		return stored ?? null
 	})
 
+	useEffect(() => {
+		pauseWurfabnahmeAutosave()
+	}, [])
+
 	const handleContinueDraft = () => {
 		if (!draft) return
 		const href = draft.recordId
@@ -34,8 +39,7 @@ export function WurfabnahmenList() {
 	}
 
 	const handleDiscardDraft = () => {
-		suspendWurfabnahmeAutosave()
-		void clearWurfabnahmeDraft()
+		void discardWurfabnahmeAutosave()
 	}
 
 	return (

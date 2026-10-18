@@ -10,15 +10,12 @@ import {
 import { useRouter } from 'next/navigation'
 import WurfabnahmeApp from '@/components/wurfabnahme/WurfabnahmeApp'
 import {
-	beginWurfabnahmeAutosave,
-	clearWurfabnahmeDraft,
-	endWurfabnahmeAutosave,
+	discardWurfabnahmeAutosave,
 	getWurfabnahme,
 	getWurfabnahmeDraft,
-	isWurfabnahmeAutosaveActive,
+	pauseWurfabnahmeAutosave,
 	saveWurfabnahme,
-	saveWurfabnahmeDraft,
-	suspendWurfabnahmeAutosave,
+	startWurfabnahmeAutosave,
 } from '@/services/wurfabnahme-db'
 import {
 	appendWurfabnahmeRecord,
@@ -35,7 +32,6 @@ import {
 } from '@/types/wurfabnahme-form'
 
 const CURRENT_DRAFT_VALUE = 'draft'
-const AUTOSAVE_INTERVAL_MS = 10_000
 
 interface WurfabnahmeEditorProps {
 	basePath: string
@@ -189,8 +185,7 @@ export function WurfabnahmeEditor({
 	)
 
 	const discardTemporaryDraft = useCallback(async () => {
-		suspendWurfabnahmeAutosave()
-		await clearWurfabnahmeDraft()
+		await discardWurfabnahmeAutosave()
 	}, [])
 
 	const handleCancel = useCallback(() => {
@@ -255,38 +250,15 @@ export function WurfabnahmeEditor({
 		discardTemporaryDraft,
 	])
 
-	const persistDraft = useCallback(async (session: number) => {
-		if (!isWurfabnahmeAutosaveActive(session)) return
-
-		const snapshot = snapshotRef.current
-		await saveWurfabnahmeDraft(session, {
-			recordId: snapshot.recordId,
-			formData: snapshot.formData,
-			deletedWelpenIds: snapshot.deletedWelpenIds,
-			activeTab: snapshot.activeTab,
-		})
-	}, [])
-
 	useEffect(() => {
 		if (!autosaveReady) return
 
-		const session = beginWurfabnahmeAutosave()
-		const timer = window.setInterval(() => {
-			void persistDraft(session)
-		}, AUTOSAVE_INTERVAL_MS)
-
-		const handlePageHide = () => {
-			void persistDraft(session)
-		}
-
-		window.addEventListener('pagehide', handlePageHide)
+		startWurfabnahmeAutosave(() => snapshotRef.current)
 
 		return () => {
-			endWurfabnahmeAutosave(session)
-			window.clearInterval(timer)
-			window.removeEventListener('pagehide', handlePageHide)
+			pauseWurfabnahmeAutosave()
 		}
-	}, [autosaveReady, persistDraft])
+	}, [autosaveReady])
 
 	const wurfTabs = [
 		{ id: 'stammblatt', label: 'Stammblatt' },
