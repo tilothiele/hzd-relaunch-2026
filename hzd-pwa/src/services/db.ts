@@ -1,6 +1,15 @@
 import Dexie, { type EntityTable } from 'dexie';
 import type { KoerungVeranstaltung } from '@/types/koerung-veranstaltung';
-import type { Wurfabnahme } from '@/types/wurfabnahme-form';
+import type { Wurfabnahme, WurfabnahmeFormData } from '@/types/wurfabnahme-form';
+
+interface WurfabnahmeDraft {
+    id: string;
+    recordId: string | null;
+    formData: WurfabnahmeFormData;
+    deletedWelpenIds: string[];
+    activeTab: string;
+    updatedAt: string;
+}
 
 interface Dog {
     documentId: string;
@@ -47,6 +56,10 @@ const db = new Dexie('HzdDatabase') as Dexie & {
     breeders: EntityTable<
         Breeder,
         'documentId'
+    >;
+    wurfabnahmeDraft: EntityTable<
+        WurfabnahmeDraft,
+        'id'
     >;
 };
 
@@ -99,6 +112,14 @@ db.version(5).stores({
     wurfabnahmen: 'id, updatedAt, zwingername, datum',
     koerungVeranstaltungen: 'id, updatedAt, datum, name',
     breeders: 'documentId, kennelName, name, email',
+})
+
+db.version(6).stores({
+    dogs: 'documentId, fullkennelname, microchipNo, cStudBookNumber',
+    wurfabnahmen: 'id, updatedAt, zwingername, datum',
+    koerungVeranstaltungen: 'id, updatedAt, datum, name',
+    breeders: 'documentId, kennelName, name, email',
+    wurfabnahmeDraft: 'id, recordId, updatedAt',
 })
 
 export type { Dog, Breeder };

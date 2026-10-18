@@ -9,7 +9,13 @@ import {
 } from 'react'
 import { useRouter } from 'next/navigation'
 import WurfabnahmeApp from '@/components/wurfabnahme/WurfabnahmeApp'
-import { getWurfabnahme, saveWurfabnahme } from '@/services/wurfabnahme-db'
+import {
+	clearWurfabnahmeDraft,
+	getWurfabnahme,
+	getWurfabnahmeDraft,
+	saveWurfabnahme,
+	saveWurfabnahmeDraft,
+} from '@/services/wurfabnahme-db'
 import {
 	appendWurfabnahmeRecord,
 	buildRecordFromForm,
@@ -23,7 +29,9 @@ import {
 	type Wurfabnahme,
 	type WurfabnahmeFormData,
 } from '@/types/wurfabnahme-form'
+
 const CURRENT_DRAFT_VALUE = 'draft'
+const AUTOSAVE_INTERVAL_MS = 30_000
 
 interface WurfabnahmeEditorProps {
 	basePath: string
@@ -54,6 +62,23 @@ export function WurfabnahmeEditor({
 		new Set(),
 	)
 	const [activeTab, setActiveTab] = useState<string>('stammblatt')
+	const [autosaveReady, setAutosaveReady] = useState(false)
+	const skipAutosaveRef = useRef(false)
+	const autosaveReadyRef = useRef(false)
+	const autosaveGenerationRef = useRef(0)
+	const snapshotRef = useRef({
+		recordId: recordId ?? null,
+		formData: draftFormData,
+		deletedWelpenIds: [] as string[],
+		activeTab,
+	})
+
+	snapshotRef.current = {
+		recordId: recordId ?? null,
+		formData: draftFormData,
+		deletedWelpenIds: [...deletedWelpenIds],
+		activeTab,
+	}
 
 	const isViewingHistory = selectedHistoryValue !== CURRENT_DRAFT_VALUE
 	const isReadOnly = !isNewForm && isViewingHistory
@@ -72,14 +97,32 @@ export function WurfabnahmeEditor({
 	)
 
 	useEffect(() => {
-		if (!recordId) {
-			setIsLoading(false)
-			return
-		}
-
 		let cancelled = false
 
-		getWurfabnahme(recordId).then((loaded) => {
+		async function loadEditor() {
+			const storedDraft = await getWurfabnahmeDraft()
+			if (cancelled) return
+
+			const currentId = recordId ?? null
+			const matchesDraft = storedDraft?.recordId === currentId
+
+			if (!recordId) {
+				if (matchesDraft && storedDraft) {
+					const restored = normalizeFormData(storedDraft.formData)
+					setDraftFormData(restored)
+					setFormData(restored)
+					setDeletedWelpenIds(new Set(storedDraft.deletedWelpenIds))
+					if (storedDraft.activeTab) {
+						setActiveTab(storedDraft.activeTab)
+					}
+				}
+				setIsLoading(false)
+				autosaveReadyRef.current = true
+				setAutosaveReady(true)
+				return
+			}
+
+			const loaded = await getWurfabnahme(recordId)
 			if (cancelled) return
 
 			if (!loaded || loaded.records.length === 0) {
@@ -88,19 +131,33 @@ export function WurfabnahmeEditor({
 				return
 			}
 
-			const draft = cloneFormDataForEdit(
+			const base = cloneFormDataForEdit(
 				getLatestWurfabnahmeRecord(loaded).formData,
 			)
+			const restored = matchesDraft && storedDraft
+				? normalizeFormData(storedDraft.formData)
+				: base
 
 			setWurfabnahme(loaded)
-			setDraftFormData(draft)
-			setFormData(draft)
+			setDraftFormData(restored)
+			setFormData(restored)
 			setSelectedHistoryValue(CURRENT_DRAFT_VALUE)
+			if (matchesDraft && storedDraft) {
+				setDeletedWelpenIds(new Set(storedDraft.deletedWelpenIds))
+				if (storedDraft.activeTab) {
+					setActiveTab(storedDraft.activeTab)
+				}
+			}
 			setIsLoading(false)
-		})
+			autosaveReadyRef.current = true
+			setAutosaveReady(true)
+		}
+
+		void loadEditor()
 
 		return () => {
 			cancelled = true
+			autosaveReadyRef.current = false
 		}
 	}, [recordId])
 
@@ -133,9 +190,21 @@ export function WurfabnahmeEditor({
 		[wurfabnahme, isViewingHistory, draftFormData, formData],
 	)
 
+	const discardTemporaryDraft = useCallback(async () => {
+		skipAutosaveRef.current = true
+		autosaveGenerationRef.current += 1
+		const existing = await getWurfabnahmeDraft()
+		const currentId = recordId ?? null
+		if (!existing || existing.recordId === currentId) {
+			await clearWurfabnahmeDraft()
+		}
+	}, [recordId])
+
 	const handleCancel = useCallback(() => {
-		router.push('/wurfabnahmen')
-	}, [router])
+		void discardTemporaryDraft().finally(() => {
+			router.push('/wurfabnahmen')
+		})
+	}, [discardTemporaryDraft, router])
 
 	const handleMarkWelpeDelete = useCallback((id: string) => {
 		setDeletedWelpenIds((prev) => new Set([...prev, id]))
@@ -178,6 +247,7 @@ export function WurfabnahmeEditor({
 				await saveWurfabnahme(createWurfabnahme(id, newRecord))
 			}
 
+			await discardTemporaryDraft()
 			router.push('/wurfabnahmen')
 		} finally {
 			setIsSaving(false)
@@ -189,7 +259,57 @@ export function WurfabnahmeEditor({
 		isReadOnly,
 		deletedWelpenIds,
 		router,
+		discardTemporaryDraft,
 	])
+
+	const persistDraft = useCallback(async () => {
+		if (skipAutosaveRef.current || !autosaveReadyRef.current) return
+
+		const generation = autosaveGenerationRef.current
+		const snapshot = snapshotRef.current
+		const existing = await getWurfabnahmeDraft()
+		if (
+			skipAutosaveRef.current
+			|| generation !== autosaveGenerationRef.current
+		) {
+			return
+		}
+		if (existing && existing.recordId !== snapshot.recordId) return
+
+		await saveWurfabnahmeDraft({
+			recordId: snapshot.recordId,
+			formData: snapshot.formData,
+			deletedWelpenIds: snapshot.deletedWelpenIds,
+			activeTab: snapshot.activeTab,
+		})
+
+		if (
+			skipAutosaveRef.current
+			|| generation !== autosaveGenerationRef.current
+		) {
+			await clearWurfabnahmeDraft()
+		}
+	}, [])
+
+	useEffect(() => {
+		if (!autosaveReady) return
+
+		const timer = window.setInterval(() => {
+			void persistDraft()
+		}, AUTOSAVE_INTERVAL_MS)
+
+		const handlePageHide = () => {
+			void persistDraft()
+		}
+
+		window.addEventListener('pagehide', handlePageHide)
+
+		return () => {
+			window.clearInterval(timer)
+			window.removeEventListener('pagehide', handlePageHide)
+			void persistDraft()
+		}
+	}, [autosaveReady, persistDraft])
 
 	const wurfTabs = [
 		{ id: 'stammblatt', label: 'Stammblatt' },
@@ -248,7 +368,7 @@ export function WurfabnahmeEditor({
 				<p className="text-red-600">{loadError}</p>
 				<button
 					type="button"
-					onClick={handleCancel}
+					onClick={() => router.push('/wurfabnahmen')}
 					className="self-start rounded bg-gray-200 px-4 py-2 text-sm hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
 				>
 					Zurück zur Liste

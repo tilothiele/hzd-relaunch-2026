@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/services/db'
+import { clearWurfabnahmeDraft } from '@/services/wurfabnahme-db'
 import { getWurfabnahmeListLabel } from '@/types/wurfabnahme-form'
 
 function formatDateTime(iso: string): string {
@@ -16,9 +17,65 @@ export function WurfabnahmenList() {
 	const records = useLiveQuery(() =>
 		db.wurfabnahmen.orderBy('updatedAt').reverse().toArray(),
 	)
+	const draft = useLiveQuery(async () => {
+		const stored = await db.wurfabnahmeDraft.get('current')
+		return stored ?? null
+	})
+
+	const handleContinueDraft = () => {
+		if (!draft) return
+		const href = draft.recordId
+			? `/wurfabnahmen/${draft.recordId}`
+			: '/wurfabnahmen/neu'
+		router.push(href)
+	}
+
+	const handleDiscardDraft = () => {
+		void clearWurfabnahmeDraft()
+	}
 
 	return (
 		<div className="flex flex-col gap-4">
+			{draft ? (
+				<div
+					className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+					role="presentation"
+				>
+					<div
+						className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800"
+						role="dialog"
+						aria-modal="true"
+						aria-labelledby="wurfabnahme-draft-title"
+					>
+						<h2
+							id="wurfabnahme-draft-title"
+							className="text-lg font-semibold"
+						>
+							Ein nicht gespeichertes Wurfabnahmeprotokoll existiert.
+						</h2>
+						<p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
+							Weiter bearbeiten? Verwerfen?
+						</p>
+						<div className="mt-6 flex flex-wrap justify-end gap-3">
+							<button
+								type="button"
+								onClick={handleDiscardDraft}
+								className="rounded bg-gray-200 px-4 py-2 text-sm font-medium hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
+							>
+								Verwerfen
+							</button>
+							<button
+								type="button"
+								onClick={handleContinueDraft}
+								autoFocus
+								className="rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+							>
+								Weiter bearbeiten
+							</button>
+						</div>
+					</div>
+				</div>
+			) : null}
 			<div className="flex flex-wrap items-center justify-between gap-3">
 				<div>
 					<h1 className="text-2xl font-bold">Wurfabnahmen</h1>
