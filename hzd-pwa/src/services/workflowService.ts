@@ -15,6 +15,15 @@ class WorkflowService {
    */
   async neuesMitglied(formData: FormData): Promise<boolean> {
     try {
+      const workflowEndpoint = process.env.WORKFLOW_ENDPOINT_URL;
+
+      if (!workflowEndpoint) {
+        console.log(
+          'WORKFLOW_ENDPOINT_URL nicht gesetzt, Workflow-API-Aufruf wird übersprungen'
+        );
+        return true;
+      }
+
       // erzeuge das PDF
       const pdfService = getPdfService();
       const pdf = await pdfService.createPdf(formData);
@@ -24,14 +33,6 @@ class WorkflowService {
       }
 
       serverLog(`Workflow "Neues Mitglied" gestartet für: ${formData.email}`);
-
-      // REST-Endpoint aufrufen (optional, wenn konfiguriert)
-      const workflowEndpoint = process.env.WORKFLOW_ENDPOINT_URL;
-
-      if (!workflowEndpoint) {
-        serverLog('Kein Workflow-Endpoint konfiguriert (WORKFLOW_ENDPOINT_URL)');
-        return false;
-      }
 
         serverLog(`Sende Daten an Workflow-Endpoint: ${workflowEndpoint}`);
 
