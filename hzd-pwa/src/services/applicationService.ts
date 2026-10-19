@@ -103,6 +103,24 @@ class ApplicationService {
 
       serverLog(`Neue Antragsanmeldung gespeichert: ${formData.email} (UUID: ${uuid})`);
 
+      if (process.env.SMTP_HOST) {
+        const emailService = getEmailService();
+        const emailSent = await emailService.sendConfirmationEmail(
+          formData.email,
+          {
+            vorname: formData.vorname,
+            name: formData.name,
+            mitgliedschaft: formData.mitgliedschaft,
+          }
+        );
+
+        if (!emailSent) {
+          serverLog(`Fehler beim Senden der Bestätigungs-E-Mail an ${formData.email}`);
+        }
+      } else {
+        console.log('SMTP_HOST nicht gesetzt, Bestätigungs-E-Mail wird übersprungen');
+      }
+
       const workflowService = getWorkflowService();
       const workflowResult = await workflowService.neuesMitglied(formData);
 
