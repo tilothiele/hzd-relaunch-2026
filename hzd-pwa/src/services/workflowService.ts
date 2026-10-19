@@ -1,6 +1,9 @@
 import { serverLog } from '../lib/server-only';
 import type { FormData } from '../types/formData';
+import { getEmailService } from './emailService';
 import { getPdfService } from './pdfService';
+
+const PDF_RECIPIENT_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
  * WorkflowService - Verwaltet Workflows für Mitgliedschaften
@@ -15,11 +18,12 @@ class WorkflowService {
    */
   async neuesMitglied(formData: FormData): Promise<boolean> {
     try {
-      const workflowEndpoint = process.env.WORKFLOW_ENDPOINT_URL;
+      const workflowEndpoint = process.env.WORKFLOW_ENDPOINT_URL?.trim();
+      const pdfRecipient = process.env.APPLICATION_PDF_EMAIL?.trim();
 
-      if (!workflowEndpoint) {
+      if (!workflowEndpoint && !pdfRecipient) {
         console.log(
-          'WORKFLOW_ENDPOINT_URL nicht gesetzt, Workflow-API-Aufruf wird übersprungen'
+          'WORKFLOW_ENDPOINT_URL und APPLICATION_PDF_EMAIL nicht gesetzt, Weiterleitung wird übersprungen'
         );
         return true;
       }
@@ -33,6 +37,14 @@ class WorkflowService {
       }
 
       serverLog(`Workflow "Neues Mitglied" gestartet für: ${formData.email}`);
+
+      if (!workflowEndpoint) {
+        console.log(
+          'WORKFLOW_ENDPOINT_URL nicht gesetzt, Workflow-API-Aufruf wird übersprungen'
+        );
+        await this.sendPdfToRecipient(formData, pdf, pdfRecipient);
+        return true;
+      }
 
         serverLog(`Sende Daten an Workflow-Endpoint: ${workflowEndpoint}`);
 
@@ -84,6 +96,7 @@ class WorkflowService {
 //          serverLog(`Workflow-Endpoint erfolgreich aufgerufen. Response: ${responseData}`);
 
           serverLog(`Workflow-Endpoint erfolgreich aufgerufen.`);
+          await this.sendPdfToRecipient(formData, pdf, pdfRecipient);
 
         } catch (endpointError) {
           console.error('Fehler beim Aufruf des Workflow-Endpoints:', endpointError);
@@ -98,6 +111,45 @@ class WorkflowService {
       console.error('Fehler im Workflow "Neues Mitglied":', error);
       serverLog(`Fehler im Workflow "Neues Mitglied" für ${formData.email}: ${error instanceof Error ? error.message : String(error)}`);
       return false;
+    }
+  }
+
+  /**
+   * Sendet das Antrags-PDF, wenn APPLICATION_PDF_EMAIL eine Adresse enthält.
+   * Ein Fehler beim Versand bricht den Workflow nicht ab.
+   */
+  private async sendPdfToRecipient(
+    formData: FormData,
+    pdf: ArrayBuffer,
+    pdfRecipient: string | undefined
+  ): Promise<void> {
+    if (!pdfRecipient) {
+      return;
+    }
+
+    if (!PDF_RECIPIENT_PATTERN.test(pdfRecipient)) {
+      serverLog(
+        'APPLICATION_PDF_EMAIL ist keine gültige E-Mail-Adresse, Versand wird übersprungen'
+      );
+      return;
+    }
+
+    if (!process.env.SMTP_HOST) {
+      serverLog(
+        'SMTP_HOST nicht gesetzt, Versand des Antrags-PDFs wird übersprungen'
+      );
+      return;
+    }
+
+    const emailService = getEmailService();
+    const emailSent = await emailService.sendApplicationPdf(
+      pdfRecipient,
+      formData,
+      pdf
+    );
+
+    if (!emailSent) {
+      serverLog(`Antrags-PDF konnte nicht an ${pdfRecipient} gesendet werden`);
     }
   }
 }

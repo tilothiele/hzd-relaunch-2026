@@ -1,6 +1,7 @@
 import nodemailer, { type Transporter } from 'nodemailer';
 import { serverLog } from '../lib/server-only';
 import { renderEmailTemplate } from '../lib/email-templates';
+import type { FormData } from '../types/formData';
 
 interface EmailConfig {
   host: string;
@@ -149,6 +150,67 @@ class EmailService {
   }
 
   /**
+   * Sendet das Antrags-PDF an eine interne Empfängeradresse.
+   */
+  async sendApplicationPdf(
+    email: string,
+    formData: FormData,
+    pdf: ArrayBuffer
+  ): Promise<boolean> {
+    try {
+      const applicant = `${formData.vorname} ${formData.name}`
+        .trim()
+        .replace(/[\r\n]+/g, ' ');
+      const safeApplicant = escapeHtml(applicant);
+      const safeEmail = escapeHtml(formData.email);
+      const safeMembership = escapeHtml(formData.mitgliedschaft);
+      const textContent = [
+        'Ein neuer Mitgliedsantrag ist eingegangen.',
+        '',
+        `Antragsteller: ${applicant}`,
+        `E-Mail: ${formData.email}`,
+        `Mitgliedschaft: ${formData.mitgliedschaft}`,
+        '',
+        'Das PDF des Antrags ist angehängt.',
+      ].join('\n');
+      const htmlContent = `
+        <p>Ein neuer Mitgliedsantrag ist eingegangen.</p>
+        <p>
+          Antragsteller: ${safeApplicant}<br />
+          E-Mail: ${safeEmail}<br />
+          Mitgliedschaft: ${safeMembership}
+        </p>
+        <p>Das PDF des Antrags ist angehängt.</p>
+      `;
+
+      const transporter = this.getTransporter();
+      const info = await transporter.sendMail({
+        from: process.env.SMTP_FROM || 'noreply@hzd-og-hamburg.de',
+        to: email,
+        subject: `Neuer Mitgliedsantrag – ${applicant}`,
+        html: htmlContent,
+        text: textContent,
+        attachments: [
+          {
+            filename: 'HZD-Aufnahmeantrag.pdf',
+            content: Buffer.from(pdf),
+            contentType: 'application/pdf',
+          },
+        ],
+      });
+
+      serverLog(`Antrags-PDF gesendet an ${email}, MessageID: ${info.messageId}`);
+      return true;
+    } catch (error) {
+      console.error('Fehler beim Senden des Antrags-PDFs:', error);
+      serverLog(
+        `FEHLER beim Versand des Antrags-PDFs an ${email}: ${error instanceof Error ? error.message : String(error)}`
+      );
+      return false;
+    }
+  }
+
+  /**
    * Testet die E-Mail-Konfiguration
    */
   async testConnection(): Promise<boolean> {
@@ -162,6 +224,14 @@ class EmailService {
       return false;
     }
   }
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 
 // Singleton-Instanz
