@@ -36,12 +36,23 @@ export class DatabaseService {
   }
 
   /**
-   * Initialisiert die Datenbank und erstellt Tabellen falls notwendig
+   * Initialisiert die Datenbank und erstellt Tabellen falls notwendig.
+   * Prisma legt das Schema beim Connect nicht an; im Container gibt es
+   * keine Migrationen.
    */
   async initializeDatabase(): Promise<void> {
     try {
-      // Prisma erstellt die Tabellen automatisch basierend auf dem Schema
       await this.prisma.$connect();
+      await this.prisma.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "applications" (
+          "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+          "creationDate" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "email" TEXT NOT NULL,
+          "uuid" TEXT,
+          "payload" TEXT,
+          "verification_sent_at" DATETIME
+        )
+      `);
       console.log('Datenbank erfolgreich initialisiert');
     } catch (error) {
       console.error('Fehler beim Initialisieren der Datenbank:', error);
