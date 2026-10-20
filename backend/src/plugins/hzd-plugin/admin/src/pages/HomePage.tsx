@@ -6,6 +6,7 @@ import { useIntl } from 'react-intl';
 import { getTranslation } from '../utils/getTranslation';
 import { ChromosoftImportPanel } from './ChromosoftImportPanel';
 import { LitterReminderPanel } from './LitterReminderPanel';
+import { SearchIndexPanel } from './SearchIndexPanel';
 
 function escapeHtml(value: string) {
   return value
@@ -235,6 +236,8 @@ const HomePage = () => {
           <ChromosoftImportPanel />
 
           <LitterReminderPanel />
+
+          <SearchIndexPanel />
         </Flex>
       </Box>
     </Main>

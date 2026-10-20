@@ -46,5 +46,12 @@
   "hzd-plugin.chromosoft.import.success": "Chromosoft-Daten verarbeitet: {members} Mitglieder, {dogs} Hunde, {studDogs} Deckrüden, {breeders} Züchter, {fixedUsers} Benutzer geprüft.",
   "hzd-plugin.chromosoft.import.successSkipped": "Chromosoft-Daten verarbeitet: {members} Mitglieder ({memberSkipped} unverändert), {dogs} Hunde ({dogSkipped} unverändert), {studDogs} Deckrüden, {breeders} Züchter, {fixedUsers} Benutzer geprüft.",
   "hzd-plugin.chromosoft.import.error": "Die Chromosoft-Daten konnten nicht importiert werden.",
-  "hzd-plugin.chromosoft.import.logError": "Die Logdatei konnte nicht heruntergeladen werden."
+  "hzd-plugin.chromosoft.import.logError": "Die Logdatei konnte nicht heruntergeladen werden.",
+  "hzd-plugin.searchIndex.title": "Suche",
+  "hzd-plugin.searchIndex.description": "Indexiert veröffentlichte Seiten und News-Artikel neu. Seiten mit gesetzter Restriction und Public = false werden nicht aufgenommen.",
+  "hzd-plugin.searchIndex.button": "Vollindexierung starten",
+  "hzd-plugin.searchIndex.success": "Die Vollindexierung ist abgeschlossen.",
+  "hzd-plugin.searchIndex.error": "Die Vollindexierung konnte nicht gestartet werden.",
+  "hzd-plugin.searchIndex.disabled": "Meilisearch ist nicht konfiguriert.",
+  "hzd-plugin.searchIndex.result": "Zuletzt am {time}: {indexed} Dokumente indexiert, {removed} entfernt."
 }

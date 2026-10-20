@@ -1,7 +1,7 @@
 import type { Core } from '@strapi/strapi';
 import { errors } from '@strapi/utils';
 import cron from 'node-cron';
-import { isSearchEnabled, registerSearchDocumentMiddleware, reindexAll } from './search/search-index';
+import { isSearchEnabled, registerSearchDocumentMiddleware, reindexAll, getReindexState } from './search/search-index';
 
 type RelationValue = number | string | { id?: number | string; documentId?: string };
 
@@ -195,6 +195,17 @@ export default {
 		});
 		strapi.log.info('[Document Middleware] Registered User data manipulation middleware');
 		registerSearchDocumentMiddleware(strapi);
+		(strapi as Core.Strapi & {
+			hzdSearch?: {
+				reindexAll: typeof reindexAll
+				getReindexState: typeof getReindexState
+				isSearchEnabled: typeof isSearchEnabled
+			}
+		}).hzdSearch = {
+			reindexAll,
+			getReindexState,
+			isSearchEnabled,
+		};
 		strapi.log.info('[Search] Document-Hooks für Page und NewsArticle registriert');
 	},
 

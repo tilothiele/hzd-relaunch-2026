@@ -46,5 +46,12 @@
   "hzd-plugin.chromosoft.import.success": "Chromosoft data processed: {members} members, {dogs} dogs, {studDogs} stud dogs, {breeders} breeders, {fixedUsers} users checked.",
   "hzd-plugin.chromosoft.import.successSkipped": "Chromosoft data processed: {members} members ({memberSkipped} unchanged), {dogs} dogs ({dogSkipped} unchanged), {studDogs} stud dogs, {breeders} breeders, {fixedUsers} users checked.",
   "hzd-plugin.chromosoft.import.error": "The Chromosoft data could not be imported.",
-  "hzd-plugin.chromosoft.import.logError": "The log file could not be downloaded."
+  "hzd-plugin.chromosoft.import.logError": "The log file could not be downloaded.",
+  "hzd-plugin.searchIndex.title": "Search",
+  "hzd-plugin.searchIndex.description": "Reindexes published pages and news articles. Pages with a restriction and Public = false are skipped.",
+  "hzd-plugin.searchIndex.button": "Start full reindex",
+  "hzd-plugin.searchIndex.success": "The full reindex is complete.",
+  "hzd-plugin.searchIndex.error": "The full reindex could not be started.",
+  "hzd-plugin.searchIndex.disabled": "Meilisearch is not configured.",
+  "hzd-plugin.searchIndex.result": "Last run {time}: {indexed} documents indexed, {removed} removed."
 }
