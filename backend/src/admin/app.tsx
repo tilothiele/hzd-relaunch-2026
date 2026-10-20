@@ -52,6 +52,7 @@ export default {
     translations: {
       de: {
         'content-manager.plugin.name': 'Content-Manager',
+        'csv-exporter.plugin.name': 'CSV-Export',
       },
     },
     auth: {
