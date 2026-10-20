@@ -6,6 +6,7 @@ import { Providers } from './providers'
 import { TestBanner } from '@/components/test-banner/test-banner'
 import { UmamiAnalytics } from '@/components/analytics/umami-analytics'
 import { readRuntimeEnv } from '@/lib/server/runtime-env'
+import { isSiteSearchConfigured } from '@/lib/server/search-config'
 
 
 config.autoAddCss = false
@@ -42,6 +43,7 @@ export default async function RootLayout({
 		?? readRuntimeEnv('UMAMI_WEBSITE_ID')
 	const umamiScriptUrl = readRuntimeEnv('NEXT_PUBLIC_UMAMI_SCRIPT_URL')
 		?? readRuntimeEnv('UMAMI_SCRIPT_URL')
+	const searchEnabled = isSiteSearchConfigured()
 
 	return (
 		<html lang='de'>
@@ -60,7 +62,7 @@ export default async function RootLayout({
 					websiteId={umamiWebsiteId}
 				/>
 				<TestBanner />
-				<Providers>
+				<Providers searchEnabled={searchEnabled}>
 					{children}
 				</Providers>
 			</body>

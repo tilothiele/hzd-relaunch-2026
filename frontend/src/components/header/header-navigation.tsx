@@ -13,6 +13,8 @@ import { cn } from '@/lib/utils'
 import FacebookShare from '@/components/ui/facebook-share-1'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBell, faCalendar } from '@fortawesome/free-solid-svg-icons'
+import { HeaderSearch } from '@/components/search/header-search'
+import { useSearchEnabled } from '@/components/search/search-config-context'
 
 interface HeaderNavigationProps {
     globalLayout?: GlobalLayout | null
@@ -43,6 +45,7 @@ export function HeaderNavigation({
 }: HeaderNavigationProps) {
     const [currentUrl, setCurrentUrl] = useState<string>('')
     const [isNotificationActive, setIsNotificationActive] = useState<boolean>(false)
+    const searchEnabled = useSearchEnabled()
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -175,6 +178,10 @@ export function HeaderNavigation({
                 />
 
                 {currentUrl && <FacebookShare url={currentUrl} />}
+
+                {searchEnabled ? (
+                    <HeaderSearch iconColor={theme.headerFooterIcons} />
+                ) : null}
 
                 <Link
                     href='/calendar'

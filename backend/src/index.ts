@@ -1,5 +1,7 @@
 import type { Core } from '@strapi/strapi';
 import { errors } from '@strapi/utils';
+import cron from 'node-cron';
+import { isSearchEnabled, registerSearchDocumentMiddleware, reindexAll } from './search/search-index';
 
 type RelationValue = number | string | { id?: number | string; documentId?: string };
 
@@ -192,6 +194,8 @@ export default {
 			return next();
 		});
 		strapi.log.info('[Document Middleware] Registered User data manipulation middleware');
+		registerSearchDocumentMiddleware(strapi);
+		strapi.log.info('[Search] Document-Hooks für Page und NewsArticle registriert');
 	},
 
 	async bootstrap({ strapi }: { strapi: Core.Strapi }) {
@@ -215,6 +219,24 @@ export default {
 		});
 
 		await setMissingBreederRoles(strapi);
+
+		const searchCron = process.env.SEARCH_REINDEX_CRON || '0 3 * * *';
+		if (isSearchEnabled()) {
+			cron.schedule(
+				searchCron,
+				async () => {
+					try {
+						await reindexAll(strapi);
+					} catch (error) {
+						strapi.log.error('[Search] Nächtliche Vollindexierung fehlgeschlagen', error);
+					}
+				},
+				{ timezone: 'Europe/Berlin' },
+			);
+			strapi.log.info(`[Search] Vollindexierung geplant: ${searchCron} (Europe/Berlin)`);
+		} else {
+			strapi.log.info('[Search] Vollindexierung nicht geplant, MEILI_HOST fehlt');
+		}
 
 		const uid = 'api::form-instance.form-instance';
 

@@ -30,12 +30,19 @@ services:
       - DATABASE_SSL=false
       - DATABASE_POOL_MIN=2
       - DATABASE_POOL_MAX=10
+      - MEILI_HOST=http://meilisearch:7700
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
+      - SEARCH_INDEX_TOKEN=${SEARCH_INDEX_TOKEN}
+      - SEARCH_WEBHOOK_SECRET=${SEARCH_WEBHOOK_SECRET}
+      - SEARCH_REINDEX_CRON=${SEARCH_REINDEX_CRON:-0 3 * * *}
     volumes:
       # Persistiere Uploads
       - ./public/uploads:/app/public/uploads
     depends_on:
       mariadb:
         condition: service_healthy
+      meilisearch:
+        condition: service_started
     networks:
       - hzd-network
     healthcheck:
@@ -64,8 +71,25 @@ services:
       timeout: 5s
       retries: 5
 
+  meilisearch:
+    image: getmeili/meilisearch:v1.55
+    container_name: hzd-meilisearch
+    restart: unless-stopped
+    environment:
+      - MEILI_ENV=production
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
+      - MEILI_NO_ANALYTICS=true
+    volumes:
+      # Indexdaten. Ohne dieses Volume geht der Suchindex beim Container-Neuaufbau verloren.
+      - meili_data:/meili_data
+    ports:
+      - '7700:7700'
+    networks:
+      - hzd-network
+
 volumes:
   mariadb_data:
+  meili_data:
 
 networks:
   hzd-network:
