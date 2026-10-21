@@ -44,7 +44,8 @@
         "blocks.detailed-image-gallery-section",
         "blocks.action-images-section",
         "blocks.black-board-section",
-        "blocks.form-section"
+        "blocks.form-section",
+        "blocks.md-text-section"
       ]
     },
     "ColorTheme": {

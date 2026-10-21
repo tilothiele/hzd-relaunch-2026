@@ -95,15 +95,27 @@ export function MarkdownContainer({ content, theme, className = "" }: MarkdownCo
                 }
 
                 /* FAQ specific styles if we want them here too */
+                .faq-page p,
+                .faq-page li {
+                    font-size: clamp(1rem, 0.94rem + 0.22vw, 1.075rem);
+                }
+                .faq-page h1 {
+                    font-size: clamp(1.7rem, 1.15rem + 1.6vw, 2.125rem);
+                    line-height: 1.3;
+                }
                 .faq-page h2 {
                     background: color-mix(in srgb, ${accentColor}, transparent 92%);
                     padding: 0.5rem 1rem;
                     border-radius: 8px;
                     border-left: none;
+                    font-size: clamp(1.3rem, 1.05rem + 0.85vw, 1.7rem);
+                    line-height: 1.35;
                 }
                 .faq-page h3 {
                     position: relative;
                     padding-left: 2.5rem;
+                    font-size: clamp(1.05rem, 0.98rem + 0.35vw, 1.2rem);
+                    line-height: 1.45;
                 }
                 .faq-page h3::before {
                     content: "F:";

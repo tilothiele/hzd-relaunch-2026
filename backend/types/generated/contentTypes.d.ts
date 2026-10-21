@@ -1679,6 +1679,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.action-images-section',
         'blocks.black-board-section',
         'blocks.form-section',
+        'blocks.md-text-section',
       ]
     >;
     SEO: Schema.Attribute.Component<'seo.seo', true>;

@@ -21,6 +21,7 @@ import { TableOfContentSectionComponent } from './table-of-content-section/table
 import { PassedDogsSectionClientLoader } from './passed-dogs-section/passed-dogs-section-client-loader'
 import { BlackBoardSectionComponent } from './black-board-section/black-board-section'
 import { FormSectionClientLoader } from './form-section/form-section-client-loader'
+import { MdTextSectionComponent } from './md-text-section/md-text-section'
 
 
 interface RenderStartpageSectionsParams {
@@ -205,6 +206,14 @@ function renderStartpageSection({
 					key={key}
 					section={section}
 					strapiBaseUrl={strapiBaseUrl}
+					theme={theme}
+				/>
+			)
+		case 'ComponentBlocksMdTextSection':
+			return (
+				<MdTextSectionComponent
+					key={key}
+					section={section}
 					theme={theme}
 				/>
 			)

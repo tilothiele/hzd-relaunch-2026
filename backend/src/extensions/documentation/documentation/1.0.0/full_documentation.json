@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-10-21T11:10:00.810Z"
+    "x-generation-date": "2026-10-21T14:53:56.952Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -57784,6 +57784,9 @@
                     },
                     {
                       "$ref": "#/components/schemas/BlocksFormSectionComponent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/BlocksMdTextSectionComponent"
                     }
                   ]
                 },
@@ -57809,7 +57812,8 @@
                     "blocks.detailed-image-gallery-section": "#/components/schemas/BlocksDetailedImageGallerySectionComponent",
                     "blocks.action-images-section": "#/components/schemas/BlocksActionImagesSectionComponent",
                     "blocks.black-board-section": "#/components/schemas/BlocksBlackBoardSectionComponent",
-                    "blocks.form-section": "#/components/schemas/BlocksFormSectionComponent"
+                    "blocks.form-section": "#/components/schemas/BlocksFormSectionComponent",
+                    "blocks.md-text-section": "#/components/schemas/BlocksMdTextSectionComponent"
                   }
                 }
               },
@@ -61767,6 +61771,30 @@
                 "type": "string"
               }
             }
+          }
+        }
+      },
+      "BlocksMdTextSectionComponent": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "__component": {
+            "type": "string",
+            "enum": [
+              "blocks.md-text-section"
+            ]
+          },
+          "MarkdownText": {
+            "type": "string"
           }
         }
       },
@@ -86604,6 +86632,9 @@
                     },
                     {
                       "$ref": "#/components/schemas/BlocksFormSectionComponent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/BlocksMdTextSectionComponent"
                     }
                   ]
                 },
@@ -86629,7 +86660,8 @@
                     "blocks.detailed-image-gallery-section": "#/components/schemas/BlocksDetailedImageGallerySectionComponent",
                     "blocks.action-images-section": "#/components/schemas/BlocksActionImagesSectionComponent",
                     "blocks.black-board-section": "#/components/schemas/BlocksBlackBoardSectionComponent",
-                    "blocks.form-section": "#/components/schemas/BlocksFormSectionComponent"
+                    "blocks.form-section": "#/components/schemas/BlocksFormSectionComponent",
+                    "blocks.md-text-section": "#/components/schemas/BlocksMdTextSectionComponent"
                   }
                 }
               },
@@ -86789,6 +86821,9 @@
                 },
                 {
                   "$ref": "#/components/schemas/BlocksFormSectionComponent"
+                },
+                {
+                  "$ref": "#/components/schemas/BlocksMdTextSectionComponent"
                 }
               ]
             },
@@ -86814,7 +86849,8 @@
                 "blocks.detailed-image-gallery-section": "#/components/schemas/BlocksDetailedImageGallerySectionComponent",
                 "blocks.action-images-section": "#/components/schemas/BlocksActionImagesSectionComponent",
                 "blocks.black-board-section": "#/components/schemas/BlocksBlackBoardSectionComponent",
-                "blocks.form-section": "#/components/schemas/BlocksFormSectionComponent"
+                "blocks.form-section": "#/components/schemas/BlocksFormSectionComponent",
+                "blocks.md-text-section": "#/components/schemas/BlocksMdTextSectionComponent"
               }
             }
           },
@@ -86971,6 +87007,9 @@
                       },
                       {
                         "$ref": "#/components/schemas/BlocksFormSectionComponent"
+                      },
+                      {
+                        "$ref": "#/components/schemas/BlocksMdTextSectionComponent"
                       }
                     ]
                   },
@@ -86996,7 +87035,8 @@
                       "blocks.detailed-image-gallery-section": "#/components/schemas/BlocksDetailedImageGallerySectionComponent",
                       "blocks.action-images-section": "#/components/schemas/BlocksActionImagesSectionComponent",
                       "blocks.black-board-section": "#/components/schemas/BlocksBlackBoardSectionComponent",
-                      "blocks.form-section": "#/components/schemas/BlocksFormSectionComponent"
+                      "blocks.form-section": "#/components/schemas/BlocksFormSectionComponent",
+                      "blocks.md-text-section": "#/components/schemas/BlocksMdTextSectionComponent"
                     }
                   }
                 },

@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_blocks_md_text_sections",
+  "info": {
+    "displayName": "MdTextSection"
+  },
+  "options": {},
+  "attributes": {
+    "MarkdownText": {
+      "type": "richtext"
+    }
+  },
+  "config": {}
+}

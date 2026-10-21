@@ -30,6 +30,7 @@ const SECTION_BLOCK_COMPONENTS = [
 	'blocks.passed-dogs-section',
 	'blocks.black-board-section',
 	'blocks.form-section',
+	'blocks.md-text-section',
 ] as const
 
 /** Dynamic Zone in news-article (schema) */

@@ -247,6 +247,16 @@ export interface BlocksItemList extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksMdTextSection extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_md_text_sections';
+  info: {
+    displayName: 'MdTextSection';
+  };
+  attributes: {
+    MarkdownText: Schema.Attribute.RichText;
+  };
+}
+
 export interface BlocksNewsArticlesSection extends Struct.ComponentSchema {
   collectionName: 'components_blocks_news_articles_sections';
   info: {
@@ -901,6 +911,7 @@ declare module '@strapi/strapi' {
       'blocks.hero-section-slide-show': BlocksHeroSectionSlideShow;
       'blocks.image-gallery-section': BlocksImageGallerySection;
       'blocks.item-list': BlocksItemList;
+      'blocks.md-text-section': BlocksMdTextSection;
       'blocks.news-articles-section': BlocksNewsArticlesSection;
       'blocks.passed-dogs-section': BlocksPassedDogsSection;
       'blocks.rich-text-section': BlocksRichTextSection;

@@ -20,6 +20,7 @@ import { ChampionsSectionComponent } from './champions-section/champions-section
 import { PassedDogsSectionComponent } from './passed-dogs-section/passed-dogs-section'
 import { BlackBoardSectionServerComponent } from './black-board-section/black-board-section-server'
 import { FormSectionServerComponent } from './form-section/form-section-server'
+import { MdTextSectionComponent } from './md-text-section/md-text-section'
 
 interface RenderSectionParams {
 	section: StartpageSection
@@ -220,6 +221,14 @@ function renderSection({
 					strapiBaseUrl={strapiBaseUrl}
 					theme={theme}
 					privacyPolicy={privacyPolicy}
+				/>
+			)
+		case 'ComponentBlocksMdTextSection':
+			return (
+				<MdTextSectionComponent
+					key={key}
+					section={section}
+					theme={theme}
 				/>
 			)
 		default:

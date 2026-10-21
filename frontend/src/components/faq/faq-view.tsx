@@ -8,7 +8,7 @@ interface FaqViewProps {
 
 export function FaqView({ content, theme }: FaqViewProps) {
     return (
-        <div className="py-20 max-w-4xl mx-auto faq-page">
+        <div className="py-2 max-w-4xl mx-auto faq-page">
             <MarkdownContainer content={content} theme={theme} />
         </div>
     )

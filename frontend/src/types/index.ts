@@ -374,7 +374,13 @@ export interface FormSection {
 	form?: Form | null
 }
 
-export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | DetailedImageGallerySection | SimpleCtaSection | ActionImagesSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection | DocumentBundleSection | TableOfContentSection | ChampionsSection | PassedDogsSection | BlackBoardSection | FormSection
+export interface MdTextSection {
+	__typename: 'ComponentBlocksMdTextSection'
+	id?: string | number | null
+	MarkdownText?: string | null
+}
+
+export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | DetailedImageGallerySection | SimpleCtaSection | ActionImagesSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection | DocumentBundleSection | TableOfContentSection | ChampionsSection | PassedDogsSection | BlackBoardSection | FormSection | MdTextSection
 
 export type PageSection = StartpageSection
 
