@@ -286,6 +286,27 @@ export async function searchDogs(
 	}
 }
 
+/** Einzelnen Hund über Slug oder documentId laden (öffentliche Detailseite). */
+export async function fetchPublicDog(key: string): Promise<Dog | null> {
+	const trimmed = key.trim()
+	if (!trimmed) {
+		return null
+	}
+
+	try {
+		const response = await fetchStrapiServer<unknown>(
+			`hzd-plugin/dogs/public/${encodeURIComponent(trimmed)}`,
+		)
+		return extractStrapiSingle<Dog>(response)
+	} catch (error) {
+		const message = error instanceof Error ? error.message : ''
+		if (/404|nicht gefunden|not found/i.test(message)) {
+			return null
+		}
+		throw error
+	}
+}
+
 /** Generische Dog-Suche mit freier Filter-Syntax (für Admin/Moderator-Bereich) */
 export async function searchDogsGeneric(
 	variables: {
@@ -439,6 +460,27 @@ export async function getBreederByDocumentId(
 	})
 
 	return extractStrapiSingle<Breeder>(response)
+}
+
+/** Einzelnen Züchter oder Deckrüdenbesitzer über Slug oder documentId laden. */
+export async function fetchPublicBreeder(key: string): Promise<Breeder | null> {
+	const trimmed = key.trim()
+	if (!trimmed) {
+		return null
+	}
+
+	try {
+		const response = await fetchStrapiServer<unknown>(
+			`hzd-plugin/breeders/public/${encodeURIComponent(trimmed)}`,
+		)
+		return extractStrapiSingle<Breeder>(response)
+	} catch (error) {
+		const message = error instanceof Error ? error.message : ''
+		if (/404|nicht gefunden|not found/i.test(message)) {
+			return null
+		}
+		throw error
+	}
 }
 
 export interface LitterSearchParams {

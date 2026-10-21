@@ -7,6 +7,40 @@ import { extractPlainText, firstSeoValue, htmlToText } from './extract-text'
 export const SEARCH_INDEX_UID = 'hzd_content'
 export const PAGE_UID = 'api::page.page'
 export const NEWS_ARTICLE_UID = 'api::news-article.news-article'
+export const DOG_UID = 'plugin::hzd-plugin.dog'
+export const BREEDER_UID = 'plugin::hzd-plugin.breeder'
+
+const BREEDER_INDEX_FIELDS = [
+	'documentId',
+	'kennelName',
+	'Slug',
+	'BreederRole',
+	'IsActive',
+	'Disable',
+	'BreedersIntroduction',
+	'updatedAt',
+]
+
+const BREEDER_INDEX_POPULATE = {
+	Address: true,
+	owner_members: {
+		fields: ['firstName', 'lastName'],
+	},
+}
+
+const DOG_INDEX_FIELDS = [
+	'documentId',
+	'givenName',
+	'fullKennelName',
+	'Slug',
+	'cFertile',
+	'Disabled',
+	'MemosReleased',
+	'Exhibitions',
+	'BreedSurvey',
+	'cStudBookNumber',
+	'updatedAt',
+]
 
 const NEWS_SECTION_COMPONENTS = [
 	'blocks.text-columns-section',
@@ -30,8 +64,8 @@ const SYNC_ACTIONS = new Set([
 
 export interface SearchDocument {
 	id: string
-	type: 'page' | 'news-article'
-	typeLabel: 'Seite' | 'News'
+	type: 'page' | 'news-article' | 'dog' | 'breeder'
+	typeLabel: 'Seite' | 'News' | 'Hund' | 'Züchter' | 'Deckrüdenbesitzer'
 	title: string
 	excerpt: string
 	content: string
@@ -173,6 +207,67 @@ function documentIdOf(entry: Record<string, unknown>): string {
 	return typeof documentId === 'string' ? documentId : ''
 }
 
+function indexDocumentId(uid: string, documentId: string): string {
+	if (uid === PAGE_UID) {
+		return `page_${documentId}`
+	}
+	if (uid === NEWS_ARTICLE_UID) {
+		return `news_${documentId}`
+	}
+	if (uid === BREEDER_UID) {
+		return `breeder_${documentId}`
+	}
+	return `dog_${documentId}`
+}
+
+function isIndexableDog(entry: Record<string, unknown>): boolean {
+	if (entry.cFertile !== true) {
+		return false
+	}
+	return entry.Disabled !== true
+}
+
+function publicPathKey(entry: Record<string, unknown>): string {
+	const slug = typeof entry.Slug === 'string' ? entry.Slug.trim() : ''
+	const segment = slug.replace(/^\/+/, '')
+	if (segment) {
+		return segment
+	}
+	return documentIdOf(entry)
+}
+
+function isIndexableBreeder(entry: Record<string, unknown>): boolean {
+	if (entry.IsActive !== true) {
+		return false
+	}
+	return entry.Disable !== true
+}
+
+function breederPersonName(entry: Record<string, unknown>): string {
+	const address = entry.Address
+	if (address && typeof address === 'object' && !Array.isArray(address)) {
+		const fullName = (address as { FullName?: unknown }).FullName
+		if (typeof fullName === 'string' && fullName.trim()) {
+			return htmlToText(fullName)
+		}
+	}
+
+	const members = Array.isArray(entry.owner_members) ? entry.owner_members : []
+	const names = members
+		.map((member) => {
+			if (!member || typeof member !== 'object') {
+				return ''
+			}
+			const record = member as { firstName?: unknown; lastName?: unknown }
+			return [record.firstName, record.lastName]
+				.filter((part): part is string => typeof part === 'string' && part.trim().length > 0)
+				.join(' ')
+		})
+		.filter(Boolean)
+
+	return htmlToText(names.join(', '))
+}
+
 export function toSearchDocument(
 	uid: string,
 	entry: Record<string, unknown>,
@@ -236,6 +331,83 @@ export function toSearchDocument(
 			content,
 			slug,
 			url: `/article${slug}`,
+			updatedAt: typeof entry.updatedAt === 'string' ? entry.updatedAt : '',
+		}
+	}
+
+	if (uid === DOG_UID) {
+		if (!isIndexableDog(entry)) {
+			return null
+		}
+		const key = publicPathKey(entry)
+		if (!key) {
+			return null
+		}
+		const givenName = htmlToText(
+			typeof entry.givenName === 'string' ? entry.givenName : '',
+		)
+		const kennelName = htmlToText(
+			typeof entry.fullKennelName === 'string' ? entry.fullKennelName : '',
+		)
+		const memo = htmlToText(
+			typeof entry.MemosReleased === 'string' ? entry.MemosReleased : '',
+		)
+		const content = [
+			givenName,
+			kennelName,
+			typeof entry.cStudBookNumber === 'string' ? entry.cStudBookNumber : '',
+			typeof entry.Exhibitions === 'string' ? entry.Exhibitions : '',
+			typeof entry.BreedSurvey === 'string' ? entry.BreedSurvey : '',
+			memo,
+		].map((part) => htmlToText(part)).filter(Boolean).join(' ')
+		const title = kennelName || givenName || 'Hund'
+		const url = `/dog/${encodeURIComponent(key)}`
+		return {
+			id: `dog_${documentId}`,
+			type: 'dog',
+			typeLabel: 'Hund',
+			title,
+			excerpt: excerptFrom(memo || givenName, content),
+			content,
+			slug: url,
+			url,
+			updatedAt: typeof entry.updatedAt === 'string' ? entry.updatedAt : '',
+		}
+	}
+
+	if (uid === BREEDER_UID) {
+		if (!isIndexableBreeder(entry)) {
+			return null
+		}
+		const key = publicPathKey(entry)
+		if (!key) {
+			return null
+		}
+		const isStudOwner = entry.BreederRole === 'S'
+		const kennelName = isStudOwner
+			? ''
+			: htmlToText(typeof entry.kennelName === 'string' ? entry.kennelName : '')
+		const personName = breederPersonName(entry)
+		const intro = htmlToText(
+			typeof entry.BreedersIntroduction === 'string' ? entry.BreedersIntroduction : '',
+		)
+		const content = [kennelName, personName, intro]
+			.map((part) => htmlToText(part))
+			.filter(Boolean)
+			.join(' ')
+		const title = isStudOwner
+			? (personName || 'Deckrüdenbesitzer')
+			: (kennelName || personName || 'Züchter')
+		const url = `/breeder/${encodeURIComponent(key)}`
+		return {
+			id: `breeder_${documentId}`,
+			type: 'breeder',
+			typeLabel: isStudOwner ? 'Deckrüdenbesitzer' : 'Züchter',
+			title,
+			excerpt: excerptFrom(intro || personName, content),
+			content,
+			slug: url,
+			url,
 			updatedAt: typeof entry.updatedAt === 'string' ? entry.updatedAt : '',
 		}
 	}
@@ -317,6 +489,79 @@ async function loadPublished(
 	return all
 }
 
+async function loadIndexableDogs(
+	strapi: Core.Strapi,
+): Promise<Record<string, unknown>[]> {
+	const pageSize = 50
+	let start = 0
+	const all: Record<string, unknown>[] = []
+	const filters = {
+		$and: [
+			{ cFertile: { $eq: true } },
+			{
+				$or: [
+					{ Disabled: { $eq: false } },
+					{ Disabled: { $null: true } },
+				],
+			},
+		],
+	}
+
+	while (true) {
+		const batch = await strapi.documents(DOG_UID as never).findMany({
+			filters,
+			fields: DOG_INDEX_FIELDS,
+			start,
+			limit: pageSize,
+		}) as Record<string, unknown>[]
+		const items = Array.isArray(batch) ? batch : []
+		all.push(...items)
+		if (items.length < pageSize) {
+			break
+		}
+		start += pageSize
+	}
+
+	return all
+}
+
+async function loadIndexableBreeders(
+	strapi: Core.Strapi,
+): Promise<Record<string, unknown>[]> {
+	const pageSize = 50
+	let start = 0
+	const all: Record<string, unknown>[] = []
+	const filters = {
+		$and: [
+			{ IsActive: { $eq: true } },
+			{
+				$or: [
+					{ Disable: { $eq: false } },
+					{ Disable: { $null: true } },
+				],
+			},
+		],
+	}
+
+	while (true) {
+		const batch = await strapi.documents(BREEDER_UID as never).findMany({
+			filters,
+			fields: BREEDER_INDEX_FIELDS,
+			populate: BREEDER_INDEX_POPULATE as never,
+			start,
+			limit: pageSize,
+		}) as Record<string, unknown>[]
+		const items = Array.isArray(batch) ? batch : []
+		all.push(...items)
+		if (items.length < pageSize) {
+			break
+		}
+		start += pageSize
+	}
+
+	return all
+}
+
 async function existingDocumentIds(index: Index): Promise<string[]> {
 	const ids: string[] = []
 	const limit = 1000
@@ -359,13 +604,17 @@ export async function reindexAll(strapi: Core.Strapi): Promise<ReindexState> {
 		const indexClient = await client()
 		const index = await getOrCreateIndex(indexClient)
 		await applyIndexSettings(indexClient, index)
-		const [pages, articles] = await Promise.all([
+		const [pages, articles, dogs, breeders] = await Promise.all([
 			loadPublished(strapi, PAGE_UID),
 			loadPublished(strapi, NEWS_ARTICLE_UID),
+			loadIndexableDogs(strapi),
+			loadIndexableBreeders(strapi),
 		])
 		const documents = [
 			...pages.map((entry) => toSearchDocument(PAGE_UID, entry)),
 			...articles.map((entry) => toSearchDocument(NEWS_ARTICLE_UID, entry)),
+			...dogs.map((entry) => toSearchDocument(DOG_UID, entry)),
+			...breeders.map((entry) => toSearchDocument(BREEDER_UID, entry)),
 		].filter((entry): entry is SearchDocument => entry !== null)
 
 		const batchSize = 100
@@ -427,14 +676,37 @@ async function removeFromIndex(strapi: Core.Strapi, id: string) {
 	strapi.log.debug(`[Search] Dokument entfernt: ${id}`)
 }
 
-async function upsertFromDatabase(strapi: Core.Strapi, uid: string, documentId: string) {
-	const published = await strapi.documents(uid as never).findOne({
+async function loadEntryForIndex(
+	strapi: Core.Strapi,
+	uid: string,
+	documentId: string,
+): Promise<Record<string, unknown> | null> {
+	if (uid === DOG_UID) {
+		return await strapi.documents(DOG_UID as never).findOne({
+			documentId,
+			fields: DOG_INDEX_FIELDS,
+		}) as Record<string, unknown> | null
+	}
+
+	if (uid === BREEDER_UID) {
+		return await strapi.documents(BREEDER_UID as never).findOne({
+			documentId,
+			fields: BREEDER_INDEX_FIELDS,
+			populate: BREEDER_INDEX_POPULATE as never,
+		}) as Record<string, unknown> | null
+	}
+
+	return await strapi.documents(uid as never).findOne({
 		documentId,
 		status: 'published',
 		populate: populateFor(uid) as never,
 	}) as Record<string, unknown> | null
+}
 
-	const indexId = uid === PAGE_UID ? `page_${documentId}` : `news_${documentId}`
+async function upsertFromDatabase(strapi: Core.Strapi, uid: string, documentId: string) {
+	const published = await loadEntryForIndex(strapi, uid, documentId)
+
+	const indexId = indexDocumentId(uid, documentId)
 	const document = published ? toSearchDocument(uid, published) : null
 
 	if (!document) {
@@ -472,8 +744,7 @@ export function syncEntry(
 	const key = `${uid}:${documentId}`
 	return enqueueOrRun(strapi, key, async () => {
 		if (remove) {
-			const indexId = uid === PAGE_UID ? `page_${documentId}` : `news_${documentId}`
-			await removeFromIndex(strapi, indexId)
+			await removeFromIndex(strapi, indexDocumentId(uid, documentId))
 			return
 		}
 		await upsertFromDatabase(strapi, uid, documentId)
@@ -484,7 +755,12 @@ export function registerSearchDocumentMiddleware(strapi: Core.Strapi) {
 	strapi.documents.use(async (context, next) => {
 		const result = await next()
 		const uid = context.uid
-		if (uid !== PAGE_UID && uid !== NEWS_ARTICLE_UID) {
+		if (
+			uid !== PAGE_UID
+			&& uid !== NEWS_ARTICLE_UID
+			&& uid !== DOG_UID
+			&& uid !== BREEDER_UID
+		) {
 			return result
 		}
 		if (!isSearchEnabled() || !SYNC_ACTIONS.has(context.action)) {
@@ -512,7 +788,12 @@ export function registerSearchDocumentMiddleware(strapi: Core.Strapi) {
 }
 
 function uidFromWebhook(body: Record<string, unknown>): string | null {
-	if (body.uid === PAGE_UID || body.uid === NEWS_ARTICLE_UID) {
+	if (
+		body.uid === PAGE_UID
+		|| body.uid === NEWS_ARTICLE_UID
+		|| body.uid === DOG_UID
+		|| body.uid === BREEDER_UID
+	) {
 		return body.uid
 	}
 	const model = typeof body.model === 'string' ? body.model : ''
@@ -521,6 +802,12 @@ function uidFromWebhook(body: Record<string, unknown>): string | null {
 	}
 	if (model === 'news-article') {
 		return NEWS_ARTICLE_UID
+	}
+	if (model === 'dog') {
+		return DOG_UID
+	}
+	if (model === 'breeder') {
+		return BREEDER_UID
 	}
 	return null
 }

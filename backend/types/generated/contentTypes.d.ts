@@ -2245,6 +2245,7 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
       'plugin::users-permissions.user'
     >;
     publishedAt: Schema.Attribute.DateTime;
+    Slug: Schema.Attribute.String & Schema.Attribute.Unique;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -2342,6 +2343,7 @@ export interface PluginHzdPluginDog extends Struct.CollectionTypeSchema {
     >;
     publishedAt: Schema.Attribute.DateTime;
     sex: Schema.Attribute.Enumeration<['M', 'F']>;
+    Slug: Schema.Attribute.String & Schema.Attribute.Unique;
     SOD1: Schema.Attribute.Enumeration<['N_N', 'N_DM', 'DM_DM']>;
     stuntLicenseSince: Schema.Attribute.Date;
     updatedAt: Schema.Attribute.DateTime;

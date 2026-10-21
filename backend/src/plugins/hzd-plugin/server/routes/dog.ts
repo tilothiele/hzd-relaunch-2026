@@ -17,6 +17,14 @@ export default [
   },
   {
     method: 'GET',
+    path: '/dogs/public/:key',
+    handler: 'dog.findPublic',
+    config: {
+      auth: false,
+    },
+  },
+  {
+    method: 'GET',
     path: '/dogs/:id',
     handler: 'dog.findOne',
     config: {

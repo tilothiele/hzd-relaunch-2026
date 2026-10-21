@@ -1,6 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, FormControlLabel, Chip, OutlinedInput, Pagination, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, ToggleButtonGroup, ToggleButton, Tooltip } from '@mui/material'
 import { ViewToggle } from '@/components/common/view-toggle'
 
@@ -12,9 +14,7 @@ import { theme } from '@/themes'
 
 import { DogCard } from './dog-card'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
-import { DogDetailView } from './dog-detail-view'
-import { TrackUmamiEvent } from '@/components/analytics/track-umami-event'
-import { getSexLabel } from '@/lib/dog-utils'
+import { dogDetailPath } from '@/lib/dog-utils'
 import type { Dog, GeoLocation, HzdSetting } from '@/types'
 import { SubmitButton } from '@/components/ui/submit-button'
 
@@ -71,7 +71,6 @@ export function DogSearch({
 	const [heartcheckFilter, setHeartcheckFilter] = useState<TriStateFilter>('')
 	const [colorcheckFilter, setColorcheckFilter] = useState<TriStateFilter>('')
 	const [showMap, setShowMap] = useState(false)
-	const [selectedDog, setSelectedDog] = useState<Dog | null>(null)
 	const [hasSearched, setHasSearched] = useState(initialSex !== '')
 	const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
 
@@ -125,15 +124,11 @@ export function DogSearch({
 		setPage(newPage)
 	}, [])
 
-	const handleDogImageClick = useCallback((dog: Dog) => {
-		setSelectedDog(dog)
-		// Scroll to top when opening detail view
-		window.scrollTo({ top: 0, behavior: 'smooth' })
-	}, [])
+	const router = useRouter()
 
-	const handleBackToSearch = useCallback(() => {
-		setSelectedDog(null)
-	}, [])
+	const openDog = useCallback((dog: Dog) => {
+		router.push(dogDetailPath(dog))
+	}, [router])
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
@@ -171,6 +166,9 @@ export function DogSearch({
 							{dog.givenName && dog.fullKennelName ? (
 								<div>{dog.givenName}</div>
 							) : null}
+							<div>
+								<Link href={dogDetailPath(dog)}>Details anzeigen</Link>
+							</div>
 						</div>
 					)
 				}
@@ -180,26 +178,6 @@ export function DogSearch({
 
 	const totalPages = pageCount
 	const currentPage = page
-
-	if (selectedDog) {
-		return (
-			<>
-				<TrackUmamiEvent
-					eventName='dog-detail-view'
-					eventData={{
-						FullKennelName: selectedDog.fullKennelName?.trim() || '',
-						geschlecht: getSexLabel(selectedDog.sex),
-					}}
-				/>
-				<DogDetailView
-					dog={selectedDog}
-					strapiBaseUrl={strapiBaseUrl}
-					hzdSetting={hzdSetting}
-					onBack={handleBackToSearch}
-				/>
-			</>
-		)
-	}
 
 	return (
 		<div className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em' }}>
@@ -488,7 +466,7 @@ export function DogSearch({
 										key={dog.documentId}
 										dog={dog}
 										strapiBaseUrl={strapiBaseUrl}
-										onImageClick={() => handleDogImageClick(dog)}
+										href={dogDetailPath(dog)}
 										userLocation={userLocation}
 										maxDistance={maxDistance === '' ? undefined : maxDistance}
 										hzdSetting={hzdSetting}
@@ -525,7 +503,7 @@ export function DogSearch({
 														<TableRow
 															key={dog.documentId}
 															hover
-															onClick={() => handleDogImageClick(dog)}
+															onClick={() => openDog(dog)}
 															sx={{ cursor: 'pointer' }}
 														>
 															<TableCell>

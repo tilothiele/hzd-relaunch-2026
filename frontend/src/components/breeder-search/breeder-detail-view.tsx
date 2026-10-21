@@ -17,7 +17,7 @@ interface BreederDetailViewProps {
     breeder: Breeder
     strapiBaseUrl?: string | null
     hzdSetting?: HzdSetting | null
-    onBack: () => void
+    onBack?: () => void
     breederRole?: 'B' | 'S' | null
 }
 
@@ -104,7 +104,7 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack, 
             <Typography variant='h5' component='h2' sx={{ fontWeight: 700 }}>
                 {title}
             </Typography>
-            <BackButton onClick={onBack} />
+            {onBack ? <BackButton onClick={onBack} /> : null}
         </Box>
     )
 
@@ -232,9 +232,11 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack, 
                 </section>
 
                 {/* Final Back Link */}
-                <Box sx={{ display: 'flex', justifyContent: 'center', pt: 4 }}>
-                    <BackButton onClick={onBack} />
-                </Box>
+                {onBack ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', pt: 4 }}>
+                        <BackButton onClick={onBack} />
+                    </Box>
+                ) : null}
             </div>
         </div>
     )

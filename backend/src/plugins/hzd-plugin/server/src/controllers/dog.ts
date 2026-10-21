@@ -376,6 +376,77 @@ const toFilterConditions = async (
 	return conditions
 }
 
+const publicDogPopulate = {
+	owner: {
+		fields: [
+			'documentId',
+			'firstName',
+			'lastName',
+			'city',
+			'zip',
+			'phone',
+			'cEmail',
+			'countryCode',
+			'locationLat',
+			'locationLng',
+		],
+	},
+	father: {
+		fields: ['documentId', 'fullKennelName', 'givenName', 'dateOfBirth', 'dateOfDeath'],
+		populate: {
+			owner: {
+				fields: [
+					'documentId',
+					'firstName',
+					'lastName',
+					'city',
+					'zip',
+					'phone',
+					'cEmail',
+					'countryCode',
+					'locationLat',
+					'locationLng',
+				],
+			},
+		},
+	},
+	mother: {
+		fields: ['documentId', 'fullKennelName', 'givenName', 'dateOfBirth', 'dateOfDeath'],
+		populate: {
+			owner: {
+				fields: [
+					'documentId',
+					'firstName',
+					'lastName',
+					'city',
+					'zip',
+					'phone',
+					'cEmail',
+					'countryCode',
+					'locationLat',
+					'locationLng',
+				],
+			},
+		},
+	},
+	Images: true,
+	avatar: true,
+	DogDocument: {
+		populate: { MediaFile: true },
+	},
+}
+
+const decodeRouteKey = (value: unknown): string => {
+	if (typeof value !== 'string') {
+		return ''
+	}
+	try {
+		return decodeURIComponent(value).trim()
+	} catch {
+		return value.trim()
+	}
+}
+
 const coreControllerFactory = factories.createCoreController(
 	'plugin::hzd-plugin.dog',
 	({ strapi }: { strapi: Core.Strapi }) => {
@@ -407,71 +478,11 @@ const coreControllerFactory = factories.createCoreController(
 					Number.isFinite(maxDist) &&
 					maxDist > 0
 
-				const dogPopulate = {
-					owner: {
-						fields: [
-							'documentId',
-							'firstName',
-							'lastName',
-							'city',
-							'zip',
-							'phone',
-							'cEmail',
-							'countryCode',
-							'locationLat',
-							'locationLng',
-						],
-					},
-					father: {
-						fields: ['documentId', 'fullKennelName', 'givenName', 'dateOfBirth', 'dateOfDeath'],
-						populate: {
-							owner: {
-								fields: [
-									'documentId',
-									'firstName',
-									'lastName',
-									'city',
-									'zip',
-									'phone',
-									'cEmail',
-									'countryCode',
-									'locationLat',
-									'locationLng',
-								],
-							},
-						},
-					},
-					mother: {
-						fields: ['documentId', 'fullKennelName', 'givenName', 'dateOfBirth', 'dateOfDeath'],
-						populate: {
-							owner: {
-								fields: [
-									'documentId',
-									'firstName',
-									'lastName',
-									'city',
-									'zip',
-									'phone',
-									'cEmail',
-									'countryCode',
-									'locationLat',
-									'locationLng',
-								],
-							},
-						},
-					},
-					Images: true,
-					avatar: true,
-					DogDocument: {
-						populate: { MediaFile: true },
-					},
-				}
-
 				const result = await findDocumentsPage(
 					strapi,
 					'plugin::hzd-plugin.dog',
 					{
-						populate: dogPopulate,
+						populate: publicDogPopulate,
 						sort,
 						page: hasGeo ? 1 : page,
 						pageSize: hasGeo ? 1000 : pageSize,
@@ -538,6 +549,48 @@ const coreControllerFactory = factories.createCoreController(
 					data: paginatedResults,
 					meta: { pagination },
 				}
+			},
+
+			async findPublic(ctx: any) {
+				const key = decodeRouteKey(ctx.params?.key)
+				if (!key) {
+					return ctx.notFound('Hund nicht gefunden.')
+				}
+
+				const loadByFilter = async (filters: Record<string, unknown>) => {
+					const page = await findDocumentsPage(
+						strapi,
+						'plugin::hzd-plugin.dog',
+						{
+							populate: publicDogPopulate,
+							page: 1,
+							pageSize: 1,
+							filters,
+						},
+					)
+					return page.results[0] ?? null
+				}
+
+				const slugKey = key.replace(/^\/+/, '')
+				const storedSlug = slugKey ? `/${slugKey}` : ''
+				const dog = (storedSlug
+					? await loadByFilter({ Slug: { $eq: storedSlug } })
+					: null)
+					?? (slugKey && slugKey !== storedSlug
+						? await loadByFilter({ Slug: { $eq: slugKey } })
+						: null)
+					?? await loadByFilter({ documentId: { $eq: key } })
+
+				if (!dog) {
+					return ctx.notFound('Hund nicht gefunden.')
+				}
+
+				const breedersByCId = new Map<number, any>()
+				const pedigreeCache = new Map<string, Record<string, any>>()
+				const enriched = await enrichDogWithBreeder(strapi, dog, breedersByCId)
+				await enrichDogPedigreeTransitive(strapi, enriched, pedigreeCache)
+
+				ctx.body = { data: enriched }
 			},
 		}
 	},

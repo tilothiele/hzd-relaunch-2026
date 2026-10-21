@@ -121,6 +121,17 @@ const toFilterConditions = (query: BreederSearchQuery): Array<Record<string, unk
 	return conditions
 }
 
+const decodeRouteKey = (value: unknown): string => {
+	if (typeof value !== 'string') {
+		return ''
+	}
+	try {
+		return decodeURIComponent(value).trim()
+	} catch {
+		return value.trim()
+	}
+}
+
 const coreControllerFactory = factories.createCoreController(
 	'plugin::hzd-plugin.breeder',
 	({ strapi }: { strapi: Core.Strapi }) => ({
@@ -185,6 +196,44 @@ const coreControllerFactory = factories.createCoreController(
 				data: results,
 				meta: { pagination: result.pagination },
 			}
+		},
+
+		async findPublic(ctx: any) {
+			const key = decodeRouteKey(ctx.params?.key)
+			if (!key) {
+				return ctx.notFound('Eintrag nicht gefunden.')
+			}
+
+			const loadByFilter = async (filters: Record<string, unknown>) => {
+				const page = await findDocumentsPage(
+					strapi,
+					'plugin::hzd-plugin.breeder',
+					{
+						populate: BREEDER_SEARCH_POPULATE,
+						page: 1,
+						pageSize: 1,
+						filters,
+					},
+				)
+				return page.results[0] ?? null
+			}
+
+			const slugKey = key.replace(/^\/+/, '')
+			const storedSlug = slugKey ? `/${slugKey}` : ''
+			const breeder = (storedSlug
+				? await loadByFilter({ Slug: { $eq: storedSlug } })
+				: null)
+				?? (slugKey && slugKey !== storedSlug
+					? await loadByFilter({ Slug: { $eq: slugKey } })
+					: null)
+				?? await loadByFilter({ documentId: { $eq: key } })
+
+			if (!breeder) {
+				return ctx.notFound('Eintrag nicht gefunden.')
+			}
+
+			const enriched = await enrichBreederRecords(strapi, breeder)
+			ctx.body = { data: enriched }
 		},
 	}),
 )

@@ -15,7 +15,7 @@ interface StudDogDetailViewProps {
 	breeder: Breeder
 	strapiBaseUrl?: string | null
 	hzdSetting?: HzdSetting | null
-	onBack: () => void
+	onBack?: () => void
 	breederRole?: 'B' | 'S' | null
 }
 
@@ -72,7 +72,7 @@ export function StudDogDetailView({
 			<Typography variant='h5' component='h2' sx={{ fontWeight: 700 }}>
 				{sectionTitle}
 			</Typography>
-			<BackButton onClick={onBack} />
+			{onBack ? <BackButton onClick={onBack} /> : null}
 		</Box>
 	)
 
@@ -183,9 +183,11 @@ export function StudDogDetailView({
 					</section>
 				) : null}
 
-				<Box sx={{ display: 'flex', justifyContent: 'center', pt: 4 }}>
-					<BackButton onClick={onBack} />
-				</Box>
+				{onBack ? (
+					<Box sx={{ display: 'flex', justifyContent: 'center', pt: 4 }}>
+						<BackButton onClick={onBack} />
+					</Box>
+				) : null}
 			</div>
 		</div>
 	)

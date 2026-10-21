@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-10-20T12:32:23.011Z"
+    "x-generation-date": "2026-10-21T11:10:00.810Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -21910,6 +21910,9 @@
                               "DogOwnersMessage": {
                                 "type": "string"
                               },
+                              "Slug": {
+                                "type": "string"
+                              },
                               "createdAt": {
                                 "type": "string",
                                 "format": "date-time"
@@ -22538,6 +22541,9 @@
                       "format": "email"
                     },
                     "BreedersMessage": {
+                      "type": "string"
+                    },
+                    "Slug": {
                       "type": "string"
                     },
                     "createdAt": {
@@ -27500,6 +27506,9 @@
                                     "DogOwnersMessage": {
                                       "type": "string"
                                     },
+                                    "Slug": {
+                                      "type": "string"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -28128,6 +28137,9 @@
                             "format": "email"
                           },
                           "BreedersMessage": {
+                            "type": "string"
+                          },
+                          "Slug": {
                             "type": "string"
                           },
                           "createdAt": {
@@ -31892,6 +31904,9 @@
                         "BreedersMessage": {
                           "type": "string"
                         },
+                        "Slug": {
+                          "type": "string"
+                        },
                         "createdAt": {
                           "type": "string",
                           "format": "date-time"
@@ -32412,6 +32427,9 @@
                 "type": "boolean"
               },
               "DogOwnersMessage": {
+                "type": "string"
+              },
+              "Slug": {
                 "type": "string"
               },
               "createdAt": {
@@ -35797,6 +35815,9 @@
                               "DogOwnersMessage": {
                                 "type": "string"
                               },
+                              "Slug": {
+                                "type": "string"
+                              },
                               "createdAt": {
                                 "type": "string",
                                 "format": "date-time"
@@ -36425,6 +36446,9 @@
                       "format": "email"
                     },
                     "BreedersMessage": {
+                      "type": "string"
+                    },
+                    "Slug": {
                       "type": "string"
                     },
                     "createdAt": {
@@ -40201,6 +40225,9 @@
                                     "DogOwnersMessage": {
                                       "type": "string"
                                     },
+                                    "Slug": {
+                                      "type": "string"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -40829,6 +40856,9 @@
                             "format": "email"
                           },
                           "BreedersMessage": {
+                            "type": "string"
+                          },
+                          "Slug": {
                             "type": "string"
                           },
                           "createdAt": {
@@ -47570,6 +47600,9 @@
                                 "DogOwnersMessage": {
                                   "type": "string"
                                 },
+                                "Slug": {
+                                  "type": "string"
+                                },
                                 "createdAt": {
                                   "type": "string",
                                   "format": "date-time"
@@ -48198,6 +48231,9 @@
                         "format": "email"
                       },
                       "BreedersMessage": {
+                        "type": "string"
+                      },
+                      "Slug": {
                         "type": "string"
                       },
                       "createdAt": {
@@ -51055,6 +51091,9 @@
                                     "DogOwnersMessage": {
                                       "type": "string"
                                     },
+                                    "Slug": {
+                                      "type": "string"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -51683,6 +51722,9 @@
                             "format": "email"
                           },
                           "BreedersMessage": {
+                            "type": "string"
+                          },
+                          "Slug": {
                             "type": "string"
                           },
                           "createdAt": {
@@ -55006,6 +55048,9 @@
                               "DogOwnersMessage": {
                                 "type": "string"
                               },
+                              "Slug": {
+                                "type": "string"
+                              },
                               "createdAt": {
                                 "type": "string",
                                 "format": "date-time"
@@ -55634,6 +55679,9 @@
                       "format": "email"
                     },
                     "BreedersMessage": {
+                      "type": "string"
+                    },
+                    "Slug": {
                       "type": "string"
                     },
                     "createdAt": {
@@ -64368,6 +64416,9 @@
                                     "DogOwnersMessage": {
                                       "type": "string"
                                     },
+                                    "Slug": {
+                                      "type": "string"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -64996,6 +65047,9 @@
                             "format": "email"
                           },
                           "BreedersMessage": {
+                            "type": "string"
+                          },
+                          "Slug": {
                             "type": "string"
                           },
                           "createdAt": {
@@ -68280,6 +68334,9 @@
                               "DogOwnersMessage": {
                                 "type": "string"
                               },
+                              "Slug": {
+                                "type": "string"
+                              },
                               "createdAt": {
                                 "type": "string",
                                 "format": "date-time"
@@ -68908,6 +68965,9 @@
                       "format": "email"
                     },
                     "BreedersMessage": {
+                      "type": "string"
+                    },
+                    "Slug": {
                       "type": "string"
                     },
                     "createdAt": {
@@ -75369,6 +75429,9 @@
                                         "DogOwnersMessage": {
                                           "type": "string"
                                         },
+                                        "Slug": {
+                                          "type": "string"
+                                        },
                                         "createdAt": {
                                           "type": "string",
                                           "format": "date-time"
@@ -75997,6 +76060,9 @@
                                 "format": "email"
                               },
                               "BreedersMessage": {
+                                "type": "string"
+                              },
+                              "Slug": {
                                 "type": "string"
                               },
                               "createdAt": {
@@ -91247,6 +91313,9 @@
                               "DogOwnersMessage": {
                                 "type": "string"
                               },
+                              "Slug": {
+                                "type": "string"
+                              },
                               "createdAt": {
                                 "type": "string",
                                 "format": "date-time"
@@ -91875,6 +91944,9 @@
                       "format": "email"
                     },
                     "BreedersMessage": {
+                      "type": "string"
+                    },
+                    "Slug": {
                       "type": "string"
                     },
                     "createdAt": {
@@ -95436,6 +95508,9 @@
                               "DogOwnersMessage": {
                                 "type": "string"
                               },
+                              "Slug": {
+                                "type": "string"
+                              },
                               "createdAt": {
                                 "type": "string",
                                 "format": "date-time"
@@ -96064,6 +96139,9 @@
                       "format": "email"
                     },
                     "BreedersMessage": {
+                      "type": "string"
+                    },
+                    "Slug": {
                       "type": "string"
                     },
                     "createdAt": {
@@ -99227,6 +99305,9 @@
                                         "DogOwnersMessage": {
                                           "type": "string"
                                         },
+                                        "Slug": {
+                                          "type": "string"
+                                        },
                                         "createdAt": {
                                           "type": "string",
                                           "format": "date-time"
@@ -99855,6 +99936,9 @@
                                 "format": "email"
                               },
                               "BreedersMessage": {
+                                "type": "string"
+                              },
+                              "Slug": {
                                 "type": "string"
                               },
                               "createdAt": {
@@ -107327,6 +107411,9 @@
                                 "DogOwnersMessage": {
                                   "type": "string"
                                 },
+                                "Slug": {
+                                  "type": "string"
+                                },
                                 "createdAt": {
                                   "type": "string",
                                   "format": "date-time"
@@ -107955,6 +108042,9 @@
                         "format": "email"
                       },
                       "BreedersMessage": {
+                        "type": "string"
+                      },
+                      "Slug": {
                         "type": "string"
                       },
                       "createdAt": {

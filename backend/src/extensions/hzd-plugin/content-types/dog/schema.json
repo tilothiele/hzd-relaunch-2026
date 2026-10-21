@@ -184,6 +184,10 @@
     },
     "DogOwnersMessage": {
       "type": "text"
+    },
+    "Slug": {
+      "type": "string",
+      "unique": true
     }
   }
 }

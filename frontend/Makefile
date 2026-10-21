@@ -11,7 +11,13 @@ BUILD_TARGET = production
 IMAGE_FULL = $(DOCKER_HUB_USERNAME)/$(IMAGE_NAME):$(VERSION)
 IMAGE_LATEST = $(DOCKER_HUB_USERNAME)/$(IMAGE_NAME):latest
 
-.PHONY: help build tag push build-push login clean docker-compose-up docker-compose-down docker-compose-logs
+# Lokaler Meilisearch-Dev-Dienst (nicht das Frontend-Image)
+MEILI_IMAGE = getmeili/meilisearch:v1.55
+MEILI_CONTAINER = hzd-meilisearch
+MEILI_PORT = 7700
+MEILI_VOLUME = hzd_meili_data
+
+.PHONY: help build tag push build-push login clean docker-compose-up docker-compose-down docker-compose-logs meili-dev
 
 # Standard-Ziel: Zeige Hilfe
 help:
@@ -25,6 +31,7 @@ help:
 	@echo "  make docker-compose-up  - Starte Services mit docker-compose"
 	@echo "  make docker-compose-down - Stoppe Services"
 	@echo "  make docker-compose-logs - Zeige Logs"
+	@echo "  make meili-dev          - Starte Meilisearch für den lokalen Dev-Betrieb"
 	@echo ""
 	@echo "Variablen:"
 	@echo "  DOCKER_HUB_USERNAME - Docker Hub Benutzername (Standard: $(DOCKER_HUB_USERNAME))"
@@ -81,6 +88,35 @@ docker-compose-down:
 docker-compose-logs:
 	@echo "Zeige Logs..."
 	docker-compose logs -f
+
+# Meilisearch lokal: Development-Modus, Port 7700, Index im Volume hzd_meili_data.
+# Schlüssel aus frontend/.env (MEILI_API_KEY) oder backend/.env (MEILI_MASTER_KEY).
+meili-dev:
+	@key=$$(grep -E '^MEILI_API_KEY=' .env 2>/dev/null | head -1 | cut -d= -f2- | tr -d '"' | tr -d "'"); \
+	if [ -z "$$key" ]; then \
+		key=$$(grep -E '^MEILI_MASTER_KEY=' ../backend/.env 2>/dev/null | head -1 | cut -d= -f2- | tr -d '"' | tr -d "'"); \
+	fi; \
+	if [ -z "$$key" ]; then \
+		echo "FEHLER: MEILI_API_KEY in .env oder MEILI_MASTER_KEY in ../backend/.env fehlt."; \
+		exit 1; \
+	fi; \
+	if docker ps --format '{{.Names}}' | grep -qx '$(MEILI_CONTAINER)'; then \
+		echo "Meilisearch läuft bereits ($(MEILI_CONTAINER), Port $(MEILI_PORT))."; \
+	elif docker ps -a --format '{{.Names}}' | grep -qx '$(MEILI_CONTAINER)'; then \
+		echo "Starte vorhandenen Container $(MEILI_CONTAINER)..."; \
+		docker start $(MEILI_CONTAINER); \
+	else \
+		echo "Starte Meilisearch ($(MEILI_IMAGE)) auf Port $(MEILI_PORT)..."; \
+		docker run -d \
+			--name $(MEILI_CONTAINER) \
+			--restart unless-stopped \
+			-p $(MEILI_PORT):7700 \
+			-e MEILI_ENV=development \
+			-e MEILI_NO_ANALYTICS=true \
+			-e MEILI_MASTER_KEY="$$key" \
+			-v $(MEILI_VOLUME):/meili_data \
+			$(MEILI_IMAGE); \
+	fi
 
 docker-compose-restart:
 	@echo "Starte Services neu..."

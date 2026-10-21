@@ -2,6 +2,7 @@
 
 import { useId } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { Card, CardMedia, CardContent, Table, TableBody, TableRow, TableCell, Box, Tooltip, Chip } from '@mui/material'
 import type { Dog, HzdSetting } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
@@ -13,6 +14,7 @@ interface DogCardProps {
 	dog: Dog
 	strapiBaseUrl: string | null | undefined
 	onImageClick?: () => void
+	href?: string
 	userLocation?: { lat: number; lng: number } | null
 	maxDistance?: DistanceFilter
 	hzdSetting?: HzdSetting | null
@@ -155,7 +157,7 @@ function FemaleSexSymbol() {
 }
 
 
-export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDistance, hzdSetting }: DogCardProps) {
+export function DogCard({ dog, strapiBaseUrl, onImageClick, href, userLocation, maxDistance, hzdSetting }: DogCardProps) {
 	const avatarUrl = dog.avatar?.url
 	const avatarAlt = dog.avatar?.alternativeText ?? 'Hund'
 	const fullName = dog.fullKennelName ?? dog.givenName ?? 'Unbekannt'
@@ -184,14 +186,7 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 
 	const showNoDogsInBreedingChip = dog.breeder?.HasNoDogsAvailabe === true
 
-	return (
-		<Card
-			sx={{
-				'&:hover': {
-					boxShadow: 3,
-				},
-			}}
-		>
+	const image = (
 			<CardMedia
 				component='div'
 				sx={{
@@ -203,15 +198,18 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 						opacity: 0.9,
 					},
 				}}
-				onClick={onImageClick}
+				onClick={href ? undefined : onImageClick}
 				onKeyDown={(e: React.KeyboardEvent) => {
+					if (href) {
+						return
+					}
 					if (e.key === 'Enter' || e.key === ' ') {
 						e.preventDefault()
 						onImageClick?.()
 					}
 				}}
-				tabIndex={0}
-				role='button'
+				tabIndex={href ? undefined : 0}
+				role={href ? undefined : 'button'}
 				aria-label='Hundedetails anzeigen'
 			>
 				<Image
@@ -224,7 +222,21 @@ export function DogCard({ dog, strapiBaseUrl, onImageClick, userLocation, maxDis
 				{dog.sex === 'M' && <MaleSexSymbol />}
 				{dog.sex === 'F' && <FemaleSexSymbol />}
 			</CardMedia>
+	)
 
+	return (
+		<Card
+			sx={{
+				'&:hover': {
+					boxShadow: 3,
+				},
+			}}
+		>
+			{href ? (
+				<Link href={href} style={{ textDecoration: 'none', color: 'inherit' }}>
+					{image}
+				</Link>
+			) : image}
 			<CardContent>
 				{showNoDogsInBreedingChip ? (
 					<Chip

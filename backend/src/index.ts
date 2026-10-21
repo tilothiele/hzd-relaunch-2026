@@ -206,7 +206,7 @@ export default {
 			getReindexState,
 			isSearchEnabled,
 		};
-		strapi.log.info('[Search] Document-Hooks für Page und NewsArticle registriert');
+		strapi.log.info('[Search] Document-Hooks für Page, NewsArticle, Dog und Breeder registriert');
 	},
 
 	async bootstrap({ strapi }: { strapi: Core.Strapi }) {

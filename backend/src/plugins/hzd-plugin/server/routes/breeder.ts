@@ -17,6 +17,14 @@ export default [
   },
   {
     method: 'GET',
+    path: '/breeders/public/:key',
+    handler: 'breeder.findPublic',
+    config: {
+      auth: false,
+    },
+  },
+  {
+    method: 'GET',
     path: '/breeders/:id',
     handler: 'breeder.findOne',
     config: {

@@ -1,5 +1,22 @@
 import type { Dog, HzdSetting } from '@/types'
 
+/**
+ * Pfadsegment für /dog/… .
+ * Der Slug ist im Backend bereits mit führendem „/“ gespeichert.
+ */
+export function dogDetailKey(slug: string | null | undefined, documentId: string): string {
+	const segment = slug?.trim().replace(/^\/+/, '') ?? ''
+	return segment || documentId
+}
+
+/** Öffentlicher Pfad: gesetzter Slug, sonst documentId. */
+export function dogDetailPath(dog: {
+	documentId: string
+	Slug?: string | null
+}): string {
+	return `/dog/${encodeURIComponent(dogDetailKey(dog.Slug, dog.documentId))}`
+}
+
 export function getSexLabel(sex: string | null | undefined): string {
 	switch (sex) {
 		case 'M':

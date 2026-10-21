@@ -1,6 +1,26 @@
 import { readPosition } from '@/lib/geo-utils'
 import type { Address, AuthUser, Breeder, Image } from '@/types'
 
+/**
+ * Pfadsegment für /breeder/… .
+ * Der Slug ist im Backend bereits mit führendem „/“ gespeichert.
+ */
+export function breederDetailKey(
+	slug: string | null | undefined,
+	documentId: string,
+): string {
+	const segment = slug?.trim().replace(/^\/+/, '') ?? ''
+	return segment || documentId
+}
+
+/** Öffentlicher Pfad: gesetzter Slug, sonst documentId. */
+export function breederDetailPath(breeder: {
+	documentId: string
+	Slug?: string | null
+}): string {
+	return `/breeder/${encodeURIComponent(breederDetailKey(breeder.Slug, breeder.documentId))}`
+}
+
 type ContactUser = Pick<
 	AuthUser,
 	| 'id'

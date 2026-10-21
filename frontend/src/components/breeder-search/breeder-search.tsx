@@ -1,6 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Box, Pagination, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, FormControlLabel } from '@mui/material'
 import GridViewIcon from '@mui/icons-material/GridView'
 import TableRowsIcon from '@mui/icons-material/TableRows'
@@ -14,13 +16,11 @@ import { searchBreeders as searchBreedersApi } from '@/lib/strapi/api'
 import { enrichBreedersWithMembers } from '@/lib/breeder-member-enrich'
 import type { Breeder, HzdSetting } from '@/types'
 import { BreederCard } from './breeder-card'
-import { BreederDetailView } from './breeder-detail-view'
-import { TrackUmamiEvent } from '@/components/analytics/track-umami-event'
 import { BreederSearchForm } from './breeder-search-form'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { theme } from '@/themes'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
-import { resolveBreederContact } from '@/lib/breeder-display-utils'
+import { breederDetailPath, resolveBreederContact } from '@/lib/breeder-display-utils'
 import { calculateDistance } from '@/lib/geo-utils'
 import { ViewToggle } from '@/components/common/view-toggle'
 
@@ -44,7 +44,6 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 	const [totalBreeders, setTotalBreeders] = useState(0)
 	const [pageCount, setPageCount] = useState(0)
 	const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
-	const [selectedBreeder, setSelectedBreeder] = useState<Breeder | null>(null)
 	const [showMap, setShowMap] = useState(false)
 	const [zipCode, setZipCode] = useState('')
 	const [zipLocation, setZipLocation] = useState<{ lat: number; lng: number } | null>(null)
@@ -130,14 +129,11 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 		setPage(newPage)
 	}, [])
 
-	const handleBreederClick = useCallback((breeder: Breeder) => {
-		setSelectedBreeder(breeder)
-		window.scrollTo({ top: 0, behavior: 'smooth' })
-	}, [])
+	const router = useRouter()
 
-	const handleBackToSearch = useCallback(() => {
-		setSelectedBreeder(null)
-	}, [])
+	const openBreeder = useCallback((breeder: Breeder) => {
+		router.push(breederDetailPath(breeder))
+	}, [router])
 
 	const handleSort = useCallback((field: SortField) => {
 		if (sortField === field) {
@@ -170,6 +166,9 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 							{contact.ownerDisplayName && (
 								<div>{contact.ownerDisplayName}</div>
 							)}
+							<div>
+								<Link href={breederDetailPath(breeder)}>Details anzeigen</Link>
+							</div>
 						</div>
 					),
 				}
@@ -179,25 +178,6 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 
 	const totalPages = pageCount
 	const currentPage = page
-
-	if (selectedBreeder) {
-		return (
-			<>
-				<TrackUmamiEvent
-					eventName='breeder-detail-view'
-					eventData={{
-						KennelName: selectedBreeder.kennelName?.trim() || '',
-					}}
-				/>
-				<BreederDetailView
-					breeder={selectedBreeder}
-					strapiBaseUrl={strapiBaseUrl}
-					hzdSetting={hzdSetting}
-					onBack={handleBackToSearch}
-				/>
-			</>
-		)
-	}
 
 	return (
 		<div className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em' }}>
@@ -324,7 +304,7 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 										key={breeder.documentId}
 										breeder={breeder}
 										strapiBaseUrl={strapiBaseUrl}
-										onClick={() => handleBreederClick(breeder)}
+										onClick={() => openBreeder(breeder)}
 										userLocation={userLocation}
 										hzdSetting={hzdSetting}
 									/>
@@ -415,7 +395,7 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 												<TableRow
 													key={breeder.documentId}
 													hover
-													onClick={() => handleBreederClick(breeder)}
+													onClick={() => openBreeder(breeder)}
 													sx={{ cursor: 'pointer' }}
 												>
 													<TableCell>

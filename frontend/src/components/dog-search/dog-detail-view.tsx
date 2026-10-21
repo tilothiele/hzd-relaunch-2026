@@ -20,7 +20,7 @@ interface DogDetailViewProps {
     dog: Dog
     strapiBaseUrl?: string | null
     hzdSetting?: HzdSetting | null
-    onBack: () => void
+    onBack?: () => void
     backButtonLabel?: string
 }
 
@@ -68,7 +68,7 @@ export function DogDetailView({
             <Typography variant='h5' component='h2' sx={{ fontWeight: 700 }}>
                 {title}
             </Typography>
-            <BackButton onClick={onBack} label={backButtonLabel} />
+            {onBack ? <BackButton onClick={onBack} label={backButtonLabel} /> : null}
         </Box>
     )
 

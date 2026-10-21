@@ -571,6 +571,7 @@ export interface DogDocument {
 
 export interface Dog {
 	documentId: string
+	Slug?: string | null
 	givenName?: string | null
 	fullKennelName?: string | null
 	sex?: 'M' | 'F' | null
@@ -656,6 +657,7 @@ export interface Address {
 
 export interface Breeder {
 	documentId: string
+	Slug?: string | null
 	cId?: number | null
 	BreederRole?: 'B' | 'S' | null
 	kennelName?: string | null
