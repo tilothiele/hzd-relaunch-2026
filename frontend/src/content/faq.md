@@ -6,7 +6,7 @@ Hier finden Sie Antworten auf die am häufigsten gestellten Fragen zur Nutzung u
 
 ### Ich bin HZD-Mitglied. Ich war noch nie eingeloggt. Brauche ich das überhaupt?
 Nein, nicht zwingend. Eingeloggte HZD-Mitglieder haben aber Zugriff auf:
-- den Mitgliederrbereich, in dem vereinsinterne Informationen für Mitglieder hinterlegt sind.
+- den Mitgliederbereich, in dem vereinsinterne Informationen für Mitglieder hinterlegt sind.
 - die Photobox
 - Zücher verwalten bzw. pflegen ihre Daten
 Das sind nur einige Beispiele. Generell können Sie als nicht eingeloggtes Mitglied auf der Seite stöbern und die öffentlichen Informationen finden - so wie Gäste es auch können.
