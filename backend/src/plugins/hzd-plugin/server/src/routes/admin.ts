@@ -73,6 +73,14 @@ export default [
   },
   {
     method: "GET",
+    path: "/chromosoft/import-strapi-daten/log",
+    handler: "import-strapi-daten.downloadLog",
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: "GET",
     path: "/search/status",
     handler: "search-index.status",
     config: {
