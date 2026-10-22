@@ -9,14 +9,14 @@ permalink: /impressum/
 ## Angaben gemäß § 5 TMG
 
 Hovawart Zuchtgemeinschaft Deutschland e.V.  
-Blumenweg 2  
-85551 Kirchheim
+Im Goldfeld 19
+30952 Ronnenberg
 
 **Vertreten durch:**  
 Claudia von Brill (Präsidentin)
 
 **Kontakt:**  
-Tel. 0175 / 1509 913  
+Tel. 0157 / 83927207
 Mail: [praesident.hzd@hovawarte.com](mailto:praesident.hzd@hovawarte.com)
 
 **Registereintrag:**  
