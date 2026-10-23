@@ -278,9 +278,9 @@ export function MeinProfilTab({ user: initialUser }: MeinProfilTabProps) {
 
             {/* Intro Text */}
             <Typography variant="body1" paragraph>
-                Hier können Sie Ihr Passwort ändern. Die Profilinformationen werden federführend in Chromosoft gepflegt.
-                Wenn Änderungen an Ihren Profildaten nötig sind, melden Sie diese bitte an die HZD-Geschäftsstelle.
-                Von dort werden die Daten an Chromosoft übermittelt und stehen Ihnen nach der nächsten Synchronisation zur Verfügung.
+                Hier können Sie Ihr Passwort ändern.
+                Wenn Sie Änderungen an Ihren Profildaten wünschen, melden Sie diese bitte an die HZD-Geschäftsstelle oder das TIK.
+                Ihre Daten werden zentral geändert. Sie stehen Ihnen hier nach der nächsten Synchronisation zur Verfügung.
             </Typography>
 
             <Divider sx={{ mb: 4 }} />
