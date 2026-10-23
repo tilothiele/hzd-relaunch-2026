@@ -35,7 +35,7 @@ async function login(request: NextRequest) {
 		return NextResponse.json(
 			{
 				error: {
-					message: 'Bitte E-Mail/Benutzername und Passwort eingeben.',
+					message: 'Bitte E-Mail/Mitgliedsnummer und Passwort eingeben.',
 				},
 			},
 			{ status: 400 },

@@ -65,7 +65,7 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
 	return (
 		<AuthFormCard title='Anmelden'>
 			<Typography variant='body2' color='text.secondary' sx={{ mb: 3 }}>
-				Melden Sie sich mit Ihrer E-Mail-Adresse oder Ihrem Benutzernamen
+				Melden Sie sich mit Ihrer E-Mail-Adresse oder Ihrer Mitgliedsnummer
 				und dem Passwort an.
 			</Typography>
 
@@ -84,7 +84,7 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
 					fullWidth
 					required
 					autoComplete='username'
-					label='E-Mail oder Benutzername'
+					label='E-Mail oder Mitgliedsnummer'
 					name='identifier'
 					value={identifier}
 					onChange={(event) => setIdentifier(event.target.value)}
