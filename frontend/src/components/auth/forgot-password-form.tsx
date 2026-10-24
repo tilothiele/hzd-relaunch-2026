@@ -11,8 +11,20 @@ import {
 	Typography,
 } from '@mui/material'
 import { AltchaField } from '@/components/altcha/altcha-field'
+import { trackUmamiEvent } from '@/components/analytics/track-umami-event'
 import { AuthFormCard } from '@/components/auth/auth-form-card'
 import { requestPasswordReset } from '@/lib/auth-api'
+
+const PASSWORD_RESET_REQUEST_EVENT = 'password-reset-request'
+
+function trackPasswordResetRequest (email: string) {
+	const identifier = email.trim().toLowerCase()
+	if (!identifier) {
+		return
+	}
+
+	trackUmamiEvent(PASSWORD_RESET_REQUEST_EVENT, { email: identifier })
+}
 
 export function ForgotPasswordForm() {
 	const [email, setEmail] = useState('')
@@ -33,6 +45,7 @@ export function ForgotPasswordForm() {
 
 		try {
 			await requestPasswordReset(email)
+			trackPasswordResetRequest(email)
 			setIsSubmitted(true)
 		} catch (submitError) {
 			setError(

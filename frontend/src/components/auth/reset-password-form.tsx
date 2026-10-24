@@ -12,10 +12,34 @@ import {
 	Typography,
 } from '@mui/material'
 import { AltchaField } from '@/components/altcha/altcha-field'
+import { trackUmamiEvent } from '@/components/analytics/track-umami-event'
 import { AuthFormCard } from '@/components/auth/auth-form-card'
 import { useAuth } from '@/hooks/use-auth'
 import { resetPasswordWithCode } from '@/lib/auth-api'
 import { fetchMe } from '@/lib/strapi/api'
+import type { AuthUser } from '@/types'
+
+const PASSWORD_RESET_EVENT = 'password-reset'
+
+function trackPasswordReset (user: AuthUser | null) {
+	const email = user?.email?.trim() || user?.cEmail?.trim() || ''
+	if (email) {
+		trackUmamiEvent(PASSWORD_RESET_EVENT, { email: email.toLowerCase() })
+		return
+	}
+
+	const username = user?.username?.trim() ?? ''
+	if (username) {
+		trackUmamiEvent(PASSWORD_RESET_EVENT, { username })
+		return
+	}
+
+	if (typeof user?.membershipNumber === 'number') {
+		trackUmamiEvent(PASSWORD_RESET_EVENT, {
+			mitgliedsnummer: String(user.membershipNumber),
+		})
+	}
+}
 
 interface ResetPasswordFormProps {
 	code?: string
@@ -74,6 +98,7 @@ export function ResetPasswordForm({ code }: ResetPasswordFormProps) {
 			}
 
 			applyAuthSession(result.jwt, user)
+			trackPasswordReset(user)
 			router.replace('/')
 			router.refresh()
 		} catch (submitError) {

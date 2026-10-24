@@ -46,16 +46,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
 		const listingRoutes = [
 			{ path: '', lastMod: indexUpdated, priority: 1, freq: 'daily' as const },
-			{ path: '/contact', lastMod: indexUpdated, priority: 0.8, freq: 'monthly' as const },
-
-			{ path: '/meine-hzd', lastMod: indexUpdated, priority: 0.6, freq: 'monthly' as const },
-			{ path: '/calendar', lastMod: calendarUpdated, priority: 0.8, freq: 'daily' as const },
-			{ path: '/results', lastMod: calendarUpdated, priority: 0.7, freq: 'weekly' as const },
-			{ path: '/dogs', lastMod: dogsUpdated, priority: 0.9, freq: 'daily' as const },
-			{ path: '/stunt-dogs', lastMod: dogsUpdated, priority: 0.8, freq: 'weekly' as const },
-			{ path: '/breeders', lastMod: breedersUpdated, priority: 0.9, freq: 'daily' as const },
-			{ path: '/litters', lastMod: littersUpdated, priority: 0.9, freq: 'daily' as const },
-			{ path: '/anmeldung', lastMod: indexUpdated, priority: 0.6, freq: 'monthly' as const },
+			//{ path: '/contact', lastMod: indexUpdated, priority: 0.8, freq: 'monthly' as const },
+			//{ path: '/meine-hzd', lastMod: indexUpdated, priority: 0.6, freq: 'monthly' as const },
+			//{ path: '/calendar', lastMod: calendarUpdated, priority: 0.8, freq: 'daily' as const },
+			//{ path: '/results', lastMod: calendarUpdated, priority: 0.7, freq: 'weekly' as const },
+			//{ path: '/dogs', lastMod: dogsUpdated, priority: 0.9, freq: 'daily' as const },
+			//{ path: '/stunt-dogs', lastMod: dogsUpdated, priority: 0.8, freq: 'weekly' as const },
+			//{ path: '/breeders', lastMod: breedersUpdated, priority: 0.9, freq: 'daily' as const },
+			//{ path: '/litters', lastMod: littersUpdated, priority: 0.9, freq: 'daily' as const },
+			//{ path: '/anmeldung', lastMod: indexUpdated, priority: 0.6, freq: 'monthly' as const },
 		].map((route) => ({
 			url: `${siteUrl}${route.path}`,
 			lastModified: route.lastMod,
