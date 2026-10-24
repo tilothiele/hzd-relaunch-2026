@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
+import { trackUmamiEvent } from '@/components/analytics/track-umami-event'
 import {
 	setStrapiAuthToken,
 	setStrapiUnauthorizedHandler,
@@ -34,6 +35,21 @@ interface AuthContextValue {
 }
 
 export const AuthContext = createContext<AuthContextValue | undefined>(undefined)
+
+const USER_LOGIN_EVENT = 'user-login'
+
+function readLoginEmail (user: AuthUser | null | undefined) {
+	return user?.email?.trim() || user?.cEmail?.trim() || ''
+}
+
+function trackUserLogin (user: AuthUser | null) {
+	const email = readLoginEmail(user).toLowerCase()
+	if (!email) {
+		return
+	}
+
+	trackUmamiEvent(USER_LOGIN_EVENT, { email })
+}
 
 interface AuthProviderProps {
 	children: ReactNode
@@ -160,19 +176,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
 			const result = await loginWithPassword(identifier, password)
 			setStrapiAuthToken(result.jwt)
 
+			let user = result.user
 			try {
 				const meData = await fetchMe(result.jwt)
-				setAuthState({
-					token: result.jwt,
-					user: meData.me ?? (result.user as AuthUser | null),
-				})
+				user = meData.me ?? result.user
 			} catch (error) {
 				console.error('[Auth] Profil nach Login nicht geladen:', error)
-				setAuthState({
-					token: result.jwt,
-					user: result.user,
-				})
 			}
+
+			setAuthState({
+				token: result.jwt,
+				user,
+			})
+			trackUserLogin(user)
 		} catch (error) {
 			const message = error instanceof Error
 				? error.message
