@@ -694,13 +694,57 @@ export async function changePassword(
 	})
 }
 
+interface SitemapPage {
+	slug?: string | null
+	updatedAt?: string | null
+	Restriction?: { Public?: boolean | null } | null
+}
+
+interface SitemapDog {
+	documentId?: string | null
+	Slug?: string | null
+	updatedAt?: string | null
+}
+
+interface SitemapBreeder {
+	documentId?: string | null
+	Slug?: string | null
+	updatedAt?: string | null
+}
+
+const SITEMAP_PAGE_SIZE = 100
+
+async function fetchAllEntities<T>(
+	path: string,
+	createQuery: (page: number) => URLSearchParams,
+): Promise<T[]> {
+	const all: T[] = []
+	let page = 1
+
+	while (page <= 50) {
+		const response = await fetchStrapiServer<unknown>(path, createQuery(page), {
+			token: process.env.STRAPI_API_TOKEN ?? null,
+		})
+		const items = extractStrapiList<T>(response)
+		all.push(...items)
+
+		const pageCount = extractStrapiPagination(response)?.pageCount ?? page
+		if (items.length === 0 || items.length < SITEMAP_PAGE_SIZE || page >= pageCount) {
+			break
+		}
+		page += 1
+	}
+
+	return all
+}
+
 export async function fetchSitemapData(): Promise<{
 	indexPage: { updatedAt: string }
-	pages: { slug: string; updatedAt: string }[]
+	pages: SitemapPage[]
 	newsArticles: { Slug: string; updatedAt: string }[]
 	newsArticleCategories: { Slug: string; updatedAt: string }[]
-	hzdPluginDogs: { updatedAt: string }[]
-	hzdPluginBreeders: { updatedAt: string }[]
+	hzdPluginDogs: SitemapDog[]
+	hzdPluginBreeders: SitemapBreeder[]
 	hzdPluginLitters: { updatedAt: string }[]
 	calendarEntries: { updatedAt: string }[]
 }> {
@@ -721,11 +765,51 @@ export async function fetchSitemapData(): Promise<{
 		calendarEntries,
 	] = await Promise.all([
 		fetchLayoutServer(),
-		fetchEntityList<{ slug: string; updatedAt: string }>('pages', limitQuery, { server: true }),
+		fetchAllEntities<SitemapPage>('pages', (page) => buildStrapiQuery({
+			fields: ['slug', 'updatedAt'],
+			populate: { 'populate[Restriction][fields][0]': 'Public' },
+			pagination: { page, pageSize: SITEMAP_PAGE_SIZE },
+			sort: 'updatedAt:desc',
+			status: 'published',
+		})),
 		fetchEntityList<{ Slug: string; updatedAt: string }>('news-articles', limitQuery, { server: true }),
 		fetchEntityList<{ Slug: string; updatedAt: string }>('news-article-categories', limitQuery, { server: true }),
-		fetchEntityList<{ updatedAt: string }>('hzd-plugin/dogs', oneQuery, { server: true }),
-		fetchEntityList<{ updatedAt: string }>('hzd-plugin/breeders', oneQuery, { server: true }),
+		fetchAllEntities<SitemapDog>('hzd-plugin/dogs', (page) => buildStrapiQuery({
+			fields: ['documentId', 'Slug', 'updatedAt'],
+			filters: {
+				and: [
+					{ cFertile: { eq: true } },
+					{
+						or: [
+							{ Disabled: { eq: false } },
+							{ Disabled: { null: true } },
+						],
+					},
+				],
+			},
+			pagination: { page, pageSize: SITEMAP_PAGE_SIZE },
+			sort: 'updatedAt:desc',
+		})),
+		fetchAllEntities<SitemapBreeder>('hzd-plugin/breeders', (page) => {
+			const query = buildStrapiQuery({
+				fields: ['documentId', 'Slug', 'updatedAt'],
+				filters: {
+					and: [
+						{ IsActive: { eq: true } },
+						{
+							or: [
+								{ Disable: { eq: false } },
+								{ Disable: { null: true } },
+							],
+						},
+					],
+				},
+				pagination: { page, pageSize: SITEMAP_PAGE_SIZE },
+				sort: 'updatedAt:desc',
+			})
+			query.set('enrich', 'false')
+			return query
+		}),
 		fetchEntityList<{ updatedAt: string }>('hzd-plugin/litters', oneQuery, { server: true }),
 		fetchEntityList<{ updatedAt: string }>('calendar-entries', oneQuery, { server: true }),
 	])

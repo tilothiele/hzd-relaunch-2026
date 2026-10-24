@@ -136,9 +136,14 @@ const coreControllerFactory = factories.createCoreController(
 	'plugin::hzd-plugin.breeder',
 	({ strapi }: { strapi: Core.Strapi }) => ({
 		async find(ctx: any) {
+			const skipEnrich = ctx?.query?.enrich === 'false'
+			if (skipEnrich) {
+				delete ctx.query.enrich
+			}
+
 			const response = await Object.getPrototypeOf(this).find.call(this, ctx)
 
-			if (response?.data) {
+			if (response?.data && !skipEnrich) {
 				response.data = await enrichBreederRecords(strapi, response.data)
 			}
 
