@@ -45,25 +45,47 @@ const serwist = new Serwist({
 
 serwist.addEventListeners();
 
+const NOTIFICATION_ICON = "/logos/HZD-logo256-hovawart-zuchtgemeinschaft-deutschland.png";
+
 // Push notification handling
 self.addEventListener("push", (event) => {
-    if (event.data) {
-        const data = event.data.json();
-        const options = {
-            body: data.body,
-            icon: "/logos/HZD-logo256-hovawart-zuchtgemeinschaft-deutschland.png",
-            badge: "/logos/HZD-logo256-hovawart-zuchtgemeinschaft-deutschland.png",
-            data: {
-                url: data.url || "/",
-            },
-        };
-        event.waitUntil(self.registration.showNotification(data.title, options));
-    }
+    const show = (async () => {
+        let title = "HZD Benachrichtigung";
+        let body = "";
+        let url = "/";
+
+        if (event.data) {
+            const raw = event.data.text();
+            try {
+                const data = JSON.parse(raw) as {
+                    title?: string;
+                    body?: string;
+                    url?: string;
+                    data?: { url?: string };
+                };
+                title = data.title || title;
+                body = data.body || "";
+                url = data.data?.url || data.url || "/";
+            } catch {
+                body = raw;
+            }
+        }
+
+        await self.registration.showNotification(title, {
+            body,
+            icon: NOTIFICATION_ICON,
+            badge: NOTIFICATION_ICON,
+            data: { url },
+        });
+    })();
+
+    event.waitUntil(show);
 });
 
 self.addEventListener("notificationclick", (event) => {
     event.notification.close();
-    event.waitUntil(self.clients.openWindow(event.notification.data.url));
+    const url = event.notification.data?.url || "/";
+    event.waitUntil(self.clients.openWindow(url));
 });
 
 self.addEventListener("message", (event) => {

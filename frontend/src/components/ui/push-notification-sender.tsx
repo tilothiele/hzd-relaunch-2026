@@ -12,13 +12,13 @@ export function PushNotificationSender() {
     const [isLoading, setIsLoading] = useState(false)
     const [status, setStatus] = useState<{ type: 'success' | 'error', text: string } | null>(null)
     const [channels, setChannels] = useState<Record<string, boolean>>({
-        aktuelles: false,
-        berichte: false,
-        hovipedia: false,
-        welpen: false,
-        terminkalender: false,
-        ergebnisse: false,
-        notvermittlungen: false,
+        aktuelles: true,
+        berichte: true,
+        hovipedia: true,
+        welpen: true,
+        terminkalender: true,
+        ergebnisse: true,
+        notvermittlungen: true,
         testnachrichten: true
     })
 
@@ -56,10 +56,13 @@ export function PushNotificationSender() {
 
             const data = await response.json()
 
-            if (response.ok) {
+            if (response.ok && data.summary?.success > 0) {
+                const failed = data.summary.failed ?? 0
                 setStatus({
                     type: 'success',
-                    text: `Erfolgreich gesendet! (${data.summary.success} Erfolge, ${data.summary.failed} Fehler)`
+                    text: failed > 0
+                        ? `An ${data.summary.success} Gerät(e) gesendet, ${failed} fehlgeschlagen.`
+                        : `An ${data.summary.success} Gerät(e) gesendet.`
                 })
                 setMessage('')
             } else {
@@ -122,6 +125,7 @@ export function PushNotificationSender() {
                         {Object.entries(channelLabels).map(([key, label]) => (
                             <button
                                 key={key}
+                                type="button"
                                 onClick={() => toggleChannel(key)}
                                 disabled={isLoading}
                                 className={`flex items-center justify-between p-3 rounded-xl border text-sm transition-all ${channels[key]
@@ -135,12 +139,13 @@ export function PushNotificationSender() {
                         ))}
                     </div>
                     <p className="mt-4 text-[11px] text-gray-500 italic">
-                        * Wenn kein Kanal ausgewählt ist, wird die Nachricht an ALLE Abonnenten gesendet.
+                        Die Nachricht geht an Geräte, die mindestens einen gewählten Kanal aktiv haben. Ohne Auswahl erhalten sie alle Abonnenten.
                     </p>
                 </div>
 
                 <div className="pt-4 border-t border-gray-50">
                     <button
+                        type="button"
                         onClick={sendNotification}
                         disabled={isLoading || !message.trim()}
                         className="w-full sm:w-auto px-8 py-3 bg-[#4560AA] text-white rounded-xl hover:bg-[#344a8a] transition-all font-bold shadow-md hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-3"

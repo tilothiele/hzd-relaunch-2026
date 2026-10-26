@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { buildStrapiQuery } from '@/lib/strapi/filters'
-import { createEntity, fetchEntityList, updateEntity } from '@/lib/strapi/api'
+import {
+	findPushSubscriptionsByEndpoint,
+	readChannels,
+	savePushSubscription,
+} from '@/lib/server/push-subscriptions'
 
 const strapiToken = process.env.STRAPI_API_TOKEN
 
@@ -9,21 +12,6 @@ function getApiOptions() {
 		server: true as const,
 		token: strapiToken ?? null,
 	}
-}
-
-async function findSubscriptionByEndpoint(endpoint: string) {
-	const query = buildStrapiQuery({
-		filters: { endpoint: { eq: endpoint } },
-		pagination: { pageSize: 1 },
-	})
-	const subscriptions = await fetchEntityList<{
-		documentId: string
-		endpoint: string
-		p256dh?: string
-		auth?: string
-		channels?: Record<string, boolean> | null
-	}>('subscriptions', query, getApiOptions())
-	return subscriptions[0] ?? null
 }
 
 export async function GET(request: NextRequest) {
@@ -36,9 +24,14 @@ export async function GET(request: NextRequest) {
 			return NextResponse.json({ error: 'Endpoint is required' }, { status: 400 })
 		}
 
-		const subscription = await findSubscriptionByEndpoint(endpoint)
+		const subscriptions = await findPushSubscriptionsByEndpoint(endpoint, getApiOptions())
+		const subscription = subscriptions[0] ?? null
 
-		return NextResponse.json({ subscriptions: subscription ? [subscription] : [] })
+		return NextResponse.json({
+			subscriptions: subscription
+				? [{ ...subscription, channels: readChannels(subscription.channels) }]
+				: [],
+		})
 	} catch (error) {
 		console.error(`[API Subscribe][GET][${timestamp}] Fetch error:`, error)
 		return NextResponse.json({ error: 'Failed to fetch subscription' }, { status: 500 })
@@ -55,27 +48,26 @@ export async function POST(request: NextRequest) {
 			return NextResponse.json({ error: 'Invalid subscription data' }, { status: 400 })
 		}
 
-		const existingSub = await findSubscriptionByEndpoint(subscription.endpoint)
+		const existing = (await findPushSubscriptionsByEndpoint(subscription.endpoint, getApiOptions()))[0] ?? null
+		const p256dh = subscription.keys?.p256dh || subscription.p256dh || existing?.p256dh || ''
+		const auth = subscription.keys?.auth || subscription.auth || existing?.auth || ''
 
-		const variableData = {
+		if (!p256dh || !auth) {
+			return NextResponse.json({
+				error: 'Push-Schlüssel fehlen. Bitte Benachrichtigungen neu aktivieren.',
+			}, { status: 400 })
+		}
+
+		const channels = subscription.channels
+			? readChannels(subscription.channels)
+			: readChannels(existing?.channels)
+
+		const result = await savePushSubscription({
 			endpoint: subscription.endpoint,
-			p256dh: subscription.keys?.p256dh || subscription.p256dh || existingSub?.p256dh || '',
-			auth: subscription.keys?.auth || subscription.auth || existingSub?.auth || '',
-			channels: subscription.channels || existingSub?.channels || null,
-			publishedAt: new Date().toISOString(),
-		}
-
-		let result
-		if (existingSub) {
-			result = await updateEntity(
-				'subscriptions',
-				existingSub.documentId,
-				variableData,
-				getApiOptions(),
-			)
-		} else {
-			result = await createEntity('subscriptions', variableData, getApiOptions())
-		}
+			p256dh,
+			auth,
+			channels,
+		}, existing, getApiOptions())
 
 		return NextResponse.json(result)
 	} catch (error) {

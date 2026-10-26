@@ -4,6 +4,17 @@ import { useEffect, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBell, faBellSlash, faSliders, faSave } from '@fortawesome/free-solid-svg-icons'
 
+function urlBase64ToUint8Array(base64String: string) {
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
+    const raw = window.atob(base64)
+    const output = new Uint8Array(raw.length)
+    for (let index = 0; index < raw.length; index += 1) {
+        output[index] = raw.charCodeAt(index)
+    }
+    return output
+}
+
 export function PushNotificationManager() {
     const [isSupported, setIsSupported] = useState(false)
     const [isSubscribed, setIsSubscribed] = useState(false)
@@ -20,7 +31,7 @@ export function PushNotificationManager() {
         terminkalender: true,
         ergebnisse: true,
         notvermittlungen: true,
-        testnachrichten: false
+        testnachrichten: true
     })
 
     useEffect(() => {
@@ -83,9 +94,13 @@ export function PushNotificationManager() {
             }
 
             const registration = await navigator.serviceWorker.ready
+            const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+            if (!vapidPublicKey) {
+                throw new Error('VAPID-Schlüssel fehlt in der Anwendung.')
+            }
             const sub = await registration.pushManager.subscribe({
                 userVisibleOnly: true,
-                applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+                applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
             })
 
             // Send subscription AND channels to your server
@@ -227,6 +242,7 @@ export function PushNotificationManager() {
                     </h4>
                     {isSubscribed && (
                         <button
+                            type="button"
                             onClick={saveSettings}
                             disabled={isLoading}
                             className="px-4 py-1.5 bg-[#4560AA] text-white rounded-lg hover:bg-[#344a8a] transition-colors text-xs font-bold shadow-sm flex items-center gap-2 disabled:opacity-50"
@@ -279,6 +295,7 @@ export function PushNotificationManager() {
                                 Benachrichtigungen sind aktiv
                             </p>
                             <button
+                                type="button"
                                 onClick={unsubscribe}
                                 disabled={isLoading}
                                 className="px-5 py-2 bg-white text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 hover:text-red-500 hover:border-red-100 transition-all text-sm font-medium flex items-center gap-2 disabled:opacity-50"
@@ -292,6 +309,7 @@ export function PushNotificationManager() {
                     <div className="flex flex-col gap-4">
                         <p className="text-sm text-gray-600">Erhalte wichtige Updates direkt auf dein Gerät (Handy oder Desktop).</p>
                         <button
+                            type="button"
                             onClick={subscribe}
                             disabled={isLoading}
                             className="px-8 py-3 text-white rounded-lg transition-all text-base w-fit font-bold shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] flex items-center gap-3 disabled:opacity-50"

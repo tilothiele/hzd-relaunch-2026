@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { buildStrapiQuery } from '@/lib/strapi/filters'
-import { deleteEntity, fetchEntityList } from '@/lib/strapi/api'
+import {
+	deletePushSubscriptions,
+	findPushSubscriptionsByEndpoint,
+} from '@/lib/server/push-subscriptions'
 
 const strapiToken = process.env.STRAPI_API_TOKEN
 
@@ -25,24 +27,15 @@ export async function POST(request: NextRequest) {
 			console.warn(`[API Unsubscribe][${timestamp}] WARNING: No STRAPI_API_TOKEN found in environment`)
 		}
 
-		const query = buildStrapiQuery({
-			filters: { endpoint: { eq: endpoint } },
-			pagination: { pageSize: 1 },
-		})
-		const subscriptions = await fetchEntityList<{ documentId: string }>(
-			'subscriptions',
-			query,
-			getApiOptions(),
-		)
-		const subscription = subscriptions[0]
+		const subscriptions = await findPushSubscriptionsByEndpoint(endpoint, getApiOptions())
 
-		if (!subscription) {
+		if (subscriptions.length === 0) {
 			console.log('[API Unsubscribe] No subscription found for endpoint.')
 			return NextResponse.json({ message: 'Subscription not found' }, { status: 200 })
 		}
 
-		console.log(`[API Unsubscribe][${timestamp}] Deleting subscription:`, subscription.documentId)
-		await deleteEntity('subscriptions', subscription.documentId, getApiOptions())
+		console.log(`[API Unsubscribe][${timestamp}] Deleting subscriptions:`, subscriptions.map((subscription) => subscription.documentId))
+		await deletePushSubscriptions(subscriptions, getApiOptions())
 
 		return NextResponse.json({ message: 'Subscription deleted' })
 	} catch (error) {

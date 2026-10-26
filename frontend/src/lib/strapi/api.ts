@@ -47,6 +47,7 @@ type FilterValue = Record<string, unknown>
 export interface StrapiRequestOptions {
 	server?: boolean
 	token?: string | null
+	query?: URLSearchParams
 }
 
 interface LayoutData {
@@ -579,7 +580,7 @@ export async function createEntity<T>(
 	options: StrapiRequestOptions = {},
 ): Promise<T> {
 	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
-	const response = await fetcher<{ data: T }>(path, undefined, {
+	const response = await fetcher<{ data: T }>(path, options.query, {
 		method: 'POST',
 		body: { data },
 		token: options.token,
@@ -594,7 +595,7 @@ export async function updateEntity<T>(
 	options: StrapiRequestOptions = {},
 ): Promise<T> {
 	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
-	const response = await fetcher<{ data: T }>(`${path}/${documentId}`, undefined, {
+	const response = await fetcher<{ data: T }>(`${path}/${documentId}`, options.query, {
 		method: 'PUT',
 		body: { data },
 		token: options.token,
@@ -608,7 +609,7 @@ export async function deleteEntity(
 	options: StrapiRequestOptions = {},
 ): Promise<void> {
 	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
-	await fetcher(`${path}/${documentId}`, undefined, {
+	await fetcher(`${path}/${documentId}`, options.query, {
 		method: 'DELETE',
 		token: options.token,
 	})
