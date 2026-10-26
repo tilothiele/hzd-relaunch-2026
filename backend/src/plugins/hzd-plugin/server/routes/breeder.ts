@@ -52,7 +52,8 @@ export default [
     path: '/breeders/:id',
     handler: 'breeder.update',
     config: {
-      // auth wird weggelassen, damit Standard-Authentifizierung verwendet wird
+      // Prüfung im Controller: eingeloggt und eigener Zwinger.
+      auth: false,
     },
   },
 ];

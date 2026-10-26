@@ -5,7 +5,11 @@ import { Box, Typography, Divider } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import Image from 'next/image'
 import type { Breeder, Dog, HzdSetting } from '@/types'
-import { findMaleOwnerDogAvatar, resolveBreederContact } from '@/lib/breeder-display-utils'
+import {
+	findMaleOwnerDogAvatar,
+	resolveBreederContact,
+	resolveBreederDogOwnerCIds,
+} from '@/lib/breeder-display-utils'
 import { getBreederByDocumentId } from '@/lib/strapi/api'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { theme } from '@/themes'
@@ -50,6 +54,7 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack, 
     const [breederDetails, setBreederDetails] = useState<Breeder>(breeder)
     const kennelName = breederDetails.kennelName ?? 'Kein Zwingername bekannt'
     const contact = resolveBreederContact(breederDetails)
+    const dogOwnerCIds = resolveBreederDogOwnerCIds(breederDetails)
 
     useEffect(() => {
         setBreederDetails(breeder)
@@ -221,8 +226,8 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack, 
                     <SectionHeader title="Zuchthündinnen" />
                     <Box sx={{ p: 2, bg: 'white', borderRadius: 2, border: '1px solid', borderColor: 'grey.100', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' }}>
                         <BreederDogsList
-                            key={`${breederDetails.documentId}:${contact.ownerCIds.join(',')}`}
-                            ownerCIds={contact.ownerCIds}
+                            key={`${breederDetails.documentId}:${dogOwnerCIds.join(',')}`}
+                            ownerCIds={dogOwnerCIds}
                             strapiBaseUrl={strapiBaseUrl}
                             hzdSetting={hzdSetting}
                             hasNoDogsAvailabe={breederDetails.HasNoDogsAvailabe}

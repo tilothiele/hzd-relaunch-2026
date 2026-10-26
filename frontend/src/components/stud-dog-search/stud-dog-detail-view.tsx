@@ -4,7 +4,11 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { Box, Typography } from '@mui/material'
 import type { Breeder, Dog, HzdSetting } from '@/types'
-import { findMaleOwnerDogAvatar, resolveBreederContact } from '@/lib/breeder-display-utils'
+import {
+	findMaleOwnerDogAvatar,
+	resolveBreederContact,
+	resolveBreederDogOwnerCIds,
+} from '@/lib/breeder-display-utils'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { BackButton } from '@/components/ui/back-button'
 import { theme } from '@/themes'
@@ -35,6 +39,7 @@ export function StudDogDetailView({
 }: StudDogDetailViewProps) {
 	const [selectedDog, setSelectedDog] = useState<Dog | null>(null)
 	const contact = resolveBreederContact(breeder)
+	const dogOwnerCIds = resolveBreederDogOwnerCIds(breeder)
 
 	const fallbackDogAvatar = breederRole === 'S' && !breeder.avatar
 		? findMaleOwnerDogAvatar(breeder)
@@ -160,7 +165,7 @@ export function StudDogDetailView({
 					</section>
 				) : null}
 
-				{contact.ownerCIds.length > 0 ? (
+				{dogOwnerCIds.length > 0 ? (
 					<section>
 						<SectionHeader title='Deckrüden' />
 						<Box
@@ -174,7 +179,7 @@ export function StudDogDetailView({
 							}}
 						>
 							<StudDogsList
-								ownerCIds={contact.ownerCIds}
+								ownerCIds={dogOwnerCIds}
 								strapiBaseUrl={strapiBaseUrl}
 								hzdSetting={hzdSetting}
 								onDogSelect={setSelectedDog}

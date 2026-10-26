@@ -124,6 +124,19 @@ export function resolveOwnerMemberCIds(breeder: Breeder): number[] {
 		.filter((cId): cId is number => typeof cId === 'number')
 }
 
+/**
+ * Besitzer-cIds für die öffentliche Zuchthunde-Liste.
+ * Hündinnen und Rüden hängen oft am Zwinger-cId, nicht an den Personen
+ * in owner_members.
+ */
+export function resolveBreederDogOwnerCIds(breeder: Breeder): number[] {
+	const ids = new Set(resolveOwnerMemberCIds(breeder))
+	if (typeof breeder.cId === 'number') {
+		ids.add(breeder.cId)
+	}
+	return [...ids]
+}
+
 export function resolveBreederContact(breeder: Breeder): BreederContactInfo {
 	const address = resolveAddress(breeder)
 	const ownerMembers = resolveOwnerMembers(breeder)

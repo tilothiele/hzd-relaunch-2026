@@ -5,6 +5,7 @@ import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, Ta
 import { Edit as EditIcon, Save as SaveIcon, Cancel as CancelIcon } from '@mui/icons-material'
 import type { Breeder, Litter, LitterSearchResult, Dog, DogSearchResult } from '@/types'
 import { searchDogsGeneric, searchLitters, createEntity, updateEntity } from '@/lib/strapi/api'
+import { resolveBreederDogOwnerCIds } from '@/lib/breeder-display-utils'
 import { formatDate } from '@/lib/utils'
 import { Add as AddIcon } from '@mui/icons-material'
 import { BreederMasterSelect } from '@/components/meine-hzd/breeder-master-select'
@@ -109,13 +110,8 @@ export function MeineWuerfeTab({
     // Fetch breeding bitches (mothers)
     useEffect(() => {
         async function loadMothers() {
-			if (!breeder?.owner_members || breeder.owner_members.length === 0) return
-			const ownerCIds = breeder.owner_members
-				.map((member) => member.cId)
-				.filter((cId): cId is number => typeof cId === 'number')
-			if (ownerCIds.length === 0 && typeof breeder.cId === 'number') {
-				ownerCIds.push(breeder.cId)
-			}
+			if (!breeder) return
+			const ownerCIds = resolveBreederDogOwnerCIds(breeder)
 			if (ownerCIds.length === 0) return
 			try {
 				const data = await searchDogsGeneric({

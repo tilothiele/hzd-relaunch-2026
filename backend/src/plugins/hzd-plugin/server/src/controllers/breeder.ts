@@ -121,6 +121,61 @@ const toFilterConditions = (query: BreederSearchQuery): Array<Record<string, unk
 	return conditions
 }
 
+const EDITABLE_BREEDER_TEXT_FIELDS = [
+	'WebsiteUrlDraft',
+	'BreedersIntroDraft',
+	'BreedersMessage',
+] as const
+
+async function loadUserFromRequest(strapi: Core.Strapi, ctx: any) {
+	const jwtService = strapi.plugin('users-permissions')?.service('jwt')
+	if (!jwtService?.getToken) {
+		return null
+	}
+
+	try {
+		const payload = await jwtService.getToken(ctx)
+		const userId = payload?.id
+		if (userId == null) {
+			return null
+		}
+
+		return strapi.db.query('plugin::users-permissions.user').findOne({
+			where: { id: userId },
+		})
+	} catch {
+		return null
+	}
+}
+
+function userOwnsBreeder(
+	user: { id?: number | string | null; documentId?: string | null },
+	breeder: unknown,
+): boolean {
+	if (!breeder || typeof breeder !== 'object') {
+		return false
+	}
+
+	const record = breeder as { owner_members?: unknown }
+	const ids = new Set<string>()
+	if (user.id != null) {
+		ids.add(String(user.id))
+	}
+	if (user.documentId) {
+		ids.add(String(user.documentId))
+	}
+
+	const members = Array.isArray(record.owner_members) ? record.owner_members : []
+	return members.some((member) => {
+		if (!member || typeof member !== 'object') {
+			return false
+		}
+		const owner = member as { id?: number | string; documentId?: string }
+		return ids.has(String(owner.id ?? ''))
+			|| (typeof owner.documentId === 'string' && ids.has(owner.documentId))
+	})
+}
+
 const decodeRouteKey = (value: unknown): string => {
 	if (typeof value !== 'string') {
 		return ''
@@ -239,6 +294,63 @@ const coreControllerFactory = factories.createCoreController(
 
 			const enriched = await enrichBreederRecords(strapi, breeder)
 			ctx.body = { data: enriched }
+		},
+
+		async update(ctx: any) {
+			const user = await loadUserFromRequest(strapi, ctx)
+			if (!user) {
+				return ctx.unauthorized('Nicht authentifiziert.')
+			}
+
+			const documentId = typeof ctx.params?.id === 'string' ? ctx.params.id : ''
+			const breeder = documentId
+				? await strapi.documents('plugin::hzd-plugin.breeder').findOne({
+					documentId,
+					populate: { owner_members: true },
+				})
+				: null
+
+			if (!breeder) {
+				return ctx.notFound('Zwinger nicht gefunden.')
+			}
+
+			if (!userOwnsBreeder(user, breeder)) {
+				return ctx.forbidden('Dieser Zwinger gehört nicht zum eigenen Konto.')
+			}
+
+			const input = ctx.request.body?.data as Record<string, unknown> | undefined
+			if (!input || typeof input !== 'object' || Array.isArray(input)) {
+				return ctx.badRequest('Missing "data" payload in the request body')
+			}
+
+			const data: Record<string, unknown> = {}
+			for (const field of EDITABLE_BREEDER_TEXT_FIELDS) {
+				if (!(field in input)) {
+					continue
+				}
+				const value = input[field]
+				data[field] = typeof value === 'string' ? value : null
+			}
+
+			if ('BreederEmail' in input) {
+				const email = typeof input.BreederEmail === 'string'
+					? input.BreederEmail.trim()
+					: ''
+				data.BreederEmail = email.length > 0 ? email : null
+			}
+
+			if ('isDirty' in input) {
+				data.isDirty = input.isDirty === true
+			}
+
+			const entity = await strapi.documents('plugin::hzd-plugin.breeder').update({
+				documentId,
+				data,
+				populate: BREEDER_SEARCH_POPULATE,
+			})
+
+			const enriched = await enrichBreederRecords(strapi, entity)
+			return { data: enriched }
 		},
 	}),
 )
