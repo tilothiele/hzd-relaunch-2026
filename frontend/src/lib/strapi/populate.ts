@@ -232,7 +232,8 @@ export const NEWS_ARTICLE_DEFAULT_SORT = ['DateOfPublication:desc', 'publishedAt
 
 export const POPULATE_PHOTOBOX_COLLECTION = new URLSearchParams({
 	'populate[photogapher][fields][0]': 'documentId',
-	'populate[photobox_images][populate][Thumbnail]': 'true',
+	// Relation am Collection-Typ heißt `photos`, nicht die Collection-Tabelle.
+	'populate[photos][populate][Thumbnail]': 'true',
 })
 
 export const POPULATE_SUPPLEMENTAL_DOCUMENT = new URLSearchParams({
