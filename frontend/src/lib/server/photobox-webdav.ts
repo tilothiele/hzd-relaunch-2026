@@ -1,4 +1,4 @@
-import { createClient, type WebDAVClient } from 'webdav'
+import { AuthType, createClient, type WebDAVClient } from 'webdav'
 
 const MAX_PATH_SEGMENT_LEN = 200
 
@@ -58,6 +58,18 @@ function parentDir(absolutePath: string): string {
 
 let clientSingleton: WebDAVClient | null = null
 
+/**
+ * Basic-Auth nach RFC 7617 (UTF-8). Der webdav-Client kodiert das
+ * Passwort als Latin-1; Hetzner antwortet darauf mit 401, sobald
+ * Zeichen wie §, ß oder ° vorkommen.
+ */
+function basicAuthHeader(username: string, password: string): string {
+	const token = Buffer.from(`${username}:${password}`, 'utf8').toString(
+		'base64',
+	)
+	return `Basic ${token}`
+}
+
 function getClient(): WebDAVClient {
 	if (clientSingleton) {
 		return clientSingleton
@@ -70,9 +82,13 @@ function getClient(): WebDAVClient {
 	}
 	const username = process.env.PHOTOBOX_WEBDAV_USERNAME?.trim() ?? ''
 	const password = process.env.PHOTOBOX_WEBDAV_PASSWORD ?? ''
+	const headers: Record<string, string> = {}
+	if (username.length > 0 || password.length > 0) {
+		headers.Authorization = basicAuthHeader(username, password)
+	}
 	clientSingleton = createClient(url.replace(/\/$/, ''), {
-		username: username.length > 0 ? username : undefined,
-		password: password.length > 0 ? password : undefined,
+		authType: AuthType.None,
+		headers,
 	})
 	return clientSingleton
 }
