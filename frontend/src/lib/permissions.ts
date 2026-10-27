@@ -4,6 +4,9 @@ const SONDERLEITER_GROUP_KEY = 'sonderleiter'
 const ADMINISTRATIR_GROUP_KEY = 'admins'
 const DECKRUEDENBESITZER_GROUP_KEY = 'dr-besitzer'
 const ZUECHTER_GROUP_KEY = 'zuechter'
+const TIK_GROUP_KEY = 'tik'
+
+export const TIK_ACCESS_DENIED_MESSAGE = '401 Zugriff verweitert'
 
 type RestrictionLike = {
 	user_groups?: unknown
@@ -188,6 +191,10 @@ export function isBreeder(user: AuthUser | null): boolean {
 	return belongsToGroup(user, ZUECHTER_GROUP_KEY)
 }
 
+export function isTik(user: AuthUser | null): boolean {
+	return belongsToGroup(user, TIK_GROUP_KEY)
+}
+
 export function isZuechter(user: AuthUser | null): boolean {
 	return belongsToGroup(user, ZUECHTER_GROUP_KEY)
 }
@@ -267,6 +274,7 @@ export const hasRequiredUserGroups = hasRequiredGroups
 
 const permissions = {
 	isBreeder,
+	isTik,
 	isAdministrator,
 	isSonderleiter,
 	hasUserGroup,
