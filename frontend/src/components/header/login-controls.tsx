@@ -18,6 +18,33 @@ interface LoginControlsProps {
 	theme: ThemeDefinition
 }
 
+function firstLetter (value: string): string {
+	const trimmed = value.trim()
+	if (!trimmed) {
+		return ''
+	}
+
+	return Array.from(trimmed)[0]?.toLocaleUpperCase('de-DE') ?? ''
+}
+
+function buildUserInitials (user: AuthUser): string {
+	const firstName = user.firstName?.trim() ?? ''
+	const lastName = user.lastName?.trim() ?? ''
+
+	if (firstName || lastName) {
+		return [firstName, lastName].filter(Boolean).map(firstLetter).join('')
+	}
+
+	const fallback = (user.username || user.cEmail || 'Account').trim()
+	const parts = fallback.split(/[\s.@_+-]+/).filter(Boolean)
+
+	if (parts.length >= 2) {
+		return parts.slice(0, 2).map(firstLetter).join('')
+	}
+
+	return Array.from(fallback).slice(0, 2).join('').toLocaleUpperCase('de-DE')
+}
+
 export function LoginControls({
 	isAuthenticated,
 	user,
@@ -47,6 +74,14 @@ export function LoginControls({
 
 		// Fallback auf username oder email
 		return user.username ?? user.cEmail ?? 'Account'
+	}, [user])
+
+	const userInitials = useMemo(() => {
+		if (!user) {
+			return ''
+		}
+
+		return buildUserInitials(user)
 	}, [user])
 
 	// Close menu when clicking outside
@@ -100,16 +135,26 @@ export function LoginControls({
 					onMouseEnter={handleMouseEnter}
 					onMouseLeave={handleMouseLeave}
 					className='flex cursor-pointer items-center gap-2 rounded px-2 py-1 transition-colors hover:bg-white/10'
-					aria-label='Benutzermenü'
+					aria-label={`Benutzermenü, ${userLabel}`}
 					aria-controls='user-menu'
 					aria-haspopup='true'
 					aria-expanded={isMenuOpen}
+					title={userLabel}
 				>
 					<FontAwesomeIcon
 						icon={faUser}
 						style={{ fontSize: '1.2em', color: theme.loginIcon }}
 					/>
-					<span style={{ fontSize: '1.2em', color: theme.headerFooterTextColor, fontWeight: 400 }}>
+					<span
+						className='min-[1000px]:hidden'
+						style={{ fontSize: '1.2em', color: theme.headerFooterTextColor, fontWeight: 400 }}
+					>
+						{userInitials}
+					</span>
+					<span
+						className='hidden min-[1000px]:inline'
+						style={{ fontSize: '1.2em', color: theme.headerFooterTextColor, fontWeight: 400 }}
+					>
 						{userLabel}
 					</span>
 				</div>
