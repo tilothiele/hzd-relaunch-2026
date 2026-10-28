@@ -33,11 +33,13 @@ FROM deps AS build
 WORKDIR /opt/app
 COPY . .
 
-# Angezeigte Version = Build-Arg GIT_TAG, z. B. 1.1.1. Ein führendes v wird entfernt.
-# Coolify interpoliert keine Shell-Befehle: die Build-Variable muss der Tag selbst sein.
-#   GIT_TAG=1.1.1
+# Angezeigte Version = GIT_TAG, z. B. 1.1.1. Ein führendes v wird entfernt.
+# SOURCE_COMMIT wird, wenn gesetzt, mit Bindestrich angehängt: 1.1.1-<commit>.
+# Coolify: GIT_TAG=1.1.1 als Build-Variable. SOURCE_COMMIT unter
+# Advanced > Build > Source commit availability auf "Available during build".
 ARG GIT_TAG
-RUN node -e 'const fs=require("fs"); const raw=String(process.env.GIT_TAG||"").trim(); const version=raw.replace(/^v/,""); if(!version){console.error("GIT_TAG fehlt. Build-Arg auf den Tag setzen, z. B. 1.1.1"); process.exit(1);} const file="package.json"; const pkg=JSON.parse(fs.readFileSync(file,"utf8")); pkg.version=version; fs.writeFileSync(file, JSON.stringify(pkg,null,2)+"\n"); console.log("package.json version="+version);'
+ARG SOURCE_COMMIT
+RUN node -e 'const fs=require("fs"); const raw=String(process.env.GIT_TAG||"").trim().replace(/^v/,""); if(!raw){console.error("GIT_TAG fehlt. Build-Arg auf den Tag setzen, z. B. 1.1.1"); process.exit(1);} const commit=String(process.env.SOURCE_COMMIT||"").trim(); const version=commit?raw+"-"+commit:raw; const file="package.json"; const pkg=JSON.parse(fs.readFileSync(file,"utf8")); pkg.version=version; fs.writeFileSync(file, JSON.stringify(pkg,null,2)+"\n"); console.log("package.json version="+version);'
 
 # Build plugin first before building Strapi
 WORKDIR /opt/app/src/plugins/hzd-plugin

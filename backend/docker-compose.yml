@@ -8,6 +8,7 @@ services:
       target: production
       args:
         GIT_TAG: ${GIT_TAG}
+        SOURCE_COMMIT: ${SOURCE_COMMIT:-}
     container_name: hzd-backend
     restart: unless-stopped
     ports:
