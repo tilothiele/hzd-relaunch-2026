@@ -25,6 +25,7 @@ import {
 	Chip,
 } from '@mui/material'
 import { Edit as EditIcon } from '@mui/icons-material'
+import { getSexLabel } from '@/lib/dog-utils'
 import { fetchMyBreedingDogs, updateEntity } from '@/lib/strapi/api'
 import type { AuthUser, Dog } from '@/types'
 import { formatDate } from '@/lib/utils'
@@ -79,6 +80,7 @@ export function MeineHundeTab({ user, strapiBaseUrl }: MeineHundeTabProps) {
 	}, [user, strapiBaseUrl])
 
 	const handleEditClick = (dog: Dog) => {
+		if (dog.Disabled === true) return
 		setEditingDog(dog)
 		setEditFormData({
 			MemosDraft: dog.MemosDraft || '',
@@ -96,7 +98,7 @@ export function MeineHundeTab({ user, strapiBaseUrl }: MeineHundeTabProps) {
 	}
 
 	const handleSave = async () => {
-		if (!editingDog || !editFormData) return
+		if (!editingDog || !editFormData || editingDog.Disabled === true) return
 
 		setIsSaving(true)
 		setSaveMessage(null)
@@ -177,42 +179,61 @@ export function MeineHundeTab({ user, strapiBaseUrl }: MeineHundeTabProps) {
 							</TableRow>
 						</TableHead>
 						<TableBody>
-							{dogs.map((dog) => (
-								<TableRow
-									key={dog.documentId}
-									sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-								>
-									<TableCell component='th' scope='row'>
-										<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-											{dog.fullKennelName || dog.givenName}
-											{dog.isDirty && (
-												<Chip
-													label='Freigabe ausstehend'
-													color='warning'
-													size='small'
-													sx={{ bgcolor: '#f59e0b', color: 'white' }}
-												/>
-											)}
-										</Box>
-									</TableCell>
-									<TableCell>
-										{dog.dateOfBirth ? formatDate(dog.dateOfBirth) : '-'}
-									</TableCell>
-									<TableCell>{dog.sex}</TableCell>
-									<TableCell>{dog.color || '-'}</TableCell>
-									<TableCell>{dog.cStudBookNumber || '-'}</TableCell>
-									<TableCell>{dog.microchipNo || '-'}</TableCell>
-									<TableCell align='right'>
-										<IconButton
-											aria-label={`${dog.fullKennelName || dog.givenName || 'Hund'} bearbeiten`}
-											onClick={() => handleEditClick(dog)}
-											size='small'
-										>
-											<EditIcon />
-										</IconButton>
-									</TableCell>
-								</TableRow>
-							))}
+							{dogs.map((dog) => {
+								const dogName = dog.fullKennelName || dog.givenName || 'Hund'
+								const isDeactivated = dog.Disabled === true
+								return (
+									<TableRow
+										key={dog.documentId}
+										sx={{
+											'&:last-child td, &:last-child th': { border: 0 },
+											...(isDeactivated ? { opacity: 0.7 } : {}),
+										}}
+									>
+										<TableCell component='th' scope='row'>
+											<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+												{dog.fullKennelName || dog.givenName}
+												{isDeactivated && (
+													<Chip
+														label='Deaktiviert'
+														size='small'
+														sx={{ bgcolor: 'action.disabledBackground' }}
+													/>
+												)}
+												{dog.isDirty && !isDeactivated && (
+													<Chip
+														label='Freigabe ausstehend'
+														color='warning'
+														size='small'
+														sx={{ bgcolor: '#f59e0b', color: 'white' }}
+													/>
+												)}
+											</Box>
+										</TableCell>
+										<TableCell>
+											{dog.dateOfBirth ? formatDate(dog.dateOfBirth) : '-'}
+										</TableCell>
+										<TableCell>{getSexLabel(dog.sex)}</TableCell>
+										<TableCell>{dog.color || '-'}</TableCell>
+										<TableCell>{dog.cStudBookNumber || '-'}</TableCell>
+										<TableCell>{dog.microchipNo || '-'}</TableCell>
+										<TableCell align='right'>
+											<IconButton
+												aria-label={
+													isDeactivated
+														? `${dogName} ist deaktiviert`
+														: `${dogName} bearbeiten`
+												}
+												onClick={() => handleEditClick(dog)}
+												disabled={isDeactivated}
+												size='small'
+											>
+												<EditIcon />
+											</IconButton>
+										</TableCell>
+									</TableRow>
+								)
+							})}
 						</TableBody>
 					</Table>
 				</TableContainer>
