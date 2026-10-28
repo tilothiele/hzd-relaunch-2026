@@ -1,5 +1,5 @@
 import type { MenuItem, AuthUser } from '@/types'
-import { isAdministrator, isBreeder, isDeckruedenbesitzer, isSonderleiter } from './permissions'
+import { isAdministrator, isBreeder, isDeckruedenbesitzer, isSonderleiter, isTik } from './permissions'
 
 export function getMenuItemUrl(menuItem: MenuItem): string {
     return menuItem.url ?? ''
@@ -33,6 +33,9 @@ export function getMenuItemEnabled(menuItem: MenuItem, _user: AuthUser | null): 
     }
     if (menuItem.id == 'sonderleiter' || menuItem.id == 'anmeldungen') {
         return isSonderleiter(_user)
+    }
+    if (menuItem.id == 'tik') {
+        return isTik(_user)
     }
     if (menuItem.id == 'zuechter') {
         return isBreeder(_user)
