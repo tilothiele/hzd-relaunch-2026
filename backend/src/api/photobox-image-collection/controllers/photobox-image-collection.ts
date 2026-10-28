@@ -1,10 +1,9 @@
 /**
  * photobox-image-collection controller
  *
- * Mitglieder sehen nur Collections, deren Fotograf sie selbst sind.
- * Der Filter wird nach der Query-Sanitizer-Stufe gesetzt, damit er
- * nicht als gesperrte User-Relation entfernt wird.
- * API-Token und Admin bleiben ungefiltert (TIK).
+ * Mitglieder sehen nur eigene Collections.
+ * API-Token (TIK, Strategie content-api-token) und Admin bleiben
+ * ungefiltert und folgen nur den Suchfiltern der Anfrage.
  */
 
 import { factories } from '@strapi/strapi'
@@ -36,7 +35,20 @@ interface CollectionController {
 
 function isPrivilegedRequest(ctx: RequestContext): boolean {
 	const strategy = ctx.state?.auth?.strategy?.name
-	return strategy === 'api-token' || strategy === 'admin'
+	return strategy === 'content-api-token'
+		|| strategy === 'api-token'
+		|| strategy === 'admin'
+}
+
+function hasMemberUser(ctx: RequestContext): boolean {
+	const user = ctx.state?.user
+	if (!user) {
+		return false
+	}
+	if (typeof user.documentId === 'string' && user.documentId.trim()) {
+		return true
+	}
+	return typeof user.id === 'number' || typeof user.id === 'string'
 }
 
 function ownerFilter(ctx: RequestContext): Record<string, unknown> {
@@ -115,10 +127,10 @@ export default factories.createCoreController(
 		async find(ctx) {
 			const request = ctx as RequestContext
 			const controller = asController(this)
-			if (isPrivilegedRequest(request)) {
-				const proto = Object.getPrototypeOf(
-					controller,
-				) as CollectionController
+			const proto = Object.getPrototypeOf(
+				controller,
+			) as CollectionController
+			if (isPrivilegedRequest(request) || !hasMemberUser(request)) {
 				return proto.find.call(controller, request)
 			}
 			return findOwned(controller, request, strapi)
@@ -127,10 +139,10 @@ export default factories.createCoreController(
 		async findOne(ctx) {
 			const request = ctx as RequestContext
 			const controller = asController(this)
-			if (isPrivilegedRequest(request)) {
-				const proto = Object.getPrototypeOf(
-					controller,
-				) as CollectionController
+			const proto = Object.getPrototypeOf(
+				controller,
+			) as CollectionController
+			if (isPrivilegedRequest(request) || !hasMemberUser(request)) {
 				return proto.findOne.call(controller, request)
 			}
 

@@ -37,7 +37,7 @@ const COLLECTION_POPULATE = new URLSearchParams({
 })
 
 export interface TikPhotoboxSearchInput {
-	membershipNumber: number | null
+	photographerQuery: string | null
 	term: string | null
 	page: number
 	pageSize: number
@@ -246,19 +246,54 @@ async function collectionIdsForImageTerm(term: string): Promise<string[]> {
 	return [...ids]
 }
 
+function photographerSearchClause(
+	query: string,
+): Record<string, unknown> | undefined {
+	const trimmed = query.trim().replace(/\s+/g, ' ')
+	if (!trimmed) {
+		return undefined
+	}
+
+	if (/^\d+$/.test(trimmed)) {
+		return {
+			photogapher: {
+				membershipNumber: { eq: Number(trimmed) },
+			},
+		}
+	}
+
+	const space = trimmed.indexOf(' ')
+	if (space === -1) {
+		return {
+			or: [
+				{ photogapher: { firstName: { containsi: trimmed } } },
+				{ photogapher: { lastName: { containsi: trimmed } } },
+			],
+		}
+	}
+
+	const firstName = trimmed.slice(0, space)
+	const lastName = trimmed.slice(space + 1)
+	return {
+		photogapher: {
+			firstName: { containsi: firstName },
+			lastName: { containsi: lastName },
+		},
+	}
+}
+
 function collectionFilters(
-	membershipNumber: number | null,
+	photographerQuery: string | null,
 	term: string | null,
 	imageCollectionIds: string[],
 ): Record<string, unknown> | undefined {
 	const clauses: Record<string, unknown>[] = []
 
-	if (membershipNumber !== null) {
-		clauses.push({
-			photogapher: {
-				membershipNumber: { eq: membershipNumber },
-			},
-		})
+	if (photographerQuery) {
+		const photographerClause = photographerSearchClause(photographerQuery)
+		if (photographerClause) {
+			clauses.push(photographerClause)
+		}
 	}
 
 	if (term) {
@@ -290,7 +325,7 @@ export async function searchTikPhotoboxCollections(
 		: []
 	const query = buildStrapiQuery({
 		filters: collectionFilters(
-			input.membershipNumber,
+			input.photographerQuery,
 			input.term,
 			imageCollectionIds,
 		),

@@ -22,24 +22,12 @@ export async function GET(request: NextRequest) {
 	}
 
 	const params = request.nextUrl.searchParams
-	const membershipRaw = params.get('membershipNumber')?.trim() ?? ''
-	let membershipNumber: number | null = null
-
-	if (membershipRaw) {
-		if (!/^\d+$/.test(membershipRaw)) {
-			return NextResponse.json(
-				{ message: 'Mitgliedsnummer muss eine Zahl sein.' },
-				{ status: 400 },
-			)
-		}
-		membershipNumber = Number(membershipRaw)
-	}
-
+	const photographerQuery = params.get('membershipNumber')?.trim() || null
 	const term = params.get('term')?.trim() || null
 
 	try {
 		const result = await searchTikPhotoboxCollections({
-			membershipNumber,
+			photographerQuery,
 			term,
 			page: clampPage(params.get('page')),
 			pageSize: clampPageSize(params.get('pageSize')),

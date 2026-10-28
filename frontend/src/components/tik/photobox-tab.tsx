@@ -208,14 +208,6 @@ export function PhotoboxTab({ strapiBaseUrl }: PhotoboxTabProps) {
 		let active = true
 
 		async function load() {
-			if (membership && !/^\d+$/.test(membership)) {
-				setError('Mitgliedsnummer muss eine Zahl sein.')
-				setCollections([])
-				setPageInfo(EMPTY_PAGE)
-				setIsLoading(false)
-				return
-			}
-
 			setIsLoading(true)
 			setError(null)
 			try {
@@ -361,7 +353,7 @@ export function PhotoboxTab({ strapiBaseUrl }: PhotoboxTabProps) {
 					value={membershipInput}
 					onChange={(event) => setMembershipInput(event.target.value)}
 					size='small'
-					inputMode='numeric'
+					helperText='Nummer oder Vorname Nachname'
 				/>
 				<TextField
 					label='Suchwort'
