@@ -32,7 +32,10 @@ export function PhotoBoxCollectionSelector({
         if (!user?.documentId || !authState.token) return
         setIsLoading(true)
         try {
-            const data = await fetchMyPhotoboxCollections(authState.token)
+            const data = await fetchMyPhotoboxCollections(
+                authState.token,
+                user.documentId,
+            )
             setCollections(data.photoboxImageCollections as unknown as PhotoboxImageCollection[])
         } catch (error) {
             console.error('Error loading collections:', error)

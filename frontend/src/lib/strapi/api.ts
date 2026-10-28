@@ -1100,9 +1100,28 @@ export async function fetchNewsArticles(
 	return { newsArticles: items }
 }
 
+function belongsToOtherPhotographer(
+	item: Record<string, unknown>,
+	userDocumentId: string,
+): boolean {
+	const photographer = item.photogapher
+	if (!photographer || typeof photographer !== 'object') {
+		return false
+	}
+	const documentId = (photographer as { documentId?: unknown }).documentId
+	return typeof documentId === 'string'
+		&& documentId.length > 0
+		&& documentId !== userDocumentId
+}
+
 export async function fetchMyPhotoboxCollections(
 	token: string,
+	userDocumentId: string,
 ) {
+	if (!userDocumentId) {
+		return { photoboxImageCollections: [] }
+	}
+
 	const query = buildStrapiQuery({
 		populate: Object.fromEntries(POPULATE_PHOTOBOX_COLLECTION.entries()),
 		pagination: { pageSize: 100 },
@@ -1112,5 +1131,9 @@ export async function fetchMyPhotoboxCollections(
 		query,
 		{ token },
 	)
-	return { photoboxImageCollections: items }
+	return {
+		photoboxImageCollections: items.filter((item) => (
+			!belongsToOtherPhotographer(item, userDocumentId)
+		)),
+	}
 }
