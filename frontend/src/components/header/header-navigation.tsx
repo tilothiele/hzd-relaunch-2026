@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { AuthUser, GlobalLayout } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import Image from 'next/image'
@@ -45,7 +45,31 @@ export function HeaderNavigation({
 }: HeaderNavigationProps) {
     const [currentUrl, setCurrentUrl] = useState<string>('')
     const [isNotificationActive, setIsNotificationActive] = useState<boolean>(false)
+    const [headerRowHeight, setHeaderRowHeight] = useState(0)
+    const headerRowRef = useRef<HTMLElement>(null)
     const searchEnabled = useSearchEnabled()
+
+    useEffect(() => {
+        const headerRow = headerRowRef.current
+        if (!headerRow) {
+            return
+        }
+
+        const updateHeaderRowHeight = () => {
+            const nextHeight = headerRow.getBoundingClientRect().height
+            setHeaderRowHeight((current) => (
+                Math.abs(current - nextHeight) < 0.5 ? current : nextHeight
+            ))
+        }
+
+        updateHeaderRowHeight()
+        const observer = new ResizeObserver(updateHeaderRowHeight)
+        observer.observe(headerRow)
+
+        return () => {
+            observer.disconnect()
+        }
+    }, [])
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -68,41 +92,39 @@ export function HeaderNavigation({
     const logoAlt = globalLayout?.Logo?.alternativeText ?? 'HZD Logo'
     const menuItems = globalLayout?.Menu?.items ?? []
 
-    // Logo Sizing Logic
-    // Base: 158px (100%)
-    // Mobile Base: 50% (79px)
-    // Absolute Min: 30% (47.4px)
-    // Desktop Scrolled: 40% (63.2px) -> existing was 63px
-
+    // Logo: 158px auf breiten Viewports, Formel trifft ~158px bei 1440px.
+    // Untergrenze ist 70% der Headerzeile, damit das Zeichen nicht
+    // schneller schrumpft als die quadratische Fläche.
     const logoBaseSize = 158
-    const logoMinSize = logoBaseSize * 0.3 // 47.4px
+    const logoFloor = Math.max(logoBaseSize * 0.3, headerRowHeight * 0.7)
+    const logoFloorPx = Math.round(logoFloor * 10) / 10
+    const logoSize = isScrolled
+        ? `${logoFloorPx}px`
+        : `clamp(${logoFloorPx}px, calc(0.25 * 100vw - 203px), ${logoBaseSize}px)`
 
-    // We use a CSS variable for the logo size to handle fluid scaling and scroll state smoothly
-    // Scaling from 158px (100%) down to 47.4px (30%) at 1000px width
-    // Formula: size = 0.25 * width - 203px (hits ~158 at 1440 and ~47 at 1000)
     // Linker Abstand: auf schmalen Viewports näher am Rand, auf breiten etwas Luft.
     const logoLeft = isScrolled
         ? 'clamp(0.25rem, 0.8vw + 0.15rem, 2rem)'
         : 'clamp(0.15rem, 1.2vw + 0.1rem, 2.25rem)'
 
     const logoSizeStyle = {
-        '--logo-size': isScrolled
-            ? `${logoMinSize}px` // Min size when scrolled
-            : `clamp(${logoMinSize}px, calc(0.25 * 100vw - 203px), ${logoBaseSize}px)`,
+        '--logo-size': logoSize,
+        width: 'var(--logo-size)',
+        height: 'var(--logo-size)',
+        minWidth: 'var(--logo-size)',
+        minHeight: 'var(--logo-size)',
         aspectRatio: '1 / 1',
-        minWidth: '40px',
-        minHeight: '40px',
-        maxWidth: '158px',
-        maxHeight: '158px',
+        boxSizing: 'content-box',
+        flexShrink: 0,
     } as React.CSSProperties
 
     // Logo Background Logic
+    // Padding skaliert mit dem Logo, damit Zeichen und Fläche
+    // bei schmalerer Breite im gleichen Verhältnis bleiben.
     const logoContainerStyle = {
         ...(logoBackground ? {
             backgroundColor: 'var(--color-logo-background-face)',
-            padding: isScrolled
-                ? '6px clamp(6px, 1vw, 12px)'
-                : 'clamp(8px, 1.2vw, 15px) clamp(6px, 1.5vw, 20px)',
+            padding: 'calc(var(--logo-size) * 0.12)',
             borderRadius: '0',
             boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
         } : {}),
@@ -114,7 +136,10 @@ export function HeaderNavigation({
         : ''
 
     return (
-        <nav className='header-nav-padding flex w-full items-center px-6 py-2'>
+        <nav
+            ref={headerRowRef}
+            className='header-nav-padding flex w-full items-center px-6 py-2'
+        >
             {/* Left Section: Drawer + Logo */}
             <div className='flex flex-1 items-center justify-start gap-4 relative'>
                 <DrawerMenuComponent
@@ -148,10 +173,11 @@ export function HeaderNavigation({
                                     width={logoBaseSize}
                                     height={logoBaseSize}
                                     style={{
-                                        height: 'var(--logo-size)',
-                                        width: 'var(--logo-size)',
-                                        maxWidth: '100%',
-                                        maxHeight: '100%',
+                                        display: 'block',
+                                        height: '100%',
+                                        width: '100%',
+                                        maxWidth: 'none',
+                                        maxHeight: 'none',
                                     }}
                                     className='mb-1 object-contain transition-all duration-500 ease-in-out'
                                     unoptimized

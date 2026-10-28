@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { Box, Card, CardContent, Typography } from '@mui/material'
 import type { CardItem, CardSection } from '@/types'
 import { theme as globalTheme, type ThemeDefinition } from '@/themes'
@@ -8,6 +9,75 @@ import { ActionButton } from '@/components/ui/action-button'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { BorderedCardItem } from './bordered-card-item'
 import { useScrollAnimation } from '@/hooks/use-scroll-animation'
+
+const STACKED_LAYOUT_MAX_WIDTH = 900
+const NARROW_VIEWPORT_WIDTH = 360
+const MAX_FADE_LEAD_PERCENT = 50
+
+interface CardSectionScrollOptions {
+	threshold: number
+	rootMargin: string
+	triggerOnce: boolean
+}
+
+// Unter md stapeln sich die Karten. Threshold 0.1 bezieht sich
+// auf die gesamte Stapelhöhe und blendet auf schmalen Viewports
+// erst spät ein. Je kleiner die Breite, desto früher startet das Fade-in.
+function cardSectionScrollOptions(
+	viewportWidth: number,
+): CardSectionScrollOptions {
+	if (viewportWidth >= STACKED_LAYOUT_MAX_WIDTH) {
+		return {
+			threshold: 0.1,
+			rootMargin: '0px',
+			triggerOnce: false,
+		}
+	}
+
+	const span = STACKED_LAYOUT_MAX_WIDTH - NARROW_VIEWPORT_WIDTH
+	const narrowness = Math.min(
+		1,
+		Math.max(
+			0,
+			(STACKED_LAYOUT_MAX_WIDTH - viewportWidth) / span,
+		),
+	)
+	const leadPercent = Math.round(narrowness * MAX_FADE_LEAD_PERCENT)
+
+	return {
+		threshold: 0,
+		rootMargin: `0px 0px ${leadPercent}% 0px`,
+		triggerOnce: false,
+	}
+}
+
+function useCardSectionScrollOptions() {
+	const [options, setOptions] = useState<CardSectionScrollOptions>(
+		() => cardSectionScrollOptions(STACKED_LAYOUT_MAX_WIDTH),
+	)
+
+	useEffect(() => {
+		const update = () => {
+			const next = cardSectionScrollOptions(window.innerWidth)
+
+			setOptions((current) => (
+				current.threshold === next.threshold
+					&& current.rootMargin === next.rootMargin
+					? current
+					: next
+			))
+		}
+
+		update()
+		window.addEventListener('resize', update)
+
+		return () => {
+			window.removeEventListener('resize', update)
+		}
+	}, [])
+
+	return options
+}
 
 interface CardSectionComponentProps {
 	section: CardSection
@@ -24,10 +94,8 @@ export function CardSectionComponent({
 	strapiBaseUrl,
 	theme,
 }: CardSectionComponentProps) {
-	const { elementRef, isVisible } = useScrollAnimation({
-		threshold: 0.1,
-		triggerOnce: false,
-	})
+	const scrollOptions = useCardSectionScrollOptions()
+	const { elementRef, isVisible } = useScrollAnimation(scrollOptions)
 
 	const cards =
 		section.CardItem?.filter(

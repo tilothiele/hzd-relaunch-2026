@@ -23,6 +23,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import Link from 'next/link'
 import type { MenuItem as MenuItemType } from '@/types'
 import { getMenuItemLabel } from '@/lib/menu-helper'
+import { HEADER_DESKTOP_MIN_WIDTH_PX } from '@/components/header/header-layout'
 
 interface NavigationMenuProps {
 	menuItems: MenuItemType[]
@@ -328,8 +329,10 @@ function DesktopMenuItem({
 
 export function NavigationMenu({ menuItems, theme }: NavigationMenuProps) {
 	const muiTheme = useTheme()
-	// Desktop-Nav erst ab ~1000px; darunter Hamburger
-	const isMobile = useMediaQuery(muiTheme.breakpoints.down(1000))
+	// Desktop-Nav ab 1150px, darunter die mobile Ansicht.
+	const isMobile = useMediaQuery(
+		muiTheme.breakpoints.down(HEADER_DESKTOP_MIN_WIDTH_PX),
+	)
 	const [mobileOpen, setMobileOpen] = useState(false)
 	const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({})
 

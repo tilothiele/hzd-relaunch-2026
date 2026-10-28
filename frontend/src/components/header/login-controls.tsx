@@ -146,13 +146,13 @@ export function LoginControls({
 						style={{ fontSize: '1.2em', color: theme.loginIcon }}
 					/>
 					<span
-						className='min-[1000px]:hidden'
+						className='min-[1150px]:hidden'
 						style={{ fontSize: '1.2em', color: theme.headerFooterTextColor, fontWeight: 400 }}
 					>
 						{userInitials}
 					</span>
 					<span
-						className='hidden min-[1000px]:inline'
+						className='hidden min-[1150px]:inline'
 						style={{ fontSize: '1.2em', color: theme.headerFooterTextColor, fontWeight: 400 }}
 					>
 						{userLabel}
