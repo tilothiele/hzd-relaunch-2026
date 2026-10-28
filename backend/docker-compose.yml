@@ -6,6 +6,8 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
+      args:
+        GIT_TAG: ${GIT_TAG}
     container_name: hzd-backend
     restart: unless-stopped
     ports:

@@ -24,6 +24,18 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Angezeigte Version = aktuelles Git-Tag (ohne führendes v), z. B. 1.1.0.
+# Der Build-Kontext enthält kein .git, daher als Build-Arg übergeben:
+#   docker build --build-arg GIT_TAG=$(git describe --tags --exact-match) .
+ARG GIT_TAG
+RUN if [ -z "${GIT_TAG}" ]; then \
+      echo "GIT_TAG fehlt. Build-Arg setzen, z. B. GIT_TAG=1.1.0 (git describe --tags --exact-match)." >&2; \
+      exit 1; \
+    fi; \
+    version="${GIT_TAG}"; \
+    version="$${version#v}"; \
+    npm pkg set "version=$$version"
+
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.

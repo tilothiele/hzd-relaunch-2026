@@ -33,6 +33,18 @@ FROM deps AS build
 WORKDIR /opt/app
 COPY . .
 
+# Angezeigte Version = aktuelles Git-Tag (ohne führendes v), z. B. 1.1.0.
+# Der Build-Kontext enthält kein .git, daher als Build-Arg übergeben:
+#   docker build --build-arg GIT_TAG=$(git describe --tags --exact-match) .
+ARG GIT_TAG
+RUN if [ -z "${GIT_TAG}" ]; then \
+      echo "GIT_TAG fehlt. Build-Arg setzen, z. B. GIT_TAG=1.1.0 (git describe --tags --exact-match)." >&2; \
+      exit 1; \
+    fi; \
+    version="${GIT_TAG}"; \
+    version="$${version#v}"; \
+    npm pkg set "version=$$version"
+
 # Build plugin first before building Strapi
 WORKDIR /opt/app/src/plugins/hzd-plugin
 RUN if [ -f "package.json" ]; then npm install && npm run build; fi
