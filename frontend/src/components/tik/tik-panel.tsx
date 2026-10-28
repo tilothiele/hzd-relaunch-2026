@@ -10,6 +10,7 @@ import {
 	Typography,
 } from '@mui/material'
 import { useAuth } from '@/hooks/use-auth'
+import { PushNotificationSender } from '@/components/ui/push-notification-sender'
 import { TIK_ACCESS_DENIED_MESSAGE, isTik } from '@/lib/permissions'
 import { PhotoboxTab } from './photobox-tab'
 
@@ -70,11 +71,13 @@ export function TikPanel({ strapiBaseUrl }: TikPanelProps) {
 					}}
 				>
 					<Tab label='Photobox' value={0} />
+					<Tab label='Push Notification' value={1} />
 				</Tabs>
 			</Box>
 			{activeTab === 0 ? (
 				<PhotoboxTab strapiBaseUrl={strapiBaseUrl} />
 			) : null}
+			{activeTab === 1 ? <PushNotificationSender /> : null}
 		</Container>
 	)
 }

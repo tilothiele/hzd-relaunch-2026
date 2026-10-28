@@ -3,11 +3,8 @@
 import { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPaperPlane, faMessage, faSliders, faCheck } from '@fortawesome/free-solid-svg-icons'
-import { useAuth } from '@/hooks/use-auth'
-import { isAdministrator } from '@/lib/permissions'
 
 export function PushNotificationSender() {
-    const { user, isInitialized } = useAuth()
     const [message, setMessage] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [status, setStatus] = useState<{ type: 'success' | 'error', text: string } | null>(null)
@@ -83,15 +80,11 @@ export function PushNotificationSender() {
         setChannels(prev => ({ ...prev, [key]: !prev[key] }))
     }
 
-    if (!isInitialized || !isAdministrator(user)) {
-        return null
-    }
-
     return (
-        <div className="p-6 bg-red-50 rounded-lg shadow-md border border-red-100 mt-8">
+        <div className="p-6 bg-white rounded-lg border border-gray-200">
             <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
                 <FontAwesomeIcon icon={faPaperPlane} className="text-[#4560AA]" />
-                Push-Benachrichtigung senden (Admin)
+                Push-Benachrichtigung senden
             </h3>
 
             {status && (

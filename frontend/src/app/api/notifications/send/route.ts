@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import webpush from 'web-push'
-import { isAdministrator } from '@/lib/permissions'
-import { getSessionUser } from '@/lib/server/passed-dog-submit'
+import { isTikDenied, requireTikUser } from '@/lib/server/tik-access'
 import { listPushSubscriptions, readChannels } from '@/lib/server/push-subscriptions'
 
 const strapiToken = process.env.STRAPI_API_TOKEN
@@ -14,6 +13,11 @@ function vapidKeys() {
 }
 
 export async function POST(request: NextRequest) {
+	const access = await requireTikUser(request)
+	if (isTikDenied(access)) {
+		return access
+	}
+
 	const timestamp = new Date().toISOString()
 	const { publicKey, privateKey } = vapidKeys()
 
@@ -28,10 +32,6 @@ export async function POST(request: NextRequest) {
 	)
 
 	try {
-		const user = await getSessionUser()
-		if (!isAdministrator(user)) {
-			return NextResponse.json({ error: 'Nicht berechtigt' }, { status: 403 })
-		}
 
 		const { message, channels } = await request.json()
 
