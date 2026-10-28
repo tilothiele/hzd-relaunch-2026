@@ -24,17 +24,11 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Angezeigte Version = aktuelles Git-Tag (ohne führendes v), z. B. 1.1.0.
-# Der Build-Kontext enthält kein .git, daher als Build-Arg übergeben:
-#   docker build --build-arg GIT_TAG=$(git describe --tags --exact-match) .
+# Angezeigte Version = Build-Arg GIT_TAG, z. B. 1.1.1. Ein führendes v wird entfernt.
+# Coolify interpoliert keine Shell-Befehle: die Build-Variable muss der Tag selbst sein.
+#   GIT_TAG=1.1.1
 ARG GIT_TAG
-RUN if [ -z "${GIT_TAG}" ]; then \
-      echo "GIT_TAG fehlt. Build-Arg setzen, z. B. GIT_TAG=1.1.0 (git describe --tags --exact-match)." >&2; \
-      exit 1; \
-    fi; \
-    version="${GIT_TAG}"; \
-    version="$${version#v}"; \
-    npm pkg set "version=$$version"
+RUN node -e 'const fs=require("fs"); const raw=String(process.env.GIT_TAG||"").trim(); const version=raw.replace(/^v/,""); if(!version){console.error("GIT_TAG fehlt. Build-Arg auf den Tag setzen, z. B. 1.1.1"); process.exit(1);} const file="package.json"; const pkg=JSON.parse(fs.readFileSync(file,"utf8")); pkg.version=version; fs.writeFileSync(file, JSON.stringify(pkg,null,2)+"\n"); console.log("package.json version="+version);'
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
