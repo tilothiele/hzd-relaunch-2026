@@ -25,7 +25,7 @@ import {
 	Chip,
 } from '@mui/material'
 import { Edit as EditIcon } from '@mui/icons-material'
-import { searchDogsGeneric, updateEntity } from '@/lib/strapi/api'
+import { fetchMyBreedingDogs, updateEntity } from '@/lib/strapi/api'
 import type { AuthUser, Dog } from '@/types'
 import { formatDate } from '@/lib/utils'
 import { HtmlRichTextEditor } from '@/components/meine-hzd/html-rich-text-editor'
@@ -57,25 +57,7 @@ export function MeineHundeTab({ user, strapiBaseUrl }: MeineHundeTabProps) {
 			setLoading(true)
 			setError(null)
 			try {
-				const filters: Record<string, unknown> = {
-					cFertile: { eq: true },
-				}
-				const hasValidDocumentId = typeof user.documentId === 'string'
-					&& user.documentId.length > 0
-					&& !user.documentId.includes('@')
-
-				if (typeof user.cId === 'number') {
-					filters.cOwnerId = { eq: user.cId }
-				} else if (hasValidDocumentId) {
-					filters.owner = { documentId: { eq: user.documentId } }
-				} else {
-					setError('Benutzer-cId fehlt — Hunde konnten nicht geladen werden.')
-					setDogs([])
-					return
-				}
-
-				const response = await searchDogsGeneric({
-					filters,
+				const response = await fetchMyBreedingDogs({
 					pagination: { pageSize: 100 },
 					sort: ['dateOfBirth:desc'],
 				}, {})

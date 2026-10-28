@@ -339,6 +339,35 @@ export async function searchDogsGeneric(
 	}
 }
 
+/** Zuchtfähige Hunde, deren Besitzer der angemeldete Benutzer ist. */
+export async function fetchMyBreedingDogs(
+	variables: {
+		pagination?: { page?: number; pageSize?: number; limit?: number }
+		sort?: string | string[]
+	} = {},
+	options: StrapiRequestOptions = {},
+): Promise<DogSearchResult> {
+	const query = buildStrapiQuery({
+		pagination: variables.pagination,
+		sort: variables.sort,
+	})
+
+	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
+	const response = await fetcher<unknown>('hzd-plugin/dogs/mine', query, {
+		token: options.token,
+	})
+
+	const items = extractStrapiList<Dog>(response)
+	const pagination = extractStrapiPagination(response)
+
+	return {
+		hzdPluginDogs_connection: toConnectionResult({
+			items,
+			pagination,
+		}),
+	}
+}
+
 /** Züchter-cIds mit „keine Hunde in Zucht“ — für cBreederId-Filter (Relation-Filter auf breeder schlägt fehl). */
 export async function fetchBreederCIdsWithNoDogsAvailable(
 	options: StrapiRequestOptions = {},

@@ -87,6 +87,46 @@ const toSortArray = (value: unknown): string[] => {
 	return list.length > 0 ? list : ['fullKennelName:asc']
 }
 
+const MINE_SORT_FIELDS = new Set(['dateOfBirth', 'fullKennelName', 'givenName'])
+
+const toMineSort = (value: unknown): string[] => {
+	const raw = value && typeof value === 'object' && !Array.isArray(value)
+		? Object.values(value as Record<string, unknown>)
+		: value
+	const safe = toStringArray(raw).filter((entry) => {
+		const [field, direction] = entry.split(':')
+		if (!field || !MINE_SORT_FIELDS.has(field)) {
+			return false
+		}
+		return direction === undefined || direction === 'asc' || direction === 'desc'
+	})
+	return safe.length > 0 ? safe : ['dateOfBirth:desc']
+}
+
+async function loadUserFromRequest(strapi: Core.Strapi, ctx: any) {
+	const jwtService = strapi.plugin('users-permissions')?.service('jwt') as {
+		getToken?: (context: unknown) => Promise<{ id?: number | string } | null>
+	} | undefined
+	if (!jwtService?.getToken) {
+		return null
+	}
+
+	try {
+		const payload = await jwtService.getToken(ctx)
+		const userId = payload?.id
+		if (userId == null) {
+			return null
+		}
+
+		return strapi.db.query('plugin::users-permissions.user').findOne({
+			where: { id: userId },
+			select: ['id', 'documentId'],
+		}) as Promise<{ id?: number; documentId?: string } | null>
+	} catch {
+		return null
+	}
+}
+
 const parsePagination = (
 	query: DogSearchQuery,
 ): { page: number; pageSize: number } => ({
@@ -460,6 +500,45 @@ const coreControllerFactory = factories.createCoreController(
 				}
 
 				return Object.getPrototypeOf(this).find.call(this, ctx)
+			},
+
+			async findMine(ctx: any) {
+				const user = await loadUserFromRequest(strapi, ctx)
+				const documentId = typeof user?.documentId === 'string'
+					? user.documentId
+					: ''
+				if (!documentId) {
+					return ctx.unauthorized('Nicht authentifiziert')
+				}
+
+				const query = (ctx.query ?? {}) as DogSearchQuery & {
+					pagination?: { page?: string | number; pageSize?: string | number }
+				}
+				const page = toInt(query.pagination?.page ?? query.page, 1)
+				const pageSize = Math.min(
+					toInt(query.pagination?.pageSize ?? query.pageSize, 100),
+					100,
+				)
+				const result = await findDocumentsPage(
+					strapi,
+					'plugin::hzd-plugin.dog',
+					{
+						sort: toMineSort(query.sort),
+						page,
+						pageSize,
+						filters: {
+							$and: [
+								{ cFertile: { $eq: true } },
+								{ owner: { documentId: { $eq: documentId } } },
+							],
+						},
+					},
+				)
+
+				return {
+					data: result.results,
+					meta: { pagination: result.pagination },
+				}
 			},
 
 			async search(ctx: any) {

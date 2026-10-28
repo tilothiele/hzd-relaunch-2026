@@ -9,6 +9,14 @@ export default [
   },
   {
     method: 'GET',
+    path: '/dogs/mine',
+    handler: 'dog.findMine',
+    config: {
+      auth: false,
+    },
+  },
+  {
+    method: 'GET',
     path: '/dogs',
     handler: 'dog.find',
     config: {
