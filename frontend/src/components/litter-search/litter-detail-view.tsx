@@ -20,6 +20,36 @@ interface LitterDetailViewProps {
     formatDate: (dateString: string | null | undefined) => string
 }
 
+interface SectionHeaderProps {
+    title: string
+    onBack: () => void
+}
+
+function SectionHeader({ title, onBack }: SectionHeaderProps) {
+    return (
+        <Box sx={{ borderBottom: '2px solid #e5e7eb', pb: 1, mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant='h5' component='h2' sx={{ fontWeight: 700 }}>
+                {title}
+            </Typography>
+            <BackButton onClick={onBack} />
+        </Box>
+    )
+}
+
+interface DetailRowProps {
+    label: string
+    value: React.ReactNode
+}
+
+function DetailRow({ label, value }: DetailRowProps) {
+    return (
+        <div className="flex items-center border-b border-gray-200 py-3 last:border-0">
+            <div className="w-1/3 md:w-1/4 font-semibold text-gray-700">{label}</div>
+            <div className="w-2/3 md:w-3/4 text-gray-900">{value}</div>
+        </div>
+    )
+}
+
 const getStatusLabel = (status: Litter['LitterStatus']) => {
     switch (status) {
         case 'Planned': return 'Geplant'
@@ -69,27 +99,16 @@ export function LitterDetailView({
     const orderLetter = litter.OrderLetter ?? ''
     const kennelName = litter.breeder?.kennelName ?? 'Kein Zwingername bekannt'
     const breederMember = litter.breeder?.Address?.FullName?.trim() ?? ''
+    // Telefonnummer des Züchters liegt im Adressfeld 2 (Breeder-Daten, kein User-Attribut).
+    const breederPhone = litter.breeder?.Address?.Address2?.trim() ?? ''
+    const breederAddress = [
+        litter.breeder?.Address?.Address1,
+        litter.breeder?.Address?.Zip,
+        litter.breeder?.Address?.City,
+    ].filter(Boolean).join(', ')
     const motherName = litter.mother?.fullKennelName ?? litter.mother?.givenName ?? 'Unbekannt'
     const stuntDogName = litter.stuntDog?.fullKennelName ?? litter.stuntDog?.givenName
     const stuntDogNonHzdOriginNote = litter.stuntDog?.NonHzdOriginNote?.trim()
-
-    // Helper to render a Section Header with Back Button
-    const SectionHeader = ({ title }: { title: string }) => (
-        <Box sx={{ borderBottom: '2px solid #e5e7eb', pb: 1, mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant='h5' component='h2' sx={{ fontWeight: 700 }}>
-                {title}
-            </Typography>
-            <BackButton onClick={onBack} />
-        </Box>
-    )
-
-    // Helper for 2-column data rows
-    const DetailRow = ({ label, value }: { label: string, value: React.ReactNode }) => (
-        <div className="flex items-center border-b border-gray-200 py-3 last:border-0">
-            <div className="w-1/3 md:w-1/4 font-semibold text-gray-700">{label}</div>
-            <div className="w-2/3 md:w-3/4 text-gray-900">{value}</div>
-        </div>
-    )
 
     const renderMotherImage = () => {
         const url = resolveMediaUrl(
@@ -219,7 +238,7 @@ export function LitterDetailView({
             <div className='mx-auto max-w-4xl space-y-8'>
                 {/* 1. Allgemein */}
                 <section>
-                    <SectionHeader title="Allgemein" />
+                    <SectionHeader title="Allgemein" onBack={onBack} />
                     <div className="rounded-lg bg-gray-50 px-6 py-2">
                         {litter.LitterStatus === 'Planned' && litter.plannedDateOfBirth && (
                             <DetailRow
@@ -247,7 +266,7 @@ export function LitterDetailView({
 
                 {/* 2. Züchter */}
                 <section>
-                    <SectionHeader title="Züchter" />
+                    <SectionHeader title="Züchter" onBack={onBack} />
                     <div className="rounded-lg bg-gray-50 px-6 py-2">
                         <DetailRow
                             label="Zwinger"
@@ -271,8 +290,22 @@ export function LitterDetailView({
                         {breederMember && (
                             <DetailRow label="Name" value={breederMember} />
                         )}
-                        {litter.breeder?.Address?.Zip && litter.breeder?.Address?.City && (
-                            <DetailRow label="Ort" value={`${litter.breeder.Address.Zip} ${litter.breeder.Address.City}`} />
+                        {breederAddress && (
+                            <DetailRow label="Adresse" value={breederAddress} />
+                        )}
+                        {breederPhone && (
+                            <DetailRow
+                                label="Telefon"
+                                value={
+                                    <a
+                                        href={`tel:${breederPhone.replace(/[\s/]/g, '')}`}
+                                        className="text-primary hover:underline transition-colors"
+                                        style={{ color: theme.submitButtonColor }}
+                                    >
+                                        {breederPhone}
+                                    </a>
+                                }
+                            />
                         )}
                     </div>
                 </section>
@@ -280,7 +313,7 @@ export function LitterDetailView({
                 {/* 3. Persönliche Worte / Status */}
                 {litter.StatusMessage && (
                     <section>
-                        <SectionHeader title="Informationen" />
+                        <SectionHeader title="Informationen" onBack={onBack} />
                         <div className='rounded bg-blue-50 p-6'>
                             <p className='text-sm text-blue-900 leading-relaxed font-medium'>{litter.StatusMessage}</p>
                         </div>
@@ -290,7 +323,7 @@ export function LitterDetailView({
                 {/* 3. Welpen Statistik */}
                 {isLittered && (litter.AmountRS || litter.AmountRSM || litter.AmountRB || litter.AmountHS || litter.AmountHSM || litter.AmountHB) && (
                     <section>
-                        <SectionHeader title="Welpen" />
+                        <SectionHeader title="Welpen" onBack={onBack} />
                         <div className='mb-6 space-y-2 pt-4'>
                             <div className="flex justify-between items-center mb-2 px-4">
                                 <p className='font-medium text-gray-700'>Verfügbarkeit:</p>
@@ -301,23 +334,23 @@ export function LitterDetailView({
                             </div>
 
                             <div className="space-y-2">
-                                {[
-                                    { key: 'S', label: 'Schwarz' },
-                                    { key: 'SM', label: 'Schwarzmarken' },
-                                    { key: 'B', label: 'Blond' }
-                                ].map(({ key, label }) => {
-                                    const male = (litter as any)[`AmountR${key}`]
-                                    const female = (litter as any)[`AmountH${key}`]
+                                {([
+                                    { key: 'S', label: 'Schwarz', maleKey: 'AmountRS', femaleKey: 'AmountHS' },
+                                    { key: 'SM', label: 'Schwarzmarken', maleKey: 'AmountRSM', femaleKey: 'AmountHSM' },
+                                    { key: 'B', label: 'Blond', maleKey: 'AmountRB', femaleKey: 'AmountHB' }
+                                ] as const).map(({ key, label, maleKey, femaleKey }) => {
+                                    const male = litter[maleKey]
+                                    const female = litter[femaleKey]
                                     if (!male && !female) return null
 
                                     return (
                                         <div key={key} className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
                                             <span className="text-sm font-semibold text-gray-700">{label}:</span>
                                             <div className="flex gap-4 font-mono text-sm">
-                                                <span className={`w-24 text-center ${male?.Available > 0 ? 'text-green-700 font-bold' : 'text-gray-400'}`}>
+                                                <span className={`w-24 text-center ${(male?.Available ?? 0) > 0 ? 'text-green-700 font-bold' : 'text-gray-400'}`}>
                                                     {male?.Available ?? 0} / {male?.Total ?? 0}
                                                 </span>
-                                                <span className={`w-24 text-center ${female?.Available > 0 ? 'text-green-700 font-bold' : 'text-gray-400'}`}>
+                                                <span className={`w-24 text-center ${(female?.Available ?? 0) > 0 ? 'text-green-700 font-bold' : 'text-gray-400'}`}>
                                                     {female?.Available ?? 0} / {female?.Total ?? 0}
                                                 </span>
                                             </div>
@@ -334,7 +367,7 @@ export function LitterDetailView({
                 {/* Footer Images for 'Littered' status */}
                 {isLittered && (
                     <section>
-                        <SectionHeader title="Eltern" />
+                        <SectionHeader title="Eltern" onBack={onBack} />
                         <div className='grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto'>
                             {renderMotherImage()}
                             {renderFatherImage()}
