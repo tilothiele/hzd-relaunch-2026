@@ -2245,6 +2245,7 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
       'manyToMany',
       'plugin::users-permissions.user'
     >;
+    Phone: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     Slug: Schema.Attribute.String & Schema.Attribute.Unique;
     updatedAt: Schema.Attribute.DateTime;

@@ -102,6 +102,9 @@
     "Slug": {
       "type": "string",
       "unique": true
+    },
+    "Phone": {
+      "type": "string"
     }
   }
 }

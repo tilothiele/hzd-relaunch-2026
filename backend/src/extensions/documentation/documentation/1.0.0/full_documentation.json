@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-10-31T22:05:28.961Z"
+    "x-generation-date": "2026-10-31T22:44:17.851Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -22546,6 +22546,9 @@
                     "Slug": {
                       "type": "string"
                     },
+                    "Phone": {
+                      "type": "string"
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time"
@@ -28142,6 +28145,9 @@
                           "Slug": {
                             "type": "string"
                           },
+                          "Phone": {
+                            "type": "string"
+                          },
                           "createdAt": {
                             "type": "string",
                             "format": "date-time"
@@ -31905,6 +31911,9 @@
                           "type": "string"
                         },
                         "Slug": {
+                          "type": "string"
+                        },
+                        "Phone": {
                           "type": "string"
                         },
                         "createdAt": {
@@ -36451,6 +36460,9 @@
                     "Slug": {
                       "type": "string"
                     },
+                    "Phone": {
+                      "type": "string"
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time"
@@ -40859,6 +40871,9 @@
                             "type": "string"
                           },
                           "Slug": {
+                            "type": "string"
+                          },
+                          "Phone": {
                             "type": "string"
                           },
                           "createdAt": {
@@ -48236,6 +48251,9 @@
                       "Slug": {
                         "type": "string"
                       },
+                      "Phone": {
+                        "type": "string"
+                      },
                       "createdAt": {
                         "type": "string",
                         "format": "date-time"
@@ -51725,6 +51743,9 @@
                             "type": "string"
                           },
                           "Slug": {
+                            "type": "string"
+                          },
+                          "Phone": {
                             "type": "string"
                           },
                           "createdAt": {
@@ -55682,6 +55703,9 @@
                       "type": "string"
                     },
                     "Slug": {
+                      "type": "string"
+                    },
+                    "Phone": {
                       "type": "string"
                     },
                     "createdAt": {
@@ -65080,6 +65104,9 @@
                           "Slug": {
                             "type": "string"
                           },
+                          "Phone": {
+                            "type": "string"
+                          },
                           "createdAt": {
                             "type": "string",
                             "format": "date-time"
@@ -68996,6 +69023,9 @@
                       "type": "string"
                     },
                     "Slug": {
+                      "type": "string"
+                    },
+                    "Phone": {
                       "type": "string"
                     },
                     "createdAt": {
@@ -76091,6 +76121,9 @@
                                 "type": "string"
                               },
                               "Slug": {
+                                "type": "string"
+                              },
+                              "Phone": {
                                 "type": "string"
                               },
                               "createdAt": {
@@ -91989,6 +92022,9 @@
                     "Slug": {
                       "type": "string"
                     },
+                    "Phone": {
+                      "type": "string"
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time"
@@ -96184,6 +96220,9 @@
                     "Slug": {
                       "type": "string"
                     },
+                    "Phone": {
+                      "type": "string"
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time"
@@ -99979,6 +100018,9 @@
                                 "type": "string"
                               },
                               "Slug": {
+                                "type": "string"
+                              },
+                              "Phone": {
                                 "type": "string"
                               },
                               "createdAt": {
@@ -108085,6 +108127,9 @@
                         "type": "string"
                       },
                       "Slug": {
+                        "type": "string"
+                      },
+                      "Phone": {
                         "type": "string"
                       },
                       "createdAt": {
