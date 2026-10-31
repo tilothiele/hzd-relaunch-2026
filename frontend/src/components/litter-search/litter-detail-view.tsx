@@ -99,8 +99,11 @@ export function LitterDetailView({
     const orderLetter = litter.OrderLetter ?? ''
     const kennelName = litter.breeder?.kennelName ?? 'Kein Zwingername bekannt'
     const breederMember = litter.breeder?.Address?.FullName?.trim() ?? ''
-    // Telefonnummer des Züchters liegt im Adressfeld 2 (Breeder-Daten, kein User-Attribut).
-    const breederPhone = litter.breeder?.Address?.Address2?.trim() ?? ''
+    // Telefonnummer aus dem Breeder-Attribut "Phone", Rückfall auf das
+    // Adressfeld 2 (Altdaten aus dem CSV-Import).
+    const breederPhone = litter.breeder?.Phone?.trim()
+        || litter.breeder?.Address?.Address2?.trim()
+        || ''
     const breederAddress = [
         litter.breeder?.Address?.Address1,
         litter.breeder?.Address?.Zip,

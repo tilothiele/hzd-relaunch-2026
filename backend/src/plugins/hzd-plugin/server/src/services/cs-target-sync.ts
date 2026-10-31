@@ -637,6 +637,26 @@ export async function updateUser(
 	)
 }
 
+/**
+ * Telefonnummer eines CS_Member für das Breeder-Attribut `Phone`.
+ * `Phone` ist die Festnetznummer aus CS, `Mobile` dient als Rückfall.
+ */
+function phoneFromCsMember(member: Record<string, unknown>): string | null {
+	return truncateOrNull(cell(member.Phone) ?? cell(member.Mobile), 50)
+}
+
+async function loadBreederPhone(
+	strapi: Core.Strapi,
+	breederId: number,
+): Promise<string | null> {
+	const breeder = await strapi.db.query(BREEDER_UID).findOne({
+		where: { id: breederId },
+		select: ['phone'],
+	}) as { phone?: string | null } | null
+	const phone = typeof breeder?.phone === 'string' ? breeder.phone.trim() : ''
+	return phone.length > 0 ? phone : null
+}
+
 export async function ensureBreederForCsMember(
 	strapi: Core.Strapi,
 	member: Record<string, unknown>,
@@ -650,8 +670,21 @@ export async function ensureBreederForCsMember(
 		log('CS_Member ohne IdPerson, Breeder-Anlage übersprungen')
 		return
 	}
+	const phone = phoneFromCsMember(member)
 	const existing = await findByCId(strapi, BREEDER_UID, cId)
 	if (existing) {
+		// Bestehende Züchter: Telefonnummer aus CS nachziehen (Feld "Phone").
+		if (!phone || typeof existing.id !== 'number') {
+			return
+		}
+		const storedPhone = await loadBreederPhone(strapi, existing.id)
+		if (storedPhone === phone) {
+			return
+		}
+		await saveDocument(strapi, BREEDER_UID, existing, { Phone: phone })
+		log(
+			`Breeder-Telefon aktualisiert cId=${cId} documentId=${existing.documentId ?? existing.id}`,
+		)
 		return
 	}
 	const data: TargetData = {
@@ -669,6 +702,7 @@ export async function ensureBreederForCsMember(
 		)
 	}
 	assign(data, 'BreederEmail', parseEmail(member.Email))
+	assign(data, 'Phone', phone)
 	const address = addressFromCsMember(member)
 	if (address) {
 		data.Address = address
@@ -830,6 +864,7 @@ export async function updateStudDog(
 			'city',
 			'countryCode',
 			'cEmail',
+			'phone',
 		],
 		populate: {
 			user_groups: {
@@ -852,6 +887,7 @@ export async function updateStudDog(
 		member: ownerId,
 	}
 	assign(data, 'BreederEmail', parseEmail(owner.cEmail))
+	assign(data, 'Phone', truncateOrNull(cell(owner.phone), 50))
 	const address = addressFromUser(owner)
 	if (address) {
 		data.Address = address

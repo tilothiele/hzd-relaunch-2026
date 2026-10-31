@@ -681,6 +681,7 @@ export interface Breeder {
 	avatar?: Image | null
 	Address?: Address | null
 	BreederEmail?: string | null
+	Phone?: string | null
 	owner_members?: AuthUser[] | null
 	dogs?: Dog[] | null
 }
