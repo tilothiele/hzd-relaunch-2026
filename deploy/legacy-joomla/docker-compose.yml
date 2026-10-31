@@ -19,8 +19,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.middlewares.joomla-https.headers.customrequestheaders.X-Forwarded-Proto=https"
-      - "traefik.http.middlewares.hzd-basic-auth.basicauth.users=${BASIC_AUTH:?}"
-      - "coolify.traefik.middlewares=hzd-basic-auth"
+      - "coolify.traefik.middlewares=hzd-auth"
 networks:
   coolify:
     external: true
