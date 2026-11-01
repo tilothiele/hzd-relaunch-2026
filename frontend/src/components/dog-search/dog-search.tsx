@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, FormControlLabel, Chip, OutlinedInput, Pagination, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, ToggleButtonGroup, ToggleButton, Tooltip } from '@mui/material'
+import { TextField, Select, MenuItem, Button, FormControl, InputLabel, Box, Switch, FormControlLabel, Chip, OutlinedInput, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, ToggleButtonGroup, ToggleButton, Tooltip } from '@mui/material'
+import { SearchResultPager } from '@/components/common/search-result-pager'
 import { ViewToggle } from '@/components/common/view-toggle'
 
 import MaleIcon from '@mui/icons-material/Male'
@@ -176,8 +177,18 @@ export function DogSearch({
 			.filter((item) => item !== null) as MapItem[]
 	}, [dogs])
 
-	const totalPages = pageCount
-	const currentPage = page
+	const resultPager = (idPrefix: string, className: string) => (
+		<SearchResultPager
+			idPrefix={idPrefix}
+			className={className}
+			page={page}
+			pageCount={pageCount}
+			pageSize={pageSize}
+			disabled={isLoading}
+			onPageChange={handlePageChange}
+			onPageSizeChange={handlePageSizeChange}
+		/>
+	)
 
 	return (
 		<div className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em' }}>
@@ -374,41 +385,21 @@ export function DogSearch({
 					</div>
 				) : null}
 
-				<div className='flex items-center justify-between'>
+				<div className='mb-4 flex flex-wrap items-center justify-between gap-3'>
 					<div className='text-sm text-gray-600'>
 						{totalDogs > 0 ? (
 							<>
-								Zeige {((currentPage - 1) * pageSize) + 1} bis{' '}
-								{Math.min(currentPage * pageSize, totalDogs)} von {totalDogs} {getDogCountLabel(sexFilter)}
+								Zeige {((page - 1) * pageSize) + 1} bis{' '}
+								{Math.min(page * pageSize, totalDogs)} von {totalDogs} {getDogCountLabel(sexFilter)}
 							</>
 						) : (
 							'Keine Hunde gefunden'
 						)}
 					</div>
-					<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-						<ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
-					</Box>
-					<div className='flex items-center gap-2'>
-						<label
-							htmlFor='page-size'
-							className='text-sm text-gray-600'
-						>
-							Pro Seite:
-						</label>
-						<select
-							id='page-size'
-							value={pageSize}
-							onChange={(e) => handlePageSizeChange(Number(e.target.value) as PageSize)}
-							className='rounded border border-gray-300 px-2 py-1 text-sm focus:border-yellow-400 focus:outline-none'
-						>
-							<option value={5}>5</option>
-							<option value={10}>10</option>
-							<option value={20}>20</option>
-							<option value={50}>50</option>
-							<option value={100}>100</option>
-						</select>
-					</div>
+					<ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
 				</div>
+
+				{resultPager('dog-results-top', 'mb-4')}
 
 				{isLoading ? (
 					<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
@@ -429,37 +420,7 @@ export function DogSearch({
 						))}
 					</div>
 				) : dogs.length > 0 ? (
-					<>
-						{totalPages > 1 ? (
-							<Box className='mb-6 flex items-center justify-center'>
-								<Pagination
-									count={totalPages}
-									page={currentPage}
-									onChange={(_, value) => handlePageChange(value)}
-									disabled={isLoading}
-									color='primary'
-									showFirstButton
-									showLastButton
-									sx={{
-										'& .MuiPaginationItem-root': {
-											fontSize: '0.875rem',
-										},
-										'& .MuiPaginationItem-page.Mui-selected': {
-											backgroundColor: theme.submitButtonColor,
-											color: theme.submitButtonTextColor,
-											'&:hover': {
-												backgroundColor: theme.submitButtonColor,
-												filter: 'brightness(90%)',
-											},
-										},
-										'& .MuiPaginationItem-root.Mui-disabled': {
-											opacity: 0.5,
-										},
-									}}
-								/>
-							</Box>
-						) : null}
-						<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+					<div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
 							{viewMode === 'cards' ? (
 								dogs.map((dog) => (
 									<DogCard
@@ -540,42 +501,13 @@ export function DogSearch({
 								</div>
 							)}
 						</div>
-
-						{totalPages > 1 ? (
-							<Box className='mt-6 flex items-center justify-center'>
-								<Pagination
-									count={totalPages}
-									page={currentPage}
-									onChange={(_, value) => handlePageChange(value)}
-									disabled={isLoading}
-									color='primary'
-									showFirstButton
-									showLastButton
-									sx={{
-										'& .MuiPaginationItem-root': {
-											fontSize: '0.875rem',
-										},
-										'& .MuiPaginationItem-page.Mui-selected': {
-											backgroundColor: theme.submitButtonColor,
-											color: theme.submitButtonTextColor,
-											'&:hover': {
-												backgroundColor: theme.submitButtonColor,
-												filter: 'brightness(90%)',
-											},
-										},
-										'& .MuiPaginationItem-root.Mui-disabled': {
-											opacity: 0.5,
-										},
-									}}
-								/>
-							</Box>
-						) : null}
-					</>
 				) : !isLoading ? (
 					<div className='rounded-lg border border-gray-200 bg-gray-50 p-8 text-center text-gray-600'>
 						Keine Hunde gefunden. Bitte passen Sie Ihre Suchkriterien an.
 					</div>
 				) : null}
+
+				{resultPager('dog-results-bottom', 'mt-4')}
 			</div>
 
 			{/* Dog Detail Modal removed in favor of conditional rendering */}

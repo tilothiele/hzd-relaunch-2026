@@ -6,6 +6,11 @@ import { factories } from '@strapi/strapi'
 import type { Core } from '@strapi/strapi'
 import { findDocumentsPage } from '../utils/document-pagination'
 import { enrichBreederRecords } from '../utils/breeder-enrich'
+import {
+	findOrderedBreederPage,
+	parseListOrder,
+	sanitizeListSeed,
+} from '../utils/breeder-list-order'
 
 const VALID_BREEDER_ROLES = ['B', 'S'] as const
 type BreederRoleValue = (typeof VALID_BREEDER_ROLES)[number]
@@ -17,6 +22,8 @@ interface BreederSearchQuery {
 	page?: string | number
 	pageSize?: string | number
 	sort?: string | string[]
+	order?: string | string[]
+	seed?: string | string[]
 }
 
 const MEMBER_CONTACT_FIELDS = [
@@ -233,6 +240,68 @@ const coreControllerFactory = factories.createCoreController(
 			const rawQuery = (ctx?.query ?? {}) as BreederSearchQuery
 			const filterConditions = toFilterConditions(rawQuery)
 			const { page, pageSize } = parsePagination(rawQuery)
+			const filters = filterConditions.length > 0
+				? { $and: filterConditions }
+				: undefined
+			const listOrder = parseListOrder(rawQuery.order)
+
+			if (listOrder) {
+				const ordered = await findOrderedBreederPage(strapi, {
+					filters,
+					order: listOrder,
+					seed: sanitizeListSeed(rawQuery.seed),
+					page,
+					pageSize,
+				})
+				const pageFilters = ordered.ids.length === 0
+					? null
+					: filters
+						? {
+							$and: [
+								filters,
+								{ documentId: { $in: ordered.ids } },
+							],
+						}
+						: { documentId: { $in: ordered.ids } }
+
+				let results: any[] = []
+				if (pageFilters) {
+					const pageResult = await findDocumentsPage(
+						strapi,
+						'plugin::hzd-plugin.breeder',
+						{
+							populate: BREEDER_SEARCH_POPULATE,
+							page: 1,
+							pageSize: ordered.ids.length,
+							filters: pageFilters,
+						},
+					)
+					const byDocumentId = new Map(
+						pageResult.results.map((entry) => [
+							String((entry as { documentId?: string }).documentId ?? ''),
+							entry,
+						]),
+					)
+					results = ordered.ids
+						.map((documentId) => byDocumentId.get(documentId))
+						.filter((entry) => entry != null)
+				}
+
+				results = (await enrichBreederRecords(strapi, results)) as any[]
+
+				return {
+					data: results,
+					meta: {
+						pagination: {
+							page: ordered.page,
+							pageSize: ordered.pageSize,
+							pageCount: ordered.pageCount,
+							total: ordered.total,
+						},
+					},
+				}
+			}
+
 			const sort = toSortArray(rawQuery.sort)
 
 			const result = await findDocumentsPage(

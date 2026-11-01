@@ -1,12 +1,11 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
 	Box,
 	FormControlLabel,
-	Pagination,
 	Paper,
 	Switch,
 	Table,
@@ -15,17 +14,13 @@ import {
 	TableContainer,
 	TableHead,
 	TableRow,
-	TableSortLabel,
 } from '@mui/material'
-import {
-	getBreederApiSort,
-	sortBreedersByField,
-	type BreederSortField,
-} from '@/lib/breeder-sort-utils'
+import { useBreederListOrder } from '@/hooks/use-breeder-list-order'
 import { searchBreeders } from '@/lib/strapi/api'
 import type { Breeder, HzdSetting } from '@/types'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
+import { SearchResultPager } from '@/components/common/search-result-pager'
 import { ViewToggle } from '@/components/common/view-toggle'
 import { breederDetailPath, resolveBreederContact, resolveBreederPhone } from '@/lib/breeder-display-utils'
 import { calculateDistance } from '@/lib/geo-utils'
@@ -39,8 +34,6 @@ interface StudDogSearchProps {
 }
 
 type PageSize = 5 | 10 | 20 | 50 | 100
-type SortDirection = 'asc' | 'desc'
-type SortField = BreederSortField
 
 export function StudDogSearch({
 	strapiBaseUrl,
@@ -62,8 +55,17 @@ export function StudDogSearch({
 		lat: number
 		lng: number
 	} | null>(null)
-	const [sortField, setSortField] = useState<SortField>('fullName')
-	const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
+	const { order, seed, setOrder } = useBreederListOrder(nameFilter)
+	const listQueryRef = useRef({ nameFilter, order })
+	if (
+		listQueryRef.current.nameFilter !== nameFilter
+		|| listQueryRef.current.order !== order
+	) {
+		listQueryRef.current = { nameFilter, order }
+		if (page !== 1) {
+			setPage(1)
+		}
+	}
 
 	const userLocation = zipLocation || null
 
@@ -82,16 +84,15 @@ export function StudDogSearch({
 					breederRole: 'S',
 					page,
 					pageSize,
-					sort: [getBreederApiSort(sortField, sortDirection)],
+					order,
+					seed,
 				},
 				{},
 			)
 			const connection = data.hzdPluginBreeders_connection
-			const breederNodes = sortBreedersByField(
-				Array.isArray(connection.nodes) ? connection.nodes : [],
-				sortField,
-				sortDirection,
-			)
+			const breederNodes = Array.isArray(connection.nodes)
+				? connection.nodes
+				: []
 
 			setBreeders(breederNodes)
 			setTotalBreeders(connection.pageInfo?.total ?? 0)
@@ -107,7 +108,7 @@ export function StudDogSearch({
 		} finally {
 			setIsLoading(false)
 		}
-	}, [strapiBaseUrl, nameFilter, page, pageSize, sortField, sortDirection])
+	}, [strapiBaseUrl, nameFilter, page, pageSize, order, seed])
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
@@ -141,15 +142,6 @@ export function StudDogSearch({
 		router.push(breederDetailPath(breeder))
 	}, [router])
 
-	const handleSort = useCallback((field: SortField) => {
-		if (sortField === field) {
-			setSortDirection((prev) => prev === 'asc' ? 'desc' : 'asc')
-		} else {
-			setSortField(field)
-			setSortDirection('asc')
-		}
-	}, [sortField])
-
 	const mapItems = useMemo<MapItem[]>(() => {
 		return breeders
 			.map((breeder): MapItem | null => {
@@ -179,6 +171,19 @@ export function StudDogSearch({
 			})
 			.filter((item): item is MapItem => item !== null)
 	}, [breeders])
+
+	const resultPager = (idPrefix: string, className: string) => (
+		<SearchResultPager
+			idPrefix={idPrefix}
+			className={className}
+			page={page}
+			pageCount={pageCount}
+			pageSize={pageSize}
+			disabled={isLoading}
+			onPageChange={handlePageChange}
+			onPageSizeChange={handlePageSizeChange}
+		/>
+	)
 
 	return (
 		<div
@@ -229,6 +234,8 @@ export function StudDogSearch({
 				<StudDogSearchForm
 					nameFilter={nameInput}
 					onNameFilterChange={setNameInput}
+					order={order}
+					onOrderChange={setOrder}
 					onSearch={handleSearch}
 					isLoading={isLoading}
 				/>
@@ -239,7 +246,7 @@ export function StudDogSearch({
 					</div>
 				) : null}
 
-				<div className='mb-4 flex items-center justify-between'>
+				<div className='mb-4 flex flex-wrap items-center justify-between gap-3'>
 					<div className='text-sm text-gray-600'>
 						{totalBreeders > 0 ? (
 							<>
@@ -251,49 +258,13 @@ export function StudDogSearch({
 							'Keine Deckrüdenbesitzer gefunden'
 						)}
 					</div>
-					<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-						<ViewToggle
-							viewMode={viewMode}
-							onViewModeChange={setViewMode}
-						/>
-					</Box>
-					{pageCount > 1 && (
-						<Box sx={{ display: 'flex', alignItems: 'center' }}>
-							<Pagination
-								count={pageCount}
-								page={page}
-								onChange={(_, value) => handlePageChange(value)}
-								disabled={isLoading}
-								color='primary'
-								size='small'
-								showFirstButton
-								showLastButton
-							/>
-						</Box>
-					)}
-					<div className='flex items-center gap-2'>
-						<label
-							htmlFor='stud-dog-page-size'
-							className='text-sm text-gray-600'
-						>
-							Pro Seite:
-						</label>
-						<select
-							id='stud-dog-page-size'
-							value={pageSize}
-							onChange={(event) =>
-								handlePageSizeChange(Number(event.target.value) as PageSize)
-							}
-							className='rounded border border-gray-300 px-2 py-1 text-sm focus:border-yellow-400 focus:outline-none'
-						>
-							<option value={5}>5</option>
-							<option value={10}>10</option>
-							<option value={20}>20</option>
-							<option value={50}>50</option>
-							<option value={100}>100</option>
-						</select>
-					</div>
+					<ViewToggle
+						viewMode={viewMode}
+						onViewModeChange={setViewMode}
+					/>
 				</div>
+
+				{resultPager('stud-dog-results-top', 'mb-4')}
 
 				{isLoading ? (
 					<div className='py-8 text-center text-gray-600'>
@@ -328,43 +299,13 @@ export function StudDogSearch({
 								<TableHead sx={{ backgroundColor: '#f9fafb' }}>
 									<TableRow>
 										<TableCell sx={{ fontWeight: 'bold' }}>
-											<TableSortLabel
-												active={sortField === 'fullName'}
-												direction={
-													sortField === 'fullName'
-														? sortDirection
-														: 'asc'
-												}
-												onClick={() => handleSort('fullName')}
-											>
-												Deckrüdenbesitzer
-											</TableSortLabel>
+											Deckrüdenbesitzer
 										</TableCell>
 										<TableCell sx={{ fontWeight: 'bold' }}>
-											<TableSortLabel
-												active={sortField === 'zip'}
-												direction={
-													sortField === 'zip'
-														? sortDirection
-														: 'asc'
-												}
-												onClick={() => handleSort('zip')}
-											>
-												PLZ
-											</TableSortLabel>
+											PLZ
 										</TableCell>
 										<TableCell sx={{ fontWeight: 'bold' }}>
-											<TableSortLabel
-												active={sortField === 'city'}
-												direction={
-													sortField === 'city'
-														? sortDirection
-														: 'asc'
-												}
-												onClick={() => handleSort('city')}
-											>
-												Ort
-											</TableSortLabel>
+											Ort
 										</TableCell>
 										<TableCell sx={{ fontWeight: 'bold' }}>
 											Telefon
@@ -426,6 +367,8 @@ export function StudDogSearch({
 						Suchkriterien an.
 					</div>
 				)}
+
+				{resultPager('stud-dog-results-bottom', 'mt-4')}
 			</div>
 		</div>
 	)

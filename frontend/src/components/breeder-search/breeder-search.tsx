@@ -1,17 +1,11 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Box, Pagination, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TableSortLabel, FormControlLabel } from '@mui/material'
-import GridViewIcon from '@mui/icons-material/GridView'
-import TableRowsIcon from '@mui/icons-material/TableRows'
+import { Box, Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, FormControlLabel } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
-import {
-	getBreederApiSort,
-	sortBreedersByField,
-	type BreederSortField,
-} from '@/lib/breeder-sort-utils'
+import { useBreederListOrder } from '@/hooks/use-breeder-list-order'
 import { searchBreeders as searchBreedersApi } from '@/lib/strapi/api'
 import { enrichBreedersWithMembers } from '@/lib/breeder-member-enrich'
 import type { Breeder, HzdSetting } from '@/types'
@@ -22,6 +16,7 @@ import { theme } from '@/themes'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
 import { breederDetailPath, resolveBreederContact, resolveBreederPhone } from '@/lib/breeder-display-utils'
 import { calculateDistance } from '@/lib/geo-utils'
+import { SearchResultPager } from '@/components/common/search-result-pager'
 import { ViewToggle } from '@/components/common/view-toggle'
 
 interface BreederSearchProps {
@@ -30,8 +25,6 @@ interface BreederSearchProps {
 }
 
 type PageSize = 5 | 10 | 20 | 50 | 100
-type SortDirection = 'asc' | 'desc'
-type SortField = BreederSortField
 
 export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps) {
 	const [nameFilter, setNameFilter] = useState('')
@@ -47,10 +40,17 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 	const [showMap, setShowMap] = useState(false)
 	const [zipCode, setZipCode] = useState('')
 	const [zipLocation, setZipLocation] = useState<{ lat: number; lng: number } | null>(null)
-
-	// Sort state
-	const [sortField, setSortField] = useState<SortField>('kennelName')
-	const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
+	const { order, seed, setOrder } = useBreederListOrder(nameFilter)
+	const listQueryRef = useRef({ nameFilter, order })
+	if (
+		listQueryRef.current.nameFilter !== nameFilter
+		|| listQueryRef.current.order !== order
+	) {
+		listQueryRef.current = { nameFilter, order }
+		if (page !== 1) {
+			setPage(1)
+		}
+	}
 
 	const userLocation = zipLocation || null
 
@@ -68,17 +68,14 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 				breederRole: 'B',
 				page,
 				pageSize,
-				sort: [getBreederApiSort(sortField, sortDirection)],
+				order,
+				seed,
 			}, {})
 
-			const breedersArray = sortBreedersByField(
-				await enrichBreedersWithMembers(
-					Array.isArray(data.hzdPluginBreeders_connection.nodes)
-						? data.hzdPluginBreeders_connection.nodes
-						: [],
-				),
-				sortField,
-				sortDirection,
+			const breedersArray = await enrichBreedersWithMembers(
+				Array.isArray(data.hzdPluginBreeders_connection.nodes)
+					? data.hzdPluginBreeders_connection.nodes
+					: [],
 			)
 			setBreeders(breedersArray)
 
@@ -101,7 +98,7 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 		} finally {
 			setIsLoading(false)
 		}
-	}, [strapiBaseUrl, nameFilter, page, pageSize, sortField, sortDirection])
+	}, [strapiBaseUrl, nameFilter, page, pageSize, order, seed])
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
@@ -135,15 +132,6 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 		router.push(breederDetailPath(breeder))
 	}, [router])
 
-	const handleSort = useCallback((field: SortField) => {
-		if (sortField === field) {
-			setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')
-		} else {
-			setSortField(field)
-			setSortDirection('asc')
-		}
-	}, [sortField])
-
 	// Konvertiere Züchter in MapItems
 	const mapItems = useMemo<MapItem[]>(() => {
 		return breeders
@@ -176,8 +164,18 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 			.filter((item): item is MapItem => item !== null)
 	}, [breeders])
 
-	const totalPages = pageCount
-	const currentPage = page
+	const resultPager = (idPrefix: string, className: string) => (
+		<SearchResultPager
+			idPrefix={idPrefix}
+			className={className}
+			page={page}
+			pageCount={pageCount}
+			pageSize={pageSize}
+			disabled={isLoading}
+			onPageChange={handlePageChange}
+			onPageSizeChange={handlePageSizeChange}
+		/>
+	)
 
 	return (
 		<div className='flex w-full justify-center px-4' style={{ paddingTop: '1em', paddingBottom: '1em' }}>
@@ -219,6 +217,8 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 				<BreederSearchForm
 					nameFilter={nameInput}
 					onNameFilterChange={setNameInput}
+					order={order}
+					onOrderChange={setOrder}
 					onSearch={handleSearch}
 					isLoading={isLoading}
 				/>
@@ -229,67 +229,21 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 					</div>
 				) : null}
 
-				<div className='mb-4 flex items-center justify-between'>
+				<div className='mb-4 flex flex-wrap items-center justify-between gap-3'>
 					<div className='text-sm text-gray-600'>
 						{totalBreeders > 0 ? (
 							<>
-								Zeige {((currentPage - 1) * pageSize) + 1} bis{' '}
-								{Math.min(currentPage * pageSize, totalBreeders)} von {totalBreeders} Züchtern
+								Zeige {((page - 1) * pageSize) + 1} bis{' '}
+								{Math.min(page * pageSize, totalBreeders)} von {totalBreeders} Züchtern
 							</>
 						) : (
 							'Keine Züchter gefunden'
 						)}
 					</div>
-					<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-						<ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
-					</Box>
-					{totalPages > 1 && (
-						<Box sx={{ display: 'flex', alignItems: 'center' }}>
-							<Pagination
-								count={totalPages}
-								page={currentPage}
-								onChange={(_, value) => handlePageChange(value)}
-								disabled={isLoading}
-								color='primary'
-								size='small'
-								showFirstButton
-								showLastButton
-								sx={{
-									'& .MuiPaginationItem-root': { fontSize: '0.875rem' },
-									'& .MuiPaginationItem-page.Mui-selected': {
-										backgroundColor: theme.submitButtonColor,
-										color: theme.submitButtonTextColor,
-										'&:hover': {
-											backgroundColor: theme.submitButtonColor,
-											filter: 'brightness(90%)',
-										},
-									},
-									'& .MuiPaginationItem-root.Mui-disabled': { opacity: 0.5 },
-								}}
-							/>
-						</Box>
-					)}
-					<div className='flex items-center gap-2'>
-						<label
-							htmlFor='page-size'
-							className='text-sm text-gray-600'
-						>
-							Pro Seite:
-						</label>
-						<select
-							id='page-size'
-							value={pageSize}
-							onChange={(e) => handlePageSizeChange(Number(e.target.value) as PageSize)}
-							className='rounded border border-gray-300 px-2 py-1 text-sm focus:border-yellow-400 focus:outline-none'
-						>
-							<option value={5}>5</option>
-							<option value={10}>10</option>
-							<option value={20}>20</option>
-							<option value={50}>50</option>
-							<option value={100}>100</option>
-						</select>
-					</div>
+					<ViewToggle viewMode={viewMode} onViewModeChange={setViewMode} />
 				</div>
+
+				{resultPager('breeder-results-top', 'mb-4')}
 
 				{isLoading ? (
 					<div className='text-center py-8 text-gray-600'>
@@ -316,58 +270,22 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 									<TableHead sx={{ backgroundColor: '#f9fafb' }}>
 										<TableRow>
 											<TableCell sx={{ fontWeight: 'bold' }}>
-												<TableSortLabel
-													active={sortField === 'kennelName'}
-													direction={sortField === 'kennelName' ? sortDirection : 'asc'}
-													onClick={() => handleSort('kennelName')}
-												>
-													Zwinger
-												</TableSortLabel>
+												Zwinger
 											</TableCell>
 											<TableCell sx={{ fontWeight: 'bold' }}>
-												<TableSortLabel
-													active={sortField === 'fullName'}
-													direction={sortField === 'fullName' ? sortDirection : 'asc'}
-													onClick={() => handleSort('fullName')}
-												>
-													Züchter
-												</TableSortLabel>
+												Züchter
 											</TableCell>
 											<TableCell sx={{ fontWeight: 'bold' }}>
-												<TableSortLabel
-													active={sortField === 'zip'}
-													direction={sortField === 'zip' ? sortDirection : 'asc'}
-													onClick={() => handleSort('zip')}
-												>
-													PLZ
-												</TableSortLabel>
+												PLZ
 											</TableCell>
 											<TableCell sx={{ fontWeight: 'bold' }}>
-												<TableSortLabel
-													active={sortField === 'city'}
-													direction={sortField === 'city' ? sortDirection : 'asc'}
-													onClick={() => handleSort('city')}
-												>
-													Ort
-												</TableSortLabel>
+												Ort
 											</TableCell>
 											<TableCell sx={{ fontWeight: 'bold' }}>
-												<TableSortLabel
-													active={sortField === 'phone'}
-													direction={sortField === 'phone' ? sortDirection : 'asc'}
-													onClick={() => handleSort('phone')}
-												>
-													Telefon
-												</TableSortLabel>
+												Telefon
 											</TableCell>
 											<TableCell sx={{ fontWeight: 'bold' }}>
-												<TableSortLabel
-													active={sortField === 'cEmail'}
-													direction={sortField === 'cEmail' ? sortDirection : 'asc'}
-													onClick={() => handleSort('cEmail')}
-												>
-													E-Mail
-												</TableSortLabel>
+												E-Mail
 											</TableCell>
 											<TableCell sx={{ fontWeight: 'bold' }}>
 												Entfernung
@@ -436,6 +354,8 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 						Keine Züchter gefunden. Bitte passen Sie Ihre Suchkriterien an.
 					</div>
 				) : null}
+
+				{resultPager('breeder-results-bottom', 'mt-4')}
 			</div>
 		</div>
 	)

@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { MainPageStructure } from '../main-page-structure'
 import { StudDogSearch } from '@/components/stud-dog-search/stud-dog-search'
 import { theme as globalTheme } from '@/themes'
@@ -27,7 +28,18 @@ export default async function StudDogsPage() {
 			theme={theme}
 			pageTitle={pageTitle}
 		>
-			<StudDogSearch strapiBaseUrl={baseUrl} hzdSetting={globalLayout?.HzdSetting} />
+			<Suspense
+				fallback={(
+					<div className='flex w-full justify-center px-4 py-8 text-sm text-gray-600'>
+						Lade Deckrüdenbesitzer...
+					</div>
+				)}
+			>
+				<StudDogSearch
+					strapiBaseUrl={baseUrl}
+					hzdSetting={globalLayout?.HzdSetting}
+				/>
+			</Suspense>
 		</MainPageStructure>
 	)
 }

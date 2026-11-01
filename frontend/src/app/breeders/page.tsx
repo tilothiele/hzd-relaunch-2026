@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { MainPageStructure } from '../main-page-structure'
 import { BreederSearch } from '@/components/breeder-search/breeder-search'
 import { theme as globalTheme } from '@/themes'
@@ -27,7 +28,18 @@ export default async function BreedersPage() {
 			theme={theme}
 			pageTitle={pageTitle}
 		>
-			<BreederSearch strapiBaseUrl={baseUrl} hzdSetting={globalLayout?.HzdSetting} />
+			<Suspense
+				fallback={(
+					<div className='flex w-full justify-center px-4 py-8 text-sm text-gray-600'>
+						Lade Züchter...
+					</div>
+				)}
+			>
+				<BreederSearch
+					strapiBaseUrl={baseUrl}
+					hzdSetting={globalLayout?.HzdSetting}
+				/>
+			</Suspense>
 		</MainPageStructure>
 	)
 }

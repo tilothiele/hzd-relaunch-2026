@@ -1,11 +1,15 @@
 'use client'
 
 import { TextField, Box, Typography } from '@mui/material'
+import { BreederListOrderField } from '@/components/common/breeder-list-order-field'
 import { SubmitButton } from '@/components/ui/submit-button'
+import type { BreederListOrder } from '@/lib/breeder-list-order'
 
 interface StudDogSearchFormProps {
 	nameFilter: string
 	onNameFilterChange: (value: string) => void
+	order: BreederListOrder
+	onOrderChange: (order: BreederListOrder) => void
 	onSearch: () => void
 	isLoading: boolean
 }
@@ -13,6 +17,8 @@ interface StudDogSearchFormProps {
 export function StudDogSearchForm({
 	nameFilter,
 	onNameFilterChange,
+	order,
+	onOrderChange,
 	onSearch,
 	isLoading,
 }: StudDogSearchFormProps) {
@@ -34,6 +40,11 @@ export function StudDogSearchForm({
 					placeholder='Name des Deckrüdenbesitzers'
 					fullWidth
 					size='small'
+				/>
+				<BreederListOrderField
+					groupName='stud-dog-list-order'
+					order={order}
+					onOrderChange={onOrderChange}
 				/>
 			</Box>
 			<Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>

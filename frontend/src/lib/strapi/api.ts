@@ -393,6 +393,8 @@ export interface BreederSearchParams {
 	breederRole?: 'B' | 'S'
 	ownerMemberDocumentId?: string
 	sort?: string | string[]
+	order?: 'random' | 'zip'
+	seed?: string
 	page?: number
 	pageSize?: number
 }
@@ -412,6 +414,8 @@ export async function searchBreeders(
 		const sortValue = Array.isArray(params.sort) ? params.sort.join(',') : params.sort
 		if (sortValue.trim().length > 0) query.set('sort', sortValue)
 	}
+	if (params.order) query.set('order', params.order)
+	if (params.seed) query.set('seed', params.seed)
 	if (params.page !== undefined) query.set('page', String(params.page))
 	if (params.pageSize !== undefined) query.set('pageSize', String(params.pageSize))
 
