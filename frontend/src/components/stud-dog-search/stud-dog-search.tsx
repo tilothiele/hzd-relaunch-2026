@@ -27,7 +27,7 @@ import type { Breeder, HzdSetting } from '@/types'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
 import { ViewToggle } from '@/components/common/view-toggle'
-import { breederDetailPath, resolveBreederContact } from '@/lib/breeder-display-utils'
+import { breederDetailPath, resolveBreederContact, resolveBreederPhone } from '@/lib/breeder-display-utils'
 import { calculateDistance } from '@/lib/geo-utils'
 import { theme } from '@/themes'
 import { StudDogCard } from './stud-dog-card'
@@ -380,6 +380,7 @@ export function StudDogSearch({
 								<TableBody>
 									{breeders.map((breeder) => {
 										const contact = resolveBreederContact(breeder)
+										const breederPhone = resolveBreederPhone(breeder)
 										let distance: number | null = null
 
 										if (
@@ -405,7 +406,7 @@ export function StudDogSearch({
 												<TableCell>{contact.ownerDisplayName || '-'}</TableCell>
 												<TableCell>{contact.zip || '-'}</TableCell>
 												<TableCell>{contact.city || '-'}</TableCell>
-												<TableCell>{contact.phone || '-'}</TableCell>
+												<TableCell>{breederPhone || '-'}</TableCell>
 												<TableCell>{contact.email || '-'}</TableCell>
 												<TableCell>
 													{distance !== null

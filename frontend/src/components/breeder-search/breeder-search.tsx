@@ -20,7 +20,7 @@ import { BreederSearchForm } from './breeder-search-form'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { theme } from '@/themes'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
-import { breederDetailPath, resolveBreederContact } from '@/lib/breeder-display-utils'
+import { breederDetailPath, resolveBreederContact, resolveBreederPhone } from '@/lib/breeder-display-utils'
 import { calculateDistance } from '@/lib/geo-utils'
 import { ViewToggle } from '@/components/common/view-toggle'
 
@@ -377,6 +377,7 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 									<TableBody>
 										{breeders.map((breeder) => {
 											const contact = resolveBreederContact(breeder)
+											const breederPhone = resolveBreederPhone(breeder)
 											let distance: number | null = null
 											if (
 												userLocation
@@ -418,7 +419,7 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 													<TableCell>{contact.ownerDisplayName || '-'}</TableCell>
 													<TableCell>{contact.zip || '-'}</TableCell>
 													<TableCell>{contact.city || '-'}</TableCell>
-													<TableCell>{contact.phone || '-'}</TableCell>
+													<TableCell>{breederPhone || '-'}</TableCell>
 													<TableCell>{contact.email || '-'}</TableCell>
 													<TableCell>{distance !== null ? `~${Math.round(distance)} km` : '-'}</TableCell>
 												</TableRow>

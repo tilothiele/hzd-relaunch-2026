@@ -192,6 +192,22 @@ export function resolveBreederContact(breeder: Breeder): BreederContactInfo {
 	}
 }
 
+/**
+ * Telefonnummer für die Anzeige.
+ *
+ * `Breeder.Phone` hat Vorrang, da es die vom Import gesetzten
+ * Züchter-Kontaktdaten enthält. Der Owner-Member dient als Rückfall,
+ * dessen Telefonnummer ist aber `publishMyData`-abhängig.
+ */
+export function resolveBreederPhone(breeder: Breeder): string | null {
+	const breederPhone = breeder.Phone?.trim()
+	if (breederPhone) {
+		return breederPhone
+	}
+
+	return resolveBreederContact(breeder).phone
+}
+
 export function findMaleOwnerDogAvatar(breeder: Breeder): Image | null {
 	const ownerIds = new Set<string>()
 	for (const user of resolveOwnerMembers(breeder)) {

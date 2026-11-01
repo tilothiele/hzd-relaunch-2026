@@ -5,8 +5,10 @@ import type { WriteStream } from 'fs'
 import type { Core } from '@strapi/strapi'
 import { findDocumentsPage } from '../utils/document-pagination'
 import {
+	createCsMemberPhoneLookup,
 	loadAuthenticatedRoleId,
 	ensureBreederForCsMember,
+	loadBreedersByCId,
 	updateDog,
 	updateStudDog,
 	updateUser,
@@ -1158,16 +1160,17 @@ async function import_strapi_daten(
 		const { steps } = options
 
 		throwIfCancelled()
+		const memberGeneration = await loadCurrentGeneration(
+			strapi,
+			'ImportGenerationCSMembers',
+		)
 		if (steps.members) {
 			job.phase = 'members'
-			const memberGeneration = await loadCurrentGeneration(
-				strapi,
-				'ImportGenerationCSMembers',
-			)
 			if (!memberGeneration) {
 				job.members = emptyCounts()
 				log('Verarbeite CS_Member: keine ImportGeneration gesetzt')
 			} else {
+				const breedersByCId = await loadBreedersByCId(strapi)
 				failed += await importCollection(strapi, {
 					label: 'Verarbeite CS_Member',
 					uid: CS_MEMBER_UID,
@@ -1176,7 +1179,12 @@ async function import_strapi_daten(
 					counts: job.members,
 					onlyChanged: options.onlyChanged,
 					log,
-					visit: (entry) => ensureBreederForCsMember(strapi, entry, log),
+					visit: (entry) => ensureBreederForCsMember(
+						strapi,
+						entry,
+						log,
+						breedersByCId,
+					),
 					apply: (entry) => updateUser(
 						strapi,
 						entry,
@@ -1228,6 +1236,10 @@ async function import_strapi_daten(
 		throwIfCancelled()
 		if (steps.studDogs) {
 			job.phase = 'studDogs'
+			const loadCsMemberPhone = createCsMemberPhoneLookup(
+				strapi,
+				memberGeneration,
+			)
 			failed += await runEntityStep(strapi, {
 				label: 'Aktualisiere Deckrüden',
 				uid: DOG_UID,
@@ -1240,6 +1252,7 @@ async function import_strapi_daten(
 				log,
 				apply: (entry) => updateStudDog(strapi, entry, log, {
 					fixGroups: options.fixGroups,
+					loadCsMemberPhone,
 				}),
 			})
 		} else {

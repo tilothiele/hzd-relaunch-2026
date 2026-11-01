@@ -8,6 +8,7 @@ import {
 	findMaleOwnerDogAvatar,
 	resolveBreederContact,
 	resolveBreederDogOwnerCIds,
+	resolveBreederPhone,
 } from '@/lib/breeder-display-utils'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { BackButton } from '@/components/ui/back-button'
@@ -30,6 +31,31 @@ function getRegionLabel(region: string | null | undefined): string {
 	return region
 }
 
+interface SectionHeaderProps {
+	title: string
+	onBack?: () => void
+}
+
+function SectionHeader({ title, onBack }: SectionHeaderProps) {
+	return (
+		<Box
+			sx={{
+				borderBottom: '2px solid #e5e7eb',
+				pb: 1,
+				mb: 3,
+				display: 'flex',
+				justifyContent: 'space-between',
+				alignItems: 'center',
+			}}
+		>
+			<Typography variant='h5' component='h2' sx={{ fontWeight: 700 }}>
+				{title}
+			</Typography>
+			{onBack ? <BackButton onClick={onBack} /> : null}
+		</Box>
+	)
+}
+
 export function StudDogDetailView({
 	breeder,
 	strapiBaseUrl,
@@ -39,6 +65,7 @@ export function StudDogDetailView({
 }: StudDogDetailViewProps) {
 	const [selectedDog, setSelectedDog] = useState<Dog | null>(null)
 	const contact = resolveBreederContact(breeder)
+	const breederPhone = resolveBreederPhone(breeder)
 	const dogOwnerCIds = resolveBreederDogOwnerCIds(breeder)
 
 	const fallbackDogAvatar = breederRole === 'S' && !breeder.avatar
@@ -62,24 +89,6 @@ export function StudDogDetailView({
 			/>
 		)
 	}
-
-	const SectionHeader = ({ title: sectionTitle }: { title: string }) => (
-		<Box
-			sx={{
-				borderBottom: '2px solid #e5e7eb',
-				pb: 1,
-				mb: 3,
-				display: 'flex',
-				justifyContent: 'space-between',
-				alignItems: 'center',
-			}}
-		>
-			<Typography variant='h5' component='h2' sx={{ fontWeight: 700 }}>
-				{sectionTitle}
-			</Typography>
-			{onBack ? <BackButton onClick={onBack} /> : null}
-		</Box>
-	)
 
 	return (
 		<div className='animate-in bg-white p-4 duration-300 fade-in md:p-8'>
@@ -105,7 +114,7 @@ export function StudDogDetailView({
 
 			<div className='mx-auto max-w-4xl space-y-12'>
 				<section>
-					<SectionHeader title='Deckrüdenbesitzer Details' />
+					<SectionHeader title='Deckrüdenbesitzer Details' onBack={onBack} />
 					<div className='grid grid-cols-1 gap-x-8 gap-y-4 rounded-lg bg-gray-50 p-6 text-gray-700 md:grid-cols-2'>
 						{contact.ownerDisplayName ? (
 							<p>
@@ -119,9 +128,16 @@ export function StudDogDetailView({
 							</p>
 						) : null}
 
-						{contact.phone ? (
+						{breederPhone ? (
 							<p>
-								<strong>Telefon:</strong> {contact.phone}
+								<strong>Telefon:</strong>{' '}
+								<a
+									href={`tel:${breederPhone.replace(/[\s/]/g, '')}`}
+									className='hover:underline'
+									style={{ color: theme.submitButtonColor }}
+								>
+									{breederPhone}
+								</a>
 							</p>
 						) : null}
 
@@ -157,7 +173,7 @@ export function StudDogDetailView({
 
 				{breeder.BreedersIntroduction ? (
 					<section>
-						<SectionHeader title='Über uns' />
+						<SectionHeader title='Über uns' onBack={onBack} />
 						<div
 							className='prose prose-lg max-w-none rounded-lg border border-gray-100 bg-white p-6 text-gray-600 shadow-sm'
 							dangerouslySetInnerHTML={{ __html: breeder.BreedersIntroduction }}
@@ -167,7 +183,7 @@ export function StudDogDetailView({
 
 				{dogOwnerCIds.length > 0 ? (
 					<section>
-						<SectionHeader title='Deckrüden' />
+						<SectionHeader title='Deckrüden' onBack={onBack} />
 						<Box
 							sx={{
 								p: 2,

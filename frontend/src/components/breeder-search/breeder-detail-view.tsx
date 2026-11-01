@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Box, Typography, Divider } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import Image from 'next/image'
 import type { Breeder, Dog, HzdSetting } from '@/types'
@@ -9,6 +9,7 @@ import {
 	findMaleOwnerDogAvatar,
 	resolveBreederContact,
 	resolveBreederDogOwnerCIds,
+	resolveBreederPhone,
 } from '@/lib/breeder-display-utils'
 import { getBreederByDocumentId } from '@/lib/strapi/api'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
@@ -49,16 +50,33 @@ function getRegionLabel(region: string | null | undefined): string {
     return region
 }
 
+interface SectionHeaderProps {
+    title: string
+    onBack?: () => void
+}
+
+function SectionHeader({ title, onBack }: SectionHeaderProps) {
+    return (
+        <Box sx={{ borderBottom: '2px solid #e5e7eb', pb: 1, mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant='h5' component='h2' sx={{ fontWeight: 700 }}>
+                {title}
+            </Typography>
+            {onBack ? <BackButton onClick={onBack} /> : null}
+        </Box>
+    )
+}
+
 export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack, breederRole }: BreederDetailViewProps) {
     const [selectedDog, setSelectedDog] = useState<Dog | null>(null)
-    const [breederDetails, setBreederDetails] = useState<Breeder>(breeder)
+    const [fetchedBreeder, setFetchedBreeder] = useState<Breeder | null>(null)
+    // Nur übernehmen, wenn die geladenen Daten zum aktuellen Züchter gehören.
+    const breederDetails = fetchedBreeder?.documentId === breeder.documentId
+        ? fetchedBreeder
+        : breeder
     const kennelName = breederDetails.kennelName ?? 'Kein Zwingername bekannt'
     const contact = resolveBreederContact(breederDetails)
+    const breederPhone = resolveBreederPhone(breederDetails)
     const dogOwnerCIds = resolveBreederDogOwnerCIds(breederDetails)
-
-    useEffect(() => {
-        setBreederDetails(breeder)
-    }, [breeder])
 
     useEffect(() => {
         if (!breeder.documentId) {
@@ -70,7 +88,7 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack, 
         void getBreederByDocumentId(breeder.documentId)
             .then((freshBreeder) => {
                 if (!cancelled && freshBreeder) {
-                    setBreederDetails(freshBreeder)
+                    setFetchedBreeder(freshBreeder)
                 }
             })
             .catch(() => {
@@ -104,15 +122,6 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack, 
     }
 
     // Helper to render a Section Header with Back Button
-    const SectionHeader = ({ title }: { title: string }) => (
-        <Box sx={{ borderBottom: '2px solid #e5e7eb', pb: 1, mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant='h5' component='h2' sx={{ fontWeight: 700 }}>
-                {title}
-            </Typography>
-            {onBack ? <BackButton onClick={onBack} /> : null}
-        </Box>
-    )
-
     return (
         <div className='bg-white p-4 md:p-8 animate-in fade-in duration-300'>
             {/* Header Section with Avatar and Kennel Name */}
@@ -149,7 +158,7 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack, 
             <div className='mx-auto max-w-4xl space-y-12'>
                 {/* Breeder Details Section */}
                 <section>
-                    <SectionHeader title="Züchter Details" />
+                    <SectionHeader title="Züchter Details" onBack={onBack} />
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-gray-700 bg-gray-50 p-6 rounded-lg'>
                         {breederDetails.breedingLicenseSince ? (
                             <p>
@@ -169,9 +178,12 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack, 
                             </p>
                         ) : null}
 
-                        {contact.phone ? (
+                        {breederPhone ? (
                             <p>
-                                <strong>Telefon:</strong> {contact.phone}
+                                <strong>Telefon:</strong>{' '}
+                                <a href={`tel:${breederPhone.replace(/[\s/]/g, '')}`} className='hover:underline' style={{ color: theme.submitButtonColor }}>
+                                    {breederPhone}
+                                </a>
                             </p>
                         ) : null}
 
@@ -216,14 +228,14 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack, 
                 {/* Introduction Section */}
                 {breederDetails.BreedersIntroduction ? (
                     <section>
-                        <SectionHeader title="Über uns" />
+                        <SectionHeader title="Über uns" onBack={onBack} />
                         <div className='prose prose-lg max-w-none text-gray-600 bg-white p-6 border border-gray-100 rounded-lg shadow-sm' dangerouslySetInnerHTML={{ __html: breederDetails.BreedersIntroduction }} />
                     </section>
                 ) : null}
 
                 {/* Zuchthündinnen */}
                 <section>
-                    <SectionHeader title="Zuchthündinnen" />
+                    <SectionHeader title="Zuchthündinnen" onBack={onBack} />
                     <Box sx={{ p: 2, bg: 'white', borderRadius: 2, border: '1px solid', borderColor: 'grey.100', boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)' }}>
                         <BreederDogsList
                             key={`${breederDetails.documentId}:${dogOwnerCIds.join(',')}`}

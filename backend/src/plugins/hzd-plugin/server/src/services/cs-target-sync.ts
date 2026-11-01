@@ -6,6 +6,7 @@ const STUD_DOG_OWNER_GROUP_KEY = 'dr-besitzer'
 const MIN_USERNAME_LENGTH = 3
 const DOG_UID = 'plugin::hzd-plugin.dog'
 const BREEDER_UID = 'plugin::hzd-plugin.breeder'
+const CS_MEMBER_UID = 'api::cs-member.cs-member'
 
 const REGION_MAP: Record<string, string> = {
 	nord: 'Nord',
@@ -639,10 +640,116 @@ export async function updateUser(
 
 /**
  * Telefonnummer eines CS_Member für das Breeder-Attribut `Phone`.
- * `Phone` ist die Festnetznummer aus CS, `Mobile` dient als Rückfall.
+ * Quelle ist ausschliesslich `CS_Member.Phone`.
  */
 function phoneFromCsMember(member: Record<string, unknown>): string | null {
-	return truncateOrNull(cell(member.Phone) ?? cell(member.Mobile), 50)
+	return truncateOrNull(cell(member.Phone), 50)
+}
+
+/**
+ * Ergebnis der CS_Member-Telefonnummern-Suche.
+ *
+ * `found` unterscheidet zwischen "kein CS_Member vorhanden" und
+ * "CS_Member vorhanden, aber ohne Telefonnummer".
+ */
+export interface CsMemberPhone {
+	found: boolean
+	phone: string | null
+}
+
+/**
+ * Liefert die Telefonnummer eines CS_Member zu einer Personen-ID.
+ *
+ * Primär wird der Datensatz der aktuell importierten Generation
+ * verwendet. Gibt es dort keinen Datensatz, greift der neueste
+ * vorhandene CS_Member als Rückfall.
+ */
+async function queryCsMemberPhone(
+	strapi: Core.Strapi,
+	cId: number,
+	generation: number | null,
+): Promise<CsMemberPhone> {
+	const findMember = async (withGeneration: boolean) => {
+		const where: Record<string, unknown> = { IdPerson: String(cId) }
+		if (withGeneration && generation !== null) {
+			where.Generation = generation
+		}
+		return strapi.db.query(CS_MEMBER_UID).findOne({
+			where,
+			orderBy: { Generation: 'desc' },
+			select: ['Phone'],
+		}) as { Phone?: string | null } | null
+	}
+
+	const member = generation === null
+		? await findMember(false)
+		: await findMember(true) ?? await findMember(false)
+	if (!member) {
+		return { found: false, phone: null }
+	}
+	return { found: true, phone: phoneFromCsMember(member) }
+}
+
+/**
+ * Erzeugt eine Telefonnummern-Suche für CS_Member.
+ *
+ * Die Ergebnisse werden pro Importlauf zwischengespeichert, damit
+ * bei mehreren Deckrüden desselben Besitzers nur eine Abfrage
+ * entsteht.
+ */
+export function createCsMemberPhoneLookup(
+	strapi: Core.Strapi,
+	generation: number | null = null,
+): (cId: number) => Promise<CsMemberPhone> {
+	const cache = new Map<number, CsMemberPhone>()
+	return async (cId: number) => {
+		const cached = cache.get(cId)
+		if (cached) {
+			return cached
+		}
+		const result = await queryCsMemberPhone(strapi, cId, generation)
+		cache.set(cId, result)
+		return result
+	}
+}
+
+/**
+ * Bestehender Züchter bzw. Deckrüdenbesitzer mit Telefonnummer.
+ */
+export interface BreederRecord {
+	id?: number
+	documentId?: string
+	phone: string | null
+}
+
+/**
+ * Lädt alle Züchter mit cId, damit der CS_Member-Import nicht für
+ * jeden Datensatz eine eigene Datenbankabfrage benötigt.
+ */
+export async function loadBreedersByCId(
+	strapi: Core.Strapi,
+): Promise<Map<number, BreederRecord>> {
+	const breeders = await strapi.db.query(BREEDER_UID).findMany({
+		select: ['id', 'documentId', 'cId', 'Phone'],
+	}) as {
+		id?: number
+		documentId?: string
+		cId?: number | null
+		Phone?: string | null
+	}[]
+	const byCId = new Map<number, BreederRecord>()
+	for (const breeder of breeders) {
+		if (typeof breeder.cId !== 'number') {
+			continue
+		}
+		const phone = typeof breeder.Phone === 'string' ? breeder.Phone.trim() : ''
+		byCId.set(breeder.cId, {
+			id: breeder.id,
+			documentId: breeder.documentId,
+			phone: phone.length > 0 ? phone : null,
+		})
+	}
+	return byCId
 }
 
 async function loadBreederPhone(
@@ -651,9 +758,9 @@ async function loadBreederPhone(
 ): Promise<string | null> {
 	const breeder = await strapi.db.query(BREEDER_UID).findOne({
 		where: { id: breederId },
-		select: ['phone'],
-	}) as { phone?: string | null } | null
-	const phone = typeof breeder?.phone === 'string' ? breeder.phone.trim() : ''
+		select: ['Phone'],
+	}) as { Phone?: string | null } | null
+	const phone = typeof breeder?.Phone === 'string' ? breeder.Phone.trim() : ''
 	return phone.length > 0 ? phone : null
 }
 
@@ -661,30 +768,39 @@ export async function ensureBreederForCsMember(
 	strapi: Core.Strapi,
 	member: Record<string, unknown>,
 	log: (line: string) => void,
+	breedersByCId?: Map<number, BreederRecord>,
 ) {
-	if (parseBoolean(member.PersonIsABreeder) !== true) {
-		return
-	}
 	const cId = parseInteger(member.IdPerson)
 	if (cId === null) {
 		log('CS_Member ohne IdPerson, Breeder-Anlage übersprungen')
 		return
 	}
 	const phone = phoneFromCsMember(member)
-	const existing = await findByCId(strapi, BREEDER_UID, cId)
+	const cached = breedersByCId?.get(cId)
+	const existing = cached
+		?? (breedersByCId ? null : await findByCId(strapi, BREEDER_UID, cId))
 	if (existing) {
-		// Bestehende Züchter: Telefonnummer aus CS nachziehen (Feld "Phone").
+		// Bestehender Züchter bzw. Deckrüdenbesitzer:
+		// Telefonnummer aus CS nachziehen (Feld "Phone").
 		if (!phone || typeof existing.id !== 'number') {
 			return
 		}
-		const storedPhone = await loadBreederPhone(strapi, existing.id)
+		const storedPhone = cached
+			? cached.phone
+			: await loadBreederPhone(strapi, existing.id)
 		if (storedPhone === phone) {
 			return
 		}
 		await saveDocument(strapi, BREEDER_UID, existing, { Phone: phone })
+		if (cached) {
+			cached.phone = phone
+		}
 		log(
 			`Breeder-Telefon aktualisiert cId=${cId} documentId=${existing.documentId ?? existing.id}`,
 		)
+		return
+	}
+	if (parseBoolean(member.PersonIsABreeder) !== true) {
 		return
 	}
 	const data: TargetData = {
@@ -708,6 +824,9 @@ export async function ensureBreederForCsMember(
 		data.Address = address
 	}
 	const savedId = await saveDocument(strapi, BREEDER_UID, null, data)
+	if (breedersByCId) {
+		breedersByCId.set(cId, { documentId: savedId, phone })
+	}
 	log(`Breeder erstellt cId=${cId} documentId=${savedId}`)
 }
 
@@ -837,11 +956,37 @@ async function ensureStudDogOwnerGroup(
 	log(`Besitzer${cId} in die Gruppe ${STUD_DOG_OWNER_GROUP_KEY} aufgenommen`)
 }
 
+/**
+ * Telefonnummer für das Breeder-Profil eines Deckrüdenbesitzers.
+ *
+ * Vorrang hat `CS_Member.Phone`, weil das Attribut `Breeder.Phone`
+ * ausschliesslich aus CS befüllt wird. Die Telefonnummer des
+ * Benutzerkontos dient nur als Rückfall, wenn kein CS_Member
+ * vorhanden ist.
+ */
+async function resolveStudDogPhone(
+	ownerCId: number,
+	ownerPhone: unknown,
+	loadCsMemberPhone?: (cId: number) => Promise<CsMemberPhone>,
+): Promise<string | null> {
+	if (loadCsMemberPhone) {
+		const csMember = await loadCsMemberPhone(ownerCId)
+		if (csMember.found) {
+			return csMember.phone
+		}
+	}
+
+	return truncateOrNull(cell(ownerPhone), 50)
+}
+
 export async function updateStudDog(
 	strapi: Core.Strapi,
 	dog: Record<string, unknown>,
 	log: (line: string) => void,
-	options?: { fixGroups?: boolean },
+	options?: {
+		fixGroups?: boolean
+		loadCsMemberPhone?: (cId: number) => Promise<CsMemberPhone>
+	},
 ) {
 	const dogId = parseInteger(dog.cId)
 	const ownerCId = parseInteger(dog.cOwnerId)
@@ -887,7 +1032,11 @@ export async function updateStudDog(
 		member: ownerId,
 	}
 	assign(data, 'BreederEmail', parseEmail(owner.cEmail))
-	assign(data, 'Phone', truncateOrNull(cell(owner.phone), 50))
+	assign(data, 'Phone', await resolveStudDogPhone(
+		ownerCId,
+		owner.phone,
+		options?.loadCsMemberPhone,
+	))
 	const address = addressFromUser(owner)
 	if (address) {
 		data.Address = address
