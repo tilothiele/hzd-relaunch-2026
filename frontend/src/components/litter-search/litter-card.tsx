@@ -5,6 +5,10 @@ import Image from 'next/image'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { formatDayMonthYear } from '@/lib/date-utils'
 import type { Litter, HzdSetting } from '@/types'
+import {
+	getPuppyAvailabilityRows,
+	PuppyAvailabilityCardRows,
+} from '@/components/litter-search/puppy-availability'
 
 interface LitterCardProps {
     litter: Litter
@@ -57,6 +61,7 @@ export function LitterCard({ litter, strapiBaseUrl, hzdSetting, distance, format
     const breederMember = litter.breeder?.Address?.FullName?.trim() ?? ''
     const motherName = litter.mother?.fullKennelName ?? litter.mother?.givenName ?? 'Unbekannt'
     const stuntDogName = litter.stuntDog?.fullKennelName ?? litter.stuntDog?.givenName
+    const puppyRows = getPuppyAvailabilityRows(litter)
 
 
     return (
@@ -75,7 +80,7 @@ export function LitterCard({ litter, strapiBaseUrl, hzdSetting, distance, format
             {/* Images - 3 columns */}
             <div className='mb-4 grid grid-cols-3 gap-4'>
                 {/* Mother */}
-                <div className='relative aspect-[4/3] overflow-hidden rounded-md bg-gray-100'>
+                <div className='group relative aspect-[4/3] overflow-hidden rounded-md bg-gray-100'>
                     <Image
                         src={resolveMediaUrl(
                             litter.mother?.avatar ||
@@ -86,12 +91,12 @@ export function LitterCard({ litter, strapiBaseUrl, hzdSetting, distance, format
                         ) || ''}
                         alt="Zuchthündin"
                         fill
-                        className='object-cover'
+                        className='object-cover transition-transform duration-300 group-hover:scale-110'
                         unoptimized
                     />
                 </div>
                 {/* Stunt Dog */}
-                <div className='relative aspect-[4/3] overflow-hidden rounded-md bg-gray-100'>
+                <div className='group relative aspect-[4/3] overflow-hidden rounded-md bg-gray-100'>
                     <Image
                         src={resolveMediaUrl(
                             litter.stuntDog?.avatar ||
@@ -102,12 +107,12 @@ export function LitterCard({ litter, strapiBaseUrl, hzdSetting, distance, format
                         ) || ''}
                         alt="Vater"
                         fill
-                        className='object-cover'
+                        className='object-cover transition-transform duration-300 group-hover:scale-110'
                         unoptimized
                     />
                 </div>
                 {/* Puppy image or placeholder */}
-                <div className='relative aspect-[4/3] overflow-hidden rounded-md bg-gray-100'>
+                <div className='group relative aspect-[4/3] overflow-hidden rounded-md bg-gray-100'>
                     <Image
                         src={resolveMediaUrl(
                             litter.PuppyImage || hzdSetting?.DefaultLitterAvatar,
@@ -115,7 +120,7 @@ export function LitterCard({ litter, strapiBaseUrl, hzdSetting, distance, format
                         ) || '/static-images/placeholder/puppies.png'}
                         alt="Welpen"
                         fill
-                        className='object-cover'
+                        className='object-cover transition-transform duration-300 group-hover:scale-110'
                         unoptimized
                     />
                 </div>
@@ -174,52 +179,12 @@ export function LitterCard({ litter, strapiBaseUrl, hzdSetting, distance, format
                                 <td className="py-2 align-top">{formatDate(litter.dateOfBirth)}</td>
                             </tr>
                         )}
+                        {litter.LitterStatus === 'Littered' && puppyRows.length > 0 ? (
+                            <PuppyAvailabilityCardRows rows={puppyRows} />
+                        ) : null}
                     </tbody>
                 </table>
             </div>
-            {(litter.LitterStatus === 'Littered') && (litter.AmountRS || litter.AmountRSM || litter.AmountRB || litter.AmountHS || litter.AmountHSM || litter.AmountHB) ? (
-                <div className='mt-3 space-y-1 border-t border-gray-200 pt-2'>
-                    <table className="w-full">
-                        <thead>
-                            <tr className="text-gray-500">
-                                <th className="text-left font-medium pb-2"></th>
-                                <th className="text-center font-bold pb-2">RÜDEN</th>
-                                <th className="text-center font-bold pb-2">HÜNDINNEN</th>
-                            </tr>
-                        </thead>
-                        <tbody className="text-gray-700">
-                            {[
-                                { key: 'S', label: 'Schwarz' },
-                                { key: 'SM', label: 'Schwarzmarken' },
-                                { key: 'B', label: 'Blond' }
-                            ].map(({ key, label }) => {
-                                const male = (litter as any)[`AmountR${key}`]
-                                const female = (litter as any)[`AmountH${key}`]
-                                if (!male && !female) return null
-
-                                const hasAvailable = (male?.Available ?? 0) > 0 || (female?.Available ?? 0) > 0
-                                const rowClass = hasAvailable ? 'border-b border-gray-100 last:border-0' : 'border-b border-gray-100 last:border-0 text-gray-400'
-
-                                return (
-                                    <tr key={key} className={rowClass}>
-                                        <td className="py-1 font-medium">{label}</td>
-                                        <td className="py-1 text-center font-mono">
-                                            <span className={male?.Available > 0 ? 'text-green-700 font-bold' : (!hasAvailable ? 'text-gray-400' : 'text-gray-600')}>
-                                                {male?.Available ?? 0}/{male?.Total ?? 0}
-                                            </span>
-                                        </td>
-                                        <td className="py-1 text-center font-mono">
-                                            <span className={female?.Available > 0 ? 'text-green-700 font-bold' : (!hasAvailable ? 'text-gray-400' : 'text-gray-600')}>
-                                                {female?.Available ?? 0}/{female?.Total ?? 0}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                )
-                            })}
-                        </tbody>
-                    </table>
-                </div>
-            ) : null}
             {litter.StatusMessage ? (
                 <div className='mt-3 rounded bg-blue-50 p-2'>
                     <p className='text-xs text-blue-700'>{litter.StatusMessage}</p>

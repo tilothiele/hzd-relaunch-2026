@@ -5,6 +5,10 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import CloseIcon from '@mui/icons-material/Close'
 import Image from 'next/image'
 import type { Litter, HzdSetting } from '@/types'
+import {
+	getPuppyAvailabilityRows,
+	PuppyAvailabilityDetail,
+} from '@/components/litter-search/puppy-availability'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { formatDayMonthYear } from '@/lib/date-utils'
 import { theme } from '@/themes'
@@ -207,6 +211,7 @@ export function LitterDetailView({
     )
 
     const isLittered = litter.LitterStatus === 'Littered'
+    const puppyRows = getPuppyAvailabilityRows(litter)
 
     return (
         <div className='bg-white p-4 md:p-8 animate-in fade-in duration-300'>
@@ -324,42 +329,13 @@ export function LitterDetailView({
                 )}
 
                 {/* 3. Welpen Statistik */}
-                {isLittered && (litter.AmountRS || litter.AmountRSM || litter.AmountRB || litter.AmountHS || litter.AmountHSM || litter.AmountHB) && (
+                {isLittered && puppyRows.length > 0 && (
                     <section>
                         <SectionHeader title="Welpen" onBack={onBack} />
-                        <div className='mb-6 space-y-2 pt-4'>
-                            <div className="flex justify-between items-center mb-2 px-4">
-                                <p className='font-medium text-gray-700'>Verfügbarkeit:</p>
-                                <div className="flex gap-4 text-[10px] text-gray-500 font-bold">
-                                    <span className="w-24 text-center">RUDE (R)</span>
-                                    <span className="w-24 text-center">HÜNDIN (H)</span>
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                {([
-                                    { key: 'S', label: 'Schwarz', maleKey: 'AmountRS', femaleKey: 'AmountHS' },
-                                    { key: 'SM', label: 'Schwarzmarken', maleKey: 'AmountRSM', femaleKey: 'AmountHSM' },
-                                    { key: 'B', label: 'Blond', maleKey: 'AmountRB', femaleKey: 'AmountHB' }
-                                ] as const).map(({ key, label, maleKey, femaleKey }) => {
-                                    const male = litter[maleKey]
-                                    const female = litter[femaleKey]
-                                    if (!male && !female) return null
-
-                                    return (
-                                        <div key={key} className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
-                                            <span className="text-sm font-semibold text-gray-700">{label}:</span>
-                                            <div className="flex gap-4 font-mono text-sm">
-                                                <span className={`w-24 text-center ${(male?.Available ?? 0) > 0 ? 'text-green-700 font-bold' : 'text-gray-400'}`}>
-                                                    {male?.Available ?? 0} / {male?.Total ?? 0}
-                                                </span>
-                                                <span className={`w-24 text-center ${(female?.Available ?? 0) > 0 ? 'text-green-700 font-bold' : 'text-gray-400'}`}>
-                                                    {female?.Available ?? 0} / {female?.Total ?? 0}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    )
-                                })}
+                        <div className='mb-6 pt-4'>
+                            <p className='mb-2 font-medium text-gray-700'>Verfügbarkeit:</p>
+                            <div className='rounded-lg bg-gray-50 px-6 py-2'>
+                                <PuppyAvailabilityDetail rows={puppyRows} />
                             </div>
                         </div>
                     </section>
