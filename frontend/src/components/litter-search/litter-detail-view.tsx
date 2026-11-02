@@ -57,7 +57,7 @@ function DetailRow({ label, value }: DetailRowProps) {
 const getStatusLabel = (status: Litter['LitterStatus']) => {
     switch (status) {
         case 'Planned': return 'Geplant'
-        case 'Manted': return 'Gedeckt'
+        case 'Manted': return 'Erwartet'
         case 'Littered': return 'Geworfen'
         case 'Closed': return 'Geschlossen'
         default: return status

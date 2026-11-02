@@ -417,7 +417,7 @@ export function MeineWuerfeTab({
                                     <TableCell>
                                         <Chip
                                             label={litter.LitterStatus === 'Planned' ? 'Geplant' :
-                                                litter.LitterStatus === 'Manted' ? 'Gedeckt' :
+                                                litter.LitterStatus === 'Manted' ? 'Erwartet' :
                                                     litter.LitterStatus === 'Littered' ? 'Geworfen' :
                                                         litter.LitterStatus === 'Closed' ? 'Abgeschlossen' : litter.LitterStatus}
                                             size='small'
@@ -476,7 +476,7 @@ export function MeineWuerfeTab({
                                         sx={{ bgcolor: 'white', minWidth: 150 }}
                                     >
                                         <MenuItem value="Planned">Geplant</MenuItem>
-                                        <MenuItem value="Manted">Gedeckt</MenuItem>
+                                        <MenuItem value="Manted">Erwartet</MenuItem>
                                         <MenuItem value="Littered">Geworfen</MenuItem>
                                         <MenuItem value="Closed">Geschlossen</MenuItem>
                                     </Select>
