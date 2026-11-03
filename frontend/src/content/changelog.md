@@ -12,5 +12,5 @@ Alle wichtigen funktionalen Änderungen an HZD-Website.
 - Bei Züchtern und Deckrüdenbesitzern wird standardmäßig eine zufällige Reihenfolge gewählt. Alternativ kann nach PLZ sortiert werden.
 
 
-## [1.1.1] - 23.10.2026 - Initiales Release
+## [1.1.1] - 23.10.2026 - Initiales Release - Die Website geht online!
 
