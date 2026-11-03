@@ -72,17 +72,26 @@ function AvailabilityEntries({ entries }: { entries: PuppyAvailabilityEntry[] })
 }
 
 export function PuppyAvailabilityCardRows({ rows }: { rows: PuppyAvailabilityRow[] }) {
-	return rows.map((row, index) => (
-		<tr
-			key={row.key}
-			className={`border-b border-gray-100 last:border-0 ${index === 0 ? 'border-t border-gray-200' : ''}`}
-		>
-			<td className='w-[40%] py-2 align-top font-bold'>{row.label}</td>
-			<td className='py-2 align-top'>
-				<AvailabilityEntries entries={row.entries} />
-			</td>
-		</tr>
-	))
+	return (
+		<>
+			<tr className='border-t border-b border-gray-200'>
+				<td colSpan={2} className='py-2 align-top font-bold'>
+					Verfügbare Welpen:
+				</td>
+			</tr>
+			{rows.map((row) => (
+				<tr
+					key={row.key}
+					className='border-b border-gray-100 last:border-0'
+				>
+					<td className='w-[40%] py-2 align-top font-bold'>{row.label}</td>
+					<td className='py-2 align-top'>
+						<AvailabilityEntries entries={row.entries} />
+					</td>
+				</tr>
+			))}
+		</>
+	)
 }
 
 export function PuppyAvailabilityDetail({ rows }: { rows: PuppyAvailabilityRow[] }) {
