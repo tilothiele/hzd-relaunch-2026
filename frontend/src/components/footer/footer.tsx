@@ -99,7 +99,24 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 							<div className='mt-4 grid grid-cols-2 gap-2 px-2'>
 								<div>
 									<p className='text-sm'>TIK/IT-Support</p>
-									<div className='text-sm'>{globalLayout?.Footer?.SupportEmail}</div>
+									{globalLayout?.Footer?.SupportEmail?.trim() ? (
+										<div className='text-sm'>
+											<a
+												href={`mailto:${globalLayout.Footer.SupportEmail.trim()}`}
+												className='underline transition-colors hover:text-yellow-400'
+											>
+												{globalLayout.Footer.SupportEmail.trim()}
+											</a>
+										</div>
+									) : null}
+									<div>
+										<Link
+											href='/changelog'
+											className='text-sm underline transition-colors hover:text-yellow-400'
+										>
+											Changelog
+										</Link>
+									</div>
 								</div>
 								<div>
 									<div><Link href='/impressum' className='text-sm transition-colors hover:text-yellow-400 underline'>
