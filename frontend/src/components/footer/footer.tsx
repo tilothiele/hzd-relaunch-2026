@@ -6,6 +6,7 @@ import Image from 'next/image'
 import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '../header/logo-utils'
 import { SocialLinks } from '../header/social-links'
+import { PhoneLink } from '@/components/common/phone-link'
 
 interface FooterProps {
 	globalLayout?: GlobalLayout | null
@@ -81,7 +82,9 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 											<div className='text-sm'>{contact.ZipCity}</div>
 										) : null}
 										{contact.Phone ? (
-											<div className='text-sm'>{contact.Phone}</div>
+											<div className='text-sm'>
+												<PhoneLink phone={contact.Phone} />
+											</div>
 										) : null}
 									</div>
 								))}

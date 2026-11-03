@@ -17,6 +17,7 @@ import { MeinePlz } from '@/components/hzd-map/meine-plz'
 import { breederDetailPath, resolveBreederContact, resolveBreederPhone } from '@/lib/breeder-display-utils'
 import { calculateDistance } from '@/lib/geo-utils'
 import { SearchResultPager } from '@/components/common/search-result-pager'
+import { PhoneLink } from '@/components/common/phone-link'
 import { ViewToggle } from '@/components/common/view-toggle'
 
 interface BreederSearchProps {
@@ -337,7 +338,15 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 													<TableCell>{contact.ownerDisplayName || '-'}</TableCell>
 													<TableCell>{contact.zip || '-'}</TableCell>
 													<TableCell>{contact.city || '-'}</TableCell>
-													<TableCell>{breederPhone || '-'}</TableCell>
+													<TableCell>
+														{breederPhone ? (
+															<PhoneLink
+																phone={breederPhone}
+																countryCode={contact.countryCode}
+																style={{ color: theme.submitButtonColor }}
+															/>
+														) : '-'}
+													</TableCell>
 													<TableCell>{contact.email || '-'}</TableCell>
 													<TableCell>{distance !== null ? `~${Math.round(distance)} km` : '-'}</TableCell>
 												</TableRow>

@@ -4,6 +4,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Box, Typography } from '@mui/material'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
+import { PhoneLink } from '@/components/common/phone-link'
+import { hasPhoneLabel } from '@/lib/phone'
 import { renderStrapiBlocks } from '@/lib/strapi-blocks'
 import type { ThemeDefinition } from '@/themes'
 
@@ -74,9 +76,8 @@ export function ContactDetail({ contact, strapiBaseUrl, theme }: ContactDetailPr
 
 						{contact.Phone ? (
 							<Typography variant='body1' sx={{ color: theme.cardsText, opacity: 0.9 }}>
-								{contact.Phone.startsWith('Tel.') || contact.Phone.startsWith('Mobil')
-									? contact.Phone
-									: `Tel.: ${contact.Phone}`}
+								{hasPhoneLabel(contact.Phone) ? null : 'Tel.: '}
+								<PhoneLink phone={contact.Phone} />
 							</Typography>
 						) : null}
 

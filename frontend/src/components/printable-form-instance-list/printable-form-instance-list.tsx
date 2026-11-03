@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Box, Typography, CircularProgress, Divider, Button } from '@mui/material'
 import PrintIcon from '@mui/icons-material/Print'
 import { countFormInstances } from '@/lib/strapi/api'
+import { PhoneLink } from '@/components/common/phone-link'
 import type { Form, FormInstance, FormInstanceSearchResult } from '@/types'
 
 interface PrintableFormInstanceListProps {
@@ -229,7 +230,9 @@ export function PrintableFormInstanceList({ form, strapiBaseUrl }: PrintableForm
 														{field.label}:
 													</Typography>
 													<Typography variant='body1' className='text-gray-900'>
-														{formatValue(value)}
+														{field.name === 'phone' && typeof value === 'string' && value.trim() ? (
+															<PhoneLink phone={value} />
+														) : formatValue(value)}
 													</Typography>
 												</Box>
 											)

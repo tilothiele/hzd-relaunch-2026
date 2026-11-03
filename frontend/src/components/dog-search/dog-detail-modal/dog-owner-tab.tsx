@@ -7,6 +7,7 @@ import HomeIcon from '@mui/icons-material/Home'
 import PhoneIcon from '@mui/icons-material/Phone'
 import EmailIcon from '@mui/icons-material/Email'
 import ContactMailIcon from '@mui/icons-material/ContactMail'
+import { PhoneLink } from '@/components/common/phone-link'
 
 interface DogOwnerTabProps {
     dog: Dog
@@ -80,9 +81,11 @@ export function DogOwnerTab({ dog }: DogOwnerTabProps) {
                                         </div>
                                     </Tooltip>
                                     <div>
-                                        <a href={`tel:${owner.phone}`} className='text-base text-blue-600 hover:underline'>
-                                            {owner.phone}
-                                        </a>
+                                        <PhoneLink
+                                            phone={owner.phone}
+                                            countryCode={owner.countryCode}
+                                            className='text-base text-blue-600 underline'
+                                        />
                                     </div>
                                 </div>
                             )}

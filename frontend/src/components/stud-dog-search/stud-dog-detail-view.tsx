@@ -12,6 +12,7 @@ import {
 } from '@/lib/breeder-display-utils'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { BackButton } from '@/components/ui/back-button'
+import { PhoneLink } from '@/components/common/phone-link'
 import { theme } from '@/themes'
 import { DogDetailView } from '@/components/dog-search/dog-detail-view'
 import { StudDogsList } from './stud-dogs-list'
@@ -131,13 +132,12 @@ export function StudDogDetailView({
 						{breederPhone ? (
 							<p>
 								<strong>Telefon:</strong>{' '}
-								<a
-									href={`tel:${breederPhone.replace(/[\s/]/g, '')}`}
-									className='hover:underline'
+								<PhoneLink
+									phone={breederPhone}
+									countryCode={contact.countryCode}
+									className='underline'
 									style={{ color: theme.submitButtonColor }}
-								>
-									{breederPhone}
-								</a>
+								/>
 							</p>
 						) : null}
 

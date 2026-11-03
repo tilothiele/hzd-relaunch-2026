@@ -11,6 +11,7 @@ import { findMaleOwnerDogAvatar, resolveBreederContact, formatBreederLocation, r
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 
 import { calculateDistance } from '@/lib/geo-utils'
+import { PhoneLink } from '@/components/common/phone-link'
 
 interface BreederCardProps {
 	breeder: Breeder
@@ -249,7 +250,10 @@ export function BreederCard({
 									</Tooltip>
 								</TableCell>
 								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-									{breederPhone}
+									<PhoneLink
+										phone={breederPhone}
+										countryCode={contact.countryCode}
+									/>
 								</TableCell>
 							</TableRow>
 						) : null}

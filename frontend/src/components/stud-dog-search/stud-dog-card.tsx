@@ -8,6 +8,7 @@ import type { Breeder, HzdSetting } from '@/types'
 import { findMaleOwnerDogAvatar, resolveBreederContact, formatBreederLocation, resolveBreederPhone } from '@/lib/breeder-display-utils'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { calculateDistance } from '@/lib/geo-utils'
+import { PhoneLink } from '@/components/common/phone-link'
 
 interface StudDogCardProps {
 	breeder: Breeder
@@ -151,7 +152,10 @@ export function StudDogCard({
 									</Tooltip>
 								</TableCell>
 								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-									{breederPhone}
+									<PhoneLink
+										phone={breederPhone}
+										countryCode={contact.countryCode}
+									/>
 								</TableCell>
 							</TableRow>
 						) : null}

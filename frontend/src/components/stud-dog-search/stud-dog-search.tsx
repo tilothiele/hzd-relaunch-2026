@@ -21,6 +21,7 @@ import type { Breeder, HzdSetting } from '@/types'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
 import { SearchResultPager } from '@/components/common/search-result-pager'
+import { PhoneLink } from '@/components/common/phone-link'
 import { ViewToggle } from '@/components/common/view-toggle'
 import { breederDetailPath, resolveBreederContact, resolveBreederPhone } from '@/lib/breeder-display-utils'
 import { calculateDistance } from '@/lib/geo-utils'
@@ -347,7 +348,15 @@ export function StudDogSearch({
 												<TableCell>{contact.ownerDisplayName || '-'}</TableCell>
 												<TableCell>{contact.zip || '-'}</TableCell>
 												<TableCell>{contact.city || '-'}</TableCell>
-												<TableCell>{breederPhone || '-'}</TableCell>
+												<TableCell>
+													{breederPhone ? (
+														<PhoneLink
+															phone={breederPhone}
+															countryCode={contact.countryCode}
+															style={{ color: theme.submitButtonColor }}
+														/>
+													) : '-'}
+												</TableCell>
 												<TableCell>{contact.email || '-'}</TableCell>
 												<TableCell>
 													{distance !== null

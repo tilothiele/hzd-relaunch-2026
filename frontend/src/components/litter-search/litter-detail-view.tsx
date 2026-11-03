@@ -13,6 +13,7 @@ import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { formatDayMonthYear } from '@/lib/date-utils'
 import { theme } from '@/themes'
 import { BackButton } from '@/components/ui/back-button'
+import { PhoneLink } from '@/components/common/phone-link'
 import { useState } from 'react'
 
 interface LitterDetailViewProps {
@@ -305,13 +306,12 @@ export function LitterDetailView({
                             <DetailRow
                                 label="Telefon"
                                 value={
-                                    <a
-                                        href={`tel:${breederPhone.replace(/[\s/]/g, '')}`}
-                                        className="text-primary hover:underline transition-colors"
+                                    <PhoneLink
+                                        phone={breederPhone}
+                                        countryCode={litter.breeder?.Address?.CountryCode}
+                                        className="text-primary underline transition-colors"
                                         style={{ color: theme.submitButtonColor }}
-                                    >
-                                        {breederPhone}
-                                    </a>
+                                    />
                                 }
                             />
                         )}

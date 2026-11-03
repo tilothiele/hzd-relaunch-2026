@@ -5,6 +5,7 @@ import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead
 import DownloadIcon from '@mui/icons-material/Download'
 import PrintIcon from '@mui/icons-material/Print'
 import { countFormInstances } from '@/lib/strapi/api'
+import { PhoneLink } from '@/components/common/phone-link'
 import type { Form, FormInstance, FormInstanceSearchResult } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 
@@ -318,7 +319,9 @@ export function FormInstanceList({ form, strapiBaseUrl, theme }: FormInstanceLis
 										return (
 											<TableCell key={fieldName}>
 												<Typography variant='body2' sx={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-													{formatValue(value)}
+													{fieldName === 'phone' && typeof value === 'string' && value.trim() ? (
+														<PhoneLink phone={value} />
+													) : formatValue(value)}
 												</Typography>
 											</TableCell>
 										)

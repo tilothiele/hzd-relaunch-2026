@@ -16,6 +16,7 @@ import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { theme } from '@/themes'
 import { BreederDogsList } from './breeder-dogs-list'
 import { BackButton } from '@/components/ui/back-button'
+import { PhoneLink } from '@/components/common/phone-link'
 import { DogDetailView } from '@/components/dog-search/dog-detail-view'
 
 interface BreederDetailViewProps {
@@ -181,9 +182,12 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack, 
                         {breederPhone ? (
                             <p>
                                 <strong>Telefon:</strong>{' '}
-                                <a href={`tel:${breederPhone.replace(/[\s/]/g, '')}`} className='hover:underline' style={{ color: theme.submitButtonColor }}>
-                                    {breederPhone}
-                                </a>
+                                <PhoneLink
+                                    phone={breederPhone}
+                                    countryCode={contact.countryCode}
+                                    className='underline'
+                                    style={{ color: theme.submitButtonColor }}
+                                />
                             </p>
                         ) : null}
 

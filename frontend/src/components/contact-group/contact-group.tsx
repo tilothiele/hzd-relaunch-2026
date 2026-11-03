@@ -7,6 +7,8 @@ import type { ContactGroup, Contact } from '@/types'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { renderStrapiBlocks } from '@/lib/strapi-blocks'
 import { ActionButton } from '@/components/ui/action-button'
+import { PhoneLink } from '@/components/common/phone-link'
+import { hasPhoneLabel } from '@/lib/phone'
 import type { ThemeDefinition } from '@/themes'
 
 interface ContactGroupProps {
@@ -33,16 +35,31 @@ function ContactCard({ contact, strapiBaseUrl, theme }: ContactCardProps) {
 				height: '100%',
 				display: 'flex',
 				flexDirection: 'column',
+				position: 'relative',
 				transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
 				'&:hover': {
 					boxShadow: hasIntroduction ? 6 : 3,
 					transform: hasIntroduction ? 'scale(1.02)' : 'none',
+				},
+				'&:hover .contact-card-name': {
+					textDecoration: contactLink ? 'underline' : 'none',
 				},
 				cursor: hasIntroduction ? 'pointer' : 'default',
 				backgroundColor: theme.cardsBackground,
 				color: theme.cardsText,
 			}}
 		>
+			{contactLink ? (
+				<Link
+					href={contactLink}
+					aria-label={contact.Name || contact.Headline || 'Kontakt'}
+					style={{
+						position: 'absolute',
+						inset: 0,
+						zIndex: 1,
+					}}
+				/>
+			) : null}
 			{avatarUrl ? (
 				<CardMedia
 					component='div'
@@ -89,13 +106,10 @@ function ContactCard({ contact, strapiBaseUrl, theme }: ContactCardProps) {
 				{contact.Name ? (
 					<Typography
 						variant='body1'
-						className='font-medium'
+						className='contact-card-name font-medium'
 						sx={{
 							mb: .5,
 							color: theme.cardsText,
-							'&:hover': {
-								textDecoration: contactLink ? 'underline' : 'none',
-							},
 						}}
 					>
 						{contact.Name}
@@ -116,10 +130,17 @@ function ContactCard({ contact, strapiBaseUrl, theme }: ContactCardProps) {
 					) : null}
 
 					{contact.Phone ? (
-						<Typography variant='body2' sx={{ color: theme.cardsText, opacity: 0.9 }}>
-							{contact.Phone.startsWith('Tel.') || contact.Phone.startsWith('Mobil')
-								? contact.Phone
-								: `Tel.: ${contact.Phone}`}
+						<Typography
+							variant='body2'
+							sx={{
+								position: 'relative',
+								zIndex: 2,
+								color: theme.cardsText,
+								opacity: 0.9,
+							}}
+						>
+							{hasPhoneLabel(contact.Phone) ? null : 'Tel.: '}
+							<PhoneLink phone={contact.Phone} />
 						</Typography>
 					) : null}
 
@@ -138,16 +159,6 @@ function ContactCard({ contact, strapiBaseUrl, theme }: ContactCardProps) {
 			</CardContent>
 		</Card>
 	)
-
-	if (contactLink) {
-		return (
-			<Box sx={{ height: '100%' }}>
-				<Link href={contactLink} style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}>
-					{cardContent}
-				</Link>
-			</Box>
-		)
-	}
 
 	return <Box sx={{ height: '100%' }}>{cardContent}</Box>
 }
