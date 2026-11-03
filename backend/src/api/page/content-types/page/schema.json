@@ -45,7 +45,8 @@
         "blocks.action-images-section",
         "blocks.black-board-section",
         "blocks.form-section",
-        "blocks.md-text-section"
+        "blocks.md-text-section",
+        "blocks.advent-calendar-section"
       ]
     },
     "ColorTheme": {

@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_blocks_advent_calendar_sections",
+  "info": {
+    "displayName": "AdventCalendarSection"
+  },
+  "options": {},
+  "attributes": {
+    "TestDate": {
+      "type": "datetime"
+    },
+    "advent_calendar": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::advent-calendar.advent-calendar"
+    }
+  },
+  "config": {}
+}

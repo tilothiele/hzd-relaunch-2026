@@ -417,6 +417,67 @@ h5 {
 	max-height: none !important;
 }
 
+@keyframes advent-snow-fall {
+	0% {
+		transform: translate3d(0, -12vh, 0);
+	}
+	100% {
+		transform: translate3d(18px, 112vh, 0);
+	}
+}
+
+.advent-snowflake {
+	position: absolute;
+	top: -8%;
+	border-radius: 9999px;
+	background: white;
+	animation-name: advent-snow-fall;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+	will-change: transform;
+}
+
+.advent-door {
+	perspective: 900px;
+	transition: transform 180ms ease, filter 180ms ease;
+}
+
+.advent-door-flap {
+	transform-origin: left center;
+	transition: transform 0.9s cubic-bezier(0.45, 0.05, 0.2, 1);
+	backface-visibility: hidden;
+}
+
+.advent-door:hover:not(:disabled) .advent-door-flap,
+.advent-door:focus-visible:not(:disabled) .advent-door-flap,
+.advent-door.is-opening .advent-door-flap {
+	transform: rotateY(-112deg);
+}
+
+.advent-door:hover:not(:disabled),
+.advent-door:focus-visible:not(:disabled) {
+	transform: translateY(-4px);
+	filter: brightness(1.05);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.advent-snowflake {
+		animation: none;
+		top: 12%;
+	}
+
+	.advent-door,
+	.advent-door:hover:not(:disabled),
+	.advent-door-flap,
+	.advent-door:hover:not(:disabled) .advent-door-flap,
+	.advent-door:focus-visible:not(:disabled) .advent-door-flap,
+	.advent-door.is-opening .advent-door-flap {
+		transition: none;
+		transform: none;
+		filter: none;
+	}
+}
+
 /* Mobile Logo Fix - Ensure logo displays correctly on small screens */
 @media (max-width: 375px) {
 	.header-logo-link {

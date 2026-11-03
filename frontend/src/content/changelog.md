@@ -10,6 +10,7 @@ Alle wichtigen funktionalen Änderungen an HZD-Website.
 - Wurfstatus 'Gedeckt' umbenannt in 'Erwartet'
 - Paginierung im Bereich Zucht ober- und unterhalb der Trefferliste
 - Bei Züchtern und Deckrüdenbesitzern wird standardmäßig eine zufällige Reihenfolge gewählt. Alternativ kann nach PLZ sortiert werden.
+- Adventskalender integriert (initiale Version)
 
 
 ## [1.1.1] - 23.10.2026 - Initiales Release - Die Website geht online!

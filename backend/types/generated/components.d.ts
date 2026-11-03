@@ -10,6 +10,34 @@ export interface BlocksActionImagesSection extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksAdventCalendarSection extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_advent_calendar_sections';
+  info: {
+    displayName: 'AdventCalendarSection';
+  };
+  attributes: {
+    advent_calendar: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::advent-calendar.advent-calendar'
+    >;
+    TestDate: Schema.Attribute.DateTime;
+  };
+}
+
+export interface BlocksAdventDay extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_advent_days';
+  info: {
+    displayName: 'AdventDay';
+  };
+  attributes: {
+    AdventImage: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
+    Day: Schema.Attribute.Integer;
+    GreetingOfTheDay: Schema.Attribute.Text;
+  };
+}
+
 export interface BlocksBbDocument extends Struct.ComponentSchema {
   collectionName: 'components_blocks_bb_documents';
   info: {
@@ -893,6 +921,8 @@ declare module '@strapi/strapi' {
   export namespace Public {
     export interface ComponentSchemas {
       'blocks.action-images-section': BlocksActionImagesSection;
+      'blocks.advent-calendar-section': BlocksAdventCalendarSection;
+      'blocks.advent-day': BlocksAdventDay;
       'blocks.bb-document': BlocksBbDocument;
       'blocks.bb-entry': BlocksBbEntry;
       'blocks.black-board-section': BlocksBlackBoardSection;

@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_blocks_advent_days",
+  "info": {
+    "displayName": "AdventDay"
+  },
+  "options": {},
+  "attributes": {
+    "Day": {
+      "type": "integer"
+    },
+    "GreetingOfTheDay": {
+      "type": "text"
+    },
+    "AdventImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  },
+  "config": {}
+}

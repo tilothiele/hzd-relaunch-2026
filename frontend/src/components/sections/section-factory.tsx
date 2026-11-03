@@ -22,6 +22,7 @@ import { PassedDogsSectionClientLoader } from './passed-dogs-section/passed-dogs
 import { BlackBoardSectionComponent } from './black-board-section/black-board-section'
 import { FormSectionClientLoader } from './form-section/form-section-client-loader'
 import { MdTextSectionComponent } from './md-text-section/md-text-section'
+import { AdventCalendarSectionComponent } from './advent-calendar-section/advent-calendar-section'
 
 
 interface RenderStartpageSectionsParams {
@@ -214,6 +215,15 @@ function renderStartpageSection({
 				<MdTextSectionComponent
 					key={key}
 					section={section}
+					theme={theme}
+				/>
+			)
+		case 'ComponentBlocksAdventCalendarSection':
+			return (
+				<AdventCalendarSectionComponent
+					key={key}
+					section={section}
+					strapiBaseUrl={strapiBaseUrl}
 					theme={theme}
 				/>
 			)

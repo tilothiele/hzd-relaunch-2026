@@ -380,7 +380,27 @@ export interface MdTextSection {
 	MarkdownText?: string | null
 }
 
-export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | DetailedImageGallerySection | SimpleCtaSection | ActionImagesSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection | DocumentBundleSection | TableOfContentSection | ChampionsSection | PassedDogsSection | BlackBoardSection | FormSection | MdTextSection
+export interface AdventDay {
+	id?: string | number | null
+	Day?: number | null
+	GreetingOfTheDay?: string | null
+	AdventImage?: Image | null
+}
+
+export interface AdventCalendar {
+	documentId?: string | null
+	Description?: string | null
+	AdventDay?: AdventDay[] | null
+}
+
+export interface AdventCalendarSection {
+	__typename: 'ComponentBlocksAdventCalendarSection'
+	id?: string | number | null
+	TestDate?: string | null
+	advent_calendar?: AdventCalendar | null
+}
+
+export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | DetailedImageGallerySection | SimpleCtaSection | ActionImagesSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection | DocumentBundleSection | TableOfContentSection | ChampionsSection | PassedDogsSection | BlackBoardSection | FormSection | MdTextSection | AdventCalendarSection
 
 export type PageSection = StartpageSection
 

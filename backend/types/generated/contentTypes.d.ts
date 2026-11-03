@@ -443,6 +443,36 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiAdventCalendarAdventCalendar
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'advent_calendars';
+  info: {
+    displayName: 'AdventCalendar';
+    pluralName: 'advent-calendars';
+    singularName: 'advent-calendar';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    AdventDay: Schema.Attribute.Component<'blocks.advent-day', true>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    Description: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::advent-calendar.advent-calendar'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiAnnouncementAnnouncement
   extends Struct.CollectionTypeSchema {
   collectionName: 'announcements';
@@ -1680,6 +1710,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.black-board-section',
         'blocks.form-section',
         'blocks.md-text-section',
+        'blocks.advent-calendar-section',
       ]
     >;
     SEO: Schema.Attribute.Component<'seo.seo', true>;
@@ -3097,6 +3128,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::advent-calendar.advent-calendar': ApiAdventCalendarAdventCalendar;
       'api::announcement.announcement': ApiAnnouncementAnnouncement;
       'api::author.author': ApiAuthorAuthor;
       'api::black-board.black-board': ApiBlackBoardBlackBoard;

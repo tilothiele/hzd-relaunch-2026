@@ -31,6 +31,7 @@ const SECTION_BLOCK_COMPONENTS = [
 	'blocks.black-board-section',
 	'blocks.form-section',
 	'blocks.md-text-section',
+	'blocks.advent-calendar-section',
 ] as const
 
 /** Dynamic Zone in news-article (schema) */
@@ -136,6 +137,12 @@ function appendSectionsDeepPopulate(
 			case 'blocks.form-section':
 				params.set(`${base}[form][fields][0]`, 'documentId')
 				params.set(`${base}[form][fields][1]`, 'Name')
+				break
+			case 'blocks.advent-calendar-section':
+				params.set(
+					`${base}[advent_calendar][populate][AdventDay][populate][AdventImage]`,
+					'true',
+				)
 				break
 			default:
 				// Kein `[populate]=true` — Strapi 5 interpretiert den Wert sonst als Key "true".

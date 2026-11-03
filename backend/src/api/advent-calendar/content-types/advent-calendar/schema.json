@@ -1,0 +1,23 @@
+{
+  "kind": "collectionType",
+  "collectionName": "advent_calendars",
+  "info": {
+    "singularName": "advent-calendar",
+    "pluralName": "advent-calendars",
+    "displayName": "AdventCalendar"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "Description": {
+      "type": "string"
+    },
+    "AdventDay": {
+      "type": "component",
+      "component": "blocks.advent-day",
+      "repeatable": true
+    }
+  }
+}
