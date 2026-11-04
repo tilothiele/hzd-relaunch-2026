@@ -21,6 +21,7 @@ import { renderFormField } from './form-field-renderer'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { renderStrapiBlocks } from '@/lib/strapi-blocks'
 import { AltchaField } from '@/components/altcha/altcha-field'
+import { RequiredFieldsNote } from '@/components/form/required-fields-note'
 import { useAuth } from '@/hooks/use-auth'
 import { theme } from '@/themes'
 
@@ -251,6 +252,8 @@ export function FormComponent({
 					{form.Name}
 				</Typography>
 			) : null}
+
+			<RequiredFieldsNote />
 
 			{form.FormFields?.map((field, index) => renderFormField(field, index, values, handleChange))}
 

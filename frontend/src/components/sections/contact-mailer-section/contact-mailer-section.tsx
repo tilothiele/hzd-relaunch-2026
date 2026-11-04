@@ -5,6 +5,7 @@ import { TextField, Button, MenuItem, Select, FormControl, InputLabel, Box, Aler
 import type { ContactMailerSection } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { AltchaField } from '@/components/altcha/altcha-field'
+import { RequiredFieldsNote } from '@/components/form/required-fields-note'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { useAuth } from '@/hooks/use-auth'
 import { SubmitButton } from '@/components/ui/submit-button'
@@ -157,7 +158,8 @@ export function ContactMailerSectionComponent({
                     )}
 
                     <form onSubmit={handleSubmit}>
-                        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+                        <RequiredFieldsNote color={theme.textColor} />
+                        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3, mt: 2 }}>
                             <TextField
                                 label="Ihre E-Mail Adresse"
                                 name="from"

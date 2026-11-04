@@ -24,6 +24,7 @@ import {
 	submitPassedDogUpdate,
 } from '@/lib/server/passed-dog-actions'
 import { AltchaField } from '@/components/altcha/altcha-field'
+import { RequiredFieldsNote } from '@/components/form/required-fields-note'
 import { useAuth } from '@/hooks/use-auth'
 
 function sessionUserName(user: {
@@ -232,6 +233,8 @@ export function PassedDogFormModal({
 					dividers
 					sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
 				>
+					<RequiredFieldsNote />
+
 					{formError ? (
 						<Typography color="error" variant="body2">
 							{formError}
