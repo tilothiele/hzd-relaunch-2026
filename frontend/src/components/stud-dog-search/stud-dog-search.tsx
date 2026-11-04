@@ -21,6 +21,7 @@ import type { Breeder, HzdSetting } from '@/types'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
 import { SearchResultPager } from '@/components/common/search-result-pager'
+import { ExternalWebsiteLink } from '@/components/common/external-website-link'
 import { PhoneLink } from '@/components/common/phone-link'
 import { ViewToggle } from '@/components/common/view-toggle'
 import { breederDetailPath, resolveBreederContact, resolveBreederPhone } from '@/lib/breeder-display-utils'
@@ -345,7 +346,19 @@ export function StudDogSearch({
 												onClick={() => openBreeder(breeder)}
 												sx={{ cursor: 'pointer' }}
 											>
-												<TableCell>{contact.ownerDisplayName || '-'}</TableCell>
+												<TableCell>
+													{breeder.WebsiteUrl ? (
+														<ExternalWebsiteLink
+															href={breeder.WebsiteUrl}
+															stopPropagation
+															style={{ color: theme.submitButtonColor }}
+														>
+															{contact.ownerDisplayName || '-'}
+														</ExternalWebsiteLink>
+													) : (
+														contact.ownerDisplayName || '-'
+													)}
+												</TableCell>
 												<TableCell>{contact.zip || '-'}</TableCell>
 												<TableCell>{contact.city || '-'}</TableCell>
 												<TableCell>

@@ -67,7 +67,7 @@ export function LitterCard({ litter, strapiBaseUrl, hzdSetting, distance, format
     return (
         <div
             key={litter.documentId}
-            className={`rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md ${onClick ? 'cursor-pointer' : ''}`}
+            className={`rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-[background-color,border-color,box-shadow] duration-200 ease-out hover:border-gray-400 hover:bg-gray-100 hover:shadow-md ${onClick ? 'cursor-pointer' : ''}`}
             onClick={onClick}
         >
             <div className='mb-3 flex items-center justify-between'>

@@ -13,6 +13,7 @@ import {
     Switch,
 } from '@mui/material'
 import type { Breeder } from '@/types'
+import { ExternalWebsiteLink } from '@/components/common/external-website-link'
 import { updateEntity } from '@/lib/strapi/api'
 
 interface IchAlsDeckruedenbesitzerTabProps {
@@ -97,7 +98,13 @@ export function IchAlsDeckruedenbesitzerTab({
 
             <Box sx={{ mb: 3 }}>
                 <Typography variant='subtitle2' color='text.secondary'>Webseite (Veröffentlicht)</Typography>
-                <Typography variant='body1' sx={{ mb: 1 }}>{breeder.WebsiteUrl || '-'}</Typography>
+                <Typography variant='body1' sx={{ mb: 1 }}>
+                    {breeder.WebsiteUrl ? (
+                        <ExternalWebsiteLink href={breeder.WebsiteUrl}>
+                            {breeder.WebsiteUrl}
+                        </ExternalWebsiteLink>
+                    ) : '-'}
+                </Typography>
                 <TextField
                     label='Webseite (Entwurf)'
                     fullWidth

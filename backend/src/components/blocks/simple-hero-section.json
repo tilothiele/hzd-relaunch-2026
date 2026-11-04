@@ -73,6 +73,13 @@
         "medium",
         "tall"
       ]
+    },
+    "AiNote": {
+      "type": "enumeration",
+      "enum": [
+        "AiGenerated",
+        "AiModified"
+      ]
     }
   },
   "config": {}

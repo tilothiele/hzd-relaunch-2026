@@ -4,6 +4,7 @@ import type { CardItem } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { ActionButton } from '@/components/ui/action-button'
+import { AiNoteLabel } from '@/components/common/ai-note-label'
 
 interface BorderedCardItemProps {
     card: CardItem
@@ -38,6 +39,7 @@ export function BorderedCardItem({ card, strapiBaseUrl, theme, isUnread }: Borde
                         style={{ objectFit }}
                         unoptimized
                     />
+                    <AiNoteLabel note={card.AiNote} />
                 </div>
             )}
 

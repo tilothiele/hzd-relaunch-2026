@@ -12,6 +12,7 @@ import {
 } from '@/lib/breeder-display-utils'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { BackButton } from '@/components/ui/back-button'
+import { ExternalWebsiteLink } from '@/components/common/external-website-link'
 import { PhoneLink } from '@/components/common/phone-link'
 import { theme } from '@/themes'
 import { DogDetailView } from '@/components/dog-search/dog-detail-view'
@@ -109,7 +110,13 @@ export function StudDogDetailView({
 					/>
 				</div>
 				<h1 className='text-3xl font-bold text-gray-900 md:text-4xl'>
-					{title}
+					{breeder.WebsiteUrl ? (
+						<ExternalWebsiteLink href={breeder.WebsiteUrl} iconSize={24}>
+							{title}
+						</ExternalWebsiteLink>
+					) : (
+						title
+					)}
 				</h1>
 			</div>
 
@@ -166,6 +173,15 @@ export function StudDogDetailView({
 								<strong>PLZ / Ort:</strong>{' '}
 								{[contact.zip, contact.city].filter(Boolean).join(' ')}
 								{contact.countryCode ? ` / ${contact.countryCode}` : ''}
+							</p>
+						) : null}
+
+						{breeder.WebsiteUrl ? (
+							<p>
+								<strong>Webseite:</strong>{' '}
+								<ExternalWebsiteLink href={breeder.WebsiteUrl}>
+									{breeder.WebsiteUrl}
+								</ExternalWebsiteLink>
 							</p>
 						) : null}
 					</div>

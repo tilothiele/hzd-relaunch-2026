@@ -2249,6 +2249,7 @@ export interface PluginHzdPluginBreeder extends Struct.CollectionTypeSchema {
       >;
     BreedersMessage: Schema.Attribute.Text;
     breedingLicenseSince: Schema.Attribute.Date;
+    cBreederEmail: Schema.Attribute.Email;
     cId: Schema.Attribute.Integer & Schema.Attribute.Unique;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &

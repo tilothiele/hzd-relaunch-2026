@@ -5,6 +5,7 @@ import type { HeroLayout, SimpleHeroSection } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { ActionButton } from '@/components/ui/action-button'
+import { AiNoteLabel } from '@/components/common/ai-note-label'
 import { SectionContainer } from '../section-container/section-container'
 import { useScrollAnimation } from '@/hooks/use-scroll-animation'
 import { useState } from 'react'
@@ -126,6 +127,7 @@ export function SimpleHeroSectionComponent({
                                     unoptimized
                                 />
                             ) : null}
+                            <AiNoteLabel note={section.AiNote} />
                         </div>
                     ) : null}
 
@@ -257,6 +259,10 @@ export function SimpleHeroSectionComponent({
                                     }`}
                             />
                         ) : null}
+                        <AiNoteLabel
+                            note={section.AiNote}
+                            onLightFromMd={Boolean(section.FadingBorder) && !isImageLeft}
+                        />
                     </div>
                 ) : null}
             </div>

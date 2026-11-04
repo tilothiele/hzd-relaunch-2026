@@ -95,6 +95,7 @@ export interface BlocksCardItem extends Struct.ComponentSchema {
   };
   attributes: {
     ActionButton: Schema.Attribute.Component<'links.action-button', false>;
+    AiNote: Schema.Attribute.Enumeration<['AiGenerated', 'AiModified']>;
     BackgroundImage: Schema.Attribute.Media<'images' | 'files'>;
     ColorTheme: Schema.Attribute.Component<'layout.color-theme', false>;
     DisplayFormat: Schema.Attribute.Enumeration<['fill', 'fit']> &
@@ -354,6 +355,7 @@ export interface BlocksSimpleHeroSection extends Struct.ComponentSchema {
     displayName: 'SimpleHeroSection';
   };
   attributes: {
+    AiNote: Schema.Attribute.Enumeration<['AiGenerated', 'AiModified']>;
     FadingBorder: Schema.Attribute.Boolean &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<true>;

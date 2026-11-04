@@ -105,6 +105,9 @@
     },
     "Phone": {
       "type": "string"
+    },
+    "cBreederEmail": {
+      "type": "email"
     }
   }
 }

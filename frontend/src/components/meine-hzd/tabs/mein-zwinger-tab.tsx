@@ -14,6 +14,7 @@ import {
 } from '@mui/material'
 import type { Breeder } from '@/types'
 import { updateEntity } from '@/lib/strapi/api'
+import { ExternalWebsiteLink } from '@/components/common/external-website-link'
 import { BreederMasterSelect } from '@/components/meine-hzd/breeder-master-select'
 
 interface MeinZwingerTabProps {
@@ -115,7 +116,13 @@ function ZwingerEditor({ breeder, strapiBaseUrl, onBreederUpdated }: ZwingerEdit
 
             <Box sx={{ mb: 3 }}>
                 <Typography variant='subtitle2' color='text.secondary'>Webseite (Veröffentlicht)</Typography>
-                <Typography variant='body1' sx={{ mb: 1 }}>{breeder.WebsiteUrl || '-'}</Typography>
+                <Typography variant='body1' sx={{ mb: 1 }}>
+                    {breeder.WebsiteUrl ? (
+                        <ExternalWebsiteLink href={breeder.WebsiteUrl}>
+                            {breeder.WebsiteUrl}
+                        </ExternalWebsiteLink>
+                    ) : '-'}
+                </Typography>
                 <TextField
                     label='Webseite (Entwurf)'
                     fullWidth

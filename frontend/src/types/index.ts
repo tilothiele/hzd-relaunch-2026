@@ -44,6 +44,8 @@ export interface HeroSectionSlideShow {
 	Headline?: SlideItem[] | null
 }
 
+export type AiNote = 'AiGenerated' | 'AiModified'
+
 export interface CardItem {
 	id?: string
 	Headline?: string | null
@@ -52,6 +54,7 @@ export interface CardItem {
 	BackgroundImage?: Image | null
 	DisplayFormat?: 'fill' | 'fit' | null
 	ActionButton?: ActionButton | null
+	AiNote?: AiNote | null
 }
 
 export interface CardSection {
@@ -215,6 +218,7 @@ export interface SimpleHeroSection {
 	ShowLog?: boolean | null
 	FadingBorder?: boolean | null
 	Height?: 'small' | 'medium' | 'tall' | null
+	AiNote?: AiNote | null
 }
 
 export interface ContactGroupSection {

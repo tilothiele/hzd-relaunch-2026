@@ -714,12 +714,14 @@ export function createCsMemberPhoneLookup(
 }
 
 /**
- * Bestehender Züchter bzw. Deckrüdenbesitzer mit Telefonnummer.
+ * Bestehender Züchter bzw. Deckrüdenbesitzer mit Telefonnummer
+ * und der aus dem Club-System übernommenen E-Mail.
  */
 export interface BreederRecord {
 	id?: number
 	documentId?: string
 	phone: string | null
+	cBreederEmail: string | null
 }
 
 /**
@@ -730,38 +732,59 @@ export async function loadBreedersByCId(
 	strapi: Core.Strapi,
 ): Promise<Map<number, BreederRecord>> {
 	const breeders = await strapi.db.query(BREEDER_UID).findMany({
-		select: ['id', 'documentId', 'cId', 'Phone'],
+		select: ['id', 'documentId', 'cId', 'Phone', 'cBreederEmail'],
 	}) as {
 		id?: number
 		documentId?: string
 		cId?: number | null
 		Phone?: string | null
+		cBreederEmail?: string | null
 	}[]
 	const byCId = new Map<number, BreederRecord>()
 	for (const breeder of breeders) {
 		if (typeof breeder.cId !== 'number') {
 			continue
 		}
-		const phone = typeof breeder.Phone === 'string' ? breeder.Phone.trim() : ''
 		byCId.set(breeder.cId, {
 			id: breeder.id,
 			documentId: breeder.documentId,
-			phone: phone.length > 0 ? phone : null,
+			phone: storedText(breeder.Phone),
+			cBreederEmail: storedEmail(breeder.cBreederEmail),
 		})
 	}
 	return byCId
 }
 
-async function loadBreederPhone(
+function storedText(value: unknown): string | null {
+	const text = typeof value === 'string' ? value.trim() : ''
+	return text.length > 0 ? text : null
+}
+
+function storedEmail(value: unknown): string | null {
+	const email = storedText(value)
+	return email ? email.toLowerCase() : null
+}
+
+async function loadBreederSyncFields(
 	strapi: Core.Strapi,
-	breederId: number,
-): Promise<string | null> {
+	existing: { id?: number; documentId?: string },
+): Promise<{ phone: string | null; cBreederEmail: string | null }> {
+	const where = typeof existing.id === 'number'
+		? { id: existing.id }
+		: existing.documentId
+			? { documentId: existing.documentId }
+			: null
+	if (!where) {
+		return { phone: null, cBreederEmail: null }
+	}
 	const breeder = await strapi.db.query(BREEDER_UID).findOne({
-		where: { id: breederId },
-		select: ['Phone'],
-	}) as { Phone?: string | null } | null
-	const phone = typeof breeder?.Phone === 'string' ? breeder.Phone.trim() : ''
-	return phone.length > 0 ? phone : null
+		where,
+		select: ['Phone', 'cBreederEmail'],
+	}) as { Phone?: string | null; cBreederEmail?: string | null } | null
+	return {
+		phone: storedText(breeder?.Phone),
+		cBreederEmail: storedEmail(breeder?.cBreederEmail),
+	}
 }
 
 export async function ensureBreederForCsMember(
@@ -781,22 +804,46 @@ export async function ensureBreederForCsMember(
 		?? (breedersByCId ? null : await findByCId(strapi, BREEDER_UID, cId))
 	if (existing) {
 		// Bestehender Züchter bzw. Deckrüdenbesitzer:
-		// Telefonnummer aus CS nachziehen (Feld "Phone").
-		if (!phone || typeof existing.id !== 'number') {
+		// Telefon und cBreederEmail aus CS nachziehen.
+		// BreederEmail bleibt die öffentlich angezeigte Adresse.
+		if (typeof existing.id !== 'number' && !existing.documentId) {
 			return
 		}
-		const storedPhone = cached
-			? cached.phone
-			: await loadBreederPhone(strapi, existing.id)
-		if (storedPhone === phone) {
+		const stored = cached
+			? {
+				phone: cached.phone,
+				cBreederEmail: cached.cBreederEmail,
+			}
+			: await loadBreederSyncFields(strapi, existing)
+		const data: TargetData = {}
+		if (phone && stored.phone !== phone) {
+			data.Phone = phone
+		}
+		const rawEmail = cell(member.Email)
+		const emailReason = emailRejectionReason(member.Email)
+		if (rawEmail && emailReason) {
+			log(
+				`CS_Member cId=${cId}: ${emailReason}, cBreederEmail wird nicht übernommen`,
+			)
+		}
+		const email = parseEmail(member.Email)
+		if (email && stored.cBreederEmail !== email) {
+			data.cBreederEmail = email
+		}
+		if (Object.keys(data).length === 0) {
 			return
 		}
-		await saveDocument(strapi, BREEDER_UID, existing, { Phone: phone })
+		await saveDocument(strapi, BREEDER_UID, existing, data)
 		if (cached) {
-			cached.phone = phone
+			if (typeof data.Phone === 'string') {
+				cached.phone = data.Phone
+			}
+			if (typeof data.cBreederEmail === 'string') {
+				cached.cBreederEmail = data.cBreederEmail
+			}
 		}
 		log(
-			`Breeder-Telefon aktualisiert cId=${cId} documentId=${existing.documentId ?? existing.id}`,
+			`Breeder aktualisiert cId=${cId} documentId=${existing.documentId ?? existing.id}`,
 		)
 		return
 	}
@@ -814,10 +861,12 @@ export async function ensureBreederForCsMember(
 	const emailReason = emailRejectionReason(member.Email)
 	if (rawEmail && emailReason) {
 		log(
-			`CS_Member cId=${cId}: ${emailReason}, BreederEmail wird nicht übernommen`,
+			`CS_Member cId=${cId}: ${emailReason}, cBreederEmail wird nicht übernommen`,
 		)
 	}
-	assign(data, 'BreederEmail', parseEmail(member.Email))
+	const email = parseEmail(member.Email)
+	assign(data, 'cBreederEmail', email)
+	assign(data, 'BreederEmail', email)
 	assign(data, 'Phone', phone)
 	const address = addressFromCsMember(member)
 	if (address) {
@@ -825,7 +874,11 @@ export async function ensureBreederForCsMember(
 	}
 	const savedId = await saveDocument(strapi, BREEDER_UID, null, data)
 	if (breedersByCId) {
-		breedersByCId.set(cId, { documentId: savedId, phone })
+		breedersByCId.set(cId, {
+			documentId: savedId,
+			phone,
+			cBreederEmail: email,
+		})
 	}
 	log(`Breeder erstellt cId=${cId} documentId=${savedId}`)
 }
@@ -1027,11 +1080,12 @@ export async function updateStudDog(
 		await ensureStudDogOwnerGroup(strapi, owner, log)
 	}
 
+	const email = parseEmail(owner.cEmail)
 	const data: TargetData = {
 		cId: ownerCId,
 		member: ownerId,
 	}
-	assign(data, 'BreederEmail', parseEmail(owner.cEmail))
+	assign(data, 'cBreederEmail', email)
 	assign(data, 'Phone', await resolveStudDogPhone(
 		ownerCId,
 		owner.phone,
@@ -1059,6 +1113,7 @@ export async function updateStudDog(
 		const kennelName = truncateOrNull(`DRB ${firstName} ${lastName}`.trim(), 200)
 		assign(data, 'kennelName', kennelName)
 		data.BreederRole = 'S'
+		assign(data, 'BreederEmail', email)
 	}
 
 	await ensurePublishMyData(strapi, ownerId)

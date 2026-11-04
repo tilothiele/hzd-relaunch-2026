@@ -5,6 +5,7 @@ import type { SimpleHeroSection } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { ActionButton } from '@/components/ui/action-button'
+import { AiNoteLabel } from '@/components/common/ai-note-label'
 import { SectionContainer } from '../section-container/section-container'
 import { useScrollAnimation } from '@/hooks/use-scroll-animation'
 import { useState } from 'react'
@@ -90,6 +91,8 @@ export function FullWidthHeroSectionComponent({
                         }}
                     />
                 ) : null}
+
+                <AiNoteLabel note={section.AiNote} />
 
                 {/* Content */}
                 <div className="container relative z-20 mx-auto px-6 pb-11 md:px-12 lg:pb-20">

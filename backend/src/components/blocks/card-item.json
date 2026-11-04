@@ -40,6 +40,13 @@
       "type": "component",
       "component": "links.action-button",
       "repeatable": false
+    },
+    "AiNote": {
+      "type": "enumeration",
+      "enum": [
+        "AiGenerated",
+        "AiModified"
+      ]
     }
   },
   "config": {}

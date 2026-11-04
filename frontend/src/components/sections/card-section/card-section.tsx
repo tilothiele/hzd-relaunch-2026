@@ -6,6 +6,7 @@ import type { CardItem, CardSection } from '@/types'
 import { theme as globalTheme, type ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { ActionButton } from '@/components/ui/action-button'
+import { AiNoteLabel } from '@/components/common/ai-note-label'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { BorderedCardItem } from './bordered-card-item'
 import { useScrollAnimation } from '@/hooks/use-scroll-animation'
@@ -312,6 +313,9 @@ export function CardSectionComponent({
 											</Box>
 										) : null}
 									</CardContent>
+									{imageUrl ? (
+										<AiNoteLabel note={card.AiNote} />
+									) : null}
 								</Box>
 							</Card>
 						</Box>

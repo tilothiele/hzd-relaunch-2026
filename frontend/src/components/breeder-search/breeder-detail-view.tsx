@@ -16,6 +16,7 @@ import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { theme } from '@/themes'
 import { BreederDogsList } from './breeder-dogs-list'
 import { BackButton } from '@/components/ui/back-button'
+import { ExternalWebsiteLink } from '@/components/common/external-website-link'
 import { PhoneLink } from '@/components/common/phone-link'
 import { DogDetailView } from '@/components/dog-search/dog-detail-view'
 
@@ -215,15 +216,9 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack, 
                         {breederDetails.WebsiteUrl ? (
                             <p>
                                 <strong>Webseite:</strong>{' '}
-                                <a
-                                    href={breederDetails.WebsiteUrl}
-                                    target='_blank'
-                                    rel='noopener noreferrer'
-                                    className='text-submit-button hover:underline'
-                                    style={{ color: theme.submitButtonColor }}
-                                >
+                                <ExternalWebsiteLink href={breederDetails.WebsiteUrl}>
                                     {breederDetails.WebsiteUrl}
-                                </a>
+                                </ExternalWebsiteLink>
                             </p>
                         ) : null}
                     </div>
