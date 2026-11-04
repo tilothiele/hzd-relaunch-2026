@@ -1,7 +1,5 @@
 # Changelog
 
-Alle wichtigen funktionalen Änderungen an HZD-Website.
-
 ## [1.1.2] - 3.11.2026
 
 - Telefonnummern werden als Link angezeigt
