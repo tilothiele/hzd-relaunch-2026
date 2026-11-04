@@ -11,6 +11,7 @@ Alle wichtigen funktionalen Änderungen an HZD-Website.
 - Paginierung im Bereich Zucht ober- und unterhalb der Trefferliste
 - Bei Züchtern und Deckrüdenbesitzern wird standardmäßig eine zufällige Reihenfolge gewählt. Alternativ kann nach PLZ sortiert werden.
 - Adventskalender integriert (initiale Version)
+- Datenschutz-Anforderungen verbessert
 
 
 ## [1.1.1] - 23.10.2026 - Initiales Release - Die Website geht online!
