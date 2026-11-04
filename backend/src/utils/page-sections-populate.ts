@@ -21,6 +21,7 @@ export const PAGE_SECTION_BLOCK_COMPONENTS = [
 	'blocks.black-board-section',
 	'blocks.form-section',
 	'blocks.md-text-section',
+	'blocks.advent-calendar-section',
 ] as const
 
 type PopulateValue = boolean | Record<string, unknown>
@@ -183,6 +184,20 @@ const sectionComponentPopulate = (
 				populate: {
 					form: {
 						fields: ['documentId', 'Name'],
+					},
+				},
+			}
+		case 'blocks.advent-calendar-section':
+			return {
+				populate: {
+					advent_calendar: {
+						populate: {
+							AdventDay: {
+								populate: {
+									AdventImage: true,
+								},
+							},
+						},
 					},
 				},
 			}
