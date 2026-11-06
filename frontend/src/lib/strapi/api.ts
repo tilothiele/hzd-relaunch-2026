@@ -438,6 +438,8 @@ export async function searchBreeders(
 export interface ZuchtleitungBreederSearchParams {
 	role?: 'B' | 'S'
 	disabledOnly?: boolean
+	/** Teilstring-Suche in Zwingername und FullName (min. 3 Zeichen) */
+	q?: string
 	page?: number
 	pageSize?: number
 }
@@ -461,6 +463,9 @@ export async function fetchZuchtleitungBreeders(
 	}
 	if (params.disabledOnly) {
 		query.set('disabledOnly', 'true')
+	}
+	if (params.q && params.q.trim().length >= 3) {
+		query.set('q', params.q.trim())
 	}
 	if (params.page !== undefined) {
 		query.set('page', String(params.page))

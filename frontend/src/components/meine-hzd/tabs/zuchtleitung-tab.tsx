@@ -14,6 +14,7 @@ import {
 	TableContainer,
 	TableHead,
 	TableRow,
+	TextField,
 	Typography,
 } from '@mui/material'
 import { fetchZuchtleitungBreeders, setBreederDisable } from '@/lib/strapi/api'
@@ -33,12 +34,16 @@ export function ZuchtleitungTab({ strapiBaseUrl }: ZuchtleitungTabProps) {
 
 	const [role, setRole] = useState<BreederRoleFilter>('B')
 	const [disabledOnly, setDisabledOnly] = useState(false)
+	const [search, setSearch] = useState('')
 	const [page, setPage] = useState(1)
 	const [pageSize, setPageSize] = useState<SearchPageSize>(10)
 	const [pageCount, setPageCount] = useState(1)
 
 	const [savingId, setSavingId] = useState<string | null>(null)
 	const [saveError, setSaveError] = useState<string | null>(null)
+
+	// Suche greift erst ab 3 Zeichen (Teilstring, Zwingername/FullName)
+	const activeSearch = search.trim().length >= 3 ? search.trim() : ''
 
 	const loadData = useCallback(async () => {
 		setLoading(true)
@@ -47,6 +52,7 @@ export function ZuchtleitungTab({ strapiBaseUrl }: ZuchtleitungTabProps) {
 			const result = await fetchZuchtleitungBreeders({
 				role,
 				disabledOnly,
+				q: activeSearch || undefined,
 				page,
 				pageSize,
 			})
@@ -59,7 +65,7 @@ export function ZuchtleitungTab({ strapiBaseUrl }: ZuchtleitungTabProps) {
 		} finally {
 			setLoading(false)
 		}
-	}, [role, disabledOnly, page, pageSize, strapiBaseUrl])
+	}, [role, disabledOnly, activeSearch, page, pageSize, strapiBaseUrl])
 
 	useEffect(() => {
 		loadData()
@@ -73,6 +79,12 @@ export function ZuchtleitungTab({ strapiBaseUrl }: ZuchtleitungTabProps) {
 
 	const handleDisabledOnlyChange = (checked: boolean) => {
 		setDisabledOnly(checked)
+		setPage(1)
+		setSaveError(null)
+	}
+
+	const handleSearchChange = (value: string) => {
+		setSearch(value)
 		setPage(1)
 		setSaveError(null)
 	}
@@ -129,7 +141,19 @@ export function ZuchtleitungTab({ strapiBaseUrl }: ZuchtleitungTabProps) {
 				</Typography>
 			</Box>
 
-			<Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gapX: 4, gapY: 1, mb: 3 }}>
+			<Box sx={{ mb: 2 }}>
+				<TextField
+					label='Suche (min. 3 Zeichen)'
+					placeholder='Zwingername oder FullName'
+					size='small'
+					value={search}
+					onChange={(event) => handleSearchChange(event.target.value)}
+					inputProps={{ 'aria-label': 'Suche nach Zwingername oder FullName' }}
+					sx={{ maxWidth: 360 }}
+				/>
+			</Box>
+
+			<Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gapX: 3, gapY: 1, mb: 3 }}>
 				<Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
 					<Typography
 						variant='body2'
@@ -153,16 +177,18 @@ export function ZuchtleitungTab({ strapiBaseUrl }: ZuchtleitungTabProps) {
 					</Typography>
 				</Box>
 
-				<FormControlLabel
-					control={
-						<Switch
-							checked={disabledOnly}
-							onChange={(event) => handleDisabledOnlyChange(event.target.checked)}
-							color='warning'
-						/>
-					}
-					label='Nur ausgeblendete Züchter (Deaktiviert)'
-				/>
+				<Box sx={{ ml: 'auto' }}>
+					<FormControlLabel
+						control={
+							<Switch
+								checked={disabledOnly}
+								onChange={(event) => handleDisabledOnlyChange(event.target.checked)}
+								color='warning'
+							/>
+						}
+						label='Nur ausgeblendete Züchter (Deaktiviert)'
+					/>
+				</Box>
 			</Box>
 
 			{saveError && (
@@ -177,7 +203,11 @@ export function ZuchtleitungTab({ strapiBaseUrl }: ZuchtleitungTabProps) {
 				</Box>
 			) : items.length === 0 ? (
 				<Box sx={{ p: 2 }}>
-					<Typography>Keine aktiven Zwinger gefunden.</Typography>
+					<Typography>
+						{activeSearch
+							? <>Keine aktiven Zwinger gefunden (Suche: „{activeSearch}“).</>
+							: 'Keine aktiven Zwinger gefunden.'}
+					</Typography>
 				</Box>
 			) : (
 				<TableContainer component={Paper} variant='outlined'>

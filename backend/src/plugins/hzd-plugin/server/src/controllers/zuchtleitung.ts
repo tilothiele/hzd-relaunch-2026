@@ -66,6 +66,7 @@ const coreControllerFactory = factories.createCoreController(
 		 * Aktive Zwinger (IsActive = true) mit optionalen Filtern:
 		 * - role: BreederRole "B" (Züchter) oder "S" (Deckrüdenbesitzer)
 		 * - disabledOnly: nur Einträge mit Disable = true (ausgeblendete Züchter)
+		 * - q: Teilstring-Suche (min. 3 Zeichen) in kennelName und Address.FullName
 		 */
 		async breeders(ctx: any) {
 			const user = await loadUserFromRequest(strapi, ctx)
@@ -85,6 +86,7 @@ const coreControllerFactory = factories.createCoreController(
 				? query.role.trim().toUpperCase()
 				: ''
 			const disabledOnly = query.disabledOnly === 'true'
+			const search = typeof query.q === 'string' ? query.q.trim() : ''
 
 			const conditions: Array<Record<string, unknown>> = [
 				{ IsActive: { $eq: true } },
@@ -94,6 +96,14 @@ const coreControllerFactory = factories.createCoreController(
 			}
 			if (disabledOnly) {
 				conditions.push({ Disable: { $eq: true } })
+			}
+			if (search.length >= 3) {
+				conditions.push({
+					$or: [
+						{ kennelName: { $containsi: search } },
+						{ Address: { FullName: { $containsi: search } } },
+					],
+				})
 			}
 
 			const { results, pagination } = await findDocumentsPage(
