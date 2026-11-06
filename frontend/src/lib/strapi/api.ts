@@ -435,6 +435,87 @@ export async function searchBreeders(
 	}
 }
 
+export interface ZuchtleitungBreederSearchParams {
+	role?: 'B' | 'S'
+	disabledOnly?: boolean
+	page?: number
+	pageSize?: number
+}
+
+export interface ZuchtleitungBreederPage {
+	items: Breeder[]
+	pagination: { page: number; pageSize: number; pageCount: number; total: number }
+}
+
+/**
+ * Zuchtleitung: Liste aktiver Zwinger (IsActive = true).
+ * Erfordert im Strapi-Backend die Gruppen-Memberschaft "zuchtleitung".
+ */
+export async function fetchZuchtleitungBreeders(
+	params: ZuchtleitungBreederSearchParams = {},
+	options: StrapiRequestOptions = {},
+): Promise<ZuchtleitungBreederPage> {
+	const query = new URLSearchParams()
+	if (params.role) {
+		query.set('role', params.role)
+	}
+	if (params.disabledOnly) {
+		query.set('disabledOnly', 'true')
+	}
+	if (params.page !== undefined) {
+		query.set('page', String(params.page))
+	}
+	if (params.pageSize !== undefined) {
+		query.set('pageSize', String(params.pageSize))
+	}
+
+	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
+	const response = await fetcher<unknown>(
+		'hzd-plugin/zuchtleitung/breeders',
+		query,
+		{ token: options.token },
+	)
+
+	const items = extractStrapiList<Breeder>(response)
+	const pagination = extractStrapiPagination(response)
+
+	return {
+		items,
+		pagination: {
+			page: pagination?.page ?? 1,
+			pageSize: pagination?.pageSize ?? items.length,
+			pageCount: pagination?.pageCount ?? 1,
+			total: pagination?.total ?? items.length,
+		},
+	}
+}
+
+/**
+ * Zuchtleitung: Disable-Flag eines Zwingers umschalten.
+ */
+export async function setBreederDisable(
+	documentId: string,
+	disable: boolean,
+	options: StrapiRequestOptions = {},
+): Promise<Breeder> {
+	const fetcher = options.server ? fetchStrapiServer : fetchStrapi
+	const response = await fetcher<{ data: Breeder }>(
+		`hzd-plugin/zuchtleitung/breeders/${encodeURIComponent(documentId)}/disable`,
+		undefined,
+		{
+			method: 'PUT',
+			token: options.token,
+			body: { data: { Disable: disable } },
+		},
+	)
+
+	const entity = extractStrapiSingle<Breeder>(response)
+	if (!entity) {
+		throw new Error('Breeder konnte nicht gespeichert werden.')
+	}
+	return entity
+}
+
 /** Generische Breeder-Suche mit freier Filter-Syntax */
 export async function searchBreedersGeneric(
 	variables: {

@@ -2,15 +2,16 @@ import { useState, useEffect } from 'react'
 import { Tabs, Tab, Box, CircularProgress } from '@mui/material'
 import { fetchEntityByDocumentId, searchBreeders } from '@/lib/strapi/api'
 import { POPULATE_BREEDER_SEARCH } from '@/lib/strapi/populate'
-import { isDeckruedenbesitzer, isZuechter } from '@/lib/permissions'
+import { isDeckruedenbesitzer, isZuechter, isZuchtleitung } from '@/lib/permissions'
 import { MeinProfilTab } from './tabs/mein-profil-tab'
 import { MeinZwingerTab } from './tabs/mein-zwinger-tab'
 import { IchAlsDeckruedenbesitzerTab } from './tabs/ich-als-deckruedenbesitzer-tab'
 import { MeineWuerfeTab } from './tabs/meine-wuerfe-tab'
 import { MeineHundeTab } from './tabs/meine-hunde-tab'
+import { ZuchtleitungTab } from './tabs/zuchtleitung-tab'
 import type { AuthUser, Breeder } from '@/types'
 
-type TabId = 0 | 1 | 2 | 3 | 4
+type TabId = 0 | 1 | 2 | 3 | 4 | 5
 
 interface MeineHzdTabsProps {
 	user: AuthUser | null
@@ -26,6 +27,7 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 	const canSeeZuechterTabs = isZuechter(user)
 	const canSeeDeckruedenTab = isDeckruedenbesitzer(user)
 	const canSeeHunde = canSeeZuechterTabs || canSeeDeckruedenTab
+	const canSeeZuchtleitung = isZuchtleitung(user)
 	const deckruedenInfoDocumentId = user?.deckrueden_info?.documentId ?? null
 
 	useEffect(() => {
@@ -116,6 +118,11 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 
 		if (activeTab === 4 && (!canSeeDeckruedenTab || !deckruedenInfo)) {
 			setActiveTab(0)
+			return
+		}
+
+		if (activeTab === 5 && !canSeeZuchtleitung) {
+			setActiveTab(0)
 		}
 	}, [
 		breeders.length,
@@ -125,6 +132,7 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 		canSeeZuechterTabs,
 		canSeeHunde,
 		canSeeDeckruedenTab,
+		canSeeZuchtleitung,
 	])
 
 	const selectedBreeder = breeders.find(
@@ -183,6 +191,7 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 					{canSeeDeckruedenTab && deckruedenInfo && (
 						<Tab label='Deckrüdenbesitzer' value={4} />
 					)}
+					{canSeeZuchtleitung && <Tab label='Zuchtleitung' value={5} />}
 				</Tabs>
 			</Box>
 
@@ -219,6 +228,9 @@ export function MeineHzdTabs({ user, strapiBaseUrl }: MeineHzdTabsProps) {
 						breeder={deckruedenInfo}
 						strapiBaseUrl={strapiBaseUrl}
 					/>
+				)}
+				{activeTab === 5 && canSeeZuchtleitung && (
+					<ZuchtleitungTab strapiBaseUrl={strapiBaseUrl} />
 				)}
 			</Box>
 		</Box>

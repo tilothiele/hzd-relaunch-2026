@@ -5,6 +5,7 @@ const ADMINISTRATIR_GROUP_KEY = 'admins'
 const DECKRUEDENBESITZER_GROUP_KEY = 'dr-besitzer'
 const ZUECHTER_GROUP_KEY = 'zuechter'
 const TIK_GROUP_KEY = 'tik'
+const ZUCHTLEITUNG_GROUP_KEY = 'zuchtleitung'
 
 export const TIK_ACCESS_DENIED_MESSAGE = '401 Zugriff verweitert'
 
@@ -211,6 +212,10 @@ export function isSonderleiter(user: AuthUser | null): boolean {
 	return belongsToGroup(user, SONDERLEITER_GROUP_KEY)
 }
 
+export function isZuchtleitung(user: AuthUser | null): boolean {
+	return belongsToGroup(user, ZUCHTLEITUNG_GROUP_KEY)
+}
+
 export function hasUserGroup(user: AuthUser | null, groupName: string): boolean {
 	const expected = groupName.trim().toLowerCase()
 	if (!expected) {
@@ -277,6 +282,7 @@ const permissions = {
 	isTik,
 	isAdministrator,
 	isSonderleiter,
+	isZuchtleitung,
 	hasUserGroup,
 	hasAnyUserGroup,
 	hasRequiredGroups,

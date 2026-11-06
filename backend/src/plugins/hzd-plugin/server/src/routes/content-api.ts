@@ -1,6 +1,7 @@
 import dogRoutes from '../../routes/dog';
 import breederRoutes from '../../routes/breeder';
 import litterRoutes from '../../routes/litter';
+import zuchtleitungRoutes from '../../routes/zuchtleitung';
 
 export default [
   {
@@ -46,4 +47,5 @@ export default [
   ...dogRoutes,
   ...breederRoutes,
   ...litterRoutes,
+  ...zuchtleitungRoutes,
 ];
