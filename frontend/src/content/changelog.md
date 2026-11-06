@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.1.3] - 6.11.2026
+
+- Züchterverwaltung für Zuchtleitung
+- TIK-Benachrichtigung bei 'Bitte meine Änderungen übernehmen' bei Zwinger/Deckrüdenbesitzer/Zuchtund.
+-
 ## [1.1.2] - 3.11.2026
 
 - Telefonnummern werden als Link angezeigt

@@ -5,6 +5,7 @@
 import { factories } from '@strapi/strapi'
 import type { Core } from '@strapi/strapi'
 import { findDocumentsPage } from '../utils/document-pagination'
+import { sendDogChangeMail } from '../utils/dog-change-mail'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyController = Record<string, any>
@@ -120,8 +121,8 @@ async function loadUserFromRequest(strapi: Core.Strapi, ctx: any) {
 
 		return strapi.db.query('plugin::users-permissions.user').findOne({
 			where: { id: userId },
-			select: ['id', 'documentId'],
-		}) as Promise<{ id?: number; documentId?: string } | null>
+			select: ['id', 'documentId', 'firstName', 'lastName', 'username', 'membershipNumber'],
+		}) as Promise<Record<string, unknown> | null>
 	} catch {
 		return null
 	}
@@ -670,6 +671,61 @@ const coreControllerFactory = factories.createCoreController(
 				await enrichDogPedigreeTransitive(strapi, enriched, pedigreeCache)
 
 				ctx.body = { data: enriched }
+			},
+
+			async update(ctx: any) {
+				const response = await Object.getPrototypeOf(this).update.call(this, ctx)
+
+				// Schalter "Meine Änderungen bitte freigeben" (isDirty) ist beim Speichern aktiv
+				const body = ctx.request?.body
+				const input = body && typeof body === 'object' && !Array.isArray(body)
+					&& body.data && typeof body.data === 'object' && !Array.isArray(body.data)
+					? body.data
+					: null
+				const freigabeRequested = input !== null && input.isDirty === true
+
+				if (freigabeRequested) {
+					try {
+						const documentId = typeof ctx.params?.id === 'string' ? ctx.params.id : ''
+						if (documentId) {
+							const dog = await strapi.documents('plugin::hzd-plugin.dog').findOne({
+								documentId,
+								populate: { breeder: true },
+							})
+							const user = await loadUserFromRequest(strapi, ctx)
+
+							await sendDogChangeMail(strapi, {
+								user: user ?? {},
+								dogName: typeof dog?.fullKennelName === 'string'
+									? dog.fullKennelName
+									: typeof dog?.givenName === 'string'
+										? dog.givenName
+										: null,
+								kennelName: typeof dog?.breeder?.kennelName === 'string'
+									? dog.breeder.kennelName
+									: null,
+								memosReleased: typeof dog?.MemosReleased === 'string'
+									? dog.MemosReleased
+									: null,
+								memosDraft: typeof dog?.MemosDraft === 'string'
+									? dog.MemosDraft
+									: null,
+								dogOwnersMessage: typeof dog?.DogOwnersMessage === 'string'
+									? dog.DogOwnersMessage
+									: null,
+							})
+						}
+					} catch (error) {
+						strapi.log.error(
+							`Zuchthund (${typeof ctx.params?.id === 'string'
+								? ctx.params.id
+								: 'unbekannt'}): Benachrichtigungs-Mail konnte nicht gesendet werden.`,
+							error,
+						)
+					}
+				}
+
+				return response
 			},
 		}
 	},

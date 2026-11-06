@@ -153,6 +153,7 @@ async function loadUserFromRequest(strapi: Core.Strapi, ctx: any) {
 
 		return strapi.db.query('plugin::users-permissions.user').findOne({
 			where: { id: userId },
+			populate: { deckrueden_info: { select: ['id', 'documentId'] } },
 		})
 	} catch {
 		return null
@@ -160,14 +161,18 @@ async function loadUserFromRequest(strapi: Core.Strapi, ctx: any) {
 }
 
 function userOwnsBreeder(
-	user: { id?: number | string | null; documentId?: string | null },
+	user: {
+		id?: number | string | null
+		documentId?: string | null
+		deckrueden_info?: unknown
+	},
 	breeder: unknown,
 ): boolean {
 	if (!breeder || typeof breeder !== 'object') {
 		return false
 	}
 
-	const record = breeder as { owner_members?: unknown }
+	const record = breeder as { id?: number | string; documentId?: string; owner_members?: unknown }
 	const ids = new Set<string>()
 	if (user.id != null) {
 		ids.add(String(user.id))
@@ -177,14 +182,36 @@ function userOwnsBreeder(
 	}
 
 	const members = Array.isArray(record.owner_members) ? record.owner_members : []
-	return members.some((member) => {
-		if (!member || typeof member !== 'object') {
-			return false
+	if (
+		members.some((member) => {
+			if (!member || typeof member !== 'object') {
+				return false
+			}
+			const owner = member as { id?: number | string; documentId?: string }
+			return ids.has(String(owner.id ?? ''))
+				|| (typeof owner.documentId === 'string' && ids.has(owner.documentId))
+		})
+	) {
+		return true
+	}
+
+	// Deckrüdenbesitzer: der Zwinger ist über user.deckrueden_info verknüpft
+	const deckruedenInfo = user.deckrueden_info
+	if (deckruedenInfo && typeof deckruedenInfo === 'object' && !Array.isArray(deckruedenInfo)) {
+		const info = deckruedenInfo as { id?: number | string; documentId?: string }
+		if (record.id != null && info.id != null && String(record.id) === String(info.id)) {
+			return true
 		}
-		const owner = member as { id?: number | string; documentId?: string }
-		return ids.has(String(owner.id ?? ''))
-			|| (typeof owner.documentId === 'string' && ids.has(owner.documentId))
-	})
+		if (
+			typeof record.documentId === 'string'
+			&& typeof info.documentId === 'string'
+			&& record.documentId === info.documentId
+		) {
+			return true
+		}
+	}
+
+	return false
 }
 
 const decodeRouteKey = (value: unknown): string => {
@@ -460,6 +487,7 @@ const coreControllerFactory = factories.createCoreController(
 				try {
 					await sendBreederChangeMail(strapi, {
 						user,
+						isDeckrueden: breeder.BreederRole === 'S',
 						kennelName: typeof breeder.kennelName === 'string'
 							? breeder.kennelName
 							: null,
