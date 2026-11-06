@@ -7,6 +7,10 @@ import type { Core } from '@strapi/strapi'
 import { findDocumentsPage } from '../utils/document-pagination'
 import { enrichBreederRecords } from '../utils/breeder-enrich'
 import {
+	sendBreederChangeMail,
+	shouldSendBreederChangeMail,
+} from '../utils/breeder-change-mail'
+import {
 	findOrderedBreederPage,
 	parseListOrder,
 	sanitizeListSeed,
@@ -412,11 +416,72 @@ const coreControllerFactory = factories.createCoreController(
 				data.isDirty = input.isDirty === true
 			}
 
+			const previous = {
+				isDirty: breeder.isDirty === true,
+				WebsiteUrlDraft: typeof breeder.WebsiteUrlDraft === 'string'
+					? breeder.WebsiteUrlDraft
+					: null,
+				BreedersIntroDraft: typeof breeder.BreedersIntroDraft === 'string'
+					? breeder.BreedersIntroDraft
+					: null,
+				BreedersMessage: typeof breeder.BreedersMessage === 'string'
+					? breeder.BreedersMessage
+					: null,
+			}
+
+			const current = {
+				isDirty: 'isDirty' in input
+					? input.isDirty === true
+					: previous.isDirty,
+				WebsiteUrlDraft: 'WebsiteUrlDraft' in input
+					? (typeof input.WebsiteUrlDraft === 'string'
+						? input.WebsiteUrlDraft
+						: null)
+					: previous.WebsiteUrlDraft,
+				BreedersIntroDraft: 'BreedersIntroDraft' in input
+					? (typeof input.BreedersIntroDraft === 'string'
+						? input.BreedersIntroDraft
+						: null)
+					: previous.BreedersIntroDraft,
+				BreedersMessage: 'BreedersMessage' in input
+					? (typeof input.BreedersMessage === 'string'
+						? input.BreedersMessage
+						: null)
+					: previous.BreedersMessage,
+			}
+
 			const entity = await strapi.documents('plugin::hzd-plugin.breeder').update({
 				documentId,
 				data,
 				populate: BREEDER_SEARCH_POPULATE,
 			})
+
+			if (shouldSendBreederChangeMail(previous, current)) {
+				try {
+					await sendBreederChangeMail(strapi, {
+						user,
+						kennelName: typeof breeder.kennelName === 'string'
+							? breeder.kennelName
+							: null,
+						websiteUrlDraft: current.WebsiteUrlDraft,
+						websiteUrl: typeof breeder.WebsiteUrl === 'string'
+							? breeder.WebsiteUrl
+							: null,
+						breedersIntroDraft: current.BreedersIntroDraft,
+						breedersIntro: typeof breeder.BreedersIntroduction === 'string'
+							? breeder.BreedersIntroduction
+							: null,
+						breedersMessage: current.BreedersMessage,
+					})
+				} catch (error) {
+					strapi.log.error(
+						`Zwingerdaten (${typeof breeder.kennelName === 'string'
+							? breeder.kennelName
+							: 'ohne Zwingername'}): Benachrichtigungs-Mail konnte nicht gesendet werden.`,
+						error,
+					)
+				}
+			}
 
 			const enriched = await enrichBreederRecords(strapi, entity)
 			return { data: enriched }
