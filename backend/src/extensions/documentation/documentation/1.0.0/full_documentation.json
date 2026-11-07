@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-11-06T23:26:40.361Z"
+    "x-generation-date": "2026-11-07T19:48:50.865Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -23527,6 +23527,9 @@
                       "type": "string",
                       "format": "email"
                     },
+                    "cPhone": {
+                      "type": "string"
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time"
@@ -29130,6 +29133,9 @@
                             "type": "string",
                             "format": "email"
                           },
+                          "cPhone": {
+                            "type": "string"
+                          },
                           "createdAt": {
                             "type": "string",
                             "format": "date-time"
@@ -32901,6 +32907,9 @@
                         "cBreederEmail": {
                           "type": "string",
                           "format": "email"
+                        },
+                        "cPhone": {
+                          "type": "string"
                         },
                         "createdAt": {
                           "type": "string",
@@ -37453,6 +37462,9 @@
                       "type": "string",
                       "format": "email"
                     },
+                    "cPhone": {
+                      "type": "string"
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time"
@@ -41869,6 +41881,9 @@
                           "cBreederEmail": {
                             "type": "string",
                             "format": "email"
+                          },
+                          "cPhone": {
+                            "type": "string"
                           },
                           "createdAt": {
                             "type": "string",
@@ -49252,6 +49267,9 @@
                         "type": "string",
                         "format": "email"
                       },
+                      "cPhone": {
+                        "type": "string"
+                      },
                       "createdAt": {
                         "type": "string",
                         "format": "date-time"
@@ -52749,6 +52767,9 @@
                           "cBreederEmail": {
                             "type": "string",
                             "format": "email"
+                          },
+                          "cPhone": {
+                            "type": "string"
                           },
                           "createdAt": {
                             "type": "string",
@@ -56713,6 +56734,9 @@
                     "cBreederEmail": {
                       "type": "string",
                       "format": "email"
+                    },
+                    "cPhone": {
+                      "type": "string"
                     },
                     "createdAt": {
                       "type": "string",
@@ -66178,6 +66202,9 @@
                             "type": "string",
                             "format": "email"
                           },
+                          "cPhone": {
+                            "type": "string"
+                          },
                           "createdAt": {
                             "type": "string",
                             "format": "date-time"
@@ -70102,6 +70129,9 @@
                     "cBreederEmail": {
                       "type": "string",
                       "format": "email"
+                    },
+                    "cPhone": {
+                      "type": "string"
                     },
                     "createdAt": {
                       "type": "string",
@@ -77204,6 +77234,9 @@
                               "cBreederEmail": {
                                 "type": "string",
                                 "format": "email"
+                              },
+                              "cPhone": {
+                                "type": "string"
                               },
                               "createdAt": {
                                 "type": "string",
@@ -93120,6 +93153,9 @@
                       "type": "string",
                       "format": "email"
                     },
+                    "cPhone": {
+                      "type": "string"
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time"
@@ -97322,6 +97358,9 @@
                       "type": "string",
                       "format": "email"
                     },
+                    "cPhone": {
+                      "type": "string"
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time"
@@ -101125,6 +101164,9 @@
                               "cBreederEmail": {
                                 "type": "string",
                                 "format": "email"
+                              },
+                              "cPhone": {
+                                "type": "string"
                               },
                               "createdAt": {
                                 "type": "string",
@@ -109238,6 +109280,9 @@
                       "cBreederEmail": {
                         "type": "string",
                         "format": "email"
+                      },
+                      "cPhone": {
+                        "type": "string"
                       },
                       "createdAt": {
                         "type": "string",

@@ -721,6 +721,7 @@ export interface BreederRecord {
 	id?: number
 	documentId?: string
 	phone: string | null
+	cPhone: string | null
 	cBreederEmail: string | null
 }
 
@@ -732,12 +733,13 @@ export async function loadBreedersByCId(
 	strapi: Core.Strapi,
 ): Promise<Map<number, BreederRecord>> {
 	const breeders = await strapi.db.query(BREEDER_UID).findMany({
-		select: ['id', 'documentId', 'cId', 'Phone', 'cBreederEmail'],
+		select: ['id', 'documentId', 'cId', 'Phone', 'cPhone', 'cBreederEmail'],
 	}) as {
 		id?: number
 		documentId?: string
 		cId?: number | null
 		Phone?: string | null
+		cPhone?: string | null
 		cBreederEmail?: string | null
 	}[]
 	const byCId = new Map<number, BreederRecord>()
@@ -749,6 +751,7 @@ export async function loadBreedersByCId(
 			id: breeder.id,
 			documentId: breeder.documentId,
 			phone: storedText(breeder.Phone),
+			cPhone: storedText(breeder.cPhone),
 			cBreederEmail: storedEmail(breeder.cBreederEmail),
 		})
 	}
@@ -768,21 +771,22 @@ function storedEmail(value: unknown): string | null {
 async function loadBreederSyncFields(
 	strapi: Core.Strapi,
 	existing: { id?: number; documentId?: string },
-): Promise<{ phone: string | null; cBreederEmail: string | null }> {
+): Promise<{ phone: string | null; cPhone: string | null; cBreederEmail: string | null }> {
 	const where = typeof existing.id === 'number'
 		? { id: existing.id }
 		: existing.documentId
 			? { documentId: existing.documentId }
 			: null
 	if (!where) {
-		return { phone: null, cBreederEmail: null }
+		return { phone: null, cPhone: null, cBreederEmail: null }
 	}
 	const breeder = await strapi.db.query(BREEDER_UID).findOne({
 		where,
-		select: ['Phone', 'cBreederEmail'],
-	}) as { Phone?: string | null; cBreederEmail?: string | null } | null
+		select: ['Phone', 'cPhone', 'cBreederEmail'],
+	}) as { Phone?: string | null; cPhone?: string | null; cBreederEmail?: string | null } | null
 	return {
 		phone: storedText(breeder?.Phone),
+		cPhone: storedText(breeder?.cPhone),
 		cBreederEmail: storedEmail(breeder?.cBreederEmail),
 	}
 }
@@ -804,7 +808,7 @@ export async function ensureBreederForCsMember(
 		?? (breedersByCId ? null : await findByCId(strapi, BREEDER_UID, cId))
 	if (existing) {
 		// Bestehender Züchter bzw. Deckrüdenbesitzer:
-		// Telefon und cBreederEmail aus CS nachziehen.
+		// cPhone und cBreederEmail aus CS nachziehen. Phone bleibt unverändert.
 		// BreederEmail bleibt die öffentlich angezeigte Adresse.
 		if (typeof existing.id !== 'number' && !existing.documentId) {
 			return
@@ -812,12 +816,13 @@ export async function ensureBreederForCsMember(
 		const stored = cached
 			? {
 				phone: cached.phone,
+				cPhone: cached.cPhone,
 				cBreederEmail: cached.cBreederEmail,
 			}
 			: await loadBreederSyncFields(strapi, existing)
 		const data: TargetData = {}
-		if (phone && stored.phone !== phone) {
-			data.Phone = phone
+		if (phone && stored.cPhone !== phone) {
+			data.cPhone = phone
 		}
 		const rawEmail = cell(member.Email)
 		const emailReason = emailRejectionReason(member.Email)
@@ -830,13 +835,24 @@ export async function ensureBreederForCsMember(
 		if (email && stored.cBreederEmail !== email) {
 			data.cBreederEmail = email
 		}
+		// Phone und cPhone sind bei Updates getrennte Felder (bei Update wird
+		// nur cPhone gepflegt) – weichen sie voneinander ab, in den Report.
+		const finalCPhone = typeof data.cPhone === 'string' ? data.cPhone : stored.cPhone
+		if (
+			stored.phone !== finalCPhone
+			&& (stored.phone !== null || finalCPhone !== null)
+		) {
+			log(
+				`CS_Member cId=${cId}: Breeder Phone und cPhone weichen ab: Phone="${stored.phone ?? '–'}" cPhone="${finalCPhone ?? '–'}"`,
+			)
+		}
 		if (Object.keys(data).length === 0) {
 			return
 		}
 		await saveDocument(strapi, BREEDER_UID, existing, data)
 		if (cached) {
-			if (typeof data.Phone === 'string') {
-				cached.phone = data.Phone
+			if (typeof data.cPhone === 'string') {
+				cached.cPhone = data.cPhone
 			}
 			if (typeof data.cBreederEmail === 'string') {
 				cached.cBreederEmail = data.cBreederEmail
@@ -867,7 +883,9 @@ export async function ensureBreederForCsMember(
 	const email = parseEmail(member.Email)
 	assign(data, 'cBreederEmail', email)
 	assign(data, 'BreederEmail', email)
+	// Bei Anlage beide Telefonfeld befüllen; bei Updates wird nur cPhone gepflegt.
 	assign(data, 'Phone', phone)
+	assign(data, 'cPhone', phone)
 	const address = addressFromCsMember(member)
 	if (address) {
 		data.Address = address
@@ -877,6 +895,7 @@ export async function ensureBreederForCsMember(
 		breedersByCId.set(cId, {
 			documentId: savedId,
 			phone,
+			cPhone: phone,
 			cBreederEmail: email,
 		})
 	}

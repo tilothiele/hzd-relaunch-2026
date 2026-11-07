@@ -14,7 +14,7 @@ import { BreederSearchForm } from './breeder-search-form'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { theme } from '@/themes'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
-import { breederDetailPath, resolveBreederContact, resolveBreederObjectContact } from '@/lib/breeder-display-utils'
+import { breederDetailPath, breederAddressFullName, resolveBreederObjectContact } from '@/lib/breeder-display-utils'
 import { calculateDistance } from '@/lib/geo-utils'
 import { SearchResultPager } from '@/components/common/search-result-pager'
 import { PhoneLink } from '@/components/common/phone-link'
@@ -137,13 +137,16 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 	const mapItems = useMemo<MapItem[]>(() => {
 		return breeders
 			.map((breeder): MapItem | null => {
-				const contact = resolveBreederContact(breeder)
+				// Name + Koordinaten ausschließlich aus dem Breeder-Objekt
+				// (Address.FullName / Address.locationLat/Lng)
+				const contact = resolveBreederObjectContact(breeder)
 				if (
 					typeof contact.locationLat !== 'number'
 					|| typeof contact.locationLng !== 'number'
 				) {
 					return null
 				}
+				const addressFullName = breederAddressFullName(breeder)
 
 				return {
 					id: breeder.documentId,
@@ -152,8 +155,8 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 					popupContent: (
 						<div>
 							<strong>{breeder.kennelName}</strong>
-							{contact.ownerDisplayName && (
-								<div>{contact.ownerDisplayName}</div>
+							{addressFullName && (
+								<div>{addressFullName}</div>
 							)}
 							<div>
 								<Link href={breederDetailPath(breeder)}>Details anzeigen</Link>
@@ -335,7 +338,7 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 															breeder.kennelName || '-'
 														)}
 													</TableCell>
-													<TableCell>{contact.ownerDisplayName || '-'}</TableCell>
+													<TableCell>{breederAddressFullName(breeder) || '-'}</TableCell>
 													<TableCell>{contact.zip || '-'}</TableCell>
 													<TableCell>{contact.city || '-'}</TableCell>
 													<TableCell>

@@ -7,7 +7,7 @@ import { Card, CardMedia, CardContent, Table, TableBody, TableRow, TableCell, Bo
 import PersonIcon from '@mui/icons-material/Person'
 import PhoneIcon from '@mui/icons-material/Phone'
 import type { Breeder, HzdSetting } from '@/types'
-import { findMaleOwnerDogAvatar, resolveBreederObjectContact, formatBreederLocation } from '@/lib/breeder-display-utils'
+import { findMaleOwnerDogAvatar, breederAddressFullName, resolveBreederObjectContact, formatBreederLocation } from '@/lib/breeder-display-utils'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 
 import { calculateDistance } from '@/lib/geo-utils'
@@ -53,6 +53,7 @@ export function BreederCard({
 	const contact = resolveBreederObjectContact(breeder)
 	const breederPhone = contact.phone
 	const locationLabel = formatBreederLocation(contact)
+	const addressFullName = breederAddressFullName(breeder)
 
 	const fallbackDogAvatar = breederRole === 'S' && !breeder.avatar
 		? findMaleOwnerDogAvatar(breeder)
@@ -185,7 +186,7 @@ export function BreederCard({
 						)}
 
 						{/* Züchter Name */}
-						{contact.ownerDisplayName ? (
+						{addressFullName ? (
 							<TableRow>
 								<TableCell
 									sx={{
@@ -200,7 +201,7 @@ export function BreederCard({
 									</Tooltip>
 								</TableCell>
 								<TableCell sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-									{contact.ownerDisplayName}
+									{addressFullName}
 								</TableCell>
 							</TableRow>
 						) : null}

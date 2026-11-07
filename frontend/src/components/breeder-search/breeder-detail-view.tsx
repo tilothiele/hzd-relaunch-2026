@@ -7,6 +7,7 @@ import Image from 'next/image'
 import type { Breeder, Dog, HzdSetting } from '@/types'
 import {
 	findMaleOwnerDogAvatar,
+	breederAddressFullName,
 	resolveBreederObjectContact,
 	resolveBreederDogOwnerCIds,
 } from '@/lib/breeder-display-utils'
@@ -77,6 +78,7 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack, 
     const kennelName = breederDetails.kennelName ?? 'Kein Zwingername bekannt'
     const contact = resolveBreederObjectContact(breederDetails)
     const breederPhone = contact.phone
+    const addressFullName = breederAddressFullName(breederDetails)
     const dogOwnerCIds = resolveBreederDogOwnerCIds(breederDetails)
 
     useEffect(() => {
@@ -167,9 +169,9 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack, 
                             </p>
                         ) : null}
 
-						{contact.ownerDisplayName ? (
+						{addressFullName ? (
 							<p>
-								<strong>Züchter:</strong> {contact.ownerDisplayName}
+								<strong>Züchter:</strong> {addressFullName}
 							</p>
 						) : null}
 

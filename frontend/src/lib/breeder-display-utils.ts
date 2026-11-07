@@ -229,6 +229,18 @@ export function resolveBreederObjectContact(breeder: Breeder): BreederContactInf
 	}
 }
 
+/** Breeder.Address.FullName – Name ausschließlich aus dem Breeder-Objekt. */
+export function breederAddressFullName(breeder: {
+	Address?: { FullName?: string | null } | null
+} | null | undefined): string | null {
+	const fullName = breeder?.Address?.FullName
+	if (typeof fullName !== 'string') {
+		return null
+	}
+	const trimmed = fullName.trim()
+	return trimmed !== '' ? trimmed : null
+}
+
 export function findMaleOwnerDogAvatar(breeder: Breeder): Image | null {
 	const ownerIds = new Set<string>()
 	for (const user of resolveOwnerMembers(breeder)) {
