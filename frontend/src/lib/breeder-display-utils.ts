@@ -208,6 +208,27 @@ export function resolveBreederPhone(breeder: Breeder): string | null {
 	return resolveBreederContact(breeder).phone
 }
 
+/**
+ * Kontaktinformationen ausschließlich aus dem Breeder-Objekt
+ * (Address-Relation, BreederEmail, Phone) – ohne Rücksicht auf
+ * owner_members (AuthUser). Verwendung: /breeders (Card + Detail).
+ */
+export function resolveBreederObjectContact(breeder: Breeder): BreederContactInfo {
+	const base = resolveBreederContact(breeder)
+	const address = resolveAddress(breeder)
+
+	return {
+		...base,
+		zip: pickFirstString(address?.Zip),
+		city: pickFirstString(address?.City),
+		countryCode: pickFirstString(address?.CountryCode),
+		phone: pickFirstString(breeder.Phone),
+		email: pickFirstString(breeder.BreederEmail),
+		address1: pickFirstString(address?.Address1),
+		address2: pickFirstString(address?.Address2),
+	}
+}
+
 export function findMaleOwnerDogAvatar(breeder: Breeder): Image | null {
 	const ownerIds = new Set<string>()
 	for (const user of resolveOwnerMembers(breeder)) {

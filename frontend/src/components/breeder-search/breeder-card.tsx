@@ -7,7 +7,7 @@ import { Card, CardMedia, CardContent, Table, TableBody, TableRow, TableCell, Bo
 import PersonIcon from '@mui/icons-material/Person'
 import PhoneIcon from '@mui/icons-material/Phone'
 import type { Breeder, HzdSetting } from '@/types'
-import { findMaleOwnerDogAvatar, resolveBreederContact, formatBreederLocation, resolveBreederPhone } from '@/lib/breeder-display-utils'
+import { findMaleOwnerDogAvatar, resolveBreederObjectContact, formatBreederLocation } from '@/lib/breeder-display-utils'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 
 import { calculateDistance } from '@/lib/geo-utils'
@@ -50,8 +50,8 @@ export function BreederCard({
 	breederRole,
 }: BreederCardProps) {
 	const kennelName = breeder.kennelName ?? 'Kein Zwingername bekannt'
-	const contact = resolveBreederContact(breeder)
-	const breederPhone = resolveBreederPhone(breeder)
+	const contact = resolveBreederObjectContact(breeder)
+	const breederPhone = contact.phone
 	const locationLabel = formatBreederLocation(contact)
 
 	const fallbackDogAvatar = breederRole === 'S' && !breeder.avatar

@@ -7,9 +7,8 @@ import Image from 'next/image'
 import type { Breeder, Dog, HzdSetting } from '@/types'
 import {
 	findMaleOwnerDogAvatar,
-	resolveBreederContact,
+	resolveBreederObjectContact,
 	resolveBreederDogOwnerCIds,
-	resolveBreederPhone,
 } from '@/lib/breeder-display-utils'
 import { getBreederByDocumentId } from '@/lib/strapi/api'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
@@ -76,8 +75,8 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack, 
         ? fetchedBreeder
         : breeder
     const kennelName = breederDetails.kennelName ?? 'Kein Zwingername bekannt'
-    const contact = resolveBreederContact(breederDetails)
-    const breederPhone = resolveBreederPhone(breederDetails)
+    const contact = resolveBreederObjectContact(breederDetails)
+    const breederPhone = contact.phone
     const dogOwnerCIds = resolveBreederDogOwnerCIds(breederDetails)
 
     useEffect(() => {
