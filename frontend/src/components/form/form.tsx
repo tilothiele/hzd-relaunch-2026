@@ -24,6 +24,9 @@ import { AltchaField } from '@/components/altcha/altcha-field'
 import { RequiredFieldsNote } from '@/components/form/required-fields-note'
 import { useAuth } from '@/hooks/use-auth'
 import { theme } from '@/themes'
+import { trackUmamiEvent } from '@/components/analytics/track-umami-event'
+
+const FORM_SUBMIT_EVENT = 'form-submit'
 
 interface FormComponentProps {
 	form: Form
@@ -219,6 +222,9 @@ export function FormComponent({
 					const errorMessage = errorData?.error?.message ?? `Fehler beim Absenden des Formulars (Status: ${response.status})`
 					throw new Error(errorMessage)
 				}
+
+				// Formular erfolgreich abgesendet - Umami-Event erfassen
+				trackUmamiEvent(FORM_SUBMIT_EVENT, { name: form.Name ?? '' })
 
 				// Formular erfolgreich abgesendet - Modal anzeigen
 				setShowThankYouModal(true)
