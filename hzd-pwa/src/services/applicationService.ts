@@ -4,6 +4,7 @@ import { FormData } from '../types/formData';
 import { ApplicationSubmissionRequest, ApplicationSubmissionResponse } from '../types/api';
 import { getEmailService } from './emailService';
 import { getWorkflowService } from './workflowService';
+import { isValidIban } from '../lib/sepa-mandat-validation';
 
 class ApplicationService {
   private db = new DatabaseService();
@@ -281,8 +282,8 @@ class ApplicationService {
       errors.push('plz:PLZ muss 5-stellig sein');
     }
 
-    // IBAN prüfen (vereinfacht)
-    if (formData.sepaIban && !/^[A-Z]{2}\d{2}[A-Z0-9]+$/.test(formData.sepaIban.replace(/\s/g, ''))) {
+    // IBAN prüfen (gemeinsame Regel: lib/sepa-mandat-validation)
+    if (formData.sepaIban && !isValidIban(formData.sepaIban)) {
       errors.push('sepaIban:Ungültige IBAN');
     }
 

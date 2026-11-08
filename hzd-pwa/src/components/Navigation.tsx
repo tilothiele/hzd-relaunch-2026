@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 
 const publicItems = [
     { name: "Mitgliedsantrag", href: "/mitgliedsantrag" },
+    { name: "SEPA-Lastschriftmandat", href: "/sepa-lastschriftmandat" },
 ];
 
 const stammItems = [
