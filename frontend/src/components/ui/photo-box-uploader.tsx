@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUpload, faUser, faDog, faTrash, faPaperPlane, faLock, faCommentAlt } from '@fortawesome/free-solid-svg-icons'
+import { faUpload, faUser, faDog, faTrash, faPaperPlane, faLock, faCommentAlt, faCamera, faImages } from '@fortawesome/free-solid-svg-icons'
 import Image from 'next/image'
 import { PhotoBoxCollectionSelector } from './photo-box-collection-selector'
 import { useAuth } from '@/hooks/use-auth'
@@ -32,6 +32,12 @@ export function PhotoBoxUploader({
     const [status, setStatus] = useState<{ type: 'success' | 'error', text: string } | null>(null)
 
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const cameraInputRef = useRef<HTMLInputElement>(null)
+
+    const clearFileInputs = () => {
+        if (fileInputRef.current) fileInputRef.current.value = ''
+        if (cameraInputRef.current) cameraInputRef.current.value = ''
+    }
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -39,7 +45,7 @@ export function PhotoBoxUploader({
             const sizeMB = file.size / (1024 * 1024)
             if (sizeMB > maxPhotoSizeMB) {
                 setStatus({ type: 'error', text: `Das Foto ist zu groß. Maximale Größe ist ${maxPhotoSizeMB}MB.` })
-                if (fileInputRef.current) fileInputRef.current.value = ''
+                clearFileInputs()
                 return
             }
 
@@ -99,7 +105,7 @@ export function PhotoBoxUploader({
         setPersons('')
         setDogs('')
         setMessage('')
-        if (fileInputRef.current) fileInputRef.current.value = ''
+        clearFileInputs()
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -186,17 +192,33 @@ export function PhotoBoxUploader({
                     {/* Image Upload Area */}
                     <div className="relative">
                         {!previewUrl ? (
-                            <div
-                                onClick={() => selectedCollection && fileInputRef.current?.click()}
-                                className="group cursor-pointer border-2 border-dashed border-gray-200 hover:border-[#4560AA] rounded-2xl p-12 transition-all duration-300 flex flex-col items-center justify-center bg-gray-50 hover:bg-blue-50/30 overflow-hidden relative"
-                            >
-                                <FontAwesomeIcon icon={faUpload} className="text-4xl text-gray-300 group-hover:text-[#4560AA] mb-4 transition-colors" />
-                                <span className="text-gray-500 group-hover:text-[#4560AA] font-black transition-colors text-center">Foto aufnehmen oder auswählen</span>
+                            <div className="border-2 border-dashed border-gray-200 rounded-2xl p-6 sm:p-8 transition-all duration-300 flex flex-col items-center justify-center bg-gray-50 overflow-hidden relative">
+                                <FontAwesomeIcon icon={faUpload} className="text-4xl text-gray-300 mb-4" />
+                                <span className="text-gray-500 font-black text-center">Foto aufnehmen oder auswählen</span>
                                 <div className="flex flex-col items-center gap-1 mt-2">
                                     <p className="text-[10px] text-gray-400 font-black">Max. {maxPhotoSizeMB}MB • JPG, PNG</p>
                                     <p className="text-[10px] text-[#4560AA] font-black uppercase tracking-wider">
                                         Fotos: {currentPhotosCount} / {maxPhotosPerCollection}
                                     </p>
+                                </div>
+
+                                <div className="flex flex-col sm:flex-row gap-3 mt-6 w-full max-w-md">
+                                    <button
+                                        type="button"
+                                        onClick={() => cameraInputRef.current?.click()}
+                                        className="flex-1 flex items-center justify-center gap-2 bg-[#4560AA] hover:bg-[#344a8a] text-white py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.98]"
+                                    >
+                                        <FontAwesomeIcon icon={faCamera} />
+                                        <span> Mit Kamera aufnehmen</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="flex-1 flex items-center justify-center gap-2 bg-white hover:bg-blue-50 text-[#4560AA] border border-[#4560AA]/40 py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.98]"
+                                    >
+                                        <FontAwesomeIcon icon={faImages} />
+                                        <span> Aus Galerie wählen</span>
+                                    </button>
                                 </div>
 
                                 {currentPhotosCount >= maxPhotosPerCollection && (
@@ -241,6 +263,13 @@ export function PhotoBoxUploader({
                         <input
                             type="file"
                             ref={fileInputRef}
+                            onChange={handleImageChange}
+                            accept="image/*"
+                            className="hidden"
+                        />
+                        <input
+                            type="file"
+                            ref={cameraInputRef}
                             onChange={handleImageChange}
                             accept="image/*"
                             capture="environment"

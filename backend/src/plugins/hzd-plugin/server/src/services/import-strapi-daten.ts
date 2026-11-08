@@ -626,11 +626,13 @@ async function importCollection(
 				strapi.log.error(`import_strapi_daten ${line}`)
 			}
 		}
+		// Unveränderte Datensätze ("nur geänderte" aktiv) werden nicht
+		// einzeln ausgegeben – das macht den Report unübersichtlich.
+		// Die Gesamtzahl steht am Ende in der Abschlusszeile.
 		if (onlyChanged && previous && changes && changes.length === 0) {
 			skipped += 1
 			counts.skipped = skipped
 			counts.processed = imported
-			log(`${label} ${index}/${total}${idLabel} übersprungen (unverändert)`)
 			return
 		}
 		imported += 1

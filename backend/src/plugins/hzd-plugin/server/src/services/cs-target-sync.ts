@@ -329,8 +329,17 @@ function mapMemberToUser(
 		publishMyData: isBreeder,
 	}
 
-	assign(data, 'cEmail', parseEmail(member.Email))
-	assign(data, 'cFlagAccess', parseBoolean(member.C01Access))
+	// Immer aus CS_Member übernommen (auch geleert, wenn der Wert leer ist):
+	data.cEmail = parseEmail(member.Email)
+	data.cFlagAccess = parseBoolean(member.C01Access)
+	data.memberSince = parseDate(member.DateOfJoining)
+	data.cancellationOn = parseDate(member.DateOfLeaving)
+	data.membershipNumber = membershipNumber
+	data.region = parseRegion(member.Oblast)
+	data.dateOfBirth = parseDate(member.DateOfBirth)
+	data.dateOfDeath = parseDate(member.DateOfDeath)
+
+	// Nur setzen, wenn vorhanden (leere Werte überschreiben keine Bestandsdaten):
 	assign(data, 'title', cell(member.Title))
 	assign(data, 'firstName', cell(member.Firstname))
 	assign(data, 'lastName', cell(member.Lastname))
@@ -340,12 +349,6 @@ function mapMemberToUser(
 	assign(data, 'countryCode', parseCountryCode(member.Country))
 	assign(data, 'phone', truncateOrNull(phone, 50))
 	assign(data, 'sex', lookup(member.Salutation, USER_SEX_MAP))
-	assign(data, 'membershipNumber', membershipNumber)
-	assign(data, 'dateOfBirth', parseDate(member.DateOfBirth))
-	assign(data, 'dateOfDeath', parseDate(member.DateOfDeath))
-	assign(data, 'memberSince', parseDate(member.DateOfJoining))
-	assign(data, 'cancellationOn', parseDate(member.DateOfLeaving))
-	assign(data, 'region', parseRegion(member.Oblast))
 	return data
 }
 
@@ -808,8 +811,9 @@ export async function ensureBreederForCsMember(
 		?? (breedersByCId ? null : await findByCId(strapi, BREEDER_UID, cId))
 	if (existing) {
 		// Bestehender Züchter bzw. Deckrüdenbesitzer:
-		// cPhone und cBreederEmail aus CS nachziehen. Phone bleibt unverändert.
-		// BreederEmail bleibt die öffentlich angezeigte Adresse.
+		// cPhone und cBreederEmail werden immer aus CS_Member aktualisiert
+		// (leerer CS-Wert leert das Feld).
+		// Phone bleibt unverändert. BreederEmail bleibt die öffentlich angezeigte Adresse.
 		if (typeof existing.id !== 'number' && !existing.documentId) {
 			return
 		}
@@ -820,24 +824,20 @@ export async function ensureBreederForCsMember(
 				cBreederEmail: cached.cBreederEmail,
 			}
 			: await loadBreederSyncFields(strapi, existing)
-		const data: TargetData = {}
-		if (phone && stored.cPhone !== phone) {
-			data.cPhone = phone
-		}
 		const rawEmail = cell(member.Email)
 		const emailReason = emailRejectionReason(member.Email)
 		if (rawEmail && emailReason) {
 			log(
-				`CS_Member cId=${cId}: ${emailReason}, cBreederEmail wird nicht übernommen`,
+				`CS_Member cId=${cId}: ${emailReason}, cBreederEmail wird geleert`,
 			)
 		}
-		const email = parseEmail(member.Email)
-		if (email && stored.cBreederEmail !== email) {
-			data.cBreederEmail = email
+		const data: TargetData = {
+			cPhone: phone,
+			cBreederEmail: parseEmail(member.Email),
 		}
-		// Phone und cPhone sind bei Updates getrennte Felder (bei Update wird
-		// nur cPhone gepflegt) – weichen sie voneinander ab, in den Report.
-		const finalCPhone = typeof data.cPhone === 'string' ? data.cPhone : stored.cPhone
+		// Phone und cPhone sind getrennte Felder (bei Update wird nur cPhone
+		// gepflegt) – abweichende Werte werden ins Report geloggt.
+		const finalCPhone = data.cPhone
 		if (
 			stored.phone !== finalCPhone
 			&& (stored.phone !== null || finalCPhone !== null)
@@ -846,17 +846,12 @@ export async function ensureBreederForCsMember(
 				`CS_Member cId=${cId}: Breeder Phone und cPhone weichen ab: Phone="${stored.phone ?? '–'}" cPhone="${finalCPhone ?? '–'}"`,
 			)
 		}
-		if (Object.keys(data).length === 0) {
-			return
-		}
 		await saveDocument(strapi, BREEDER_UID, existing, data)
 		if (cached) {
-			if (typeof data.cPhone === 'string') {
-				cached.cPhone = data.cPhone
-			}
-			if (typeof data.cBreederEmail === 'string') {
-				cached.cBreederEmail = data.cBreederEmail
-			}
+			cached.cPhone = phone
+			cached.cBreederEmail = typeof data.cBreederEmail === 'string'
+				? data.cBreederEmail
+				: null
 		}
 		log(
 			`Breeder aktualisiert cId=${cId} documentId=${existing.documentId ?? existing.id}`,
@@ -877,7 +872,7 @@ export async function ensureBreederForCsMember(
 	const emailReason = emailRejectionReason(member.Email)
 	if (rawEmail && emailReason) {
 		log(
-			`CS_Member cId=${cId}: ${emailReason}, cBreederEmail wird nicht übernommen`,
+			`CS_Member cId=${cId}: ${emailReason}, cBreederEmail bleibt leer`,
 		)
 	}
 	const email = parseEmail(member.Email)
