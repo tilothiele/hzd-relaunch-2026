@@ -4,7 +4,8 @@
 
 - Züchterverwaltung für Zuchtleitung
 - TIK-Benachrichtigung bei 'Bitte meine Änderungen übernehmen' bei Zwinger/Deckrüdenbesitzer/Zuchtund.
--
+- Photobox: Upload via local File und direkt von der Kamera
+
 ## [1.1.2] - 3.11.2026
 
 - Telefonnummern werden als Link angezeigt
