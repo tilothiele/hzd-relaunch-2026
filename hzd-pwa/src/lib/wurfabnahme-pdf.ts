@@ -17,6 +17,7 @@ import {
 	type WelpenRowData,
 	type WurfabnahmeFormData,
 } from '@/types/wurfabnahme-form'
+import { HZD_LOGO_PNG_SRC, pngDimensions } from '@/lib/hzd-logo'
 
 const PAGE_W = 595.28
 const PAGE_H = 841.89
@@ -191,35 +192,25 @@ async function signatureImage(pen: Pen, dataUrl: string): Promise<PDFImage | nul
 }
 
 async function loadLogo(doc: PDFDocument) {
-	// Aktuelles HZD-Logo (public/hzd-logo.webp). pdf-lib kann WebP nicht
-	// direkt einbetten, daher Umweg über Canvas → PNG (reiner Web-Approach,
-	// läuft im Browser; außerhalb des Browsers gibt es kein Logo).
-	const response = await fetch('/hzd-logo.webp')
-	if (!response.ok) {
+	// Aktuelles HZD-Logo – statisches PNG (abgeleitet von hzd-logo.webp),
+	// direkt als Web-Asset geladen und eingebettet (pdf-lib kann kein WebP).
+	try {
+		const response = await fetch(HZD_LOGO_PNG_SRC)
+		if (!response.ok) {
+			return null
+		}
+
+		const bytes = new Uint8Array(await response.arrayBuffer())
+		const dim = pngDimensions(bytes)
+		if (!dim) {
+			return null
+		}
+
+		const image = await doc.embedPng(bytes)
+		return { image, aspect: dim.width / dim.height }
+	} catch {
 		return null
 	}
-
-	const blob = await response.blob()
-	const bitmap = await createImageBitmap(blob)
-	const aspect = bitmap.width / bitmap.height
-	const canvas = document.createElement('canvas')
-	canvas.width = bitmap.width
-	canvas.height = bitmap.height
-	const ctx = canvas.getContext('2d')
-	if (!ctx) {
-		bitmap.close()
-		return null
-	}
-	ctx.drawImage(bitmap, 0, 0)
-	bitmap.close()
-
-	const bytes = pngBytes(canvas.toDataURL('image/png'))
-	if (!bytes) {
-		return null
-	}
-
-	const image = await doc.embedPng(bytes)
-	return { image, aspect }
 }
 
 function litterLabel(stamm: StammblattData): string {

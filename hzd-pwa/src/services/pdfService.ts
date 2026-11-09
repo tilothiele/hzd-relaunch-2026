@@ -1,7 +1,9 @@
 import jsPDF from 'jspdf';
+import fs from 'fs';
+import path from 'path';
 import { FormData } from '../types/formData';
 import { serverLog } from '../lib/server-only';
-import { getHzdLogoPng } from '../lib/server/hzd-logo';
+import { HZD_LOGO_ASPECT } from '../lib/hzd-logo';
 import { getFinanverwaltungContact, FinanverwaltungContact } from '../lib/server/finanverwaltung';
 import {
   MEMBERSHIP_TYPE_HZD_VOLLMITGLIED,
@@ -61,21 +63,26 @@ class PdfService {
         pdf.text(line, margin, yPosition + (index * 3.5));
       });
 
-      // Logo rechts (aktueller HZD-Logo aus public/hzd-logo.webp,
-      // von getHzdLogoPng() zu PNG konvertiert)
-      const logo = await getHzdLogoPng();
-      if (logo) {
-        const logoHeight = 25;
-        const logoWidth = 25 * logo.aspectRatio;
-        const logoX = pageWidth - margin - logoWidth;
-        pdf.addImage(
-          `data:image/png;base64,${logo.data.toString('base64')}`,
-          'PNG',
-          logoX,
-          yPosition,
-          logoWidth,
-          logoHeight,
-        );
+      // Logo rechts (aktueller HZD-Logo; statisches PNG, abgeleitet von hzd-logo.webp)
+      try {
+        const logoFile = path.join(process.cwd(), 'public', 'hzd-logo.png');
+        if (fs.existsSync(logoFile)) {
+          const logoBuffer = fs.readFileSync(logoFile);
+          const logoBase64 = logoBuffer.toString('base64');
+          const logoHeight = 25;
+          const logoWidth = 25 * HZD_LOGO_ASPECT;
+          const logoX = pageWidth - margin - logoWidth;
+          pdf.addImage(
+            `data:image/png;base64,${logoBase64}`,
+            'PNG',
+            logoX,
+            yPosition,
+            logoWidth,
+            logoHeight,
+          );
+        }
+      } catch (error) {
+        console.error('Fehler beim Laden des Logos:', error);
       }
 
       // Website rechts vertikal

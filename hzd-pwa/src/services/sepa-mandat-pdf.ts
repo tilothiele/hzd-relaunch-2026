@@ -12,7 +12,7 @@ import {
 } from 'pdf-lib';
 import { GLAEUBIGER_ID } from '../lib/sepa-mandat-validation';
 import { getFinanverwaltungContact, finanContactAddressLines } from '../lib/server/finanverwaltung';
-import { getHzdLogoPng } from '../lib/server/hzd-logo';
+import { HZD_LOGO_ASPECT } from '../lib/hzd-logo';
 import { serverLog } from '../lib/server-only';
 import type { SepaMandatFormData } from '../types/sepa-mandat-form';
 
@@ -257,18 +257,18 @@ class SepaMandatPdfService {
       // ---- HZD-Logo: alte Logo-Grafik der Vorlage überdecken und
       // das aktuelle HZD-Logo (Quadrat, transparent) an gleicher Stelle zeichnen.
       page.drawRectangle({ ...LOGO_COVER, color: WEISS });
-      const logo = await getHzdLogoPng();
-      if (logo) {
+      const logoFile = path.join(process.cwd(), 'public', 'hzd-logo.png');
+      if (fs.existsSync(logoFile)) {
         // Logo mit Seitenverhältnis in das Überdeckungsrechteck einpassen
         let logoW = LOGO_COVER.width;
-        let logoH = logoW / logo.aspectRatio;
+        let logoH = logoW / HZD_LOGO_ASPECT;
         if (logoH > LOGO_COVER.height) {
           logoH = LOGO_COVER.height;
-          logoW = logoH * logo.aspectRatio;
+          logoW = logoH * HZD_LOGO_ASPECT;
         }
         const logoX = LOGO_COVER.x + (LOGO_COVER.width - logoW) / 2;
         const logoY = LOGO_COVER.y + (LOGO_COVER.height - logoH) / 2;
-        const embeddedLogo = await doc.embedPng(logo.data);
+        const embeddedLogo = await doc.embedPng(fs.readFileSync(logoFile));
         page.drawImage(embeddedLogo, {
           x: logoX,
           y: logoY,
