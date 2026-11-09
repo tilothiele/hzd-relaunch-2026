@@ -3,19 +3,30 @@
 import type { ChangeEvent, FormEvent } from 'react'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { REGIONALGRUPPEN, validateSepaMandatFormData, type SepaMandatErrors } from '@/lib/sepa-mandat-validation'
-import type { SepaMandatFormData } from '@/types/sepa-mandat-form'
+import {
+  REGIONALGRUPPEN,
+  validateSepaMandatFormData,
+  type SepaMandatErrors,
+  type SepaMandatErrorKey,
+} from '@/lib/sepa-mandat-validation'
+import type { SepaMandatFormData, SepaMandatPerson } from '@/types/sepa-mandat-form'
 
 /** Zuständige Finanzverwaltung für die gewählte Regionalgruppe (Strapi > HZD Settings) */
 type FinanStatus = 'idle' | 'loading' | 'ok' | 'empty'
 
-const initialFormData: SepaMandatFormData = {
-  regionalgruppe: '',
+const leerePerson: SepaMandatPerson = {
   vorname: '',
   nachname: '',
   strasse: '',
   plz: '',
   ort: '',
+}
+
+const initialFormData: SepaMandatFormData = {
+  regionalgruppe: '',
+  mitglied: { ...leerePerson },
+  abweichenderKontoinhaber: false,
+  kontoinhaber: { ...leerePerson },
   kreditinstitut: '',
   iban: '',
   bic: '',
@@ -26,15 +37,22 @@ const inputClass = (hasError: boolean, mono = false) =>
     hasError ? 'border-red-500' : 'border-gray-300'
   } ${mono ? 'font-mono' : ''}`
 
-// Lesbare Feldbezeichnungen für den Hinweis unter dem Absenden-Button
+// Lesbare Feldbezeichnungen für die Meldung unter dem Absenden-Button
+// (+ pro-Feld-Fehler). Schlüssel = Validierungs-Fehltaster.
 const FELD_LABELS: Record<string, string> = {
-  regionalgruppe: 'Regionalgruppe auswählen (oben im Formular)',
-  vorname: 'Vorname',
-  nachname: 'Nachname',
-  strasse: 'Straße',
-  plz: 'PLZ (exakt 5 Ziffern)',
-  ort: 'Ort',
+  regionalgruppe: 'Regionalgruppe auswählen (Abschnitt 1)',
+  mitgliedVorname: 'Mitglied – Vorname',
+  mitgliedNachname: 'Mitglied – Name',
+  mitgliedStrasse: 'Mitglied – Straße',
+  mitgliedPlz: 'Mitglied – PLZ (exakt 5 Ziffern)',
+  mitgliedOrt: 'Mitglied – Ort',
+  kontoinhaberVorname: 'Kontoinhaber – Vorname (abweichend)',
+  kontoinhaberNachname: 'Kontoinhaber – Name (abweichend)',
+  kontoinhaberStrasse: 'Kontoinhaber – Straße (abweichend)',
+  kontoinhaberPlz: 'Kontoinhaber – PLZ (abweichend)',
+  kontoinhaberOrt: 'Kontoinhaber – Ort (abweichend)',
   iban: 'IBAN',
+  bic: 'BIC',
   kreditinstitut: 'Kreditinstitut',
 }
 
@@ -112,18 +130,50 @@ export default function SepaMandatForm() {
     return () => clearTimeout(timer)
   }, [toast])
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    const updated = { ...formData, [name]: value }
-    setFormData(updated)
+  /** Validierungs-Fehltaster für ein Eingabefeld (auch "person.feld") */
+  const errKey = (name: string): SepaMandatErrorKey | string => {
+    if (name.includes('.')) {
+      const [s, k] = name.split('.') as [string, string]
+      return `${s}${k.charAt(0).toUpperCase()}${k.slice(1)}`
+    }
+    return name
+  }
+
+  const removeError = (name: string) => {
+    const ek = errKey(name)
     setErrors((prev) => {
-      if (!prev[name as keyof SepaMandatFormData]) {
-        return prev
-      }
+      if (!(prev[ek as SepaMandatErrorKey])) return prev
       const next = { ...prev }
-      delete next[name as keyof SepaMandatFormData]
+      delete next[ek as SepaMandatErrorKey]
       return next
     })
+  }
+
+  const onInput = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    if (['regionalgruppe', 'iban', 'bic', 'kreditinstitut'].includes(name)) {
+      setFormData((prev) => ({ ...prev, [name]: value }))
+    } else {
+      const [personKey, personFeld] = name.split('.')
+      const key = personKey as 'mitglied' | 'kontoinhaber'
+      setFormData((prev) => ({
+        ...prev,
+        [key]: { ...prev[key], [personFeld]: value },
+      }))
+    }
+    removeError(name)
+  }
+
+  /** Schalter 'Abweichender Kontoinhaber'. Ein → Felder enabled/Pflicht (vorausgefüllt aus Mitglied);
+   *  aus → Felder deaktiviert (Kontoinhaber = Mitglied). */
+  const onAbweichendSwitch = (e: ChangeEvent<HTMLInputElement>) => {
+    const checked = e.target.checked
+    setFormData((prev) => ({
+      ...prev,
+      abweichenderKontoinhaber: checked,
+      kontoinhaber: checked ? { ...prev.mitglied } : { ...leerePerson },
+    }))
+    setErrors({})
   }
 
   const handleSubmit = async (e: FormEvent) => {
@@ -176,6 +226,41 @@ export default function SepaMandatForm() {
     }
   }
 
+  /* ---------- wiederverwendbares Eingabefeld ---------- */
+  const feld = (
+    name: string,
+    label: string,
+    value: string,
+    opts: { hint?: string; disabled?: boolean; mono?: boolean; placeholder?: string; span?: boolean; plz?: boolean } = {},
+  ) => {
+    const ek = errKey(name)
+    const error = errors[ek as SepaMandatErrorKey]
+    return (
+      <div className={`space-y-3 ${opts.span ? 'md:col-span-2' : ''}`}>
+        <label className="block text-sm font-medium text-gray-700">
+          {label}
+          {opts.hint ? <span className="font-normal text-gray-500"> {opts.hint}</span> : null}
+        </label>
+        <input
+          name={name}
+          value={value}
+          placeholder={opts.placeholder}
+          disabled={opts.disabled}
+          maxLength={opts.plz ? 5 : undefined}
+          inputMode={opts.plz ? 'numeric' : undefined}
+          onChange={onInput}
+          className={`${inputClass(!!error, opts.mono)} ${opts.disabled ? 'disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed' : ''}`}
+          data-error={!!error}
+        />
+        {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
+      </div>
+    )
+  }
+
+  const m = formData.mitglied
+  const k = formData.kontoinhaber
+  const abweichend = formData.abweichenderKontoinhaber
+
   return (
     <div className="min-h-screen py-8 px-4" style={{ backgroundColor: '#f8f8f8' }}>
       <div className="max-w-4xl mx-auto">
@@ -207,7 +292,7 @@ export default function SepaMandatForm() {
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <form onSubmit={handleSubmit} className="p-8 space-y-12">
 
-            {/* Regionalgruppe Section */}
+            {/* ---- Abschnitt 1: Regionalgruppe ---- */}
             <div className="border-b border-gray-200 pb-8">
               <div className="flex items-center mb-4">
                 <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
@@ -225,22 +310,29 @@ export default function SepaMandatForm() {
               </div>
 
               <div className="space-y-3 max-w-md">
-                <label className="block text-sm font-medium text-gray-700">Zuständige Regionalgruppe *</label>
-                <select
-                  name="regionalgruppe"
-                  value={formData.regionalgruppe}
-                  onChange={handleChange}
-                  className={inputClass(!!errors.regionalgruppe)}
-                  data-error={!!errors.regionalgruppe}
-                >
-                  <option value="">Bitte wählen</option>
-                  {REGIONALGRUPPEN.map((gruppe) => (
-                    <option key={gruppe} value={gruppe}>{gruppe}</option>
-                  ))}
-                </select>
-                {errors.regionalgruppe && (
-                  <p className="text-sm text-red-600 mt-1">{errors.regionalgruppe}</p>
-                )}
+                <div className="space-y-3">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Zuständige Regionalgruppe *
+                  </label>
+                  <select
+                    name="regionalgruppe"
+                    value={formData.regionalgruppe}
+                    onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+                      setFormData((prev) => ({ ...prev, regionalgruppe: e.target.value }))
+                      removeError('regionalgruppe')
+                    }}
+                    className={inputClass(!!errors.regionalgruppe)}
+                    data-error={!!errors.regionalgruppe}
+                  >
+                    <option value="">Bitte wählen</option>
+                    {REGIONALGRUPPEN.map((gruppe) => (
+                      <option key={gruppe} value={gruppe}>{gruppe}</option>
+                    ))}
+                  </select>
+                  {errors.regionalgruppe && (
+                    <p className="text-sm text-red-600 mt-1">{errors.regionalgruppe}</p>
+                  )}
+                </div>
 
                 {/* Vorschau: Sende-Adresse der zuständigen Finanzverwaltung (aus HZD Settings im Strapi-Backend) */}
                 {formData.regionalgruppe !== '' && (
@@ -270,16 +362,40 @@ export default function SepaMandatForm() {
               </div>
             </div>
 
-            {/* SEPA-Lastschriftmandat Section */}
+            {/* ---- Abschnitt 2: Mitglied ---- */}
+            <div className="border-b border-gray-200 pb-8">
+              <div className="flex items-center mb-4">
+                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                  2
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900">Mitglied</h2>
+              </div>
+
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  Angaben zu Ihrem Mitglied. Dieser Block erscheint im PDF.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {feld('mitglied.vorname', 'Vorname *', m.vorname, { placeholder: 'Vorname des Mitglieds' })}
+                {feld('mitglied.nachname', 'Name *', m.nachname, { placeholder: 'Nachname' })}
+                {feld('mitglied.strasse', 'Straße *', m.strasse, { placeholder: 'Musterstraße 123', span: true })}
+                {feld('mitglied.plz', 'PLZ *', m.plz, { placeholder: '20095', plz: true })}
+                {feld('mitglied.ort', 'Ort *', m.ort, { placeholder: 'Hamburg' })}
+              </div>
+            </div>
+
+            {/* ---- Abschnitt 3: SEPA-Lastschriftmandat / Kontoinhaber ---- */}
             <div className="pb-8">
               <div className="flex items-center mb-8">
                 <div className="w-10 h-10 bg-orange-600 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
-                  2
+                  3
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900">SEPA-Lastschriftmandat</h2>
               </div>
 
-              <div className="space-y-3 mb-4">
+              <div className="space-y-3 mb-6">
                 <p className="text-sm text-gray-600">
                   Ich ermächtige die Hovawart Zuchtgemeinschaft Deutschland, den Mitgliedsbeitrag mittels Lastschrift einzuziehen. Zugleich weise ich
                   mein Kreditinstitut an, die von der Hovawart Zuchtgemeinschaft auf mein Konto gezogenen Lastschriften einzulösen.
@@ -292,130 +408,80 @@ export default function SepaMandatForm() {
                 </p>
               </div>
 
-              {/* Kontoinhaber / Kontodaten */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-3">
-                  <label className="block text-sm font-medium text-gray-700">Vorname *</label>
-                  <input
-                    name="vorname"
-                    value={formData.vorname}
-                    placeholder="Vorname des Kontoinhabers"
-                    onChange={handleChange}
-                    className={inputClass(!!errors.vorname)}
-                    data-error={!!errors.vorname}
-                  />
-                  {errors.vorname && (
-                    <p className="text-sm text-red-600 mt-1">{errors.vorname}</p>
-                  )}
-                </div>
+              {/* ===== Kontoinhaber ===== */}
+              <div className="border border-gray-200 rounded-xl p-5 space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Kontoinhaber</h3>
+                    <p className="text-sm text-gray-600">
+                      Standardmäßig ist der Kontoinhaber das <span className="font-medium">Mitglied</span> selbst
+                      (Daten aus Abschnitt 2).
+                    </p>
+                  </div>
 
-                <div className="space-y-3">
-                  <label className="block text-sm font-medium text-gray-700">Nachname *</label>
-                  <input
-                    name="nachname"
-                    value={formData.nachname}
-                    placeholder="Nachname des Kontoinhabers"
-                    onChange={handleChange}
-                    className={inputClass(!!errors.nachname)}
-                    data-error={!!errors.nachname}
-                  />
-                  {errors.nachname && (
-                    <p className="text-sm text-red-600 mt-1">{errors.nachname}</p>
-                  )}
-                </div>
-
-                <div className="space-y-3 md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700">Straße *</label>
-                  <input
-                    name="strasse"
-                    value={formData.strasse}
-                    placeholder="Musterstraße 123"
-                    onChange={handleChange}
-                    className={inputClass(!!errors.strasse)}
-                    data-error={!!errors.strasse}
-                  />
-                  {errors.strasse && (
-                    <p className="text-sm text-red-600 mt-1">{errors.strasse}</p>
-                  )}
-                </div>
-
-                <div className="space-y-3">
-                  <label className="block text-sm font-medium text-gray-700">PLZ *</label>
-                  <input
-                    name="plz"
-                    value={formData.plz}
-                    placeholder="20095"
-                    maxLength={5}
-                    inputMode="numeric"
-                    onChange={handleChange}
-                    className={inputClass(!!errors.plz)}
-                    data-error={!!errors.plz}
-                  />
-                  {errors.plz && (
-                    <p className="text-sm text-red-600 mt-1">{errors.plz}</p>
-                  )}
-                </div>
-
-                <div className="space-y-3">
-                  <label className="block text-sm font-medium text-gray-700">Ort *</label>
-                  <input
-                    name="ort"
-                    value={formData.ort}
-                    placeholder="Hamburg"
-                    onChange={handleChange}
-                    className={inputClass(!!errors.ort)}
-                    data-error={!!errors.ort}
-                  />
-                  {errors.ort && (
-                    <p className="text-sm text-red-600 mt-1">{errors.ort}</p>
-                  )}
-                </div>
-
-                <div className="space-y-3">
-                  <label className="block text-sm font-medium text-gray-700">IBAN *</label>
-                  <input
-                    name="iban"
-                    value={formData.iban}
-                    placeholder="DE89 3704 0044 0532 0130 00"
-                    onChange={handleChange}
-                    className={inputClass(!!errors.iban, true)}
-                    data-error={!!errors.iban}
-                  />
-                  {errors.iban && (
-                    <p className="text-sm text-red-600 mt-1">{errors.iban}</p>
-                  )}
-                </div>
-
-                <div className="space-y-3">
-                  <label className="block text-sm font-medium text-gray-700">
-                    BIC <span className="font-normal text-gray-500">(nur bei Konten im Ausland erforderlich)</span>
+                  <label className="flex items-center gap-3 cursor-pointer select-none mt-1">
+                    <input
+                      type="checkbox"
+                      checked={abweichend}
+                      onChange={onAbweichendSwitch}
+                      className="w-5 h-5 accent-orange-600 cursor-pointer"
+                    />
+                    <span className="text-sm font-medium text-gray-800">
+                      Abweichender Kontoinhaber
+                    </span>
                   </label>
-                  <input
-                    name="bic"
-                    value={formData.bic}
-                    placeholder="COBADEFFXXX"
-                    onChange={handleChange}
-                    className={inputClass(!!errors.bic, true)}
-                    data-error={!!errors.bic}
-                  />
-                  {errors.bic && (
-                    <p className="text-sm text-red-600 mt-1">{errors.bic}</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {feld(
+                    'kontoinhaber.vorname',
+                    'Vorname *',
+                    k.vorname,
+                    {
+                      disabled: !abweichend,
+                      placeholder: abweichend ? 'Vorname des Kontoinhabers' : '=',
+                    },
+                  )}
+                  {feld(
+                    'kontoinhaber.nachname',
+                    'Name *',
+                    k.nachname,
+                    { disabled: !abweichend, placeholder: abweichend ? 'Nachname' : '=' },
+                  )}
+                  {feld(
+                    'kontoinhaber.strasse',
+                    'Straße *',
+                    k.strasse,
+                    { disabled: !abweichend, span: true, placeholder: abweichend ? 'Musterstraße 123' : '=' },
+                  )}
+                  {feld(
+                    'kontoinhaber.plz',
+                    'PLZ *',
+                    k.plz,
+                    { disabled: !abweichend, plz: true, placeholder: abweichend ? '20095' : '=' },
+                  )}
+                  {feld(
+                    'kontoinhaber.ort',
+                    'Ort *',
+                    k.ort,
+                    { disabled: !abweichend, placeholder: abweichend ? 'Hamburg' : '=' },
                   )}
                 </div>
 
-                <div className="space-y-3 md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700">Kreditinstitut *</label>
-                  <input
-                    name="kreditinstitut"
-                    value={formData.kreditinstitut}
-                    placeholder="Name der Bank"
-                    onChange={handleChange}
-                    className={inputClass(!!errors.kreditinstitut)}
-                    data-error={!!errors.kreditinstitut}
-                  />
-                  {errors.kreditinstitut && (
-                    <p className="text-sm text-red-600 mt-1">{errors.kreditinstitut}</p>
-                  )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {feld('iban', 'IBAN *', formData.iban, {
+                    placeholder: 'DE89 3704 0044 0532 0130 00',
+                    mono: true,
+                    span: true,
+                  })}
+                  {feld('bic', 'BIC', formData.bic, {
+                    hint: '(nur bei Konten im Ausland erforderlich)',
+                    mono: true,
+                    placeholder: 'COBADEFFXXX',
+                  })}
+                  {feld('kreditinstitut', 'Kreditinstitut *', formData.kreditinstitut, {
+                    placeholder: 'Name der Bank',
+                  })}
                 </div>
               </div>
             </div>
@@ -447,7 +513,7 @@ export default function SepaMandatForm() {
                       <span>Wird erstellt...</span>
                     </div>
                   ) : (
-                    'Absenden'
+                    'Als PDF herunterladen'
                   )}
                 </button>
               </div>

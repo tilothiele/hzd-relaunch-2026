@@ -1,13 +1,29 @@
 // Formularfelder für das SEPA-Lastschriftmandat (/sepa-lastschriftmandat)
-export interface SepaMandatFormData {
-  /** Regionalgruppe (Nord/West/Mitte/Süd/Ost/HZD → Finanzverwaltung_* in HZD Settings) */
-  regionalgruppe: string;
+
+/** Personendaten (Mitglied bzw. Kontoinhaber) – gleiche 5 Felder */
+export interface SepaMandatPerson {
   vorname: string;
   nachname: string;
   strasse: string;
   plz: string;
   ort: string;
+}
+
+export interface SepaMandatFormData {
+  /** Regionalgruppe (Label: Nord/West/Mitte/Süd/Ost/HZD → HZD Settings > Finanzverwaltung_<Region> im Strapi-Backend) */
+  regionalgruppe: string;
+  /** Mitglied – immer Pflicht (erscheint als eigener Block im PDF) */
+  mitglied: SepaMandatPerson;
+  /**
+   * Schalter 'Abweichender Kontoinhaber'.
+   * default aus: der Kontoinhaber ist das Mitglied selbst (Personendaten = mitglied).
+   * ein: die Personendaten 'kontoinhaber' werden enabled + Pflicht und von 'mitglied' abweichend.
+   */
+  abweichenderKontoinhaber: boolean;
+  /** Kontoinhaber – nur Pflicht/validiert, wenn abweichenderKontoinhaber = true */
+  kontoinhaber: SepaMandatPerson;
   kreditinstitut: string;
   iban: string;
+  /** optional (nur bei Konten im Ausland erforderlich) */
   bic: string;
 }

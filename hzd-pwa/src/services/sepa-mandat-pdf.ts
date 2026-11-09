@@ -4,35 +4,40 @@ import {
   PDFDocument,
   PDFName,
   PDFString,
-  PDFBool,
-  PDFTextField,
   PDFArray,
   PDFDict,
   rgb,
 } from 'pdf-lib';
-import { getFinanverwaltungContact, finanContactAddressLines, getGlaeubigerId } from '../lib/server/finanverwaltung';
+import {
+  getFinanverwaltungContact,
+  finanContactAddressLines,
+  getGlaeubigerId,
+} from '../lib/server/finanverwaltung';
 import { HZD_LOGO_ASPECT } from '../lib/hzd-logo';
 import { serverLog } from '../lib/server-only';
-import type { SepaMandatFormData } from '../types/sepa-mandat-form';
+import type { SepaMandatFormData, SepaMandatPerson } from '../types/sepa-mandat-form';
 
 /**
  * SepaMandatPdfService – generiert das SEPA-Lastschriftmandat (HZD Formular 032,
  * Version 03) auf Basis der Original-Vorlage src/templates/sepa-mandat-032-03.pdf.
  *
  * Vorgehen pro PDF:
- * 1. Nicht benötigte Vorlagenelemente werden entfernt: die versteckten
- *    Adress-Buttons (eingebackene Adressen je RG), das
- *    Regionalgruppen-Grid (RG Ost … RG West), die Buttons
- *    'Drucken' / 'Daten löschen' und die gelbe Hinweisbox
- *    ('Bitte senden Sie …').
- * 2. Die Adresszeilen der zuständigen Finanzverwaltung (je nach
- *    Regionalgruppe aus Strapi > HZD Settings; E-Mail-Adressen unter der
- *    Postanschrift) werden an der Originalposition gezeichnet.
- * 3. Die Gläubiger-Identifikationsnummer (aus Strapi > HZD Settings) wird
- *    an der Originalposition gezeichnet.
+ * 1. ALLE Formular-Felder der Vorlage werden entfernt (versteckte Adress-Buttons,
+ *    Regionalgruppen-Grid, Bedien-Buttons, gelbe Hinweisbox, Kontodaten-Felder…) –
+ *    die Daten werden statisch kompakt gezeichnet.
+ * 2. Der Adressblock der zuständigen Finanzverwaltung (je nach Regionalgruppe
+ *    aus Strapi > HZD Settings, inkl. E-Mail-Adressen unter der Postanschrift)
+ *    wird an der Originalposition gezeichnet – der eingebackene Adressbereich
+ *    der Vorlage wird überdeckt.
+ * 3. Die Gläubiger-Identifikationsnummer (aus Strapi > HZD Settings) wird an
+ *    der Originalposition gezeichnet.
  * 4. Das alte Logo oben rechts in der Vorlage wird überdeckt und durch das
- *    aktuelle HZD-Logo (public/hzd-logo.webp) ersetzt.
- * 5. Die Kontodaten werden als echte PDF-Formularwerte eingetragen.
+ *    aktuelle HZD-Logo (public/hzd-logo.png) ersetzt.
+ * 5. Kompakter Zwei-Spalten-Block 'Mitglied' | 'Kontoinhaber' (je Vorname, Name,
+ *    Straße, PLZ, Ort) + IBAN / BIC / Kreditinstitut + Ort, Datum / Unterschrift
+ *    werden gezeichnet – kleiner geschnitten, damit alles auf eine Seite passt.
+ *    Der eingerahmte Footer (Formularnummer/Version/Datum/Bereich/…) wird
+ *    mit einer weißen Abdeckung entfernt.
  */
 
 const TEMPLATE_PATH = path.join(
@@ -42,51 +47,99 @@ const TEMPLATE_PATH = path.join(
   'sepa-mandat-032-03.pdf',
 );
 
-// In der Originalvorlage enthaltene Felder, die im fertigen PDF entfernt werden:
-// - 6 versteckte Adress-Buttons (tragen die eingebackenen Adressen je RG)
-// - 5 Regionalgruppen-Auswahlfelder (RG Ost … RG West)
-// - 2 Bedien-Buttons ('Drucken', 'Daten löschen')
-// - Hinweisfeld 'Text1' (gelbe Box 'Bitte senden Sie …' – der Hinweis
-//   steht im Webformular über dem Absenden-Button)
+/**
+ * Alle Formular-Felder der Originalvorlage – werden im fertigen PDF komplett
+ * entfernt, damit die Inhalte statisch als Text gezeichnet werden können
+ * (keine Formularwerte mehr nötig).
+ */
 const ZU_ENTFERNENDE_VORLAGENFELDER = [
+  // 6 versteckte Adress-Buttons (eingebackene Adressen je RG)
   'Ost',
   'Nord',
   'Süd',
   'Mitte',
   'West',
   'Präsidium',
+  // 5 Regionalgruppen-Auswahlfelder
   'RG Ost',
   'RG Nord',
   'RG Süd',
   'RG Mitte',
   'RG West',
+  // 2 Bedien-Buttons + 1 Hinweisfeld (gelbe Box)
   'Drucken',
   'Daten löschen',
   'Text1',
+  // 9 Kontodaten-Felder (Vorname … Ort, Datum)
+  'Vorname',
+  'Name',
+  'Straße',
+  'PLZ',
+  'Ort',
+  'IBAN',
+  'BIC nur bei Konten im Ausland erforderlich',
+  'Kreditinstitut',
+  'Ort Datum',
 ];
 
-// Geometrie (PDF-Punkte, Ursprung links unten) – orientiert an der Originalvorlage
+/* ------------------------------------------------------------------ *
+ * Geometrie (PDF-Punkte, Ursprung links unten) – A4 = 595 × 842
+ * ------------------------------------------------------------------ */
+
+// Adressblock (oben links) – eingebackene Vorlagen-Adresse + evtl. E-Mails
 const ADRESS_X = 72.2;
 const ADRESS_OBERE_BASELINE = 719;
-// Einfacher Zeilenabstand innerhalb des Adressblocks (11-pt-Schrift).
+const ADRESSE_FONT_SIZE = 11;
+// Zeilenabstand innerhalb des Adressblocks (11-pt-Schrift).
 const ADRESS_ZEILENABSTAND = 14;
 // Zusätzlicher Abstand nach der Postanschrift (ZipCity), vor den E-Mail-Adressen.
 const ABSTAND_NACH_POSTANSCHRIFT = 12;
-const ADRESS_COVER_X = 64;
-const ADRESS_COVER_BREITE = 290;
-const ADRESS_COVER_OBEN = 738;
-const GLAEUBIGER_BASELINE = 450;
-const GLAEUBIGER_COVER = { x: 64, y: 440, width: 500, height: 22 };
+const ADRESS_COVER_X = 58;
+const ADRESS_COVER_BREITE = 305;
+const ADRESS_COVER_OBEN = 742;
+
+// Gläubiger-Identifikationsnummer: die statische Zeile der Vorlage erstreckt
+// sich über bottomY 446,4–455,8 (Baseline ≈ 449) – Abdeckung muss sie komplett
+// einschließen (inkl. Absteigern), daher unten bis 443, oben über gezeichnete
+// Zeile (Baseline 455, Top ≈ 462).
+const GLAEUBIGER_COVER = { x: 58, y: 443, width: 488, height: 22 };
+const GLAEUBIGER_X = 72.2;
+const GLAEUBIGER_Y = 455;
+const GLAEUBIGER_FONT_SIZE = 10;
+
 // Altes Logo der Vorlage (oben rechts, neben dem "www.hovawarte.com"-Streifen):
 // gemessen bei 300 dpi auf x 525,6–577,0 pt und 26,2–70,3 pt ab Seitenoberkante.
 // Überdeckungsrechteck mit Sicherheitsrand (Ursprung links unten, A4 = 842 pt hoch).
 const LOGO_COVER = { x: 524.5, y: 770.5, width: 54, height: 46.5 };
 
-const ADRESSE_FONT_SIZE = 11;
-const TEXT_FONT_SIZE = 10;
+// Große weiße Abdeckung: statisches 'Kontoinhaber'-Label + alte Kontodaten-
+// Bereiche (inkl. rechter Randstriche) + Footer (eingerahmte Versionstabelle
+// Bereich/Formularnummer/Version/Datum/Bearbeiter/…). Deckt y≈6…394,
+// lässt den SEPA-Text oben (Gläubiger-Zeile ~456) intakt.
+const GROSSE_COVER = { x: 55, y: 4, width: 505, height: 390 };
+
+// Zwei Spalten: Links = Mitglied, Rechts = Kontoinhaber
+const L_X = 60;
+const R_X = 305;
+const VAL_W = 232; // Breite eines vollen Feldes in einer Spalte
+const SUB = 118; // Aufteilung: Vorname | Name (118 + 114)
+const PLZ_W = 70;
+
+// Zeilen (Label-Baseline / Wert-Baseline): Reihenfolge von oben nach unten
+const H_Y = 385; // Kopfzeilen 'Mitglied' | 'Kontoinhaber'
+const R1_L = 363, R1_V = 350; // Vorname | Name
+const R2_L = 333, R2_V = 320; // Straße
+const R3_L = 303, R3_V = 290; // PLZ | Ort
+const R4_L = 269, R4_V = 256; // IBAN (Vollbreite)
+const R5_L = 239, R5_V = 225; // BIC | Kreditinstitut (Vollbreite)
+const SIGN_L = 186, SIGN_V = 172; // Ort, Datum | Unterschrift
+
+const LABEL_SIZE = 7.5;
+const VALUE_SIZE = 10.5;
 
 const WEISS = rgb(1, 1, 1);
 const SCHWARZ = rgb(0, 0, 0);
+const LINIE = rgb(0.3, 0.3, 0.3);
 
 function readTemplate(): Buffer {
   try {
@@ -99,14 +152,15 @@ function readTemplate(): Buffer {
   }
 }
 
-/** Entfernt die Vorlagenelemente aus obigen Listen aus Seite + AcroForm */
+/** Entfernt ALLE Vorlagen-Felder aus Seite + AcroForm (nach Feldname) */
 function entferneVorlagenelemente(doc: PDFDocument) {
   const toRemove = new Set(ZU_ENTFERNENDE_VORLAGENFELDER);
   const nameOf = (dict: PDFDict): string | null => {
     try {
       const t = dict.lookup(PDFName.of('T'));
-      // In dieser Vorlage ist /T ein PDFString (beide Typen unterstützen decodeText();
-      // toString() liefert die PDF-Form inkl. Klammern und ist nicht vergleichbar)
+      // In dieser Vorlage ist /T ein PDFString (beide Typen unterstützen
+      // decodeText(); toString() liefert die PDF-Form inkl. Klammern und
+      // wäre damit nicht vergleichbar).
       if (t instanceof PDFString) return t.decodeText();
       if (t instanceof PDFName) return t.decodeText();
       return null;
@@ -141,34 +195,60 @@ function entferneVorlagenelemente(doc: PDFDocument) {
       }
     }
   }
-  // Viewer sollen die Werte der Textfelder selbst aufbereiten
-  acro.set(PDFName.of('NeedAppearances'), PDFBool.True);
 }
 
-/** Trägt einen Wert in das Textfeld mit dem Namen ein (Leerzeichen für IBAN/BIC gestrichen) */
-function fülleTextfeld(
-  doc: PDFDocument,
-  name: string,
-  wert: string,
-): boolean {
-  const form = doc.getForm();
-  const field = form
-    .getFields()
-    .find((f): f is PDFTextField => f instanceof PDFTextField && f.getName() === name);
-  if (!field || !wert) return false;
-  let text = wert;
-  try {
-    if (field.getMaxLength() !== undefined) text = wert.replace(/\s+/g, '');
-  } catch {
-    /* ohne MaxLength */
+/* ------------------------------------------------------------------ *
+ * Zeichen-Helfer
+ * ------------------------------------------------------------------ */
+
+/** Ein Feld: Label (klein) über einer Linie, Wert (falls vorhanden) darauf */
+function zeichneFeld(
+  page: ReturnType<PDFDocument['getPage']>,
+  font: Awaited<ReturnType<PDFDocument['embedFont']>>,
+  x: number,
+  breite: number,
+  labelY: number,
+  wertY: number,
+  label: string,
+  wert: string | undefined,
+) {
+  page.drawText(label, { x, y: labelY, size: LABEL_SIZE, font, color: SCHWARZ });
+
+  if (wert && wert.trim()) {
+    let size = VALUE_SIZE;
+    const maxB = breite - 3;
+    while (size > 7 && font.widthOfTextAtSize(wert.trim(), size) > maxB) {
+      size -= 0.5;
+    }
+    page.drawText(wert.trim(), {
+      x: x + 1.5,
+      y: wertY,
+      size,
+      font,
+      color: SCHWARZ,
+    });
   }
-  try {
-    field.setText(text);
-  } catch {
-    field.removeMaxLength();
-    field.setText(text);
-  }
-  return true;
+
+  page.drawLine({
+    start: { x, y: wertY - 1.4 },
+    end: { x: x + breite, y: wertY - 1.4 },
+    thickness: 0.6,
+    color: LINIE,
+  });
+}
+
+/** Zeichnet den 5-Felder-Block (Vorname,Name / Straße / PLZ,Ort) in einer Spalte */
+function zeichnePerson(
+  page: ReturnType<PDFDocument['getPage']>,
+  font: Awaited<ReturnType<PDFDocument['embedFont']>>,
+  x: number,
+  person: SepaMandatPerson,
+) {
+  zeichneFeld(page, font, x, SUB, R1_L, R1_V, 'Vorname', person.vorname);
+  zeichneFeld(page, font, x + SUB, VAL_W - SUB, R1_L, R1_V, 'Name', person.nachname);
+  zeichneFeld(page, font, x, VAL_W, R2_L, R2_V, 'Straße', person.strasse);
+  zeichneFeld(page, font, x, PLZ_W, R3_L, R3_V, 'PLZ', person.plz);
+  zeichneFeld(page, font, x + PLZ_W, VAL_W - PLZ_W, R3_L, R3_V, 'Ort', person.ort);
 }
 
 class SepaMandatPdfService {
@@ -181,14 +261,13 @@ class SepaMandatPdfService {
       const doc = await PDFDocument.load(readTemplate());
       entferneVorlagenelemente(doc);
 
-      const helvetica = await doc.embedFont('Helvetica');
-      const helveticaBold = await doc.embedFont('Helvetica-Bold');
+      const font = await doc.embedFont('Helvetica');
+      const fontBold = await doc.embedFont('Helvetica-Bold');
       const page = doc.getPage(0);
 
-      // ---- Adressblock der zuständigen Finanzverwaltung (Strapi > HZD Settings)
+      // ---- Adressblock: zuständige Finanzverwaltung (Strapi > HZD Settings)
       // E-Mail-Adressen unter der Postanschrift. Ohne Regionalgruppe oder
       // ohne hinterlegten Kontakt bleibt der Adressblock leer.
-      // Der eingebackene Adressbereich der Vorlage wird überdeckt.
       let adressZeilen: string[] = [];
       let mailZeilen: string[] = [];
       try {
@@ -220,7 +299,7 @@ class SepaMandatPdfService {
           x: ADRESS_X,
           y,
           size: ADRESSE_FONT_SIZE,
-          font: index === 0 ? helveticaBold : helvetica,
+          font: index === 0 ? fontBold : font,
           color: SCHWARZ,
         });
         y -= ADRESS_ZEILENABSTAND;
@@ -232,14 +311,14 @@ class SepaMandatPdfService {
             x: ADRESS_X,
             y,
             size: ADRESSE_FONT_SIZE,
-            font: helvetica,
+            font,
             color: SCHWARZ,
           });
           y -= ADRESS_ZEILENABSTAND;
         });
       }
 
-      // ---- Gläubiger-Identifikationsnummer (Strapi > HZD Settings)
+      // ---- Gläubiger-Identifikationsnummer (Strapi > HZD Settings) ----------
       let glaeubigerId: string | null = null;
       try {
         glaeubigerId = await getGlaeubigerId();
@@ -253,10 +332,10 @@ class SepaMandatPdfService {
       page.drawText(
         glaeubigerText,
         {
-          x: ADRESS_X,
-          y: GLAEUBIGER_BASELINE,
-          size: TEXT_FONT_SIZE,
-          font: helvetica,
+          x: GLAEUBIGER_X,
+          y: GLAEUBIGER_Y,
+          size: GLAEUBIGER_FONT_SIZE,
+          font,
           color: SCHWARZ,
         },
       );
@@ -284,33 +363,44 @@ class SepaMandatPdfService {
         });
       }
 
-      // ---- Kontodaten (wahre PDF-Formularwerte)
-      fülleTextfeld(doc, 'Vorname', data.vorname);
-      fülleTextfeld(doc, 'Name', data.nachname);
-      fülleTextfeld(doc, 'Straße', data.strasse);
-      fülleTextfeld(doc, 'PLZ', data.plz);
-      fülleTextfeld(doc, 'Ort', data.ort);
-      fülleTextfeld(doc, 'IBAN', data.iban);
-      fülleTextfeld(doc, 'Kreditinstitut', data.kreditinstitut);
-      // BIC ist optional (nur bei Konten im Ausland erforderlich)
-      if (data.bic) {
-        const bic = doc
-          .getForm()
-          .getFields()
-          .find(
-            (f): f is PDFTextField =>
-              f instanceof PDFTextField && f.getName().includes('BIC'),
-          );
-        if (bic) {
-          const text = data.bic.replace(/\s+/g, '');
-          try {
-            bic.setText(text);
-          } catch {
-            bic.removeMaxLength();
-            bic.setText(text);
-          }
-        }
-      }
+      // ---- Große Abdeckung: alte Kontodaten + Footer ----------------------
+      page.drawRectangle({ ...GROSSE_COVER, color: WEISS });
+
+      // ---- Daten: Kontoinhaber = abweichend ? kontoinhaber : mitglied ----
+      const mitglied: SepaMandatPerson = {
+        vorname: data.mitglied?.vorname ?? '',
+        nachname: data.mitglied?.nachname ?? '',
+        strasse: data.mitglied?.strasse ?? '',
+        plz: data.mitglied?.plz ?? '',
+        ort: data.mitglied?.ort ?? '',
+      };
+      const quelle: SepaMandatPerson = data.abweichenderKontoinhaber
+        ? data.kontoinhaber
+        : data.mitglied;
+      const konto: SepaMandatPerson = {
+        vorname: quelle?.vorname ?? '',
+        nachname: quelle?.nachname ?? '',
+        strasse: quelle?.strasse ?? '',
+        plz: quelle?.plz ?? '',
+        ort: quelle?.ort ?? '',
+      };
+
+      // ---- Kopfzeilen der beiden Blöcke ----------------------------------
+      page.drawText('Mitglied', { x: L_X, y: H_Y, size: 11, font: fontBold, color: SCHWARZ });
+      page.drawText('Kontoinhaber', { x: R_X, y: H_Y, size: 11, font: fontBold, color: SCHWARZ });
+
+      // ---- Mitglied (links) | Kontoinhaber (rechts) ----------------------
+      zeichnePerson(page, font, L_X, mitglied);
+      zeichnePerson(page, font, R_X, konto);
+
+      // ---- Konto / Bank (Vollbreite, Konto des Kontoinhabers) ------------
+      zeichneFeld(page, font, L_X, 250, R4_L, R4_V, 'IBAN', data.iban);
+      zeichneFeld(page, font, L_X, 120, R5_L, R5_V, 'BIC', data.bic);
+      zeichneFeld(page, font, L_X + 250, 215, R5_L, R5_V, 'Kreditinstitut', data.kreditinstitut);
+
+      // ---- Ort, Datum | Unterschrift -------------------------------------
+      zeichneFeld(page, font, L_X, 195, SIGN_L, SIGN_V, 'Ort, Datum', undefined);
+      zeichneFeld(page, font, R_X, VAL_W, SIGN_L, SIGN_V, 'Unterschrift', undefined);
 
       const bytes = await doc.save();
       serverLog('SEPA-Lastschriftmandat PDF erfolgreich erstellt');
