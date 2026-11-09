@@ -31,6 +31,9 @@ import type { SepaMandatFormData, SepaMandatPerson } from '../types/sepa-mandat-
  *    der Vorlage wird überdeckt.
  * 3. Die Gläubiger-Identifikationsnummer (aus Strapi > HZD Settings) wird an
  *    der Originalposition gezeichnet.
+ *    Überschrift 'SEPA-Lastschriftmandat' + Zustimmungstext (statischer
+ *    Vorlagentext) werden überdeckt und bündig mit dem Mitglied-Block
+ *    (linke Kante x=60) neu gezeichnet.
  * 4. Das alte Logo oben rechts in der Vorlage wird überdeckt und durch das
  *    aktuelle HZD-Logo (public/hzd-logo.png) ersetzt.
  * 5. Kompakter Zwei-Spalten-Block 'Mitglied' | 'Kontoinhaber' (je Vorname, Name,
@@ -86,8 +89,13 @@ const ZU_ENTFERNENDE_VORLAGENFELDER = [
  * Geometrie (PDF-Punkte, Ursprung links unten) – A4 = 595 × 842
  * ------------------------------------------------------------------ */
 
+// Linke Textkante: bündig mit den Blöcken 'Mitglied'/'Kontoinhaber' (L_X = 60).
+// Die Vorlage steht auf x=72,2 – Adressblock, Überschrift, Zustimmungstext und
+// Gläubiger-Zeile werden deshalb alle bei x=60 (neu) gezeichnet.
+const TEXT_X = 60;
+
 // Adressblock (oben links) – eingebackene Vorlagen-Adresse + evtl. E-Mails
-const ADRESS_X = 72.2;
+const ADRESS_X = TEXT_X;
 const ADRESS_OBERE_BASELINE = 719;
 const ADRESSE_FONT_SIZE = 11;
 // Zeilenabstand innerhalb des Adressblocks (11-pt-Schrift).
@@ -103,9 +111,26 @@ const ADRESS_COVER_OBEN = 742;
 // einschließen (inkl. Absteigern), daher unten bis 443, oben über gezeichnete
 // Zeile (Baseline 455, Top ≈ 462).
 const GLAEUBIGER_COVER = { x: 58, y: 443, width: 488, height: 22 };
-const GLAEUBIGER_X = 72.2;
+const GLAEUBIGER_X = TEXT_X;
 const GLAEUBIGER_Y = 455;
 const GLAEUBIGER_FONT_SIZE = 10;
+
+// Überschrift + Zustimmungstext der Vorlage (statisch, x=72,2):
+// Um die linke Kante bündig mit dem Mitglied-Block (x=TEXT_X) zu stellen,
+// wird die Vorlage mit Weiß überdeckt und der Text bei x=TEXT_X neu gezeichnet.
+// Schriftarten via Breitenmessung ermittelt (Ziel: Titel 150,7 / L1 424,7 / L2 466,8 pt):
+const TITEL_BASELINE = 546.2; // gemessen: Box 546,2–556,4
+const TITEL_FONT_SIZE = 14; // Helvetica-Bold ≈ 150,8 pt
+const PARAGRAPH_BASELINES = [520.4, 508.4, 496.4, 484.4, 472.4]; // gemessen, Zeilenabstand 12
+const PARAGRAPH_FONT_SIZE = 9.5; // Helvetica ≈ L1 425,0 / L2 467,8 pt
+const TITEL_PARAGRAPH_COVER = { x: 55, y: 468, width: 495, height: 92 };
+const PARAGRAPH_TEXT = [
+  'Ich ermächtige die Hovawart Zuchtgemeinschaft Deutschland, den Mitgliedsbeitrag mittels Lastschrift',
+  'einzuziehen. Zugleich weise ich mein Kreditinstitut an, die von der Hovawart Zuchtgemeinschaft auf mein Konto',
+  'gezogenen Lastschriften einzulösen.',
+  'Hinweis: Ich kann innerhalb von acht Wochen, beginnend mit dem Belastungsdatum, die Erstattung des',
+  'belasteten Betrages verlangen. Es gelten dabei die mit meinem Kreditinstitut vereinbarten Bedingungen.',
+];
 
 // Altes Logo der Vorlage (oben rechts, neben dem "www.hovawarte.com"-Streifen):
 // gemessen bei 300 dpi auf x 525,6–577,0 pt und 26,2–70,3 pt ab Seitenoberkante.
@@ -125,14 +150,16 @@ const VAL_W = 232; // Breite eines vollen Feldes in einer Spalte
 const SUB = 118; // Aufteilung: Vorname | Name (118 + 114)
 const PLZ_W = 70;
 
-// Zeilen (Label-Baseline / Wert-Baseline): Reihenfolge von oben nach unten
+// Zeilen (Label-Baseline / Wert-Baseline): Reihenfolge von oben nach unten.
+// Über der Bankverbindung (IBAN) und darunter (Ort/Datum) gibt es einen
+// deutlich größeren Abschnittsabstand als innerhalb der Blöcke.
 const H_Y = 385; // Kopfzeilen 'Mitglied' | 'Kontoinhaber'
 const R1_L = 363, R1_V = 350; // Vorname | Name
 const R2_L = 333, R2_V = 320; // Straße
-const R3_L = 303, R3_V = 290; // PLZ | Ort
-const R4_L = 269, R4_V = 256; // IBAN (Vollbreite)
-const R5_L = 239, R5_V = 225; // BIC | Kreditinstitut (Vollbreite)
-const SIGN_L = 186, SIGN_V = 172; // Ort, Datum | Unterschrift
+const R3_L = 303, R3_V = 290; // PLZ | Ort (= untere Grenze der Person-Blöcke, Linie bei 288,6)
+const R4_L = 248, R4_V = 235; // IBAN (Vollbreite) – ca. 40 pt Abstand zur Block-Linie
+const R5_L = 214, R5_V = 201; // BIC | Kreditinstitut (Vollbreite)
+const SIGN_L = 160, SIGN_V = 147; // Ort, Datum | Unterschrift – ca. 40 pt Abstand zur Bankzeile
 
 const LABEL_SIZE = 7.5;
 const VALUE_SIZE = 10.5;
@@ -339,6 +366,27 @@ class SepaMandatPdfService {
           color: SCHWARZ,
         },
       );
+
+      // ---- Überschrift + Zustimmungstext: linke Kante bündig zum
+      // Mitglied-Block (x=TEXT_X). Statische Vorlagenschrift (x=72,2) überdecken
+      // und mit der gemessenen Originalschrift neu zeichnen.
+      page.drawRectangle({ ...TITEL_PARAGRAPH_COVER, color: WEISS });
+      page.drawText('SEPA-Lastschriftmandat', {
+        x: TEXT_X,
+        y: TITEL_BASELINE,
+        size: TITEL_FONT_SIZE,
+        font: fontBold,
+        color: SCHWARZ,
+      });
+      PARAGRAPH_TEXT.forEach((zeile, i) => {
+        page.drawText(zeile, {
+          x: TEXT_X,
+          y: PARAGRAPH_BASELINES[i],
+          size: PARAGRAPH_FONT_SIZE,
+          font,
+          color: SCHWARZ,
+        });
+      });
 
       // ---- HZD-Logo: alte Logo-Grafik der Vorlage überdecken und
       // das aktuelle HZD-Logo (Quadrat, transparent) an gleicher Stelle zeichnen.
