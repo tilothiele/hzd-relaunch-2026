@@ -35,6 +35,21 @@ function asText(value: string | null | undefined): string | null {
 	return typeof value === 'string' && value.trim() ? value.trim() : null
 }
 
+/** Runtime-Guard: Raw-Wert der Strapi-Settings → Kontakt-Objekt oder null. */
+function asContact(value: unknown): HdzSettingApiContact | null {
+	if (!value || typeof value !== 'object') {
+		return null
+	}
+	return value as HdzSettingApiContact
+}
+
+/** Runtime-Guard: Raw-Wert der Strapi-Settings → Text oder null. */
+function asString(value: unknown): string | null {
+	return asText(
+		typeof value === 'string' ? value : null,
+	)
+}
+
 function normalizeContact(
 	contact: HdzSettingApiContact | null | undefined,
 ): FinanverwaltungContact | null {
@@ -54,9 +69,7 @@ function normalizeContact(
 }
 
 /** Lädt die HZD Settings aus Strapi (einmalig je Aufruf, ohne Caching). */
-async function fetchHdzSettings(): Promise<{
-	[attr: string]: HdzSettingApiContact | string | null
-}> {
+async function fetchHdzSettings(): Promise<Record<string, unknown>> {
 	const url = `${getStrapiBaseUrl()}/api/hzd-setting`
 
 	const response = await fetch(url, {
@@ -71,7 +84,7 @@ async function fetchHdzSettings(): Promise<{
 	}
 
 	const payload = (await response.json()) as {
-		data?: Record<string, HdzSettingApiContact | string | null>
+		data?: Record<string, unknown>
 	}
 	return payload?.data ?? {}
 }
@@ -83,11 +96,11 @@ async function fetchHdzSettings(): Promise<{
 export async function getHdzSettings(): Promise<HdzSettings> {
 	const data = await fetchHdzSettings()
 	return {
-		glaeubigerId: asText(data.Glaeubiger_Identifikationsnummer),
+		glaeubigerId: asString(data.Glaeubiger_Identifikationsnummer),
 		finanverwaltung: Object.fromEntries(
 			REGIONAL_GROUPS.map((group) => [
 				group.id,
-				normalizeContact(data[`Finanzverwaltung_${group.id}`]),
+				normalizeContact(asContact(data[`Finanzverwaltung_${group.id}`])),
 			]),
 		),
 	}
