@@ -3,7 +3,7 @@
 // Die Konfiguration (Adressen pro Regionalgruppe, Gläubiger-Identifikationsnummer)
 // stammt aus config/regionalgruppen-adressen.json.
 import sepaMandatConfig from '../config/regionalgruppen-adressen.json';
-import type { SepaMandatFormData } from '../types/sepa-mandat-form';
+import type { SepaMandatFormData, SepaMandatPerson } from '../types/sepa-mandat-form';
 
 /** Gläubiger-Identifikationsnummer (aus der Konfigurations-JSON) */
 export const GLAEUBIGER_ID: string = sepaMandatConfig.glaeubigerId;
@@ -20,7 +20,7 @@ export function getAdresszeilen(regionalgruppe: string): string[] {
 
 /** Gleiche IBAN-Regel wie beim Mitgliedsantrag (ohne Leerzeichen, Großbuchstaben) */
 export function isValidIban(iban: string): boolean {
-  return /^[A-Z]{2}\d{2}[A-Z0-9]+$/.test(iban.replace(/\s/g, ''));
+  return /^[A-Z]{2}\d{2}[A-Z0-9]+$/.test(iban.replace(/\s+/g, ''));
 }
 
 /** Gleiche PLZ-Regel wie beim Mitgliedsantrag (5-stellig) */
@@ -28,40 +28,91 @@ export function isValidPlz(plz: string): boolean {
   return /^\d{5}$/.test(plz);
 }
 
-export type SepaMandatErrors = Partial<Record<keyof SepaMandatFormData, string>>;
+/**
+ * Fehlertastern (flach, lesbar im Formular + in der API-Antwort).
+ * 'mitglied*' → Mitglied-Block; 'kontoinhaber*' → Kontoinhaber-Block (nur relevant,
+ * wenn 'Abweichender Kontoinhaber' aktiviert ist).
+ */
+export type SepaMandatErrorKey =
+  | 'regionalgruppe'
+  | 'mitgliedVorname'
+  | 'mitgliedNachname'
+  | 'mitgliedStrasse'
+  | 'mitgliedPlz'
+  | 'mitgliedOrt'
+  | 'kontoinhaberVorname'
+  | 'kontoinhaberNachname'
+  | 'kontoinhaberStrasse'
+  | 'kontoinhaberPlz'
+  | 'kontoinhaberOrt'
+  | 'iban'
+  | 'bic'
+  | 'kreditinstitut';
+
+export type SepaMandatErrors = Partial<Record<SepaMandatErrorKey, string>>;
+
+/** Fehlertaster für ein Person-Feld: 'mitglied.'/'kontoinhaber.' + Feldname */
+function personFeldKey(prefix: 'mitglied' | 'kontoinhaber', feld: keyof SepaMandatPerson): SepaMandatErrorKey {
+  const kap = feld.charAt(0).toUpperCase() + feld.slice(1);
+  return `${prefix}${kap}` as SepaMandatErrorKey;
+}
+
+const PERSON_FELDER: Array<{ feld: keyof SepaMandatPerson; meldung: string }> = [
+  { feld: 'vorname', meldung: 'Vorname ist erforderlich' },
+  { feld: 'nachname', meldung: 'Name ist erforderlich' },
+  { feld: 'strasse', meldung: 'Straße ist erforderlich' },
+  { feld: 'plz', meldung: 'PLZ ist erforderlich' },
+  { feld: 'ort', meldung: 'Ort ist erforderlich' },
+];
+
+function pruefePerson(
+  person: SepaMandatPerson | undefined,
+  prefix: 'mitglied' | 'kontoinhaber',
+  errors: SepaMandatErrors,
+) {
+  for (const { feld, meldung } of PERSON_FELDER) {
+    const wert = typeof person?.[feld] === 'string' ? person[feld].trim() : '';
+    if (wert === '') {
+      errors[personFeldKey(prefix, feld)] = meldung;
+    }
+  }
+  if (
+    !errors[personFeldKey(prefix, 'plz')] &&
+    person?.plz &&
+    !isValidPlz(person.plz)
+  ) {
+    errors[personFeldKey(prefix, 'plz')] = 'PLZ muss 5-stellig sein';
+  }
+}
 
 export function validateSepaMandatFormData(
   data: SepaMandatFormData,
 ): { isValid: boolean; errors: SepaMandatErrors } {
   const errors: SepaMandatErrors = {};
 
-  const required: Array<[keyof SepaMandatFormData, string]> = [
-    ['regionalgruppe', 'Bitte wählen Sie die zuständige Regionalgruppe'],
-    ['vorname', 'Vorname ist erforderlich'],
-    ['nachname', 'Nachname ist erforderlich'],
-    ['strasse', 'Straße ist erforderlich'],
-    ['plz', 'PLZ ist erforderlich'],
-    ['ort', 'Ort ist erforderlich'],
-    ['kreditinstitut', 'Kreditinstitut ist erforderlich'],
-    ['iban', 'IBAN ist erforderlich'],
-  ];
-
-  for (const [field, message] of required) {
-    const value = data[field];
-    if (typeof value !== 'string' || value.trim() === '') {
-      errors[field] = message;
-    }
-  }
-
-  if (!errors.regionalgruppe && !regionalgruppen[data.regionalgruppe]) {
+  // Regionalgruppe
+  if (!data.regionalgruppe || data.regionalgruppe.trim() === '') {
+    errors.regionalgruppe = 'Bitte wählen Sie die zuständige Regionalgruppe';
+  } else if (!regionalgruppen[data.regionalgruppe]) {
     errors.regionalgruppe = 'Unbekannte Regionalgruppe';
   }
 
-  if (!errors.plz && !isValidPlz(data.plz)) {
-    errors.plz = 'PLZ muss 5-stellig sein';
+  // Mitglied – immer Pflicht (voller Block im PDF)
+  pruefePerson(data.mitglied, 'mitglied', errors);
+
+  // Kontoinhaber – nur wenn 'Abweichender Kontoinhaber' aktiviert ist;
+  // dann Pflicht, sonst = Mitglied
+  if (data.abweichenderKontoinhaber) {
+    pruefePerson(data.kontoinhaber, 'kontoinhaber', errors);
   }
 
-  if (!errors.iban && !isValidIban(data.iban)) {
+  // Konto / Bank
+  if (!data.kreditinstitut || data.kreditinstitut.trim() === '') {
+    errors.kreditinstitut = 'Kreditinstitut ist erforderlich';
+  }
+  if (!data.iban || data.iban.trim() === '') {
+    errors.iban = 'IBAN ist erforderlich';
+  } else if (!isValidIban(data.iban)) {
     errors.iban = 'Ungültige IBAN';
   }
 
