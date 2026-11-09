@@ -3,7 +3,7 @@
 import type { ChangeEvent, FormEvent } from 'react'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { REGIONALGRUPPEN, validateSepaMandatFormData, type SepaMandatErrors } from '@/lib/sepa-mandat-validation'
+import { REGIONALGRUPPEN, GLAEUBIGER_ID, getAdresszeilen, validateSepaMandatFormData, type SepaMandatErrors } from '@/lib/sepa-mandat-validation'
 import type { SepaMandatFormData } from '@/types/sepa-mandat-form'
 
 const initialFormData: SepaMandatFormData = {
@@ -26,13 +26,10 @@ const inputClass = (hasError: boolean, mono = false) =>
 export default function SepaMandatForm() {
   const [formData, setFormData] = useState<SepaMandatFormData>(initialFormData)
   const [errors, setErrors] = useState<SepaMandatErrors>({})
-  const [isFormValid, setIsFormValid] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null)
 
-  useEffect(() => {
-    setIsFormValid(validateSepaMandatFormData(formData).isValid)
-  }, [formData])
+  const isFormValid = validateSepaMandatFormData(formData).isValid
 
   // Auto-hide Toast nach 6 Sekunden
   useEffect(() => {
@@ -172,6 +169,23 @@ export default function SepaMandatForm() {
                 {errors.regionalgruppe && (
                   <p className="text-sm text-red-600 mt-1">{errors.regionalgruppe}</p>
                 )}
+
+                {/* Vorschau: Sende-Adresse der gewählten Regionalgruppe (aus der Konfigurations-JSON) */}
+                {formData.regionalgruppe !== '' &&
+                  getAdresszeilen(formData.regionalgruppe).length > 0 && (
+                    <div className="mt-2 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                      <p className="text-sm font-medium text-gray-700 mb-2">
+                        Sende-Adresse (erscheint oben links im PDF):
+                      </p>
+                      <div className="text-sm text-gray-600 leading-6">
+                        {getAdresszeilen(formData.regionalgruppe).map((zeile, index) => (
+                          <div key={zeile + index} className={index === 0 ? 'font-semibold text-gray-800' : ''}>
+                            {zeile}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
               </div>
             </div>
 
@@ -193,7 +207,7 @@ export default function SepaMandatForm() {
                   <br />
                   Es gelten dabei die mit meinem Kreditinstitut vereinbarten Bedingungen.
                   <br />
-                  Gläubiger-Identifikationsnummer: DE79 ZZZ0 0000 5154 60. Mandatsreferenz ist die Mitgliedsnummer (wird separat mitgeteilt).
+                  Gläubiger-Identifikationsnummer: {GLAEUBIGER_ID}. Mandatsreferenz ist die Mitgliedsnummer.
                 </p>
               </div>
 
@@ -293,7 +307,7 @@ export default function SepaMandatForm() {
 
                 <div className="space-y-3">
                   <label className="block text-sm font-medium text-gray-700">
-                    BIC * <span className="font-normal text-gray-500">(nur bei Konten im Ausland erforderlich)</span>
+                    BIC <span className="font-normal text-gray-500">(nur bei Konten im Ausland erforderlich)</span>
                   </label>
                   <input
                     name="bic"

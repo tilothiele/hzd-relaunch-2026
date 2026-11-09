@@ -1,11 +1,22 @@
 // Gemeinsame Validierung für das SEPA-Lastschriftmandat (Frontend + API).
 // Die IBAN-Regel entspricht der des Mitgliedsantrags (applicationService.validateFormData).
-import regionalgruppenAdressen from '../config/regionalgruppen-adressen.json';
+// Die Konfiguration (Adressen pro Regionalgruppe, Gläubiger-Identifikationsnummer)
+// stammt aus config/regionalgruppen-adressen.json.
+import sepaMandatConfig from '../config/regionalgruppen-adressen.json';
 import type { SepaMandatFormData } from '../types/sepa-mandat-form';
 
-const adressen = regionalgruppenAdressen as Record<string, string[]>;
+/** Gläubiger-Identifikationsnummer (aus der Konfigurations-JSON) */
+export const GLAEUBIGER_ID: string = sepaMandatConfig.glaeubigerId;
 
-export const REGIONALGRUPPEN = Object.keys(adressen);
+const regionalgruppen = sepaMandatConfig.regionalgruppen as Record<string, string[]>;
+
+/** Regionalgruppen in Dropdown-Reihenfolge (Schlüsselreihenfolge der JSON) */
+export const REGIONALGRUPPEN = Object.keys(regionalgruppen);
+
+/** Adresszeilen (Array von Strings = Zeilen im PDF-Adressblock) für eine Regionalgruppe */
+export function getAdresszeilen(regionalgruppe: string): string[] {
+  return regionalgruppen[regionalgruppe] ?? [];
+}
 
 /** Gleiche IBAN-Regel wie beim Mitgliedsantrag (ohne Leerzeichen, Großbuchstaben) */
 export function isValidIban(iban: string): boolean {
@@ -33,7 +44,6 @@ export function validateSepaMandatFormData(
     ['ort', 'Ort ist erforderlich'],
     ['kreditinstitut', 'Kreditinstitut ist erforderlich'],
     ['iban', 'IBAN ist erforderlich'],
-    ['bic', 'BIC ist erforderlich'],
   ];
 
   for (const [field, message] of required) {
@@ -43,7 +53,7 @@ export function validateSepaMandatFormData(
     }
   }
 
-  if (!errors.regionalgruppe && !adressen[data.regionalgruppe]) {
+  if (!errors.regionalgruppe && !regionalgruppen[data.regionalgruppe]) {
     errors.regionalgruppe = 'Unbekannte Regionalgruppe';
   }
 
@@ -55,5 +65,6 @@ export function validateSepaMandatFormData(
     errors.iban = 'Ungültige IBAN';
   }
 
+  // BIC ist optional (nur bei Konten im Ausland erforderlich)
   return { isValid: Object.keys(errors).length === 0, errors };
 }

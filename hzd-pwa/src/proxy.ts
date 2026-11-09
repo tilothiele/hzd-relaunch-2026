@@ -22,6 +22,7 @@ export function proxy(request: NextRequest) {
 
 	const isPublicPath = pathname === '/login'
 		|| pathname === '/mitgliedsantrag'
+		|| pathname === '/sepa-lastschriftmandat'
 		|| pathname === '/antrag-bestaetigung'
 		|| pathname === '/verify-email'
 		|| pathname.startsWith('/_next')
