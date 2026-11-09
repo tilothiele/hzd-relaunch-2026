@@ -3,7 +3,7 @@
 import type { ChangeEvent, FormEvent } from 'react'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { REGIONALGRUPPEN, GLAEUBIGER_ID, validateSepaMandatFormData, type SepaMandatErrors } from '@/lib/sepa-mandat-validation'
+import { REGIONALGRUPPEN, validateSepaMandatFormData, type SepaMandatErrors } from '@/lib/sepa-mandat-validation'
 import type { SepaMandatFormData } from '@/types/sepa-mandat-form'
 
 /** Zuständige Finanzverwaltung für die gewählte Regionalgruppe (Strapi > HZD Settings) */
@@ -45,6 +45,28 @@ export default function SepaMandatForm() {
   const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null)
   const [finanZeilen, setFinanZeilen] = useState<string[]>([])
   const [finanStatus, setFinanStatus] = useState<FinanStatus>('idle')
+  // Gläubiger-Identifikationsnummer (Strapi > HZD Settings); null = noch nicht geladen
+  const [glaeubigerId, setGlaeubigerId] = useState<string | null>(null)
+
+  // Gläubiger-Identifikationsnummer aus dem Strapi-Backend laden
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/sepa-mandat/glaeubiger-id')
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload) => {
+        if (cancelled) return
+        const wert = payload?.glaeubigerId
+        if (typeof wert === 'string' && wert.trim()) {
+          setGlaeubigerId(wert.trim())
+        }
+      })
+      .catch(() => {
+        /* Backend nicht erreichbar → bleibt leer */
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   // Sende-Adresse der zuständigen Finanzverwaltung aus dem Strapi-Backend laden
   useEffect(() => {
@@ -266,7 +288,7 @@ export default function SepaMandatForm() {
                   <br />
                   Es gelten dabei die mit meinem Kreditinstitut vereinbarten Bedingungen.
                   <br />
-                  Gläubiger-Identifikationsnummer: {GLAEUBIGER_ID}. Mandatsreferenz ist die Mitgliedsnummer.
+                  Gläubiger-Identifikationsnummer: {glaeubigerId ?? '—'}. Mandatsreferenz ist die Mitgliedsnummer.
                 </p>
               </div>
 

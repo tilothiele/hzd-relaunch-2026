@@ -10,8 +10,7 @@ import {
   PDFDict,
   rgb,
 } from 'pdf-lib';
-import { GLAEUBIGER_ID } from '../lib/sepa-mandat-validation';
-import { getFinanverwaltungContact, finanContactAddressLines } from '../lib/server/finanverwaltung';
+import { getFinanverwaltungContact, finanContactAddressLines, getGlaeubigerId } from '../lib/server/finanverwaltung';
 import { HZD_LOGO_ASPECT } from '../lib/hzd-logo';
 import { serverLog } from '../lib/server-only';
 import type { SepaMandatFormData } from '../types/sepa-mandat-form';
@@ -29,9 +28,8 @@ import type { SepaMandatFormData } from '../types/sepa-mandat-form';
  * 2. Die Adresszeilen der zuständigen Finanzverwaltung (je nach
  *    Regionalgruppe aus Strapi > HZD Settings; E-Mail-Adressen unter der
  *    Postanschrift) werden an der Originalposition gezeichnet.
- * 3. Die Gläubiger-Identifikationsnummer (aus
- *    config/regionalgruppen-adressen.json) wird an der Originalposition
- *    gezeichnet.
+ * 3. Die Gläubiger-Identifikationsnummer (aus Strapi > HZD Settings) wird
+ *    an der Originalposition gezeichnet.
  * 4. Das alte Logo oben rechts in der Vorlage wird überdeckt und durch das
  *    aktuelle HZD-Logo (public/hzd-logo.webp) ersetzt.
  * 5. Die Kontodaten werden als echte PDF-Formularwerte eingetragen.
@@ -241,10 +239,19 @@ class SepaMandatPdfService {
         });
       }
 
-      // ---- Gläubiger-Identifikationsnummer (aus der JSON)
+      // ---- Gläubiger-Identifikationsnummer (Strapi > HZD Settings)
+      let glaeubigerId: string | null = null;
+      try {
+        glaeubigerId = await getGlaeubigerId();
+      } catch (error) {
+        console.error('Fehler beim Laden der Gläubiger-Identifikationsnummer:', error);
+      }
+      const glaeubigerText = glaeubigerId
+        ? `Gläubiger-Identifikationsnummer: ${glaeubigerId}. Mandatsreferenz ist die Mitgliedsnummer.`
+        : `Mandatsreferenz ist die Mitgliedsnummer.`;
       page.drawRectangle({ ...GLAEUBIGER_COVER, color: WEISS });
       page.drawText(
-        `Gläubiger-Identifikationsnummer: ${GLAEUBIGER_ID}. Mandatsreferenz ist die Mitgliedsnummer.`,
+        glaeubigerText,
         {
           x: ADRESS_X,
           y: GLAEUBIGER_BASELINE,

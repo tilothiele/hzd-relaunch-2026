@@ -130,6 +130,9 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::contact.contact"
+    },
+    "Glaeubiger_Identifikationsnummer": {
+      "type": "string"
     }
   }
 }

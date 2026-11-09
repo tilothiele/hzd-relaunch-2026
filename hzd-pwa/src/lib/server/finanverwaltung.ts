@@ -1,5 +1,5 @@
 import { getStrapiBaseUrl } from '@/lib/strapi-api'
-import { resolveRegionId } from '@/constants/regional-groups'
+import { REGIONAL_GROUPS, resolveRegionId } from '@/constants/regional-groups'
 
 /**
  * Kontakt der zuständigen Finanzverwaltung (Strapi > HZD Settings > Contact).
@@ -13,18 +13,50 @@ export interface FinanverwaltungContact {
 	emails: string[]
 }
 
-/**
- * Lädt den Finanzverwaltung-Kontakt der gegebenen Regionalgruppe aus Strapi.
- * Gibt `null` zurück, wenn keine Regionalgruppe oder kein Kontakt hinterlegt ist.
- */
-export async function getFinanverwaltungContact(
-	region: string | null | undefined,
-): Promise<FinanverwaltungContact | null> {
-	const regionId = resolveRegionId(region)
-	if (!regionId) {
+/** Normalisierte HZD Settings (Strapi Single Collection 'HZD Settings') */
+export interface HdzSettings {
+	/** Gläubiger-Identifikationsnummer (Attribut Glaeubiger_Identifikationsnummer) */
+	glaeubigerId: string | null
+	/** Finanzverwaltung-Kontakte, indexiert nach Regionalgruppen-ID (Nord/West/Mitte/Sued/Ost/HZD) */
+	finanverwaltung: Record<string, FinanverwaltungContact | null>
+}
+
+type HdzSettingApiContact = {
+	Headline?: string | null
+	Name?: string | null
+	Street?: string | null
+	ZipCity?: string | null
+	Phone?: string | null
+	Email1?: string | null
+	Email2?: string | null
+}
+
+function asText(value: string | null | undefined): string | null {
+	return typeof value === 'string' && value.trim() ? value.trim() : null
+}
+
+function normalizeContact(
+	contact: HdzSettingApiContact | null | undefined,
+): FinanverwaltungContact | null {
+	if (!contact) {
 		return null
 	}
+	return {
+		headline: asText(contact.Headline),
+		name: asText(contact.Name),
+		street: asText(contact.Street),
+		zipCity: asText(contact.ZipCity),
+		phone: asText(contact.Phone),
+		emails: [contact.Email1, contact.Email2].filter(
+			(email): email is string => Boolean(email && email.trim()),
+		),
+	}
+}
 
+/** Lädt die HZD Settings aus Strapi (einmalig je Aufruf, ohne Caching). */
+async function fetchHdzSettings(): Promise<{
+	[attr: string]: HdzSettingApiContact | string | null
+}> {
 	const url = `${getStrapiBaseUrl()}/api/hzd-setting`
 
 	const response = await fetch(url, {
@@ -39,36 +71,50 @@ export async function getFinanverwaltungContact(
 	}
 
 	const payload = (await response.json()) as {
-		data?: {
-			[attribute: string]:
-				| null
-				| {
-						Headline?: string | null
-						Name?: string | null
-						Street?: string | null
-						ZipCity?: string | null
-						Phone?: string | null
-						Email1?: string | null
-						Email2?: string | null
-				  }
-		}
+		data?: Record<string, HdzSettingApiContact | string | null>
 	}
+	return payload?.data ?? {}
+}
 
-	const contact = payload?.data?.[`Finanzverwaltung_${regionId}`]
-	if (!contact) {
-		return null
-	}
-
+/**
+ * Lädt die HZD Settings (Gläubiger-Identifikationsnummer +
+ * Finanzverwaltung-Kontakte) aus dem Strapi-Backend.
+ */
+export async function getHdzSettings(): Promise<HdzSettings> {
+	const data = await fetchHdzSettings()
 	return {
-		headline: contact.Headline?.trim() ? contact.Headline : null,
-		name: contact.Name?.trim() ? contact.Name : null,
-		street: contact.Street?.trim() ? contact.Street : null,
-		zipCity: contact.ZipCity?.trim() ? contact.ZipCity : null,
-		phone: contact.Phone?.trim() ? contact.Phone : null,
-		emails: [contact.Email1, contact.Email2].filter(
-			(email): email is string => Boolean(email && email.trim()),
+		glaeubigerId: asText(data.Glaeubiger_Identifikationsnummer),
+		finanverwaltung: Object.fromEntries(
+			REGIONAL_GROUPS.map((group) => [
+				group.id,
+				normalizeContact(data[`Finanzverwaltung_${group.id}`]),
+			]),
 		),
 	}
+}
+
+/**
+ * Gläubiger-Identifikationsnummer aus Strapi > HZD Settings.
+ * Gibt `null` zurück, wenn keine Nummer hinterlegt ist.
+ */
+export async function getGlaeubigerId(): Promise<string | null> {
+	const settings = await getHdzSettings()
+	return settings.glaeubigerId
+}
+
+/**
+ * Lädt den Finanzverwaltung-Kontakt der gegebenen Regionalgruppe aus Strapi.
+ * Gibt `null` zurück, wenn keine Regionalgruppe oder kein Kontakt hinterlegt ist.
+ */
+export async function getFinanverwaltungContact(
+	region: string | null | undefined,
+): Promise<FinanverwaltungContact | null> {
+	const regionId = resolveRegionId(region)
+	if (!regionId) {
+		return null
+	}
+	const settings = await getHdzSettings()
+	return settings.finanverwaltung[regionId] ?? null
 }
 
 /** Adresszeilen der Postanschrift (ohne E-Mails) für die gewählte Regionalgruppe. */

@@ -1,14 +1,10 @@
 // Gemeinsame Validierung für das SEPA-Lastschriftmandat (Frontend + API).
 // Die IBAN-Regel entspricht der des Mitgliedsantrags (applicationService.validateFormData).
-// Die Gläubiger-Identifikationsnummer stammt aus config/regionalgruppen-adressen.json.
-// Die Adressen der zuständigen Finanzverwaltung werden je nach Regionalgruppe
-// aus dem Strapi-Backend geladen (HZD Settings > Finanzverwaltung_<Region>).
-import sepaMandatConfig from '../config/regionalgruppen-adressen.json';
+// Die Adressen der zuständigen Finanzverwaltung und die
+// Gläubiger-Identifikationsnummer werden je nach Bedarf aus dem Strapi-Backend
+// geladen (HZD Settings > Finanzverwaltung_<Region> / Glaeubiger_Identifikationsnummer).
 import { REGIONAL_GROUPS, resolveRegionId } from '../constants/regional-groups';
 import type { SepaMandatFormData } from '../types/sepa-mandat-form';
-
-/** Gläubiger-Identifikationsnummer (aus der Konfigurations-JSON) */
-export const GLAEUBIGER_ID: string = sepaMandatConfig.glaeubigerId;
 
 /** Regionalgruppen in Dropdown-Reihenfolge */
 export const REGIONALGRUPPEN = REGIONAL_GROUPS.map((group) => group.label);

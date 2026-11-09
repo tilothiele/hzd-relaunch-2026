@@ -1353,6 +1353,7 @@ export interface ApiHzdSettingHzdSetting extends Struct.SingleTypeSchema {
       'oneToOne',
       'api::contact.contact'
     >;
+    Glaeubiger_Identifikationsnummer: Schema.Attribute.String;
     ImportGenerationCSDogs: Schema.Attribute.Integer;
     ImportGenerationCSMembers: Schema.Attribute.Integer;
     ImportTimestampCSDogs: Schema.Attribute.DateTime;
