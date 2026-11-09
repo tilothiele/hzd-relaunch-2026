@@ -23,13 +23,30 @@ const inputClass = (hasError: boolean, mono = false) =>
     hasError ? 'border-red-500' : 'border-gray-300'
   } ${mono ? 'font-mono' : ''}`
 
+// Lesbare Feldbezeichnungen für den Hinweis unter dem Absenden-Button
+const FELD_LABELS: Record<string, string> = {
+  regionalgruppe: 'Regionalgruppe auswählen (oben im Formular)',
+  vorname: 'Vorname',
+  nachname: 'Nachname',
+  strasse: 'Straße',
+  plz: 'PLZ (exakt 5 Ziffern)',
+  ort: 'Ort',
+  iban: 'IBAN',
+  kreditinstitut: 'Kreditinstitut',
+}
+
 export default function SepaMandatForm() {
   const [formData, setFormData] = useState<SepaMandatFormData>(initialFormData)
   const [errors, setErrors] = useState<SepaMandatErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null)
 
-  const isFormValid = validateSepaMandatFormData(formData).isValid
+  const { isValid: isFormValid, errors: validierungsfehler } = validateSepaMandatFormData(formData)
+
+  // Fehlende bzw. ungültige Pflichtfelder – für den Hinweis unter dem Absenden-Button
+  const fehlendeFelder = Object.keys(validierungsfehler)
+    .filter((feld) => feld !== 'bic')
+    .map((feld) => FELD_LABELS[feld] ?? feld)
 
   // Auto-hide Toast nach 6 Sekunden
   useEffect(() => {
@@ -340,25 +357,50 @@ export default function SepaMandatForm() {
             </div>
 
             {/* Submit */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                type="submit"
-                disabled={!isFormValid || isSubmitting}
-                className={`px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-200 shadow-lg ${
-                  !isFormValid || isSubmitting
-                    ? 'bg-gray-400 cursor-not-allowed opacity-50'
-                    : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 transform hover:scale-105 hover:shadow-xl'
-                }`}
-              >
-                {isSubmitting ? (
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Wird erstellt...</span>
-                  </div>
-                ) : (
-                  'Absenden'
-                )}
-              </button>
+            <div className="space-y-4">
+              {/* Hinweis (entspricht der ehemaligen gelben Box im PDF) */}
+              <div className="mx-auto max-w-2xl p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  Bitte senden Sie das ausgefüllte Formular an den Finanzverwalter Ihrer
+                  zuständigen Regionalgruppe. Die Sende-Adresse sehen Sie oben unter
+                  Ihrer Auswahl.
+                </p>
+              </div>
+
+              <div className="flex justify-center">
+                <button
+                  type="submit"
+                  disabled={!isFormValid || isSubmitting}
+                  className={`px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-200 shadow-lg ${
+                    !isFormValid || isSubmitting
+                      ? 'bg-gray-400 cursor-not-allowed opacity-50'
+                      : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 transform hover:scale-105 hover:shadow-xl'
+                  }`}
+                >
+                  {isSubmitting ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Wird erstellt...</span>
+                    </div>
+                  ) : (
+                    'Absenden'
+                  )}
+                </button>
+              </div>
+
+              {/* Hinweis: was noch ausgefüllt werden muss, bis abgeschickt werden kann */}
+              {!isFormValid && (
+                <div className="mx-auto max-w-2xl p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                  <p className="text-sm font-medium text-amber-800 mb-2">
+                    Damit das Formular abgeschickt werden kann, noch ausfüllen:
+                  </p>
+                  <ul className="list-disc list-inside text-sm text-amber-800 space-y-1">
+                    {fehlendeFelder.map((feld) => (
+                      <li key={feld}>{feld}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </form>
         </div>

@@ -3,6 +3,7 @@ import path from 'path';
 import {
   PDFDocument,
   PDFName,
+  PDFString,
   PDFBool,
   PDFTextField,
   PDFArray,
@@ -11,7 +12,6 @@ import {
 } from 'pdf-lib';
 import {
   GLAEUBIGER_ID,
-  REGIONALGRUPPEN,
   getAdresszeilen,
 } from '../lib/sepa-mandat-validation';
 import { serverLog } from '../lib/server-only';
@@ -22,16 +22,17 @@ import type { SepaMandatFormData } from '../types/sepa-mandat-form';
  * Version 03) auf Basis der Original-Vorlage src/templates/sepa-mandat-032-03.pdf.
  *
  * Vorgehen pro PDF:
- * 1. Die in der Vorlage versteckten Adress-Buttons (je einer pro RG mit
- *    eingebackener Adresse) werden entfernt.
+ * 1. Nicht benötigte Vorlagenelemente werden entfernt: die versteckten
+ *    Adress-Buttons (eingebackene Adressen je RG), das
+ *    Regionalgruppen-Grid (RG Ost … RG West), die Buttons
+ *    'Drucken' / 'Daten löschen' und die gelbe Hinweisbox
+ *    ('Bitte senden Sie …').
  * 2. Die Adresszeilen der zuständigen Regionalgruppe (aus
  *    config/regionalgruppen-adressen.json) werden an der Originalposition
  *    gezeichnet.
  * 3. Die Gläubiger-Identifikationsnummer (ebenfalls aus der JSON) wird
  *    an der Originalposition gezeichnet.
  * 4. Die Kontodaten werden als echte PDF-Formularwerte eingetragen.
- * 5. Im Regionalgruppen-Grid wird nur bei gewählter RG ein 'x' markiert –
- *    ist keine RG gewählt, bleibt das Grid unbezeichnet.
  */
 
 const TEMPLATE_PATH = path.join(
@@ -41,14 +42,27 @@ const TEMPLATE_PATH = path.join(
   'sepa-mandat-032-03.pdf',
 );
 
-// Versteckte Buttons in der Vorlage, die die eingebackenen Adressen tragen
-const VERSTECKTE_ADRESS_BUTTONS = [
+// In der Originalvorlage enthaltene Felder, die im fertigen PDF entfernt werden:
+// - 6 versteckte Adress-Buttons (tragen die eingebackenen Adressen je RG)
+// - 5 Regionalgruppen-Auswahlfelder (RG Ost … RG West)
+// - 2 Bedien-Buttons ('Drucken', 'Daten löschen')
+// - Hinweisfeld 'Text1' (gelbe Box 'Bitte senden Sie …' – der Hinweis
+//   steht im Webformular über dem Absenden-Button)
+const ZU_ENTFERNENDE_VORLAGENFELDER = [
   'Ost',
   'Nord',
   'Süd',
   'Mitte',
   'West',
   'Präsidium',
+  'RG Ost',
+  'RG Nord',
+  'RG Süd',
+  'RG Mitte',
+  'RG West',
+  'Drucken',
+  'Daten löschen',
+  'Text1',
 ];
 
 // Geometrie (PDF-Punkte, Ursprung links unten) – orientiert an der Originalvorlage
@@ -64,28 +78,6 @@ const GLAEUBIGER_COVER = { x: 64, y: 440, width: 500, height: 22 };
 const ADRESSE_FONT_SIZE = 11;
 const TEXT_FONT_SIZE = 10;
 
-/**
- * Checkbox-Grid: die 5 Label-Positionen stammen aus der Vorlage
- * (Koordinaten der /Ch-Felder 'RG Ost' … 'RG West'), 'HZD' ist der
- * sechste Slot direkt darunter.
- */
-const CHECKBOX_SLOTS: Array<{
-  rg: string;
-  x: number;
-  y: number;
-  label?: string;
-}> = [
-  { rg: 'Ost', x: 361.3, y: 717.7 },
-  { rg: 'Nord', x: 434.6, y: 717.3 },
-  { rg: 'Süd', x: 361.3, y: 677.6 },
-  { rg: 'Mitte', x: 433.7, y: 677.6 },
-  { rg: 'West', x: 360.9, y: 638.7 },
-  { rg: 'HZD', x: 360.9, y: 599.7, label: 'HZD' },
-];
-const BOX_GROESSE = 6;
-const BOX_ABSTAND_VOR_LABEL = 9;
-const BOX_OFFSET_IN_LABEL = 7;
-
 const WEISS = rgb(1, 1, 1);
 const SCHWARZ = rgb(0, 0, 0);
 
@@ -100,13 +92,17 @@ function readTemplate(): Buffer {
   }
 }
 
-/** Entfernt die versteckten Adress-Buttons aus Seite + AcroForm */
-function entferneAdressButtons(doc: PDFDocument) {
-  const toRemove = new Set(VERSTECKTE_ADRESS_BUTTONS);
+/** Entfernt die Vorlagenelemente aus obigen Listen aus Seite + AcroForm */
+function entferneVorlagenelemente(doc: PDFDocument) {
+  const toRemove = new Set(ZU_ENTFERNENDE_VORLAGENFELDER);
   const nameOf = (dict: PDFDict): string | null => {
     try {
       const t = dict.lookup(PDFName.of('T'));
-      return t ? t.toString() : null;
+      // In dieser Vorlage ist /T ein PDFString (beide Typen unterstützen decodeText();
+      // toString() liefert die PDF-Form inkl. Klammern und ist nicht vergleichbar)
+      if (t instanceof PDFString) return t.decodeText();
+      if (t instanceof PDFName) return t.decodeText();
+      return null;
     } catch {
       return null;
     }
@@ -176,7 +172,7 @@ class SepaMandatPdfService {
       );
 
       const doc = await PDFDocument.load(readTemplate());
-      entferneAdressButtons(doc);
+      entferneVorlagenelemente(doc);
 
       const helvetica = await doc.embedFont('Helvetica');
       const helveticaBold = await doc.embedFont('Helvetica-Bold');
@@ -221,41 +217,6 @@ class SepaMandatPdfService {
           color: SCHWARZ,
         },
       );
-
-      // ---- Regionalgruppen-Grid: 'x' nur bei gewählter RG, sonst keines
-      const gewaehlt = REGIONALGRUPPEN.includes(data.regionalgruppe ?? '')
-        ? data.regionalgruppe
-        : null;
-      for (const slot of CHECKBOX_SLOTS) {
-        const bx = slot.x - BOX_ABSTAND_VOR_LABEL;
-        const by = slot.y + BOX_OFFSET_IN_LABEL;
-        page.drawRectangle({
-          x: bx,
-          y: by,
-          width: BOX_GROESSE,
-          height: BOX_GROESSE,
-          borderColor: SCHWARZ,
-          borderWidth: 0.8,
-        });
-        if (slot.label) {
-          page.drawText(slot.label, {
-            x: slot.x + 2,
-            y: by + 6,
-            size: 12,
-            font: helvetica,
-            color: SCHWARZ,
-          });
-        }
-        if (gewaehlt === slot.rg) {
-          page.drawText('x', {
-            x: bx + 0.6,
-            y: by + 0.4,
-            size: 8,
-            font: helveticaBold,
-            color: SCHWARZ,
-          });
-        }
-      }
 
       // ---- Kontodaten (wahre PDF-Formularwerte)
       fülleTextfeld(doc, 'Vorname', data.vorname);
