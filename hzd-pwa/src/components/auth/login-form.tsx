@@ -61,8 +61,8 @@ export function LoginForm() {
 			<div className="w-full max-w-md space-y-8 rounded-lg bg-white p-6 shadow-md dark:bg-gray-800 sm:p-8">
 				<div className="flex flex-col items-center">
 					<Image
-						src="/android/android-launchericon-192-192.png"
-						alt="Logo"
+						src="/HZD-logo256-hovawart-zuchtgemeinschaft-deutschland.png"
+						alt="HZD Logo"
 						width={96}
 						height={96}
 						className="h-24 w-24 rounded-xl"

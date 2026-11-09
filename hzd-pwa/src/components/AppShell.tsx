@@ -18,8 +18,8 @@ export function AppShell({
 				<div className="flex items-center gap-3">
 					<Link href="/" className="flex items-center gap-4 hover:opacity-80 transition-opacity">
 						<Image
-							src="/android/android-launchericon-192-192.png"
-							alt="Logo"
+							src="/HZD-logo256-hovawart-zuchtgemeinschaft-deutschland.png"
+							alt="HZD Logo"
 							width={48}
 							height={48}
 							className="h-12 w-12 rounded-lg"

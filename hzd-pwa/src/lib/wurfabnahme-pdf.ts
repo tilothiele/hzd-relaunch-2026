@@ -192,7 +192,7 @@ async function signatureImage(pen: Pen, dataUrl: string): Promise<PDFImage | nul
 
 async function loadLogo(doc: PDFDocument): Promise<PDFImage | null> {
 	try {
-		const response = await fetch('/hzd-logo.png')
+		const response = await fetch('/HZD-logo256-hovawart-zuchtgemeinschaft-deutschland.png')
 		if (!response.ok) {
 			return null
 		}

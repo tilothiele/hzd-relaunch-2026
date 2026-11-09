@@ -64,7 +64,7 @@ class PdfService {
 
       // Logo rechts
       try {
-        const absoluteLogoPath = path.join(process.cwd(), 'public', 'logo.png');
+        const absoluteLogoPath = path.join(process.cwd(), 'public', 'HZD-logo256-hovawart-zuchtgemeinschaft-deutschland.png');
         if (fs.existsSync(absoluteLogoPath)) {
           const logoBuffer = fs.readFileSync(absoluteLogoPath);
           const logoBase64 = logoBuffer.toString('base64');
