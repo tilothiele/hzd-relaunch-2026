@@ -40,7 +40,7 @@ interface Pen {
 	bold: PDFFont
 	y: number
 	images: Map<string, PDFImage | null>
-	logo: PDFImage | null
+	logo: { image: PDFImage; aspect: number } | null
 	wurfLabel: string
 }
 
@@ -190,18 +190,36 @@ async function signatureImage(pen: Pen, dataUrl: string): Promise<PDFImage | nul
 	}
 }
 
-async function loadLogo(doc: PDFDocument): Promise<PDFImage | null> {
-	try {
-		const response = await fetch('/HZD-logo256-hovawart-zuchtgemeinschaft-deutschland.png')
-		if (!response.ok) {
-			return null
-		}
-
-		const bytes = new Uint8Array(await response.arrayBuffer())
-		return await doc.embedPng(bytes)
-	} catch {
+async function loadLogo(doc: PDFDocument) {
+	// Aktuelles HZD-Logo (public/hzd-logo.webp). pdf-lib kann WebP nicht
+	// direkt einbetten, daher Umweg über Canvas → PNG (reiner Web-Approach,
+	// läuft im Browser; außerhalb des Browsers gibt es kein Logo).
+	const response = await fetch('/hzd-logo.webp')
+	if (!response.ok) {
 		return null
 	}
+
+	const blob = await response.blob()
+	const bitmap = await createImageBitmap(blob)
+	const aspect = bitmap.width / bitmap.height
+	const canvas = document.createElement('canvas')
+	canvas.width = bitmap.width
+	canvas.height = bitmap.height
+	const ctx = canvas.getContext('2d')
+	if (!ctx) {
+		bitmap.close()
+		return null
+	}
+	ctx.drawImage(bitmap, 0, 0)
+	bitmap.close()
+
+	const bytes = pngBytes(canvas.toDataURL('image/png'))
+	if (!bytes) {
+		return null
+	}
+
+	const image = await doc.embedPng(bytes)
+	return { image, aspect }
 }
 
 function litterLabel(stamm: StammblattData): string {
@@ -243,11 +261,13 @@ function beginPage(pen: Pen, kicker: string, title: string) {
 
 	const logoBottom = PAGE_H - 22 - LOGO_GAP - LOGO_SIZE
 	if (pen.logo) {
-		pen.page.drawImage(pen.logo, {
-			x: PAGE_W - MARGIN_X - LOGO_SIZE,
-			y: logoBottom,
-			width: LOGO_SIZE,
-			height: LOGO_SIZE,
+		const logoW = Math.min(LOGO_SIZE, LOGO_SIZE * pen.logo.aspect)
+		const logoH = Math.min(LOGO_SIZE, LOGO_SIZE / pen.logo.aspect)
+		pen.page.drawImage(pen.logo.image, {
+			x: PAGE_W - MARGIN_X - logoW,
+			y: logoBottom + (LOGO_SIZE - logoH),
+			width: logoW,
+			height: logoH,
 		})
 	}
 

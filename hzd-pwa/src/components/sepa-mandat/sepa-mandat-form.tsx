@@ -162,7 +162,7 @@ export default function SepaMandatForm() {
           <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
             <div className="flex justify-center mb-6">
               <Image
-                src="/HZD-logo256-hovawart-zuchtgemeinschaft-deutschland.png"
+                src="/hzd-logo.webp"
                 alt="HZD Logo"
                 width={96}
                 height={96}

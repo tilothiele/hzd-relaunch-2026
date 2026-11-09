@@ -12,6 +12,7 @@ import {
 } from 'pdf-lib';
 import { GLAEUBIGER_ID } from '../lib/sepa-mandat-validation';
 import { getFinanverwaltungContact, finanContactAddressLines } from '../lib/server/finanverwaltung';
+import { getHzdLogoPng } from '../lib/server/hzd-logo';
 import { serverLog } from '../lib/server-only';
 import type { SepaMandatFormData } from '../types/sepa-mandat-form';
 
@@ -31,7 +32,9 @@ import type { SepaMandatFormData } from '../types/sepa-mandat-form';
  * 3. Die Gläubiger-Identifikationsnummer (aus
  *    config/regionalgruppen-adressen.json) wird an der Originalposition
  *    gezeichnet.
- * 4. Die Kontodaten werden als echte PDF-Formularwerte eingetragen.
+ * 4. Das alte Logo oben rechts in der Vorlage wird überdeckt und durch das
+ *    aktuelle HZD-Logo (public/hzd-logo.webp) ersetzt.
+ * 5. Die Kontodaten werden als echte PDF-Formularwerte eingetragen.
  */
 
 const TEMPLATE_PATH = path.join(
@@ -67,12 +70,19 @@ const ZU_ENTFERNENDE_VORLAGENFELDER = [
 // Geometrie (PDF-Punkte, Ursprung links unten) – orientiert an der Originalvorlage
 const ADRESS_X = 72.2;
 const ADRESS_OBERE_BASELINE = 719;
-const ADRESS_ZEILEN_ABSTAND = 26;
+// Einfacher Zeilenabstand innerhalb des Adressblocks (11-pt-Schrift).
+const ADRESS_ZEILENABSTAND = 14;
+// Zusätzlicher Abstand nach der Postanschrift (ZipCity), vor den E-Mail-Adressen.
+const ABSTAND_NACH_POSTANSCHRIFT = 12;
 const ADRESS_COVER_X = 64;
 const ADRESS_COVER_BREITE = 290;
 const ADRESS_COVER_OBEN = 738;
 const GLAEUBIGER_BASELINE = 450;
 const GLAEUBIGER_COVER = { x: 64, y: 440, width: 500, height: 22 };
+// Altes Logo der Vorlage (oben rechts, neben dem "www.hovawarte.com"-Streifen):
+// gemessen bei 300 dpi auf x 525,6–577,0 pt und 26,2–70,3 pt ab Seitenoberkante.
+// Überdeckungsrechteck mit Sicherheitsrand (Ursprung links unten, A4 = 842 pt hoch).
+const LOGO_COVER = { x: 524.5, y: 770.5, width: 54, height: 46.5 };
 
 const ADRESSE_FONT_SIZE = 11;
 const TEXT_FONT_SIZE = 10;
@@ -181,20 +191,23 @@ class SepaMandatPdfService {
       // E-Mail-Adressen unter der Postanschrift. Ohne Regionalgruppe oder
       // ohne hinterlegten Kontakt bleibt der Adressblock leer.
       // Der eingebackene Adressbereich der Vorlage wird überdeckt.
-      let zeilen: string[] = [];
+      let adressZeilen: string[] = [];
+      let mailZeilen: string[] = [];
       try {
         const contact = await getFinanverwaltungContact(data.regionalgruppe);
-        zeilen = [
-          ...finanContactAddressLines(contact),
-          ...(contact?.emails ?? []),
-        ];
+        adressZeilen = finanContactAddressLines(contact);
+        mailZeilen = contact?.emails ?? [];
       } catch (error) {
         console.error('Fehler beim Laden der Finanzverwaltung-Adresse:', error);
       }
-      const coverUnten =
-        ADRESS_OBERE_BASELINE -
-        Math.max(1, zeilen.length - 1) * ADRESS_ZEILEN_ABSTAND -
-        8;
+      const mitAbstand =
+        adressZeilen.length > 0 && mailZeilen.length > 0;
+      const zeilenGesamt =
+        adressZeilen.length + mailZeilen.length + (mitAbstand ? 1 : 0);
+      const spannung =
+        Math.max(0, zeilenGesamt - 1) * ADRESS_ZEILENABSTAND +
+        (mitAbstand ? ABSTAND_NACH_POSTANSCHRIFT : 0);
+      const coverUnten = ADRESS_OBERE_BASELINE - spannung - 8;
       page.drawRectangle({
         x: ADRESS_COVER_X,
         y: coverUnten,
@@ -204,7 +217,7 @@ class SepaMandatPdfService {
       });
 
       let y = ADRESS_OBERE_BASELINE;
-      zeilen.forEach((zeile, index) => {
+      adressZeilen.forEach((zeile, index) => {
         page.drawText(zeile, {
           x: ADRESS_X,
           y,
@@ -212,8 +225,21 @@ class SepaMandatPdfService {
           font: index === 0 ? helveticaBold : helvetica,
           color: SCHWARZ,
         });
-        y -= ADRESS_ZEILEN_ABSTAND;
+        y -= ADRESS_ZEILENABSTAND;
       });
+      if (mailZeilen.length > 0) {
+        if (mitAbstand) y -= ABSTAND_NACH_POSTANSCHRIFT;
+        mailZeilen.forEach((mail) => {
+          page.drawText(mail, {
+            x: ADRESS_X,
+            y,
+            size: ADRESSE_FONT_SIZE,
+            font: helvetica,
+            color: SCHWARZ,
+          });
+          y -= ADRESS_ZEILENABSTAND;
+        });
+      }
 
       // ---- Gläubiger-Identifikationsnummer (aus der JSON)
       page.drawRectangle({ ...GLAEUBIGER_COVER, color: WEISS });
@@ -227,6 +253,29 @@ class SepaMandatPdfService {
           color: SCHWARZ,
         },
       );
+
+      // ---- HZD-Logo: alte Logo-Grafik der Vorlage überdecken und
+      // das aktuelle HZD-Logo (Quadrat, transparent) an gleicher Stelle zeichnen.
+      page.drawRectangle({ ...LOGO_COVER, color: WEISS });
+      const logo = await getHzdLogoPng();
+      if (logo) {
+        // Logo mit Seitenverhältnis in das Überdeckungsrechteck einpassen
+        let logoW = LOGO_COVER.width;
+        let logoH = logoW / logo.aspectRatio;
+        if (logoH > LOGO_COVER.height) {
+          logoH = LOGO_COVER.height;
+          logoW = logoH * logo.aspectRatio;
+        }
+        const logoX = LOGO_COVER.x + (LOGO_COVER.width - logoW) / 2;
+        const logoY = LOGO_COVER.y + (LOGO_COVER.height - logoH) / 2;
+        const embeddedLogo = await doc.embedPng(logo.data);
+        page.drawImage(embeddedLogo, {
+          x: logoX,
+          y: logoY,
+          width: logoW,
+          height: logoH,
+        });
+      }
 
       // ---- Kontodaten (wahre PDF-Formularwerte)
       fülleTextfeld(doc, 'Vorname', data.vorname);

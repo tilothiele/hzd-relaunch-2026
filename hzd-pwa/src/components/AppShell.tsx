@@ -18,7 +18,7 @@ export function AppShell({
 				<div className="flex items-center gap-3">
 					<Link href="/" className="flex items-center gap-4 hover:opacity-80 transition-opacity">
 						<Image
-							src="/HZD-logo256-hovawart-zuchtgemeinschaft-deutschland.png"
+							src="/hzd-logo.webp"
 							alt="HZD Logo"
 							width={48}
 							height={48}

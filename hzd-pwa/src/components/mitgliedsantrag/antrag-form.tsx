@@ -444,7 +444,7 @@ export default function AntragForm() {
             {/* Logo */}
             <div className="flex justify-center mb-6">
               <Image
-                src="/HZD-logo256-hovawart-zuchtgemeinschaft-deutschland.png"
+                src="/hzd-logo.webp"
                 alt="HZD Logo"
                 width={96}
                 height={96}

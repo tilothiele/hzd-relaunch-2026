@@ -1,8 +1,7 @@
 import jsPDF from 'jspdf';
-import fs from 'fs';
-import path from 'path';
 import { FormData } from '../types/formData';
 import { serverLog } from '../lib/server-only';
+import { getHzdLogoPng } from '../lib/server/hzd-logo';
 import { getFinanverwaltungContact, FinanverwaltungContact } from '../lib/server/finanverwaltung';
 import {
   MEMBERSHIP_TYPE_HZD_VOLLMITGLIED,
@@ -62,20 +61,21 @@ class PdfService {
         pdf.text(line, margin, yPosition + (index * 3.5));
       });
 
-      // Logo rechts
-      try {
-        const absoluteLogoPath = path.join(process.cwd(), 'public', 'HZD-logo256-hovawart-zuchtgemeinschaft-deutschland.png');
-        if (fs.existsSync(absoluteLogoPath)) {
-          const logoBuffer = fs.readFileSync(absoluteLogoPath);
-          const logoBase64 = logoBuffer.toString('base64');
-          const logoWidth = 25;
-          const logoHeight = 25;
-          const logoX = pageWidth - margin - logoWidth;
-          const logoY = yPosition;
-          pdf.addImage(`data:image/png;base64,${logoBase64}`, 'PNG', logoX, logoY, logoWidth, logoHeight);
-        }
-      } catch (error) {
-        console.error('Fehler beim Laden des Logos:', error);
+      // Logo rechts (aktueller HZD-Logo aus public/hzd-logo.webp,
+      // von getHzdLogoPng() zu PNG konvertiert)
+      const logo = await getHzdLogoPng();
+      if (logo) {
+        const logoHeight = 25;
+        const logoWidth = 25 * logo.aspectRatio;
+        const logoX = pageWidth - margin - logoWidth;
+        pdf.addImage(
+          `data:image/png;base64,${logo.data.toString('base64')}`,
+          'PNG',
+          logoX,
+          yPosition,
+          logoWidth,
+          logoHeight,
+        );
       }
 
       // Website rechts vertikal

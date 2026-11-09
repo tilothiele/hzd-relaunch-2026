@@ -61,7 +61,7 @@ export function LoginForm() {
 			<div className="w-full max-w-md space-y-8 rounded-lg bg-white p-6 shadow-md dark:bg-gray-800 sm:p-8">
 				<div className="flex flex-col items-center">
 					<Image
-						src="/HZD-logo256-hovawart-zuchtgemeinschaft-deutschland.png"
+						src="/hzd-logo.webp"
 						alt="HZD Logo"
 						width={96}
 						height={96}

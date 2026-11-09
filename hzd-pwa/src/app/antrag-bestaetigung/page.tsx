@@ -16,7 +16,7 @@ export default async function AntragBestaetigungPage({ searchParams }: Confirmat
         <div className="bg-blue-900 text-white px-8 py-5 flex items-center justify-center relative">
           <h1 className="text-3xl font-bold">HZD OG Hamburg u.U.</h1>
           <Image 
-            src="/HZD-logo256-hovawart-zuchtgemeinschaft-deutschland.png" 
+            src="/hzd-logo.webp" 
             alt="HZD Logo" 
             width={80} 
             height={80}
