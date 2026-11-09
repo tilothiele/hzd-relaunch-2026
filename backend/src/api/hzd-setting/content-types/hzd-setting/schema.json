@@ -100,6 +100,36 @@
     },
     "ReportEmail": {
       "type": "email"
+    },
+    "Finanzverwaltung_Nord": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::contact.contact"
+    },
+    "Finanzverwaltung_West": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::contact.contact"
+    },
+    "Finanzverwaltung_Mitte": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::contact.contact"
+    },
+    "Finanzverwaltung_Sued": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::contact.contact"
+    },
+    "Finanzverwaltung_Ost": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::contact.contact"
+    },
+    "Finanzverwaltung_HZD": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::contact.contact"
     }
   }
 }

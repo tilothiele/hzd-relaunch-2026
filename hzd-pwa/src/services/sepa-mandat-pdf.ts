@@ -10,10 +10,8 @@ import {
   PDFDict,
   rgb,
 } from 'pdf-lib';
-import {
-  GLAEUBIGER_ID,
-  getAdresszeilen,
-} from '../lib/sepa-mandat-validation';
+import { GLAEUBIGER_ID } from '../lib/sepa-mandat-validation';
+import { getFinanverwaltungContact, finanContactAddressLines } from '../lib/server/finanverwaltung';
 import { serverLog } from '../lib/server-only';
 import type { SepaMandatFormData } from '../types/sepa-mandat-form';
 
@@ -27,11 +25,12 @@ import type { SepaMandatFormData } from '../types/sepa-mandat-form';
  *    Regionalgruppen-Grid (RG Ost … RG West), die Buttons
  *    'Drucken' / 'Daten löschen' und die gelbe Hinweisbox
  *    ('Bitte senden Sie …').
- * 2. Die Adresszeilen der zuständigen Regionalgruppe (aus
- *    config/regionalgruppen-adressen.json) werden an der Originalposition
+ * 2. Die Adresszeilen der zuständigen Finanzverwaltung (je nach
+ *    Regionalgruppe aus Strapi > HZD Settings; E-Mail-Adressen unter der
+ *    Postanschrift) werden an der Originalposition gezeichnet.
+ * 3. Die Gläubiger-Identifikationsnummer (aus
+ *    config/regionalgruppen-adressen.json) wird an der Originalposition
  *    gezeichnet.
- * 3. Die Gläubiger-Identifikationsnummer (ebenfalls aus der JSON) wird
- *    an der Originalposition gezeichnet.
  * 4. Die Kontodaten werden als echte PDF-Formularwerte eingetragen.
  */
 
@@ -178,9 +177,20 @@ class SepaMandatPdfService {
       const helveticaBold = await doc.embedFont('Helvetica-Bold');
       const page = doc.getPage(0);
 
-      // ---- Adressblock der zuständigen Regionalgruppe (aus der JSON)
-      // eingebackenen Adressbereich der Vorlage überdecken
-      const zeilen = getAdresszeilen(data.regionalgruppe);
+      // ---- Adressblock der zuständigen Finanzverwaltung (Strapi > HZD Settings)
+      // E-Mail-Adressen unter der Postanschrift. Ohne Regionalgruppe oder
+      // ohne hinterlegten Kontakt bleibt der Adressblock leer.
+      // Der eingebackene Adressbereich der Vorlage wird überdeckt.
+      let zeilen: string[] = [];
+      try {
+        const contact = await getFinanverwaltungContact(data.regionalgruppe);
+        zeilen = [
+          ...finanContactAddressLines(contact),
+          ...(contact?.emails ?? []),
+        ];
+      } catch (error) {
+        console.error('Fehler beim Laden der Finanzverwaltung-Adresse:', error);
+      }
       const coverUnten =
         ADRESS_OBERE_BASELINE -
         Math.max(1, zeilen.length - 1) * ADRESS_ZEILEN_ABSTAND -

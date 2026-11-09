@@ -1329,6 +1329,30 @@ export interface ApiHzdSettingHzdSetting extends Struct.SingleTypeSchema {
     DefaultLitterAvatar: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios'
     >;
+    Finanzverwaltung_HZD: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::contact.contact'
+    >;
+    Finanzverwaltung_Mitte: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::contact.contact'
+    >;
+    Finanzverwaltung_Nord: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::contact.contact'
+    >;
+    Finanzverwaltung_Ost: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::contact.contact'
+    >;
+    Finanzverwaltung_Sued: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::contact.contact'
+    >;
+    Finanzverwaltung_West: Schema.Attribute.Relation<
+      'oneToOne',
+      'api::contact.contact'
+    >;
     ImportGenerationCSDogs: Schema.Attribute.Integer;
     ImportGenerationCSMembers: Schema.Attribute.Integer;
     ImportTimestampCSDogs: Schema.Attribute.DateTime;

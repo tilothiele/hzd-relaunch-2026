@@ -1,21 +1,21 @@
 // Gemeinsame Validierung für das SEPA-Lastschriftmandat (Frontend + API).
 // Die IBAN-Regel entspricht der des Mitgliedsantrags (applicationService.validateFormData).
-// Die Konfiguration (Adressen pro Regionalgruppe, Gläubiger-Identifikationsnummer)
-// stammt aus config/regionalgruppen-adressen.json.
+// Die Gläubiger-Identifikationsnummer stammt aus config/regionalgruppen-adressen.json.
+// Die Adressen der zuständigen Finanzverwaltung werden je nach Regionalgruppe
+// aus dem Strapi-Backend geladen (HZD Settings > Finanzverwaltung_<Region>).
 import sepaMandatConfig from '../config/regionalgruppen-adressen.json';
+import { REGIONAL_GROUPS, resolveRegionId } from '../constants/regional-groups';
 import type { SepaMandatFormData } from '../types/sepa-mandat-form';
 
 /** Gläubiger-Identifikationsnummer (aus der Konfigurations-JSON) */
 export const GLAEUBIGER_ID: string = sepaMandatConfig.glaeubigerId;
 
-const regionalgruppen = sepaMandatConfig.regionalgruppen as Record<string, string[]>;
+/** Regionalgruppen in Dropdown-Reihenfolge */
+export const REGIONALGRUPPEN = REGIONAL_GROUPS.map((group) => group.label);
 
-/** Regionalgruppen in Dropdown-Reihenfolge (Schlüsselreihenfolge der JSON) */
-export const REGIONALGRUPPEN = Object.keys(regionalgruppen);
-
-/** Adresszeilen (Array von Strings = Zeilen im PDF-Adressblock) für eine Regionalgruppe */
-export function getAdresszeilen(regionalgruppe: string): string[] {
-  return regionalgruppen[regionalgruppe] ?? [];
+/** Prüft, ob es sich um eine bekannte Regionalgruppe handelt (Nord/West/Mitte/Süd/Ost/HZD) */
+export function isValidRegionalgruppe(regionalgruppe: string): boolean {
+  return resolveRegionId(regionalgruppe) !== null;
 }
 
 /** Gleiche IBAN-Regel wie beim Mitgliedsantrag (ohne Leerzeichen, Großbuchstaben) */
@@ -53,7 +53,7 @@ export function validateSepaMandatFormData(
     }
   }
 
-  if (!errors.regionalgruppe && !regionalgruppen[data.regionalgruppe]) {
+  if (!errors.regionalgruppe && !isValidRegionalgruppe(data.regionalgruppe)) {
     errors.regionalgruppe = 'Unbekannte Regionalgruppe';
   }
 

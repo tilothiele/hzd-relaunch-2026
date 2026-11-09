@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { FormData } from '../types/formData';
 import { serverLog } from '../lib/server-only';
+import { getFinanverwaltungContact, FinanverwaltungContact } from '../lib/server/finanverwaltung';
 import {
   MEMBERSHIP_TYPE_HZD_VOLLMITGLIED,
   MEMBERSHIP_TYPE_OG_MITGLIED,
@@ -25,7 +26,15 @@ class PdfService {
   async createPdf(formData: FormData): Promise<ArrayBuffer> {
     try {
       serverLog(`PDF-Generierung gestartet für: ${formData.email}`);
-      
+
+      // Zuständige Finanzverwaltung für die gewählte Regionalgruppe aus Strapi laden
+      let finanContact: FinanverwaltungContact | null = null;
+      try {
+        finanContact = await getFinanverwaltungContact(formData.regionalgruppe);
+      } catch (error) {
+        console.error('Fehler beim Laden der Finanzverwaltung-Adresse:', error);
+      }
+
       // PDF erstellen
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pageWidth = pdf.internal.pageSize.getWidth();
@@ -39,14 +48,16 @@ class PdfService {
       pdf.setFont('helvetica', 'normal');
       pdf.setTextColor(0, 0, 0);
 
-      // Adresse links
-      const addressLines = [
-        'HZD OG Hamburg u.U.',
-        'Tilo Thiele',
-        'Anne-Becker-Ring 8',
-        '21031 Hamburg',
-        'geschaeftsstelle@hzd-og-hamburg.de'
-      ];
+      // Adresse links: zuständige Finanzverwaltung der gewählten Regionalgruppe
+      // (Strapi > HZD Settings > Contact). E-Mail-Adressen unter der Postanschrift.
+      // Ohne Regionalgruppe/Kontakt bleibt das Adressfeld leer.
+      const addressLines: string[] = [];
+      if (finanContact) {
+        if (finanContact.name) addressLines.push(finanContact.name);
+        if (finanContact.street) addressLines.push(finanContact.street);
+        if (finanContact.zipCity) addressLines.push(finanContact.zipCity);
+        addressLines.push(...finanContact.emails);
+      }
       addressLines.forEach((line, index) => {
         pdf.text(line, margin, yPosition + (index * 3.5));
       });

@@ -3,8 +3,11 @@
 import type { ChangeEvent, FormEvent } from 'react'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { REGIONALGRUPPEN, GLAEUBIGER_ID, getAdresszeilen, validateSepaMandatFormData, type SepaMandatErrors } from '@/lib/sepa-mandat-validation'
+import { REGIONALGRUPPEN, GLAEUBIGER_ID, validateSepaMandatFormData, type SepaMandatErrors } from '@/lib/sepa-mandat-validation'
 import type { SepaMandatFormData } from '@/types/sepa-mandat-form'
+
+/** Zuständige Finanzverwaltung für die gewählte Regionalgruppe (Strapi > HZD Settings) */
+type FinanStatus = 'idle' | 'loading' | 'ok' | 'empty'
 
 const initialFormData: SepaMandatFormData = {
   regionalgruppe: '',
@@ -40,6 +43,36 @@ export default function SepaMandatForm() {
   const [errors, setErrors] = useState<SepaMandatErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null)
+  const [finanZeilen, setFinanZeilen] = useState<string[]>([])
+  const [finanStatus, setFinanStatus] = useState<FinanStatus>('idle')
+
+  // Sende-Adresse der zuständigen Finanzverwaltung aus dem Strapi-Backend laden
+  useEffect(() => {
+    const region = formData.regionalgruppe
+    if (region === '') {
+      setFinanZeilen([])
+      setFinanStatus('idle')
+      return
+    }
+    let cancelled = false
+    setFinanStatus('loading')
+    fetch(`/api/sepa-mandat/finanverwaltung?region=${encodeURIComponent(region)}`)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload) => {
+        if (cancelled) return
+        const zeilen: string[] = payload?.adresszeilen ?? []
+        setFinanZeilen(zeilen)
+        setFinanStatus(zeilen.length > 0 ? 'ok' : 'empty')
+      })
+      .catch(() => {
+        if (cancelled) return
+        setFinanZeilen([])
+        setFinanStatus('empty')
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [formData.regionalgruppe])
 
   const { isValid: isFormValid, errors: validierungsfehler } = validateSepaMandatFormData(formData)
 
@@ -187,22 +220,31 @@ export default function SepaMandatForm() {
                   <p className="text-sm text-red-600 mt-1">{errors.regionalgruppe}</p>
                 )}
 
-                {/* Vorschau: Sende-Adresse der gewählten Regionalgruppe (aus der Konfigurations-JSON) */}
-                {formData.regionalgruppe !== '' &&
-                  getAdresszeilen(formData.regionalgruppe).length > 0 && (
-                    <div className="mt-2 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                      <p className="text-sm font-medium text-gray-700 mb-2">
-                        Sende-Adresse (erscheint oben links im PDF):
-                      </p>
+                {/* Vorschau: Sende-Adresse der zuständigen Finanzverwaltung (aus HZD Settings im Strapi-Backend) */}
+                {formData.regionalgruppe !== '' && (
+                  <div className="mt-2 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                    <p className="text-sm font-medium text-gray-700 mb-2">
+                      Sende-Adresse (erscheint oben links im PDF):
+                    </p>
+                    {finanStatus === 'loading' && (
+                      <p className="text-sm text-gray-400">Wird geladen…</p>
+                    )}
+                    {finanStatus === 'ok' && (
                       <div className="text-sm text-gray-600 leading-6">
-                        {getAdresszeilen(formData.regionalgruppe).map((zeile, index) => (
+                        {finanZeilen.map((zeile, index) => (
                           <div key={zeile + index} className={index === 0 ? 'font-semibold text-gray-800' : ''}>
                             {zeile}
                           </div>
                         ))}
                       </div>
-                    </div>
-                  )}
+                    )}
+                    {finanStatus === 'empty' && (
+                      <p className="text-sm text-gray-400">
+                        Keine Adresse für diese Regionalgruppe hinterlegt.
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 

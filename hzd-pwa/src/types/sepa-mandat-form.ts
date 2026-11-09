@@ -1,6 +1,6 @@
 // Formularfelder für das SEPA-Lastschriftmandat (/sepa-lastschriftmandat)
 export interface SepaMandatFormData {
-  /** Regionalgruppe (Schlüssel aus config/regionalgruppen-adressen.json) */
+  /** Regionalgruppe (Nord/West/Mitte/Süd/Ost/HZD → Finanzverwaltung_* in HZD Settings) */
   regionalgruppe: string;
   vorname: string;
   nachname: string;
