@@ -303,13 +303,15 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 	const availableRegions = useMemo(() => {
 		// Stammliste (inkl. neuer Regionen wie RZV) plus zusätzlich
 		// in den Daten vorkommende Region-Werte.
+		// Reihenfolge = Reihenfolge von CALENDAR_REGIONS (manuell in
+		// lib/calendar-utils.ts pflegbar), unbekannte Werte folgen am Ende.
 		const regions = new Set<string>(CALENDAR_REGIONS)
 		allCalendarItems.forEach((item) => {
 			if (item.Region) {
 				regions.add(item.Region)
 			}
 		})
-		return Array.from(regions).sort()
+		return Array.from(regions)
 	}, [allCalendarItems])
 
 	const sortedItems = useMemo(() => {
