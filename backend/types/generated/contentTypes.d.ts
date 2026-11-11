@@ -666,7 +666,7 @@ export interface ApiCalendarEntryCalendarEntry
       >;
     publishedAt: Schema.Attribute.DateTime;
     Region: Schema.Attribute.Enumeration<
-      ['NORD', 'OST', 'MITTE', 'SUED', 'WEST', 'HZD', 'VDH']
+      ['NORD', 'OST', 'MITTE', 'SUED', 'WEST', 'HZD', 'VDH', 'RZV']
     >;
     Time: Schema.Attribute.Time;
     updatedAt: Schema.Attribute.DateTime;

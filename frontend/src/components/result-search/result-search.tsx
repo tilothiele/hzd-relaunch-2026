@@ -27,7 +27,7 @@ interface CalendarColors {
  * Mappt ColorSchema Enumeration-Werte (vom GraphQL Backend) auf konkrete Farben
  * Enumeration-Werte: Gelb, Gruen, Pink, Rot, Violet
  */
-import { getCalendarColors, formatDate, withVisibleCalendarDocuments } from '@/lib/calendar-utils'
+import { CALENDAR_REGIONS, getCalendarColors, formatDate, withVisibleCalendarDocuments } from '@/lib/calendar-utils'
 
 export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 	const [calendars, setCalendars] = useState<Calendar[]>([])
@@ -301,7 +301,9 @@ export function ResultSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 	}, [])
 
 	const availableRegions = useMemo(() => {
-		const regions = new Set<string>()
+		// Stammliste (inkl. neuer Regionen wie RZV) plus zusätzlich
+		// in den Daten vorkommende Region-Werte.
+		const regions = new Set<string>(CALENDAR_REGIONS)
 		allCalendarItems.forEach((item) => {
 			if (item.Region) {
 				regions.add(item.Region)

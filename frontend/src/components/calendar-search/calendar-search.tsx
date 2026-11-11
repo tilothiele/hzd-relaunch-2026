@@ -10,7 +10,7 @@ import type { ThemeDefinition } from '@/themes'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { ExternalRegistrationLink, InternalRegistrationLink } from '@/components/calendar/registration-links'
 
-import { getCalendarColors, withVisibleCalendarDocuments } from '@/lib/calendar-utils'
+import { CALENDAR_REGIONS, getCalendarColors, withVisibleCalendarDocuments } from '@/lib/calendar-utils'
 import { CalendarItemCard } from './calendar-item-card'
 
 /** Kalendertag in lokaler Zeitzone (yyyy-mm-dd), nicht UTC */
@@ -386,7 +386,9 @@ export function CalendarSearch({ strapiBaseUrl, theme }: CalendarSearchProps) {
 	}, [])
 
 	const availableRegions = useMemo(() => {
-		const regions = new Set<string>()
+		// Stammliste (inkl. neuer Regionen wie RZV) plus zusätzlich
+		// in den Daten vorkommende Region-Werte.
+		const regions = new Set<string>(CALENDAR_REGIONS)
 		allCalendarItems.forEach((item) => {
 			if (item.Region) {
 				regions.add(item.Region)

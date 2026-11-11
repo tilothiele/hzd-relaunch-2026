@@ -1,6 +1,24 @@
 import type { Calendar, CalendarDocument, CalendarItem } from '@/types'
 
 /**
+ * Bekannte Region-Werte (Strapi calendar-entry, Enumeration 'Region').
+ * Dienen als Stammliste für die Region-Filter-Dropdowns
+ * (/calendar und Ergebnis-Suche), damit alle Optionen immer
+ * verfügbar sind – auch wenn noch keine passenden Einträge
+ * existieren (z.B. RZV).
+ */
+export const CALENDAR_REGIONS = [
+    'NORD',
+    'OST',
+    'MITTE',
+    'SUED',
+    'WEST',
+    'HZD',
+    'VDH',
+    'RZV',
+] as const
+
+/**
  * Mappt ColorSchema Enumeration-Werte (vom GraphQL Backend) auf konkrete Farben
  */
 export function getColorBySchema(colorSchema: Calendar['ColorSchema']): { backgroundColor: string; textColor: string } {
