@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Typography, Chip } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { DogDataTab } from './dog-detail-modal/dog-data-tab'
 import { resolveDogImage } from '@/lib/dog-utils'
 import { DogPedigreeTab } from './dog-detail-modal/dog-pedigree-tab'
@@ -60,7 +60,6 @@ export function DogDetailView({
     backButtonLabel,
 }: DogDetailViewProps) {
     const fullName = dog.fullKennelName ?? dog.givenName ?? 'Unbekannt'
-    const showNoDogsInBreedingChip = dog.breeder?.HasNoDogsAvailabe === true
 
     // Helper to render a Section Header with Back Button
     const SectionHeader = ({ title }: { title: string }) => (
@@ -93,15 +92,6 @@ export function DogDetailView({
                 <h1 className='text-3xl font-bold text-gray-900 md:text-4xl'>{fullName}</h1>
                 {dog.givenName && dog.fullKennelName ? (
                     <p className='mt-2 text-xl text-gray-600'>{dog.givenName}</p>
-                ) : null}
-                {showNoDogsInBreedingChip ? (
-                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-                        <Chip
-                            label='Aktuell keine Hunde in der Zucht'
-                            color='warning'
-                            variant='outlined'
-                        />
-                    </Box>
                 ) : null}
             </div>
 

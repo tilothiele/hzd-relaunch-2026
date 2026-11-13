@@ -1,7 +1,7 @@
 'use client'
 
 import { useDogs } from '@/hooks/use-dogs'
-import { Box, CircularProgress, Pagination, Typography, Modal, IconButton, Chip } from '@mui/material'
+import { Box, CircularProgress, Pagination, Typography, Modal, IconButton } from '@mui/material'
 import Image from 'next/image'
 import { useMemo, useState } from 'react'
 import { resolveDogImage, formatSexWithHeight } from '@/lib/dog-utils'
@@ -55,18 +55,6 @@ export function BreederDogsList({
 	}
 
 	const handleZoomClose = () => setZoomImage(null)
-
-	if (breederHidesDogListing) {
-		return (
-			<Box sx={{ mt: 1 }}>
-				<Chip
-					label='Aktuell keine Hunde in der Zucht'
-					color='warning'
-					variant='outlined'
-				/>
-			</Box>
-		)
-	}
 
 	if (isLoading) {
 		return (

@@ -1,12 +1,13 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import Link from 'next/link'
 import { useGlobalLayout } from '@/hooks/use-global-layout'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { theme } from '@/themes'
 
 import { useCookieConsent } from '@/hooks/use-cookie-consent'
+import { COOKIE_CONSENT } from '@/components/cookie-consent/cookie-consent-texts'
 
 export function CookieBanner() {
 	const { globalLayout, baseUrl } = useGlobalLayout()
@@ -42,11 +43,10 @@ export function CookieBanner() {
 				}}
 			>
 				<h2 className='text-lg font-semibold text-gray-900'>
-					Cookies & Datenschutz
+					{COOKIE_CONSENT.title}
 				</h2>
 				<p className='mt-2 text-sm leading-relaxed text-gray-700'>
-					Wir verwenden Cookies, um Funktionen zu ermöglichen und Statistiken zu erheben.
-					Sie können Ihre Entscheidung jederzeit in den Datenschutz-Einstellungen anpassen.
+					{COOKIE_CONSENT.body}
 					{privacyPolicyUrl ? (
 						<>
 							{' '}
@@ -56,18 +56,26 @@ export function CookieBanner() {
 								rel='noopener noreferrer'
 								className='text-gray-700 underline underline-offset-4 transition-colors hover:text-gray-900'
 							>
-								Lesen Sie bitteunsere Datenschutzerklärung
+								{COOKIE_CONSENT.privacyLinkLabel}
 							</Link>
 						</>
 					) : null}
+					{' '}
+					·{' '}
+					<Link
+						href={COOKIE_CONSENT.impressum.href}
+						className='text-gray-700 underline underline-offset-4 transition-colors hover:text-gray-900'
+					>
+						{COOKIE_CONSENT.impressum.label}
+					</Link>
 				</p>
 				<div className='mt-4 flex flex-wrap gap-3'>
 					<button
 						type='button'
 						onClick={handleAccept}
 						disabled={isSaving}
-						className='rounded px-4 py-2 text-sm font-semibold
-							transition-colors disabled:cursor-not-allowed disabled:opacity-60'
+						className='rounded border border-gray-400 px-4 py-2 text-sm font-semibold text-gray-700
+							transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60'
 						style={{
 							backgroundColor: theme.submitButtonColor,
 							color: theme.submitButtonTextColor,
@@ -76,7 +84,7 @@ export function CookieBanner() {
 						onMouseEnter={() => setIsHovered(true)}
 						onMouseLeave={() => setIsHovered(false)}
 					>
-						{isSaving ? 'Speichern…' : 'Alle akzeptieren'}
+						{isSaving ? 'Speichern…' : COOKIE_CONSENT.acceptLabel}
 					</button>
 					<button
 						type='button'
@@ -85,7 +93,7 @@ export function CookieBanner() {
 						className='rounded border border-gray-400 px-4 py-2 text-sm font-semibold text-gray-700
 							transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60'
 					>
-						{isSaving ? 'Speichern…' : 'Nur notwendige Cookies'}
+						{isSaving ? 'Speichern…' : COOKIE_CONSENT.rejectLabel}
 					</button>
 				</div>
 			</div>

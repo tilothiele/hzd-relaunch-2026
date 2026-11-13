@@ -16,7 +16,20 @@ import {
 	IconButton,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import type { Form, FormSubmitButton, Image, StandardIdentifier } from '@/types'
+import type {
+	Form,
+	FormSubmitButton,
+	Image,
+	StandardIdentifier,
+	DogStandardIdentifier,
+	ShortTextInput,
+	EmailAddress,
+	TextArea,
+	NumberInput,
+	Choice,
+	BooleanChoice,
+	FormField,
+} from '@/types'
 import { renderFormField } from './form-field-renderer'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { renderStrapiBlocks } from '@/lib/strapi-blocks'
@@ -80,6 +93,124 @@ function resolveSuccessTarget(raw: string | null | undefined): {
 	}
 }
 
+// Prüft, ob in einem Eingabefeld tatsächlich ein Wert eingetragen ist.
+function isValueSet(value: unknown): boolean {
+	if (value === null || value === undefined) {
+		return false
+	}
+	if (typeof value === 'string') {
+		return value.trim() !== ''
+	}
+	if (typeof value === 'boolean') {
+		return value
+	}
+	if (typeof value === 'number') {
+		return Number.isFinite(value)
+	}
+	if (Array.isArray(value)) {
+		return value.length > 0
+	}
+	return false
+}
+
+interface InputFieldEntry {
+	key: string
+	required: boolean
+}
+
+// Sammelt alle tatsächlich dargestellten Eingabefelder und markiert, ob es sich
+// um ein Pflichtfeld (required) handelt. Nicht-pflichtige Felder gelten als
+// "freiwillige Angaben".
+function getInputFieldEntries(fields: FormField[] | null | undefined): InputFieldEntry[] {
+	if (!fields) {
+		return []
+	}
+
+	const entries: InputFieldEntry[] = []
+	const add = (key: string | null | undefined, required: boolean) => {
+		if (key) {
+			entries.push({ key, required })
+		}
+	}
+
+	for (const field of fields) {
+		switch (field.__typename) {
+			case 'ComponentFormShortTextInput': {
+				const f = field as ShortTextInput
+				add(f.STName ?? f.id, !!(f.MinLength && f.MinLength > 0))
+				break
+			}
+			case 'ComponentFormEmailAdress': {
+				const f = field as EmailAddress
+				add(f.EAName ?? f.id, !!f.EARequired)
+				break
+			}
+			case 'ComponentFormTextArea': {
+				const f = field as TextArea
+				// TextArea besitzt keinen Required-Flag, daher immer freiwillig
+				add(f.TAName ?? f.id, false)
+				break
+			}
+			case 'ComponentFormNumberInput': {
+				const f = field as NumberInput
+				add(f.NIName ?? f.id, !!f.NIRequired)
+				break
+			}
+			case 'ComponentFormChoice': {
+				const f = field as Choice
+				add(f.CName ?? f.id, !!f.CRequired)
+				break
+			}
+			case 'ComponentFormBooleanChoice': {
+				const f = field as BooleanChoice
+				add(f.BCName ?? f.id, !!f.BCRequired)
+				break
+			}
+			case 'ComponentFormStandardIdentifiers': {
+				const f = field as StandardIdentifier
+				const sub: Array<{ key: string; status: 'Erforderlich' | 'Ja' | 'Nein' | null | undefined }> = [
+					{ key: 'membershipNumber', status: f.MembershipNumber },
+					{ key: 'firstName', status: f.FirstName },
+					{ key: 'lastName', status: f.LastName },
+					{ key: 'street', status: f.Street },
+					{ key: 'zip', status: f.Zip },
+					{ key: 'city', status: f.City },
+					{ key: 'countryCode', status: f.CountryCode },
+					{ key: 'phone', status: f.Phone },
+					{ key: 'email', status: f.EMail },
+				]
+				for (const s of sub) {
+					// Feld wird nur dargestellt, wenn Status gesetzt und != 'Nein'
+					if (s.status && s.status !== 'Nein') {
+						add(s.key, s.status === 'Erforderlich')
+					}
+				}
+				break
+			}
+			case 'ComponentFormDogStandardIdentifier': {
+				const f = field as DogStandardIdentifier
+				const sub: Array<{ key: string; status: 'Erforderlich' | 'Ja' | 'Nein' | null | undefined }> = [
+					{ key: 'dogGivenName', status: f.GivenName },
+					{ key: 'dogKennelName', status: f.KennelName },
+					{ key: 'dogChipNo', status: f.ChipNo },
+					{ key: 'dogZuchtbuchnummer', status: f.Zuchtbuchnummer },
+					{ key: 'dogDateOfBirth', status: f.DateOfBirth },
+				]
+				for (const s of sub) {
+					if (s.status && s.status !== 'Nein') {
+						add(s.key, s.status === 'Erforderlich')
+					}
+				}
+				break
+			}
+			default:
+				break
+		}
+	}
+
+	return entries
+}
+
 export function FormComponent({
 	form,
 	privacyPolicy,
@@ -95,6 +226,30 @@ export function FormComponent({
 	const [showThankYouModal, setShowThankYouModal] = useState(false)
 	const [isHovered, setIsHovered] = useState(false)
 	const privacyPolicyUrl = resolveMediaUrl(privacyPolicy, strapiBaseUrl)
+
+	// Pflichtangaben (bestehende Datenschutz-Checkbox)
+	const isPrivacyPolicyRequired = form.InclPrivacyPolicy && privacyPolicyUrl
+	const isPrivacyPolicyAccepted = (values['privacyPolicyAccepted'] as boolean) ?? false
+
+	// Freiwillige Angaben: nur dargestellte Eingabefelder ohne "required"
+	const voluntaryFieldKeys = getInputFieldEntries(form.FormFields)
+		.filter((entry) => !entry.required)
+		.map((entry) => entry.key)
+	const hasVoluntaryFields = voluntaryFieldKeys.length > 0
+	const hasVoluntaryData = voluntaryFieldKeys.some((key) => isValueSet(values[key]))
+
+	// Checkbox für freiwillige Angaben:
+	// - nur sichtbar, wenn Datenschutz aktiv ist UND es freiwillige Felder gibt
+	// - deaktiviert, wenn keine freiwilligen Daten eingetragen sind
+	// - enabled, sobald freiwillige Daten eingetragen sind
+	const showVoluntaryCheckbox = !!isPrivacyPolicyRequired && hasVoluntaryFields
+	const voluntaryCheckboxEnabled = hasVoluntaryData
+	const isVoluntaryAccepted = (values['voluntaryDataAccepted'] as boolean) ?? false
+
+	const canSubmit =
+		(!isPrivacyPolicyRequired || isPrivacyPolicyAccepted) &&
+		(!showVoluntaryCheckbox || !voluntaryCheckboxEnabled || isVoluntaryAccepted) &&
+		altchaVerified
 
 	// Fülle StandardIdentifiers-Felder mit User-Daten aus authState
 	useEffect(() => {
@@ -186,6 +341,10 @@ export function FormComponent({
 				setSubmitError('Bitte bestätigen Sie, dass Sie kein automatisiertes Programm sind.')
 				return
 			}
+			if (showVoluntaryCheckbox && voluntaryCheckboxEnabled && !isVoluntaryAccepted) {
+				setSubmitError('Bitte akzeptieren Sie die Verarbeitung Ihrer freiwilligen Angaben.')
+				return
+			}
 			setIsSubmitting(true)
 
 			try {
@@ -199,6 +358,11 @@ export function FormComponent({
 					}
 					return acc
 				}, {} as Record<string, unknown>)
+
+				// Zustand der Checkbox für freiwillige Angaben in den Daten aufzeichnen
+				if (showVoluntaryCheckbox) {
+					cleanedValues['voluntaryDataAccepted'] = isVoluntaryAccepted
+				}
 
 				const formData = {
 					formId: form.documentId,
@@ -240,16 +404,12 @@ export function FormComponent({
 				setAltchaReset((current) => current + 1)
 			}
 		},
-		[altchaVerified, values, form],
+		[altchaVerified, values, form, showVoluntaryCheckbox, voluntaryCheckboxEnabled, isVoluntaryAccepted],
 	)
 
 	const submitButton = form.FormFields?.find(
 		(field): field is FormSubmitButton => field.__typename === 'ComponentFormFormSubmitButton',
 	)
-
-	const isPrivacyPolicyRequired = form.InclPrivacyPolicy && privacyPolicyUrl
-	const isPrivacyPolicyAccepted = (values['privacyPolicyAccepted'] as boolean) ?? false
-	const canSubmit = (!isPrivacyPolicyRequired || isPrivacyPolicyAccepted) && altchaVerified
 
 	return (
 		<Box component='form' onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -275,11 +435,34 @@ export function FormComponent({
 					}
 					label={
 						<>
-							Ich habe die{' '}
+							Ich akzeptiere hiermit, dass meine Daten (Pflichteingaben) gemäß den{' '}
 							<Link href={privacyPolicyUrl} target='_blank' rel='noopener noreferrer' underline='hover'>
 								Datenschutzbestimmungen
 							</Link>{' '}
-							zur Kenntnis genommen
+							verarbeitet werden.
+						</>
+					}
+					sx={{ mt: 1 }}
+				/>
+			) : null}
+
+			{showVoluntaryCheckbox ? (
+				<FormControlLabel
+					control={
+						<Checkbox
+							checked={isVoluntaryAccepted}
+							onChange={(e) => handleChange('voluntaryDataAccepted', e.target.checked)}
+							name='voluntaryDataAccepted'
+							disabled={!voluntaryCheckboxEnabled}
+						/>
+					}
+					label={
+						<>
+							Ich akzeptiere hiermit, dass meine Daten (freiwillige Angaben) gemäß den{' '}
+							<Link href={privacyPolicyUrl} target='_blank' rel='noopener noreferrer' underline='hover'>
+								Datenschutzbestimmungen
+							</Link>{' '}
+							verarbeitet werden.
 						</>
 					}
 					sx={{ mt: 1 }}

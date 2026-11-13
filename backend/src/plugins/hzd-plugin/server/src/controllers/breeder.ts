@@ -23,6 +23,7 @@ interface BreederSearchQuery {
 	name?: string
 	breederRole?: string
 	ownerMemberDocumentId?: string
+	activeFilter?: string
 	page?: string | number
 	pageSize?: string | number
 	sort?: string | string[]
@@ -104,6 +105,21 @@ const toFilterConditions = (query: BreederSearchQuery): Array<Record<string, unk
 		conditions.push({ IsActive: { $eq: true } })
 		conditions.push({
 			$or: [{ Disable: { $eq: false } }, { Disable: { $null: true } }],
+		})
+	}
+
+	// Aktivitätsfilter: „inaktiv" = Breeder.HasNoDogsAvailabe ist true.
+	const activeFilter = typeof query.activeFilter === 'string'
+		? query.activeFilter.trim()
+		: ''
+	if (activeFilter === 'inactive') {
+		conditions.push({ HasNoDogsAvailabe: { $eq: true } })
+	} else if (activeFilter === 'active') {
+		conditions.push({
+			$or: [
+				{ HasNoDogsAvailabe: { $eq: false } },
+				{ HasNoDogsAvailabe: { $null: true } },
+			],
 		})
 	}
 

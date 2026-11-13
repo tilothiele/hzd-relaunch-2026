@@ -10,7 +10,7 @@ import { searchBreeders as searchBreedersApi } from '@/lib/strapi/api'
 import { enrichBreedersWithMembers } from '@/lib/breeder-member-enrich'
 import type { Breeder, HzdSetting } from '@/types'
 import { BreederCard } from './breeder-card'
-import { BreederSearchForm } from './breeder-search-form'
+import { BreederSearchForm, type BreederActiveFilter } from './breeder-search-form'
 import { HzdMap, type MapItem } from '@/components/hzd-map/hzd-map'
 import { theme } from '@/themes'
 import { MeinePlz } from '@/components/hzd-map/meine-plz'
@@ -41,13 +41,15 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 	const [showMap, setShowMap] = useState(false)
 	const [zipCode, setZipCode] = useState('')
 	const [zipLocation, setZipLocation] = useState<{ lat: number; lng: number } | null>(null)
+	const [activeFilter, setActiveFilter] = useState<BreederActiveFilter>('active')
 	const { order, seed, setOrder } = useBreederListOrder(nameFilter)
-	const listQueryRef = useRef({ nameFilter, order })
+	const listQueryRef = useRef({ nameFilter, order, activeFilter })
 	if (
 		listQueryRef.current.nameFilter !== nameFilter
 		|| listQueryRef.current.order !== order
+		|| listQueryRef.current.activeFilter !== activeFilter
 	) {
-		listQueryRef.current = { nameFilter, order }
+		listQueryRef.current = { nameFilter, order, activeFilter }
 		if (page !== 1) {
 			setPage(1)
 		}
@@ -67,6 +69,7 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 			const data = await searchBreedersApi({
 				name: nameFilter.trim() || undefined,
 				breederRole: 'B',
+				activeFilter,
 				page,
 				pageSize,
 				order,
@@ -99,7 +102,7 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 		} finally {
 			setIsLoading(false)
 		}
-	}, [strapiBaseUrl, nameFilter, page, pageSize, order, seed])
+	}, [strapiBaseUrl, nameFilter, activeFilter, page, pageSize, order, seed])
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
@@ -221,6 +224,8 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 				<BreederSearchForm
 					nameFilter={nameInput}
 					onNameFilterChange={setNameInput}
+					activeFilter={activeFilter}
+					onActiveFilterChange={setActiveFilter}
 					order={order}
 					onOrderChange={setOrder}
 					onSearch={handleSearch}

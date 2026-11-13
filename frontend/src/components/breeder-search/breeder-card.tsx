@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
-import { Card, CardMedia, CardContent, Table, TableBody, TableRow, TableCell, Box, Tooltip } from '@mui/material'
+import { Card, CardMedia, CardContent, Table, TableBody, TableRow, TableCell, Box, Tooltip, Chip } from '@mui/material'
 import PersonIcon from '@mui/icons-material/Person'
 import PhoneIcon from '@mui/icons-material/Phone'
 import type { Breeder, HzdSetting } from '@/types'
@@ -110,6 +110,21 @@ export function BreederCard({
 					unoptimized
 					sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
 				/>
+				{breeder.HasNoDogsAvailabe === true && (
+					<Chip
+						label='z.Zt. nicht aktiv'
+						color='warning'
+						size='small'
+						sx={{
+							position: 'absolute',
+							bottom: 8,
+							left: 8,
+							m: 0,
+							fontSize: '0.75rem',
+							fontWeight: 600,
+						}}
+					/>
+				)}
 			</CardMedia>
 
 			<CardContent>

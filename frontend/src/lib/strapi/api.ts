@@ -392,6 +392,7 @@ export interface BreederSearchParams {
 	name?: string
 	breederRole?: 'B' | 'S'
 	ownerMemberDocumentId?: string
+	activeFilter?: 'active' | 'inactive' | 'all'
 	sort?: string | string[]
 	order?: 'random' | 'zip'
 	seed?: string
@@ -407,6 +408,9 @@ export async function searchBreeders(
 
 	if (params.name?.trim()) query.set('name', params.name.trim())
 	if (params.breederRole) query.set('breederRole', params.breederRole)
+	if (params.activeFilter === 'active' || params.activeFilter === 'inactive') {
+		query.set('activeFilter', params.activeFilter)
+	}
 	if (params.ownerMemberDocumentId?.trim()) {
 		query.set('ownerMemberDocumentId', params.ownerMemberDocumentId.trim())
 	}

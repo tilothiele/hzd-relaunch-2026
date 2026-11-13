@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Box, Typography } from '@mui/material'
+import { Box, Typography, Chip } from '@mui/material'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import Image from 'next/image'
 import type { Breeder, Dog, HzdSetting } from '@/types'
@@ -139,6 +139,21 @@ export function BreederDetailView({ breeder, strapiBaseUrl, hzdSetting, onBack, 
                         sizes='(max-width: 520px) 100vw, 520px'
                         priority
                     />
+                    {breederDetails.HasNoDogsAvailabe === true && (
+                        <Chip
+                            label='z.Zt. nicht aktiv'
+                            color='warning'
+                            size='small'
+                            sx={{
+                                position: 'absolute',
+                                bottom: 10,
+                                left: 10,
+                                m: 0,
+                                fontSize: '0.8rem',
+                                fontWeight: 600,
+                            }}
+                        />
+                    )}
                 </div>
                 <h1 className='text-3xl font-bold text-gray-900 md:text-4xl'>
                     {breederDetails.WebsiteUrl ? (

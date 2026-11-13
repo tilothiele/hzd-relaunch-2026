@@ -213,7 +213,7 @@ export function HzdMap({ isVisible, items, userLocation, height = '400px' }: Hzd
                 <div className='absolute inset-0 flex flex-col items-center justify-center bg-white/60 p-6 text-center backdrop-blur-sm'>
                     <h3 className='mb-2 text-xl font-bold text-gray-900'>Interaktive Karte</h3>
                     <p className='mb-6 max-w-md text-sm text-gray-700'>
-                        Um die Karte anzuzeigen, akzeptieren Sie bitte die Cookies und Datenschutzbestimmungen.
+                        Um die Karte anzuzeigen, akzeptieren Sie das Abrufen der externen Karteninhalte gemäß unseren Datenschutzbestimmungen.
                         Dabei werden Daten von OpenStreetMap geladen.
                     </p>
                     <div className='flex flex-wrap items-center justify-center gap-4'>
@@ -228,7 +228,7 @@ export function HzdMap({ isVisible, items, userLocation, height = '400px' }: Hzd
                             onMouseEnter={() => setIsButtonHovered(true)}
                             onMouseLeave={() => setIsButtonHovered(false)}
                         >
-                            Karte aktivieren & Cookies akzeptieren
+                            Karte aktivieren & externe Inhalte abrufen
                         </button>
                         {privacyPolicyUrl && (
                             <Link
