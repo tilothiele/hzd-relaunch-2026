@@ -126,7 +126,7 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 										Datenschutz
 									</Link></div>
 									<div><Link href='/cookie-einstellungen' className='text-sm transition-colors hover:text-yellow-400 underline'>
-										Cookie-Einstellungen
+										Datenschutz-Einstellungen
 									</Link></div>
 								</div>
 							</div>

@@ -46,7 +46,7 @@ export function CookieBanner() {
 				</h2>
 				<p className='mt-2 text-sm leading-relaxed text-gray-700'>
 					Wir verwenden Cookies, um Funktionen zu ermöglichen und Statistiken zu erheben.
-					Sie können Ihre Entscheidung jederzeit in den Cookie-Einstellungen anpassen.
+					Sie können Ihre Entscheidung jederzeit in den Datenschutz-Einstellungen anpassen.
 					{privacyPolicyUrl ? (
 						<>
 							{' '}
