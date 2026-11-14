@@ -2,7 +2,7 @@
 
 ## [1.1.4] - 15.11.2026
 
-- Datenschutzrelevante Darstellung u. Funktionalität verbessert
+- Datenschutzrelevante Darstellung u. Funktionalität verbessert.
 - Inaktive Züchter werden nun auch ausgewiesen
 
 ## [1.1.3] - 6.11.2026

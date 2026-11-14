@@ -23,11 +23,17 @@ import { ViewToggle } from '@/components/common/view-toggle'
 interface BreederSearchProps {
 	strapiBaseUrl?: string | null
 	hzdSetting?: HzdSetting | null
+	/**
+	 * Fix gesetzter Status-Filter der Seite:
+	 * - 'active'   -> nur aktive Züchter (Standard, /breeders)
+	 * - 'inactive' -> nur inaktive Züchter (/inactive-breeders)
+	 */
+	activeFilter?: BreederActiveFilter
 }
 
 type PageSize = 5 | 10 | 20 | 50 | 100
 
-export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps) {
+export function BreederSearch({ strapiBaseUrl, hzdSetting, activeFilter = 'active' }: BreederSearchProps) {
 	const [nameFilter, setNameFilter] = useState('')
 	const [nameInput, setNameInput] = useState('')
 	const [page, setPage] = useState(1)
@@ -41,15 +47,13 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 	const [showMap, setShowMap] = useState(false)
 	const [zipCode, setZipCode] = useState('')
 	const [zipLocation, setZipLocation] = useState<{ lat: number; lng: number } | null>(null)
-	const [activeFilter, setActiveFilter] = useState<BreederActiveFilter>('active')
 	const { order, seed, setOrder } = useBreederListOrder(nameFilter)
-	const listQueryRef = useRef({ nameFilter, order, activeFilter })
+	const listQueryRef = useRef({ nameFilter, order })
 	if (
 		listQueryRef.current.nameFilter !== nameFilter
 		|| listQueryRef.current.order !== order
-		|| listQueryRef.current.activeFilter !== activeFilter
 	) {
-		listQueryRef.current = { nameFilter, order, activeFilter }
+		listQueryRef.current = { nameFilter, order }
 		if (page !== 1) {
 			setPage(1)
 		}
@@ -224,8 +228,6 @@ export function BreederSearch({ strapiBaseUrl, hzdSetting }: BreederSearchProps)
 				<BreederSearchForm
 					nameFilter={nameInput}
 					onNameFilterChange={setNameInput}
-					activeFilter={activeFilter}
-					onActiveFilterChange={setActiveFilter}
 					order={order}
 					onOrderChange={setOrder}
 					onSearch={handleSearch}

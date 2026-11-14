@@ -38,6 +38,7 @@ export default async function BreedersPage() {
 				<BreederSearch
 					strapiBaseUrl={baseUrl}
 					hzdSetting={globalLayout?.HzdSetting}
+					activeFilter='active'
 				/>
 			</Suspense>
 		</MainPageStructure>
