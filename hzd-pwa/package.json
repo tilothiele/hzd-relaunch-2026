@@ -16,10 +16,12 @@
     "altcha-lib": "2.6.0",
     "dexie": "^4.4.6",
     "dexie-react-hooks": "^4.4.0",
+    "docxtemplater": "^3.71.1",
     "jspdf": "^4.2.1",
     "next": "16.4.2",
     "nodemailer": "^10.1.2",
     "pdf-lib": "^1.17.1",
+    "pizzip": "^3.3.0",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "uuid": "^14.0.3"
@@ -32,6 +34,7 @@
     "@types/uuid": "^10.0.0",
     "eslint": "^9.39.5",
     "eslint-config-next": "16.4.2",
+    "jszip": "^3.10.2",
     "prisma": "^6.19.3",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3"

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateSepaMandatFormData } from '@/lib/sepa-mandat-validation';
 import type { SepaMandatFormData } from '@/types/sepa-mandat-form';
-import { getSepaMandatPdfService } from '@/services/sepa-mandat-pdf';
+import { getSepaMandatPdfService } from '@/services/sepa-mandat-pdf-gotenberg';
 
 /**
  * POST /api/sepa-mandat-pdf

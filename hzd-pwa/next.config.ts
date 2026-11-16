@@ -15,6 +15,8 @@ const nextConfig: NextConfig = {
 		'jspdf',
 		'nodemailer',
 		'altcha-lib',
+		'docxtemplater',
+		'jszip',
 	],
 	async rewrites() {
 		return [

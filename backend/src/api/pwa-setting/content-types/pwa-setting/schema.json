@@ -1,0 +1,35 @@
+{
+  "kind": "singleType",
+  "collectionName": "pwa_settings",
+  "info": {
+    "singularName": "pwa-setting",
+    "pluralName": "pwa-settings",
+    "displayName": "PWA Settings"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "VorlageAusschreibungKoerung": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "VorlageSepaLastschriftmandat": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  }
+}

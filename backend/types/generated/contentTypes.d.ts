@@ -1863,6 +1863,39 @@ export interface ApiPhotoboxImagePhotoboxImage
   };
 }
 
+export interface ApiPwaSettingPwaSetting extends Struct.SingleTypeSchema {
+  collectionName: 'pwa_settings';
+  info: {
+    displayName: 'PWA Settings';
+    pluralName: 'pwa-settings';
+    singularName: 'pwa-setting';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::pwa-setting.pwa-setting'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    VorlageAusschreibungKoerung: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
+    VorlageSepaLastschriftmandat: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
+  };
+}
+
 export interface ApiRegionalUnitRegionalUnit
   extends Struct.CollectionTypeSchema {
   collectionName: 'regional_units';
@@ -3184,6 +3217,7 @@ declare module '@strapi/strapi' {
       'api::passed-dog.passed-dog': ApiPassedDogPassedDog;
       'api::photobox-image-collection.photobox-image-collection': ApiPhotoboxImageCollectionPhotoboxImageCollection;
       'api::photobox-image.photobox-image': ApiPhotoboxImagePhotoboxImage;
+      'api::pwa-setting.pwa-setting': ApiPwaSettingPwaSetting;
       'api::regional-unit.regional-unit': ApiRegionalUnitRegionalUnit;
       'api::subscription.subscription': ApiSubscriptionSubscription;
       'api::supplemental-document-group.supplemental-document-group': ApiSupplementalDocumentGroupSupplementalDocumentGroup;

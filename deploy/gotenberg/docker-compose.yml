@@ -1,0 +1,35 @@
+# /opt/gotenberg/compose.yaml
+services:
+  gotenberg:
+    image: gotenberg/gotenberg:${CONTAINER_TAG:-9}
+    container_name: gotenberg
+    restart: unless-stopped
+    ports:
+      - "3010:3000"
+    environment:
+      API_TIMEOUT: ${API_TIMEOUT:-60s}
+      API_BODY_LIMIT: ${API_BODY_LIMIT:-20MB}
+      API_ENABLE_BASIC_AUTH: ${API_ENABLE_BASIC_AUTH:-false}
+      GOTENBERG_API_BASIC_AUTH_USERNAME: ${GOTENBERG_API_BASIC_AUTH_USERNAME:-}
+      GOTENBERG_API_BASIC_AUTH_PASSWORD: ${GOTENBERG_API_BASIC_AUTH_PASSWORD:-}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      LOG_STD_FORMAT: ${LOG_STD_FORMAT:-auto}
+      CHROMIUM_MAX_CONCURRENCY: ${CHROMIUM_MAX_CONCURRENCY:-6}
+      CHROMIUM_RESTART_AFTER: ${CHROMIUM_RESTART_AFTER:-100}
+      CHROMIUM_AUTO_START: ${CHROMIUM_AUTO_START:-false}
+      LIBREOFFICE_RESTART_AFTER: ${LIBREOFFICE_RESTART_AFTER:-10}
+      LIBREOFFICE_AUTO_START: ${LIBREOFFICE_AUTO_START:-false}
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "1.0"
+        reservations:
+          memory: 512M
+          cpus: "0.2"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
