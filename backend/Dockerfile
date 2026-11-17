@@ -73,4 +73,9 @@ COPY --from=build --chown=node:node /opt/app ./
 COPY --from=deps --chown=node:node /opt/node_modules /opt/app/node_modules
 
 EXPOSE 1337
+
+# Strapi liefert auf /_health den Status 204, sobald der Server Anfragen annimmt.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+  CMD ["node", "-e", "fetch('http://127.0.0.1:1337/_health').then((r)=>process.exit(r.status===204||r.status===200?0:1)).catch(()=>process.exit(1))"]
+
 CMD ["npm", "run", "start"]

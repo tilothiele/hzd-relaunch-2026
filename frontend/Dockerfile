@@ -71,4 +71,9 @@ ENV PORT=3000
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
 ENV HOSTNAME="0.0.0.0"
+
+# Liveness: der Next-Server antwortet, ohne die Startseite zu rendern.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD ["node", "-e", "fetch('http://127.0.0.1:3000/api/health').then((r)=>process.exit(r.status===200?0:1)).catch(()=>process.exit(1))"]
+
 CMD ["node", "server.js"]
