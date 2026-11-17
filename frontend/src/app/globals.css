@@ -437,6 +437,76 @@ h5 {
 	will-change: transform;
 }
 
+@keyframes advent-star-twinkle {
+	0%,
+	100% {
+		opacity: 0.28;
+	}
+	50% {
+		opacity: 1;
+	}
+}
+
+.advent-star-twinkle {
+	animation-name: advent-star-twinkle;
+	animation-timing-function: ease-in-out;
+	animation-iteration-count: infinite;
+}
+
+@keyframes advent-shooting-star {
+	0% {
+		transform: translate3d(0, 0, 0) rotate(var(--star-angle));
+		opacity: 0;
+	}
+	2% {
+		opacity: 1;
+	}
+	9% {
+		transform: translate3d(var(--star-dx), var(--star-dy), 0) rotate(var(--star-angle));
+		opacity: 0;
+	}
+	100% {
+		transform: translate3d(var(--star-dx), var(--star-dy), 0) rotate(var(--star-angle));
+		opacity: 0;
+	}
+}
+
+.advent-shooting-star {
+	position: absolute;
+	width: 11rem;
+	height: 2px;
+	border-radius: 999px;
+	transform-origin: right center;
+	background: linear-gradient(
+		90deg,
+		transparent 0%,
+		rgba(255, 246, 194, 0.15) 35%,
+		#fff6c2 78%,
+		#fff8d6 100%
+	);
+	opacity: 0;
+	animation-name: advent-shooting-star;
+	animation-duration: 18s;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+}
+
+.advent-shooting-star::after {
+	content: '';
+	position: absolute;
+	right: -2px;
+	top: -2px;
+	width: 6px;
+	height: 6px;
+	border-radius: 999px;
+	background: #fff8d6;
+	box-shadow: 0 0 10px 2px #ffe14a;
+}
+
+.advent-shooting-star-late {
+	animation-delay: 9s;
+}
+
 .advent-door {
 	perspective: 900px;
 	transition: transform 180ms ease, filter 180ms ease;
@@ -464,6 +534,15 @@ h5 {
 	.advent-snowflake {
 		animation: none;
 		top: 12%;
+	}
+
+	.advent-star-twinkle,
+	.advent-shooting-star {
+		animation: none;
+	}
+
+	.advent-shooting-star {
+		opacity: 0;
 	}
 
 	.advent-door,

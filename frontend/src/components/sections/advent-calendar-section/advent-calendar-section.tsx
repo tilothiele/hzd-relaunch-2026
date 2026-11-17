@@ -202,6 +202,146 @@ function spanClass(day: number): string {
 	return ''
 }
 
+const NIGHT_STARS = Array.from({ length: 24 }, (_, index) => ({
+	id: index,
+	left: `${(index * 17 + 4) % 94}%`,
+	top: `${(index * 29 + 6) % 86}%`,
+	size: index % 7 === 0 ? 16 : index % 3 === 0 ? 9 : 3,
+	delay: `${(index % 8) * 0.45}s`,
+	duration: `${2.8 + (index % 5) * 0.7}s`,
+	twinkle: index % 4 !== 2,
+	opacity: 0.4 + (index % 5) * 0.12,
+}))
+
+interface StarFlight {
+	angle: string
+	dx: string
+	dy: string
+	left: string
+	top: string
+}
+
+function randomFlight(): StarFlight {
+	const angle = Math.random() * 360
+	const rad = (angle * Math.PI) / 180
+	const distance = 46 + Math.random() * 24
+	const dx = Math.cos(rad) * distance
+	const dy = Math.sin(rad) * distance
+
+	return {
+		angle: `${angle.toFixed(1)}deg`,
+		dx: `${dx.toFixed(1)}vw`,
+		dy: `${dy.toFixed(1)}vw`,
+		left: `${(50 - dx / 2).toFixed(1)}%`,
+		top: `${(38 - dy / 2).toFixed(1)}%`,
+	}
+}
+
+const INITIAL_FLIGHT: StarFlight = {
+	angle: '0deg',
+	dx: '50vw',
+	dy: '0vw',
+	left: '25%',
+	top: '30%',
+}
+
+function ShootingStar({ late }: { late?: boolean }) {
+	const nodeRef = useRef<HTMLSpanElement>(null)
+	const [flight, setFlight] = useState(INITIAL_FLIGHT)
+
+	useEffect(() => {
+		setFlight(randomFlight())
+		const node = nodeRef.current
+		if (!node) {
+			return
+		}
+		const handleIteration = () => {
+			setFlight(randomFlight())
+		}
+		node.addEventListener('animationiteration', handleIteration)
+		return () => {
+			node.removeEventListener('animationiteration', handleIteration)
+		}
+	}, [])
+
+	return (
+		<span
+			ref={nodeRef}
+			className={`advent-shooting-star${late ? ' advent-shooting-star-late' : ''}`}
+			style={{
+				left: flight.left,
+				top: flight.top,
+				['--star-angle' as string]: flight.angle,
+				['--star-dx' as string]: flight.dx,
+				['--star-dy' as string]: flight.dy,
+			}}
+		/>
+	)
+}
+
+function NightSky() {
+	const maskId = useId().replace(/:/g, '')
+
+	return (
+		<div
+			className='pointer-events-none absolute inset-x-0 overflow-hidden'
+			style={{ top: '-2.5rem', bottom: '-2.5rem' }}
+			aria-hidden
+		>
+			<span className='absolute top-3 right-[6%] h-20 w-20 sm:top-5 sm:h-28 sm:w-28'>
+				<span className='absolute inset-2 rounded-full bg-[#ffe56a]/30 blur-xl' />
+				<svg viewBox='0 0 64 64' className='relative h-full w-full'>
+					<mask id={maskId}>
+						<rect width='64' height='64' fill='black' />
+						<circle cx='28' cy='34' r='18' fill='white' />
+						<circle cx='40' cy='28' r='16' fill='black' />
+					</mask>
+					<rect
+						width='64'
+						height='64'
+						fill='#ffe14a'
+						mask={`url(#${maskId})`}
+					/>
+				</svg>
+			</span>
+			{NIGHT_STARS.map((star) => (
+				<span
+					key={star.id}
+					className={`absolute text-[#fff4c4] ${star.twinkle ? 'advent-star-twinkle' : ''}`}
+					style={{
+						left: star.left,
+						top: star.top,
+						opacity: star.opacity,
+						animationDelay: star.delay,
+						animationDuration: star.duration,
+					}}
+				>
+					{star.size <= 4 ? (
+						<span
+							className='block rounded-full bg-[#fff6c8]'
+							style={{ width: star.size, height: star.size }}
+						/>
+					) : (
+						<svg
+							viewBox='0 0 16 16'
+							width={star.size}
+							height={star.size}
+							aria-hidden
+						>
+							<path
+								fill='currentColor'
+								d='M8 0 9.3 6.1 16 8 9.3 9.9 8 16 6.7 9.9 0 8 6.7 6.1Z'
+							/>
+						</svg>
+					)}
+				</span>
+			))}
+			<ShootingStar />
+			<ShootingStar late />
+		</div>
+	)
+}
+
 function Snowfall() {
 	const flakes = useMemo(() => (
 		Array.from({ length: 32 }, (_, index) => ({
@@ -325,6 +465,8 @@ export function AdventCalendarSectionComponent({
 				paddingTop='2.5rem'
 				paddingBottom='2.5rem'
 			>
+				<div className='relative w-full'>
+					<NightSky />
 				<div className='relative mx-auto w-full max-w-5xl px-2 min-[1056px]:px-0'>
 					{heading}
 					<AdventAnnouncement
@@ -335,6 +477,7 @@ export function AdventCalendarSectionComponent({
 							strapiBaseUrl,
 						)}
 					/>
+				</div>
 				</div>
 			</SectionContainer>
 		)
@@ -367,6 +510,8 @@ export function AdventCalendarSectionComponent({
 			paddingTop='2.5rem'
 			paddingBottom='2.5rem'
 		>
+			<div className='relative w-full'>
+				<NightSky />
 			<div className='relative mx-auto w-full max-w-5xl px-2 min-[1056px]:px-0'>
 				<Snowfall />
 				<div className='mb-6'>{heading}</div>
@@ -526,6 +671,7 @@ export function AdventCalendarSectionComponent({
 				/>,
 				document.body,
 			) : null}
+			</div>
 		</SectionContainer>
 	)
 }
