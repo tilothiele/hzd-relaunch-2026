@@ -192,12 +192,12 @@ backup_application "$BASE_DIR" "website" \
 #	"ik4k40sg4ckg8cc0wc44k8sk_redmine-themes"
 
 # GLPI
-dump_file="glpi_db_dump_$(date +%F).sql"
-mysql_dump_docker "$BASE_DIR" "glpi" "$dump_file"
-backup_application "$BASE_DIR" "glpi" \
-	"glpi" -- \
-	"$BASE_DIR/$dump_file" \
-	"dkkoc84408ws008gsg440000-glpi_data"
+#dump_file="glpi_db_dump_$(date +%F).sql"
+#mysql_dump_docker "$BASE_DIR" "glpi" "$dump_file"
+#backup_application "$BASE_DIR" "glpi" \
+#	"glpi" -- \
+#	"$BASE_DIR/$dump_file" \
+#	"dkkoc84408ws008gsg440000-glpi_data"
 
 # Paperless
 dump_file="paperless_db_dump_$(date +%F).sql"
@@ -223,7 +223,7 @@ backup_application "$BASE_DIR" "opencloud" \
 
 # Vaultwarden
 backup_application "$BASE_DIR" "vaultwarden" \
-    "vaultwarden-e0c4woggs40w4swo8w0kcw48-093235645179" \
+    "vaultwarden-e0c4woggs40w4swo8w0kcw48-082127050975" \
     -- \
     "e0c4woggs40w4swo8w0kcw48_vaultwarden-data"
 
