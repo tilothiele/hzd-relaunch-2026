@@ -5,7 +5,16 @@ import { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 import styled, { keyframes } from 'styled-components';
 
+import {
+  CsImporterConfigModal,
+  type ConfigSection,
+} from '../components/CsImporterConfigModal';
 import { getTranslation } from '../utils/getTranslation';
+import {
+  defaultCsImporterConfig,
+  normalizeCsImporterConfig,
+  type CsImporterConfig,
+} from '../../../server/src/cs-importer-config';
 
 type ImportPhase =
   | 'idle'
@@ -335,12 +344,18 @@ function ImportProgressBar({
 
 const ChromosoftImportPanel = () => {
   const { formatMessage } = useIntl();
-  const { get, post } = useFetchClient();
+  const { get, post, put } = useFetchClient();
   const { toggleNotification } = useNotification();
   const [status, setStatus] = useState<ImportStatus>(IDLE_STATUS);
   const [starting, setStarting] = useState(false);
   const [aborting, setAborting] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [importerConfig, setImporterConfig] = useState<CsImporterConfig>(
+    defaultCsImporterConfig(),
+  );
+  const [configReady, setConfigReady] = useState(false);
+  const [configSection, setConfigSection] = useState<ConfigSection | null>(null);
+  const [savingConfig, setSavingConfig] = useState(false);
   const [fixGroups, setFixGroups] = useState(false);
   const [onlyChanged, setOnlyChanged] = useState(false);
   const [steps, setSteps] = useState<ImportSteps>(DEFAULT_STEPS);
@@ -359,8 +374,25 @@ const ChromosoftImportPanel = () => {
     let cancelled = false;
     const load = async () => {
       try {
-        const response = await get('/hzd-plugin/chromosoft/import-strapi-daten/status');
-        const nextStatus = normalizeStatus(response.data);
+        const configResponse = await get('/hzd-plugin/chromosoft/importer-config');
+        const loadedConfig = normalizeCsImporterConfig(
+          (configResponse.data as { config?: unknown } | undefined)?.config,
+        );
+        if (!cancelled) {
+          setImporterConfig(loadedConfig);
+        }
+      } catch {
+        // Ohne gespeicherte Konfiguration bleiben die Standardwerte.
+      } finally {
+        if (!cancelled) {
+          setConfigReady(true);
+        }
+      }
+      try {
+        const statusResponse = await get(
+          '/hzd-plugin/chromosoft/import-strapi-daten/status',
+        );
+        const nextStatus = normalizeStatus(statusResponse.data);
         if (!cancelled && nextStatus) {
           setStatus(nextStatus);
           phaseRef.current = nextStatus.phase;
@@ -517,6 +549,37 @@ const ChromosoftImportPanel = () => {
     }
   };
 
+  const handleSaveConfig = async (next: CsImporterConfig) => {
+    try {
+      setSavingConfig(true);
+      const response = await put('/hzd-plugin/chromosoft/importer-config', next);
+      const saved = normalizeCsImporterConfig(
+        (response.data as { config?: unknown } | undefined)?.config,
+      );
+      setImporterConfig(saved);
+      setConfigSection(null);
+      toggleNotification({
+        type: 'success',
+        message: formatMessage({
+          id: getTranslation('chromosoft.import.config.saved'),
+          defaultMessage: 'Die Feldkonfiguration wurde gespeichert.',
+        }),
+      });
+    } catch (error) {
+      toggleNotification({
+        type: 'danger',
+        message:
+          readErrorMessage(error) ||
+          formatMessage({
+            id: getTranslation('chromosoft.import.config.saveError'),
+            defaultMessage: 'Die Feldkonfiguration konnte nicht gespeichert werden.',
+          }),
+      });
+    } finally {
+      setSavingConfig(false);
+    }
+  };
+
   const handleDownloadLog = async () => {
     try {
       setDownloading(true);
@@ -641,6 +704,42 @@ const ChromosoftImportPanel = () => {
             </Typography>
           </Box>
         </Box>
+
+        <Flex gap={2} wrap="wrap">
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={!configReady}
+            onClick={() => setConfigSection('user')}
+          >
+            {formatMessage({
+              id: getTranslation('chromosoft.import.config.user'),
+              defaultMessage: 'Felder User',
+            })}
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={!configReady}
+            onClick={() => setConfigSection('dog')}
+          >
+            {formatMessage({
+              id: getTranslation('chromosoft.import.config.dog'),
+              defaultMessage: 'Felder Dog',
+            })}
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={!configReady}
+            onClick={() => setConfigSection('breeder')}
+          >
+            {formatMessage({
+              id: getTranslation('chromosoft.import.config.breeder'),
+              defaultMessage: 'Felder Breeder',
+            })}
+          </Button>
+        </Flex>
 
         <Flex direction="column" alignItems="flex-start" gap={2}>
           <Flex gap={2} alignItems="center">
@@ -790,6 +889,15 @@ const ChromosoftImportPanel = () => {
             })}
           </Button>
         </Flex>
+
+        <CsImporterConfigModal
+          open={configSection !== null}
+          section={configSection ?? 'user'}
+          config={importerConfig}
+          saving={savingConfig}
+          onClose={() => setConfigSection(null)}
+          onSave={handleSaveConfig}
+        />
 
         {status.logFileName && (
           <Button

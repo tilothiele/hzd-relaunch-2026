@@ -133,6 +133,9 @@
     },
     "Glaeubiger_Identifikationsnummer": {
       "type": "string"
+    },
+    "CS_Importer_config": {
+      "type": "json"
     }
   }
 }

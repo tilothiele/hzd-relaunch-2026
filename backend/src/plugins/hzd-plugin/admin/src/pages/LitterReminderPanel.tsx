@@ -1,4 +1,4 @@
-import { Box, Button, Flex, SingleSelect, SingleSelectOption, Typography } from '@strapi/design-system';
+import { Box, Button, Checkbox, Flex, SingleSelect, SingleSelectOption, Typography } from '@strapi/design-system';
 import { useFetchClient, useNotification } from '@strapi/strapi/admin';
 import { useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -19,6 +19,8 @@ interface ReminderResult {
 interface ReminderReport {
   weeks: number;
   cutoffDate: string;
+  dryRun?: boolean;
+  log?: string[];
   results: ReminderResult[];
 }
 
@@ -41,6 +43,7 @@ const LitterReminderPanel = () => {
   const { post } = useFetchClient();
   const { toggleNotification } = useNotification();
   const [weeks, setWeeks] = useState<(typeof WEEK_OPTIONS)[number]>(9);
+  const [dryRun, setDryRun] = useState(false);
   const [sending, setSending] = useState(false);
   const [report, setReport] = useState<ReminderReport | null>(null);
 
@@ -54,7 +57,10 @@ const LitterReminderPanel = () => {
   const handleSend = async () => {
     try {
       setSending(true);
-      const response = await post('/hzd-plugin/litters/send-reminder', { weeks });
+      const response = await post('/hzd-plugin/litters/send-reminder', {
+        weeks,
+        dryRun,
+      });
       setReport(response.data as ReminderReport);
     } catch (error) {
       const message = readErrorMessage(error);
@@ -126,6 +132,23 @@ const LitterReminderPanel = () => {
           </Box>
         </Box>
 
+        <Flex gap={2} alignItems="center">
+          <Checkbox
+            id="litter-reminder-dry-run"
+            checked={dryRun}
+            disabled={sending}
+            onCheckedChange={(value: boolean | 'indeterminate') => {
+              setDryRun(value === true);
+            }}
+          />
+          <Typography tag="label" htmlFor="litter-reminder-dry-run">
+            {formatMessage({
+              id: getTranslation('litterReminder.dryRun'),
+              defaultMessage: 'Dry run',
+            })}
+          </Typography>
+        </Flex>
+
         <Button type="button" loading={sending} onClick={handleSend}>
           {formatMessage({
             id: getTranslation('litterReminder.button'),
@@ -133,7 +156,24 @@ const LitterReminderPanel = () => {
           })}
         </Button>
 
-        {report && (
+        {report?.dryRun && (
+          <Box background="neutral100" padding={4} hasRadius width="100%">
+            <pre
+              style={{
+                margin: 0,
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                fontSize: '13px',
+                lineHeight: 1.5,
+              }}
+            >
+              {(report.log ?? []).join('\n')}
+            </pre>
+          </Box>
+        )}
+
+        {report && !report.dryRun && (
           <Box paddingTop={2} width="100%">
             <Typography fontWeight="bold">
               {formatMessage(

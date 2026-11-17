@@ -20,6 +20,7 @@ interface LitterReminderRow {
 	dateOfBirth: string | null
 	email: string | null
 	sent: boolean
+	planned?: boolean
 	reason?: string
 }
 
@@ -27,11 +28,23 @@ function isWeekOption(value: number): value is (typeof WEEK_OPTIONS)[number] {
 	return (WEEK_OPTIONS as readonly number[]).includes(value)
 }
 
-function readWeeks(body: unknown): number | null {
+function readBody(body: unknown): Record<string, unknown> | null {
 	if (!body || typeof body !== 'object' || Array.isArray(body)) {
 		return null
 	}
-	const raw = (body as Record<string, unknown>).weeks
+	return body as Record<string, unknown>
+}
+
+function readDryRun(body: unknown): boolean {
+	return readBody(body)?.dryRun === true
+}
+
+function readWeeks(body: unknown): number | null {
+	const source = readBody(body)
+	if (!source) {
+		return null
+	}
+	const raw = source.weeks
 	const parsed = typeof raw === 'number'
 		? raw
 		: typeof raw === 'string'
@@ -166,6 +179,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 		notFound: (message: string) => unknown
 	}) {
 		const weeks = readWeeks(ctx.request.body)
+		const dryRun = readDryRun(ctx.request.body)
 		if (!weeks) {
 			return ctx.badRequest('weeks muss 9, 10, 11 oder 12 sein.')
 		}
@@ -192,12 +206,20 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 			.plugin('email-designer-5')
 			.service('email') as TemplatedEmailService
 		const results: LitterReminderRow[] = []
+		const log: string[] = []
+		if (dryRun) {
+			log.push('Dry run: es werden keine E-Mails gesendet.')
+			log.push(
+				`Mindestalter ${weeks} Wochen, Geburt vor ${formatDateDMY(cutoffDate)}, Template ${templateReferenceId}.`,
+			)
+		}
 
 		for (const litter of litters) {
 			const documentId = asTrimmedString(litter.documentId)
 			const label = litterLabel(litter)
 			const dateOfBirth = asTrimmedString(litter.dateOfBirth) || null
 			const email = breederEmail(litter)
+			const birthLabel = dateOfBirth ? formatDateDMY(dateOfBirth) : '–'
 
 			if (!email) {
 				results.push({
@@ -207,6 +229,24 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 					email: null,
 					sent: false,
 					reason: 'Keine BreederEmail',
+				})
+				if (dryRun) {
+					log.push(`Übersprungen: "${label}" — Keine BreederEmail`)
+				}
+				continue
+			}
+
+			if (dryRun) {
+				log.push(
+					`Würde senden: "${label}" (Geburt ${birthLabel}) an ${email}`,
+				)
+				results.push({
+					documentId,
+					litter: label,
+					dateOfBirth,
+					email,
+					sent: false,
+					planned: true,
 				})
 				continue
 			}
@@ -279,10 +319,23 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 			}
 		}
 
+		if (dryRun) {
+			const plannedCount = results.filter((row) => row.planned).length
+			const skippedCount = results.length - plannedCount
+			log.push(
+				`Abgeschlossen: ${plannedCount} würden gesendet, ${skippedCount} übersprungen.`,
+			)
+			for (const line of log) {
+				strapi.log.info(`Wurf-Erinnerung ${line}`)
+			}
+		}
+
 		ctx.body = {
 			weeks,
 			cutoffDate,
 			templateReferenceId,
+			dryRun,
+			log,
 			results,
 		}
 	},

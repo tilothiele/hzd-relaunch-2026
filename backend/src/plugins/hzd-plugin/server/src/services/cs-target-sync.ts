@@ -1,4 +1,16 @@
 import type { Core } from '@strapi/strapi'
+import {
+	BREEDER_STUD_OWNER_FIELDS,
+	BREEDER_ZUECHTER_FIELDS,
+	DOG_IMPORT_FIELDS,
+	USER_IMPORT_FIELDS,
+	applyFieldOverwrite,
+	defaultCsImporterConfig,
+	importFieldKeys,
+	isStoredFieldEmpty,
+	type CsFieldOverwriteMode,
+	type CsImporterConfig,
+} from '../cs-importer-config'
 
 const USER_UID = 'plugin::users-permissions.user'
 const USER_GROUP_UID = 'api::user-group.user-group'
@@ -67,6 +79,19 @@ const DOG_SOD1_MAP: Record<string, 'N_N' | 'N_DM' | 'DM_DM'> = {
 }
 
 const DOG_HD_VALUES = new Set(['A1', 'A2', 'B1', 'B2'])
+
+const USER_SCALAR_FIELDS = importFieldKeys(USER_IMPORT_FIELDS)
+	.filter((key) => key !== 'role' && key !== 'deckrueden_info')
+const DOG_SCALAR_FIELDS = importFieldKeys(DOG_IMPORT_FIELDS)
+const BREEDER_SCALAR_FIELDS = [
+	'kennelName',
+	'IsActive',
+	'BreederEmail',
+	'cBreederEmail',
+	'Phone',
+	'cPhone',
+	'BreederRole',
+]
 
 const BREED_SURVEY_FIELDS = [
 	'VerhaltenIi',
@@ -413,6 +438,39 @@ async function findByCId(
 	return found ?? null
 }
 
+async function loadStoredTarget(
+	strapi: Core.Strapi,
+	uid: string,
+	existing: { id?: number; documentId?: string },
+	select: string[],
+	populate?: Record<string, unknown>,
+): Promise<Record<string, unknown>> {
+	const where = typeof existing.id === 'number'
+		? { id: existing.id }
+		: existing.documentId
+			? { documentId: existing.documentId }
+			: null
+	if (!where) {
+		return {}
+	}
+	const found = await strapi.db.query(uid).findOne({
+		where,
+		select,
+		populate,
+	})
+	return (found ?? {}) as Record<string, unknown>
+}
+
+function isUserFieldEmpty(fieldName: string, value: unknown): boolean {
+	if (
+		fieldName === 'email'
+		&& canOverwriteUserEmail(typeof value === 'string' ? value : null)
+	) {
+		return true
+	}
+	return isStoredFieldEmpty(fieldName, value)
+}
+
 async function saveDocument(
 	strapi: Core.Strapi,
 	uid: string,
@@ -472,17 +530,6 @@ function canOverwriteUserEmail(email: string | null | undefined): boolean {
 		return true
 	}
 	return PLACEHOLDER_USER_EMAIL.test(trimmed)
-}
-
-async function loadStoredUserEmail(
-	strapi: Core.Strapi,
-	userId: number,
-): Promise<string | null> {
-	const user = await strapi.db.query(USER_UID).findOne({
-		where: { id: userId },
-		select: ['email'],
-	}) as { email?: string | null } | null
-	return typeof user?.email === 'string' ? user.email : null
 }
 
 async function applyUniqueMemberEmail(
@@ -582,6 +629,7 @@ export async function updateUser(
 	member: Record<string, unknown>,
 	authenticatedRoleId: number,
 	log: (line: string) => void,
+	importerConfig: CsImporterConfig = defaultCsImporterConfig(),
 ) {
 	const cId = parseInteger(member.IdPerson)
 	if (cId === null) {
@@ -598,10 +646,26 @@ export async function updateUser(
 	const data = mapMemberToUser(member, cId, authenticatedRoleId)
 	const existing = await findByCId(strapi, USER_UID, cId)
 	await omitTakenMembershipNumber(strapi, data, existing, cId, log)
-	const storedEmail = typeof existing?.id === 'number'
-		? await loadStoredUserEmail(strapi, existing.id)
+	const stored = existing
+		? await loadStoredTarget(
+			strapi,
+			USER_UID,
+			existing,
+			USER_SCALAR_FIELDS,
+			{
+				role: { select: ['id'] },
+				deckrueden_info: { select: ['id'] },
+			},
+		)
 		: null
-	const mayOverwriteEmail = !existing || canOverwriteUserEmail(storedEmail)
+	const storedEmail = typeof stored?.email === 'string' ? stored.email : null
+	const emailMode = importerConfig.user.email
+	const mayOverwriteEmail = !existing
+		|| emailMode === 'overwrite'
+		|| (
+			emailMode === 'fillIfEmpty'
+			&& canOverwriteUserEmail(storedEmail)
+		)
 	const skipMemberEmailReasons = [
 		data.blocked === true ? 'blocked=true' : null,
 	].filter((reason): reason is string => reason !== null)
@@ -625,9 +689,18 @@ export async function updateUser(
 		log(
 			`CS_Member cId=${cId}: ${reasons.join(', ')}, user.email wird nicht übernommen`,
 		)
-	} else if (existing && !mayOverwriteEmail) {
+	} else if (existing && emailMode === 'fillIfEmpty' && !mayOverwriteEmail) {
 		log(
 			`CS_Member cId=${cId}: user.email "${storedEmail}" wird nicht überschrieben`,
+		)
+	}
+	if (stored) {
+		applyFieldOverwrite(
+			data,
+			stored,
+			importFieldKeys(USER_IMPORT_FIELDS),
+			importerConfig.user,
+			isUserFieldEmpty,
 		)
 	}
 	if (!existing) {
@@ -726,6 +799,11 @@ export interface BreederRecord {
 	phone: string | null
 	cPhone: string | null
 	cBreederEmail: string | null
+	kennelName: string | null
+	isActive: boolean | null
+	breederEmail: string | null
+	address: Record<string, unknown> | null
+	role: string | null
 }
 
 /**
@@ -736,7 +814,19 @@ export async function loadBreedersByCId(
 	strapi: Core.Strapi,
 ): Promise<Map<number, BreederRecord>> {
 	const breeders = await strapi.db.query(BREEDER_UID).findMany({
-		select: ['id', 'documentId', 'cId', 'Phone', 'cPhone', 'cBreederEmail'],
+		select: [
+			'id',
+			'documentId',
+			'cId',
+			'Phone',
+			'cPhone',
+			'cBreederEmail',
+			'kennelName',
+			'IsActive',
+			'BreederEmail',
+			'BreederRole',
+		],
+		populate: { Address: true },
 	}) as {
 		id?: number
 		documentId?: string
@@ -744,19 +834,18 @@ export async function loadBreedersByCId(
 		Phone?: string | null
 		cPhone?: string | null
 		cBreederEmail?: string | null
+		kennelName?: string | null
+		IsActive?: boolean | null
+		BreederEmail?: string | null
+		BreederRole?: string | null
+		Address?: unknown
 	}[]
 	const byCId = new Map<number, BreederRecord>()
 	for (const breeder of breeders) {
 		if (typeof breeder.cId !== 'number') {
 			continue
 		}
-		byCId.set(breeder.cId, {
-			id: breeder.id,
-			documentId: breeder.documentId,
-			phone: storedText(breeder.Phone),
-			cPhone: storedText(breeder.cPhone),
-			cBreederEmail: storedEmail(breeder.cBreederEmail),
-		})
+		byCId.set(breeder.cId, breederRecordFromRow(breeder))
 	}
 	return byCId
 }
@@ -771,27 +860,103 @@ function storedEmail(value: unknown): string | null {
 	return email ? email.toLowerCase() : null
 }
 
-async function loadBreederSyncFields(
-	strapi: Core.Strapi,
-	existing: { id?: number; documentId?: string },
-): Promise<{ phone: string | null; cPhone: string | null; cBreederEmail: string | null }> {
-	const where = typeof existing.id === 'number'
-		? { id: existing.id }
-		: existing.documentId
-			? { documentId: existing.documentId }
-			: null
-	if (!where) {
-		return { phone: null, cPhone: null, cBreederEmail: null }
+function storedBoolean(value: unknown): boolean | null {
+	return typeof value === 'boolean' ? value : null
+}
+
+function storedAddress(value: unknown): Record<string, unknown> | null {
+	if (!value || typeof value !== 'object' || Array.isArray(value)) {
+		return null
 	}
-	const breeder = await strapi.db.query(BREEDER_UID).findOne({
-		where,
-		select: ['Phone', 'cPhone', 'cBreederEmail'],
-	}) as { Phone?: string | null; cPhone?: string | null; cBreederEmail?: string | null } | null
+	return value as Record<string, unknown>
+}
+
+function breederRecordFromRow(breeder: {
+	id?: number
+	documentId?: string
+	Phone?: string | null
+	cPhone?: string | null
+	cBreederEmail?: string | null
+	kennelName?: string | null
+	IsActive?: boolean | null
+	BreederEmail?: string | null
+	BreederRole?: string | null
+	Address?: unknown
+}): BreederRecord {
 	return {
-		phone: storedText(breeder?.Phone),
-		cPhone: storedText(breeder?.cPhone),
-		cBreederEmail: storedEmail(breeder?.cBreederEmail),
+		id: breeder.id,
+		documentId: breeder.documentId,
+		phone: storedText(breeder.Phone),
+		cPhone: storedText(breeder.cPhone),
+		cBreederEmail: storedEmail(breeder.cBreederEmail),
+		kennelName: storedText(breeder.kennelName),
+		isActive: storedBoolean(breeder.IsActive),
+		breederEmail: storedEmail(breeder.BreederEmail),
+		address: storedAddress(breeder.Address),
+		role: typeof breeder.BreederRole === 'string' ? breeder.BreederRole : null,
 	}
+}
+
+function breederStoredFields(
+	record: BreederRecord,
+): Record<string, unknown> {
+	return {
+		kennelName: record.kennelName,
+		IsActive: record.isActive,
+		BreederEmail: record.breederEmail,
+		cBreederEmail: record.cBreederEmail,
+		Phone: record.phone,
+		cPhone: record.cPhone,
+		Address: record.address,
+		BreederRole: record.role,
+	}
+}
+
+function rememberBreederFields(
+	record: BreederRecord,
+	data: TargetData,
+) {
+	if ('Phone' in data) {
+		record.phone = storedText(data.Phone)
+	}
+	if ('cPhone' in data) {
+		record.cPhone = storedText(data.cPhone)
+	}
+	if ('cBreederEmail' in data) {
+		record.cBreederEmail = storedEmail(data.cBreederEmail)
+	}
+	if ('kennelName' in data) {
+		record.kennelName = storedText(data.kennelName)
+	}
+	if ('IsActive' in data) {
+		record.isActive = storedBoolean(data.IsActive)
+	}
+	if ('BreederEmail' in data) {
+		record.breederEmail = storedEmail(data.BreederEmail)
+	}
+	if ('Address' in data) {
+		record.address = storedAddress(data.Address)
+	}
+}
+
+function breederFieldsFromMember(
+	member: Record<string, unknown>,
+	phone: string | null,
+): TargetData {
+	const data: TargetData = {
+		cPhone: phone,
+		cBreederEmail: parseEmail(member.Email),
+	}
+	assign(data, 'kennelName', truncateOrNull(cell(member.BreedingStation), 200))
+	assign(data, 'IsActive', parseBoolean(member.PersonIsAnActiveBreeder))
+	const email = parseEmail(member.Email)
+	assign(data, 'BreederEmail', email)
+	assign(data, 'Phone', phone)
+	const address = addressFromCsMember(member)
+	if (address) {
+		data.Address = address
+	}
+	return data
 }
 
 export async function ensureBreederForCsMember(
@@ -799,6 +964,7 @@ export async function ensureBreederForCsMember(
 	member: Record<string, unknown>,
 	log: (line: string) => void,
 	breedersByCId?: Map<number, BreederRecord>,
+	importerConfig: CsImporterConfig = defaultCsImporterConfig(),
 ) {
 	const cId = parseInteger(member.IdPerson)
 	if (cId === null) {
@@ -809,49 +975,66 @@ export async function ensureBreederForCsMember(
 	const cached = breedersByCId?.get(cId)
 	const existing = cached
 		?? (breedersByCId ? null : await findByCId(strapi, BREEDER_UID, cId))
+	const data = breederFieldsFromMember(member, phone)
+	const rawEmail = cell(member.Email)
+	const emailReason = emailRejectionReason(member.Email)
 	if (existing) {
-		// Bestehender Züchter bzw. Deckrüdenbesitzer:
-		// cPhone und cBreederEmail werden immer aus CS_Member aktualisiert
-		// (leerer CS-Wert leert das Feld).
-		// Phone bleibt unverändert. BreederEmail bleibt die öffentlich angezeigte Adresse.
 		if (typeof existing.id !== 'number' && !existing.documentId) {
 			return
 		}
 		const stored = cached
-			? {
-				phone: cached.phone,
-				cPhone: cached.cPhone,
-				cBreederEmail: cached.cBreederEmail,
-			}
-			: await loadBreederSyncFields(strapi, existing)
-		const rawEmail = cell(member.Email)
-		const emailReason = emailRejectionReason(member.Email)
-		if (rawEmail && emailReason) {
-			log(
-				`CS_Member cId=${cId}: ${emailReason}, cBreederEmail wird geleert`,
+			? breederStoredFields(cached)
+			: await loadStoredTarget(
+				strapi,
+				BREEDER_UID,
+				existing,
+				BREEDER_SCALAR_FIELDS,
+				{ Address: true },
 			)
-		}
-		const data: TargetData = {
-			cPhone: phone,
-			cBreederEmail: parseEmail(member.Email),
-		}
-		// Phone und cPhone sind getrennte Felder (bei Update wird nur cPhone
-		// gepflegt) – abweichende Werte werden ins Report geloggt.
-		const finalCPhone = data.cPhone
+		const storedPhone = storedText(stored.Phone)
+		const finalCPhone = typeof data.cPhone === 'string' ? data.cPhone : null
 		if (
-			stored.phone !== finalCPhone
-			&& (stored.phone !== null || finalCPhone !== null)
+			storedPhone !== finalCPhone
+			&& (storedPhone !== null || finalCPhone !== null)
 		) {
 			log(
-				`CS_Member cId=${cId}: Breeder Phone und cPhone weichen ab: Phone="${stored.phone ?? '–'}" cPhone="${finalCPhone ?? '–'}"`,
+				`CS_Member cId=${cId}: Breeder Phone und cPhone weichen ab: Phone="${storedPhone ?? '–'}" cPhone="${finalCPhone ?? '–'}"`,
+			)
+		}
+		const isStudOwner = stored.BreederRole === 'S' || cached?.role === 'S'
+		if (isStudOwner) {
+			const studData: TargetData = {
+				cPhone: data.cPhone,
+				cBreederEmail: data.cBreederEmail,
+			}
+			applyFieldOverwrite(
+				studData,
+				stored,
+				['cPhone', 'cBreederEmail'],
+				importerConfig.breeder.deckruedenbesitzer,
+			)
+			for (const key of Object.keys(data)) {
+				delete data[key]
+			}
+			Object.assign(data, studData)
+		} else {
+			applyFieldOverwrite(
+				data,
+				stored,
+				importFieldKeys(BREEDER_ZUECHTER_FIELDS),
+				importerConfig.breeder.zuechter,
+			)
+		}
+		if (rawEmail && emailReason) {
+			log(
+				'cBreederEmail' in data && data.cBreederEmail == null
+					? `CS_Member cId=${cId}: ${emailReason}, cBreederEmail wird geleert`
+					: `CS_Member cId=${cId}: ${emailReason}, cBreederEmail bleibt unverändert`,
 			)
 		}
 		await saveDocument(strapi, BREEDER_UID, existing, data)
 		if (cached) {
-			cached.cPhone = phone
-			cached.cBreederEmail = typeof data.cBreederEmail === 'string'
-				? data.cBreederEmail
-				: null
+			rememberBreederFields(cached, data)
 		}
 		log(
 			`Breeder aktualisiert cId=${cId} documentId=${existing.documentId ?? existing.id}`,
@@ -861,47 +1044,53 @@ export async function ensureBreederForCsMember(
 	if (parseBoolean(member.PersonIsABreeder) !== true) {
 		return
 	}
-	const data: TargetData = {
-		cId,
-		BreederRole: 'B',
-	}
-	const kennelName = truncateOrNull(cell(member.BreedingStation), 200)
-	assign(data, 'kennelName', kennelName)
-	assign(data, 'IsActive', parseBoolean(member.PersonIsAnActiveBreeder))
-	const rawEmail = cell(member.Email)
-	const emailReason = emailRejectionReason(member.Email)
 	if (rawEmail && emailReason) {
 		log(
 			`CS_Member cId=${cId}: ${emailReason}, cBreederEmail bleibt leer`,
 		)
 	}
-	const email = parseEmail(member.Email)
-	assign(data, 'cBreederEmail', email)
-	assign(data, 'BreederEmail', email)
-	// Bei Anlage beide Telefonfeld befüllen; bei Updates wird nur cPhone gepflegt.
-	assign(data, 'Phone', phone)
-	assign(data, 'cPhone', phone)
-	const address = addressFromCsMember(member)
-	if (address) {
-		data.Address = address
-	}
+	data.cId = cId
+	data.BreederRole = 'B'
 	const savedId = await saveDocument(strapi, BREEDER_UID, null, data)
 	if (breedersByCId) {
-		breedersByCId.set(cId, {
+		const created = breederRecordFromRow({
 			documentId: savedId,
-			phone,
-			cPhone: phone,
-			cBreederEmail: email,
+			Phone: typeof data.Phone === 'string' ? data.Phone : null,
+			cPhone: typeof data.cPhone === 'string' ? data.cPhone : null,
+			cBreederEmail: typeof data.cBreederEmail === 'string'
+				? data.cBreederEmail
+				: null,
+			kennelName: typeof data.kennelName === 'string' ? data.kennelName : null,
+			IsActive: typeof data.IsActive === 'boolean' ? data.IsActive : null,
+			BreederEmail: typeof data.BreederEmail === 'string'
+				? data.BreederEmail
+				: null,
+			BreederRole: 'B',
+			Address: data.Address,
 		})
+		breedersByCId.set(cId, created)
 	}
 	log(`Breeder erstellt cId=${cId} documentId=${savedId}`)
 }
 
-async function ensurePublishMyData(strapi: Core.Strapi, userId: number) {
+async function ensurePublishMyData(
+	strapi: Core.Strapi,
+	userId: number,
+	mode: CsFieldOverwriteMode,
+) {
+	if (mode === 'keep') {
+		return
+	}
 	const user = await strapi.db.query(USER_UID).findOne({
 		where: { id: userId },
 		select: ['id', 'publishMyData'],
-	}) as { publishMyData?: boolean } | null
+	}) as { publishMyData?: boolean | null } | null
+	if (
+		mode === 'fillIfEmpty'
+		&& !isStoredFieldEmpty('publishMyData', user?.publishMyData)
+	) {
+		return
+	}
 	if (user?.publishMyData === true) {
 		return
 	}
@@ -1046,6 +1235,33 @@ async function resolveStudDogPhone(
 	return truncateOrNull(cell(ownerPhone), 50)
 }
 
+async function linkDeckruedenInfo(
+	strapi: Core.Strapi,
+	ownerId: number,
+	breederId: number,
+	mode: CsFieldOverwriteMode,
+) {
+	if (mode === 'keep') {
+		return
+	}
+	if (mode === 'fillIfEmpty') {
+		const owner = await strapi.db.query(USER_UID).findOne({
+			where: { id: ownerId },
+			populate: { deckrueden_info: { select: ['id'] } },
+		}) as { deckrueden_info?: { id?: number } | null } | null
+		if (!isStoredFieldEmpty(
+			'deckrueden_info',
+			owner?.deckrueden_info ?? null,
+		)) {
+			return
+		}
+	}
+	await strapi.db.query(USER_UID).update({
+		where: { id: ownerId },
+		data: { deckrueden_info: breederId },
+	})
+}
+
 export async function updateStudDog(
 	strapi: Core.Strapi,
 	dog: Record<string, unknown>,
@@ -1053,6 +1269,7 @@ export async function updateStudDog(
 	options?: {
 		fixGroups?: boolean
 		loadCsMemberPhone?: (cId: number) => Promise<CsMemberPhone>
+		importerConfig?: CsImporterConfig
 	},
 ) {
 	const dogId = parseInteger(dog.cId)
@@ -1094,17 +1311,26 @@ export async function updateStudDog(
 		await ensureStudDogOwnerGroup(strapi, owner, log)
 	}
 
+	const importerConfig = options?.importerConfig ?? defaultCsImporterConfig()
 	const email = parseEmail(owner.cEmail)
+	const firstName = cell(owner.firstName) ?? ''
+	const lastName = cell(owner.lastName) ?? ''
 	const data: TargetData = {
 		cId: ownerCId,
 		member: ownerId,
 	}
 	assign(data, 'cBreederEmail', email)
+	assign(data, 'BreederEmail', email)
 	assign(data, 'Phone', await resolveStudDogPhone(
 		ownerCId,
 		owner.phone,
 		options?.loadCsMemberPhone,
 	))
+	assign(
+		data,
+		'kennelName',
+		truncateOrNull(`DRB ${firstName} ${lastName}`.trim(), 200),
+	)
 	const address = addressFromUser(owner)
 	if (address) {
 		data.Address = address
@@ -1122,22 +1348,40 @@ export async function updateStudDog(
 			)
 			return
 		}
-		const firstName = cell(owner.firstName) ?? ''
-		const lastName = cell(owner.lastName) ?? ''
-		const kennelName = truncateOrNull(`DRB ${firstName} ${lastName}`.trim(), 200)
-		assign(data, 'kennelName', kennelName)
 		data.BreederRole = 'S'
-		assign(data, 'BreederEmail', email)
+	} else {
+		const stored = await loadStoredTarget(
+			strapi,
+			BREEDER_UID,
+			existing,
+			BREEDER_SCALAR_FIELDS,
+			{
+				Address: true,
+				member: { select: ['id'] },
+			},
+		)
+		applyFieldOverwrite(
+			data,
+			stored,
+			importFieldKeys(BREEDER_STUD_OWNER_FIELDS),
+			importerConfig.breeder.deckruedenbesitzer,
+		)
 	}
 
-	await ensurePublishMyData(strapi, ownerId)
+	await ensurePublishMyData(
+		strapi,
+		ownerId,
+		importerConfig.user.publishMyData,
+	)
 	const savedId = await saveDocument(strapi, BREEDER_UID, existing, data)
 	const linked = await findBreederByRole(strapi, ownerCId, 'S')
 	if (typeof linked?.id === 'number') {
-		await strapi.db.query(USER_UID).update({
-			where: { id: ownerId },
-			data: { deckrueden_info: linked.id },
-		})
+		await linkDeckruedenInfo(
+			strapi,
+			ownerId,
+			linked.id,
+			importerConfig.user.deckrueden_info,
+		)
 	}
 	log(
 		existing
@@ -1150,6 +1394,7 @@ export async function updateDog(
 	strapi: Core.Strapi,
 	dog: Record<string, unknown>,
 	log: (line: string) => void,
+	importerConfig: CsImporterConfig = defaultCsImporterConfig(),
 ) {
 	const cId = parseInteger(dog.IdAnimal)
 	if (cId === null) {
@@ -1159,6 +1404,20 @@ export async function updateDog(
 
 	const data = mapDogToTarget(dog, cId)
 	const existing = await findByCId(strapi, DOG_UID, cId)
+	if (existing) {
+		const stored = await loadStoredTarget(
+			strapi,
+			DOG_UID,
+			existing,
+			DOG_SCALAR_FIELDS,
+		)
+		applyFieldOverwrite(
+			data,
+			stored,
+			importFieldKeys(DOG_IMPORT_FIELDS),
+			importerConfig.dog,
+		)
+	}
 	const savedId = await saveDocument(strapi, DOG_UID, existing, data)
 	log(
 		existing

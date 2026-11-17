@@ -5,6 +5,12 @@ import type { WriteStream } from 'fs'
 import type { Core } from '@strapi/strapi'
 import { findDocumentsPage } from '../utils/document-pagination'
 import {
+	defaultCsImporterConfig,
+	formatCsImporterConfigLog,
+	normalizeCsImporterConfig,
+	type CsImporterConfig,
+} from '../cs-importer-config'
+import {
 	createCsMemberPhoneLookup,
 	loadAuthenticatedRoleId,
 	ensureBreederForCsMember,
@@ -320,6 +326,60 @@ async function storeProcessedTimestamp(
 		strapi.log.error(
 			`${field} konnte nicht gespeichert werden: ${describeError(error)}`,
 		)
+	}
+}
+
+async function loadCsImporterConfig(
+	strapi: Core.Strapi,
+): Promise<{ config: CsImporterConfig; stored: boolean }> {
+	try {
+		const read = async (status: 'published' | 'draft') => {
+			const settings = await strapi.documents(HZD_SETTING_UID).findFirst({
+				status,
+				fields: ['CS_Importer_config'],
+			})
+			return settings?.CS_Importer_config
+		}
+		const published = await read('published')
+		const draft = await read('draft')
+		const raw = published ?? draft
+		const stored = raw !== null && raw !== undefined
+		return {
+			config: normalizeCsImporterConfig(stored ? raw : undefined),
+			stored,
+		}
+	} catch (error) {
+		strapi.log.warn(
+			`CS_Importer_config konnte nicht gelesen werden: ${describeError(error)}`,
+		)
+		return { config: defaultCsImporterConfig(), stored: false }
+	}
+}
+
+async function storeCsImporterConfig(
+	strapi: Core.Strapi,
+	config: CsImporterConfig,
+): Promise<void> {
+	const published = await strapi.documents(HZD_SETTING_UID).findFirst({
+		status: 'published',
+	})
+	const draft = await strapi.documents(HZD_SETTING_UID).findFirst({
+		status: 'draft',
+	})
+	const documentId = published?.documentId ?? draft?.documentId
+	if (!documentId) {
+		throw new Error(
+			'HZD Settings fehlen, CS_Importer_config wurde nicht gespeichert.',
+		)
+	}
+	await strapi.documents(HZD_SETTING_UID).update({
+		documentId,
+		data: {
+			CS_Importer_config: config,
+		} as never,
+	})
+	if (published) {
+		await strapi.documents(HZD_SETTING_UID).publish({ documentId })
 	}
 }
 
@@ -1157,6 +1217,16 @@ async function import_strapi_daten(
 				? `Import gestartet (${startNotes.join(', ')})`
 				: 'Import gestartet',
 		)
+		const loadedConfig = await loadCsImporterConfig(strapi)
+		const importerConfig = loadedConfig.config
+		log(
+			loadedConfig.stored
+				? 'CS_Importer_config aus HZD Settings geladen'
+				: 'CS_Importer_config nicht gesetzt, Standardwerte aktiv',
+		)
+		for (const line of formatCsImporterConfigLog(importerConfig)) {
+			log(line)
+		}
 		const authenticatedRoleId = await loadAuthenticatedRoleId(strapi)
 		let failed = 0
 		const { steps } = options
@@ -1168,6 +1238,9 @@ async function import_strapi_daten(
 		)
 		if (steps.members) {
 			job.phase = 'members'
+			log(
+				'Verarbeite CS_Member: Feldkonfiguration user, breeder.zuechter; bei Rolle S zusätzlich breeder.deckruedenbesitzer.cPhone und cBreederEmail',
+			)
 			if (!memberGeneration) {
 				job.members = emptyCounts()
 				log('Verarbeite CS_Member: keine ImportGeneration gesetzt')
@@ -1186,12 +1259,14 @@ async function import_strapi_daten(
 						entry,
 						log,
 						breedersByCId,
+						importerConfig,
 					),
 					apply: (entry) => updateUser(
 						strapi,
 						entry,
 						authenticatedRoleId,
 						log,
+						importerConfig,
 					),
 				})
 				await storeProcessedTimestamp(
@@ -1207,6 +1282,7 @@ async function import_strapi_daten(
 		throwIfCancelled()
 		if (steps.dogs) {
 			job.phase = 'dogs'
+			log('Verarbeite CS_Dog: Feldkonfiguration dog')
 			const dogGeneration = await loadCurrentGeneration(
 				strapi,
 				'ImportGenerationCSDogs',
@@ -1223,7 +1299,12 @@ async function import_strapi_daten(
 					counts: job.dogs,
 					onlyChanged: options.onlyChanged,
 					log,
-					apply: (entry) => updateDog(strapi, entry, log),
+					apply: (entry) => updateDog(
+						strapi,
+						entry,
+						log,
+						importerConfig,
+					),
 				})
 				await storeProcessedTimestamp(
 					strapi,
@@ -1238,6 +1319,9 @@ async function import_strapi_daten(
 		throwIfCancelled()
 		if (steps.studDogs) {
 			job.phase = 'studDogs'
+			log(
+				'Aktualisiere Deckrüden: Feldkonfiguration breeder.deckruedenbesitzer, user.publishMyData und user.deckrueden_info',
+			)
 			const loadCsMemberPhone = createCsMemberPhoneLookup(
 				strapi,
 				memberGeneration,
@@ -1255,6 +1339,7 @@ async function import_strapi_daten(
 				apply: (entry) => updateStudDog(strapi, entry, log, {
 					fixGroups: options.fixGroups,
 					loadCsMemberPhone,
+					importerConfig,
 				}),
 			})
 		} else {
@@ -1264,6 +1349,9 @@ async function import_strapi_daten(
 		throwIfCancelled()
 		if (steps.breeders) {
 			job.phase = 'breeders'
+			log(
+				'Aktualisiere Züchter: keine Feldüberschreibung. Der Schritt ordnet nur Benutzergruppen zu. Züchterfelder (breeder.zuechter) schreibt „Verarbeite CS_Member“.',
+			)
 			failed += await updateBreederOwnerGroups(
 				strapi,
 				job.breeders,
@@ -1366,6 +1454,16 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
 			...snapshot(),
 			timestamps: await loadImportTimestamps(strapi),
 		}
+	},
+
+	async getImporterConfig() {
+		return loadCsImporterConfig(strapi)
+	},
+
+	async saveImporterConfig(value: unknown) {
+		const config = normalizeCsImporterConfig(value)
+		await storeCsImporterConfig(strapi, config)
+		return { config, stored: true }
 	},
 
 	getDownloadableLog() {

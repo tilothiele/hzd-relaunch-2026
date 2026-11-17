@@ -81,6 +81,22 @@ export default [
   },
   {
     method: "GET",
+    path: "/chromosoft/importer-config",
+    handler: "import-strapi-daten.getImporterConfig",
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: "PUT",
+    path: "/chromosoft/importer-config",
+    handler: "import-strapi-daten.saveImporterConfig",
+    config: {
+      policies: [],
+    },
+  },
+  {
+    method: "GET",
     path: "/search/status",
     handler: "search-index.status",
     config: {

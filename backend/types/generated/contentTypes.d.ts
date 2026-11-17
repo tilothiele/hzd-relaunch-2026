@@ -1311,6 +1311,7 @@ export interface ApiHzdSettingHzdSetting extends Struct.SingleTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    CS_Importer_config: Schema.Attribute.JSON;
     DefaultAvatarB: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios'
     >;

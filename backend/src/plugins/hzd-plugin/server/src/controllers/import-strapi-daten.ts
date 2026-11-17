@@ -26,6 +26,8 @@ interface ImportService {
 	abortImport: () => { aborted: boolean; status: unknown }
 	getStatus: () => Promise<unknown>
 	getDownloadableLog: () => { filePath: string; fileName: string } | null
+	getImporterConfig: () => Promise<{ config: unknown; stored: boolean }>
+	saveImporterConfig: (value: unknown) => Promise<{ config: unknown; stored: boolean }>
 }
 
 function readSteps(value: unknown): ImportSteps {
@@ -94,6 +96,34 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
 	async status(ctx: { body: unknown }) {
 		ctx.body = await getService(strapi).getStatus()
+	},
+
+	async getImporterConfig(ctx: { body: unknown }) {
+		ctx.body = await getService(strapi).getImporterConfig()
+	},
+
+	async saveImporterConfig(ctx: {
+		status: number
+		body: unknown
+		request: { body?: unknown }
+	}) {
+		const body = ctx.request.body
+		if (!body || typeof body !== 'object' || Array.isArray(body)) {
+			ctx.status = 400
+			ctx.body = {
+				error: { message: 'CS_Importer_config ist kein Objekt.' },
+			}
+			return
+		}
+		try {
+			ctx.body = await getService(strapi).saveImporterConfig(body)
+		} catch (error) {
+			const message = error instanceof Error
+				? error.message
+				: 'CS_Importer_config konnte nicht gespeichert werden.'
+			ctx.status = 400
+			ctx.body = { error: { message } }
+		}
 	},
 
 	async downloadLog(ctx: {
