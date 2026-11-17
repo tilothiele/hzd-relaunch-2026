@@ -422,7 +422,7 @@ h5 {
 		transform: translate3d(0, -12vh, 0);
 	}
 	100% {
-		transform: translate3d(18px, 112vh, 0);
+		transform: translate3d(var(--snow-drift, 18px), 112vh, 0);
 	}
 }
 

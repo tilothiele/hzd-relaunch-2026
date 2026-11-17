@@ -342,33 +342,80 @@ function NightSky() {
 	)
 }
 
+const SNOW_LAYERS = [
+	{
+		id: 'far',
+		count: 16,
+		minDuration: 22,
+		durationSpan: 6,
+		minSize: 2,
+		sizeSpan: 1,
+		opacity: 0.4,
+		drift: 8,
+	},
+	{
+		id: 'mid',
+		count: 12,
+		minDuration: 13,
+		durationSpan: 4,
+		minSize: 5,
+		sizeSpan: 2,
+		opacity: 0.62,
+		drift: 18,
+	},
+	{
+		id: 'near',
+		count: 8,
+		minDuration: 7,
+		durationSpan: 2,
+		minSize: 9,
+		sizeSpan: 3,
+		opacity: 0.88,
+		drift: 32,
+	},
+] as const
+
 function Snowfall() {
-	const flakes = useMemo(() => (
-		Array.from({ length: 32 }, (_, index) => ({
-			id: index,
-			left: `${(index * 31) % 100}%`,
-			delay: `${(index % 8) * 0.8}s`,
-			duration: `${9 + (index % 7)}s`,
-			size: index % 5 === 0 ? 7 : 3 + (index % 3),
-			opacity: 0.45 + (index % 4) * 0.12,
+	const layers = useMemo(() => (
+		SNOW_LAYERS.map((layer, layerIndex) => ({
+			id: layer.id,
+			zIndex: layerIndex,
+			flakes: Array.from({ length: layer.count }, (_, index) => ({
+				id: `${layer.id}-${index}`,
+				left: `${(index * 37 + layerIndex * 19) % 100}%`,
+				delay: `${(index % 8) * 0.8}s`,
+				duration: `${layer.minDuration + (index % (layer.durationSpan + 1))}s`,
+				size: layer.minSize + (index % (layer.sizeSpan + 1)),
+				opacity: layer.opacity,
+				drift: `${layer.drift}px`,
+			})),
 		}))
 	), [])
 
 	return (
 		<div className='pointer-events-none absolute inset-0 overflow-hidden' aria-hidden>
-			{flakes.map((flake) => (
-				<span
-					key={flake.id}
-					className='advent-snowflake'
-					style={{
-						left: flake.left,
-						width: flake.size,
-						height: flake.size,
-						opacity: flake.opacity,
-						animationDelay: flake.delay,
-						animationDuration: flake.duration,
-					}}
-				/>
+			{layers.map((layer) => (
+				<div
+					key={layer.id}
+					className='absolute inset-0'
+					style={{ zIndex: layer.zIndex }}
+				>
+					{layer.flakes.map((flake) => (
+						<span
+							key={flake.id}
+							className='advent-snowflake'
+							style={{
+								left: flake.left,
+								width: flake.size,
+								height: flake.size,
+								opacity: flake.opacity,
+								animationDelay: flake.delay,
+								animationDuration: flake.duration,
+								['--snow-drift' as string]: flake.drift,
+							}}
+						/>
+					))}
+				</div>
 			))}
 		</div>
 	)
