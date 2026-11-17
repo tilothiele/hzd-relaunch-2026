@@ -41,6 +41,16 @@ export function resolveAdventMoment(
 	return readAdventMoment(now)
 }
 
+/** Januar bis Oktober bleibt der Abschnitt ausgeblendet. */
+export function isAdventSectionHidden(moment: AdventMoment): boolean {
+	return moment.month >= 1 && moment.month <= 10
+}
+
+/** Im November erscheinen nur Überschrift und Ankündigung. */
+export function isAdventAnnouncementVisible(moment: AdventMoment): boolean {
+	return moment.month === 11
+}
+
 export function isAdventCalendarVisible(moment: AdventMoment): boolean {
 	return moment.month === 12 && moment.day >= 1 && moment.day <= 31
 }

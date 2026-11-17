@@ -3,12 +3,14 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Image from 'next/image'
+import { BlocksRenderer, type BlocksContent } from '@strapi/blocks-react-renderer'
 import type { AdventCalendarSection, AdventDay, Image as MediaImage } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import {
-	isAdventCalendarVisible,
+	isAdventAnnouncementVisible,
+	isAdventSectionHidden,
 	isDoorOpenable,
 	resolveAdventMoment,
 } from '@/lib/advent-calendar'
@@ -24,6 +26,16 @@ interface DoorFace {
 	color: string
 	pattern: 'plain' | 'dots' | 'stripes' | 'ribbon'
 	snow: boolean
+}
+
+const FALLBACK_BACKGROUND = '#0c241c'
+
+function adventBackgroundColor(value: string | null | undefined): string {
+	const color = value?.trim() ?? ''
+	if (/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(color)) {
+		return color
+	}
+	return FALLBACK_BACKGROUND
 }
 
 const VISUAL_ORDER = [
@@ -92,6 +104,89 @@ function resolveThumbnailUrl(
 	}
 
 	return resolveMediaUrl(media, baseUrl)
+}
+
+function AdventAnnouncement ({
+	content,
+	image,
+	imageUrl,
+}: {
+	content?: BlocksContent | null
+	image?: MediaImage | null
+	imageUrl?: string | null
+}) {
+	const hasText = Array.isArray(content) && content.length > 0
+	if (!hasText && !imageUrl) {
+		return null
+	}
+
+	const text = hasText ? (
+		<div className='whitespace-pre-line text-center text-lg leading-relaxed text-[#f4e7c5] sm:text-left [&_a]:text-[#f4e7c5] [&_a]:underline [&_li]:text-[#f4e7c5] [&_p]:text-[#f4e7c5] [&_p+p]:mt-4'>
+			<BlocksRenderer content={content} />
+		</div>
+	) : null
+
+	if (!imageUrl) {
+		return <div className='relative mt-6'>{text}</div>
+	}
+
+	return (
+		<div className='relative mt-6 grid items-center gap-12 sm:grid-cols-2'>
+			<Image
+				src={imageUrl}
+				alt={image?.alternativeText || 'Adventskalender'}
+				width={image?.width ?? 800}
+				height={image?.height ?? 800}
+				className='h-auto w-full rounded-xl object-contain'
+				unoptimized
+			/>
+			{text}
+		</div>
+	)
+}
+
+function doorHoverLabel(day: number, year: number): string {
+	const dayLabel = String(day).padStart(2, '0')
+	return `Dein Adventskalendertürchen für den ${dayLabel}.12.${year}`
+}
+
+function ClosedPadlock ({
+	large,
+	color,
+}: {
+	large: boolean
+	color: string
+}) {
+	const maskId = useId().replace(/:/g, '')
+
+	return (
+		<svg
+			viewBox='0 0 64 76'
+			className={large ? 'h-12 w-10' : 'h-9 w-8'}
+			aria-hidden
+			style={{ color }}
+		>
+			<mask id={maskId}>
+				<rect width='64' height='76' fill='black' />
+				<path
+					d='M18 32V20a14 14 0 0 1 28 0v12'
+					fill='none'
+					stroke='white'
+					strokeWidth='7'
+					strokeLinecap='round'
+				/>
+				<rect x='6' y='30' width='52' height='40' rx='7' fill='white' />
+				<circle cx='32' cy='44' r='6' fill='black' />
+				<path d='M28.4 48h7.2l2.2 12h-11.6z' fill='black' />
+			</mask>
+			<rect
+				width='64'
+				height='76'
+				fill='currentColor'
+				mask={`url(#${maskId})`}
+			/>
+		</svg>
+	)
 }
 
 function spanClass(day: number): string {
@@ -182,6 +277,7 @@ export function AdventCalendarSectionComponent({
 	const dialogTitleId = useId()
 	const [selectedDay, setSelectedDay] = useState<number | null>(null)
 	const [openingDay, setOpeningDay] = useState<number | null>(null)
+	const [showDoors, setShowDoors] = useState(false)
 	const openTimer = useRef<number | null>(null)
 
 	const daysByNumber = useMemo(() => {
@@ -205,9 +301,48 @@ export function AdventCalendarSectionComponent({
 		}
 	}, [])
 
-	if (!isAdventCalendarVisible(moment)) {
+	const backgroundColor = adventBackgroundColor(
+		section.advent_calendar?.Hintergrundfarbe,
+	)
+	const heading = (
+		<h2
+			id={titleId}
+			className='relative text-center text-2xl tracking-wide text-[#f4e7c5] sm:text-4xl'
+		>
+			HZD Adventskalender {moment.year}
+		</h2>
+	)
+
+	if (isAdventSectionHidden(moment)) {
 		return null
 	}
+
+	if (isAdventAnnouncementVisible(moment)) {
+		return (
+			<SectionContainer
+				variant='full-width'
+				backgroundColor={backgroundColor}
+				paddingTop='2.5rem'
+				paddingBottom='2.5rem'
+			>
+				<div className='relative mx-auto w-full max-w-5xl px-2 min-[1056px]:px-0'>
+					{heading}
+					<AdventAnnouncement
+						content={section.advent_calendar?.Ankuendigung}
+						image={section.advent_calendar?.KalenderPlatzhalter}
+						imageUrl={resolveMediaUrl(
+							section.advent_calendar?.KalenderPlatzhalter,
+							strapiBaseUrl,
+						)}
+					/>
+				</div>
+			</SectionContainer>
+		)
+	}
+	const featuredDay = Math.min(moment.day, 24)
+	const featured = daysByNumber.get(featuredDay) ?? null
+	const featuredImageUrl = resolveMediaUrl(featured?.AdventImage, strapiBaseUrl)
+	const featuredGreeting = featured?.GreetingOfTheDay?.trim() ?? ''
 
 	const openDoor = (day: number) => {
 		if (!isDoorOpenable(moment, day)) {
@@ -228,23 +363,61 @@ export function AdventCalendarSectionComponent({
 	return (
 		<SectionContainer
 			variant='full-width'
-			backgroundColor='#0c241c'
+			backgroundColor={backgroundColor}
 			paddingTop='2.5rem'
 			paddingBottom='2.5rem'
 		>
-			<div className='relative mx-auto w-full max-w-6xl overflow-hidden px-3 sm:px-6'>
+			<div className='relative mx-auto w-full max-w-5xl px-2 min-[1056px]:px-0'>
 				<Snowfall />
-				<h2
-					id={titleId}
-					className='relative mb-6 text-center font-serif text-2xl tracking-wide text-[#f4e7c5] sm:text-4xl'
+				<div className='mb-6'>{heading}</div>
+				<figure className='relative mx-auto w-full'>
+					{featuredImageUrl ? (
+						<Image
+							src={featuredImageUrl}
+							alt={featured?.AdventImage?.alternativeText || `Adventsbild zum ${featuredDay}. Dezember`}
+							width={featured?.AdventImage?.width ?? 1600}
+							height={featured?.AdventImage?.height ?? 1000}
+							className='h-auto max-h-[70vh] w-full rounded-xl object-contain'
+							unoptimized
+							priority
+						/>
+					) : (
+						<p className='px-4 pt-6 text-center text-[#f4e7c5]'>
+							Für den {featuredDay}. Dezember ist noch kein Bild hinterlegt.
+						</p>
+					)}
+					{featuredGreeting ? (
+						<figcaption className='mt-5 whitespace-pre-line text-center text-lg leading-relaxed text-[#f4e7c5]'>
+							{featuredGreeting}
+						</figcaption>
+					) : null}
+				</figure>
+				<button
+					type='button'
+					role='switch'
+					aria-checked={showDoors}
+					className='relative mx-auto mt-8 flex w-fit items-center gap-3 rounded-full text-[#f4e7c5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4'
+					style={{ outlineColor: theme.buttonColor }}
+					onClick={() => setShowDoors((current) => !current)}
 				>
-					HZD Adventskalender {moment.year}
-				</h2>
-				<div className='relative grid grid-flow-dense grid-cols-2 auto-rows-[5.75rem] gap-2.5 sm:auto-rows-[6.5rem] sm:gap-3 lg:grid-cols-6 lg:auto-rows-[7rem]'>
+					<span
+						className={`relative h-8 w-14 rounded-full border border-[#f4e7c5]/40 transition-colors ${showDoors ? 'bg-[#d4b46a]' : 'bg-[#234e3a]'}`}
+						aria-hidden
+					>
+						<span
+							className={`absolute top-1 left-1 h-6 w-6 rounded-full bg-[#f4e7c5] shadow transition-transform ${showDoors ? 'translate-x-6' : ''}`}
+						/>
+					</span>
+					Kalendertürchen anzeigen
+				</button>
+				{showDoors ? (
+				<div className='relative mt-8 grid grid-flow-dense grid-cols-2 auto-rows-[5.75rem] gap-2.5 sm:auto-rows-[6.5rem] sm:gap-3 lg:grid-cols-6 lg:auto-rows-[7rem]'>
 					{VISUAL_ORDER.map((day) => {
 						const openable = isDoorOpenable(moment, day)
 						const entry = daysByNumber.get(day)
 						const face = faceFor(day)
+						const doorFaceUrl = resolveMediaUrl(entry?.TuerchenImage, strapiBaseUrl)
+						const hoverLabel = doorHoverLabel(day, moment.year)
 						const thumbUrl = openable
 							? resolveThumbnailUrl(entry?.AdventImage, strapiBaseUrl)
 							: null
@@ -253,54 +426,94 @@ export function AdventCalendarSectionComponent({
 							: `Türchen ${day}, öffnet am ${day}. Dezember`
 
 						return (
-							<button
+							<div
 								key={day}
-								type='button'
-								className={`advent-door relative overflow-hidden rounded-2xl bg-[#0c241c] shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-70 ${spanClass(day)} ${openingDay === day ? 'is-opening' : ''}`}
-								style={{
-									outlineColor: theme.buttonColor,
-									boxShadow: '0 10px 18px rgba(0,0,0,0.28)',
-								}}
-								disabled={!openable}
-								aria-label={label}
-								onClick={() => openDoor(day)}
+								className={`group relative h-full ${spanClass(day)}`}
+								title={hoverLabel}
 							>
-								{thumbUrl ? (
-									<Image
-										src={thumbUrl}
-										alt=''
-										fill
-										className='object-cover'
-										unoptimized
-										sizes='(max-width: 640px) 50vw, 220px'
-									/>
-								) : null}
-								<span
-									className='advent-door-flap absolute inset-0 flex items-center justify-center'
+								<button
+									type='button'
+									className={`advent-door h-full w-full relative overflow-hidden rounded-2xl shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-70 ${!openable ? 'pointer-events-none' : ''} ${openingDay === day ? 'is-opening' : ''}`}
 									style={{
-										backgroundColor: face.background,
-										color: face.color,
-										boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.35)',
+										backgroundColor,
+										outlineColor: theme.buttonColor,
+										boxShadow: '0 10px 18px rgba(0,0,0,0.28)',
 									}}
+									disabled={!openable}
+									aria-label={label}
+									title={hoverLabel}
+									onClick={() => openDoor(day)}
 								>
-									{face.snow ? (
-										<span
-											className='pointer-events-none absolute inset-x-0 top-0 h-4 bg-white'
-											style={{ clipPath: 'ellipse(62% 100% at 50% 0%)' }}
+									{thumbUrl ? (
+										<Image
+											src={thumbUrl}
+											alt=''
+											fill
+											className='object-cover'
+											unoptimized
+											sizes='(max-width: 640px) 50vw, 220px'
 										/>
 									) : null}
-									<DoorPattern face={face} />
+									{doorFaceUrl ? (
+										<span className='advent-door-flap absolute inset-0'>
+											<Image
+												src={doorFaceUrl}
+												alt=''
+												fill
+												className='object-cover'
+												unoptimized
+												sizes='(max-width: 640px) 50vw, 220px'
+											/>
+										</span>
+									) : (
+										<span
+											className='advent-door-flap absolute inset-0 flex items-center justify-center'
+											style={{
+												backgroundColor: face.background,
+												color: face.color,
+												boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.35)',
+											}}
+										>
+											{face.snow ? (
+												<span
+													className='pointer-events-none absolute inset-x-0 top-0 h-4 bg-white'
+													style={{ clipPath: 'ellipse(62% 100% at 50% 0%)' }}
+												/>
+											) : null}
+											<DoorPattern face={face} />
+											<span
+												className={`relative font-serif leading-none ${day === 24 ? 'text-6xl sm:text-7xl' : 'text-3xl sm:text-4xl'}`}
+												style={{ textShadow: '0 2px 0 rgba(0,0,0,0.12)' }}
+											>
+												{day}
+											</span>
+										</span>
+									)}
+								</button>
+								{!openable ? (
 									<span
-										className={`relative font-serif leading-none ${day === 24 ? 'text-6xl sm:text-7xl' : 'text-3xl sm:text-4xl'}`}
-										style={{ textShadow: '0 2px 0 rgba(0,0,0,0.12)' }}
+										className='pointer-events-none absolute right-1.5 bottom-1.5 z-20'
+										aria-hidden
 									>
-										{day}
+										<ClosedPadlock
+											large={day === 24}
+											color={face.color}
+										/>
 									</span>
-								</span>
-							</button>
+								) : null}
+								{hoverLabel ? (
+									<span
+										role='tooltip'
+										className='pointer-events-none absolute bottom-[calc(100%+0.35rem)] left-1/2 z-30 hidden w-max -translate-x-1/2 whitespace-nowrap rounded-md bg-[#f4e7c5] px-2.5 py-1.5 text-center text-xs leading-snug text-[#1c3358] shadow-lg group-hover:block group-focus-within:block'
+									>
+										{hoverLabel}
+									</span>
+								) : null}
+							</div>
 						)
 					})}
 				</div>
+				) : null}
 			</div>
 			{selectedDay != null ? createPortal(
 				<DoorDialog

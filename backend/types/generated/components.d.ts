@@ -35,6 +35,9 @@ export interface BlocksAdventDay extends Struct.ComponentSchema {
     >;
     Day: Schema.Attribute.Integer;
     GreetingOfTheDay: Schema.Attribute.Text;
+    TuerchenImage: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
   };
 }
 

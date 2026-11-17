@@ -18,6 +18,24 @@
       "type": "component",
       "component": "blocks.advent-day",
       "repeatable": true
+    },
+    "Hintergrundfarbe": {
+      "type": "customField",
+      "customField": "plugin::color-picker.color",
+      "regex": "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+    },
+    "Ankuendigung": {
+      "type": "blocks"
+    },
+    "KalenderPlatzhalter": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
     }
   }
 }

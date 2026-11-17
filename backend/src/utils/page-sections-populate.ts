@@ -192,9 +192,11 @@ const sectionComponentPopulate = (
 				populate: {
 					advent_calendar: {
 						populate: {
+							KalenderPlatzhalter: true,
 							AdventDay: {
 								populate: {
 									AdventImage: true,
+									TuerchenImage: true,
 								},
 							},
 						},

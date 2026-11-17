@@ -389,11 +389,15 @@ export interface AdventDay {
 	Day?: number | null
 	GreetingOfTheDay?: string | null
 	AdventImage?: Image | null
+	TuerchenImage?: Image | null
 }
 
 export interface AdventCalendar {
 	documentId?: string | null
 	Description?: string | null
+	Hintergrundfarbe?: string | null
+	Ankuendigung?: BlocksContent | null
+	KalenderPlatzhalter?: Image | null
 	AdventDay?: AdventDay[] | null
 }
 

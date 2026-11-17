@@ -456,10 +456,16 @@ export interface ApiAdventCalendarAdventCalendar
   };
   attributes: {
     AdventDay: Schema.Attribute.Component<'blocks.advent-day', true>;
+    Ankuendigung: Schema.Attribute.Blocks;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     Description: Schema.Attribute.String;
+    Hintergrundfarbe: Schema.Attribute.String &
+      Schema.Attribute.CustomField<'plugin::color-picker.color'>;
+    KalenderPlatzhalter: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',

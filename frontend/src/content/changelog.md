@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.1.5] - 17.11.2026
+
+- Adventskalender initiale Version.
+
 ## [1.1.4] - 15.11.2026
 
 - Datenschutzrelevante Darstellung u. Funktionalität verbessert.
