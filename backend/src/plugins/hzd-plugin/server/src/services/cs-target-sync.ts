@@ -620,6 +620,7 @@ async function applyUniqueMemberEmail(
 	existing: { id?: number; documentId?: string } | null,
 	cId: number,
 	log: (line: string) => void,
+	dryRun = false,
 ) {
 	const memberEmail = typeof data.cEmail === 'string' ? data.cEmail : null
 	const placeholder = `c.${cId}@hovawarte.com`
@@ -631,9 +632,11 @@ async function applyUniqueMemberEmail(
 			log(`CS_Member cId=${cId}: user.email übernommen (${memberEmail})`)
 			return
 		}
-		log(
-			`CS_Member cId=${cId}: Email ${memberEmail} ist bereits bei ${otherUserLabel(taken)} vergeben, user.email wird nicht übernommen`,
-		)
+		if (!dryRun) {
+			log(
+				`CS_Member cId=${cId}: Email ${memberEmail} ist bereits bei ${otherUserLabel(taken)} vergeben, user.email wird nicht übernommen`,
+			)
+		}
 	}
 
 	if (existing) {
@@ -667,6 +670,7 @@ async function omitTakenMembershipNumber(
 	existing: { id?: number; documentId?: string } | null,
 	cId: number,
 	log: (line: string) => void,
+	dryRun = false,
 ) {
 	const membershipNumber = data.membershipNumber
 	if (typeof membershipNumber !== 'number') {
@@ -689,6 +693,9 @@ async function omitTakenMembershipNumber(
 		data.username = `c.${cId}`
 	}
 	delete data.membershipNumber
+	if (dryRun) {
+		return
+	}
 	const owner = typeof taken.cId === 'number' ? `cId=${taken.cId}` : `id=${taken.id}`
 	log(
 		`CS_Member cId=${cId}: membershipNumber ${membershipNumber} ist bereits bei ${owner} vergeben, Feld bleibt unverändert`,
@@ -716,19 +723,23 @@ export async function updateUser(
 ) {
 	const cId = parseInteger(member.IdPerson)
 	if (cId === null) {
-		log('CS_Member ohne IdPerson, User-Update übersprungen')
+		if (!dryRun) {
+			log('CS_Member ohne IdPerson, User-Update übersprungen')
+		}
 		return
 	}
 	if (parseBoolean(member.PersonIsABreeder) === true) {
-		log(
-			`CS_Member cId=${cId}: PersonIsABreeder=true, User wird nicht angelegt oder aktualisiert`,
-		)
+		if (!dryRun) {
+			log(
+				`CS_Member cId=${cId}: PersonIsABreeder=true, User wird nicht angelegt oder aktualisiert`,
+			)
+		}
 		return
 	}
 
 	const data = mapMemberToUser(member, cId, authenticatedRoleId)
 	const existing = await findByCId(strapi, USER_UID, cId)
-	await omitTakenMembershipNumber(strapi, data, existing, cId, log)
+	await omitTakenMembershipNumber(strapi, data, existing, cId, log, dryRun)
 	const stored = existing
 		? await loadStoredTarget(
 			strapi,
@@ -756,16 +767,16 @@ export async function updateUser(
 		? emailRejectionReason(member.Email)
 		: null
 	if (mayOverwriteEmail && skipMemberEmailReasons.length === 0) {
-		if (emailFormatReason) {
+		if (emailFormatReason && !dryRun) {
 			log(
 				`CS_Member cId=${cId}: ${emailFormatReason}, user.email wird nicht übernommen`,
 			)
 		}
-		await applyUniqueMemberEmail(strapi, data, existing, cId, log)
+		await applyUniqueMemberEmail(strapi, data, existing, cId, log, dryRun)
 	} else if (existing) {
 		delete data.email
 	}
-	if (skipMemberEmailReasons.length > 0 && mayOverwriteEmail) {
+	if (skipMemberEmailReasons.length > 0 && mayOverwriteEmail && !dryRun) {
 		const reasons = emailFormatReason
 			? [...skipMemberEmailReasons, emailFormatReason]
 			: skipMemberEmailReasons
@@ -1069,7 +1080,9 @@ export async function ensureBreederForCsMember(
 ) {
 	const cId = parseInteger(member.IdPerson)
 	if (cId === null) {
-		log('CS_Member ohne IdPerson, Breeder-Anlage übersprungen')
+		if (!dryRun) {
+			log('CS_Member ohne IdPerson, Breeder-Anlage übersprungen')
+		}
 		return
 	}
 	const phone = phoneFromCsMember(member)
@@ -1095,7 +1108,8 @@ export async function ensureBreederForCsMember(
 		const storedPhone = storedText(stored.Phone)
 		const finalCPhone = typeof data.cPhone === 'string' ? data.cPhone : null
 		if (
-			storedPhone !== finalCPhone
+			!dryRun
+			&& storedPhone !== finalCPhone
 			&& (storedPhone !== null || finalCPhone !== null)
 		) {
 			log(
@@ -1126,9 +1140,10 @@ export async function ensureBreederForCsMember(
 				importerConfig.breeder.zuechter,
 			)
 		}
-		if (rawEmail && emailReason) {
+		const clearingEmail = 'cBreederEmail' in data && data.cBreederEmail == null
+		if (rawEmail && emailReason && (!dryRun || clearingEmail)) {
 			log(
-				'cBreederEmail' in data && data.cBreederEmail == null
+				clearingEmail
 					? `CS_Member cId=${cId}: ${emailReason}, cBreederEmail wird geleert`
 					: `CS_Member cId=${cId}: ${emailReason}, cBreederEmail bleibt unverändert`,
 			)
@@ -1151,7 +1166,7 @@ export async function ensureBreederForCsMember(
 	if (parseBoolean(member.PersonIsABreeder) !== true) {
 		return
 	}
-	if (rawEmail && emailReason) {
+	if (rawEmail && emailReason && !dryRun) {
 		log(
 			`CS_Member cId=${cId}: ${emailReason}, cBreederEmail bleibt leer`,
 		)
@@ -1513,7 +1528,9 @@ export async function updateDog(
 ) {
 	const cId = parseInteger(dog.IdAnimal)
 	if (cId === null) {
-		log('CS_Dog ohne IdAnimal, Dog-Update übersprungen')
+		if (!dryRun) {
+			log('CS_Dog ohne IdAnimal, Dog-Update übersprungen')
+		}
 		return
 	}
 

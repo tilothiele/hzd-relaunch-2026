@@ -628,6 +628,7 @@ async function importCollection(
 		idAttribute: string
 		counts: Counts
 		onlyChanged: boolean
+		dryRun?: boolean
 		log: (line: string) => void
 		visit?: (entry: Record<string, unknown>) => Promise<void>
 		apply?: (entry: Record<string, unknown>) => Promise<void>
@@ -640,6 +641,7 @@ async function importCollection(
 		idAttribute,
 		counts,
 		onlyChanged,
+		dryRun = false,
 		log,
 		visit,
 		apply,
@@ -699,17 +701,19 @@ async function importCollection(
 		imported += 1
 		counts.processed = imported
 		counts.skipped = skipped
-		const changeNote = !previous
-			? ' neu'
-			: changes && changes.length > 0
-				? ` geändert (${changes.length})`
-				: ''
-		log(`${label} ${index}/${total}${idLabel}${changeNote}`)
-		if (changes) {
-			for (const change of changes) {
-				log(
-					`${label}${idLabel} ${change.name}: ${formatLogValue(change.previous)} -> ${formatLogValue(change.current)}`,
-				)
+		if (!dryRun) {
+			const changeNote = !previous
+				? ' neu'
+				: changes && changes.length > 0
+					? ` geändert (${changes.length})`
+					: ''
+			log(`${label} ${index}/${total}${idLabel}${changeNote}`)
+			if (changes) {
+				for (const change of changes) {
+					log(
+						`${label}${idLabel} ${change.name}: ${formatLogValue(change.previous)} -> ${formatLogValue(change.current)}`,
+					)
+				}
 			}
 		}
 		if (apply) {
@@ -1269,6 +1273,7 @@ async function import_strapi_daten(
 					idAttribute: 'IdPerson',
 					counts: job.members,
 					onlyChanged: options.onlyChanged,
+					dryRun: options.dryRun,
 					log,
 					visit: (entry) => ensureBreederForCsMember(
 						strapi,
@@ -1287,11 +1292,7 @@ async function import_strapi_daten(
 						options.dryRun,
 					),
 				})
-				if (options.dryRun) {
-					log(
-						'Verarbeite CS_Member: Dry run, ProcessedTimestampCSMembers nicht gesetzt',
-					)
-				} else {
+				if (!options.dryRun) {
 					await storeProcessedTimestamp(
 						strapi,
 						'ProcessedTimestampCSMembers',
@@ -1322,6 +1323,7 @@ async function import_strapi_daten(
 					idAttribute: 'IdAnimal',
 					counts: job.dogs,
 					onlyChanged: options.onlyChanged,
+					dryRun: options.dryRun,
 					log,
 					apply: (entry) => updateDog(
 						strapi,
@@ -1331,11 +1333,7 @@ async function import_strapi_daten(
 						options.dryRun,
 					),
 				})
-				if (options.dryRun) {
-					log(
-						'Verarbeite CS_Dog: Dry run, ProcessedTimestampCSDogs nicht gesetzt',
-					)
-				} else {
+				if (!options.dryRun) {
 					await storeProcessedTimestamp(
 						strapi,
 						'ProcessedTimestampCSDogs',
