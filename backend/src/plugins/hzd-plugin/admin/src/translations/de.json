@@ -27,6 +27,7 @@
   "hzd-plugin.chromosoft.import.abort": "Abbruch",
   "hzd-plugin.chromosoft.import.abortError": "Der Import konnte nicht abgebrochen werden.",
   "hzd-plugin.chromosoft.import.onlyChanged": "Nur geänderte Datensätze importieren",
+  "hzd-plugin.chromosoft.import.dryRun": "Dry run",
   "hzd-plugin.chromosoft.import.fixGroups": "Fixe Gruppen",
   "hzd-plugin.chromosoft.import.fixedUsers": "Fixe Benutzerdaten",
   "hzd-plugin.chromosoft.import.skipped": "{count} übersprungen",

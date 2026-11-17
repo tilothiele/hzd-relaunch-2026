@@ -105,6 +105,7 @@ export interface ImportStrapiDatenStatus {
 interface ImportOptions {
 	onlyChanged: boolean
 	fixGroups: boolean
+	dryRun: boolean
 	steps: ImportSteps
 }
 
@@ -1089,6 +1090,18 @@ function normalizeSteps(value: Partial<ImportSteps> | undefined): ImportSteps {
 	return steps
 }
 
+function lockDryRunSteps(steps: ImportSteps, dryRun: boolean): ImportSteps {
+	if (!dryRun) {
+		return steps
+	}
+	return {
+		...steps,
+		studDogs: false,
+		breeders: false,
+		fixedUsers: false,
+	}
+}
+
 const OWNER_GROUP_BY_ROLE: Record<string, string> = {
 	B: ZUECHTER_GROUP_KEY,
 	S: STUD_DOG_OWNER_GROUP_KEY,
@@ -1209,6 +1222,7 @@ async function import_strapi_daten(
 		job.logFilePath = opened.filePath
 		const log = (line: string) => writeLog(opened.stream, line)
 		const startNotes = [
+			options.dryRun ? 'Dry run' : null,
 			options.onlyChanged ? 'nur geänderte Datensätze' : null,
 			options.fixGroups ? 'Fixe Gruppen' : null,
 		].filter((note): note is string => note !== null)
@@ -1217,6 +1231,11 @@ async function import_strapi_daten(
 				? `Import gestartet (${startNotes.join(', ')})`
 				: 'Import gestartet',
 		)
+		if (options.dryRun) {
+			log(
+				'Dry run: keine Inserts oder Updates. Geplante Änderungen werden nur protokolliert.',
+			)
+		}
 		const loadedConfig = await loadCsImporterConfig(strapi)
 		const importerConfig = loadedConfig.config
 		log(
@@ -1260,6 +1279,7 @@ async function import_strapi_daten(
 						log,
 						breedersByCId,
 						importerConfig,
+						options.dryRun,
 					),
 					apply: (entry) => updateUser(
 						strapi,
@@ -1267,13 +1287,20 @@ async function import_strapi_daten(
 						authenticatedRoleId,
 						log,
 						importerConfig,
+						options.dryRun,
 					),
 				})
-				await storeProcessedTimestamp(
-					strapi,
-					'ProcessedTimestampCSMembers',
-				)
-				log('Verarbeite CS_Member: ProcessedTimestampCSMembers gesetzt')
+				if (options.dryRun) {
+					log(
+						'Verarbeite CS_Member: Dry run, ProcessedTimestampCSMembers nicht gesetzt',
+					)
+				} else {
+					await storeProcessedTimestamp(
+						strapi,
+						'ProcessedTimestampCSMembers',
+					)
+					log('Verarbeite CS_Member: ProcessedTimestampCSMembers gesetzt')
+				}
 			}
 		} else {
 			log('Verarbeite CS_Member übersprungen')
@@ -1304,13 +1331,20 @@ async function import_strapi_daten(
 						entry,
 						log,
 						importerConfig,
+						options.dryRun,
 					),
 				})
-				await storeProcessedTimestamp(
-					strapi,
-					'ProcessedTimestampCSDogs',
-				)
-				log('Verarbeite CS_Dog: ProcessedTimestampCSDogs gesetzt')
+				if (options.dryRun) {
+					log(
+						'Verarbeite CS_Dog: Dry run, ProcessedTimestampCSDogs nicht gesetzt',
+					)
+				} else {
+					await storeProcessedTimestamp(
+						strapi,
+						'ProcessedTimestampCSDogs',
+					)
+					log('Verarbeite CS_Dog: ProcessedTimestampCSDogs gesetzt')
+				}
 			}
 		} else {
 			log('Verarbeite CS_Dog übersprungen')
@@ -1414,7 +1448,8 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
 		if (running) {
 			return { started: false, reason: 'running' as const, status: snapshot() }
 		}
-		const steps = normalizeSteps(options?.steps)
+		const dryRun = options?.dryRun === true
+		const steps = lockDryRunSteps(normalizeSteps(options?.steps), dryRun)
 		if (!firstEnabledStep(steps)) {
 			return { started: false, reason: 'no-steps' as const, status: snapshot() }
 		}
@@ -1431,6 +1466,7 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
 		void import_strapi_daten(strapi, {
 			onlyChanged,
 			fixGroups,
+			dryRun,
 			steps,
 		})
 		return { started: true, reason: null, status: snapshot() }
@@ -1494,6 +1530,7 @@ const service = ({ strapi }: { strapi: Core.Strapi }) => ({
 		return import_strapi_daten(strapi, {
 			onlyChanged: false,
 			fixGroups: false,
+			dryRun: false,
 			steps,
 		})
 	},

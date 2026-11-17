@@ -13,6 +13,7 @@ interface ImportService {
 	startImport: (options?: {
 		onlyChanged?: boolean
 		fixGroups?: boolean
+		dryRun?: boolean
 		steps?: ImportSteps
 	}) => {
 		started: boolean
@@ -60,15 +61,18 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 			? body as {
 				onlyChanged?: unknown
 				fixGroups?: unknown
+				dryRun?: unknown
 				steps?: unknown
 			}
 			: {}
 		const onlyChanged = payload.onlyChanged === true
 		const fixGroups = payload.fixGroups === true
+		const dryRun = payload.dryRun === true
 		const steps = readSteps(payload.steps)
 		const result = getService(strapi).startImport({
 			onlyChanged,
 			fixGroups,
+			dryRun,
 			steps,
 		})
 		if (result.started) {

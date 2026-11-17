@@ -471,6 +471,89 @@ function isUserFieldEmpty(fieldName: string, value: unknown): boolean {
 	return isStoredFieldEmpty(fieldName, value)
 }
 
+const DRY_RUN_META_KEYS = new Set(['id', 'documentId', '__component'])
+
+function dryRunScalar(value: unknown): string {
+	if (value === null || value === undefined) {
+		return ''
+	}
+	if (value instanceof Date) {
+		return value.toISOString()
+	}
+	if (
+		typeof value === 'string'
+		|| typeof value === 'number'
+		|| typeof value === 'boolean'
+	) {
+		return String(value)
+	}
+	if (Array.isArray(value)) {
+		return JSON.stringify(value.map((entry) => dryRunScalar(entry)))
+	}
+	if (typeof value === 'object') {
+		const record = value as Record<string, unknown>
+		const contentKeys = Object.keys(record).filter(
+			(key) => !DRY_RUN_META_KEYS.has(key),
+		)
+		if (
+			'id' in record
+			&& contentKeys.length === 0
+			&& (
+				typeof record.id === 'number'
+				|| typeof record.id === 'string'
+			)
+		) {
+			return String(record.id)
+		}
+		const content: Record<string, string> = {}
+		for (const key of contentKeys.sort()) {
+			content[key] = dryRunScalar(record[key])
+		}
+		return JSON.stringify(content)
+	}
+	return String(value)
+}
+
+function formatDryRunValue(value: string): string {
+	return value === '' ? '–' : JSON.stringify(value)
+}
+
+function logPlannedWrite(
+	log: (line: string) => void,
+	kind: 'Insert' | 'Update',
+	entity: string,
+	cId: number,
+	data: TargetData,
+	stored: Record<string, unknown> | null,
+	options?: { newPassword?: boolean },
+) {
+	const lines: string[] = []
+	for (const key of Object.keys(data)) {
+		if (key === 'password') {
+			continue
+		}
+		const before = stored ? dryRunScalar(stored[key]) : ''
+		const after = dryRunScalar(data[key])
+		if (kind === 'Update' && before === after) {
+			continue
+		}
+		lines.push(
+			`  ${key}: ${formatDryRunValue(before)} → ${formatDryRunValue(after)}`,
+		)
+	}
+	if (options?.newPassword) {
+		lines.push('  password: – → (neues Passwort)')
+	}
+	if (kind === 'Update' && lines.length === 0) {
+		log(`Dry run: ${entity} Update cId=${cId}, keine Feldänderung`)
+		return
+	}
+	log(`Dry run: ${entity} ${kind} cId=${cId}`)
+	for (const line of lines) {
+		log(line)
+	}
+}
+
 async function saveDocument(
 	strapi: Core.Strapi,
 	uid: string,
@@ -630,6 +713,7 @@ export async function updateUser(
 	authenticatedRoleId: number,
 	log: (line: string) => void,
 	importerConfig: CsImporterConfig = defaultCsImporterConfig(),
+	dryRun = false,
 ) {
 	const cId = parseInteger(member.IdPerson)
 	if (cId === null) {
@@ -703,8 +787,20 @@ export async function updateUser(
 			isUserFieldEmpty,
 		)
 	}
-	if (!existing) {
+	if (!existing && !dryRun) {
 		data.password = await hashPassword(strapi, `Import-${cId}-ChangeMe!`)
+	}
+	if (dryRun) {
+		logPlannedWrite(
+			log,
+			existing ? 'Update' : 'Insert',
+			'User',
+			cId,
+			data,
+			stored,
+			{ newPassword: !existing },
+		)
+		return
 	}
 	const savedId = await saveDocument(strapi, USER_UID, existing, data)
 	log(
@@ -965,6 +1061,7 @@ export async function ensureBreederForCsMember(
 	log: (line: string) => void,
 	breedersByCId?: Map<number, BreederRecord>,
 	importerConfig: CsImporterConfig = defaultCsImporterConfig(),
+	dryRun = false,
 ) {
 	const cId = parseInteger(member.IdPerson)
 	if (cId === null) {
@@ -1032,13 +1129,19 @@ export async function ensureBreederForCsMember(
 					: `CS_Member cId=${cId}: ${emailReason}, cBreederEmail bleibt unverändert`,
 			)
 		}
-		await saveDocument(strapi, BREEDER_UID, existing, data)
+		if (dryRun) {
+			logPlannedWrite(log, 'Update', 'Breeder', cId, data, stored)
+		} else {
+			await saveDocument(strapi, BREEDER_UID, existing, data)
+		}
 		if (cached) {
 			rememberBreederFields(cached, data)
 		}
-		log(
-			`Breeder aktualisiert cId=${cId} documentId=${existing.documentId ?? existing.id}`,
-		)
+		if (!dryRun) {
+			log(
+				`Breeder aktualisiert cId=${cId} documentId=${existing.documentId ?? existing.id}`,
+			)
+		}
 		return
 	}
 	if (parseBoolean(member.PersonIsABreeder) !== true) {
@@ -1051,7 +1154,12 @@ export async function ensureBreederForCsMember(
 	}
 	data.cId = cId
 	data.BreederRole = 'B'
-	const savedId = await saveDocument(strapi, BREEDER_UID, null, data)
+	if (dryRun) {
+		logPlannedWrite(log, 'Insert', 'Breeder', cId, data, null)
+	}
+	const savedId = dryRun
+		? ''
+		: await saveDocument(strapi, BREEDER_UID, null, data)
 	if (breedersByCId) {
 		const created = breederRecordFromRow({
 			documentId: savedId,
@@ -1070,7 +1178,9 @@ export async function ensureBreederForCsMember(
 		})
 		breedersByCId.set(cId, created)
 	}
-	log(`Breeder erstellt cId=${cId} documentId=${savedId}`)
+	if (!dryRun) {
+		log(`Breeder erstellt cId=${cId} documentId=${savedId}`)
+	}
 }
 
 async function ensurePublishMyData(
@@ -1395,6 +1505,7 @@ export async function updateDog(
 	dog: Record<string, unknown>,
 	log: (line: string) => void,
 	importerConfig: CsImporterConfig = defaultCsImporterConfig(),
+	dryRun = false,
 ) {
 	const cId = parseInteger(dog.IdAnimal)
 	if (cId === null) {
@@ -1404,19 +1515,32 @@ export async function updateDog(
 
 	const data = mapDogToTarget(dog, cId)
 	const existing = await findByCId(strapi, DOG_UID, cId)
-	if (existing) {
-		const stored = await loadStoredTarget(
+	const stored = existing
+		? await loadStoredTarget(
 			strapi,
 			DOG_UID,
 			existing,
 			DOG_SCALAR_FIELDS,
 		)
+		: null
+	if (stored) {
 		applyFieldOverwrite(
 			data,
 			stored,
 			importFieldKeys(DOG_IMPORT_FIELDS),
 			importerConfig.dog,
 		)
+	}
+	if (dryRun) {
+		logPlannedWrite(
+			log,
+			existing ? 'Update' : 'Insert',
+			'Dog',
+			cId,
+			data,
+			stored,
+		)
+		return
 	}
 	const savedId = await saveDocument(strapi, DOG_UID, existing, data)
 	log(

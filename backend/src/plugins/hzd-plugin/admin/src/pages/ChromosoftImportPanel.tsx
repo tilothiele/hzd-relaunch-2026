@@ -70,6 +70,12 @@ const STEP_ORDER: ImportStepKey[] = [
   'fixedUsers',
 ];
 
+const DRY_RUN_LOCKED_STEPS: ImportStepKey[] = [
+  'studDogs',
+  'breeders',
+  'fixedUsers',
+];
+
 const DEFAULT_STEPS: ImportSteps = {
   members: true,
   dogs: true,
@@ -358,11 +364,16 @@ const ChromosoftImportPanel = () => {
   const [savingConfig, setSavingConfig] = useState(false);
   const [fixGroups, setFixGroups] = useState(false);
   const [onlyChanged, setOnlyChanged] = useState(false);
+  const [dryRun, setDryRun] = useState(false);
   const [steps, setSteps] = useState<ImportSteps>(DEFAULT_STEPS);
   const phaseRef = useRef<ImportPhase>('idle');
+  const stepsBeforeDryRun = useRef<ImportSteps | null>(null);
 
   const isRunning = isRunningPhase(status.phase);
-  const hasSelectedStep = STEP_ORDER.some((step) => steps[step]);
+  const hasSelectedStep = STEP_ORDER.some((step) => (
+    steps[step]
+    && !(dryRun && DRY_RUN_LOCKED_STEPS.includes(step))
+  ));
 
   useEffect(() => {
     if (!isRunning) {
@@ -487,20 +498,57 @@ const ChromosoftImportPanel = () => {
     }
   }, [formatMessage, status, toggleNotification]);
 
+  const handleDryRunChange = (value: boolean | 'indeterminate') => {
+    const next = value === true;
+    setDryRun(next);
+    if (next) {
+      setSteps((current) => {
+        stepsBeforeDryRun.current = current;
+        return {
+          ...current,
+          studDogs: false,
+          breeders: false,
+          fixedUsers: false,
+        };
+      });
+      return;
+    }
+    const previous = stepsBeforeDryRun.current;
+    if (!previous) {
+      return;
+    }
+    setSteps((current) => ({
+      ...current,
+      studDogs: previous.studDogs,
+      breeders: previous.breeders,
+      fixedUsers: previous.fixedUsers,
+    }));
+  };
+
   const handleImport = async () => {
+    const effectiveSteps: ImportSteps = dryRun
+      ? {
+        ...steps,
+        studDogs: false,
+        breeders: false,
+        fixedUsers: false,
+      }
+      : steps;
     try {
       setStarting(true);
-      const firstStep = STEP_ORDER.find((step) => steps[step]) ?? 'members';
+      const firstStep = STEP_ORDER.find((step) => effectiveSteps[step])
+        ?? 'members';
       setStatus((current) => ({
         ...IDLE_STATUS,
         phase: firstStep,
-        steps,
+        steps: effectiveSteps,
         timestamps: current.timestamps,
       }));
       const response = await post('/hzd-plugin/chromosoft/import-strapi-daten', {
         onlyChanged,
         fixGroups,
-        steps,
+        dryRun,
+        steps: effectiveSteps,
       });
       const nextStatus = normalizeStatus(response.data);
       if (nextStatus) {
@@ -744,6 +792,23 @@ const ChromosoftImportPanel = () => {
         <Flex direction="column" alignItems="flex-start" gap={2}>
           <Flex gap={2} alignItems="center">
             <Checkbox
+              id="chromosoft-dry-run"
+              checked={dryRun}
+              disabled={isRunning}
+              onCheckedChange={handleDryRunChange}
+            />
+            <Typography
+              tag="label"
+              htmlFor="chromosoft-dry-run"
+            >
+              {formatMessage({
+                id: getTranslation('chromosoft.import.dryRun'),
+                defaultMessage: 'Dry run',
+              })}
+            </Typography>
+          </Flex>
+          <Flex gap={2} alignItems="center">
+            <Checkbox
               id="chromosoft-fix-groups"
               checked={fixGroups}
               disabled={isRunning}
@@ -783,13 +848,16 @@ const ChromosoftImportPanel = () => {
         </Flex>
 
         <Flex direction="column" alignItems="stretch" gap={4} width="100%">
-          {STEP_ORDER.map((step) => (
+          {STEP_ORDER.map((step) => {
+            const lockedByDryRun = dryRun
+              && DRY_RUN_LOCKED_STEPS.includes(step);
+            return (
             <Flex key={step} gap={3} alignItems="flex-start" width="100%">
               <Box paddingTop={1}>
                 <Checkbox
                   id={`chromosoft-step-${step}`}
-                  checked={steps[step]}
-                  disabled={isRunning}
+                  checked={lockedByDryRun ? false : steps[step]}
+                  disabled={isRunning || lockedByDryRun}
                   onCheckedChange={(value: boolean | 'indeterminate') => {
                     setSteps((current) => ({
                       ...current,
@@ -861,7 +929,8 @@ const ChromosoftImportPanel = () => {
                 ) : null}
               </Box>
             </Flex>
-          ))}
+            );
+          })}
         </Flex>
 
         <Flex gap={2}>
