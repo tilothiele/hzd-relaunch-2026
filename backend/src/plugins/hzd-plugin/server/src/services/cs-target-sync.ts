@@ -529,7 +529,7 @@ function logPlannedWrite(
 ) {
 	const lines: string[] = []
 	for (const key of Object.keys(data)) {
-		if (key === 'password') {
+		if (key === 'password' || key === 'cId') {
 			continue
 		}
 		const before = stored ? dryRunScalar(stored[key]) : ''
@@ -545,7 +545,6 @@ function logPlannedWrite(
 		lines.push('  password: – → (neues Passwort)')
 	}
 	if (kind === 'Update' && lines.length === 0) {
-		log(`Dry run: ${entity} Update cId=${cId}, keine Feldänderung`)
 		return
 	}
 	log(`Dry run: ${entity} ${kind} cId=${cId}`)
@@ -773,7 +772,12 @@ export async function updateUser(
 		log(
 			`CS_Member cId=${cId}: ${reasons.join(', ')}, user.email wird nicht übernommen`,
 		)
-	} else if (existing && emailMode === 'fillIfEmpty' && !mayOverwriteEmail) {
+	} else if (
+		!dryRun
+		&& existing
+		&& emailMode === 'fillIfEmpty'
+		&& !mayOverwriteEmail
+	) {
 		log(
 			`CS_Member cId=${cId}: user.email "${storedEmail}" wird nicht überschrieben`,
 		)

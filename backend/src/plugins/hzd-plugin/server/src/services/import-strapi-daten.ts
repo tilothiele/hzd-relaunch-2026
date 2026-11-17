@@ -668,7 +668,7 @@ async function importCollection(
 	let failed = 0
 	await iterateGeneration(strapi, uid, generation, async (entry, index) => {
 		const recordId = readRecordId(entry[idAttribute])
-		const idLabel = recordId ? ` ${idAttribute}=${recordId}` : ''
+		const idLabel = recordId ? ` cId=${recordId}` : ''
 		const previous = recordId ? previousById.get(recordId) : undefined
 		const changes = previous
 			? listFieldChanges(entry, previous, attributes)
@@ -699,15 +699,12 @@ async function importCollection(
 		imported += 1
 		counts.processed = imported
 		counts.skipped = skipped
-		const documentId = typeof entry.documentId === 'string' ? entry.documentId : ''
 		const changeNote = !previous
 			? ' neu'
 			: changes && changes.length > 0
 				? ` geändert (${changes.length})`
 				: ''
-		log(
-			`${label} ${index}/${total}${idLabel}${documentId ? ` documentId=${documentId}` : ''}${changeNote}`,
-		)
+		log(`${label} ${index}/${total}${idLabel}${changeNote}`)
 		if (changes) {
 			for (const change of changes) {
 				log(
