@@ -563,6 +563,9 @@ export function AdventCalendarSectionComponent({
 				<Snowfall />
 				<div className='mb-6'>{heading}</div>
 				<figure className='relative mx-auto w-full'>
+					<p className='relative mb-4 text-center text-lg text-[#f4e7c5]'>
+						Dein Türchenbild von heute, dem {moment.day}.{moment.month}.{moment.year}
+					</p>
 					{featuredImageUrl ? (
 						<Image
 							src={featuredImageUrl}
