@@ -103,20 +103,31 @@ async function resolveKennelNameFromRelation(relation: unknown): Promise<string 
 		return getBreederKennelName({ documentId: value })
 	}
 
+	// Document Service formt manyToOne vor dem Hook um, z. B.
+	// { set: [{ id: 12 }] } oder { connect: [{ id: 12 }] }.
+	if (Array.isArray(relation)) {
+		for (let index = relation.length - 1; index >= 0; index -= 1) {
+			const name = await resolveKennelNameFromRelation(relation[index])
+			if (name) {
+				return name
+			}
+		}
+		return null
+	}
+
 	if (typeof relation === 'object') {
 		const rel = relation as Record<string, unknown>
 
-		// v4/v5-Relation-Payloads: { connect: [...] } / { set: ... }
-		if (Array.isArray(rel.connect) && rel.connect.length > 0) {
-			const byConnect = await resolveKennelNameFromRelation(rel.connect[0])
-			if (byConnect) {
-				return byConnect
-			}
-		}
 		if (rel.set !== undefined && rel.set !== null) {
-			const bySet = await resolveKennelNameFromPayloadPart(rel.set)
+			const bySet = await resolveKennelNameFromRelation(rel.set)
 			if (bySet) {
 				return bySet
+			}
+		}
+		if (rel.connect !== undefined && rel.connect !== null) {
+			const byConnect = await resolveKennelNameFromRelation(rel.connect)
+			if (byConnect) {
+				return byConnect
 			}
 		}
 
@@ -134,23 +145,6 @@ async function resolveKennelNameFromRelation(relation: unknown): Promise<string 
 	return null
 }
 
-async function resolveKennelNameFromPayloadPart(value: unknown): Promise<string | null> {
-	if (typeof value === 'number') {
-		return getBreederKennelName({ id: value })
-	}
-	if (typeof value === 'string') {
-		const trimmed = value.trim()
-		if (!trimmed) {
-			return null
-		}
-		if (/^[0-9]+$/.test(trimmed)) {
-			return getBreederKennelName({ id: Number(trimmed) })
-		}
-		return getBreederKennelName({ documentId: trimmed })
-	}
-	return null
-}
-
 async function resolveExistingLitterDocumentId(
 	where: Record<string, unknown> | undefined,
 ): Promise<string | undefined> {
@@ -162,10 +156,17 @@ async function resolveExistingLitterDocumentId(
 		return where.documentId
 	}
 
-	if (typeof where.id === 'number') {
+	const rawId = where.id
+	const id = typeof rawId === 'number'
+		? rawId
+		: typeof rawId === 'string' && /^[0-9]+$/.test(rawId)
+			? Number(rawId)
+			: undefined
+
+	if (id != null) {
 		try {
 			const litter = await strapi.db.query(LITTER_UID).findOne({
-				where: { id: where.id },
+				where: { id },
 				select: ['documentId'],
 			}) as { documentId?: string | null } | null
 			return typeof litter?.documentId === 'string' ? litter.documentId : undefined
