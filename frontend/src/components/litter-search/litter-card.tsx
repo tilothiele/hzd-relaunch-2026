@@ -99,10 +99,12 @@ export function LitterCard({ litter, strapiBaseUrl, hzdSetting, distance, format
                 <div className='group relative aspect-[4/3] overflow-hidden rounded-md bg-gray-100'>
                     <Image
                         src={resolveMediaUrl(
-                            litter.stuntDog?.avatar ||
-                            (litter.stuntDog?.color === 'SM' ? hzdSetting?.DefaultAvatarSM :
-                                litter.stuntDog?.color === 'B' ? hzdSetting?.DefaultAvatarB :
-                                    hzdSetting?.DefaultAvatarS),
+                            litter.stuntDog
+                                ? litter.stuntDog.avatar ||
+                                    (litter.stuntDog.color === 'SM' ? hzdSetting?.DefaultAvatarSM :
+                                        litter.stuntDog.color === 'B' ? hzdSetting?.DefaultAvatarB :
+                                            hzdSetting?.DefaultAvatarS)
+                                : hzdSetting?.DefaultBreederAvatar,
                             strapiBaseUrl
                         ) || ''}
                         alt="Vater"

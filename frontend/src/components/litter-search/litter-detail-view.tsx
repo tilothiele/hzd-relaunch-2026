@@ -153,10 +153,12 @@ export function LitterDetailView({
 
     const renderFatherImage = () => {
         const url = resolveMediaUrl(
-            litter.stuntDog?.avatar ||
-            (litter.stuntDog?.color === 'SM' ? hzdSetting?.DefaultAvatarSM :
-                litter.stuntDog?.color === 'B' ? hzdSetting?.DefaultAvatarB :
-                    hzdSetting?.DefaultAvatarS),
+            litter.stuntDog
+                ? litter.stuntDog.avatar ||
+                    (litter.stuntDog.color === 'SM' ? hzdSetting?.DefaultAvatarSM :
+                        litter.stuntDog.color === 'B' ? hzdSetting?.DefaultAvatarB :
+                            hzdSetting?.DefaultAvatarS)
+                : hzdSetting?.DefaultBreederAvatar,
             strapiBaseUrl
         ) || ''
         const name = stuntDogName || 'Unbekannt'

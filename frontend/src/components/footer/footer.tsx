@@ -14,6 +14,20 @@ interface FooterProps {
 	theme: ThemeDefinition
 }
 
+function formatFooterVersion (version: string): string {
+	const separator = version.lastIndexOf('-')
+	if (separator < 0) {
+		return version
+	}
+
+	const suffix = version.slice(separator + 1)
+	if (suffix.length <= 10) {
+		return version
+	}
+
+	return `${version.slice(0, separator + 1)}${suffix.slice(0, 10)}`
+}
+
 export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 	const currentYear = new Date().getFullYear()
 
@@ -26,6 +40,7 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 
 	const partnerLinks = globalLayout?.PartnerLink ?? []
 	const footerContacts = (globalLayout?.Footer?.contacts ?? []).slice(0, 3)
+	const appVersion = process.env.NEXT_PUBLIC_APP_VERSION
 
 	return (
 		<footer
@@ -202,10 +217,10 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 					{currentYear}
 					{' '}
 					{globalLayout?.Copyright}
-					{process.env.NEXT_PUBLIC_APP_VERSION && (
+					{appVersion && (
 						<span style={{ marginLeft: '1em', opacity: 0.8 }}>
 							<a href="/changelog">
-								v{process.env.NEXT_PUBLIC_APP_VERSION}
+								v{formatFooterVersion(appVersion)}
 							</a>
 							{process.env.NEXT_PUBLIC_BUILD_DATE && (
 								<span style={{ marginLeft: '0.5em' }}>
