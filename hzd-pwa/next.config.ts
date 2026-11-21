@@ -9,6 +9,9 @@ const pwaConfig = withPWA({
 const nextConfig: NextConfig = {
 	output: 'standalone',
 	agentRules: false,
+	experimental: {
+		agentUpgrade: 'security',
+	},
 	serverExternalPackages: [
 		'@prisma/client',
 		'prisma',
