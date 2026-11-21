@@ -34,6 +34,11 @@
       "relation": "oneToOne",
       "target": "plugin::users-permissions.user"
     },
+    "CEO2": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
     "CFO": {
       "type": "relation",
       "relation": "oneToOne",

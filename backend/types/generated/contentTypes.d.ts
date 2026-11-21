@@ -1437,6 +1437,10 @@ export interface ApiLocalCummunityLocalCummunity
       'oneToOne',
       'plugin::users-permissions.user'
     >;
+    CEO2: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
     CFO: Schema.Attribute.Relation<
       'oneToOne',
       'plugin::users-permissions.user'
@@ -1927,6 +1931,12 @@ export interface ApiPwaSettingPwaSetting extends Struct.SingleTypeSchema {
       'api::pwa-setting.pwa-setting'
     > &
       Schema.Attribute.Private;
+    Mirgliedsantrag_HZD: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
+    Mitgliedsantrag_OG: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &

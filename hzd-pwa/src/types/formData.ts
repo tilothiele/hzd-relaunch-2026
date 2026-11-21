@@ -27,6 +27,7 @@ export interface FormData {
   kurzzeitBis: string;
   sepaName: string;
   regionalgruppe?: string; // Nord | West | Mitte | Sued | Ost | HZD
+  regionalUnitId?: string; // documentId der RegionalUnit
   sepaIban: string;
   sepaBic: string;
   sepaKreditinstitut: string;

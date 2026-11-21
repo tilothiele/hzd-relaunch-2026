@@ -2,24 +2,141 @@
 
 import { useState, ChangeEvent, FormEvent, useRef, useEffect, useCallback } from 'react'
 import Image from 'next/image'
-import { v4 as uuidv4 } from 'uuid'
-import { AltchaField } from '@/components/altcha/altcha-field'
 import { MEMBERSHIP_TYPES } from '@/constants/membership-types'
 import { REGIONAL_GROUPS } from '@/constants/regional-groups'
+import type { RegionalUnitHeader } from '@/lib/regional-unit'
 import type { FinanverwaltungContact } from '@/lib/server/finanverwaltung'
 import { FormData } from '@/types/formData'
 
+interface RegionalUnitOption {
+  documentId: string;
+  name: string;
+  header: RegionalUnitHeader;
+}
+
+/**
+ * Platzhalter der DOCX-Vorlage (Hilfetext unter dem Button).
+ * Die Namen entsprechen den Schlüsseln in
+ * src/services/mitgliedsantrag-dokumente.ts (buildMitgliedsantragModel).
+ */
+const VORLAGE_PLATZHALTER: Array<{
+  pl: string;
+  wert: string;
+  hinweis?: string;
+}> = [
+  {
+    pl: 'Headline',
+    wert: 'Name der gewählten Regionalgruppe',
+    hinweis: 'RegionalUnit.Name aus der Auswahlliste oben.',
+  },
+  {
+    pl: 'Name',
+    wert: 'Name der verknüpften Ortsgruppe',
+    hinweis: 'LocalCommunity.Name der gewählten RegionalUnit. Mehrere Ortsgruppen stehen untereinander.',
+  },
+  { pl: 'Street', wert: 'Straße der verknüpften Ortsgruppe' },
+  { pl: 'ZipCity', wert: 'PLZ und Ort der verknüpften Ortsgruppe' },
+  {
+    pl: 'Phone',
+    wert: 'Telefon der Regionalgruppe',
+    hinweis: 'Zuerst CFO, sonst CEO, sonst Schriftführung.',
+  },
+  {
+    pl: 'Email1',
+    wert: 'E-Mail der Finanzverwaltung (CFO)',
+  },
+  {
+    pl: 'Email2',
+    wert: 'E-Mail der Schriftführung, sonst des CEO',
+  },
+  {
+    pl: 'antrag_fuer',
+    wert: 'Name im Antragstitel',
+    hinweis: 'Name der Ortsgruppe, sonst RegionalUnit.Name.',
+  },
+  { pl: 'anrede', wert: 'Antragsteller – Anrede' },
+  { pl: 'vorname', wert: 'Antragsteller – Vorname' },
+  { pl: 'name', wert: 'Antragsteller – Name' },
+  { pl: 'strasse', wert: 'Antragsteller – Straße' },
+  { pl: 'plz', wert: 'Antragsteller – PLZ' },
+  { pl: 'ort', wert: 'Antragsteller – Ort' },
+  { pl: 'geburtsdatum', wert: 'Antragsteller – Geburtsdatum (TT.M.JJJJ)' },
+  { pl: 'email', wert: 'Antragsteller – E-Mail' },
+  { pl: 'telefon', wert: 'Antragsteller – Telefon' },
+  {
+    pl: 'mitgliedschaft_vdh',
+    wert: 'Bisherige Mitgliedschaften in VDH-Verbänden oder -Vereinen',
+  },
+  { pl: 'hund_name', wert: 'Hund – Name' },
+  { pl: 'hund_zwinger', wert: 'Hund – Zwingername' },
+  { pl: 'hund_zuchtbuch', wert: 'Hund – Zuchtbuchnummer' },
+  { pl: 'hund_wurfdatum', wert: 'Hund – Wurfdatum (TT.M.JJJJ)' },
+  { pl: 'hund_rasse', wert: 'Hund – Rasse' },
+  { pl: 'hund_versicherung', wert: 'Hund – Haftpflichtversicherung' },
+  { pl: 'hund_vers_nr', wert: 'Hund – Versicherungsnummer' },
+  { pl: 'hund_geschlecht', wert: 'Hund – Geschlecht' },
+  { pl: 'hund_chip', wert: 'Hund – Chipnummer' },
+  {
+    pl: 'mitgliedschaft_label',
+    wert: 'Bezeichnung der gewählten Mitgliedschaft',
+    hinweis: 'Bei Kurzmitgliedschaft inklusive Von- und Bis-Datum.',
+  },
+  { pl: 'mitgliedschaft_zeitraum', wert: 'Zeitraum (jährlich oder monatlich)' },
+  { pl: 'mitgliedschaft_preis', wert: 'Beitrag der gewählten Mitgliedschaft' },
+  {
+    pl: 'familien_hinweis',
+    wert: 'Hinweis zur Familienmitgliedschaft',
+    hinweis: 'Nur gefüllt, wenn eine Familienmitgliedschaft gewählt ist.',
+  },
+  {
+    pl: 'glaeubiger_id',
+    wert: 'Gläubiger-Identifikationsnummer',
+    hinweis: 'Kommt aus HZD Settings.',
+  },
+  {
+    pl: 'kontoinhaber',
+    wert: 'Kontoinhaber',
+    hinweis: 'Ohne abweichenden Kontoinhaber werden Vor- und Nachname des Antragstellers eingesetzt.',
+  },
+  { pl: 'anschrift', wert: 'Anschrift des Kontoinhabers (Straße, PLZ Ort)' },
+  { pl: 'kreditinstitut', wert: 'Kreditinstitut' },
+  { pl: 'iban', wert: 'IBAN' },
+  { pl: 'bic', wert: 'BIC' },
+  {
+    pl: 'weitere_mitteilungen',
+    wert: 'Weitere Mitteilungen',
+    hinweis: 'Bleibt leer, wenn das Feld nicht ausgefüllt wurde.',
+  },
+];
+
+/** Platzhalter (ohne Klammern) in die Zwischenablage kopieren. */
+async function kopiereTextInZwischenablage(text: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    // Fallback unten
+  }
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export default function AntragForm() {
   const formRef = useRef<HTMLFormElement>(null);
-  const [requestId, setRequestId] = useState<string>('');
-  const [showSuccessDialog, setShowSuccessDialog] = useState<boolean>(false);
-
-  // Debug: Log requestId when it changes
-  useEffect(() => {
-    if (requestId) {
-      console.log('Request ID set:', requestId);
-    }
-  }, [requestId]);
   const [formData, setFormData] = useState<FormData>({
     anrede: "",
     name: "",
@@ -50,18 +167,43 @@ export default function AntragForm() {
     sepaKreditinstitut: "",
     weitereMitteilungen: "",
     regionalgruppe: "",
+    regionalUnitId: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
-  const [savedFormData, setSavedFormData] = useState<FormData | null>(null);
   const [useAntragstellerAsKontoinhaber, setUseAntragstellerAsKontoinhaber] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
-  const [altchaVerified, setAltchaVerified] = useState(false);
-  const [altchaReset, setAltchaReset] = useState(0);
   const [finanContact, setFinanContact] = useState<FinanverwaltungContact | null>(null);
+  const [kopierterPlatzhalter, setKopierterPlatzhalter] = useState<string | null>(null);
   const [finanLoading, setFinanLoading] = useState(false);
+  const [regionalUnits, setRegionalUnits] = useState<RegionalUnitOption[]>([]);
+  const [regionalUnitsLoading, setRegionalUnitsLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/mitgliedsantrag/regional-units')
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload) => {
+        if (cancelled) return;
+        const units = Array.isArray(payload?.units) ? payload.units : [];
+        setRegionalUnits(units);
+      })
+      .catch(() => {
+        if (!cancelled) setRegionalUnits([]);
+      })
+      .finally(() => {
+        if (!cancelled) setRegionalUnitsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const selectedRegionalUnit = regionalUnits.find(
+    (unit) => unit.documentId === formData.regionalUnitId,
+  ) ?? null;
 
   // Lädt die zuständige Finanzverwaltung (Strapi > HZD Settings) für die gewählte Regionalgruppe
   useEffect(() => {
@@ -131,6 +273,10 @@ export default function AntragForm() {
     const newErrors: Record<string, string> = {};
 
     console.log('Validating form data:', data);
+
+    if (!data.regionalUnitId || !data.regionalUnitId.trim()) {
+      newErrors.regionalUnitId = "Bitte wählen Sie eine Regionalgruppe";
+    }
 
     // Vereinfachte Validierung - nur die wichtigsten Felder
     if (!data.vorname || !data.vorname.trim()) {
@@ -207,28 +353,61 @@ export default function AntragForm() {
 
 
 
-  const generatePDF = async () => {
-    // Verwende die gespeicherten Daten für die PDF-Generierung
-    const dataToUse = savedFormData || formData;
-    console.log('Generating PDF with data:', dataToUse);
+  const kopierePlatzhalter = async (pl: string) => {
+    const ok = await kopiereTextInZwischenablage(`{{${pl}}}`);
+    if (ok) {
+      setKopierterPlatzhalter(pl);
+      window.setTimeout(() => {
+        setKopierterPlatzhalter((v) => (v === pl ? null : v));
+      }, 2000);
+    }
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    const validationResult = validateForm();
+    if (!validationResult.isValid) {
+      setErrors(validationResult.errors);
+      return;
+    }
+
+    const kontoinhaber = useAntragstellerAsKontoinhaber
+      ? `${formData.vorname} ${formData.name}`.trim()
+      : formData.sepaName.trim();
+
+    const payload: FormData = {
+      ...formData,
+      kontoinhaber,
+    };
+
+    setIsSubmitting(true);
+    setErrors({});
 
     try {
-      // Serverseitige PDF-Generierung
       const response = await fetch('/api/generate-pdf', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          formData: dataToUse
-        })
+        body: JSON.stringify({ formData: payload }),
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        let message = 'Das PDF konnte nicht erstellt werden.';
+        try {
+          const result = await response.json();
+          if (typeof result?.message === 'string' && result.message.trim()) {
+            message = result.message;
+          }
+        } catch {
+          // Antwort ohne JSON
+        }
+        setToast({ message, type: 'error' });
+        setErrors({ general: message });
+        return;
       }
 
-      // PDF als Blob herunterladen
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -238,200 +417,14 @@ export default function AntragForm() {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-
+      setToast({ message: 'Das PDF wurde erstellt.', type: 'success' });
     } catch (error) {
-      console.error('Fehler beim Generieren des PDFs:', error);
-      alert('Fehler beim Generieren des PDFs. Bitte versuchen Sie es erneut.');
-    }
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-
-    const validationResult = validateForm();
-    if (!validationResult.isValid) {
-      // Set errors immediately so they show up in the UI
-      setErrors(validationResult.errors);
-      setIsFormValid(false);
-
-      // Wait for React to update the DOM with errors
-      setTimeout(() => {
-        // Scroll to first error in the correct order
-        const errorFields = [
-          'anrede', 'vorname', 'name', 'geburtsdatum', 'strasse', 'plz', 'ort', 'telefon', 'email',
-          'hundName', 'hundChip', 'hundWurfdatum', 'hundRasse', 'hundGeschlecht', 'hundVersicherung', 'hundVersNr',
-          'sepaName', 'sepaKreditinstitut', 'sepaIban', 'sepaBic',
-          'mitgliedschaft', 'kurzzeitVon', 'kurzzeitBis'
-        ];
-
-        for (const fieldName of errorFields) {
-          if (validationResult.errors[fieldName]) {
-            const errorField = document.querySelector(`[name="${fieldName}"]`);
-            if (errorField) {
-              console.log('Scrolling to field:', fieldName); // Debug log
-              errorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              break;
-            }
-          }
-        }
-      }, 100);
-      return;
-    }
-
-    if (!altchaVerified) {
-      setToast({
-        message: 'Bitte bestätigen Sie, dass Sie kein automatisiertes Programm sind.',
-        type: 'error',
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-    setToast(null); // Toast zurücksetzen
-
-    // Generiere UUID für diesen Request
-    const currentRequestId = uuidv4();
-    setRequestId(currentRequestId);
-
-    // Kontoinhaber ermitteln
-    const ermittelterKontoinhaber = useAntragstellerAsKontoinhaber
-      ? `${formData.vorname} ${formData.name}`
-      : formData.sepaName;
-
-    // FormData mit ermitteltem Kontoinhaber erstellen
-    const formDataMitKontoinhaber = {
-      ...formData,
-      kontoinhaber: ermittelterKontoinhaber
-    };
-
-    try {
-      // REST-Endpoint aufrufen
-      const response = await fetch('/api/submit-application', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          uuid: currentRequestId,
-          formData: formDataMitKontoinhaber
-        })
-      });
-
-      const result = await response.json();
-      console.log("API Response:", result);
-
-      if (result.success) {
-        // Erfolgreiche Übermittlung
-        setSavedFormData({ ...formDataMitKontoinhaber });
-        setToast({ message: 'Antrag erfolgreich übermittelt!', type: 'success' });
-
-        // Weiterleitung zur Bestätigungsseite
-        window.location.href = `/antrag-bestaetigung?email=${encodeURIComponent(formDataMitKontoinhaber.email)}`;
-      } else {
-        // Backend-Validierungsfehler anzeigen
-        if (result.errors && Array.isArray(result.errors)) {
-          // Erste Fehlermeldung als Toast anzeigen (ohne Feldname)
-          const firstError = result.errors[0];
-          const toastMessage = firstError.includes(':') ? firstError.split(':', 2)[1] : firstError;
-          setToast({ message: toastMessage, type: 'error' });
-
-          // Konvertiere Backend-Errors zu Frontend-Errors
-          const backendErrors: Record<string, string> = {};
-          result.errors.forEach((error: string) => {
-            // Prüfe auf Feldname:Fehlermeldung Format
-            if (error.includes(':')) {
-              const [fieldName, message] = error.split(':', 2);
-              backendErrors[fieldName] = message;
-            } else {
-              // Fallback für alte Format ohne Feldname
-              if (error.includes("'vorname'")) {
-                backendErrors.vorname = "Vorname ist erforderlich";
-              } else if (error.includes("'name'")) {
-                backendErrors.name = "Nachname ist erforderlich";
-              } else if (error.includes("Ungültige E-Mail")) {
-                backendErrors.email = "Ungültige E-Mail-Adresse";
-              } else if (error.includes("'email'")) {
-                backendErrors.email = "E-Mail ist erforderlich";
-              } else if (error.includes("'strasse'")) {
-                backendErrors.strasse = "Straße ist erforderlich";
-              } else if (error.includes("5-stellig")) {
-                backendErrors.plz = "PLZ muss 5-stellig sein";
-              } else if (error.includes("'plz'")) {
-                backendErrors.plz = "PLZ ist erforderlich";
-              } else if (error.includes("'ort'")) {
-                backendErrors.ort = "Ort ist erforderlich";
-              } else if (error.includes("'hundName'")) {
-                backendErrors.hundName = "Name des Hundes ist erforderlich";
-              } else if (error.includes("'mitgliedschaft'")) {
-                backendErrors.mitgliedschaft = "Bitte wählen Sie eine Mitgliedschaftsart";
-              } else if (error.includes("Ungültige IBAN")) {
-                backendErrors.sepaIban = "Ungültige IBAN";
-              } else if (error.includes("'sepaIban'")) {
-                backendErrors.sepaIban = "IBAN ist erforderlich";
-              } else if (error.includes("'sepaBic'")) {
-                backendErrors.sepaBic = "BIC ist erforderlich";
-              } else if (error.includes("'sepaKreditinstitut'")) {
-                backendErrors.sepaKreditinstitut = "Kreditinstitut ist erforderlich";
-              } else {
-                // Allgemeine Fehlermeldung
-                console.error('Unbekannter Backend-Fehler:', error);
-              }
-            }
-          });
-          setErrors(backendErrors);
-        } else {
-          // Allgemeine Fehlermeldung als Toast
-          setToast({ message: result.message || 'Unbekannter Fehler', type: 'error' });
-          setErrors({ general: result.message || 'Unbekannter Fehler' });
-        }
-        setIsSubmitting(false);
-        setAltchaReset((current) => current + 1);
-        return; // Nicht weiter mit Reset
-      }
-
-      // Reset form
-      setFormData({
-        anrede: "",
-        name: "",
-        vorname: "",
-        geburtsdatum: "",
-        strasse: "",
-        plz: "",
-        ort: "",
-        email: "",
-        telefon: "",
-        mitgliedschaftVDH: "",
-        hundName: "",
-        hundZwinger: "",
-        hundZuchtbuch: "",
-        hundChip: "",
-        hundWurfdatum: "",
-        hundRasse: "",
-        hundGeschlecht: "",
-        hundVersicherung: "",
-        hundVersNr: "",
-        mitgliedschaft: "",
-        kurzzeitVon: "",
-        kurzzeitBis: "",
-        kontoinhaber: "",
-        sepaName: "",
-        sepaIban: "",
-        sepaBic: "",
-        sepaKreditinstitut: "",
-        weitereMitteilungen: "",
-        regionalgruppe: "",
-      });
-      setErrors({});
-      setIsFormValid(false); // Button nach Reset deaktivieren
-      setRequestId(''); // Reset Request ID after successful submission
-      setUseAntragstellerAsKontoinhaber(false); // Reset Checkbox
-    } catch (error) {
-      console.error("Fehler beim Senden:", error);
-      setToast({ message: 'Fehler beim Senden des Formulars. Bitte versuchen Sie es erneut.', type: 'error' });
-      setErrors({ general: 'Fehler beim Senden des Formulars. Bitte versuchen Sie es erneut.' });
-      setRequestId(''); // Reset Request ID on error
+      console.error('Fehler beim Erstellen des PDFs:', error);
+      const message = 'Das PDF konnte nicht erstellt werden. Bitte versuchen Sie es erneut.';
+      setToast({ message, type: 'error' });
+      setErrors({ general: message });
+    } finally {
       setIsSubmitting(false);
-      setAltchaReset((current) => current + 1);
     }
   };
 
@@ -441,6 +434,35 @@ export default function AntragForm() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
+            <div className="max-w-md mx-auto mb-6 text-left">
+              <label htmlFor="regionalUnitId" className="block text-sm font-medium text-gray-700 mb-2">
+                Regionalgruppe *
+              </label>
+              <select
+                id="regionalUnitId"
+                name="regionalUnitId"
+                value={formData.regionalUnitId || ''}
+                onChange={handleChange}
+                disabled={regionalUnitsLoading}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                  errors.regionalUnitId ? 'border-red-500' : 'border-gray-300'
+                }`}
+                data-error={!!errors.regionalUnitId}
+              >
+                <option value="">
+                  {regionalUnitsLoading ? 'Wird geladen…' : 'Bitte wählen'}
+                </option>
+                {regionalUnits.map((unit) => (
+                  <option key={unit.documentId} value={unit.documentId}>
+                    {unit.name}
+                  </option>
+                ))}
+              </select>
+              {errors.regionalUnitId && (
+                <p className="text-sm text-red-600 mt-1">{errors.regionalUnitId}</p>
+              )}
+            </div>
+
             {/* Logo */}
             <div className="flex justify-center mb-6">
               <Image
@@ -457,7 +479,7 @@ export default function AntragForm() {
               HZD Ortsgruppen-Aufnahmeantrag
             </h1>
             <p className="text-xl text-blue-600 font-semibold">
-              OG Hamburg und Umgebung
+              {selectedRegionalUnit?.header.antragFuer || 'Bitte Regionalgruppe wählen'}
             </p>
 
             {/* Allgemeine Fehlermeldungen */}
@@ -466,9 +488,25 @@ export default function AntragForm() {
                 <p className="text-sm text-red-600">{errors.general}</p>
               </div>
             )}
-            <p className="text-l text-blue-600">
-              Mittlerer Landweg 74a, 21033 Hamburg
-            </p>
+            {selectedRegionalUnit && (
+              <div className="text-l text-blue-600 space-y-0.5">
+                {selectedRegionalUnit.header.street.split('\n').filter(Boolean).map((line, index) => (
+                  <p key={`street-${index}`}>{line}</p>
+                ))}
+                {selectedRegionalUnit.header.zipCity.split('\n').filter(Boolean).map((line, index) => (
+                  <p key={`zip-${index}`}>{line}</p>
+                ))}
+                {selectedRegionalUnit.header.phone && (
+                  <p>{selectedRegionalUnit.header.phone}</p>
+                )}
+                {selectedRegionalUnit.header.email1 && (
+                  <p>{selectedRegionalUnit.header.email1}</p>
+                )}
+                {selectedRegionalUnit.header.email2 && (
+                  <p>{selectedRegionalUnit.header.email2}</p>
+                )}
+              </div>
+            )}
             <div className="w-24 h-1 bg-blue-600 mx-auto mt-4 rounded-full"></div>
           </div>
         </div>
@@ -488,8 +526,8 @@ export default function AntragForm() {
 
               <div className="mb-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-800">
-                  Hiermit beantrage ich in Anerkennung der Satzung, Ordnungen und Beschlüsse der HZD die Mitgliedschaft in der
-                  Ortsgruppe Hamburg u.U. der Hovawart
+                  Hiermit beantrage ich in Anerkennung der Satzung, Ordnungen und Beschlüsse der HZD die Mitgliedschaft in der{' '}
+                  {selectedRegionalUnit?.header.antragFuer || 'Ortsgruppe'} der Hovawart
                   Zuchtgemeinschaft Deutschland e.V.. Ich gehöre keinem kynologischen Verein außerhalb des Verbandes für das Deutsche Hundewesen
                   (VDH) bzw. außerhalb der Fédération Cynologique Internationale (FCI) an. Ich bestätige, dass ich aus keinem anderen VDH-Verein
                   ausgeschlossen wurde und dass gegen mich kein Ausschlussverfahren läuft. Ich bin weder gewerbsmäßiger Hundehändler/-züchter noch
@@ -1090,8 +1128,8 @@ export default function AntragForm() {
 
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <p className="text-sm text-red-800">
-                  <strong>Hinweis:</strong> Die Daten werden elektronisch an die Geschäftsstelle der HZD OG Hamburg Billwerder übermittelt.
-                    Der Antrag wird erst gültig, wenn er in Papierform und unterschrieben vorliegt. Sie können ihren unterschriebenen Mitgliedsantrag per Post an die o.a. Adresse schicken.
+                  <strong>Hinweis:</strong> Mit „PDF erstellen“ wird der Antrag als PDF-Datei heruntergeladen.
+                    Der Antrag wird erst gültig, wenn er in Papierform und unterschrieben vorliegt. Sie können den unterschriebenen Mitgliedsantrag per Post an die oben genannte Adresse schicken.
                     Alternativ können Sie zur Unterschrift bei nächster Gelegenheit im Vereinshaus in Hamburg-Billwerder vorbeikommen.
                 </p>
               </div>
@@ -1112,97 +1150,125 @@ export default function AntragForm() {
               />
             </div>
 
-            <div className="flex justify-center">
-              <AltchaField
-                onVerifiedChange={setAltchaVerified}
-                resetSignal={altchaReset}
-              />
-            </div>
-
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
 
               <button
                 type="submit"
-                disabled={!isFormValid || !altchaVerified || isSubmitting}
+                disabled={!isFormValid || isSubmitting}
                 className={`px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-200 shadow-lg ${
-                  !isFormValid || !altchaVerified || isSubmitting
+                  !isFormValid || isSubmitting
                     ? 'bg-gray-400 cursor-not-allowed opacity-50'
                     : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 transform hover:scale-105 hover:shadow-xl'
                 }`}
-                onClick={() => console.log('Button clicked, isFormValid:', isFormValid, 'isSubmitting:', isSubmitting)}
               >
                 {isSubmitting ? (
                   <div className="flex items-center justify-center space-x-2">
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Wird gesendet...</span>
+                    <span>Wird erstellt...</span>
                   </div>
                 ) : (
-                  'Weiter'
+                  'PDF erstellen'
                 )}
               </button>
+            </div>
+
+            <div className="mx-auto max-w-3xl p-5 bg-blue-50 border border-blue-200 rounded-lg">
+              <h3 className="text-base font-semibold text-blue-900 mb-3">
+                So wird die Vorlagendatei gestaltet
+              </h3>
+              <p className="text-sm text-blue-800 mb-4">
+                Die Vorlage ist eine Word-Datei (DOCX), hinterlegt im
+                Strapi-Backend unter <strong>PWA Settings</strong> →{' '}
+                <strong>Mitgliedsantrag_OG</strong>. An den Stellen
+                in der Vorlage, an denen die eingegebenen Werte stehen sollen,
+                schreiben Sie die Platzhalter in doppelte geschwungene
+                Klammern – z. B.{' '}
+                <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-white border border-blue-200 text-blue-900">
+                  {'{{name}}'}
+                </span>
+                , mit exakter Groß-/Kleinschreibung wie in der Liste unten.
+                Beim Generieren werden diese Stellen durch die
+                Formularwerte ersetzt; Layout, Formatierungen und alle
+                sonstigen Texte der Vorlage bleiben unverändert.
+              </p>
+
+              <table className="w-full text-sm mb-4">
+                <thead>
+                  <tr className="text-blue-900 border-b border-blue-200">
+                    <th className="text-left py-2 pr-3 font-semibold">
+                      Platzhalter in der Vorlage
+                    </th>
+                    <th className="text-left py-2 font-semibold">
+                      Wird ersetzt durch
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {VORLAGE_PLATZHALTER.map(({ pl, wert, hinweis }) => (
+                    <tr
+                      key={pl}
+                      className="border-b border-blue-100 align-top"
+                    >
+                      <td className="py-2 pr-3 whitespace-nowrap">
+                        <div className="inline-flex items-center gap-1.5">
+                          <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-white border border-blue-200 text-blue-900">
+                            {'{{'}
+                            {pl}
+                            {'}}'}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => kopierePlatzhalter(pl)}
+                            title={`{{${pl}}} in die Zwischenablage kopieren`}
+                            className={`text-xs px-1.5 py-0.5 rounded border transition-colors ${
+                              kopierterPlatzhalter === pl
+                                ? 'text-green-700 border-green-300 bg-green-50'
+                                : 'text-blue-700 border-blue-200 bg-white hover:bg-blue-100'
+                            }`}
+                          >
+                            {kopierterPlatzhalter === pl
+                              ? '✓ kopiert'
+                              : '📋 kopieren'}
+                          </button>
+                        </div>
+                      </td>
+                      <td className="py-2 text-blue-800">
+                        {wert}
+                        {hinweis && (
+                          <div className="text-xs text-blue-600 mt-0.5">
+                            {hinweis}
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <ul className="list-disc list-inside text-sm text-blue-800 space-y-1">
+                <li>
+                  Die Formularwerte werden erst eingesetzt, wenn alle
+                  Pflichtfelder ausgefüllt sind.
+                </li>
+                <li>
+                  Platzhalter können an beliebiger Stelle in der Vorlage
+                  stehen (Kopfzeile, Tabelle, Fußzeile).
+                </li>
+                <li>
+                  Headline, Name, Street, ZipCity, Phone, Email1, Email2 und
+                  antrag_fuer kommen aus der oben gewählten RegionalUnit.
+                  Name (groß) ist die Ortsgruppe, name (klein) der Antragsteller.
+                </li>
+                <li>
+                  Es wird nur das PDF erzeugt. Der Antrag wird nicht gespeichert
+                  und es wird keine E-Mail versendet.
+                </li>
+              </ul>
             </div>
           </form>
         </div>
       </div>
-
-      {/* Success Dialog */}
-      {showSuccessDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md mx-4">
-            <div className="text-center">
-              {/* Success Icon */}
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-
-              {/* Title */}
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
-                Antrag erfolgreich eingereicht!
-              </h3>
-
-              {/* Lorem Ipsum Message */}
-              <div className="text-sm text-gray-600 mb-6 space-y-3">
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                </p>
-                <p>
-                  Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                  Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                </p>
-                <p>
-                  Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,
-                  totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
-                </p>
-              </div>
-
-              {/* PDF Download Button */}
-              <div className="mb-4">
-                <button
-                  onClick={generatePDF}
-                  className="w-full px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors duration-200 mb-3"
-                >
-                  PDF herunterladen
-                </button>
-              </div>
-
-              {/* Close Button */}
-              <button
-                onClick={() => {
-                  setShowSuccessDialog(false);
-                  setIsSubmitting(false); // Reset submitting state when closing dialog
-                }}
-                className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200"
-              >
-                Schließen
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Toast Component */}
       {toast && (

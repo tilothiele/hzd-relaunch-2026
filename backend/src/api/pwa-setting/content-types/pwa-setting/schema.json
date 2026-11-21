@@ -30,6 +30,26 @@
         "videos",
         "audios"
       ]
+    },
+    "Mitgliedsantrag_OG": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "Mirgliedsantrag_HZD": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
     }
   }
 }
