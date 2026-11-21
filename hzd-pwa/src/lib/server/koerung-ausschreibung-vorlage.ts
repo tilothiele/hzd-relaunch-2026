@@ -1,10 +1,10 @@
 import { getStrapiBaseUrl } from '@/lib/strapi-api';
 
 /**
- * Lädt die DOCX-Vorlage für die HZD-Körung-Ausschreibung aus dem
- * Strapi-Backend (Single Collection 'PWA Settings') herunter.
+ * Lädt DOCX-Vorlagen aus der Strapi-Single-Collection 'PWA Settings'.
  *
- * Medien-Attribut: VorlageAusschreibungKoerung
+ * `ladePwaSettingVorlage` ist der gemeinsame Abruf. Die Körungs-Ausschreibung
+ * nutzt das Medien-Attribut VorlageAusschreibungKoerung
  * (in der Aufgabenstellung 'PWA Setting'.VorlageAusschreibung; dort ist
  * normalerweise ein docx hinterlegt).
  *
@@ -15,7 +15,10 @@ import { getStrapiBaseUrl } from '@/lib/strapi-api';
  *      Nutzerin eingeloggt ist)
  */
 
-const MEDIA_ATTRIBUT = 'VorlageAusschreibungKoerung';
+const KOERUNG_MEDIA_ATTRIBUT = 'VorlageAusschreibungKoerung';
+const KOERUNG_LEER_MELDUNG =
+  'Keine Vorlage für die HZD-Körung-Ausschreibung hinterlegt ' +
+  '(Strapi > PWA Settings > VorlageAusschreibungKoerung ist leer).';
 
 /** Die Vorlage selbst fehlt/einlesen nicht möglich (unabhängig von Berechtigungen). */
 export class VorlageFehltError extends Error {
@@ -43,6 +46,8 @@ function istMediaRef(value: unknown): value is VorlageMedia {
 }
 
 async function fetchSettingMedia(
+  mediaAttribut: string,
+  leerMeldung: string,
   headers: Record<string, string>,
 ): Promise<VorlageMedia> {
   const strapiBase = getStrapiBaseUrl();
@@ -74,26 +79,27 @@ async function fetchSettingMedia(
       ? (data.attributes as Record<string, unknown>)
       : (data as Record<string, unknown> | null | undefined) ?? null;
 
-  const media = attrs?.[MEDIA_ATTRIBUT];
+  const media = attrs?.[mediaAttribut];
   if (!istMediaRef(media)) {
-    throw new VorlageFehltError(
-      'Keine Vorlage für die HZD-Körung-Ausschreibung hinterlegt ' +
-        '(Strapi > PWA Settings > VorlageAusschreibungKoerung ist leer).',
-    );
+    throw new VorlageFehltError(leerMeldung);
   }
 
   return media;
 }
 
 /**
- * Lädt die Vorlagendatei (normalerweise docx) aus dem Strapi-Backend und
- * liefert die Rohbytes als Buffer zurück.
+ * Lädt eine Medien-Vorlage aus der Single Collection 'PWA Settings'.
  *
+ * @param mediaAttribut Attributname, z. B. VorlageSepaLastschriftmandat
+ * @param leerMeldung Fehlermeldung, wenn das Attribut keine Datei enthält
  * @param userJwt JWT der aktuellen PWA-Sitzung (optional, Fallback-Bearer)
  * @throws VorlageFehltError wenn die Single Collection keine Datei enthält
- * @throws Error wenn Strapi nicht erreichbar ist oder alle Zugriffsversuche fehlschlagen
+ * @throws VorlageFehltError wenn Strapi nicht erreichbar ist oder alle
+ *         Zugriffsversuche fehlschlagen
  */
-export async function ladeVorlageKoerungAusschreibung(
+export async function ladePwaSettingVorlage(
+  mediaAttribut: string,
+  leerMeldung: string,
   userJwt: string | null = null,
 ): Promise<Buffer> {
   const strapiBase = getStrapiBaseUrl();
@@ -116,7 +122,11 @@ export async function ladeVorlageKoerungAusschreibung(
 
   for (const versuch of versuche) {
     try {
-      const media = await fetchSettingMedia(versuch.headers);
+      const media = await fetchSettingMedia(
+        mediaAttribut,
+        leerMeldung,
+        versuch.headers,
+      );
       const mediaUrl = media.url.startsWith('http')
         ? media.url
         : `${strapiBase}${media.url.startsWith('/') ? '' : '/'}${media.url}`;
@@ -150,5 +160,20 @@ export async function ladeVorlageKoerungAusschreibung(
       : String(letzterFehler);
   throw new VorlageFehltError(
     `Vorlage konnte nicht aus Strapi (${strapiBase}) geladen werden: ${grundFehler}`,
+  );
+}
+
+/**
+ * Lädt die DOCX-Vorlage der HZD-Körung-Ausschreibung.
+ *
+ * @param userJwt JWT der aktuellen PWA-Sitzung (optional, Fallback-Bearer)
+ */
+export async function ladeVorlageKoerungAusschreibung(
+  userJwt: string | null = null,
+): Promise<Buffer> {
+  return ladePwaSettingVorlage(
+    KOERUNG_MEDIA_ATTRIBUT,
+    KOERUNG_LEER_MELDUNG,
+    userJwt,
   );
 }

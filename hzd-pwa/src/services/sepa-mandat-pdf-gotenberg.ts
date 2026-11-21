@@ -1,5 +1,3 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import PizZip from 'pizzip';
 import Docxtemplater from 'docxtemplater';
 import {
@@ -7,6 +5,7 @@ import {
   finanContactAddressLines,
   getGlaeubigerId,
 } from '@/lib/server/finanverwaltung';
+import { ladePwaSettingVorlage } from '@/lib/server/koerung-ausschreibung-vorlage';
 import { convertOfficeDocumentToPdf } from '@/lib/gotenberg';
 import { serverLog } from '@/lib/server-only';
 import type { SepaMandatFormData } from '@/types/sepa-mandat-form';
@@ -15,10 +14,12 @@ import type { SepaMandatFormData } from '@/types/sepa-mandat-form';
  * SEPA-Lastschriftmandat (HZD Formular 032) – Template-basierter PDF-Generator.
  *
  * Ablauf:
- *   1. DOCX-Vorlage `src/templates/sepa-mandat-032.docx` (docxtemplater-Tags
- *      in Form von {{plazhalter}}) auslesen und mit Formulardaten + Strapi-Daten
- *      (Finanzverwaltung, Gläubiger-Identifikationsnummer) befüllen.
- *   2. Ergebnis an den Gotenberg-Server (/forms/libreoffice/convert) senden,
+ *   1. DOCX-Vorlage aus dem Strapi-Backend laden (Single Collection
+ *      'PWA Settings' > VorlageSepaLastschriftmandat).
+ *   2. docxtemplater-Platzhalter ({{finanverwaltung_adresse}}, {{iban}}, …)
+ *      mit Formulardaten + Strapi-Daten (Finanzverwaltung,
+ *      Gläubiger-Identifikationsnummer) befüllen.
+ *   3. Ergebnis an den Gotenberg-Server (/forms/libreoffice/convert) senden,
  *      der die befüllte Datei per LibreOffice in PDF umwandelt.
  *
  * Die Vorlage kann in Word oder LibreOffice geöffnet und verfeinert werden;
@@ -26,12 +27,10 @@ import type { SepaMandatFormData } from '@/types/sepa-mandat-form';
  * Notation ergänzen und sie anschließend in buildSepaMandatModel pflegen.
  */
 
-const TEMPLATE_PATH = path.join(
-  process.cwd(),
-  'src',
-  'templates',
-  'sepa-mandat-032.docx',
-);
+const VORLAGE_ATTRIBUT = 'VorlageSepaLastschriftmandat';
+const VORLAGE_LEER_MELDUNG =
+  'Keine Vorlage für das SEPA-Lastschriftmandat hinterlegt ' +
+  '(Strapi > PWA Settings > VorlageSepaLastschriftmandat ist leer).';
 const GOTENBERG_FILENAME = 'SEPA-Lastschriftmandat.docx';
 
 /** Platzhaltermodell der DOCX-Vorlage. */
@@ -111,21 +110,13 @@ export async function buildSepaMandatModel(
 }
 
 /** Liest die DOCX-Vorlage und ersetzt die {{…}}-Platzhalter. */
-export async function renderSepaMandatDocx(
+export function renderSepaMandatDocx(
+  vorlage: Buffer,
   model: SepaMandatTemplateModel,
-): Promise<Buffer> {
-  let templateBuffer: Buffer;
-  try {
-    templateBuffer = fs.readFileSync(TEMPLATE_PATH);
-  } catch {
-    throw new Error(
-      'SEPA-Lastschriftmandat-Vorlage (src/templates/sepa-mandat-032.docx) nicht gefunden',
-    );
-  }
-
+): Buffer {
   // docxtemplater 3.x erwartet im Konstruktor ein Zip-Objekt (PizZip),
   // keinen rohen Buffer (würde mit "You passed a Buffer…" werfen).
-  const zip = new PizZip(templateBuffer.toString('base64'), { base64: true });
+  const zip = new PizZip(vorlage.toString('base64'), { base64: true });
 
   // docxtemplater 3.x defaultet auf einfache {…}-Delimiters; die Vorlage
   // nutzt {{Platzhalter}} → Delimiter ausdrücklich setzen.
@@ -136,18 +127,31 @@ export async function renderSepaMandatDocx(
   doc.render(model);
 
   // PizZip.generate liefert synchron den fertigen Buffer (Node).
-  return doc.getZip().generate({ type: 'nodebuffer' });
+  // DEFLATE, sonst bleiben eingebettete Bilder der Strapi-Vorlage
+  // unkomprimiert und die DOCX wird unnötig groß.
+  return doc.getZip().generate({
+    type: 'nodebuffer',
+    compression: 'DEFLATE',
+  });
 }
 
 class SepaMandatPdfService {
   /** Erzeugt das SEPA-Lastschriftmandat als PDF (ArrayBuffer). */
-  async createPdf(data: SepaMandatFormData): Promise<ArrayBuffer> {
+  async createPdf(
+    data: SepaMandatFormData,
+    userJwt: string | null = null,
+  ): Promise<ArrayBuffer> {
     serverLog(
-      `SEPA-Lastschriftmandat PDF (Vorlage + Gotenberg): Regionalgruppe ${data.regionalgruppe}`,
+      `SEPA-Lastschriftmandat PDF (Strapi-Vorlage + Gotenberg): Regionalgruppe ${data.regionalgruppe}`,
     );
 
+    const vorlage = await ladePwaSettingVorlage(
+      VORLAGE_ATTRIBUT,
+      VORLAGE_LEER_MELDUNG,
+      userJwt,
+    );
     const model = await buildSepaMandatModel(data);
-    const docxBuffer = await renderSepaMandatDocx(model);
+    const docxBuffer = await renderSepaMandatDocx(vorlage, model);
     const pdfBuffer = await convertOfficeDocumentToPdf(
       docxBuffer,
       GOTENBERG_FILENAME,

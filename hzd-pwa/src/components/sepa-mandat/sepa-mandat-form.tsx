@@ -56,6 +56,80 @@ const FELD_LABELS: Record<string, string> = {
   kreditinstitut: 'Kreditinstitut',
 }
 
+/**
+ * Platzhalter der DOCX-Vorlage (für den Hilfetext unter dem Button).
+ * Die Namen entsprechen exakt den Schlüsseln in
+ * src/services/sepa-mandat-pdf-gotenberg.ts (buildSepaMandatModel).
+ */
+const VORLAGE_PLATZHALTER: Array<{
+  pl: string
+  wert: string
+  hinweis?: string
+}> = [
+  {
+    pl: 'finanverwaltung_adresse',
+    wert: 'Postanschrift der zuständigen Finanzverwaltung',
+    hinweis: 'Kommt aus HZD Settings, je nach gewählter Regionalgruppe. Mehrere Zeilen.',
+  },
+  {
+    pl: 'finanverwaltung_mail',
+    wert: 'E-Mail-Adressen der zuständigen Finanzverwaltung',
+    hinweis: 'Kommt aus HZD Settings. Mehrere Adressen stehen durch Komma getrennt.',
+  },
+  {
+    pl: 'glaeubiger_info',
+    wert: 'Gläubiger-Identifikationsnummer und Mandatsreferenz',
+    hinweis: 'Kommt aus HZD Settings. Ohne hinterlegte Nummer bleibt nur der Hinweis auf die Mitgliedsnummer.',
+  },
+  { pl: 'mitglied_vorname', wert: 'Mitglied – Vorname' },
+  { pl: 'mitglied_name', wert: 'Mitglied – Name' },
+  { pl: 'mitglied_strasse', wert: 'Mitglied – Straße' },
+  { pl: 'mitglied_plz', wert: 'Mitglied – PLZ' },
+  { pl: 'mitglied_ort', wert: 'Mitglied – Ort' },
+  {
+    pl: 'kontoinhaber_vorname',
+    wert: 'Kontoinhaber – Vorname',
+    hinweis: 'Ohne abweichenden Kontoinhaber werden die Mitglied-Daten eingesetzt.',
+  },
+  { pl: 'kontoinhaber_name', wert: 'Kontoinhaber – Name' },
+  { pl: 'kontoinhaber_strasse', wert: 'Kontoinhaber – Straße' },
+  { pl: 'kontoinhaber_plz', wert: 'Kontoinhaber – PLZ' },
+  { pl: 'kontoinhaber_ort', wert: 'Kontoinhaber – Ort' },
+  { pl: 'iban', wert: 'IBAN' },
+  {
+    pl: 'bic',
+    wert: 'BIC',
+    hinweis: 'Optional. Bleibt leer, wenn kein BIC eingegeben wurde.',
+  },
+  { pl: 'kreditinstitut', wert: 'Kreditinstitut' },
+]
+
+/** Platzhalter (ohne Klammern) → Zwischenablage (mit Clipboard-Fallback). */
+async function kopiereTextInZwischenablage(text: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text)
+      return true
+    }
+  } catch {
+    // → Fallback unten
+  }
+  try {
+    const ta = document.createElement('textarea')
+    ta.value = text
+    ta.setAttribute('readonly', '')
+    ta.style.position = 'fixed'
+    ta.style.opacity = '0'
+    document.body.appendChild(ta)
+    ta.select()
+    document.execCommand('copy')
+    document.body.removeChild(ta)
+    return true
+  } catch {
+    return false
+  }
+}
+
 export default function SepaMandatForm() {
   const [formData, setFormData] = useState<SepaMandatFormData>(initialFormData)
   const [errors, setErrors] = useState<SepaMandatErrors>({})
@@ -65,6 +139,18 @@ export default function SepaMandatForm() {
   const [finanStatus, setFinanStatus] = useState<FinanStatus>('idle')
   // Gläubiger-Identifikationsnummer (Strapi > HZD Settings); null = noch nicht geladen
   const [glaeubigerId, setGlaeubigerId] = useState<string | null>(null)
+  const [kopierterPlatzhalter, setKopierterPlatzhalter] = useState<string | null>(null)
+
+  /** {{Platzhalter}} in die Zwischenablage kopieren + kurz bestätigen. */
+  const kopierePlatzhalter = async (pl: string) => {
+    const ok = await kopiereTextInZwischenablage(`{{${pl}}}`)
+    if (ok) {
+      setKopierterPlatzhalter(pl)
+      window.setTimeout(() => {
+        setKopierterPlatzhalter((v) => (v === pl ? null : v))
+      }, 2000)
+    }
+  }
 
   // Gläubiger-Identifikationsnummer aus dem Strapi-Backend laden
   useEffect(() => {
@@ -531,6 +617,97 @@ export default function SepaMandatForm() {
                   </ul>
                 </div>
               )}
+
+              {/* Hilfetext: Gestaltung der Vorlagendatei + Platzhalterliste */}
+              <div className="mx-auto max-w-3xl p-5 bg-blue-50 border border-blue-200 rounded-lg">
+                <h3 className="text-base font-semibold text-blue-900 mb-3">
+                  So wird die Vorlagendatei gestaltet
+                </h3>
+                <p className="text-sm text-blue-800 mb-4">
+                  Die Vorlage ist eine Word-Datei (DOCX), hinterlegt im
+                  Strapi-Backend unter <strong>PWA Settings</strong> →{' '}
+                  <strong>VorlageSepaLastschriftmandat</strong>. An den Stellen
+                  in der Vorlage, an denen die eingegebenen Werte stehen sollen,
+                  schreiben Sie die Platzhalter in doppelte geschwungene
+                  Klammern – z. B.{' '}
+                  <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-white border border-blue-200 text-blue-900">
+                    {'{{mitglied_name}}'}
+                  </span>
+                  , mit exakter Groß-/Kleinschreibung wie in der Liste unten.
+                  Beim Generieren werden diese Stellen durch die
+                  Formularwerte ersetzt; Layout, Formatierungen und alle
+                  sonstigen Texte der Vorlage bleiben unverändert.
+                </p>
+
+                <table className="w-full text-sm mb-4">
+                  <thead>
+                    <tr className="text-blue-900 border-b border-blue-200">
+                      <th className="text-left py-2 pr-3 font-semibold">
+                        Platzhalter in der Vorlage
+                      </th>
+                      <th className="text-left py-2 font-semibold">
+                        Wird ersetzt durch
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {VORLAGE_PLATZHALTER.map(({ pl, wert, hinweis }) => (
+                      <tr
+                        key={pl}
+                        className="border-b border-blue-100 align-top"
+                      >
+                        <td className="py-2 pr-3 whitespace-nowrap">
+                          <div className="inline-flex items-center gap-1.5">
+                            <span className="font-mono text-xs px-1.5 py-0.5 rounded bg-white border border-blue-200 text-blue-900">
+                              {'{{'}
+                              {pl}
+                              {'}}'}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => kopierePlatzhalter(pl)}
+                              title={`{{${pl}}} in die Zwischenablage kopieren`}
+                              className={`text-xs px-1.5 py-0.5 rounded border transition-colors ${
+                                kopierterPlatzhalter === pl
+                                  ? 'text-green-700 border-green-300 bg-green-50'
+                                  : 'text-blue-700 border-blue-200 bg-white hover:bg-blue-100'
+                              }`}
+                            >
+                              {kopierterPlatzhalter === pl
+                                ? '✓ kopiert'
+                                : '📋 kopieren'}
+                            </button>
+                          </div>
+                        </td>
+                        <td className="py-2 text-blue-800">
+                          {wert}
+                          {hinweis && (
+                            <div className="text-xs text-blue-600 mt-0.5">
+                              {hinweis}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                <ul className="list-disc list-inside text-sm text-blue-800 space-y-1">
+                  <li>
+                    Die Formularwerte werden erst eingesetzt, wenn alle
+                    Pflichtfelder ausgefüllt sind.
+                  </li>
+                  <li>
+                    Platzhalter können an beliebiger Stelle in der Vorlage
+                    stehen (Kopfzeile, Tabelle, Fußzeile).
+                  </li>
+                  <li>
+                    Adresse, E-Mail und Gläubiger-Identifikationsnummer kommen
+                    aus den HZD Settings und hängen an der gewählten
+                    Regionalgruppe.
+                  </li>
+                </ul>
+              </div>
             </div>
           </form>
         </div>

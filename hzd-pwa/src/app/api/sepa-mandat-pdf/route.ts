@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getStrapiJwtFromRequest } from '@/lib/auth-cookie';
 import { validateSepaMandatFormData } from '@/lib/sepa-mandat-validation';
 import type { SepaMandatFormData } from '@/types/sepa-mandat-form';
 import { getSepaMandatPdfService } from '@/services/sepa-mandat-pdf-gotenberg';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * POST /api/sepa-mandat-pdf
  * Erzeugt das SEPA-Lastschriftmandat (HZD Formular 032) als PDF.
+ *
+ * Die DOCX-Vorlage kommt aus Strapi > PWA Settings >
+ * VorlageSepaLastschriftmandat. Platzhalter werden befüllt und die Datei
+ * per Gotenberg in PDF umgewandelt.
+ *
  * Body: { formData: SepaMandatFormData }
  */
 export async function POST(request: NextRequest) {
@@ -28,8 +36,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const userJwt = getStrapiJwtFromRequest(request);
     const pdfService = getSepaMandatPdfService();
-    const pdfBuffer = await pdfService.createPdf(data);
+    const pdfBuffer = await pdfService.createPdf(data, userJwt);
 
     console.log('SEPA-Lastschriftmandat PDF erstellt', {
       regionalgruppe: data.regionalgruppe,
@@ -44,10 +53,16 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
+    const meldung =
+      error instanceof Error ? error.message : String(error);
     console.error('Fehler bei der SEPA-Lastschriftmandat-PDF-Generierung:', error);
+
+    const status =
+      /Gotenberg|Strapi|Vorlage|leer/i.test(meldung) ? 502 : 500;
+
     return NextResponse.json(
-      { success: false, error: 'Fehler bei der PDF-Generierung' },
-      { status: 500 }
+      { success: false, message: meldung },
+      { status },
     );
   }
 }
