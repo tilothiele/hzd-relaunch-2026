@@ -47,8 +47,8 @@ export async function getBadgeNumber(badgeName: string): Promise<number | null> 
         }
 
         const metadataKey = `${badgeName}-0`
-        let metadata = await getFromStore(metadataKey)
-        let currId = metadata?.currId || 1
+        const metadata = await getFromStore(metadataKey)
+        const currId = metadata?.currId || 1
 
         const currentKey = `${badgeName}-${currId}`
         const currentElement = await getFromStore(currentKey)

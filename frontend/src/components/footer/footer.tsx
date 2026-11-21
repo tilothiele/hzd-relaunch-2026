@@ -219,9 +219,9 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 					{globalLayout?.Copyright}
 					{appVersion && (
 						<span style={{ marginLeft: '1em', opacity: 0.8 }}>
-							<a href="/changelog">
+							<Link href="/changelog">
 								v{formatFooterVersion(appVersion)}
-							</a>
+							</Link>
 							{process.env.NEXT_PUBLIC_BUILD_DATE && (
 								<span style={{ marginLeft: '0.5em' }}>
 									({process.env.NEXT_PUBLIC_BUILD_DATE})

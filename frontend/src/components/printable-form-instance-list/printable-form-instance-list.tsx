@@ -137,6 +137,10 @@ export function PrintableFormInstanceList({ form, strapiBaseUrl }: PrintableForm
 		return String(value)
 	}, [])
 
+	const handlePrint = useCallback(() => {
+		window.print()
+	}, [])
+
 	if (error) {
 		return (
 			<Box className='p-4'>
@@ -146,10 +150,6 @@ export function PrintableFormInstanceList({ form, strapiBaseUrl }: PrintableForm
 			</Box>
 		)
 	}
-
-	const handlePrint = useCallback(() => {
-		window.print()
-	}, [])
 
 	return (
 		<Box sx={{ padding: 3, '@media print': { padding: 2 } }}>

@@ -262,7 +262,6 @@ export function MeineWuerfeTab({
 
         // Initialize selected father for Autocomplete
         if (litter.stuntDog) {
-            // @ts-ignore - casting simpler object to Dog for option display
             const initialFather: Dog = {
                 documentId: litter.stuntDog.documentId,
                 fullKennelName: litter.stuntDog.fullKennelName || '',
