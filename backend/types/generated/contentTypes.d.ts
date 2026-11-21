@@ -1433,18 +1433,9 @@ export interface ApiLocalCummunityLocalCummunity
     draftAndPublish: true;
   };
   attributes: {
-    CEO: Schema.Attribute.Relation<
-      'oneToOne',
-      'plugin::users-permissions.user'
-    >;
-    CEO2: Schema.Attribute.Relation<
-      'oneToOne',
-      'plugin::users-permissions.user'
-    >;
-    CFO: Schema.Attribute.Relation<
-      'oneToOne',
-      'plugin::users-permissions.user'
-    >;
+    CEO: Schema.Attribute.Relation<'oneToOne', 'api::contact.contact'>;
+    CEO2: Schema.Attribute.Relation<'oneToOne', 'api::contact.contact'>;
+    CFO: Schema.Attribute.Relation<'oneToOne', 'api::contact.contact'>;
     City: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1461,10 +1452,7 @@ export interface ApiLocalCummunityLocalCummunity
       'manyToOne',
       'api::regional-unit.regional-unit'
     >;
-    Secretary: Schema.Attribute.Relation<
-      'oneToOne',
-      'plugin::users-permissions.user'
-    >;
+    Secretary: Schema.Attribute.Relation<'oneToOne', 'api::contact.contact'>;
     Street: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -1962,14 +1950,9 @@ export interface ApiRegionalUnitRegionalUnit
     draftAndPublish: true;
   };
   attributes: {
-    CEO: Schema.Attribute.Relation<
-      'oneToOne',
-      'plugin::users-permissions.user'
-    >;
-    CFO: Schema.Attribute.Relation<
-      'oneToOne',
-      'plugin::users-permissions.user'
-    >;
+    CEO: Schema.Attribute.Relation<'oneToOne', 'api::contact.contact'>;
+    CEO2: Schema.Attribute.Relation<'oneToOne', 'api::contact.contact'>;
+    CFO: Schema.Attribute.Relation<'oneToOne', 'api::contact.contact'>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1985,10 +1968,7 @@ export interface ApiRegionalUnitRegionalUnit
       Schema.Attribute.Private;
     Name: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
-    Secretary: Schema.Attribute.Relation<
-      'oneToOne',
-      'plugin::users-permissions.user'
-    >;
+    Secretary: Schema.Attribute.Relation<'oneToOne', 'api::contact.contact'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

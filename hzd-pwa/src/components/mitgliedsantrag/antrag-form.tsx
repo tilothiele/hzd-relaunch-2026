@@ -3,11 +3,9 @@
 import { useState, ChangeEvent, FormEvent, useRef, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import { MEMBERSHIP_TYPES } from '@/constants/membership-types'
-import { REGIONAL_GROUPS } from '@/constants/regional-groups'
 import { useAuth } from '@/hooks/use-auth'
 import type { RegionalUnitHeader } from '@/lib/regional-unit'
 import { isTik } from '@/lib/user-groups'
-import type { FinanverwaltungContact } from '@/lib/server/finanverwaltung'
 import { FormData } from '@/types/formData'
 
 interface OrtsgruppeOption {
@@ -171,7 +169,6 @@ export default function AntragForm() {
     sepaBic: "",
     sepaKreditinstitut: "",
     weitereMitteilungen: "",
-    regionalgruppe: "",
     regionalUnitId: "",
     localCommunityId: "",
   });
@@ -181,9 +178,7 @@ export default function AntragForm() {
   const [isFormValid, setIsFormValid] = useState(false);
   const [useAntragstellerAsKontoinhaber, setUseAntragstellerAsKontoinhaber] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
-  const [finanContact, setFinanContact] = useState<FinanverwaltungContact | null>(null);
   const [kopierterPlatzhalter, setKopierterPlatzhalter] = useState<string | null>(null);
-  const [finanLoading, setFinanLoading] = useState(false);
   const [ortsgruppen, setOrtsgruppen] = useState<OrtsgruppeOption[]>([]);
   const [ortsgruppenLoading, setOrtsgruppenLoading] = useState(true);
 
@@ -212,31 +207,6 @@ export default function AntragForm() {
   const selectedOrtsgruppe = ortsgruppen.find(
     (community) => community.documentId === formData.localCommunityId,
   ) ?? null;
-
-  // Lädt die zuständige Finanzverwaltung (Strapi > HZD Settings) für die gewählte Regionalgruppe
-  useEffect(() => {
-    const region = formData.regionalgruppe;
-    if (!region) {
-      setFinanContact(null);
-      return;
-    }
-    let cancelled = false;
-    setFinanLoading(true);
-    fetch(`/api/mitgliedsantrag/finanverwaltung?region=${encodeURIComponent(region)}`)
-      .then((response) => (response.ok ? response.json() : null))
-      .then((payload) => {
-        if (!cancelled) setFinanContact(payload?.contact ?? null);
-      })
-      .catch(() => {
-        if (!cancelled) setFinanContact(null);
-      })
-      .finally(() => {
-        if (!cancelled) setFinanLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [formData.regionalgruppe]);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -978,52 +948,6 @@ export default function AntragForm() {
                   4
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900">SEPA-Lastschriftmandat</h2>
-              </div>
-
-              {/* Regionalgruppe & zuständige Finanzverwaltung */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div className="space-y-3">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Regionalgruppe
-                  </label>
-                  <select
-                    name="regionalgruppe"
-                    value={formData.regionalgruppe || ""}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border rounded-lg border-gray-300 focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
-                  >
-                    <option value="">Bitte wählen</option>
-                    {REGIONAL_GROUPS.map((group) => (
-                      <option key={group.id} value={group.id}>
-                        {group.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-3">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Zuständige Finanzverwaltung
-                  </label>
-                  <div className="min-h-[3.75rem] px-4 py-3 bg-orange-50 border border-orange-100 rounded-lg text-sm text-gray-700">
-                    {finanLoading && (
-                      <p className="text-gray-400">Wird geladen…</p>
-                    )}
-                    {!finanLoading && !formData.regionalgruppe && (
-                      <p className="text-gray-400">Bitte Regionalgruppe wählen.</p>
-                    )}
-                    {!finanLoading && formData.regionalgruppe && finanContact && (
-                      <div className="space-y-0.5">
-                        {finanContact.name && <p>{finanContact.name}</p>}
-                        {finanContact.street && <p>{finanContact.street}</p>}
-                        {finanContact.zipCity && <p>{finanContact.zipCity}</p>}
-                      </div>
-                    )}
-                    {!finanLoading && formData.regionalgruppe && !finanContact && (
-                      <p className="text-gray-400">Keine Adresse hinterlegt.</p>
-                    )}
-                  </div>
-                </div>
               </div>
 
               <div className="grid grid-cols-1">

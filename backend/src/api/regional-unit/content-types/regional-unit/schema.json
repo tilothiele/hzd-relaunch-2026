@@ -23,17 +23,22 @@
     "CEO": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "plugin::users-permissions.user"
+      "target": "api::contact.contact"
+    },
+    "CEO2": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::contact.contact"
     },
     "CFO": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "plugin::users-permissions.user"
+      "target": "api::contact.contact"
     },
     "Secretary": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "plugin::users-permissions.user"
+      "target": "api::contact.contact"
     }
   }
 }

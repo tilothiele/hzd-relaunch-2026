@@ -1,7 +1,8 @@
 /**
  * Briefkopf des Mitgliedsantrags aus einer RegionalUnit.
  * Straße und Ort stammen von den verknüpften Ortsgruppen,
- * Telefon und E-Mail von CFO, CEO und Schriftführung.
+ * Telefon und E-Mail stammen aus dem verknüpften Contact
+ * (Phone, Email1, sonst Email2) von CFO, CEO und Schriftführung.
  */
 
 export interface RegionalUnitPerson {

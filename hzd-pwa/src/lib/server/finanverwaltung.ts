@@ -72,9 +72,26 @@ function normalizeContact(
 	}
 }
 
+const CONTACT_FIELDS = [
+	'Headline',
+	'Name',
+	'Street',
+	'ZipCity',
+	'Phone',
+	'Email1',
+	'Email2',
+] as const
+
 /** Lädt die HZD Settings aus Strapi (einmalig je Aufruf, ohne Caching). */
 async function fetchHdzSettings(): Promise<Record<string, unknown>> {
-	const url = `${getStrapiBaseUrl()}/api/hzd-setting`
+	const params = new URLSearchParams()
+	for (const group of REGIONAL_GROUPS) {
+		const prefix = `populate[Finanzverwaltung_${group.id}]`
+		CONTACT_FIELDS.forEach((field, index) => {
+			params.set(`${prefix}[fields][${index}]`, field)
+		})
+	}
+	const url = `${getStrapiBaseUrl()}/api/hzd-setting?${params.toString()}`
 
 	const response = await fetch(url, {
 		headers: { Accept: 'application/json' },

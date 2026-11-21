@@ -20,15 +20,18 @@ function asRecord(value: unknown): Record<string, unknown> | null {
 	return value as Record<string, unknown>
 }
 
-function personEmail(record: Record<string, unknown>): string | null {
-	return asText(record.cEmail) ?? asText(record.email)
-}
-
-function asPerson(value: unknown): RegionalUnitPerson | null {
+function contactRecord(value: unknown): Record<string, unknown> | null {
 	const record = asRecord(value)
 	if (!record) return null
-	const phone = asText(record.phone)
-	const email = personEmail(record)
+	return asRecord(record.data) ?? record
+}
+
+/** Contact.Phone plus Contact.Email1, sonst Contact.Email2. */
+function asPerson(value: unknown): RegionalUnitPerson | null {
+	const record = contactRecord(value)
+	if (!record) return null
+	const phone = asText(record.Phone)
+	const email = asText(record.Email1) ?? asText(record.Email2)
 	if (!phone && !email) return null
 	return { phone, email }
 }
@@ -69,6 +72,14 @@ function asRegionalUnit(value: unknown): RegionalUnit | null {
 	}
 }
 
+const CONTACT_FIELDS = ['Phone', 'Email1', 'Email2'] as const
+
+function setContactFields(params: URLSearchParams, prefix: string) {
+	CONTACT_FIELDS.forEach((field, index) => {
+		params.set(`${prefix}[fields][${index}]`, field)
+	})
+}
+
 function listUrl(): string {
 	const params = new URLSearchParams({
 		sort: 'Name:asc',
@@ -77,25 +88,14 @@ function listUrl(): string {
 		'populate[local_cummunities][fields][1]': 'Street',
 		'populate[local_cummunities][fields][2]': 'ZipCode',
 		'populate[local_cummunities][fields][3]': 'City',
-		'populate[local_cummunities][populate][CFO][fields][0]': 'phone',
-		'populate[local_cummunities][populate][CFO][fields][1]': 'email',
-		'populate[local_cummunities][populate][CFO][fields][2]': 'cEmail',
-		'populate[local_cummunities][populate][CEO][fields][0]': 'phone',
-		'populate[local_cummunities][populate][CEO][fields][1]': 'email',
-		'populate[local_cummunities][populate][CEO][fields][2]': 'cEmail',
-		'populate[local_cummunities][populate][Secretary][fields][0]': 'phone',
-		'populate[local_cummunities][populate][Secretary][fields][1]': 'email',
-		'populate[local_cummunities][populate][Secretary][fields][2]': 'cEmail',
-		'populate[CFO][fields][0]': 'phone',
-		'populate[CFO][fields][1]': 'email',
-		'populate[CFO][fields][2]': 'cEmail',
-		'populate[CEO][fields][0]': 'phone',
-		'populate[CEO][fields][1]': 'email',
-		'populate[CEO][fields][2]': 'cEmail',
-		'populate[Secretary][fields][0]': 'phone',
-		'populate[Secretary][fields][1]': 'email',
-		'populate[Secretary][fields][2]': 'cEmail',
 	})
+	for (const role of ['CFO', 'CEO', 'Secretary']) {
+		setContactFields(
+			params,
+			`populate[local_cummunities][populate][${role}]`,
+		)
+		setContactFields(params, `populate[${role}]`)
+	}
 	return `${getStrapiBaseUrl()}/api/regional-units?${params.toString()}`
 }
 

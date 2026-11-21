@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-11-21T20:30:49.762Z"
+    "x-generation-date": "2026-11-21T23:06:02.389Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -27683,76 +27683,16 @@
             "$ref": "#/components/schemas/RegionalUnit"
           },
           "CEO": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "oneOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "number"
-                  }
-                ]
-              },
-              "documentId": {
-                "type": "string"
-              }
-            }
+            "$ref": "#/components/schemas/Contact"
           },
           "CEO2": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "oneOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "number"
-                  }
-                ]
-              },
-              "documentId": {
-                "type": "string"
-              }
-            }
+            "$ref": "#/components/schemas/Contact"
           },
           "CFO": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "oneOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "number"
-                  }
-                ]
-              },
-              "documentId": {
-                "type": "string"
-              }
-            }
+            "$ref": "#/components/schemas/Contact"
           },
           "Secretary": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "oneOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "number"
-                  }
-                ]
-              },
-              "documentId": {
-                "type": "string"
-              }
-            }
+            "$ref": "#/components/schemas/Contact"
           },
           "createdAt": {
             "type": "string",
@@ -33563,6 +33503,17 @@
                 ],
                 "example": "string or id"
               },
+              "CEO2": {
+                "oneOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ],
+                "example": "string or id"
+              },
               "CFO": {
                 "oneOf": [
                   {
@@ -33650,58 +33601,16 @@
             }
           },
           "CEO": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "oneOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "number"
-                  }
-                ]
-              },
-              "documentId": {
-                "type": "string"
-              }
-            }
+            "$ref": "#/components/schemas/Contact"
+          },
+          "CEO2": {
+            "$ref": "#/components/schemas/Contact"
           },
           "CFO": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "oneOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "number"
-                  }
-                ]
-              },
-              "documentId": {
-                "type": "string"
-              }
-            }
+            "$ref": "#/components/schemas/Contact"
           },
           "Secretary": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "oneOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "number"
-                  }
-                ]
-              },
-              "documentId": {
-                "type": "string"
-              }
-            }
+            "$ref": "#/components/schemas/Contact"
           },
           "createdAt": {
             "type": "string",
