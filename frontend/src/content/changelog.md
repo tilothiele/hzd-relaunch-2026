@@ -3,6 +3,7 @@
 ## [1.1.5] - 17.11.2026
 
 - Adventskalender initiale Version.
+- Strapi Backend upgrade auf v5.63.0
 
 ## [1.1.4] - 15.11.2026
 
