@@ -10,6 +10,8 @@ export interface FinanverwaltungContact {
 	street: string | null
 	zipCity: string | null
 	phone: string | null
+	email1: string | null
+	email2: string | null
 	emails: string[]
 }
 
@@ -62,6 +64,8 @@ function normalizeContact(
 		street: asText(contact.Street),
 		zipCity: asText(contact.ZipCity),
 		phone: asText(contact.Phone),
+		email1: asText(contact.Email1),
+		email2: asText(contact.Email2),
 		emails: [contact.Email1, contact.Email2].filter(
 			(email): email is string => Boolean(email && email.trim()),
 		),

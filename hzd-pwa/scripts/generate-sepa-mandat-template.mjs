@@ -9,8 +9,8 @@
  * Ergebnis: src/templates/sepa-mandat-032.docx
  *
  * Platzhalter im Dokument:
- *   {{finanverwaltung_adresse}}   Postanschrift (Zeilen mit \n getrennt)
- *   {{finanverwaltung_mail}}      E-Mail-Adresse(n)
+ *   {{Headline}} {{Name}} {{Street}} {{ZipCity}} {{Phone}}
+ *   {{Email1}} {{Email2}}         Kontakt der Finanzverwaltung, je Feld
  *   {{glaeubiger_info}}           Gläubiger-Identifikationsnummer-Satz
  *   {{mitglied_vorname}} … {{mitglied_ort}}
  *   {{kontoinhaber_vorname}} … {{kontoinhaber_ort}}
@@ -146,8 +146,13 @@ const DOCUMENT = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:tblGrid><w:gridCol w:w="7838"/><w:gridCol w:w="1800"/></w:tblGrid>
 <w:tr>
 <w:tc><w:tcPr><w:tcW w:w="7838" w:type="dxa"/></w:tcPr>
-<w:p><w:r><w:t>{{finanverwaltung_adresse}}</w:t></w:r></w:p>
-<w:p><w:r><w:t>{{finanverwaltung_mail}}</w:t></w:r></w:p>
+<w:p><w:r><w:t>{{Headline}}</w:t></w:r></w:p>
+<w:p><w:r><w:t>{{Name}}</w:t></w:r></w:p>
+<w:p><w:r><w:t>{{Street}}</w:t></w:r></w:p>
+<w:p><w:r><w:t>{{ZipCity}}</w:t></w:r></w:p>
+<w:p><w:r><w:t>{{Phone}}</w:t></w:r></w:p>
+<w:p><w:r><w:t>{{Email1}}</w:t></w:r></w:p>
+<w:p><w:r><w:t>{{Email2}}</w:t></w:r></w:p>
 </w:tc>
 <w:tc><w:tcPr><w:tcW w:w="1800" w:type="dxa"/></w:tcPr>
 <w:p><w:pPr><w:jc w:val="right"/></w:pPr>${LOGO}</w:p>

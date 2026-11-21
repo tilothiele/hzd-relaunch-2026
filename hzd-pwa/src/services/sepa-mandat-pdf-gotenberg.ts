@@ -2,7 +2,6 @@ import PizZip from 'pizzip';
 import Docxtemplater from 'docxtemplater';
 import {
   getFinanverwaltungContact,
-  finanContactAddressLines,
   getGlaeubigerId,
 } from '@/lib/server/finanverwaltung';
 import { ladePwaSettingVorlage } from '@/lib/server/koerung-ausschreibung-vorlage';
@@ -16,8 +15,8 @@ import type { SepaMandatFormData } from '@/types/sepa-mandat-form';
  * Ablauf:
  *   1. DOCX-Vorlage aus dem Strapi-Backend laden (Single Collection
  *      'PWA Settings' > VorlageSepaLastschriftmandat).
- *   2. docxtemplater-Platzhalter ({{finanverwaltung_adresse}}, {{iban}}, …)
- *      mit Formulardaten + Strapi-Daten (Finanzverwaltung,
+ *   2. docxtemplater-Platzhalter ({{Headline}}, {{Street}}, {{Email1}}, {{iban}}, …)
+ *      mit Formulardaten + Strapi-Daten (Finanzverwaltung einzeln,
  *      Gläubiger-Identifikationsnummer) befüllen.
  *   3. Ergebnis an den Gotenberg-Server (/forms/libreoffice/convert) senden,
  *      der die befüllte Datei per LibreOffice in PDF umwandelt.
@@ -35,8 +34,13 @@ const GOTENBERG_FILENAME = 'SEPA-Lastschriftmandat.docx';
 
 /** Platzhaltermodell der DOCX-Vorlage. */
 export interface SepaMandatTemplateModel {
-  finanverwaltung_adresse: string;
-  finanverwaltung_mail: string;
+  Headline: string;
+  Name: string;
+  Street: string;
+  ZipCity: string;
+  Phone: string;
+  Email1: string;
+  Email2: string;
   glaeubiger_info: string;
   mitglied_vorname: string;
   mitglied_name: string;
@@ -61,12 +65,22 @@ export interface SepaMandatTemplateModel {
 export async function buildSepaMandatModel(
   data: SepaMandatFormData,
 ): Promise<SepaMandatTemplateModel> {
-  let adressZeilen: string[] = [];
-  let mail: string = '';
+  let headline = '';
+  let name = '';
+  let street = '';
+  let zipCity = '';
+  let phone = '';
+  let email1 = '';
+  let email2 = '';
   try {
     const contact = await getFinanverwaltungContact(data.regionalgruppe);
-    adressZeilen = finanContactAddressLines(contact);
-    mail = (contact?.emails ?? []).join(', ');
+    headline = contact?.headline ?? '';
+    name = contact?.name ?? '';
+    street = contact?.street ?? '';
+    zipCity = contact?.zipCity ?? '';
+    phone = contact?.phone ?? '';
+    email1 = contact?.email1 ?? '';
+    email2 = contact?.email2 ?? '';
   } catch (error) {
     console.error('Fehler beim Laden der Finanzverwaltung-Adresse:', error);
   }
@@ -88,8 +102,13 @@ export async function buildSepaMandatModel(
   const t = (value: string | undefined) => value?.trim() ?? '';
 
   return {
-    finanverwaltung_adresse: adressZeilen.join('\n'),
-    finanverwaltung_mail: mail,
+    Headline: headline,
+    Name: name,
+    Street: street,
+    ZipCity: zipCity,
+    Phone: phone,
+    Email1: email1,
+    Email2: email2,
     glaeubiger_info: glaeubigerId
       ? `Gläubiger-Identifikationsnummer: ${glaeubigerId}. Mandatsreferenz ist die Mitgliedsnummer.`
       : 'Mandatsreferenz ist die Mitgliedsnummer.',

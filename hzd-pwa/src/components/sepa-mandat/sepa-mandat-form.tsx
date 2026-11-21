@@ -9,10 +9,24 @@ import {
   type SepaMandatErrors,
   type SepaMandatErrorKey,
 } from '@/lib/sepa-mandat-validation'
+import type { FinanverwaltungContact } from '@/lib/server/finanverwaltung'
 import type { SepaMandatFormData, SepaMandatPerson } from '@/types/sepa-mandat-form'
 
 /** Zuständige Finanzverwaltung für die gewählte Regionalgruppe (Strapi > HZD Settings) */
 type FinanStatus = 'idle' | 'loading' | 'ok' | 'empty'
+
+const FINAN_VORSCHAU: Array<{
+  key: 'headline' | 'name' | 'street' | 'zipCity' | 'phone' | 'email1' | 'email2'
+  label: string
+}> = [
+  { key: 'headline', label: 'Headline' },
+  { key: 'name', label: 'Name' },
+  { key: 'street', label: 'Street' },
+  { key: 'zipCity', label: 'ZipCity' },
+  { key: 'phone', label: 'Phone' },
+  { key: 'email1', label: 'Email1' },
+  { key: 'email2', label: 'Email2' },
+]
 
 const leerePerson: SepaMandatPerson = {
   vorname: '',
@@ -67,15 +81,16 @@ const VORLAGE_PLATZHALTER: Array<{
   hinweis?: string
 }> = [
   {
-    pl: 'finanverwaltung_adresse',
-    wert: 'Postanschrift der zuständigen Finanzverwaltung',
-    hinweis: 'Kommt aus HZD Settings, je nach gewählter Regionalgruppe. Mehrere Zeilen.',
+    pl: 'Headline',
+    wert: 'Überschrift der zuständigen Finanzverwaltung',
+    hinweis: 'HZD Settings, Kontakt der gewählten Regionalgruppe.',
   },
-  {
-    pl: 'finanverwaltung_mail',
-    wert: 'E-Mail-Adressen der zuständigen Finanzverwaltung',
-    hinweis: 'Kommt aus HZD Settings. Mehrere Adressen stehen durch Komma getrennt.',
-  },
+  { pl: 'Name', wert: 'Name der zuständigen Finanzverwaltung' },
+  { pl: 'Street', wert: 'Straße der zuständigen Finanzverwaltung' },
+  { pl: 'ZipCity', wert: 'PLZ und Ort der zuständigen Finanzverwaltung' },
+  { pl: 'Phone', wert: 'Telefon der zuständigen Finanzverwaltung' },
+  { pl: 'Email1', wert: 'Erste E-Mail der zuständigen Finanzverwaltung' },
+  { pl: 'Email2', wert: 'Zweite E-Mail der zuständigen Finanzverwaltung' },
   {
     pl: 'glaeubiger_info',
     wert: 'Gläubiger-Identifikationsnummer und Mandatsreferenz',
@@ -135,7 +150,7 @@ export default function SepaMandatForm() {
   const [errors, setErrors] = useState<SepaMandatErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null)
-  const [finanZeilen, setFinanZeilen] = useState<string[]>([])
+  const [finanContact, setFinanContact] = useState<FinanverwaltungContact | null>(null)
   const [finanStatus, setFinanStatus] = useState<FinanStatus>('idle')
   // Gläubiger-Identifikationsnummer (Strapi > HZD Settings); null = noch nicht geladen
   const [glaeubigerId, setGlaeubigerId] = useState<string | null>(null)
@@ -176,7 +191,7 @@ export default function SepaMandatForm() {
   useEffect(() => {
     const region = formData.regionalgruppe
     if (region === '') {
-      setFinanZeilen([])
+      setFinanContact(null)
       setFinanStatus('idle')
       return
     }
@@ -186,13 +201,20 @@ export default function SepaMandatForm() {
       .then((response) => (response.ok ? response.json() : null))
       .then((payload) => {
         if (cancelled) return
-        const zeilen: string[] = payload?.adresszeilen ?? []
-        setFinanZeilen(zeilen)
-        setFinanStatus(zeilen.length > 0 ? 'ok' : 'empty')
+        const contact = payload?.contact as FinanverwaltungContact | null | undefined
+        const hatInhalt = Boolean(
+          contact &&
+            FINAN_VORSCHAU.some(({ key }) => {
+              const wert = contact[key]
+              return typeof wert === 'string' && wert.trim() !== ''
+            }),
+        )
+        setFinanContact(hatInhalt && contact ? contact : null)
+        setFinanStatus(hatInhalt ? 'ok' : 'empty')
       })
       .catch(() => {
         if (cancelled) return
-        setFinanZeilen([])
+        setFinanContact(null)
         setFinanStatus('empty')
       })
     return () => {
@@ -429,14 +451,21 @@ export default function SepaMandatForm() {
                     {finanStatus === 'loading' && (
                       <p className="text-sm text-gray-400">Wird geladen…</p>
                     )}
-                    {finanStatus === 'ok' && (
-                      <div className="text-sm text-gray-600 leading-6">
-                        {finanZeilen.map((zeile, index) => (
-                          <div key={zeile + index} className={index === 0 ? 'font-semibold text-gray-800' : ''}>
-                            {zeile}
-                          </div>
-                        ))}
-                      </div>
+                    {finanStatus === 'ok' && finanContact && (
+                      <dl className="text-sm text-gray-600 space-y-1">
+                        {FINAN_VORSCHAU.map(({ key, label }) => {
+                          const wert = finanContact[key]
+                          if (typeof wert !== 'string' || wert.trim() === '') return null
+                          return (
+                            <div key={key} className="grid grid-cols-[7rem_1fr] gap-2">
+                              <dt className="text-gray-500">{label}</dt>
+                              <dd className={key === 'headline' ? 'font-semibold text-gray-800' : ''}>
+                                {wert}
+                              </dd>
+                            </div>
+                          )
+                        })}
+                      </dl>
                     )}
                     {finanStatus === 'empty' && (
                       <p className="text-sm text-gray-400">
@@ -702,9 +731,9 @@ export default function SepaMandatForm() {
                     stehen (Kopfzeile, Tabelle, Fußzeile).
                   </li>
                   <li>
-                    Adresse, E-Mail und Gläubiger-Identifikationsnummer kommen
-                    aus den HZD Settings und hängen an der gewählten
-                    Regionalgruppe.
+                    Headline, Name, Street, ZipCity, Phone, Email1 und Email2
+                    kommen einzeln aus dem Kontakt der Finanzverwaltung in den
+                    HZD Settings und hängen an der gewählten Regionalgruppe.
                   </li>
                 </ul>
               </div>
