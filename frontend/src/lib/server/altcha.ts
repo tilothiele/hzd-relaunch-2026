@@ -136,9 +136,10 @@ export async function withAltcha(
 /** Für Server Actions, die das Cookie aus dem Next-Cookie-Store lesen. */
 export async function consumeAltchaFromCookies(): Promise<string | null> {
 	try {
-		const payload = cookies().get(ALTCHA_COOKIE)?.value
+		const cookieStore = await cookies()
+		const payload = cookieStore.get(ALTCHA_COOKIE)?.value
 		const result = await verifyPayload(payload)
-		cookies().set(ALTCHA_COOKIE, '', {
+		cookieStore.set(ALTCHA_COOKIE, '', {
 			path: '/',
 			maxAge: 0,
 			sameSite: 'lax',

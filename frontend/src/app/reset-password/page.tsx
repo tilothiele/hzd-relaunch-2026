@@ -9,8 +9,9 @@ export const dynamic = 'force-dynamic'
 export default async function ResetPasswordPage({
 	searchParams,
 }: {
-	searchParams: { code?: string }
+	searchParams: Promise<{ code?: string }>
 }) {
+	const resolvedSearchParams = await searchParams
 	const { globalLayout, baseUrl } = await fetchGlobalLayout()
 	const theme = globalTheme
 
@@ -22,7 +23,7 @@ export default async function ResetPasswordPage({
 			pageTitle='Passwort zurücksetzen'
 		>
 			<SectionContainer>
-				<ResetPasswordForm code={searchParams.code} />
+				<ResetPasswordForm code={resolvedSearchParams.code} />
 			</SectionContainer>
 		</MainPageStructure>
 	)

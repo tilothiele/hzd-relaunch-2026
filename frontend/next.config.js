@@ -33,9 +33,7 @@ const nextConfig = {
 		NEXT_PUBLIC_APP_VERSION: pkg.version,
 		NEXT_PUBLIC_BUILD_DATE: new Date().toLocaleDateString('de-DE'),
 	},
-	experimental: {
-		serverComponentsExternalPackages: ['altcha-lib'],
-	},
+	serverExternalPackages: ['altcha-lib'],
 	output: 'standalone'
 }
 

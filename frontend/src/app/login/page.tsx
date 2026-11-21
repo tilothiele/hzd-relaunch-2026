@@ -9,8 +9,9 @@ export const dynamic = 'force-dynamic'
 export default async function LoginPage({
 	searchParams,
 }: {
-	searchParams: { callbackUrl?: string }
+	searchParams: Promise<{ callbackUrl?: string }>
 }) {
+	const resolvedSearchParams = await searchParams
 	const { globalLayout, baseUrl } = await fetchGlobalLayout()
 	const theme = globalTheme
 
@@ -22,7 +23,7 @@ export default async function LoginPage({
 			pageTitle='Anmelden'
 		>
 			<SectionContainer>
-				<LoginForm callbackUrl={searchParams.callbackUrl} />
+				<LoginForm callbackUrl={resolvedSearchParams.callbackUrl} />
 			</SectionContainer>
 		</MainPageStructure>
 	)
