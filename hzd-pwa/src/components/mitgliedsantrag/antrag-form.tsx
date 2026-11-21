@@ -4,13 +4,16 @@ import { useState, ChangeEvent, FormEvent, useRef, useEffect, useCallback } from
 import Image from 'next/image'
 import { MEMBERSHIP_TYPES } from '@/constants/membership-types'
 import { REGIONAL_GROUPS } from '@/constants/regional-groups'
+import { useAuth } from '@/hooks/use-auth'
 import type { RegionalUnitHeader } from '@/lib/regional-unit'
+import { isTik } from '@/lib/user-groups'
 import type { FinanverwaltungContact } from '@/lib/server/finanverwaltung'
 import { FormData } from '@/types/formData'
 
-interface RegionalUnitOption {
+interface OrtsgruppeOption {
   documentId: string;
   name: string;
+  regionalUnitId: string;
   header: RegionalUnitHeader;
 }
 
@@ -26,20 +29,20 @@ const VORLAGE_PLATZHALTER: Array<{
 }> = [
   {
     pl: 'Headline',
-    wert: 'Name der gewählten Regionalgruppe',
-    hinweis: 'RegionalUnit.Name aus der Auswahlliste oben.',
+    wert: 'Name der Regionalgruppe zur gewählten Ortsgruppe',
+    hinweis: 'RegionalUnit.Name der gewählten LocalCommunity.',
   },
   {
     pl: 'Name',
-    wert: 'Name der verknüpften Ortsgruppe',
-    hinweis: 'LocalCommunity.Name der gewählten RegionalUnit. Mehrere Ortsgruppen stehen untereinander.',
+    wert: 'Name der gewählten Ortsgruppe',
+    hinweis: 'LocalCommunity.Name aus der Auswahlliste.',
   },
-  { pl: 'Street', wert: 'Straße der verknüpften Ortsgruppe' },
-  { pl: 'ZipCity', wert: 'PLZ und Ort der verknüpften Ortsgruppe' },
+  { pl: 'Street', wert: 'Straße der gewählten Ortsgruppe' },
+  { pl: 'ZipCity', wert: 'PLZ und Ort der gewählten Ortsgruppe' },
   {
     pl: 'Phone',
-    wert: 'Telefon der Regionalgruppe',
-    hinweis: 'Zuerst CFO, sonst CEO, sonst Schriftführung.',
+    wert: 'Telefon der Ortsgruppe',
+    hinweis: 'Zuerst CFO, sonst CEO, sonst Schriftführung der Ortsgruppe, sonst der Regionalgruppe.',
   },
   {
     pl: 'Email1',
@@ -52,7 +55,7 @@ const VORLAGE_PLATZHALTER: Array<{
   {
     pl: 'antrag_fuer',
     wert: 'Name im Antragstitel',
-    hinweis: 'Name der Ortsgruppe, sonst RegionalUnit.Name.',
+    hinweis: 'Name der gewählten Ortsgruppe.',
   },
   { pl: 'anrede', wert: 'Antragsteller – Anrede' },
   { pl: 'vorname', wert: 'Antragsteller – Vorname' },
@@ -136,6 +139,8 @@ async function kopiereTextInZwischenablage(text: string): Promise<boolean> {
 }
 
 export default function AntragForm() {
+  const { user, isAuthenticated, isInitialized } = useAuth();
+  const zeigeVorlagenhilfe = isInitialized && isAuthenticated && isTik(user);
   const formRef = useRef<HTMLFormElement>(null);
   const [formData, setFormData] = useState<FormData>({
     anrede: "",
@@ -168,6 +173,7 @@ export default function AntragForm() {
     weitereMitteilungen: "",
     regionalgruppe: "",
     regionalUnitId: "",
+    localCommunityId: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -178,8 +184,8 @@ export default function AntragForm() {
   const [finanContact, setFinanContact] = useState<FinanverwaltungContact | null>(null);
   const [kopierterPlatzhalter, setKopierterPlatzhalter] = useState<string | null>(null);
   const [finanLoading, setFinanLoading] = useState(false);
-  const [regionalUnits, setRegionalUnits] = useState<RegionalUnitOption[]>([]);
-  const [regionalUnitsLoading, setRegionalUnitsLoading] = useState(true);
+  const [ortsgruppen, setOrtsgruppen] = useState<OrtsgruppeOption[]>([]);
+  const [ortsgruppenLoading, setOrtsgruppenLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -187,22 +193,24 @@ export default function AntragForm() {
       .then((response) => (response.ok ? response.json() : null))
       .then((payload) => {
         if (cancelled) return;
-        const units = Array.isArray(payload?.units) ? payload.units : [];
-        setRegionalUnits(units);
+        const communities = Array.isArray(payload?.communities)
+          ? payload.communities
+          : [];
+        setOrtsgruppen(communities);
       })
       .catch(() => {
-        if (!cancelled) setRegionalUnits([]);
+        if (!cancelled) setOrtsgruppen([]);
       })
       .finally(() => {
-        if (!cancelled) setRegionalUnitsLoading(false);
+        if (!cancelled) setOrtsgruppenLoading(false);
       });
     return () => {
       cancelled = true;
     };
   }, []);
 
-  const selectedRegionalUnit = regionalUnits.find(
-    (unit) => unit.documentId === formData.regionalUnitId,
+  const selectedOrtsgruppe = ortsgruppen.find(
+    (community) => community.documentId === formData.localCommunityId,
   ) ?? null;
 
   // Lädt die zuständige Finanzverwaltung (Strapi > HZD Settings) für die gewählte Regionalgruppe
@@ -238,6 +246,15 @@ export default function AntragForm() {
     let updatedFormData;
     if (type === "radio") {
       updatedFormData = { ...formData, mitgliedschaft: value };
+    } else if (name === "localCommunityId") {
+      const community = ortsgruppen.find(
+        (candidate) => candidate.documentId === value,
+      );
+      updatedFormData = {
+        ...formData,
+        localCommunityId: value,
+        regionalUnitId: community?.regionalUnitId ?? "",
+      };
     } else {
       updatedFormData = { ...formData, [name]: value };
     }
@@ -274,8 +291,8 @@ export default function AntragForm() {
 
     console.log('Validating form data:', data);
 
-    if (!data.regionalUnitId || !data.regionalUnitId.trim()) {
-      newErrors.regionalUnitId = "Bitte wählen Sie eine Regionalgruppe";
+    if (!data.localCommunityId || !data.localCommunityId.trim()) {
+      newErrors.localCommunityId = "Bitte wählen Sie eine Ortsgruppe";
     }
 
     // Vereinfachte Validierung - nur die wichtigsten Felder
@@ -434,35 +451,6 @@ export default function AntragForm() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
-            <div className="max-w-md mx-auto mb-6 text-left">
-              <label htmlFor="regionalUnitId" className="block text-sm font-medium text-gray-700 mb-2">
-                Regionalgruppe *
-              </label>
-              <select
-                id="regionalUnitId"
-                name="regionalUnitId"
-                value={formData.regionalUnitId || ''}
-                onChange={handleChange}
-                disabled={regionalUnitsLoading}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
-                  errors.regionalUnitId ? 'border-red-500' : 'border-gray-300'
-                }`}
-                data-error={!!errors.regionalUnitId}
-              >
-                <option value="">
-                  {regionalUnitsLoading ? 'Wird geladen…' : 'Bitte wählen'}
-                </option>
-                {regionalUnits.map((unit) => (
-                  <option key={unit.documentId} value={unit.documentId}>
-                    {unit.name}
-                  </option>
-                ))}
-              </select>
-              {errors.regionalUnitId && (
-                <p className="text-sm text-red-600 mt-1">{errors.regionalUnitId}</p>
-              )}
-            </div>
-
             {/* Logo */}
             <div className="flex justify-center mb-6">
               <Image
@@ -475,12 +463,37 @@ export default function AntragForm() {
               />
             </div>
 
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">
               HZD Ortsgruppen-Aufnahmeantrag
             </h1>
-            <p className="text-xl text-blue-600 font-semibold">
-              {selectedRegionalUnit?.header.antragFuer || 'Bitte Regionalgruppe wählen'}
-            </p>
+            <div className="max-w-md mx-auto text-left">
+              <label htmlFor="localCommunityId" className="block text-sm font-medium text-gray-700 mb-2">
+                Ortsgruppe *
+              </label>
+              <select
+                id="localCommunityId"
+                name="localCommunityId"
+                value={formData.localCommunityId || ''}
+                onChange={handleChange}
+                disabled={ortsgruppenLoading}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                  errors.localCommunityId ? 'border-red-500' : 'border-gray-300'
+                }`}
+                data-error={!!errors.localCommunityId}
+              >
+                <option value="">
+                  {ortsgruppenLoading ? 'Wird geladen…' : 'Bitte wählen'}
+                </option>
+                {ortsgruppen.map((community) => (
+                  <option key={community.documentId} value={community.documentId}>
+                    {community.name}
+                  </option>
+                ))}
+              </select>
+              {errors.localCommunityId && (
+                <p className="text-sm text-red-600 mt-1">{errors.localCommunityId}</p>
+              )}
+            </div>
 
             {/* Allgemeine Fehlermeldungen */}
             {errors.general && (
@@ -488,22 +501,22 @@ export default function AntragForm() {
                 <p className="text-sm text-red-600">{errors.general}</p>
               </div>
             )}
-            {selectedRegionalUnit && (
+            {selectedOrtsgruppe && (
               <div className="text-l text-blue-600 space-y-0.5">
-                {selectedRegionalUnit.header.street.split('\n').filter(Boolean).map((line, index) => (
+                {selectedOrtsgruppe.header.street.split('\n').filter(Boolean).map((line, index) => (
                   <p key={`street-${index}`}>{line}</p>
                 ))}
-                {selectedRegionalUnit.header.zipCity.split('\n').filter(Boolean).map((line, index) => (
+                {selectedOrtsgruppe.header.zipCity.split('\n').filter(Boolean).map((line, index) => (
                   <p key={`zip-${index}`}>{line}</p>
                 ))}
-                {selectedRegionalUnit.header.phone && (
-                  <p>{selectedRegionalUnit.header.phone}</p>
+                {selectedOrtsgruppe.header.phone && (
+                  <p>{selectedOrtsgruppe.header.phone}</p>
                 )}
-                {selectedRegionalUnit.header.email1 && (
-                  <p>{selectedRegionalUnit.header.email1}</p>
+                {selectedOrtsgruppe.header.email1 && (
+                  <p>{selectedOrtsgruppe.header.email1}</p>
                 )}
-                {selectedRegionalUnit.header.email2 && (
-                  <p>{selectedRegionalUnit.header.email2}</p>
+                {selectedOrtsgruppe.header.email2 && (
+                  <p>{selectedOrtsgruppe.header.email2}</p>
                 )}
               </div>
             )}
@@ -527,7 +540,7 @@ export default function AntragForm() {
               <div className="mb-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-800">
                   Hiermit beantrage ich in Anerkennung der Satzung, Ordnungen und Beschlüsse der HZD die Mitgliedschaft in der{' '}
-                  {selectedRegionalUnit?.header.antragFuer || 'Ortsgruppe'} der Hovawart
+                  {selectedOrtsgruppe?.header.antragFuer || 'Ortsgruppe'} der Hovawart
                   Zuchtgemeinschaft Deutschland e.V.. Ich gehöre keinem kynologischen Verein außerhalb des Verbandes für das Deutsche Hundewesen
                   (VDH) bzw. außerhalb der Fédération Cynologique Internationale (FCI) an. Ich bestätige, dass ich aus keinem anderen VDH-Verein
                   ausgeschlossen wurde und dass gegen mich kein Ausschlussverfahren läuft. Ich bin weder gewerbsmäßiger Hundehändler/-züchter noch
@@ -1173,6 +1186,7 @@ export default function AntragForm() {
               </button>
             </div>
 
+            {zeigeVorlagenhilfe && (
             <div className="mx-auto max-w-3xl p-5 bg-blue-50 border border-blue-200 rounded-lg">
               <h3 className="text-base font-semibold text-blue-900 mb-3">
                 So wird die Vorlagendatei gestaltet
@@ -1257,7 +1271,8 @@ export default function AntragForm() {
                 </li>
                 <li>
                   Headline, Name, Street, ZipCity, Phone, Email1, Email2 und
-                  antrag_fuer kommen aus der oben gewählten RegionalUnit.
+                  antrag_fuer kommen aus der oben gewählten Ortsgruppe
+                  (LocalCommunity) und ihrer Regionalgruppe.
                   Name (groß) ist die Ortsgruppe, name (klein) der Antragsteller.
                 </li>
                 <li>
@@ -1266,6 +1281,7 @@ export default function AntragForm() {
                 </li>
               </ul>
             </div>
+            )}
           </form>
         </div>
       </div>

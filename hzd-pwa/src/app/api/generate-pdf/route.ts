@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const meldung = error instanceof Error ? error.message : String(error);
     console.error('Fehler bei der Mitgliedsantrag-PDF-Generierung:', error);
-    const status = /Gotenberg|Strapi|Vorlage|leer|Regionalgruppe/i.test(meldung)
+    const status = /Gotenberg|Strapi|Vorlage|leer|Regionalgruppe|Ortsgruppe/i.test(meldung)
       ? 502
       : 500;
     return NextResponse.json(

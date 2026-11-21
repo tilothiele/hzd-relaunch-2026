@@ -1,9 +1,15 @@
 import Docxtemplater from 'docxtemplater';
 import PizZip from 'pizzip';
 import { convertOfficeDocumentToPdf } from '@/lib/gotenberg';
-import { buildRegionalUnitHeader } from '@/lib/regional-unit';
+import {
+  buildLocalCommunityHeader,
+  buildRegionalUnitHeader,
+} from '@/lib/regional-unit';
 import { getGlaeubigerId } from '@/lib/server/finanverwaltung';
-import { getRegionalUnit } from '@/lib/server/regional-units';
+import {
+  getLocalCommunity,
+  getRegionalUnit,
+} from '@/lib/server/regional-units';
 import { ladePwaSettingVorlage } from '@/lib/server/koerung-ausschreibung-vorlage';
 import { serverLog } from '@/lib/server-only';
 import type { FormData } from '@/types/formData';
@@ -142,13 +148,22 @@ export async function buildMitgliedsantragModel(
     antragFuer: '',
   };
   let header = emptyHeader;
-  const regionalUnitId = data.regionalUnitId?.trim() ?? '';
-  if (regionalUnitId) {
-    const unit = await getRegionalUnit(regionalUnitId);
-    if (!unit) {
-      throw new Error('Die gewählte Regionalgruppe wurde nicht gefunden.');
+  const localCommunityId = data.localCommunityId?.trim() ?? '';
+  if (localCommunityId) {
+    const selected = await getLocalCommunity(localCommunityId);
+    if (!selected) {
+      throw new Error('Die gewählte Ortsgruppe wurde nicht gefunden.');
     }
-    header = buildRegionalUnitHeader(unit);
+    header = buildLocalCommunityHeader(selected.unit, selected.community);
+  } else {
+    const regionalUnitId = data.regionalUnitId?.trim() ?? '';
+    if (regionalUnitId) {
+      const unit = await getRegionalUnit(regionalUnitId);
+      if (!unit) {
+        throw new Error('Die gewählte Ortsgruppe wurde nicht gefunden.');
+      }
+      header = buildRegionalUnitHeader(unit);
+    }
   }
 
   let glaeubigerId = '';

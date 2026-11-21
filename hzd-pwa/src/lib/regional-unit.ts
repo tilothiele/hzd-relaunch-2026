@@ -10,10 +10,14 @@ export interface RegionalUnitPerson {
 }
 
 export interface RegionalUnitCommunity {
+	documentId: string
 	name: string | null
 	street: string | null
 	zipCode: string | null
 	city: string | null
+	ceo: RegionalUnitPerson | null
+	cfo: RegionalUnitPerson | null
+	secretary: RegionalUnitPerson | null
 }
 
 export interface RegionalUnit {
@@ -45,32 +49,75 @@ function joinLines(values: string[]): string {
 	return values.filter((value) => value !== '').join('\n')
 }
 
-export function buildRegionalUnitHeader(unit: RegionalUnit): RegionalUnitHeader {
-	const names = unit.communities.map((community) => clean(community.name))
-	const streets = unit.communities.map((community) => clean(community.street))
-	const zipCities = unit.communities.map((community) =>
-		[clean(community.zipCode), clean(community.city)]
-			.filter((part) => part !== '')
-			.join(' '),
-	)
-	const phone = [unit.cfo, unit.ceo, unit.secretary]
+function firstPhone(
+	...people: Array<RegionalUnitPerson | null | undefined>
+): string {
+	return people
 		.map((person) => clean(person?.phone))
 		.find((value) => value !== '') ?? ''
-	const email1 = clean(unit.cfo?.email)
-	const email2Candidate = clean(unit.secretary?.email) || clean(unit.ceo?.email)
-	const email2 = email2Candidate !== '' && email2Candidate !== email1
-		? email2Candidate
-		: ''
-	const communityNames = names.filter((name) => name !== '')
+}
 
+function firstEmail(
+	...people: Array<RegionalUnitPerson | null | undefined>
+): string {
+	return people
+		.map((person) => clean(person?.email))
+		.find((value) => value !== '') ?? ''
+}
+
+function zipCity(community: RegionalUnitCommunity): string {
+	return [clean(community.zipCode), clean(community.city)]
+		.filter((part) => part !== '')
+		.join(' ')
+}
+
+export function buildRegionalUnitHeader(unit: RegionalUnit): RegionalUnitHeader {
+	const names = unit.communities.map((community) => clean(community.name))
+	const communityNames = names.filter((name) => name !== '')
+	const email1 = firstEmail(unit.cfo)
+	const email2 = firstEmail(unit.secretary, unit.ceo)
 	return {
 		headline: clean(unit.name),
 		name: joinLines(communityNames),
-		street: joinLines(streets),
-		zipCity: joinLines(zipCities),
-		phone,
+		street: joinLines(
+			unit.communities.map((community) => clean(community.street)),
+		),
+		zipCity: joinLines(unit.communities.map(zipCity)),
+		phone: firstPhone(unit.cfo, unit.ceo, unit.secretary),
 		email1,
-		email2,
+		email2: email2 !== '' && email2 !== email1 ? email2 : '',
 		antragFuer: communityNames.join(', ') || clean(unit.name),
+	}
+}
+
+/** Briefkopf für genau eine gewählte Ortsgruppe. */
+export function buildLocalCommunityHeader(
+	unit: RegionalUnit,
+	community: RegionalUnitCommunity,
+): RegionalUnitHeader {
+	const email1 = firstEmail(community.cfo, unit.cfo)
+	const email2 = firstEmail(
+		community.secretary,
+		community.ceo,
+		unit.secretary,
+		unit.ceo,
+	)
+	const name = clean(community.name)
+	return {
+		headline: clean(unit.name),
+		name,
+		street: clean(community.street),
+		zipCity: zipCity(community),
+		phone: firstPhone(
+			community.cfo,
+			community.ceo,
+			community.secretary,
+			unit.cfo,
+			unit.ceo,
+			unit.secretary,
+		),
+		email1,
+		email2: email2 !== '' && email2 !== email1 ? email2 : '',
+		antragFuer: name || clean(unit.name),
 	}
 }

@@ -35,12 +35,17 @@ function asPerson(value: unknown): RegionalUnitPerson | null {
 
 function asCommunity(value: unknown): RegionalUnitCommunity | null {
 	const record = asRecord(value)
-	if (!record) return null
+	const documentId = asText(record?.documentId)
+	if (!record || !documentId) return null
 	return {
+		documentId,
 		name: asText(record.Name),
 		street: asText(record.Street),
 		zipCode: asText(record.ZipCode),
 		city: asText(record.City),
+		ceo: asPerson(record.CEO),
+		cfo: asPerson(record.CFO),
+		secretary: asPerson(record.Secretary),
 	}
 }
 
@@ -72,6 +77,15 @@ function listUrl(): string {
 		'populate[local_cummunities][fields][1]': 'Street',
 		'populate[local_cummunities][fields][2]': 'ZipCode',
 		'populate[local_cummunities][fields][3]': 'City',
+		'populate[local_cummunities][populate][CFO][fields][0]': 'phone',
+		'populate[local_cummunities][populate][CFO][fields][1]': 'email',
+		'populate[local_cummunities][populate][CFO][fields][2]': 'cEmail',
+		'populate[local_cummunities][populate][CEO][fields][0]': 'phone',
+		'populate[local_cummunities][populate][CEO][fields][1]': 'email',
+		'populate[local_cummunities][populate][CEO][fields][2]': 'cEmail',
+		'populate[local_cummunities][populate][Secretary][fields][0]': 'phone',
+		'populate[local_cummunities][populate][Secretary][fields][1]': 'email',
+		'populate[local_cummunities][populate][Secretary][fields][2]': 'cEmail',
 		'populate[CFO][fields][0]': 'phone',
 		'populate[CFO][fields][1]': 'email',
 		'populate[CFO][fields][2]': 'cEmail',
@@ -110,4 +124,22 @@ export async function getRegionalUnit(
 	if (!id) return null
 	const units = await listRegionalUnits()
 	return units.find((unit) => unit.documentId === id) ?? null
+}
+
+export async function getLocalCommunity(
+	documentId: string,
+): Promise<{
+	unit: RegionalUnit
+	community: RegionalUnitCommunity
+} | null> {
+	const id = documentId.trim()
+	if (!id) return null
+	const units = await listRegionalUnits()
+	for (const unit of units) {
+		const community = unit.communities.find(
+			(candidate) => candidate.documentId === id,
+		)
+		if (community) return { unit, community }
+	}
+	return null
 }

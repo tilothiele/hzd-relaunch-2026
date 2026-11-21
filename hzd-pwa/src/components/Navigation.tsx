@@ -4,30 +4,79 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import { isSonderleiter } from "@/lib/user-groups";
 
-const publicItems = [
+type NavLink = {
+    name: string;
+    href: string;
+};
+
+const formularItems: NavLink[] = [
     { name: "Mitgliedsantrag", href: "/mitgliedsantrag" },
     { name: "SEPA-Lastschriftmandat", href: "/sepa-lastschriftmandat" },
-    { name: "Ausschreibung HZD-Körung", href: "/ausschreibung-hzd-koerung" },
 ];
 
-const stammItems = [
+const sonderleiterItems: NavLink[] = [
+    {
+        name: "Ausschreibung HZD-Körung",
+        href: "/ausschreibung-hzd-koerung",
+    },
+];
+
+const memberItems: NavLink[] = [
+    { name: "Körung", href: "/koerungen" },
+    { name: "Zucht", href: "/wurfabnahmen" },
+];
+
+const stammItems: NavLink[] = [
     { name: "HZD-Hunde", href: "/hunde" },
     { name: "HZD-Züchter", href: "/zuechter" },
 ];
 
+const desktopTriggerClass = (active: boolean) =>
+    `inline-flex items-center gap-1 border-b-2 px-1 pt-1 text-base font-medium ${
+        active
+            ? "border-indigo-500 text-gray-900 dark:text-white"
+            : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
+    }`;
+
+const desktopLinkClass = (active: boolean) =>
+    `inline-flex items-center border-b-2 px-1 pt-1 text-base font-medium ${
+        active
+            ? "border-indigo-500 text-gray-900 dark:text-white"
+            : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
+    }`;
+
+const menuLinkClass = (active: boolean) =>
+    `block px-4 py-2 text-sm ${
+        active
+            ? "bg-indigo-50 text-indigo-700 dark:bg-gray-700 dark:text-white"
+            : "text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-700"
+    }`;
+
+const mobileLinkClass = (active: boolean) =>
+    `block border-l-4 py-2 pl-3 pr-4 text-lg font-medium ${
+        active
+            ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-gray-700 dark:text-white"
+            : "border-transparent text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
+    }`;
+
+const sectionLabelClass =
+    "px-3 pt-3 text-xs font-semibold uppercase tracking-wide text-gray-400";
+
 export default function Navigation() {
     const pathname = usePathname();
-    const { isAuthenticated, isInitialized } = useAuth();
+    const { user, isAuthenticated, isInitialized } = useAuth();
     const showMemberItems = isInitialized && isAuthenticated;
-    const [isOpen, setIsOpen] = useState(false);
-    const [isStammOpen, setIsStammOpen] = useState(false);
-    const stammRef = useRef<HTMLDivElement>(null);
-
-    const navItems = [
-        { name: "Körung", href: "/koerungen" },
-        { name: "Zucht", href: "/wurfabnahmen" },
-    ];
+    const canUseSonderleiter = showMemberItems && isSonderleiter(user);
+    const [mobile, setMobile] = useState({ open: false, path: pathname });
+    const [menuState, setMenuState] = useState({
+        id: null as string | null,
+        path: pathname,
+    });
+    const desktopRef = useRef<HTMLDivElement>(null);
+    const isOpen = mobile.open && mobile.path === pathname;
+    const openMenu = menuState.path === pathname ? menuState.id : null;
 
     const isActive = (href: string) => {
         if (href === "/wurfabnahmen") {
@@ -41,87 +90,68 @@ export default function Navigation() {
         return pathname === href || pathname.startsWith(`${href}/`);
     };
 
-    const isStammActive = stammItems.some((item) => isActive(item.href));
+    const isAnyActive = (items: NavLink[]) =>
+        items.some((item) => isActive(item.href));
 
     useEffect(() => {
-        setIsStammOpen(false);
-        setIsOpen(false);
-    }, [pathname]);
-
-    useEffect(() => {
-        if (!isStammOpen) {
+        if (!openMenu) {
             return;
         }
 
         const handlePointerDown = (event: MouseEvent) => {
-            if (!stammRef.current?.contains(event.target as Node)) {
-                setIsStammOpen(false);
+            if (!desktopRef.current?.contains(event.target as Node)) {
+                setMenuState({ id: null, path: pathname });
             }
         };
 
         window.addEventListener("mousedown", handlePointerDown);
         return () => window.removeEventListener("mousedown", handlePointerDown);
-    }, [isStammOpen]);
+    }, [openMenu, pathname]);
+
+    const toggleMenu = (id: string) => {
+        setMenuState((current) => {
+            const currentId = current.path === pathname ? current.id : null;
+            return {
+                id: currentId === id ? null : id,
+                path: pathname,
+            };
+        });
+    };
+
+    const closeMenus = () => {
+        setMenuState({ id: null, path: pathname });
+        setMobile({ open: false, path: pathname });
+    };
 
     return (
         <>
-            {/* Desktop Navigation */}
-            <div className="hidden sm:flex sm:items-center sm:gap-2">
+            <div className="hidden sm:flex sm:items-center sm:gap-2" ref={desktopRef}>
                 <div className="flex sm:space-x-6">
-                    {publicItems.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`inline-flex items-center border-b-2 px-1 pt-1 text-base font-medium ${isActive(item.href)
-                                ? "border-indigo-500 text-gray-900 dark:text-white"
-                                : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
-                                }`}
-                        >
-                            {item.name}
-                        </Link>
-                    ))}
-                    {showMemberItems && navItems.map((item) => (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`inline-flex items-center border-b-2 px-1 pt-1 text-base font-medium ${isActive(item.href)
-                                ? "border-indigo-500 text-gray-900 dark:text-white"
-                                : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
-                                }`}
-                        >
-                            {item.name}
-                        </Link>
-                    ))}
-                    {showMemberItems && (
-                    <div className="relative" ref={stammRef}>
+                    <div className="relative">
                         <button
                             type="button"
-                            aria-expanded={isStammOpen}
+                            aria-expanded={openMenu === "formulare"}
                             aria-haspopup="menu"
-                            onClick={() => setIsStammOpen((open) => !open)}
-                            className={`inline-flex items-center gap-1 border-b-2 px-1 pt-1 text-base font-medium ${isStammActive
-                                ? "border-indigo-500 text-gray-900 dark:text-white"
-                                : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
-                                }`}
+                            onClick={() => toggleMenu("formulare")}
+                            className={desktopTriggerClass(isAnyActive(formularItems))}
                         >
-                            Stammdaten
-                            <span aria-hidden="true">{isStammOpen ? "▴" : "▾"}</span>
+                            Formulare
+                            <span aria-hidden="true">
+                                {openMenu === "formulare" ? "▴" : "▾"}
+                            </span>
                         </button>
-                        {isStammOpen && (
+                        {openMenu === "formulare" && (
                             <div
                                 role="menu"
-                                className="absolute left-0 top-full z-30 mt-1 min-w-44 rounded-md bg-white py-1 shadow-lg dark:bg-gray-800"
+                                className="absolute left-0 top-full z-30 mt-1 min-w-56 rounded-md bg-white py-1 shadow-lg dark:bg-gray-800"
                             >
-                                {stammItems.map((item) => (
+                                {formularItems.map((item) => (
                                     <Link
                                         key={item.href}
                                         href={item.href}
                                         role="menuitem"
-                                        className={`block px-4 py-2 text-sm ${isActive(item.href)
-                                            ? "bg-indigo-50 text-indigo-700 dark:bg-gray-700 dark:text-white"
-                                            : "text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-700"
-                                            }`}
-                                        onClick={() => setIsStammOpen(false)}
+                                        className={menuLinkClass(isActive(item.href))}
+                                        onClick={closeMenus}
                                     >
                                         {item.name}
                                     </Link>
@@ -129,14 +159,112 @@ export default function Navigation() {
                             </div>
                         )}
                     </div>
+
+                    {showMemberItems && (
+                        <div className="relative">
+                            <button
+                                type="button"
+                                aria-expanded={openMenu === "intern"}
+                                aria-haspopup="menu"
+                                onClick={() => toggleMenu("intern")}
+                                className={desktopTriggerClass(
+                                    isAnyActive(sonderleiterItems),
+                                )}
+                            >
+                                Interne Formulare
+                                <span aria-hidden="true">
+                                    {openMenu === "intern" ? "▴" : "▾"}
+                                </span>
+                            </button>
+                            {openMenu === "intern" && (
+                                <div
+                                    role="menu"
+                                    className="absolute left-0 top-full z-30 mt-1 min-w-64 rounded-md bg-white py-1 shadow-lg dark:bg-gray-800"
+                                >
+                                    {canUseSonderleiter ? (
+                                        <div role="group" aria-label="Sonderleiter">
+                                            <p className="px-4 pb-1 pt-2 text-sm font-medium text-gray-900 dark:text-white">
+                                                Sonderleiter
+                                            </p>
+                                            {sonderleiterItems.map((item) => (
+                                                <Link
+                                                    key={item.href}
+                                                    href={item.href}
+                                                    role="menuitem"
+                                                    className={`${menuLinkClass(isActive(item.href))} pl-8`}
+                                                    onClick={closeMenus}
+                                                >
+                                                    {item.name}
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <span
+                                            role="menuitem"
+                                            aria-disabled="true"
+                                            className="block cursor-not-allowed px-4 py-2 text-sm text-gray-400"
+                                        >
+                                            Sonderleiter
+                                        </span>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {showMemberItems && memberItems.map((item) => (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            className={desktopLinkClass(isActive(item.href))}
+                        >
+                            {item.name}
+                        </Link>
+                    ))}
+
+                    {showMemberItems && (
+                        <div className="relative">
+                            <button
+                                type="button"
+                                aria-expanded={openMenu === "stamm"}
+                                aria-haspopup="menu"
+                                onClick={() => toggleMenu("stamm")}
+                                className={desktopTriggerClass(isAnyActive(stammItems))}
+                            >
+                                Stammdaten
+                                <span aria-hidden="true">
+                                    {openMenu === "stamm" ? "▴" : "▾"}
+                                </span>
+                            </button>
+                            {openMenu === "stamm" && (
+                                <div
+                                    role="menu"
+                                    className="absolute left-0 top-full z-30 mt-1 min-w-44 rounded-md bg-white py-1 shadow-lg dark:bg-gray-800"
+                                >
+                                    {stammItems.map((item) => (
+                                        <Link
+                                            key={item.href}
+                                            href={item.href}
+                                            role="menuitem"
+                                            className={menuLinkClass(isActive(item.href))}
+                                            onClick={closeMenus}
+                                        >
+                                            {item.name}
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     )}
                 </div>
             </div>
 
-            {/* Mobile Menu Button */}
             <div className="flex items-center sm:hidden">
                 <button
-                    onClick={() => setIsOpen(!isOpen)}
+                    onClick={() => setMobile({
+                        open: !isOpen,
+                        path: pathname,
+                    })}
                     type="button"
                     className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 dark:hover:bg-gray-700 dark:hover:text-white"
                     aria-controls="mobile-menu"
@@ -176,50 +304,74 @@ export default function Navigation() {
                 </button>
             </div>
 
-            {/* Mobile Menu Dropdown */}
             {isOpen && (
-                <div className="absolute top-16 left-0 w-full bg-white shadow-lg dark:bg-gray-800 sm:hidden z-20" id="mobile-menu">
-                    <div className="space-y-1 pb-3 pt-2 px-4 shadow-sm border-t dark:border-gray-700">
-                        {publicItems.map((item) => (
+                <div
+                    className="absolute top-16 left-0 z-20 w-full bg-white shadow-lg dark:bg-gray-800 sm:hidden"
+                    id="mobile-menu"
+                >
+                    <div className="space-y-1 border-t px-4 pb-3 pt-2 shadow-sm dark:border-gray-700">
+                        <p className={sectionLabelClass}>Formulare</p>
+                        {formularItems.map((item) => (
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`block border-l-4 py-2 pl-3 pr-4 text-lg font-medium ${isActive(item.href)
-                                    ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-gray-700 dark:text-white"
-                                    : "border-transparent text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
-                                    }`}
-                                onClick={() => setIsOpen(false)}
+                                className={mobileLinkClass(isActive(item.href))}
+                                onClick={closeMenus}
                             >
                                 {item.name}
                             </Link>
                         ))}
-                        {showMemberItems && navItems.map((item) => (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                className={`block border-l-4 py-2 pl-3 pr-4 text-lg font-medium ${isActive(item.href)
-                                    ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-gray-700 dark:text-white"
-                                    : "border-transparent text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
-                                    }`}
-                                onClick={() => setIsOpen(false)}
-                            >
-                                {item.name}
-                            </Link>
-                        ))}
+
                         {showMemberItems && (
-                            <p className="px-3 pt-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
-                                Stammdaten
-                            </p>
+                            <p className={sectionLabelClass}>Interne Formulare</p>
+                        )}
+                        {showMemberItems && (
+                            canUseSonderleiter ? (
+                                <>
+                                    <p className="px-3 pt-2 text-sm font-medium text-gray-900 dark:text-white">
+                                        Sonderleiter
+                                    </p>
+                                    {sonderleiterItems.map((item) => (
+                                        <Link
+                                            key={item.href}
+                                            href={item.href}
+                                            className={`${mobileLinkClass(isActive(item.href))} ml-3`}
+                                            onClick={closeMenus}
+                                        >
+                                            {item.name}
+                                        </Link>
+                                    ))}
+                                </>
+                            ) : (
+                                <span
+                                    aria-disabled="true"
+                                    className="block cursor-not-allowed border-l-4 border-transparent py-2 pl-3 pr-4 text-lg font-medium text-gray-400"
+                                >
+                                    Sonderleiter
+                                </span>
+                            )
+                        )}
+
+                        {showMemberItems && memberItems.map((item) => (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={mobileLinkClass(isActive(item.href))}
+                                onClick={closeMenus}
+                            >
+                                {item.name}
+                            </Link>
+                        ))}
+
+                        {showMemberItems && (
+                            <p className={sectionLabelClass}>Stammdaten</p>
                         )}
                         {showMemberItems && stammItems.map((item) => (
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`block border-l-4 py-2 pl-3 pr-4 text-lg font-medium ${isActive(item.href)
-                                    ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-gray-700 dark:text-white"
-                                    : "border-transparent text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
-                                    }`}
-                                onClick={() => setIsOpen(false)}
+                                className={mobileLinkClass(isActive(item.href))}
+                                onClick={closeMenus}
                             >
                                 {item.name}
                             </Link>

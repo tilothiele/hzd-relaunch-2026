@@ -10,6 +10,8 @@ import {
   type KoerungAusschreibungErrorKey,
   type KoerungAusschreibungErrors,
 } from '@/lib/koerung-ausschreibung-validation'
+import { useAuth } from '@/hooks/use-auth'
+import { isTik } from '@/lib/user-groups'
 import type { KoerungAusschreibungFormData } from '@/types/koerung-ausschreibung-form'
 
 const initialFormData: KoerungAusschreibungFormData = {
@@ -166,6 +168,8 @@ async function kopiereTextInZwischenablage(text: string): Promise<boolean> {
 }
 
 export default function KoerungAusschreibungForm() {
+  const { user, isAuthenticated, isInitialized } = useAuth()
+  const zeigeVorlagenhilfe = isInitialized && isAuthenticated && isTik(user)
   const [formData, setFormData] = useState<KoerungAusschreibungFormData>(
     initialFormData,
   )
@@ -658,6 +662,7 @@ export default function KoerungAusschreibungForm() {
               )}
 
               {/* Hilfetext: Gestaltung der Vorlagendatei + Platzhalterliste */}
+              {zeigeVorlagenhilfe && (
               <div className="mx-auto max-w-3xl p-5 bg-blue-50 border border-blue-200 rounded-lg">
                 <h3 className="text-base font-semibold text-blue-900 mb-3">
                   So wird die Vorlagendatei gestaltet
@@ -754,6 +759,7 @@ export default function KoerungAusschreibungForm() {
                   </li>
                 </ul>
               </div>
+              )}
             </div>
           </form>
         </div>
