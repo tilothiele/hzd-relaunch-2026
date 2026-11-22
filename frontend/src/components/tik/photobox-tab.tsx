@@ -1,6 +1,7 @@
 'use client'
 
 import { Fragment, useCallback, useEffect, useState } from 'react'
+import EmailIcon from '@mui/icons-material/Email'
 import {
 	Alert,
 	Box,
@@ -26,6 +27,7 @@ import {
 	type TikPhotoboxCollection,
 	type TikPhotoboxPageInfo,
 	type TikPhotoboxPhoto,
+	type TikPhotoboxPhotographer,
 } from '@/lib/tik-photobox'
 import { theme } from '@/themes'
 
@@ -60,6 +62,45 @@ function formatWhen(value: string | null): string {
 function showText(value: string | null | undefined): string {
 	const trimmed = value?.trim()
 	return trimmed ? trimmed : '–'
+}
+
+function mailtoHref(email: string | null | undefined): string | null {
+	const trimmed = email?.trim()
+	if (!trimmed || !trimmed.includes('@') || /\s/.test(trimmed)) {
+		return null
+	}
+	return `mailto:${trimmed}`
+}
+
+function PhotographerName({
+	photographer,
+}: {
+	photographer: TikPhotoboxPhotographer | null | undefined
+}) {
+	const name = showText(photographer?.displayName)
+	const href = mailtoHref(photographer?.email)
+	if (!href || name === '–') {
+		return name
+	}
+
+	return (
+		<Box
+			component='a'
+			href={href}
+			aria-label={`E-Mail an ${name}`}
+			sx={{
+				display: 'inline-flex',
+				alignItems: 'center',
+				gap: 0.5,
+				color: theme.submitButtonColor,
+				textDecoration: 'none',
+				'&:hover': { textDecoration: 'underline' },
+			}}
+		>
+			{name}
+			<EmailIcon sx={{ fontSize: 18 }} aria-hidden />
+		</Box>
+	)
 }
 
 function mediaSrc(
@@ -523,7 +564,9 @@ function PhotoboxTable({
 									{membershipLabel(collection)}
 								</TableCell>
 								<TableCell>
-									{showText(collection.photographer?.displayName)}
+									<PhotographerName
+										photographer={collection.photographer}
+									/>
 								</TableCell>
 								<TableCell>{collection.photos.length}</TableCell>
 								<TableCell>
@@ -676,10 +719,16 @@ function PhotoboxCards({
 								label='Mitgliedsnummer'
 								value={membershipLabel(collection)}
 							/>
-							<Field
-								label='Fotograf'
-								value={showText(collection.photographer?.displayName)}
-							/>
+							<Box>
+								<Typography variant='caption' color='text.secondary'>
+									Fotograf
+								</Typography>
+								<Typography variant='body2' component='div'>
+									<PhotographerName
+										photographer={collection.photographer}
+									/>
+								</Typography>
+							</Box>
 						</Box>
 						<Button
 							size='small'

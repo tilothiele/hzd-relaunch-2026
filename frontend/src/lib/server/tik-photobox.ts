@@ -32,6 +32,8 @@ const COLLECTION_POPULATE = new URLSearchParams({
 	'populate[photogapher][fields][3]': 'lastName',
 	'populate[photogapher][fields][4]': 'DisplayName',
 	'populate[photogapher][fields][5]': 'username',
+	'populate[photogapher][fields][6]': 'cEmail',
+	'populate[photogapher][fields][7]': 'email',
 	'populate[photos][populate][Thumbnail]': 'true',
 	'populate[photos][sort][0]': 'createdAt:desc',
 })
@@ -157,6 +159,7 @@ function photographerOf(
 	return {
 		membershipNumber: readNumber(record.membershipNumber),
 		displayName: displayName || null,
+		email: readString(record.cEmail) ?? readString(record.email),
 	}
 }
 

@@ -12,6 +12,7 @@ export interface TikPhotoboxPhoto {
 export interface TikPhotoboxPhotographer {
 	membershipNumber: number | null
 	displayName: string | null
+	email: string | null
 }
 
 export interface TikPhotoboxCollection {
