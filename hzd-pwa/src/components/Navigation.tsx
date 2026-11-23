@@ -310,7 +310,7 @@ export default function Navigation() {
                     id="mobile-menu"
                 >
                     <div className="space-y-1 border-t px-4 pb-3 pt-2 shadow-sm dark:border-gray-700">
-                        <p className={sectionLabelClass}>Formulare</p>
+                        <p className={sectionLabelClass}>Öffentliche Formulare</p>
                         {formularItems.map((item) => (
                             <Link
                                 key={item.href}
