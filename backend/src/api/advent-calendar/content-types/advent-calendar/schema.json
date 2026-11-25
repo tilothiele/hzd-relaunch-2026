@@ -36,6 +36,53 @@
         "videos",
         "audios"
       ]
+    },
+    "SchlussGruesse": {
+      "type": "blocks"
+    },
+    "SchlussBild": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "TageVorlauf": {
+      "type": "integer",
+      "required": true,
+      "default": 10,
+      "min": 0,
+      "max": 30
+    },
+    "TageNachlauf": {
+      "type": "integer",
+      "required": true,
+      "default": 14,
+      "min": 2,
+      "max": 30
+    },
+    "Jahr": {
+      "type": "integer",
+      "required": true,
+      "min": 2026,
+      "max": 2099
+    },
+    "KalenderPlatzhalterAiNote": {
+      "type": "enumeration",
+      "enum": [
+        "AiGenerated",
+        "AiModified"
+      ]
+    },
+    "SchlussBildAiNote": {
+      "type": "enumeration",
+      "enum": [
+        "AiGenerated",
+        "AiModified"
+      ]
     }
   }
 }

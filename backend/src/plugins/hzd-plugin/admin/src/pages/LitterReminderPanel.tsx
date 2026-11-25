@@ -1,6 +1,6 @@
-import { Box, Button, Checkbox, Flex, SingleSelect, SingleSelectOption, Typography } from '@strapi/design-system';
+import { Box, Button, Checkbox, Field, Flex, SingleSelect, SingleSelectOption, TextInput, Typography } from '@strapi/design-system';
 import { useFetchClient, useNotification } from '@strapi/strapi/admin';
-import { useState } from 'react';
+import { useEffect, useState, type ChangeEvent } from 'react';
 import { useIntl } from 'react-intl';
 
 import { getTranslation } from '../utils/getTranslation';
@@ -28,6 +28,10 @@ function isWeekOption(value: number): value is (typeof WEEK_OPTIONS)[number] {
   return (WEEK_OPTIONS as readonly number[]).includes(value);
 }
 
+function isEmailAddress(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+}
+
 function readErrorMessage(error: unknown): string {
   if (!error || typeof error !== 'object' || !('response' in error)) {
     return '';
@@ -40,12 +44,39 @@ function readErrorMessage(error: unknown): string {
 
 const LitterReminderPanel = () => {
   const { formatMessage } = useIntl();
-  const { post } = useFetchClient();
+  const { get, post } = useFetchClient();
   const { toggleNotification } = useNotification();
   const [weeks, setWeeks] = useState<(typeof WEEK_OPTIONS)[number]>(9);
+  const [fromEmail, setFromEmail] = useState('');
+  const [bccEmail, setBccEmail] = useState('');
+  const [loadingDefaults, setLoadingDefaults] = useState(true);
   const [dryRun, setDryRun] = useState(false);
   const [sending, setSending] = useState(false);
   const [report, setReport] = useState<ReminderReport | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    get('/hzd-plugin/litters/reminder-settings')
+      .then((response) => {
+        if (cancelled) {
+          return;
+        }
+        const body = response.data as { from?: string; bcc?: string };
+        setFromEmail(body.from ?? '');
+        setBccEmail(body.bcc ?? '');
+      })
+      .catch(() => {
+        // Die Felder bleiben leer und können von Hand gefüllt werden.
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoadingDefaults(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [get]);
 
   const handleWeeksChange = (value: string | number) => {
     const parsed = typeof value === 'number' ? value : Number.parseInt(value, 10);
@@ -55,11 +86,36 @@ const LitterReminderPanel = () => {
   };
 
   const handleSend = async () => {
+    const from = fromEmail.trim();
+    const bcc = bccEmail.trim();
+    if (!isEmailAddress(from)) {
+      toggleNotification({
+        type: 'danger',
+        message: formatMessage({
+          id: getTranslation('litterReminder.fromInvalid'),
+          defaultMessage: 'From muss eine gültige E-Mail-Adresse sein.',
+        }),
+      });
+      return;
+    }
+    if (bcc && !isEmailAddress(bcc)) {
+      toggleNotification({
+        type: 'danger',
+        message: formatMessage({
+          id: getTranslation('litterReminder.bccInvalid'),
+          defaultMessage: 'BCC muss eine gültige E-Mail-Adresse sein.',
+        }),
+      });
+      return;
+    }
+
     try {
       setSending(true);
       const response = await post('/hzd-plugin/litters/send-reminder', {
         weeks,
         dryRun,
+        from,
+        bcc,
       });
       setReport(response.data as ReminderReport);
     } catch (error) {
@@ -107,6 +163,44 @@ const LitterReminderPanel = () => {
           </Box>
         </Box>
 
+        <Box width="420px">
+          <Field.Root name="litter-reminder-from" required>
+            <Field.Label>
+              {formatMessage({
+                id: getTranslation('litterReminder.from'),
+                defaultMessage: 'From',
+              })}
+            </Field.Label>
+            <TextInput
+              type="email"
+              value={fromEmail}
+              disabled={sending || loadingDefaults}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                setFromEmail(event.target.value);
+              }}
+            />
+          </Field.Root>
+        </Box>
+
+        <Box width="420px">
+          <Field.Root name="litter-reminder-bcc">
+            <Field.Label>
+              {formatMessage({
+                id: getTranslation('litterReminder.bcc'),
+                defaultMessage: 'BCC',
+              })}
+            </Field.Label>
+            <TextInput
+              type="email"
+              value={bccEmail}
+              disabled={sending || loadingDefaults}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                setBccEmail(event.target.value);
+              }}
+            />
+          </Field.Root>
+        </Box>
+
         <Box width="240px">
           <Typography tag="label" variant="pi" fontWeight="bold">
             {formatMessage({
@@ -149,7 +243,12 @@ const LitterReminderPanel = () => {
           </Typography>
         </Flex>
 
-        <Button type="button" loading={sending} onClick={handleSend}>
+        <Button
+          type="button"
+          loading={sending}
+          disabled={sending || loadingDefaults}
+          onClick={handleSend}
+        >
           {formatMessage({
             id: getTranslation('litterReminder.button'),
             defaultMessage: 'Erinnerungen senden',

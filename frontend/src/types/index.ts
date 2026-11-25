@@ -398,6 +398,13 @@ export interface AdventCalendar {
 	Hintergrundfarbe?: string | null
 	Ankuendigung?: BlocksContent | null
 	KalenderPlatzhalter?: Image | null
+	KalenderPlatzhalterAiNote?: AiNote | null
+	SchlussGruesse?: BlocksContent | null
+	SchlussBild?: Image | null
+	SchlussBildAiNote?: AiNote | null
+	TageVorlauf?: number | null
+	TageNachlauf?: number | null
+	Jahr?: number | null
 	AdventDay?: AdventDay[] | null
 }
 

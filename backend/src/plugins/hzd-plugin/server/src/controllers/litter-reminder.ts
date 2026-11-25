@@ -8,10 +8,15 @@ const WEEK_OPTIONS = [9, 10, 11, 12] as const
 
 interface TemplatedEmailService {
 	sendTemplatedEmail: (
-		emailOptions: { to: string },
+		emailOptions: { to: string; from: string; bcc?: string },
 		emailTemplate: { templateReferenceId: number },
 		data: Record<string, unknown>,
 	) => Promise<unknown>
+}
+
+interface ZuchtMailAddresses {
+	from: string
+	bcc: string
 }
 
 interface LitterReminderRow {
@@ -37,6 +42,16 @@ function readBody(body: unknown): Record<string, unknown> | null {
 
 function readDryRun(body: unknown): boolean {
 	return readBody(body)?.dryRun === true
+}
+
+function readEmailAddress(body: unknown, key: string): string {
+	const source = readBody(body)
+	const raw = source?.[key]
+	return typeof raw === 'string' ? raw.trim() : ''
+}
+
+function isEmailAddress(value: string): boolean {
+	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 }
 
 function readWeeks(body: unknown): number | null {
@@ -129,6 +144,28 @@ async function loadTemplateReferenceId(strapi: Core.Strapi): Promise<number | nu
 	return (await read('published')) ?? (await read('draft'))
 }
 
+async function loadZuchtMailAddresses(
+	strapi: Core.Strapi,
+): Promise<ZuchtMailAddresses> {
+	const read = async (status: 'published' | 'draft') => {
+		const settings = await strapi.documents(HZD_SETTING_UID).findFirst({
+			status,
+			fields: ['WebmasterZuchtFromEmail', 'WebmasterZuchtCCEmail'],
+		})
+		return {
+			from: asTrimmedString(settings?.WebmasterZuchtFromEmail),
+			bcc: asTrimmedString(settings?.WebmasterZuchtCCEmail),
+		}
+	}
+
+	const published = await read('published')
+	const draft = await read('draft')
+	return {
+		from: published.from || draft.from,
+		bcc: published.bcc || draft.bcc,
+	}
+}
+
 async function findDueLitters(
 	strapi: Core.Strapi,
 	cutoffDate: string,
@@ -172,6 +209,10 @@ async function findDueLitters(
 }
 
 export default ({ strapi }: { strapi: Core.Strapi }) => ({
+	async defaults(ctx: { body: unknown }) {
+		ctx.body = await loadZuchtMailAddresses(strapi)
+	},
+
 	async send(ctx: {
 		body?: unknown
 		request: { body?: unknown }
@@ -180,8 +221,16 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 	}) {
 		const weeks = readWeeks(ctx.request.body)
 		const dryRun = readDryRun(ctx.request.body)
+		const from = readEmailAddress(ctx.request.body, 'from')
+		const bcc = readEmailAddress(ctx.request.body, 'bcc')
 		if (!weeks) {
 			return ctx.badRequest('weeks muss 9, 10, 11 oder 12 sein.')
+		}
+		if (!isEmailAddress(from)) {
+			return ctx.badRequest('From muss eine gültige E-Mail-Adresse sein.')
+		}
+		if (bcc && !isEmailAddress(bcc)) {
+			return ctx.badRequest('BCC muss eine gültige E-Mail-Adresse sein.')
 		}
 
 		const templateReferenceId = await loadTemplateReferenceId(strapi)
@@ -212,6 +261,7 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 			log.push(
 				`Mindestalter ${weeks} Wochen, Geburt vor ${formatDateDMY(cutoffDate)}, Template ${templateReferenceId}.`,
 			)
+			log.push(`From ${from}${bcc ? `, BCC ${bcc}` : ''}.`)
 		}
 
 		for (const litter of litters) {
@@ -253,7 +303,11 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 
 			try {
 				const sent = await emailDesigner.sendTemplatedEmail(
-					{ to: email },
+					{
+						to: email,
+						from,
+						...(bcc ? { bcc } : {}),
+					},
 					{ templateReferenceId },
 					litterTemplateData(litter),
 				)
@@ -291,7 +345,8 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
 				const smtpHost = strapi.config.get('plugin::email.providerOptions.host')
 				const smtpPort = strapi.config.get('plugin::email.providerOptions.port')
 				strapi.log.info(
-					`Wurf-Erinnerung an ${email} von SMTP ${String(smtpHost)}:${String(smtpPort)} angenommen`
+					`Wurf-Erinnerung an ${email} von ${from}${bcc ? ` bcc ${bcc}` : ''}`
+					+ ` über SMTP ${String(smtpHost)}:${String(smtpPort)} angenommen`
 					+ ` (${delivery.messageId ?? 'ohne messageId'}): ${delivery.response ?? 'keine Antwort'}`,
 				)
 				results.push({

@@ -136,6 +136,12 @@
     },
     "CS_Importer_config": {
       "type": "json"
+    },
+    "WebmasterZuchtFromEmail": {
+      "type": "email"
+    },
+    "WebmasterZuchtCCEmail": {
+      "type": "email"
     }
   }
 }

@@ -40,6 +40,14 @@ export default [
     },
   },
   {
+    method: "GET",
+    path: "/litters/reminder-settings",
+    handler: "litter-reminder.defaults",
+    config: {
+      policies: [],
+    },
+  },
+  {
     method: "POST",
     path: "/litters/send-reminder",
     handler: "litter-reminder.send",

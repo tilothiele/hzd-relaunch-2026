@@ -500,8 +500,20 @@ export interface ApiAdventCalendarAdventCalendar
     Description: Schema.Attribute.String;
     Hintergrundfarbe: Schema.Attribute.String &
       Schema.Attribute.CustomField<'plugin::color-picker.color'>;
+    Jahr: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 2099;
+          min: 2026;
+        },
+        number
+      >;
     KalenderPlatzhalter: Schema.Attribute.Media<
       'images' | 'files' | 'videos' | 'audios'
+    >;
+    KalenderPlatzhalterAiNote: Schema.Attribute.Enumeration<
+      ['AiGenerated', 'AiModified']
     >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -510,6 +522,33 @@ export interface ApiAdventCalendarAdventCalendar
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
+    SchlussBild: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
+    SchlussBildAiNote: Schema.Attribute.Enumeration<
+      ['AiGenerated', 'AiModified']
+    >;
+    SchlussGruesse: Schema.Attribute.Blocks;
+    TageNachlauf: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 30;
+          min: 2;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<14>;
+    TageVorlauf: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 30;
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<10>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1418,6 +1457,8 @@ export interface ApiHzdSettingHzdSetting extends Struct.SingleTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    WebmasterZuchtCCEmail: Schema.Attribute.Email;
+    WebmasterZuchtFromEmail: Schema.Attribute.Email;
   };
 }
 

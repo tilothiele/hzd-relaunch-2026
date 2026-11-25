@@ -151,6 +151,10 @@ function appendSectionsDeepPopulate(
 					`${base}[advent_calendar][populate][KalenderPlatzhalter]`,
 					'true',
 				)
+				params.set(
+					`${base}[advent_calendar][populate][SchlussBild]`,
+					'true',
+				)
 				break
 			default:
 				// Kein `[populate]=true` — Strapi 5 interpretiert den Wert sonst als Key "true".

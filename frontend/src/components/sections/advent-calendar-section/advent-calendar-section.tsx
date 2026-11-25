@@ -8,8 +8,10 @@ import type { AdventCalendarSection, AdventDay, Image as MediaImage } from '@/ty
 import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
+import { AiNoteLabel } from '@/components/common/ai-note-label'
 import {
 	isAdventAnnouncementVisible,
+	isAdventClosingVisible,
 	isAdventSectionHidden,
 	isDoorOpenable,
 	resolveAdventMoment,
@@ -110,10 +112,14 @@ function AdventAnnouncement ({
 	content,
 	image,
 	imageUrl,
+	imageAlt,
+	aiNote,
 }: {
 	content?: BlocksContent | null
 	image?: MediaImage | null
 	imageUrl?: string | null
+	imageAlt?: string
+	aiNote?: string | null
 }) {
 	const hasText = Array.isArray(content) && content.length > 0
 	if (!hasText && !imageUrl) {
@@ -132,14 +138,17 @@ function AdventAnnouncement ({
 
 	return (
 		<div className='relative mt-6 grid items-center gap-12 sm:grid-cols-2'>
-			<Image
-				src={imageUrl}
-				alt={image?.alternativeText || 'Adventskalender'}
-				width={image?.width ?? 800}
-				height={image?.height ?? 800}
-				className='h-auto w-full rounded-xl object-contain'
-				unoptimized
-			/>
+			<div className='relative'>
+				<Image
+					src={imageUrl}
+					alt={image?.alternativeText || imageAlt || 'Adventskalender'}
+					width={image?.width ?? 800}
+					height={image?.height ?? 800}
+					className='h-auto w-full rounded-xl object-contain'
+					unoptimized
+				/>
+				<AiNoteLabel note={aiNote} />
+			</div>
 			{text}
 		</div>
 	)
@@ -459,7 +468,9 @@ export function AdventCalendarSectionComponent({
 	strapiBaseUrl,
 	theme,
 }: AdventCalendarSectionComponentProps) {
+	const calendar = section.advent_calendar
 	const moment = resolveAdventMoment(section.TestDate)
+	const jahr = calendar?.Jahr ?? null
 	const titleId = useId()
 	const dialogTitleId = useId()
 	const [selectedDay, setSelectedDay] = useState<number | null>(null)
@@ -469,14 +480,14 @@ export function AdventCalendarSectionComponent({
 
 	const daysByNumber = useMemo(() => {
 		const map = new Map<number, AdventDay>()
-		for (const entry of section.advent_calendar?.AdventDay ?? []) {
+		for (const entry of calendar?.AdventDay ?? []) {
 			const day = Number(entry?.Day)
 			if (day >= 1 && day <= 24 && !map.has(day)) {
 				map.set(day, entry)
 			}
 		}
 		return map
-	}, [section.advent_calendar])
+	}, [calendar])
 
 	const selected = selectedDay == null ? null : daysByNumber.get(selectedDay) ?? null
 	const imageUrl = resolveMediaUrl(selected?.AdventImage, strapiBaseUrl)
@@ -489,22 +500,22 @@ export function AdventCalendarSectionComponent({
 	}, [])
 
 	const backgroundColor = adventBackgroundColor(
-		section.advent_calendar?.Hintergrundfarbe,
+		calendar?.Hintergrundfarbe,
 	)
 	const heading = (
 		<h2
 			id={titleId}
 			className='relative text-center text-2xl tracking-wide text-[#f4e7c5] sm:text-4xl'
 		>
-			HZD Adventskalender {moment.year}
+			HZD Adventskalender {jahr ?? ''}
 		</h2>
 	)
 
-	if (isAdventSectionHidden(moment)) {
+	if (jahr == null || isAdventSectionHidden(moment, calendar)) {
 		return null
 	}
 
-	if (isAdventAnnouncementVisible(moment)) {
+	if (isAdventAnnouncementVisible(moment, calendar)) {
 		return (
 			<SectionContainer
 				variant='full-width'
@@ -517,25 +528,27 @@ export function AdventCalendarSectionComponent({
 				<div className='relative mx-auto w-full max-w-5xl px-2 min-[1056px]:px-0'>
 					{heading}
 					<AdventAnnouncement
-						content={section.advent_calendar?.Ankuendigung}
-						image={section.advent_calendar?.KalenderPlatzhalter}
+						content={calendar?.Ankuendigung}
+						image={calendar?.KalenderPlatzhalter}
 						imageUrl={resolveMediaUrl(
-							section.advent_calendar?.KalenderPlatzhalter,
+							calendar?.KalenderPlatzhalter,
 							strapiBaseUrl,
 						)}
+						aiNote={calendar?.KalenderPlatzhalterAiNote}
 					/>
 				</div>
 				</div>
 			</SectionContainer>
 		)
 	}
+	const isClosing = isAdventClosingVisible(moment, calendar)
 	const featuredDay = Math.min(moment.day, 24)
 	const featured = daysByNumber.get(featuredDay) ?? null
 	const featuredImageUrl = resolveMediaUrl(featured?.AdventImage, strapiBaseUrl)
 	const featuredGreeting = featured?.GreetingOfTheDay?.trim() ?? ''
 
 	const openDoor = (day: number) => {
-		if (!isDoorOpenable(moment, day)) {
+		if (!isDoorOpenable(moment, day, calendar)) {
 			return
 		}
 
@@ -561,10 +574,22 @@ export function AdventCalendarSectionComponent({
 				<NightSky />
 			<div className='relative mx-auto w-full max-w-5xl px-2 min-[1056px]:px-0'>
 				<Snowfall />
-				<div className='mb-6'>{heading}</div>
+				<div className={isClosing ? undefined : 'mb-6'}>{heading}</div>
+				{isClosing ? (
+					<AdventAnnouncement
+						content={calendar?.SchlussGruesse}
+						image={calendar?.SchlussBild}
+						imageUrl={resolveMediaUrl(
+							calendar?.SchlussBild,
+							strapiBaseUrl,
+						)}
+						imageAlt='Schlussbild des Adventskalenders'
+						aiNote={calendar?.SchlussBildAiNote}
+					/>
+				) : (
 				<figure className='relative mx-auto w-full'>
 					<p className='relative mb-4 text-center text-lg text-[#f4e7c5]'>
-						Dein Türchenbild von heute, dem {moment.day}.{moment.month}.{moment.year}
+						Dein Türchenbild von heute, dem {moment.day}.{moment.month}.{jahr}
 					</p>
 					{featuredImageUrl ? (
 						<Image
@@ -587,6 +612,7 @@ export function AdventCalendarSectionComponent({
 						</figcaption>
 					) : null}
 				</figure>
+				)}
 				<button
 					type='button'
 					role='switch'
@@ -608,11 +634,11 @@ export function AdventCalendarSectionComponent({
 				{showDoors ? (
 				<div className='relative mt-8 grid grid-flow-dense grid-cols-2 auto-rows-[5.75rem] gap-2.5 sm:auto-rows-[6.5rem] sm:gap-3 lg:grid-cols-6 lg:auto-rows-[7rem]'>
 					{VISUAL_ORDER.map((day) => {
-						const openable = isDoorOpenable(moment, day)
+						const openable = isDoorOpenable(moment, day, calendar)
 						const entry = daysByNumber.get(day)
 						const face = faceFor(day)
 						const doorFaceUrl = resolveMediaUrl(entry?.TuerchenImage, strapiBaseUrl)
-						const hoverLabel = doorHoverLabel(day, moment.year)
+						const hoverLabel = doorHoverLabel(day, jahr)
 						const thumbUrl = openable
 							? resolveThumbnailUrl(entry?.AdventImage, strapiBaseUrl)
 							: null
