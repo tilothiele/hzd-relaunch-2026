@@ -5,6 +5,7 @@ import { theme as globalTheme, type ThemeDefinition } from '@/themes'
 import { fetchNewsArticleBySlug, fetchGlobalLayout } from '@/lib/server/fetch-news-article-by-slug'
 import { enrichSectionsWithSupplementalDocuments } from '@/lib/server/enrich-supplemental-sections'
 import { renderServerSections } from '@/components/sections/server-section-factory'
+import { pagePath } from '@/lib/page-path'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import NotFoundSection from '@/components/sections/not-found-section/not-found-section'
 import { MarkAsRead } from '@/components/news/mark-as-read'
@@ -185,7 +186,7 @@ export default async function ArticlePage({ params }: PageProps) {
 		sections,
 		strapiBaseUrl: baseUrl,
 		theme,
-		privacyPolicy: globalLayout?.PrivacyPolicy ?? null,
+		privacyPolicyHref: pagePath(globalLayout?.datenschutz),
 	})
 
     const pageTitle = article.SEO?.MetaTitle || article.Headline || 'Artikel'

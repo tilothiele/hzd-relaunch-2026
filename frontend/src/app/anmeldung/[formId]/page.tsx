@@ -3,6 +3,7 @@ import { theme as globalTheme } from '@/themes'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { fetchFormByDocumentId } from '@/lib/strapi/api'
 import { FormComponent } from '@/components/form/form'
+import { pagePath } from '@/lib/page-path'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 
 export const dynamic = 'force-dynamic'
@@ -57,8 +58,7 @@ export default async function AnmeldungFormIdPage({ params }: AnmeldungFormIdPag
 				{form ? (
 					<FormComponent
 						form={form}
-						privacyPolicy={globalLayout?.PrivacyPolicy ?? null}
-						strapiBaseUrl={baseUrl}
+						privacyPolicyHref={pagePath(globalLayout?.datenschutz)}
 					/>
 				) : (
 					<div className='flex min-h-[50vh] items-center justify-center px-4 text-center text-sm text-gray-600'>

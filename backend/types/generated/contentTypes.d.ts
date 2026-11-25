@@ -1262,6 +1262,7 @@ export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    datenschutz: Schema.Attribute.Relation<'oneToOne', 'api::page.page'>;
     DrawerMenu: Schema.Attribute.JSON;
     Footer: Schema.Attribute.Component<'layout.footer', false>;
     GalleryDescription: Schema.Attribute.Blocks;
@@ -1279,9 +1280,6 @@ export interface ApiGlobalLayoutGlobalLayout extends Struct.SingleTypeSchema {
       Schema.Attribute.DefaultTo<'Classic'>;
     page: Schema.Attribute.Relation<'oneToOne', 'api::page.page'>;
     PartnerLink: Schema.Attribute.Component<'links.partnerl-link', true>;
-    PrivacyPolicy: Schema.Attribute.Media<
-      'images' | 'files' | 'videos' | 'audios'
-    >;
     publishedAt: Schema.Attribute.DateTime;
     ResultsHeader: Schema.Attribute.Component<
       'blocks.simple-hero-section',

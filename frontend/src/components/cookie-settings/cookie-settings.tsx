@@ -3,7 +3,7 @@
 import { useCallback, useState } from 'react'
 import Link from 'next/link'
 import { useGlobalLayout } from '@/hooks/use-global-layout'
-import { resolveMediaUrl } from '@/components/header/logo-utils'
+import { pagePath } from '@/lib/page-path'
 import { theme } from '@/themes'
 import { useCookieConsent, type ConsentStatus } from '@/hooks/use-cookie-consent'
 import { COOKIE_CONSENT } from '@/components/cookie-consent/cookie-consent-texts'
@@ -35,9 +35,9 @@ const STATUS_CONFIG: Record<ConsentStatus, {
 const BASE_BUTTON = 'rounded border px-4 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60'
 
 export function CookieSettings() {
-	const { globalLayout, baseUrl } = useGlobalLayout()
+	const { globalLayout } = useGlobalLayout()
 	const { status, accept, reject } = useCookieConsent()
-	const privacyPolicyUrl = resolveMediaUrl(globalLayout?.PrivacyPolicy ?? null, baseUrl)
+	const privacyPolicyUrl = pagePath(globalLayout?.datenschutz)
 	const [isSaving, setIsSaving] = useState(false)
 
 	const handleAccept = useCallback(() => {
@@ -92,8 +92,6 @@ export function CookieSettings() {
 							{' '}
 							<Link
 								href={privacyPolicyUrl}
-								target="_blank"
-								rel="noopener noreferrer"
 								className={LINK_CLASS}
 							>
 								{COOKIE_CONSENT.privacyLinkLabel}

@@ -3,16 +3,16 @@
 import { useCallback, useState } from 'react'
 import Link from 'next/link'
 import { useGlobalLayout } from '@/hooks/use-global-layout'
-import { resolveMediaUrl } from '@/components/header/logo-utils'
+import { pagePath } from '@/lib/page-path'
 import { theme } from '@/themes'
 
 import { useCookieConsent } from '@/hooks/use-cookie-consent'
 import { COOKIE_CONSENT } from '@/components/cookie-consent/cookie-consent-texts'
 
 export function CookieBanner() {
-	const { globalLayout, baseUrl } = useGlobalLayout()
+	const { globalLayout } = useGlobalLayout()
 	const { status, accept, reject, isUndecided } = useCookieConsent()
-	const privacyPolicyUrl = resolveMediaUrl(globalLayout?.PrivacyPolicy ?? null, baseUrl)
+	const privacyPolicyUrl = pagePath(globalLayout?.datenschutz)
 	const [isSaving, setIsSaving] = useState(false)
 	const [isHovered, setIsHovered] = useState(false)
 
@@ -52,8 +52,6 @@ export function CookieBanner() {
 							{' '}
 							<Link
 								href={privacyPolicyUrl}
-								target='_blank'
-								rel='noopener noreferrer'
 								className='text-gray-700 underline underline-offset-4 transition-colors hover:text-gray-900'
 							>
 								{COOKIE_CONSENT.privacyLinkLabel}

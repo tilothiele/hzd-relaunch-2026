@@ -6,6 +6,7 @@ import type { Form, FormSection } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { fetchFormByDocumentId } from '@/lib/strapi/api'
 import { useGlobalLayout } from '@/hooks/use-global-layout'
+import { pagePath } from '@/lib/page-path'
 import { FormSectionView } from './form-section'
 
 interface FormSectionClientLoaderProps {
@@ -29,7 +30,6 @@ function unwrapForm(value: unknown): Form | null {
 
 export function FormSectionClientLoader({
 	section,
-	strapiBaseUrl,
 	theme,
 }: FormSectionClientLoaderProps) {
 	const populatedForm = unwrapForm(section.form)
@@ -80,8 +80,7 @@ export function FormSectionClientLoader({
 	return (
 		<FormSectionView
 			form={form ?? populatedForm}
-			privacyPolicy={globalLayout?.PrivacyPolicy ?? null}
-			strapiBaseUrl={strapiBaseUrl}
+			privacyPolicyHref={pagePath(globalLayout?.datenschutz)}
 			theme={theme}
 			sectionId={section.id}
 		/>

@@ -469,7 +469,7 @@ export interface GlobalLayout {
 	SOS?: ComponentLayoutSOS | null
 	Sections?: StartpageSection[] | null
 	PartnerLink?: PartnerLink[] | null
-	PrivacyPolicy?: Image | null
+	datenschutz?: Pick<Page, 'slug' | 'title'> | null
 	page?: Page | null
 	authenticated_page?: Page | null
 	announcements?: Announcement[] | null

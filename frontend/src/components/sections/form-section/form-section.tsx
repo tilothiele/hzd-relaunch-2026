@@ -1,6 +1,6 @@
 'use client'
 
-import type { Form, Image } from '@/types'
+import type { Form } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { FormComponent } from '@/components/form/form'
@@ -8,16 +8,14 @@ import { Typography } from '@mui/material'
 
 interface FormSectionViewProps {
 	form: Form | null
-	privacyPolicy?: Image | null
-	strapiBaseUrl: string
+	privacyPolicyHref?: string | null
 	theme: ThemeDefinition
 	sectionId?: string | number | null
 }
 
 export function FormSectionView({
 	form,
-	privacyPolicy,
-	strapiBaseUrl,
+	privacyPolicyHref,
 	theme,
 	sectionId,
 }: FormSectionViewProps) {
@@ -32,8 +30,7 @@ export function FormSectionView({
 			{form ? (
 				<FormComponent
 					form={form}
-					privacyPolicy={privacyPolicy}
-					strapiBaseUrl={strapiBaseUrl}
+					privacyPolicyHref={privacyPolicyHref}
 				/>
 			) : (
 				<Typography className='text-center text-gray-600'>

@@ -6,7 +6,7 @@ import Link from 'next/link'
 import 'leaflet/dist/leaflet.css'
 import type L from 'leaflet'
 import { useCookieConsent } from '@/hooks/use-cookie-consent'
-import { resolveMediaUrl } from '@/components/header/logo-utils'
+import { pagePath } from '@/lib/page-path'
 import { useGlobalLayout } from '@/hooks/use-global-layout'
 import { theme } from '@/themes'
 import OpenWithIcon from '@mui/icons-material/OpenWith'
@@ -114,9 +114,9 @@ export function HzdMap({ isVisible, items, userLocation, height = '400px' }: Hzd
     const resizeStartRef = useRef<{ y: number; height: number } | null>(null)
 
     const { isAccepted, accept } = useCookieConsent()
-    const { globalLayout, baseUrl: globalBaseUrl } = useGlobalLayout()
+    const { globalLayout } = useGlobalLayout()
 
-    const privacyPolicyUrl = resolveMediaUrl(globalLayout?.PrivacyPolicy ?? null, globalBaseUrl)
+    const privacyPolicyUrl = pagePath(globalLayout?.datenschutz)
 
     useEffect(() => {
         setIsMounted(true)
@@ -233,7 +233,6 @@ export function HzdMap({ isVisible, items, userLocation, height = '400px' }: Hzd
                         {privacyPolicyUrl && (
                             <Link
                                 href={privacyPolicyUrl}
-                                target='_blank'
                                 className='text-sm text-gray-600 underline hover:text-gray-900'
                             >
                                 Datenschutzerklärung lesen

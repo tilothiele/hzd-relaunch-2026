@@ -19,7 +19,6 @@ import CloseIcon from '@mui/icons-material/Close'
 import type {
 	Form,
 	FormSubmitButton,
-	Image,
 	StandardIdentifier,
 	DogStandardIdentifier,
 	ShortTextInput,
@@ -31,7 +30,6 @@ import type {
 	FormField,
 } from '@/types'
 import { renderFormField } from './form-field-renderer'
-import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { renderStrapiBlocks } from '@/lib/strapi-blocks'
 import { AltchaField } from '@/components/altcha/altcha-field'
 import { RequiredFieldsNote } from '@/components/form/required-fields-note'
@@ -43,8 +41,7 @@ const FORM_SUBMIT_EVENT = 'form-submit'
 
 interface FormComponentProps {
 	form: Form
-	privacyPolicy?: Image | null
-	strapiBaseUrl?: string | null
+	privacyPolicyHref?: string | null
 }
 
 function resolveSuccessTarget(raw: string | null | undefined): {
@@ -213,8 +210,7 @@ function getInputFieldEntries(fields: FormField[] | null | undefined): InputFiel
 
 export function FormComponent({
 	form,
-	privacyPolicy,
-	strapiBaseUrl,
+	privacyPolicyHref,
 }: FormComponentProps) {
 	const router = useRouter()
 	const { isAuthenticated, authState } = useAuth()
@@ -225,7 +221,7 @@ export function FormComponent({
 	const [altchaReset, setAltchaReset] = useState(0)
 	const [showThankYouModal, setShowThankYouModal] = useState(false)
 	const [isHovered, setIsHovered] = useState(false)
-	const privacyPolicyUrl = resolveMediaUrl(privacyPolicy, strapiBaseUrl)
+	const privacyPolicyUrl = privacyPolicyHref?.trim() || null
 
 	// Pflichtangaben (bestehende Datenschutz-Checkbox)
 	const isPrivacyPolicyRequired = form.InclPrivacyPolicy && privacyPolicyUrl
@@ -436,7 +432,7 @@ export function FormComponent({
 					label={
 						<>
 							Ich akzeptiere hiermit, dass meine Daten (Pflichteingaben) gemäß den{' '}
-							<Link href={privacyPolicyUrl} target='_blank' rel='noopener noreferrer' underline='hover'>
+							<Link href={privacyPolicyUrl} underline='hover'>
 								Datenschutzbestimmungen
 							</Link>{' '}
 							verarbeitet werden.
@@ -459,7 +455,7 @@ export function FormComponent({
 					label={
 						<>
 							Ich akzeptiere hiermit, dass meine Daten (freiwillige Angaben) gemäß den{' '}
-							<Link href={privacyPolicyUrl} target='_blank' rel='noopener noreferrer' underline='hover'>
+							<Link href={privacyPolicyUrl} underline='hover'>
 								Datenschutzbestimmungen
 							</Link>{' '}
 							verarbeitet werden.

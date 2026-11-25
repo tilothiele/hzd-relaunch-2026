@@ -2,6 +2,7 @@ import { MainPageStructure } from '../main-page-structure'
 import { theme as globalTheme } from '@/themes'
 import { fetchPageBySlug, fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { renderServerSections } from '@/components/sections/server-section-factory'
+import { pagePath } from '@/lib/page-path'
 import NotFoundSection from '@/components/sections/not-found-section/not-found-section'
 import AccessForbiddenSection from '@/components/sections/access-forbidden-section/access-forbidden-section'
 import { AuthGuard } from '@/components/auth-guard/auth-guard'
@@ -105,7 +106,7 @@ export default async function Page({ params }: PageProps) {
 		strapiBaseUrl: baseUrl,
 		theme,
 		logo: globalLayout?.Logo,
-		privacyPolicy: globalLayout?.PrivacyPolicy ?? null,
+		privacyPolicyHref: pagePath(globalLayout?.datenschutz),
 	})
 
 	if (isPublicAccessible && !hasGroupRestriction) {

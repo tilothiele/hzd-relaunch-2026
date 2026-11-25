@@ -57,16 +57,6 @@
       "relation": "oneToOne",
       "target": "api::page.page"
     },
-    "PrivacyPolicy": {
-      "type": "media",
-      "multiple": false,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ]
-    },
     "SOS": {
       "type": "component",
       "component": "layout.sos",
@@ -97,6 +87,11 @@
     },
     "SocialLinkIG": {
       "type": "string"
+    },
+    "datenschutz": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::page.page"
     }
   }
 }

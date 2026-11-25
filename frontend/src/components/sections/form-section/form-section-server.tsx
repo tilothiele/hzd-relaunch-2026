@@ -1,14 +1,15 @@
-import type { Form, FormSection, Image } from '@/types'
+import type { Form, FormSection } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { fetchFormByDocumentId } from '@/lib/strapi/api'
 import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
+import { pagePath } from '@/lib/page-path'
 import { FormSectionView } from './form-section'
 
 interface FormSectionServerProps {
 	section: FormSection
 	strapiBaseUrl: string
 	theme: ThemeDefinition
-	privacyPolicy?: Image | null
+	privacyPolicyHref?: string | null
 }
 
 function unwrapForm(value: unknown): Form | null {
@@ -26,9 +27,8 @@ function unwrapForm(value: unknown): Form | null {
 
 export async function FormSectionServerComponent({
 	section,
-	strapiBaseUrl,
 	theme,
-	privacyPolicy,
+	privacyPolicyHref,
 }: FormSectionServerProps) {
 	const populatedForm = unwrapForm(section.form)
 	const documentId = populatedForm?.documentId
@@ -46,21 +46,20 @@ export async function FormSectionServerComponent({
 		}
 	}
 
-	let resolvedPrivacyPolicy = privacyPolicy ?? null
-	if (resolvedPrivacyPolicy === null && form?.InclPrivacyPolicy) {
+	let resolvedPrivacyPolicyHref = privacyPolicyHref ?? null
+	if (resolvedPrivacyPolicyHref === null && form?.InclPrivacyPolicy) {
 		try {
 			const layout = await fetchGlobalLayout()
-			resolvedPrivacyPolicy = layout.globalLayout?.PrivacyPolicy ?? null
+			resolvedPrivacyPolicyHref = pagePath(layout.globalLayout?.datenschutz)
 		} catch {
-			resolvedPrivacyPolicy = null
+			resolvedPrivacyPolicyHref = null
 		}
 	}
 
 	return (
 		<FormSectionView
 			form={form}
-			privacyPolicy={resolvedPrivacyPolicy}
-			strapiBaseUrl={strapiBaseUrl}
+			privacyPolicyHref={resolvedPrivacyPolicyHref}
 			theme={theme}
 			sectionId={section.id}
 		/>

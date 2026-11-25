@@ -6,6 +6,7 @@ import { fetchGlobalLayout } from '@/lib/server/fetch-page-by-slug'
 import { enrichSectionsWithSupplementalDocuments } from '@/lib/server/enrich-supplemental-sections'
 import { fetchCategoryBySlug, fetchArticlesByCategory } from '@/lib/server/fetch-articles-by-category'
 import { renderServerSections } from '@/components/sections/server-section-factory'
+import { pagePath } from '@/lib/page-path'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import NotFoundSection from '@/components/sections/not-found-section/not-found-section'
 import { ArticleCard } from '@/components/articles/article-card'
@@ -140,7 +141,7 @@ export default async function ArticlesCategoryPage({ params, searchParams }: Pag
 				strapiBaseUrl: baseUrl,
 				theme: theme,
 				logo: globalLayout?.Logo,
-				privacyPolicy: globalLayout?.PrivacyPolicy ?? null,
+				privacyPolicyHref: pagePath(globalLayout?.datenschutz),
 			})}
 
 			{/* Category Header */}

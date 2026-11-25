@@ -1,4 +1,4 @@
-import type { Image, StartpageSection } from '@/types'
+import type { StartpageSection } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { HeroSectionSlideShowComponent } from './hero-section-slide-show/hero-section-slide-show'
 import { CardSectionComponent } from './card-section/card-section'
@@ -30,7 +30,7 @@ interface RenderSectionParams {
 	key: string
 	logo?: any // Add logo prop
 	hzdSetting?: any // Add hzdSetting prop
-	privacyPolicy?: Image | null
+	privacyPolicyHref?: string | null
 }
 
 function renderSection({
@@ -40,7 +40,7 @@ function renderSection({
 	key,
 	logo,
 	hzdSetting,
-	privacyPolicy,
+	privacyPolicyHref,
 }: RenderSectionParams) {
 	//console.log('Server Factory Rendering:', section.__typename)
 	switch (section.__typename) {
@@ -221,7 +221,7 @@ function renderSection({
 					section={section}
 					strapiBaseUrl={strapiBaseUrl}
 					theme={theme}
-					privacyPolicy={privacyPolicy}
+					privacyPolicyHref={privacyPolicyHref}
 				/>
 			)
 		case 'ComponentBlocksMdTextSection':
@@ -252,14 +252,14 @@ export function renderServerSections({
 	theme,
 	logo,
 	hzdSetting,
-	privacyPolicy,
+	privacyPolicyHref,
 }: {
 	sections: StartpageSection[] | null | undefined
 	strapiBaseUrl: string
 	theme: ThemeDefinition
 	logo?: any // Add logo prop
 	hzdSetting?: any // Add hzdSetting prop
-	privacyPolicy?: Image | null
+	privacyPolicyHref?: string | null
 }) {
 	if (!sections?.length) {
 		return null
@@ -275,7 +275,7 @@ export function renderServerSections({
 				key,
 				logo,
 				hzdSetting,
-				privacyPolicy,
+				privacyPolicyHref,
 			})
 		})
 		.filter((node) => node !== null)

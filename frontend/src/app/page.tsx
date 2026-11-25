@@ -4,6 +4,7 @@ import { getStrapiBaseUrl } from '@/lib/server/strapi-client'
 import { fetchLayoutServer, fetchMe } from '@/lib/strapi/api'
 import { enrichSectionsWithSupplementalDocuments } from '@/lib/server/enrich-supplemental-sections'
 import { renderServerSections } from '@/components/sections/server-section-factory'
+import { pagePath } from '@/lib/page-path'
 import type { GlobalLayout, Page } from '@/types'
 import { cookies } from 'next/headers'
 import { STRAPI_JWT_COOKIE } from '@/lib/auth-cookie'
@@ -89,7 +90,7 @@ export default async function Home() {
 		theme,
 		logo: globalLayout?.Logo,
 		hzdSetting: globalLayout?.HzdSetting,
-		privacyPolicy: globalLayout?.PrivacyPolicy ?? null,
+		privacyPolicyHref: pagePath(globalLayout?.datenschutz),
 	})
 
 	return (

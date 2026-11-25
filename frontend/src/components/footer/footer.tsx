@@ -5,6 +5,7 @@ import type { GlobalLayout } from '@/types'
 import Image from 'next/image'
 import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '../header/logo-utils'
+import { pagePath } from '@/lib/page-path'
 import { SocialLinks } from '../header/social-links'
 import { PhoneLink } from '@/components/common/phone-link'
 
@@ -39,6 +40,7 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 	const logoHeight = 156
 
 	const partnerLinks = globalLayout?.PartnerLink ?? []
+	const datenschutzHref = pagePath(globalLayout?.datenschutz)
 	const footerContacts = (globalLayout?.Footer?.contacts ?? []).slice(0, 3)
 	const appVersion = process.env.NEXT_PUBLIC_APP_VERSION
 
@@ -137,9 +139,11 @@ export function Footer({ globalLayout, strapiBaseUrl, theme }: FooterProps) {
 									<div><Link href='/impressum' className='text-sm transition-colors hover:text-yellow-400 underline'>
 										Impressum
 									</Link></div>
-									<div><Link href={resolveMediaUrl(globalLayout?.PrivacyPolicy, strapiBaseUrl) ?? '/datenschutz'} className='text-sm transition-colors hover:text-yellow-400 underline'>
-										Datenschutz
-									</Link></div>
+									{datenschutzHref ? (
+										<div><Link href={datenschutzHref} className='text-sm transition-colors hover:text-yellow-400 underline'>
+											Datenschutz
+										</Link></div>
+									) : null}
 									<div><Link href='/cookie-einstellungen' className='text-sm transition-colors hover:text-yellow-400 underline'>
 										Datenschutz-Einstellungen
 									</Link></div>

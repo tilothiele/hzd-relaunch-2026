@@ -30,7 +30,9 @@ export function buildGlobalLayoutPopulate(): Record<string, unknown> {
 				},
 			},
 			Impressum: true,
-			PrivacyPolicy: true,
+			datenschutz: {
+				fields: ['slug', 'title'],
+			},
 			CalendarHeader: {
 				populate: {
 					HeroImage: true,
