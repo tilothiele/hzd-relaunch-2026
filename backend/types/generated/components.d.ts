@@ -20,6 +20,7 @@ export interface BlocksAdventCalendarSection extends Struct.ComponentSchema {
       'oneToOne',
       'api::advent-calendar.advent-calendar'
     >;
+    AdventKalenderPadding: Schema.Attribute.Component<'layout.padding', false>;
     TestDate: Schema.Attribute.DateTime;
   };
 }

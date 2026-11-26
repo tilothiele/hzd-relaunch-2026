@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-11-25T21:16:12.898Z"
+    "x-generation-date": "2026-11-26T20:37:09.634Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -31884,6 +31884,9 @@
           },
           "advent_calendar": {
             "$ref": "#/components/schemas/AdventCalendar"
+          },
+          "AdventKalenderPadding": {
+            "$ref": "#/components/schemas/LayoutPaddingComponent"
           }
         }
       },

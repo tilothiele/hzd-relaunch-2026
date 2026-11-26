@@ -502,6 +502,16 @@ export function AdventCalendarSectionComponent({
 	const backgroundColor = adventBackgroundColor(
 		calendar?.Hintergrundfarbe,
 	)
+	const mapPadding = (size: 'small' | 'middle' | 'large' | null | undefined) => {
+		switch (size) {
+			case 'small': return '1rem'
+			case 'middle': return '2rem'
+			case 'large': return '3rem'
+			default: return '2.5rem' // Vorheriger Standard-Wert ohne Padding-Konfiguration
+		}
+	}
+	const paddingTop = mapPadding(section.AdventKalenderPadding?.Top)
+	const paddingBottom = mapPadding(section.AdventKalenderPadding?.Bottom)
 	const heading = (
 		<h2
 			id={titleId}
@@ -520,8 +530,8 @@ export function AdventCalendarSectionComponent({
 			<SectionContainer
 				variant='full-width'
 				backgroundColor={backgroundColor}
-				paddingTop='2.5rem'
-				paddingBottom='2.5rem'
+				paddingTop={paddingTop}
+				paddingBottom={paddingBottom}
 			>
 				<div className='relative w-full'>
 					<NightSky />
@@ -567,8 +577,8 @@ export function AdventCalendarSectionComponent({
 		<SectionContainer
 			variant='full-width'
 			backgroundColor={backgroundColor}
-			paddingTop='2.5rem'
-			paddingBottom='2.5rem'
+			paddingTop={paddingTop}
+			paddingBottom={paddingBottom}
 		>
 			<div className='relative w-full'>
 				<NightSky />

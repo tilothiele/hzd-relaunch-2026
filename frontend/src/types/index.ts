@@ -413,6 +413,7 @@ export interface AdventCalendarSection {
 	id?: string | number | null
 	TestDate?: string | null
 	advent_calendar?: AdventCalendar | null
+	AdventKalenderPadding?: ComponentLayoutPadding | null
 }
 
 export type StartpageSection = HeroSectionSlideShow | CardSection | RichTextSection | SupplementalDocumentGroupSection | TeaserTextWithImageSection | TextColumnsSection | ImageGallerySection | DetailedImageGallerySection | SimpleCtaSection | ActionImagesSection | ContactGroupSection | NewsArticlesSection | ContactMailerSection | SimpleHeroSection | DocumentBundleSection | TableOfContentSection | ChampionsSection | PassedDogsSection | BlackBoardSection | FormSection | MdTextSection | AdventCalendarSection

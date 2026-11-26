@@ -12,6 +12,11 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::advent-calendar.advent-calendar"
+    },
+    "AdventKalenderPadding": {
+      "type": "component",
+      "component": "layout.padding",
+      "repeatable": false
     }
   },
   "config": {}

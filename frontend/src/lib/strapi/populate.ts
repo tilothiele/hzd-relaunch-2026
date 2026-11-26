@@ -98,6 +98,7 @@ function appendSectionsDeepPopulate(
 			case 'blocks.text-columns-section':
 				params.set(`${base}[TextColumn][populate][ColumnActionButton]`, '*')
 				params.set(`${base}[TextColumn][populate][BulletItems]`, '*')
+				params.set(`${base}[Padding]`, 'true')
 				break
 			case 'blocks.image-gallery-section':
 				params.set(`${base}[GalleryImages]`, 'true')
@@ -139,6 +140,7 @@ function appendSectionsDeepPopulate(
 				params.set(`${base}[form][fields][1]`, 'Name')
 				break
 			case 'blocks.advent-calendar-section':
+				params.set(`${base}[AdventKalenderPadding]`, 'true')
 				params.set(
 					`${base}[advent_calendar][populate][AdventDay][populate][AdventImage]`,
 					'true',

@@ -89,11 +89,13 @@ const sectionComponentPopulate = (
 				populate: {
 					Image: true,
 					ActionButton: true,
+					TTWI_Padding: true,
 				},
 			}
 		case 'blocks.text-columns-section':
 			return {
 				populate: {
+					Padding: true,
 					TextColumn: {
 						populate: {
 							ColumnActionButton: true,
@@ -190,6 +192,7 @@ const sectionComponentPopulate = (
 		case 'blocks.advent-calendar-section':
 			return {
 				populate: {
+					AdventKalenderPadding: true,
 					advent_calendar: {
 						populate: {
 							KalenderPlatzhalter: true,
