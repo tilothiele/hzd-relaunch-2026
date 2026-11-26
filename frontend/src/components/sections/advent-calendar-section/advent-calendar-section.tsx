@@ -8,6 +8,11 @@ import type { AdventCalendarSection, AdventDay, Image as MediaImage } from '@/ty
 import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
+import {
+	SECTION_PADDING,
+	sectionPaddingBottom,
+	sectionPaddingTop,
+} from '@/lib/section-padding'
 import { AiNoteLabel } from '@/components/common/ai-note-label'
 import {
 	isAdventAnnouncementVisible,
@@ -502,16 +507,9 @@ export function AdventCalendarSectionComponent({
 	const backgroundColor = adventBackgroundColor(
 		calendar?.Hintergrundfarbe,
 	)
-	const mapPadding = (size: 'small' | 'middle' | 'large' | null | undefined) => {
-		switch (size) {
-			case 'small': return '1rem'
-			case 'middle': return '2rem'
-			case 'large': return '3rem'
-			default: return '2.5rem' // Vorheriger Standard-Wert ohne Padding-Konfiguration
-		}
-	}
-	const paddingTop = mapPadding(section.AdventKalenderPadding?.Top)
-	const paddingBottom = mapPadding(section.AdventKalenderPadding?.Bottom)
+	const paddingConfig = SECTION_PADDING.adventCalendar
+	const paddingTop = sectionPaddingTop(paddingConfig, section.AdventKalenderPadding?.Top)
+	const paddingBottom = sectionPaddingBottom(paddingConfig, section.AdventKalenderPadding?.Bottom)
 	const heading = (
 		<h2
 			id={titleId}

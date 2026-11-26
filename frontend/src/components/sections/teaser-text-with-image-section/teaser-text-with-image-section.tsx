@@ -2,6 +2,11 @@ import Image from 'next/image'
 import type { TeaserTextWithImageSection } from '@/types'
 import type { ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
+import {
+	SECTION_PADDING,
+	sectionPaddingBottom,
+	sectionPaddingTop,
+} from '@/lib/section-padding'
 import { ActionButton } from '@/components/ui/action-button'
 import { SectionContainer } from '../section-container/section-container'
 
@@ -30,17 +35,9 @@ export function TeaserTextWithImageSectionComponent({
 	const isImageLeft = imagePosition === 'left'
 	const backgroundColor = section.TeaserOddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
 
-	const mapPadding = (size: 'small' | 'middle' | 'large' | null | undefined) => {
-		switch (size) {
-			case 'small': return '1rem'
-			case 'middle': return '2rem'
-			case 'large': return '3rem'
-			default: return '1em'
-		}
-	}
-
-	const paddingTop = mapPadding(section.TTWI_Padding?.Top)
-	const paddingBottom = mapPadding(section.TTWI_Padding?.Bottom)
+	const paddingConfig = SECTION_PADDING.teaserTextWithImage
+	const paddingTop = sectionPaddingTop(paddingConfig, section.TTWI_Padding?.Top)
+	const paddingBottom = sectionPaddingBottom(paddingConfig, section.TTWI_Padding?.Bottom)
 
 	return (
 		<SectionContainer

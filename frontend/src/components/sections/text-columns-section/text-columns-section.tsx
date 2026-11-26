@@ -5,6 +5,11 @@ import { Accordion, AccordionSummary, AccordionDetails } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import type { TextColumnsSection, BulletItem } from '@/types'
 import type { ThemeDefinition } from '@/themes'
+import {
+	SECTION_PADDING,
+	sectionPaddingBottom,
+	sectionPaddingTop,
+} from '@/lib/section-padding'
 import { ActionButton } from '@/components/ui/action-button'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { useScrollAnimation } from '@/hooks/use-scroll-animation'
@@ -121,18 +126,9 @@ export function TextColumnsSectionComponent({
 
 	const backgroundColor = section.TextColumnsOddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
 
-	const mapPadding = (size: 'small' | 'middle' | 'large' | null | undefined) => {
-		switch (size) {
-			case 'small': return '1rem'
-			case 'middle': return '3rem'
-			case 'large': return '5rem'
-			default: return '1.2rem' // Default top padding for TextColumns
-		}
-	}
-
-	// Use specific defaults if not provided to match original style '1.2rem' top, '1.5rem' bottom
-	const paddingTop = section.Padding?.Top ? mapPadding(section.Padding.Top) : '1.2rem'
-	const paddingBottom = section.Padding?.Bottom ? mapPadding(section.Padding.Bottom) : '1.5rem'
+	const paddingConfig = SECTION_PADDING.textColumns
+	const paddingTop = sectionPaddingTop(paddingConfig, section.Padding?.Top)
+	const paddingBottom = sectionPaddingBottom(paddingConfig, section.Padding?.Bottom)
 
 	return (
 		<SectionContainer

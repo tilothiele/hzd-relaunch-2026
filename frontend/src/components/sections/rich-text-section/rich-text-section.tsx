@@ -1,5 +1,10 @@
 import type { RichTextSection } from '@/types'
 import type { ThemeDefinition } from '@/themes'
+import {
+	SECTION_PADDING,
+	sectionPaddingBottom,
+	sectionPaddingTop,
+} from '@/lib/section-padding'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 
 interface RichTextSectionComponentProps {
@@ -14,17 +19,9 @@ export function RichTextSectionComponent({
 }: RichTextSectionComponentProps) {
 	const backgroundColor = section.RichTextOddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
 
-	const mapPadding = (size: 'small' | 'middle' | 'large' | null | undefined) => {
-		switch (size) {
-			case 'small': return '1rem'
-			case 'middle': return '2rem'
-			case 'large': return '3rem'
-			default: return '1em'
-		}
-	}
-
-	const paddingTop = mapPadding(section.RichTextPadding?.Top)
-	const paddingBottom = mapPadding(section.RichTextPadding?.Bottom)
+	const paddingConfig = SECTION_PADDING.richText
+	const paddingTop = sectionPaddingTop(paddingConfig, section.RichTextPadding?.Top)
+	const paddingBottom = sectionPaddingBottom(paddingConfig, section.RichTextPadding?.Bottom)
 
 	return (
 		<SectionContainer
