@@ -6,6 +6,11 @@ import type { CardItem, CardSection } from '@/types'
 import { theme as globalTheme, type ThemeDefinition } from '@/themes'
 import { resolveMediaUrl } from '@/components/header/logo-utils'
 import { ActionButton } from '@/components/ui/action-button'
+import {
+	SECTION_PADDING,
+	sectionPaddingBottom,
+	sectionPaddingTop,
+} from '@/lib/section-padding'
 import { AiNoteLabel } from '@/components/common/ai-note-label'
 import { SectionContainer } from '@/components/sections/section-container/section-container'
 import { BorderedCardItem } from './bordered-card-item'
@@ -110,14 +115,20 @@ export function CardSectionComponent({
 	const backgroundColor = section.CardColumnsOddEven === 'Odd' ? theme.oddBgColor : theme.evenBgColor
 	const isBorderedBox = section.CardLayout === 'Bordered_Box'
 
+	const paddingConfig = isBorderedBox
+		? SECTION_PADDING.cardSectionBorderedBox
+		: SECTION_PADDING.cardSectionFullCover
+	const paddingTop = sectionPaddingTop(paddingConfig, section.CardsPadding?.Top)
+	const paddingBottom = sectionPaddingBottom(paddingConfig, section.CardsPadding?.Bottom)
+
 	if (isBorderedBox) {
 		return (
 			<SectionContainer
 				variant='max-width'
 				id={section.CardsAnchor || undefined}
 				backgroundColor={backgroundColor}
-				paddingTop='3em'
-				paddingBottom='3em'
+				paddingTop={paddingTop}
+				paddingBottom={paddingBottom}
 			>
 				{section.CardHeadline && (
 					<Typography
@@ -180,6 +191,8 @@ export function CardSectionComponent({
 			variant='full-width'
 			id={section.CardsAnchor || undefined}
 			backgroundColor={backgroundColor}
+			paddingTop={paddingTop}
+			paddingBottom={paddingBottom}
 		>
 			<Box
 				ref={elementRef}

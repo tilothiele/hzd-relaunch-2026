@@ -69,6 +69,7 @@ function appendSectionsDeepPopulate(
 				params.set(`${base}[CardItem][populate][BackgroundImage]`, 'true')
 				params.set(`${base}[CardItem][populate][ActionButton]`, '*')
 				params.set(`${base}[CardItem][populate][ColorTheme]`, '*')
+				params.set(`${base}[CardsPadding]`, 'true')
 				break
 			case 'blocks.supplemental-document-group-section':
 				// Dokumente werden in enrich-supplemental-sections nachgeladen

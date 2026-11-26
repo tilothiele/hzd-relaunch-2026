@@ -130,6 +130,7 @@ export interface BlocksCardSection extends Struct.ComponentSchema {
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'Full Cover'>;
     CardsAnchor: Schema.Attribute.String;
+    CardsPadding: Schema.Attribute.Component<'layout.padding', false>;
   };
 }
 

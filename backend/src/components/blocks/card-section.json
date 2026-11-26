@@ -32,6 +32,11 @@
         "Full Cover",
         "Bordered Box"
       ]
+    },
+    "CardsPadding": {
+      "type": "component",
+      "component": "layout.padding",
+      "repeatable": false
     }
   },
   "config": {}

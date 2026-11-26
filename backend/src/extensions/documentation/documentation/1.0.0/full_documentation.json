@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2026-11-26T20:37:09.634Z"
+    "x-generation-date": "2026-11-26T21:29:07.790Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -29775,6 +29775,9 @@
               "Full Cover",
               "Bordered Box"
             ]
+          },
+          "CardsPadding": {
+            "$ref": "#/components/schemas/LayoutPaddingComponent"
           }
         }
       },

@@ -33,6 +33,7 @@ const sectionComponentPopulate = (
 		case 'blocks.card-section':
 			return {
 				populate: {
+					CardsPadding: true,
 					CardItem: {
 						populate: {
 							BackgroundImage: true,

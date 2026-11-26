@@ -65,6 +65,7 @@ export interface CardSection {
 	CardItem?: CardItem[] | null
 	CardsAnchor?: string | null
 	CardLayout?: 'Full_Cover' | 'Bordered_Box' | null
+	CardsPadding?: ComponentLayoutPadding | null
 }
 
 export interface RichTextSection {

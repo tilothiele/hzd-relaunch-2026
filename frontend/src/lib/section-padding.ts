@@ -24,6 +24,8 @@ export type SectionPaddingKey =
 	| 'teaserTextWithImage'
 	| 'textColumns'
 	| 'adventCalendar'
+	| 'cardSectionBorderedBox'
+	| 'cardSectionFullCover'
 
 export const SECTION_PADDING: Record<SectionPaddingKey, SectionPaddingConfig> = {
 	richText: {
@@ -53,6 +55,20 @@ export const SECTION_PADDING: Record<SectionPaddingKey, SectionPaddingConfig> = 
 		small: '1rem',
 		middle: '2rem',
 		large: '3rem',
+	},
+	cardSectionBorderedBox: {
+		defaultTop: '3em',
+		defaultBottom: '3em',
+		small: '1rem',
+		middle: '2rem',
+		large: '3rem',
+	},
+	cardSectionFullCover: {
+		defaultTop: '0',
+		defaultBottom: '0',
+		small: '1rem',
+		middle: '3rem',
+		large: '5rem',
 	},
 }
 
