@@ -263,7 +263,7 @@ async function nextOrderLetter(
 
 const LITTERED_FIRST_POPULATE = {
   breeder: {
-    fields: ['documentId', 'kennelName', 'WebsiteUrl', 'Phone'],
+    fields: ['documentId', 'kennelName', 'WebsiteUrl', 'Phone', 'BreederEmail'],
     populate: {
       Address: true,
     },

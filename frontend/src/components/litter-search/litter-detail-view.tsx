@@ -109,6 +109,7 @@ export function LitterDetailView({
     const breederPhone = litter.breeder?.Phone?.trim()
         || litter.breeder?.Address?.Address2?.trim()
         || ''
+    const breederEmail = litter.breeder?.BreederEmail?.trim() ?? ''
     const breederAddress = [
         litter.breeder?.Address?.Address1,
         litter.breeder?.Address?.Zip,
@@ -314,6 +315,20 @@ export function LitterDetailView({
                                         className="text-primary underline transition-colors"
                                         style={{ color: theme.submitButtonColor }}
                                     />
+                                }
+                            />
+                        )}
+                        {breederEmail && (
+                            <DetailRow
+                                label="E-Mail"
+                                value={
+                                    <a
+                                        href={`mailto:${breederEmail}`}
+                                        className="text-primary hover:underline transition-colors break-all"
+                                        style={{ color: theme.submitButtonColor }}
+                                    >
+                                        {breederEmail}
+                                    </a>
                                 }
                             />
                         )}
