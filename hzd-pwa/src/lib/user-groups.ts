@@ -8,7 +8,7 @@ function readGroupKey(group: unknown): string {
 		return ''
 	}
 
-	console.log('group', group)
+	//console.log('group', group)
 	const record = group as Record<string, unknown>
 	const attributes = record.attributes
 	const nested = attributes
@@ -47,7 +47,7 @@ export function belongsToGroup(
 	groupKey: string,
 ): boolean {
 
-	console.log('belongsToGroup', { user, groupKey })
+	//console.log('belongsToGroup', { user, groupKey })
 	const expected = groupKey.trim().toLowerCase()
 	if (!expected) {
 		return false
