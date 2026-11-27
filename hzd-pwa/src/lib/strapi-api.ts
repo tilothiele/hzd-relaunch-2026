@@ -68,10 +68,11 @@ export function formatAuthDisplayName(
 }
 
 export async function fetchMe(token: string): Promise<AuthUser | null> {
+	// Hinweis: nur Attribute des users-permissions.user-Modells populieren –
+	// ein ungültiger Schlüssel (z. B. `member`) bricht die ganze Anfrage mit 400.
 	const params = new URLSearchParams({
 		'populate[role]': '*',
 		'populate[user_groups]': '*',
-		'populate[member][populate]': '*',
 	})
 
 	const response = await fetch(
